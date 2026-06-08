@@ -1,0 +1,1953 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>프로젝트 AI 문서 자동화 — MVP 발표</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg0: #0b1020;
+        --bg1: #131a31;
+        --ink: #1e2330;
+        --ink2: #5b6478;
+        --line: #e8eaf2;
+        --card: #ffffff;
+        --soft: #f6f7fc;
+        --accent: #5b5bf0;
+        --accent2: #8b5cf6;
+        --cyan: #06b6d4;
+        --mvp: #16a34a;
+        --mvpp: #2563eb;
+        --term-bg: #0f1629;
+        --term-ink: #d7e0f5;
+        --shadow: 0 30px 80px rgba(10, 15, 40, 0.45);
+        --side: 215px;
+        --mono:
+          "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+          monospace;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family:
+          "Pretendard Variable",
+          Pretendard,
+          -apple-system,
+          "Apple SD Gothic Neo",
+          "Malgun Gothic",
+          sans-serif;
+        color: var(--ink);
+        background: #06070d;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      /* ===== stage / background ===== */
+      .stage {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: var(--side);
+        display: grid;
+        place-items: center;
+        padding: 56px 70px;
+        transition: left 0.25s ease;
+        background:
+          radial-gradient(
+            1200px 700px at 12% -10%,
+            #1c2545 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            1000px 700px at 110% 120%,
+            #2a1b4a 0%,
+            transparent 50%
+          ),
+          linear-gradient(160deg, var(--bg0), var(--bg1));
+      }
+      body.collapsed .stage {
+        left: 0;
+      }
+      .stage::before {
+        /* subtle grid */
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.5;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 46px 46px;
+        mask-image: radial-gradient(
+          1000px 600px at 50% 40%,
+          #000,
+          transparent 85%
+        );
+      }
+      /* ===== top chrome ===== */
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        z-index: 60;
+        width: 0;
+        background: linear-gradient(
+          90deg,
+          var(--accent),
+          var(--accent2),
+          var(--cyan)
+        );
+        transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .brand {
+        position: fixed;
+        top: 18px;
+        left: 22px;
+        z-index: 55;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #aeb7d6;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .brand .logo {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 800;
+        font-size: 14px;
+        box-shadow: 0 6px 16px rgba(91, 91, 240, 0.5);
+      }
+      #counter {
+        position: fixed;
+        top: 20px;
+        right: 22px;
+        z-index: 55;
+        color: #8893b6;
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+      #counter b {
+        color: #fff;
+        font-weight: 700;
+      }
+      /* ===== left sidebar (TOC) ===== */
+      .side {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--side);
+        z-index: 56;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(180deg, #0c1226, #0a0e1c);
+        border-right: 1px solid rgba(255, 255, 255, 0.07);
+        transition: transform 0.25s ease;
+      }
+      body.collapsed .side {
+        transform: translateX(-100%);
+      }
+      .side .sh {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 20px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+      .side .sh .logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 800;
+        font-size: 15px;
+        box-shadow: 0 6px 16px rgba(91, 91, 240, 0.5);
+      }
+      .side .sh b {
+        color: #eef1fb;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.2;
+        display: block;
+      }
+      .side .sh small {
+        color: #7c86bb;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+      }
+      .side .list {
+        flex: 1;
+        overflow: auto;
+        padding: 12px 12px 18px;
+      }
+      .side .list::-webkit-scrollbar {
+        width: 8px;
+      }
+      .side .list::-webkit-scrollbar-thumb {
+        background: #283250;
+        border-radius: 8px;
+      }
+      .side .item {
+        display: flex;
+        gap: 11px;
+        align-items: center;
+        padding: 9px 12px;
+        border-radius: 10px;
+        color: #aab4d8;
+        cursor: pointer;
+        font-size: 13.5px;
+        font-weight: 500;
+        transition: 0.15s;
+        border: 1px solid transparent;
+      }
+      .side .item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+      .side .item .no {
+        font: 700 11px var(--mono);
+        color: #5d68a0;
+        width: 20px;
+        flex: none;
+      }
+      .side .item.cur {
+        background: linear-gradient(
+          135deg,
+          rgba(91, 91, 240, 0.28),
+          rgba(139, 92, 246, 0.18)
+        );
+        color: #fff;
+        box-shadow: inset 3px 0 0 var(--accent);
+      }
+      .side .item.cur .no {
+        color: #aab2ff;
+      }
+      /* ===== edge nav arrows ===== */
+      .edge {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 58;
+        width: 54px;
+        height: 96px;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 30px;
+        color: #cfd6f3;
+        background: rgba(15, 20, 40, 0.45);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        transition: 0.15s;
+      }
+      .edge:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+      .edge:disabled {
+        opacity: 0.2;
+        cursor: default;
+      }
+      .edge:disabled:hover {
+        background: rgba(15, 20, 40, 0.45);
+        color: #cfd6f3;
+      }
+      .edge.left {
+        left: calc(var(--side) + 16px);
+        border-radius: 0 18px 18px 0;
+      }
+      .edge.right {
+        right: 18px;
+        border-radius: 18px 0 0 18px;
+      }
+      body.collapsed .edge.left {
+        left: 18px;
+      }
+      /* ===== slide ===== */
+      .slide {
+        display: none;
+        width: min(1060px, 95vw);
+        height: min(660px, 86vh);
+        background: linear-gradient(180deg, #ffffff, #fcfdff);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+      .slide.active {
+        display: block;
+      }
+      .pad {
+        position: absolute;
+        inset: 0;
+        padding: 48px 56px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: safe center;
+      }
+      .pad::-webkit-scrollbar {
+        width: 9px;
+      }
+      .pad::-webkit-scrollbar-thumb {
+        background: #d3d8ea;
+        border-radius: 9px;
+      }
+      .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+      .kicker::before {
+        content: "";
+        width: 22px;
+        height: 2px;
+        border-radius: 2px;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+      }
+      h2.title {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        margin-bottom: 22px;
+        color: #171b29;
+      }
+      h2.title .sub {
+        color: var(--ink2);
+        font-weight: 600;
+        font-size: 0.62em;
+        margin-left: 6px;
+      }
+      /* stagger reveal */
+      .slide.active .anim {
+        animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+      .slide.active .anim:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .slide.active .anim:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+      .slide.active .anim:nth-child(3) {
+        animation-delay: 0.19s;
+      }
+      .slide.active .anim:nth-child(4) {
+        animation-delay: 0.26s;
+      }
+      .slide.active .anim:nth-child(5) {
+        animation-delay: 0.33s;
+      }
+      .slide.active .anim:nth-child(6) {
+        animation-delay: 0.4s;
+      }
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      p {
+        line-height: 1.7;
+        color: #2b3145;
+      }
+      strong {
+        color: #0f1320;
+        font-weight: 700;
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 0.86em;
+        background: #eef0fe;
+        color: #4338ca;
+        padding: 2px 7px;
+        border-radius: 7px;
+        font-weight: 500;
+      }
+      .muted {
+        color: var(--ink2);
+      }
+      /* ===== badges ===== */
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+      }
+      .t-mvp {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+      }
+      .t-mvpp {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      }
+      /* ===== terminal ===== */
+      .term {
+        background: var(--term-bg);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 12px 30px rgba(8, 12, 30, 0.35);
+        border: 1px solid #1f2945;
+      }
+      .term .bar {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 11px 14px;
+        background: #0b1124;
+        border-bottom: 1px solid #1f2945;
+      }
+      .term .bar i {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        display: block;
+      }
+      .term .bar i:nth-child(1) {
+        background: #ff5f57;
+      }
+      .term .bar i:nth-child(2) {
+        background: #febc2e;
+      }
+      .term .bar i:nth-child(3) {
+        background: #28c840;
+      }
+      .term .bar span {
+        margin-left: 8px;
+        color: #5e6b91;
+        font: 600 12px var(--mono);
+      }
+      .term pre {
+        margin: 0;
+        padding: 16px 18px;
+        font-family: var(--mono);
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--term-ink);
+        overflow: auto;
+        white-space: pre;
+      }
+      .term .c-cmd {
+        color: #7ee2b8;
+      }
+      .term .c-cmt {
+        color: #5e6b91;
+      }
+      .term .c-arr {
+        color: #8b9bff;
+      }
+      .term pre::-webkit-scrollbar {
+        height: 8px;
+      }
+      .term pre::-webkit-scrollbar-thumb {
+        background: #26314f;
+        border-radius: 8px;
+      }
+      /* ===== generic cards ===== */
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      .g2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .g3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .g4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px 22px;
+      }
+      .card.soft {
+        background: var(--soft);
+      }
+      .pain {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px 18px;
+      }
+      .pain .ic {
+        font-size: 24px;
+        line-height: 1;
+      }
+      .pain b {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 15.5px;
+      }
+      .pain span {
+        color: var(--ink2);
+        font-size: 14px;
+      }
+      /* value cards */
+      .val {
+        position: relative;
+        background: linear-gradient(180deg, #fff, #fbfbff);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 24px 24px 22px;
+        overflow: hidden;
+      }
+      .val::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 4px;
+        width: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+      }
+      .val .vn {
+        font: 800 13px/1 var(--mono);
+        color: var(--accent);
+        letter-spacing: 0.1em;
+      }
+      .val h3 {
+        font-size: 19px;
+        margin: 10px 0 8px;
+        color: #161a28;
+      }
+      .val p {
+        font-size: 14.5px;
+        color: #3a4156;
+      }
+      .quoteline {
+        margin-top: 12px;
+        padding: 10px 14px;
+        background: #0f1629;
+        border-radius: 10px;
+        color: #cdd7f4;
+        font: 500 12.5px/1.6 var(--mono);
+      }
+      .quoteline .ok {
+        color: #7ee2b8;
+      }
+      /* ===== pipeline (slide 5) ===== */
+      .flow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        margin-top: 6px;
+      }
+      .node {
+        width: 100%;
+        max-width: 620px;
+        border-radius: 14px;
+        padding: 16px 20px;
+        text-align: center;
+        font-weight: 700;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+      .node.io {
+        background: #eef1ff;
+        border-color: #d9defc;
+        color: #27338c;
+      }
+      .node.proc {
+        background: linear-gradient(135deg, #5b5bf0, #8b5cf6);
+        color: #fff;
+        border: none;
+      }
+      .node.proc small {
+        display: block;
+        font-weight: 600;
+        opacity: 0.92;
+        margin-top: 5px;
+        font-size: 12.5px;
+      }
+      .node.done {
+        background: #ecfdf3;
+        border-color: #bbf7d0;
+        color: #15803d;
+      }
+      .arrow {
+        width: 2px;
+        height: 22px;
+        background: linear-gradient(#c7cdf0, #aab2e8);
+        position: relative;
+      }
+      .arrow::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #aab2e8;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #6d28d9;
+        background: #f3e8ff;
+        border-radius: 999px;
+        padding: 2px 10px;
+        margin: 0 3px;
+      }
+      /* ===== steps (demo) ===== */
+      .steps {
+        display: grid;
+        gap: 10px;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 14px;
+        align-items: center;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 11px 16px;
+      }
+      .step .num {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 15px;
+      }
+      .step code {
+        background: #e9ecfd;
+      }
+      .step .arr {
+        color: var(--accent);
+        font-weight: 800;
+      }
+      /* ===== tables ===== */
+      table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        font-size: 14.5px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      th,
+      td {
+        padding: 11px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        vertical-align: middle;
+      }
+      th {
+        background: #f3f4fb;
+        font-weight: 700;
+        color: #3b4258;
+        font-size: 13px;
+        letter-spacing: 0.02em;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      td.c,
+      th.c {
+        text-align: center;
+        white-space: nowrap;
+      }
+      tbody tr:hover td {
+        background: #fafbff;
+      }
+      .fromto {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .fromto .f {
+        color: var(--ink2);
+      }
+      .fromto .a {
+        color: var(--accent);
+        font-weight: 800;
+      }
+      .fromto .t {
+        font-weight: 700;
+        color: #15203a;
+      }
+      /* ===== gantt ===== */
+      .gantt {
+        margin-top: 6px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .gantt .row {
+        display: grid;
+        grid-template-columns: 150px repeat(8, 1fr);
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+      }
+      .gantt .row:last-child {
+        border-bottom: none;
+      }
+      .gantt .row.head {
+        background: #f3f4fb;
+        font: 700 12px/1 var(--mono);
+        color: #6b74a0;
+      }
+      .gantt .lbl {
+        padding: 11px 14px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #2b3145;
+        border-right: 1px solid var(--line);
+      }
+      .gantt .wk {
+        padding: 9px 0;
+        text-align: center;
+        font: 700 11px var(--mono);
+        color: #8a92ad;
+        border-right: 1px dashed #eef0f7;
+      }
+      .gantt .cell {
+        height: 42px;
+        position: relative;
+        border-right: 1px dashed #eef0f7;
+      }
+      .gantt .bar {
+        position: absolute;
+        top: 9px;
+        height: 24px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        box-shadow: 0 6px 14px rgba(91, 91, 240, 0.3);
+        left: 6%;
+        right: 6%;
+      }
+      .gantt .bar.g {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+      }
+      .gantt .bar.b {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      }
+      /* ===== metric tiles ===== */
+      .metric {
+        background: linear-gradient(180deg, #fff, #f7f8ff);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 22px;
+        text-align: center;
+      }
+      .metric .big {
+        font: 800 40px/1 var(--mono);
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -0.02em;
+      }
+      .metric .lab {
+        margin-top: 8px;
+        font-weight: 700;
+        color: #222838;
+      }
+      .metric .desc {
+        margin-top: 4px;
+        font-size: 12.5px;
+        color: var(--ink2);
+      }
+      /* ===== env rows ===== */
+      .env {
+        display: grid;
+        gap: 12px;
+      }
+      .env .r {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: 14px;
+        align-items: center;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 13px 18px;
+      }
+      .env .k {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-weight: 700;
+        color: #2a3147;
+      }
+      .env .k .ic {
+        font-size: 18px;
+      }
+      /* ===== title slide ===== */
+      .cover {
+        display: grid;
+        place-content: center;
+        text-align: center;
+        height: 100%;
+        padding: 40px;
+      }
+      .cover .chip {
+        justify-self: center;
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 7px 16px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #eef1ff, #f3ecff);
+        color: #4f46e5;
+        font-weight: 800;
+        font-size: 12.5px;
+        letter-spacing: 0.1em;
+        margin-bottom: 22px;
+      }
+      .cover h1 {
+        font-size: 52px;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        background: linear-gradient(
+          120deg,
+          #1e2a78 0%,
+          #5b5bf0 45%,
+          #8b5cf6 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .cover .lead {
+        margin-top: 18px;
+        font-size: 18px;
+        color: #3a4258;
+        line-height: 1.7;
+      }
+      .cover .files {
+        margin-top: 26px;
+        font: 500 13px var(--mono);
+        color: #7a83a3;
+      }
+      .cover .files code {
+        background: #f0f2fe;
+        color: #4f46e5;
+      }
+      /* ===== bottom nav ===== */
+      .nav {
+        position: fixed;
+        bottom: 20px;
+        left: calc(50% + var(--side) / 2);
+        transform: translateX(-50%);
+        z-index: 60;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: left 0.25s ease;
+        background: rgba(15, 20, 40, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 8px 10px;
+        border-radius: 999px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      }
+      body.collapsed .nav {
+        left: 50%;
+      }
+      .nav button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.08);
+        color: #dfe5fb;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.15s;
+        display: grid;
+        place-items: center;
+      }
+      .nav button:hover {
+        background: var(--accent);
+        transform: translateY(-1px);
+      }
+      .dots {
+        display: flex;
+        gap: 7px;
+        padding: 0 8px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #454f74;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .dot:hover {
+        background: #6b76a3;
+      }
+      .dot.on {
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        transform: scale(1.4);
+      }
+      .tools {
+        position: fixed;
+        bottom: 24px;
+        right: 22px;
+        z-index: 60;
+        display: flex;
+        gap: 8px;
+      }
+      .tools button {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(15, 20, 40, 0.7);
+        backdrop-filter: blur(10px);
+        color: #cfd6f3;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .tools button:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+      .help {
+        position: fixed;
+        bottom: 26px;
+        left: 22px;
+        z-index: 55;
+        color: #6b75a0;
+        font-size: 12px;
+      }
+      /* ===== TOC drawer ===== */
+      .toc {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        background: rgba(6, 8, 16, 0.6);
+        backdrop-filter: blur(6px);
+        display: none;
+        padding: 6vh 5vw;
+      }
+      .toc.open {
+        display: block;
+      }
+      .toc .panel {
+        max-width: 920px;
+        margin: 0 auto;
+        background: #0f1428;
+        border: 1px solid #232c4b;
+        border-radius: 20px;
+        padding: 26px 30px;
+        max-height: 88vh;
+        overflow: auto;
+      }
+      .toc h4 {
+        color: #aeb7d6;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+      .toc .list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .toc .item {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #141b33;
+        border: 1px solid #222b49;
+        color: #dbe1f7;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .toc .item:hover {
+        background: #1c244a;
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+      .toc .item .no {
+        font: 800 13px var(--mono);
+        color: #7c86bb;
+        width: 26px;
+      }
+      .toc .item.cur {
+        border-color: var(--accent);
+        background: #1a2140;
+      }
+      @media (max-width: 960px) {
+        .stage {
+          left: 0;
+          padding: 48px 16px;
+        }
+        .side {
+          transform: translateX(-100%);
+          box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+        }
+        body.show-side .side {
+          transform: none;
+        }
+        .edge.left {
+          left: 18px;
+        }
+        .nav {
+          left: 50%;
+        }
+      }
+      @media (max-width: 720px) {
+        .g2,
+        .g3,
+        .g4 {
+          grid-template-columns: 1fr;
+        }
+        .pad {
+          padding: 30px 24px;
+        }
+        .cover h1 {
+          font-size: 36px;
+        }
+        .slide {
+          height: 88vh;
+        }
+        .edge {
+          width: 42px;
+          height: 72px;
+          font-size: 24px;
+        }
+      }
+      /* ===== print → PDF ===== */
+      @media print {
+        @page {
+          size: A4 landscape;
+          margin: 0;
+        }
+        body {
+          overflow: visible;
+          background: #fff;
+        }
+        .stage {
+          position: static;
+          display: block;
+          padding: 0;
+          background: #fff;
+          left: 0;
+        }
+        .stage::before,
+        #progress,
+        #counter,
+        .side,
+        .edge,
+        .nav,
+        .tools,
+        .help {
+          display: none !important;
+        }
+        .slide {
+          display: block !important;
+          width: 100%;
+          height: auto;
+          min-height: 100vh;
+          border-radius: 0;
+          box-shadow: none;
+          page-break-after: always;
+        }
+        .pad {
+          position: static;
+          height: auto;
+          overflow: visible;
+        }
+        .slide .anim {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <aside class="side">
+      <div class="sh">
+        <span class="logo">U</span>
+        <div><b>프로젝트 AI 문서 자동화</b><small>MVP 발표</small></div>
+      </div>
+      <div class="list" id="sideList"></div>
+    </aside>
+    <div id="counter"><b id="cur">01</b> / <span id="tot">15</span></div>
+
+    <div class="stage">
+      <!-- 0 · COVER -->
+      <section class="slide active">
+        <div class="pad">
+          <div class="cover">
+            <span class="chip anim">◆ MVP 발표 자료</span>
+            <h1 class="anim">프로젝트 AI<br />문서 자동화</h1>
+            <div class="lead anim">
+              기존 프로젝트에 명령 한 번이면,<br /><strong
+                >코드 근거가 붙은 운영 문서</strong
+              >가 자동으로.
+            </div>
+            <div class="files anim">
+              Understand-Anything 기반 <code>Claude Code 플러그인</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Overview</div>
+          <h2 class="title anim">개요</h2>
+          <div class="val anim">
+            <div class="vn">THE PITCH</div>
+            <h3 style="font-size: 23px; line-height: 1.5; color: #1c2050">
+              "기존 프로젝트에 명령 한 번이면,
+              <span style="color: var(--accent)"
+                >코드 근거가 붙은 운영 문서</span
+              >가 자동으로 만들어집니다."
+            </h3>
+          </div>
+          <p class="anim" style="margin-top: 18px">
+            Understand-Anything(오픈소스) 기반
+            <strong>Claude Code 플러그인</strong>. 별도 프로그램 설치 없이, 쓰던
+            AI CLI 명령으로 바로 사용합니다.
+          </p>
+          <p class="anim" style="margin-top: 18px">
+            📌 이번 <strong>MVP는 "근거 기반 문서 자동화 + 검토/승인"</strong>을
+            증명하는 단계입니다.
+          </p>
+        </div>
+      </section>
+
+      <!-- 2 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Problem · Before</div>
+          <h2 class="title anim">문제</h2>
+          <div class="grid g2 anim">
+            <div class="pain">
+              <div class="ic">📄</div>
+              <div>
+                <b>문서와 코드가 따로 논다</b
+                ><span>마지막 업데이트가 언제인지 모른다.</span>
+              </div>
+            </div>
+            <div class="pain">
+              <div class="ic">🧑‍💻</div>
+              <div>
+                <b>담당자가 떠나면 깜깜이</b
+                ><span>시스템 구조가 사람 머릿속에만 있다.</span>
+              </div>
+            </div>
+            <div class="pain">
+              <div class="ic">🗄️</div>
+              <div>
+                <b>PL/SQL·MyBatis는 미궁</b
+                ><span>화면-API-테이블 연결을 손으로 추적한다.</span>
+              </div>
+            </div>
+            <div class="pain">
+              <div class="ic">🆕</div>
+              <div>
+                <b>온보딩에 수주</b
+                ><span>신규 투입 시 서비스 파악에 오래 걸린다.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Solution · After</div>
+          <h2 class="title anim">기대 효과</h2>
+          <table class="anim">
+            <thead>
+              <tr>
+                <th>항목</th>
+                <th>변화</th>
+                <th class="c">단계</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>신규 투입 온보딩</td>
+                <td>
+                  <div class="fromto">
+                    <span class="f">수주</span><span class="a">→</span
+                    ><span class="t">1~2일</span>
+                  </div>
+                </td>
+                <td class="c"><span class="tag t-mvp">MVP</span></td>
+              </tr>
+              <tr>
+                <td>문서 최신화</td>
+                <td>
+                  <div class="fromto">
+                    <span class="f">수동·누락</span><span class="a">→</span
+                    ><span class="t">실행마다 자동 갱신</span>
+                  </div>
+                </td>
+                <td class="c"><span class="tag t-mvp">MVP</span></td>
+              </tr>
+              <tr>
+                <td>PL/SQL 파악</td>
+                <td>
+                  <div class="fromto">
+                    <span class="f">담당자 의존</span><span class="a">→</span
+                    ><span class="t">LLM 요약 + <code>[추정]</code> 태그</span>
+                  </div>
+                </td>
+                <td class="c"><span class="tag t-mvp">MVP</span></td>
+              </tr>
+              <tr>
+                <td>문서 신뢰성</td>
+                <td>
+                  <div class="fromto">
+                    <span class="f">보증 없음</span><span class="a">→</span
+                    ><span class="t">검토·승인·감사 내재화</span>
+                  </div>
+                </td>
+                <td class="c"><span class="tag t-mvp">MVP</span></td>
+              </tr>
+              <tr>
+                <td>변경 영향도</td>
+                <td>
+                  <div class="fromto">
+                    <span class="f">수동 코드 추적</span><span class="a">→</span
+                    ><span class="t"><code>/understand-impact</code> 자동</span>
+                  </div>
+                </td>
+                <td class="c"><span class="tag t-mvpp">MVP+</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Core Value</div>
+          <h2 class="title anim">핵심 가치 2가지</h2>
+          <div class="grid g2 anim">
+            <div class="val">
+              <div class="vn">VALUE 01</div>
+              <h3>근거 기반 분석</h3>
+              <p>
+                모든 문장에 <code>근거: 파일:라인</code>이 붙고, 근거가 없으면
+                <strong>저장 자체가 차단</strong>됩니다.
+              </p>
+              <div class="quoteline">
+                LoginController는 /login 처리 <span class="ok">[확정(AI)]</span
+                ><br />근거: LoginController.java:42
+              </div>
+            </div>
+            <div class="val">
+              <div class="vn">VALUE 02</div>
+              <h3>검토·승인·감사</h3>
+              <p>
+                AI 초안(DRAFT)을 담당자가 검토·승인(APPROVED)하고, 전 과정이
+                감사 로그로 남습니다.
+              </p>
+              <div class="quoteline">
+                DRAFT <span class="ok">→</span> UNDER_REVIEW
+                <span class="ok">→</span> APPROVED<br /><span
+                  style="color: #8b9bff"
+                  >audit log · 누가·언제·무엇을</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">How it works</div>
+          <h2 class="title anim">시스템 흐름</h2>
+          <div class="flow anim">
+            <div class="node io">프로젝트 코드</div>
+            <div class="arrow"></div>
+            <div class="node proc">
+              AI 분석 — 지식 그래프
+              <span
+                class="pill"
+                style="background: rgba(255, 255, 255, 0.18); color: #fff"
+                >→</span
+              >
+              근거 매핑
+              <span
+                class="pill"
+                style="background: rgba(255, 255, 255, 0.18); color: #fff"
+                >→</span
+              >
+              문서화<small>코드 근거가 붙은 문장만 통과</small>
+            </div>
+            <div class="arrow"></div>
+            <div class="node">근거 붙은 문서 5종 &nbsp;(DRAFT)</div>
+            <div class="arrow"></div>
+            <div class="node done">
+              담당자 검토·승인 &nbsp;→&nbsp; APPROVED ✓
+            </div>
+          </div>
+          <p
+            class="muted anim"
+            style="text-align: center; margin-top: 14px; font-size: 14px"
+          >
+            각 문장엔 <strong>근거</strong>가, 각 단계엔
+            <strong>감사 로그</strong>가 자동으로 따라붙습니다.
+          </p>
+        </div>
+      </section>
+
+      <!-- 6 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Use case 01</div>
+          <h2 class="title anim">최초 분석</h2>
+          <p class="anim">
+            <strong>상황</strong> — 프로젝트 PM이 (인수받은/유지보수 중인)
+            프로젝트를 <strong>처음으로</strong> 분석해 기준 문서 세트를 만든다.
+          </p>
+          <div class="term anim" style="margin: 14px 0">
+            <div class="bar"><i></i><i></i><i></i><span>terminal</span></div>
+            <pre><span class="c-cmd">$ /understand-init</span>     <span class="c-cmt"># 초기화 (VCS 자동 감지, 설정 생성)</span>
+<span class="c-cmd">$ /understand</span>          <span class="c-cmt"># 코드베이스 스캔 → 지식 그래프 생성</span>
+<span class="c-cmd">$ /understand-docs</span>     <span class="c-cmt"># 근거 기반 5종 문서 자동 생성</span></pre>
+          </div>
+          <div class="grid g3 anim" style="gap: 10px">
+            <div class="card soft" style="padding: 13px 15px">
+              <b><code>01_tech-stack</code></b>
+              <div class="muted" style="font-size: 13px; margin-top: 4px">
+                언어·프레임워크·라이브러리
+              </div>
+            </div>
+            <div class="card soft" style="padding: 13px 15px">
+              <b><code>02_architecture</code></b>
+              <div class="muted" style="font-size: 13px; margin-top: 4px">
+                레이어·모듈 의존 관계
+              </div>
+            </div>
+            <div class="card soft" style="padding: 13px 15px">
+              <b><code>03_feature-spec</code></b>
+              <div class="muted" style="font-size: 13px; margin-top: 4px">
+                업무 기능·진입점
+              </div>
+            </div>
+            <div class="card soft" style="padding: 13px 15px">
+              <b><code>04_api-spec</code></b>
+              <div class="muted" style="font-size: 13px; margin-top: 4px">
+                API·처리 Controller
+              </div>
+            </div>
+            <div class="card soft" style="padding: 13px 15px">
+              <b><code>05_db-spec</code></b>
+              <div class="muted" style="font-size: 13px; margin-top: 4px">
+                테이블·컬럼·Mapper
+              </div>
+            </div>
+            <div
+              class="card"
+              style="
+                padding: 13px 15px;
+                background: linear-gradient(135deg, #eef1ff, #f3ecff);
+                border-color: #dcdffb;
+              "
+            >
+              <b style="color: #4f46e5">→ docs/ 즉시 생성</b>
+              <div class="muted" style="font-size: 13px; margin-top: 4px">
+                근거 링크로 구조 파악
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Use case 02</div>
+          <h2 class="title anim">
+            문서 신뢰성 <span class="sub">검토 · 승인</span>
+          </h2>
+          <p class="anim">
+            <strong>상황</strong> — AI가 쓴 문서를 공식 운영 문서로 채택하기 전
+            검증이 필요하다.
+          </p>
+          <div class="term anim" style="margin: 14px 0">
+            <div class="bar"><i></i><i></i><i></i><span>terminal</span></div>
+            <pre><span class="c-cmd">$ /understand-docs review --list</span>                     <span class="c-cmt"># 검토 대기 + [추정] 수</span>
+<span class="c-cmd">$ /understand-docs review --doc 04_api-spec.md</span>        <span class="c-cmt"># [추정] → [확정(홍길동)]</span>
+<span class="c-cmd">$ /understand-docs approve --doc 04_api-spec.md --by "홍길동"</span>   <span class="c-cmt"># 공식 승인</span></pre>
+          </div>
+          <div class="grid g3 anim" style="gap: 12px">
+            <div class="card soft">
+              <b>4단계 신뢰도 태그</b>
+              <div class="muted" style="font-size: 13px; margin-top: 5px">
+                <code>[확정(AI)]</code> <code>[확정(담당자)]</code>
+                <code>[추정]</code> <code>[확인 필요]</code>
+              </div>
+            </div>
+            <div class="card soft">
+              <b>판단 어려우면 위임</b>
+              <div class="muted" style="font-size: 13px; margin-top: 5px">
+                동적 SQL·리플렉션은 <code>[확인 필요]</code>로 담당자에게
+              </div>
+            </div>
+            <div class="card soft">
+              <b>전 과정 감사 기록</b>
+              <div class="muted" style="font-size: 13px; margin-top: 5px">
+                생성·검토·승인이 audit log에 남음
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">
+            Use case 03 &nbsp;·&nbsp; <span style="color: #2563eb">MVP+</span>
+          </div>
+          <h2 class="title anim">
+            변경 영향도 분석
+            <span class="tag t-mvpp" style="vertical-align: middle">MVP+</span>
+          </h2>
+          <p class="anim">
+            <strong>상황</strong> — "로그인에 간편 로그인을 추가하면 어디까지
+            영향이 갈까?"
+          </p>
+          <div class="term anim" style="margin: 14px 0">
+            <div class="bar"><i></i><i></i><i></i><span>terminal</span></div>
+            <pre><span class="c-cmd">$ /understand-impact 로그인 기능에 간편 로그인 추가</span>        <span class="c-cmt"># 자연어</span>
+<span class="c-cmd">$ /understand-impact --path src/auth/LoginService.java</span>   <span class="c-cmt"># 파일 지정</span></pre>
+          </div>
+          <div class="grid g4 anim" style="gap: 10px">
+            <div class="metric" style="padding: 16px">
+              <div class="lab">API 영향</div>
+            </div>
+            <div class="metric" style="padding: 16px">
+              <div class="lab">DB 영향</div>
+            </div>
+            <div class="metric" style="padding: 16px">
+              <div class="lab">업무 흐름</div>
+            </div>
+            <div class="metric" style="padding: 16px">
+              <div class="lab">연관 모듈</div>
+            </div>
+          </div>
+          <p class="muted anim" style="margin-top: 14px; font-size: 14px">
+            출력 <code>docs/09_release/change-impact-analysis.md</code> · 수정
+            <strong>전·후</strong> 모두 영향 범위를 미리 보여줍니다.
+          </p>
+        </div>
+      </section>
+
+      <!-- 9 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Demo</div>
+          <h2 class="title anim">
+            데모 시나리오 <span class="sub">MVP 전체 흐름</span>
+          </h2>
+          <div class="steps anim">
+            <div class="step">
+              <div class="num">1</div>
+              <div>
+                <code>/understand-init</code>
+                <span class="arr">→</span> 프로젝트 인식, 설정 생성
+              </div>
+            </div>
+            <div class="step">
+              <div class="num">2</div>
+              <div>
+                <code>/understand</code> <span class="arr">→</span> 지식 그래프
+                생성 (U-A)
+              </div>
+            </div>
+            <div class="step">
+              <div class="num">3</div>
+              <div>
+                <code>/understand-docs</code> <span class="arr">→</span> 근거
+                붙은 5종 문서 (DRAFT)
+              </div>
+            </div>
+            <div class="step">
+              <div class="num">4</div>
+              <div>
+                <code>/understand-docs review</code>
+                <span class="arr">→</span> [추정] 항목 검토·확정
+              </div>
+            </div>
+            <div class="step">
+              <div class="num">5</div>
+              <div>
+                <code>/understand-docs approve</code>
+                <span class="arr">→</span> 공식 승인 (APPROVED)
+              </div>
+            </div>
+            <div class="step">
+              <div class="num">6</div>
+              <div>
+                <code>/understand-export</code> <span class="arr">→</span> HTML
+                산출물
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Scope</div>
+          <h2 class="title anim">단계별 구현 범위</h2>
+          <div class="grid g2 anim">
+            <div class="card" style="border-top: 4px solid var(--mvp)">
+              <span class="tag t-mvp" style="margin-bottom: 12px"
+                >이번 MVP</span
+              >
+              <div class="muted" style="font-size: 12.5px; margin: 6px 0 10px">
+                개방형 · Claude Code 기준 · 비민감 샘플
+              </div>
+              <ul
+                style="
+                  list-style: none;
+                  display: grid;
+                  gap: 8px;
+                  font-size: 14.5px;
+                "
+              >
+                <li>
+                  ✅ <code>/understand-init</code> · <code>docs</code> ·
+                  <code>export</code>(HTML)
+                </li>
+                <li>✅ 근거 붙은 5종 문서 생성</li>
+                <li>✅ DRAFT → 검토 → 승인 → 감사 로그</li>
+              </ul>
+            </div>
+            <div class="card" style="border-top: 4px solid var(--mvpp)">
+              <span class="tag t-mvpp" style="margin-bottom: 12px"
+                >MVP+ · 안정화 후</span
+              >
+              <div class="muted" style="font-size: 12.5px; margin: 6px 0 10px">
+                필수 MVP 검증 뒤 확장
+              </div>
+              <ul
+                style="
+                  list-style: none;
+                  display: grid;
+                  gap: 8px;
+                  font-size: 14.5px;
+                "
+              >
+                <li>🔜 <code>/understand-impact</code> 변경 영향도</li>
+                <li>🔜 <code>/understand-history</code> 이력</li>
+                <li>🔜 대시보드 · <code>export</code> PPT/Word</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Plan · WBS</div>
+          <h2 class="title anim">
+            작업 분해 · 일정
+            <span class="sub">Discovery 후 본작업 43영업일</span>
+          </h2>
+          <div class="gantt anim">
+            <div class="row head">
+              <div class="lbl">작업 패키지</div>
+              <div class="wk">W1<br />6/08</div>
+              <div class="wk">W2<br />6/15</div>
+              <div class="wk">W3<br />6/22</div>
+              <div class="wk">W4<br />6/29</div>
+              <div class="wk">W5<br />7/06</div>
+              <div class="wk">W6<br />7/13</div>
+              <div class="wk">W7<br />7/20</div>
+              <div class="wk">W8<br />7/29</div>
+            </div>
+            <div class="row">
+              <div class="lbl">1 · Core 골격</div>
+              <div class="cell" style="grid-column: 2/4">
+                <div class="bar"></div>
+              </div>
+              <div class="cell" style="grid-column: 4/10"></div>
+            </div>
+            <div class="row">
+              <div class="lbl">2 · 문서 생성</div>
+              <div class="cell" style="grid-column: 2/4"></div>
+              <div class="cell" style="grid-column: 4/6">
+                <div class="bar"></div>
+              </div>
+              <div class="cell" style="grid-column: 6/10"></div>
+            </div>
+            <div class="row">
+              <div class="lbl">3 · 검토/승인/감사</div>
+              <div class="cell" style="grid-column: 2/6"></div>
+              <div class="cell" style="grid-column: 6/8">
+                <div class="bar"></div>
+              </div>
+              <div class="cell" style="grid-column: 8/10"></div>
+            </div>
+            <div class="row">
+              <div class="lbl">4 · Export/안정화</div>
+              <div class="cell" style="grid-column: 2/8"></div>
+              <div class="cell" style="grid-column: 8/9">
+                <div class="bar g"></div>
+              </div>
+              <div class="cell" style="grid-column: 9/10"></div>
+            </div>
+            <div class="row">
+              <div class="lbl">5 · 매뉴얼/릴리즈</div>
+              <div class="cell" style="grid-column: 2/9"></div>
+              <div class="cell" style="grid-column: 9/10">
+                <div class="bar g"></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="lbl">6 · MVP+ (별도)</div>
+              <div
+                class="cell"
+                style="
+                  grid-column: 2/10;
+                  display: flex;
+                  align-items: center;
+                  padding-left: 12px;
+                "
+              >
+                <span class="tag t-mvpp"
+                  >impact · history · 대시보드 · PPT/Word</span
+                >
+              </div>
+            </div>
+          </div>
+          <p class="muted anim" style="margin-top: 14px; font-size: 13.5px">
+            ⚠️ 일정 리스크 시 <strong>WBS 6(MVP+)부터 축소</strong>. WBS
+            2·3(근거 스키마·검토/승인)은 필수라 축소 대상이 아님.
+          </p>
+        </div>
+      </section>
+
+      <!-- 12 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Environment</div>
+          <h2 class="title anim">지원 환경 <span class="sub">MVP</span></h2>
+          <div class="env anim">
+            <div class="r">
+              <div class="k"><span class="ic">🌐</span>네트워크</div>
+              <div>개방형 (Claude Code 기준선)</div>
+            </div>
+            <div class="r">
+              <div class="k"><span class="ic">🔀</span>버전관리</div>
+              <div>Git · SVN · VCS 없음(스냅샷 해시) 모두 지원</div>
+            </div>
+            <div class="r">
+              <div class="k"><span class="ic">🗂️</span>개발</div>
+              <div>
+                Java/Spring · MyBatis XML · Oracle SQL/PL-SQL · YAML/Properties
+              </div>
+            </div>
+            <div class="r">
+              <div class="k"><span class="ic">📦</span>설치</div>
+              <div>
+                온라인 plugin 마켓플레이스 설치 + 폐쇄망 fork clone 오프라인 설치
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="kicker anim">Target metrics</div>
+          <h2 class="title anim">
+            목표 지표 <span class="sub">MVP 합격선</span>
+          </h2>
+          <div class="grid g4 anim">
+            <div class="metric">
+              <div class="big">95%</div>
+              <div class="lab">근거율</div>
+              <div class="desc">[확정(AI)] 코드 근거 포함</div>
+            </div>
+            <div class="metric">
+              <div class="big">5분</div>
+              <div class="lab">속도</div>
+              <div class="desc">50K LOC E2E (PoC)</div>
+            </div>
+            <div class="metric">
+              <div class="big">2종+</div>
+              <div class="lab">샘플</div>
+              <div class="desc">비민감 Java/Spring/MyBatis/Oracle</div>
+            </div>
+            <div class="metric">
+              <div class="big">100%</div>
+              <div class="lab">신뢰성</div>
+              <div class="desc">생성→검토→승인 재현</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14 -->
+      <section class="slide">
+        <div class="pad">
+          <div class="cover">
+            <span class="chip anim">Wrap-up</span>
+            <h1 class="anim" style="font-size: 40px">
+              근거 · 신뢰<br />두 축을 증명합니다
+            </h1>
+            <div class="lead anim">
+              기존 프로젝트에 <strong>근거 기반 문서 + 검토/승인</strong>을
+              입히는 자동화 도구.<br />별도 CLI 없이 쓰던 AI CLI 명령으로,
+              오픈소스를 보존하며 확장.
+            </div>
+            <div
+              class="card soft anim"
+              style="
+                margin-top: 24px;
+                max-width: 680px;
+                justify-self: center;
+                border-left: 4px solid var(--accent);
+              "
+            >
+              <strong>다음 단계</strong> &nbsp;비민감 샘플 2종 선정 → 필수 MVP
+              구현 → 릴리즈 게이트 통과
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- chrome -->
+    <button class="edge left" id="prev" aria-label="이전 슬라이드">‹</button>
+    <button class="edge right" id="next" aria-label="다음 슬라이드">›</button>
+    <div class="nav"><div class="dots" id="dots"></div></div>
+    <div class="tools">
+      <button id="sideBtn" title="목차 접기/펴기 (O)">☰</button>
+      <button id="fsBtn" title="전체화면 (F)">⛶</button>
+    </div>
+    <div class="help">← → 이동 · O 목차 · F 전체화면 · Ctrl+P PDF</div>
+
+    <script>
+      (function () {
+        var slides = [].slice.call(document.querySelectorAll(".slide"));
+        var titles = [
+          "표지",
+          "개요",
+          "문제 (Before)",
+          "해결 (After)",
+          "핵심 가치 2가지",
+          "시스템 흐름",
+          "UC① 최초 분석",
+          "UC② 문서 신뢰성",
+          "UC③ 변경 영향도",
+          "데모 시나리오",
+          "구현 범위",
+          "WBS·일정",
+          "지원 환경",
+          "목표 지표",
+          "정리",
+        ];
+        var i = 0,
+          n = slides.length;
+        var bar = document.getElementById("progress"),
+          cur = document.getElementById("cur");
+        document.getElementById("tot").textContent = String(n).padStart(2, "0");
+        var dots = document.getElementById("dots"),
+          sideList = document.getElementById("sideList");
+        var prevBtn = document.getElementById("prev"),
+          nextBtn = document.getElementById("next");
+        slides.forEach(function (_, k) {
+          var d = document.createElement("div");
+          d.className = "dot" + (k === 0 ? " on" : "");
+          d.title = titles[k] || "#" + k;
+          d.onclick = function () {
+            go(k);
+          };
+          dots.appendChild(d);
+          var it = document.createElement("div");
+          it.className = "item" + (k === 0 ? " cur" : "");
+          it.innerHTML =
+            '<span class="no">' +
+            String(k).padStart(2, "0") +
+            "</span><span>" +
+            (titles[k] || "Slide " + k) +
+            "</span>";
+          it.onclick = function () {
+            go(k);
+            if (window.innerWidth <= 960)
+              document.body.classList.remove("show-side");
+          };
+          sideList.appendChild(it);
+        });
+        var dotEls = [].slice.call(dots.children),
+          itemEls = [].slice.call(sideList.children);
+        function go(k) {
+          i = Math.max(0, Math.min(n - 1, k));
+          slides.forEach(function (s, x) {
+            s.classList.toggle("active", x === i);
+          });
+          dotEls.forEach(function (d, x) {
+            d.classList.toggle("on", x === i);
+          });
+          itemEls.forEach(function (t, x) {
+            t.classList.toggle("cur", x === i);
+          });
+          bar.style.width = (i / (n - 1)) * 100 + "%";
+          cur.textContent = String(i + 1).padStart(2, "0");
+          prevBtn.disabled = i === 0;
+          nextBtn.disabled = i === n - 1;
+          var p = slides[i].querySelector(".pad");
+          if (p) p.scrollTop = 0;
+          if (itemEls[i] && itemEls[i].scrollIntoView)
+            itemEls[i].scrollIntoView({ block: "nearest" });
+        }
+        function next() {
+          go(i + 1);
+        }
+        function prev() {
+          go(i - 1);
+        }
+        function toggleSide() {
+          document.body.classList.toggle(
+            window.innerWidth <= 960 ? "show-side" : "collapsed",
+          );
+        }
+        function fs() {
+          var el = document.documentElement;
+          var inFs =
+            document.fullscreenElement || document.webkitFullscreenElement;
+          if (!inFs) {
+            (
+              el.requestFullscreen ||
+              el.webkitRequestFullscreen ||
+              el.msRequestFullscreen ||
+              function () {}
+            ).call(el);
+          } else {
+            (
+              document.exitFullscreen ||
+              document.webkitExitFullscreen ||
+              document.msExitFullscreen ||
+              function () {}
+            ).call(document);
+          }
+        }
+        prevBtn.onclick = prev;
+        nextBtn.onclick = next;
+        document.getElementById("sideBtn").onclick = toggleSide;
+        document.getElementById("fsBtn").onclick = fs;
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") {
+            e.preventDefault();
+            next();
+          } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+            e.preventDefault();
+            prev();
+          } else if (e.key === "Home") {
+            go(0);
+          } else if (e.key === "End") {
+            go(n - 1);
+          } else if (e.key === "o" || e.key === "O") {
+            toggleSide();
+          } else if (e.key === "f" || e.key === "F") {
+            fs();
+          } else if (/^[1-9]$/.test(e.key)) {
+            go(parseInt(e.key, 10));
+          }
+        });
+        var sx = null;
+        document.addEventListener(
+          "touchstart",
+          function (e) {
+            sx = e.touches[0].clientX;
+          },
+          { passive: true },
+        );
+        document.addEventListener(
+          "touchend",
+          function (e) {
+            if (sx === null) return;
+            var dx = e.changedTouches[0].clientX - sx;
+            if (Math.abs(dx) > 55) {
+              dx < 0 ? next() : prev();
+            }
+            sx = null;
+          },
+          { passive: true },
+        );
+        go(0);
+      })();
+    </script>
+  </body>
+</html>

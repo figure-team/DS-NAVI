@@ -1,0 +1,31 @@
+{
+  "name": "@ktds/legacy-core",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "ktds Legacy 문서 자동화 공통 엔진 (kg-reader, evidence, doc-generator, ...). CLI 독립. U-A fork 내 격리 패키지.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.1.0"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}

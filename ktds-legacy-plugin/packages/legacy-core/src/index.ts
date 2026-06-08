@@ -8,3 +8,4 @@ export * from "./doc-state/index.js";
 export * from "./audit/index.js";
 export * from "./approval/index.js";
 export * from "./lock/index.js";
+export * from "./doc-generator/index.js";

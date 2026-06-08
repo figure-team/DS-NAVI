@@ -55,6 +55,17 @@ describe("readKnowledgeGraph — real v2.7.3 fixture (97 nodes / 183 edges)", ()
     const g2 = await readKnowledgeGraph(FIXTURE);
     expect(g1.fingerprint).toBe(g2.fingerprint);
   });
+
+  it("populates project meta and layers (with nodeIds mapped to uids)", async () => {
+    const graph = await readKnowledgeGraph(FIXTURE);
+    expect(graph.project.languages.length).toBeGreaterThan(0);
+    expect(graph.layers.length).toBeGreaterThan(0);
+    const uidSet = new Set(graph.nodes.map((n) => n.uid));
+    // every layer member uid resolves to a real node (raw nodeIds were mapped)
+    for (const l of graph.layers) {
+      for (const uid of l.nodeUids) expect(uidSet.has(uid)).toBe(true);
+    }
+  });
 });
 
 describe("uid derivation", () => {

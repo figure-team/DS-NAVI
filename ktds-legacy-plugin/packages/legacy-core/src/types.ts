@@ -67,13 +67,47 @@ export interface CanonicalEdge {
   weight: number;
 }
 
+export interface ProjectMeta {
+  name: string;
+  languages: string[];
+  frameworks: string[];
+  description: string;
+  gitCommitHash: string;
+}
+
+export interface Layer {
+  id: string;
+  name: string;
+  description: string;
+  /** member node uids (mapped from U-A raw nodeIds). */
+  nodeUids: string[];
+}
+
 export interface CanonicalGraph {
   /** U-A graph data version (field name is `version`, e.g. "1.0.0"). plan §0.2 */
   sourceVersion: string;
   /** structural fingerprint for drift detection (plan §2.1 / A14). */
   fingerprint: string;
+  project: ProjectMeta;
+  layers: Layer[];
   nodes: CanonicalNode[];
   edges: CanonicalEdge[];
+}
+
+// ── 문서 모델 (doc-generator) — 결정론 skeleton + 선택적 LLM prose (plan §2.2) ──
+export interface DocSection {
+  heading: string;
+  /** 근거 붙은 항목들 (모두 evidence 계약을 통과). */
+  claims: Claim[];
+  /** host CLI(Claude)가 생성한 산문 본문. skeleton에는 비어 있음. */
+  prose?: string;
+}
+
+export interface GeneratedDoc {
+  /** 파일명, 예: "01_tech-stack.md". */
+  filename: string;
+  title: string;
+  sections: DocSection[];
 }
 
 // ── 검토/승인 상태기계 (plan §3.3 / 축③) ───────────────────────────────

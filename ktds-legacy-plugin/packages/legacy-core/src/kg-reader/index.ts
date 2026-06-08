@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import type { CanonicalEdge, CanonicalGraph, CanonicalKind, CanonicalNode } from "../types.js";
+import type {
+  CanonicalEdge, CanonicalGraph, CanonicalKind, CanonicalNode, Layer, ProjectMeta,
+} from "../types.js";
 
 // ── Baseline schema definition (docs/ktds/UA_BASELINE.md, A14) ───────────
 // All 21 node types and 35 edge types verified in v2.7.3.
@@ -54,12 +56,27 @@ interface RawEdge {
   weight: number;
 }
 
+interface RawProject {
+  name?: string;
+  languages?: string[];
+  frameworks?: string[];
+  description?: string;
+  gitCommitHash?: string;
+}
+
+interface RawLayer {
+  id: string;
+  name: string;
+  description?: string;
+  nodeIds?: string[];
+}
+
 interface RawGraph {
   version: string;
-  project?: unknown;
+  project?: RawProject;
   nodes: RawNode[];
   edges: RawEdge[];
-  layers?: unknown;
+  layers?: RawLayer[];
   tour?: unknown;
 }
 
@@ -291,5 +308,26 @@ export function parseRawGraph(raw: RawGraph, options: ReadOptions = {}): Canonic
     );
   }
 
-  return { sourceVersion: raw.version, fingerprint, nodes, edges };
+  const project: ProjectMeta = {
+    name: raw.project?.name ?? "",
+    languages: raw.project?.languages ?? [],
+    frameworks: raw.project?.frameworks ?? [],
+    description: raw.project?.description ?? "",
+    gitCommitHash: raw.project?.gitCommitHash ?? "",
+  };
+
+  // Map each layer's raw nodeIds → uids (drop ids that resolved to nothing).
+  const layers: Layer[] = (raw.layers ?? []).map((l) => ({
+    id: l.id,
+    name: l.name,
+    description: l.description ?? "",
+    // map raw nodeIds → uids, drop unresolved, dedup (so the member count is distinct).
+    nodeUids: [
+      ...new Set(
+        (l.nodeIds ?? []).map((id) => uidMap.get(id)).filter((u): u is string => u !== undefined)
+      ),
+    ],
+  }));
+
+  return { sourceVersion: raw.version, fingerprint, project, layers, nodes, edges };
 }

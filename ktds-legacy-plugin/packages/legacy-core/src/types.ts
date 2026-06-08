@@ -78,3 +78,33 @@ export interface CanonicalGraph {
 
 // ── 검토/승인 상태기계 (plan §3.3 / 축③) ───────────────────────────────
 export type DocState = "DRAFT" | "UNDER_REVIEW" | "APPROVED" | "RETURNED";
+
+// ── 감사 로그 (plan §3.3 — MVP 이벤트 집합; 보안 이벤트는 Phase 2) ───────
+export type AuditEventType =
+  | "LLM_REQUEST"
+  | "DOC_GENERATED"
+  | "DOC_ITEM_CONFIRMED"
+  | "DOC_APPROVED"
+  | "RUN_ABORTED"
+  | "INIT_RERUN"
+  | "STALE_LOCK_REMOVED";
+
+export interface AuditEvent {
+  /** ISO timestamp. */
+  ts: string;
+  type: AuditEventType;
+  /** document filename, when applicable. */
+  doc?: string;
+  /** operator handle/initials — NOT real name/employee id (O3, MVP 미저장). */
+  by?: string;
+  runId?: string;
+  detail?: Record<string, unknown>;
+}
+
+// ── 승인 기록 (plan §7.2 — approvals.json) ──────────────────────────────
+export interface ApprovalRecord {
+  doc: string;
+  /** handle/initials only (O3). */
+  by: string;
+  at: string;
+}

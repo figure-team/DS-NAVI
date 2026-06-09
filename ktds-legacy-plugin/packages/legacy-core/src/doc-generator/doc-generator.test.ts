@@ -167,14 +167,20 @@ describe("edge ordering is deterministic regardless of input order (HIGH fix)", 
 });
 
 describe("§2.3 edge consumption", () => {
-  it("feature-spec consumes contains_flow/flow_step edges", () => {
-    const g = graphOf(
-      [node("DomA", "domain"), node("FlowA", "flow"), node("StepA", "step")],
-      [edge("FlowA", "StepA", "flow_step"), edge("DomA", "FlowA", "contains_flow")]
-    );
-    const sec = buildFeatureSpec(g).sections.find((s) => s.heading.includes("흐름 단계"))!;
-    expect(sec.claims).toHaveLength(2);
-    expect(sec.claims.some((c) => c.claim.includes("FlowA → StepA"))).toBe(true);
+  it("feature-spec renders domain / flow / step nodes (§2.3)", () => {
+    const g = graphOf([node("DomA", "domain"), node("FlowA", "flow"), node("StepA", "step")]);
+    const doc = buildFeatureSpec(g);
+    expect(doc.sections.find((s) => s.heading === "업무 도메인")!.claims).toHaveLength(1);
+    expect(doc.sections.find((s) => s.heading === "처리 흐름")!.claims).toHaveLength(1);
+    expect(doc.sections.find((s) => s.heading === "처리 단계")!.claims.some((c) => c.claim.includes("StepA"))).toBe(true);
+  });
+
+  it("feature-spec renders step nodes with their code evidence (CONFIRMED_AI)", () => {
+    const g = graphOf([node("checkout-step", "step", { evidence: { path: "CartActionBean.java", line: 141 } })]);
+    const sec = buildFeatureSpec(g).sections.find((s) => s.heading === "처리 단계")!;
+    expect(sec.claims).toHaveLength(1);
+    expect(sec.claims[0]!.confidence).toBe("CONFIRMED_AI");
+    expect(sec.claims[0]!.evidence[0]).toEqual({ path: "CartActionBean.java", line: 141 });
   });
 
   it("api-spec consumes routes/middleware edges", () => {

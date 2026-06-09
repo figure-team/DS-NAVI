@@ -144,17 +144,16 @@ export function buildArchitecture(graph: CanonicalGraph): GeneratedDoc {
 export function buildFeatureSpec(graph: CanonicalGraph): GeneratedDoc {
   const domains = nodesOfKind(graph, "domain").map((n) => claimForNode(n, `업무 도메인: ${n.name} — ${n.summary}`));
   const flows = nodesOfKind(graph, "flow").map((n) => claimForNode(n, `흐름: ${n.name} — ${n.summary}`));
-  // §2.3: contains_flow/flow_step 엣지로 흐름-단계 관계 표현
-  const steps = edgesOfType(graph, "contains_flow", "flow_step").map((e) =>
-    edgeClaim(graph, e, `${e.type === "contains_flow" ? "흐름 포함" : "흐름 단계"}: ${e.sourceUid} → ${e.targetUid}`)
-  );
+  // §2.3 step 노드: 코드 진입점 근거(file:line)를 살려 CONFIRMED_AI 로 렌더.
+  // (contains_flow/flow_step 엣지로 표현되는 흐름-단계 포함관계의 단계 엔티티 자체)
+  const stepNodes = nodesOfKind(graph, "step").map((n) => claimForNode(n, `처리 단계: ${n.name} — ${n.summary}`));
   return {
     filename: "03_feature-spec.md",
     title: "기능 명세",
     sections: [
       { heading: "업무 도메인", claims: domains },
       { heading: "처리 흐름", claims: flows },
-      { heading: "흐름 단계 / 구성", claims: steps },
+      { heading: "처리 단계", claims: stepNodes },
     ],
   };
 }

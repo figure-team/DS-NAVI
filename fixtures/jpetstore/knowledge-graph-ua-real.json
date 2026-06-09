@@ -4190,6 +4190,589 @@
     "empty"
    ],
    "complexity": "simple"
+  },
+  {
+   "id": "domain:account-auth",
+   "type": "domain",
+   "name": "계정/인증",
+   "summary": "회원 가입, 로그인/로그아웃, 계정 정보 수정 등 사용자 계정 생명주기와 세션 기반 인증을 담당한다. 로그인 사용자에게는 카탈로그 추천 목록(MyList)을 구성해 제공한다.",
+   "tags": [
+    "account",
+    "authentication",
+    "session"
+   ],
+   "complexity": "moderate",
+   "domainMeta": {
+    "entities": [
+     "Account",
+     "Profile",
+     "Signon"
+    ],
+    "businessRules": [
+     "username/password 일치 시에만 인증 성공",
+     "계정 등록/수정은 트랜잭션으로 처리",
+     "로그인 성공 시 세션에 계정과 MyList(추천 목록) 저장"
+    ],
+    "crossDomainInteractions": [
+     "로그인 시 CatalogService로 관심 카테고리 기반 MyList 구성",
+     "주문 도메인의 소유권 검증에 세션 인증 계정을 사용"
+    ]
+   }
+  },
+  {
+   "id": "domain:catalog-browsing",
+   "type": "domain",
+   "name": "카탈로그 탐색",
+   "summary": "카테고리 → 상품 → 아이템으로 이어지는 상품 카탈로그 탐색과 키워드 기반 상품 검색을 담당한다. CatalogService가 Category/Product/Item 매퍼에 위임해 조회 결과를 제공한다.",
+   "tags": [
+    "catalog",
+    "navigation",
+    "search"
+   ],
+   "complexity": "moderate",
+   "domainMeta": {
+    "entities": [
+     "Category",
+     "Product",
+     "Item"
+    ],
+    "businessRules": [
+     "검색은 키워드를 토큰화하여 상품 목록을 조회",
+     "아이템 조회 시 재고(inStock) 상태를 함께 확인"
+    ],
+    "crossDomainInteractions": [
+     "장바구니 담기 시 아이템/재고 조회를 제공",
+     "로그인 사용자의 MyList 추천 목록 데이터를 제공"
+    ]
+   }
+  },
+  {
+   "id": "domain:shopping-cart",
+   "type": "domain",
+   "name": "장바구니",
+   "summary": "세션 기반 장바구니에 아이템을 담고 삭제하며 수량을 변경하고 소계를 계산하는 흐름을 담당한다. CatalogService로 재고를 확인하면서 Cart 도메인 객체를 관리한다.",
+   "tags": [
+    "cart",
+    "shopping-cart",
+    "session"
+   ],
+   "complexity": "moderate",
+   "domainMeta": {
+    "entities": [
+     "Cart",
+     "CartItem",
+     "Item"
+    ],
+    "businessRules": [
+     "이미 담긴 아이템은 수량을 증가시키고 없으면 새 항목으로 추가",
+     "소계는 각 항목 단가×수량의 합으로 계산",
+     "장바구니는 사용자 세션에 보관"
+    ],
+    "crossDomainInteractions": [
+     "아이템 추가 시 카탈로그 도메인에서 아이템/재고 조회",
+     "체크아웃 시 주문 도메인으로 흐름을 넘기고 세션 장바구니를 주문 초기화에 사용"
+    ]
+   }
+  },
+  {
+   "id": "domain:order-checkout",
+   "type": "domain",
+   "name": "주문/결제",
+   "summary": "장바구니로부터 주문을 초기화하고 배송정보 입력·주문 확정·재고 차감을 거쳐 주문을 저장하며, 주문 조회/목록을 제공하는 핵심 거래 도메인이다. OrderService가 Order/LineItem/Item/Sequence 매퍼를 트랜잭션으로 조율한다.",
+   "tags": [
+    "order",
+    "checkout",
+    "transactional"
+   ],
+   "complexity": "complex",
+   "domainMeta": {
+    "entities": [
+     "Order",
+     "LineItem",
+     "Item",
+     "Account"
+    ],
+    "businessRules": [
+     "주문 생성은 로그인 사용자만 가능",
+     "주문 저장 시 순번 채번 → 헤더/라인아이템 저장 → 재고 차감을 한 트랜잭션으로 처리",
+     "주문 조회는 현재 로그인 사용자의 소유 주문만 허용",
+     "주문 확정 후 세션 장바구니를 비움"
+    ],
+    "crossDomainInteractions": [
+     "계정 도메인의 인증/소유권 검증을 사용",
+     "장바구니 도메인의 세션 Cart로부터 주문을 초기화",
+     "카탈로그 도메인의 Item 재고를 차감"
+    ]
+   }
+  },
+  {
+   "id": "flow:user-registration",
+   "type": "flow",
+   "name": "회원 가입",
+   "summary": "신규 계정 정보를 입력받아 계정과 프로필을 저장한 뒤 카탈로그 메인으로 이동한다.",
+   "tags": [
+    "account",
+    "create"
+   ],
+   "complexity": "simple",
+   "domainMeta": {
+    "entryPoint": "POST /actions/Account.action?newAccount",
+    "entryType": "http"
+   }
+  },
+  {
+   "id": "flow:login",
+   "type": "flow",
+   "name": "로그인",
+   "summary": "username/password로 인증을 수행하고 성공 시 세션에 계정과 MyList를 저장한다. 로그아웃은 세션을 무효화한다.",
+   "tags": [
+    "authentication",
+    "session"
+   ],
+   "complexity": "moderate",
+   "domainMeta": {
+    "entryPoint": "POST /actions/Account.action?signon",
+    "entryType": "http"
+   }
+  },
+  {
+   "id": "flow:edit-account",
+   "type": "flow",
+   "name": "계정 정보 수정",
+   "summary": "기존 계정/프로필 정보를 갱신하여 사용자 설정과 관심 카테고리를 변경한다.",
+   "tags": [
+    "account",
+    "update"
+   ],
+   "complexity": "simple",
+   "domainMeta": {
+    "entryPoint": "POST /actions/Account.action?editAccount",
+    "entryType": "http"
+   }
+  },
+  {
+   "id": "flow:browse-catalog",
+   "type": "flow",
+   "name": "카탈로그 탐색",
+   "summary": "메인 → 카테고리 → 상품 → 아이템 순으로 카탈로그를 탐색하며 각 단계의 데이터를 조회해 화면에 바인딩한다.",
+   "tags": [
+    "catalog",
+    "navigation",
+    "read"
+   ],
+   "complexity": "moderate",
+   "domainMeta": {
+    "entryPoint": "GET /actions/Catalog.action?viewCategory",
+    "entryType": "http"
+   }
+  },
+  {
+   "id": "flow:search-products",
+   "type": "flow",
+   "name": "상품 검색",
+   "summary": "검색 키워드를 검증하고 토큰화해 상품 목록을 조회한 뒤 검색 결과 화면으로 포워딩한다.",
+   "tags": [
+    "catalog",
+    "search"
+   ],
+   "complexity": "simple",
+   "domainMeta": {
+    "entryPoint": "GET /actions/Catalog.action?searchProducts",
+    "entryType": "http"
+   }
+  },
+  {
+   "id": "flow:manage-cart",
+   "type": "flow",
+   "name": "장바구니 관리",
+   "summary": "아이템을 장바구니에 담고 삭제하며 수량을 변경하고 소계를 갱신하는 세션 장바구니 조작 흐름.",
+   "tags": [
+    "cart",
+    "create",
+    "update"
+   ],
+   "complexity": "moderate",
+   "domainMeta": {
+    "entryPoint": "POST /actions/Cart.action?addItemToCart",
+    "entryType": "http"
+   }
+  },
+  {
+   "id": "flow:create-order",
+   "type": "flow",
+   "name": "주문 생성",
+   "summary": "장바구니로부터 주문을 초기화하고 배송정보를 입력받아 주문을 확정·저장한 뒤 재고를 차감하고 장바구니를 비운다(장바구니→배송정보→주문확정).",
+   "tags": [
+    "order",
+    "checkout",
+    "create"
+   ],
+   "complexity": "complex",
+   "domainMeta": {
+    "entryPoint": "POST /actions/Order.action?newOrder",
+    "entryType": "http"
+   }
+  },
+  {
+   "id": "flow:view-order",
+   "type": "flow",
+   "name": "주문 조회",
+   "summary": "주문 ID로 주문을 조회하고 현재 로그인 사용자의 소유 주문인지 검증한 뒤 상세 화면을 보여주며, 사용자별 주문 목록도 제공한다.",
+   "tags": [
+    "order",
+    "read",
+    "authorization"
+   ],
+   "complexity": "moderate",
+   "domainMeta": {
+    "entryPoint": "GET /actions/Order.action?viewOrder",
+    "entryType": "http"
+   }
+  },
+  {
+   "id": "step:user-registration:submit-new-account",
+   "type": "step",
+   "name": "신규 계정 정보 제출",
+   "summary": "newAccount 이벤트 핸들러가 입력된 계정 정보를 받아 등록 절차를 시작한다.",
+   "tags": [
+    "account",
+    "event-handler"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+   "lineRange": [
+    115,
+    121
+   ]
+  },
+  {
+   "id": "step:user-registration:persist-account",
+   "type": "step",
+   "name": "계정/프로필 저장",
+   "summary": "AccountService.insertAccount가 신규 계정과 연관 프로필을 트랜잭션 내에서 AccountMapper로 저장한다.",
+   "tags": [
+    "account",
+    "transactional",
+    "create"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+   "lineRange": [
+    53,
+    58
+   ]
+  },
+  {
+   "id": "step:login:authenticate-credentials",
+   "type": "step",
+   "name": "자격증명 인증",
+   "summary": "signon 핸들러가 username/password로 AccountService 인증을 수행한다.",
+   "tags": [
+    "authentication"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+   "lineRange": [
+    159,
+    177
+   ]
+  },
+  {
+   "id": "step:login:establish-session",
+   "type": "step",
+   "name": "세션 및 MyList 설정",
+   "summary": "인증 성공 시 세션에 계정과 카탈로그 추천 목록(MyList)을 저장하고 카탈로그로 리다이렉트한다.",
+   "tags": [
+    "session",
+    "authentication"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+   "lineRange": [
+    159,
+    177
+   ]
+  },
+  {
+   "id": "step:login:signoff",
+   "type": "step",
+   "name": "로그아웃",
+   "summary": "signoff 핸들러가 세션을 무효화하여 로그아웃을 처리하고 카탈로그 메인으로 리다이렉트한다.",
+   "tags": [
+    "authentication",
+    "session"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+   "lineRange": [
+    184,
+    188
+   ]
+  },
+  {
+   "id": "step:edit-account:update-account",
+   "type": "step",
+   "name": "계정/프로필 갱신",
+   "summary": "AccountService.updateAccount가 기존 계정과 프로필 정보를 트랜잭션 내에서 갱신한다.",
+   "tags": [
+    "account",
+    "transactional",
+    "update"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+   "lineRange": [
+    66,
+    73
+   ]
+  },
+  {
+   "id": "step:browse-catalog:view-category",
+   "type": "step",
+   "name": "카테고리 조회",
+   "summary": "viewCategory가 categoryId로 카테고리와 상품 목록을 조회해 카테고리 화면으로 포워딩한다.",
+   "tags": [
+    "catalog",
+    "read"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+   "lineRange": [
+    153,
+    159
+   ]
+  },
+  {
+   "id": "step:browse-catalog:resolve-catalog-data",
+   "type": "step",
+   "name": "카탈로그 데이터 위임 조회",
+   "summary": "CatalogService가 Category/Product/Item 매퍼에 위임해 카탈로그 탐색 단계별 데이터를 제공한다.",
+   "tags": [
+    "catalog",
+    "read",
+    "service"
+   ],
+   "complexity": "moderate",
+   "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+   "lineRange": [
+    34,
+    90
+   ]
+  },
+  {
+   "id": "step:search-products:execute-search",
+   "type": "step",
+   "name": "키워드 검증 및 검색 실행",
+   "summary": "searchProducts가 키워드 유효성을 검증한 뒤 CatalogService.searchProductList로 검색 결과를 조회한다.",
+   "tags": [
+    "catalog",
+    "search"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+   "lineRange": [
+    190,
+    198
+   ]
+  },
+  {
+   "id": "step:search-products:tokenize-and-query",
+   "type": "step",
+   "name": "키워드 토큰화 후 조회",
+   "summary": "searchProductList가 키워드를 토큰화하여 ProductMapper로 상품 목록을 검색한다.",
+   "tags": [
+    "catalog",
+    "search",
+    "read"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+   "lineRange": [
+    71,
+    77
+   ]
+  },
+  {
+   "id": "step:manage-cart:add-item",
+   "type": "step",
+   "name": "아이템 담기",
+   "summary": "addItemToCart가 이미 담긴 아이템이면 수량을 늘리고 아니면 CatalogService로 조회해 추가한다.",
+   "tags": [
+    "cart",
+    "create"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+   "lineRange": [
+    68,
+    87
+   ]
+  },
+  {
+   "id": "step:manage-cart:cart-add-logic",
+   "type": "step",
+   "name": "장바구니 항목 추가 로직",
+   "summary": "Cart.addItem이 동일 상품이 존재하면 수량을 증가시키고 없으면 새 CartItem을 생성해 등록한다.",
+   "tags": [
+    "cart",
+    "shopping-cart",
+    "business-logic"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+   "lineRange": [
+    67,
+    78
+   ]
+  },
+  {
+   "id": "step:manage-cart:update-quantities",
+   "type": "step",
+   "name": "수량 변경",
+   "summary": "updateCartQuantities가 요청 파라미터의 수량을 읽어 장바구니 각 항목 수량을 갱신한다.",
+   "tags": [
+    "cart",
+    "update"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+   "lineRange": [
+    116,
+    135
+   ]
+  },
+  {
+   "id": "step:manage-cart:compute-subtotal",
+   "type": "step",
+   "name": "소계 계산",
+   "summary": "Cart.getSubTotal이 각 항목의 단가×수량을 합산해 장바구니 소계 금액을 계산한다.",
+   "tags": [
+    "cart",
+    "calculation",
+    "business-logic"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+   "lineRange": [
+    119,
+    123
+   ]
+  },
+  {
+   "id": "step:create-order:init-order-form",
+   "type": "step",
+   "name": "주문서 초기화",
+   "summary": "newOrderForm이 로그인 여부를 확인하고 세션 장바구니로부터 주문 객체를 초기화한 뒤 입력 폼으로 포워딩한다.",
+   "tags": [
+    "order",
+    "checkout"
+   ],
+   "complexity": "moderate",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+   "lineRange": [
+    119,
+    135
+   ]
+  },
+  {
+   "id": "step:create-order:init-order-from-cart",
+   "type": "step",
+   "name": "장바구니로부터 주문 구성",
+   "summary": "Order.initOrder가 Account의 배송/청구 정보와 Cart 항목을 결합해 주문과 라인 항목을 구성한다.",
+   "tags": [
+    "order",
+    "initialization",
+    "business-logic"
+   ],
+   "complexity": "moderate",
+   "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+   "lineRange": [
+    286,
+    324
+   ]
+  },
+  {
+   "id": "step:create-order:confirm-and-submit",
+   "type": "step",
+   "name": "배송정보 입력 및 주문 확정",
+   "summary": "newOrder가 배송지 입력 단계와 확정 단계를 구분 처리하며, 확정 시 OrderService로 주문을 저장하고 장바구니를 비운다.",
+   "tags": [
+    "order",
+    "checkout",
+    "create"
+   ],
+   "complexity": "moderate",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+   "lineRange": [
+    142,
+    164
+   ]
+  },
+  {
+   "id": "step:create-order:allocate-sequence",
+   "type": "step",
+   "name": "주문 순번 채번",
+   "summary": "OrderService.getNextId가 SequenceMapper로 시퀀스 현재 값을 읽고 증가시켜 주문 ID를 발급한다.",
+   "tags": [
+    "order",
+    "sequence"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+   "lineRange": [
+    121,
+    130
+   ]
+  },
+  {
+   "id": "step:create-order:persist-order-decrement-stock",
+   "type": "step",
+   "name": "주문 저장 및 재고 차감",
+   "summary": "OrderService.insertOrder가 주문 헤더와 각 라인아이템을 저장하고 해당 아이템의 재고 수량을 차감하는 트랜잭션을 수행한다.",
+   "tags": [
+    "order",
+    "transactional",
+    "create"
+   ],
+   "complexity": "complex",
+   "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+   "lineRange": [
+    59,
+    77
+   ]
+  },
+  {
+   "id": "step:view-order:fetch-and-authorize",
+   "type": "step",
+   "name": "주문 조회 및 소유권 검증",
+   "summary": "viewOrder가 주문 ID로 주문을 조회하고 현재 로그인 사용자의 소유 주문인지 검증한 뒤 상세 화면으로 포워딩한다.",
+   "tags": [
+    "order",
+    "read",
+    "authorization"
+   ],
+   "complexity": "moderate",
+   "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+   "lineRange": [
+    171,
+    185
+   ]
+  },
+  {
+   "id": "step:view-order:load-order-detail",
+   "type": "step",
+   "name": "주문 상세 로드",
+   "summary": "OrderService.getOrder가 주문 ID로 주문 헤더와 라인아이템 목록을 조회해 Order 객체를 구성한다.",
+   "tags": [
+    "order",
+    "read"
+   ],
+   "complexity": "simple",
+   "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+   "lineRange": [
+    87,
+    99
+   ]
   }
  ],
  "edges": [
@@ -6138,6 +6721,249 @@
    "type": "tested_by",
    "direction": "forward",
    "weight": 0.5
+  },
+  {
+   "source": "domain:account-auth",
+   "target": "flow:user-registration",
+   "type": "contains_flow",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "domain:account-auth",
+   "target": "flow:login",
+   "type": "contains_flow",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "domain:account-auth",
+   "target": "flow:edit-account",
+   "type": "contains_flow",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "domain:catalog-browsing",
+   "target": "flow:browse-catalog",
+   "type": "contains_flow",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "domain:catalog-browsing",
+   "target": "flow:search-products",
+   "type": "contains_flow",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "domain:shopping-cart",
+   "target": "flow:manage-cart",
+   "type": "contains_flow",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "domain:order-checkout",
+   "target": "flow:create-order",
+   "type": "contains_flow",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "domain:order-checkout",
+   "target": "flow:view-order",
+   "type": "contains_flow",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "flow:user-registration",
+   "target": "step:user-registration:submit-new-account",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "flow:user-registration",
+   "target": "step:user-registration:persist-account",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "flow:login",
+   "target": "step:login:authenticate-credentials",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.3
+  },
+  {
+   "source": "flow:login",
+   "target": "step:login:establish-session",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "flow:login",
+   "target": "step:login:signoff",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.9
+  },
+  {
+   "source": "flow:edit-account",
+   "target": "step:edit-account:update-account",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "flow:browse-catalog",
+   "target": "step:browse-catalog:view-category",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "flow:browse-catalog",
+   "target": "step:browse-catalog:resolve-catalog-data",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "flow:search-products",
+   "target": "step:search-products:execute-search",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "flow:search-products",
+   "target": "step:search-products:tokenize-and-query",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "flow:manage-cart",
+   "target": "step:manage-cart:add-item",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.3
+  },
+  {
+   "source": "flow:manage-cart",
+   "target": "step:manage-cart:cart-add-logic",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "flow:manage-cart",
+   "target": "step:manage-cart:update-quantities",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "flow:manage-cart",
+   "target": "step:manage-cart:compute-subtotal",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "flow:create-order",
+   "target": "step:create-order:init-order-form",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.2
+  },
+  {
+   "source": "flow:create-order",
+   "target": "step:create-order:init-order-from-cart",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.4
+  },
+  {
+   "source": "flow:create-order",
+   "target": "step:create-order:confirm-and-submit",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.6
+  },
+  {
+   "source": "flow:create-order",
+   "target": "step:create-order:allocate-sequence",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.8
+  },
+  {
+   "source": "flow:create-order",
+   "target": "step:create-order:persist-order-decrement-stock",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "flow:view-order",
+   "target": "step:view-order:fetch-and-authorize",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 0.5
+  },
+  {
+   "source": "flow:view-order",
+   "target": "step:view-order:load-order-detail",
+   "type": "flow_step",
+   "direction": "forward",
+   "weight": 1
+  },
+  {
+   "source": "domain:account-auth",
+   "target": "domain:catalog-browsing",
+   "type": "cross_domain",
+   "direction": "forward",
+   "description": "로그인 시 카탈로그 추천 목록(MyList)을 구성하기 위해 CatalogService를 호출한다.",
+   "weight": 0.5
+  },
+  {
+   "source": "domain:catalog-browsing",
+   "target": "domain:shopping-cart",
+   "type": "cross_domain",
+   "direction": "forward",
+   "description": "장바구니 담기 시 카탈로그가 아이템과 재고 정보를 제공한다.",
+   "weight": 0.6
+  },
+  {
+   "source": "domain:shopping-cart",
+   "target": "domain:order-checkout",
+   "type": "cross_domain",
+   "direction": "forward",
+   "description": "체크아웃 시 세션 장바구니가 주문 초기화의 입력이 된다.",
+   "weight": 0.7
+  },
+  {
+   "source": "domain:order-checkout",
+   "target": "domain:account-auth",
+   "type": "cross_domain",
+   "direction": "forward",
+   "description": "주문 생성/조회 시 로그인 인증과 주문 소유권 검증에 계정 도메인을 사용한다.",
+   "weight": 0.6
+  },
+  {
+   "source": "domain:order-checkout",
+   "target": "domain:catalog-browsing",
+   "type": "cross_domain",
+   "direction": "forward",
+   "description": "주문 확정 시 카탈로그의 Item 재고를 차감한다.",
+   "weight": 0.6
   }
  ],
  "tour": []

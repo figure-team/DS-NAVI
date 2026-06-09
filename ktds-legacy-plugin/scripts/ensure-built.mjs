@@ -1,6 +1,10 @@
 // 최초 1회 엔진 빌드 보장.
 // 플러그인 설치 직후엔 packages/legacy-core/dist 가 없다(빌드 산출물·node_modules 는 git 미포함).
-// dist 가 없으면 legacy-core 를 standalone 으로 install + build 한다(U-A 의존성 0, 런타임 의존은 zod 뿐).
+// dist 가 없으면 legacy-core 에서 install + build 한다.
+//   - legacy-core 자체의 런타임 의존은 zod 뿐(U-A 코드 의존 0)이지만,
+//   - 루트 pnpm-workspace.yaml 때문에 install 은 워크스페이스 전체로 확장되고
+//     루트 prepare 가 U-A core 까지 빌드한다 → 한 번의 자동 빌드로 U-A·ktds 엔진이 모두 준비된다.
+//   - 따라서 tree-sitter 네이티브 프리빌드 다운로드를 위해 최초 1회 네트워크가 필요하다.
 import { existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";

@@ -15,29 +15,51 @@ ktds는 `Lum1104/Understand-Anything`의 **fork**이며, U-A 스킬(`/understand
 
 ## 2. 온라인 설치 (개방형/유형3)
 
+> ⚠️ **마켓플레이스 이름은 `ktds`** (`.claude-plugin/marketplace.json`의 `name`). 설치 시 플러그인 뒤에 **`@ktds`** 를 붙인다. (옛 이름 `@understand-anything` 아님 — 2026-06-09 변경)
+
 ```bash
-# Claude Code 안에서 (GitHub fork 또는 로컬 경로 모두 가능)
-/plugin marketplace add <fork>                            # owner/repo 또는 /abs/local/path
-/plugin install understand-anything@understand-anything   # U-A (/understand)
-/plugin install ktds-legacy@understand-anything           # ktds (/understand-init, -docs, -export)
+# Claude Code 안에서 (GitHub repo 또는 로컬 경로 모두 가능)
+/plugin marketplace add figure-team/code-atlas    # 또는 /abs/local/path
+/plugin install understand-anything@ktds          # U-A (/understand)
+/plugin install ktds-legacy@ktds                  # ktds (/understand-init, -docs, -export)
 ```
 
-> **수동 빌드 불필요.** ktds 스킬을 **처음 실행할 때 엔진이 자동 빌드**된다(`pnpm`/`npm` + `tsc`, 수 초~수십 초, 1회). 따라서 다른 컴퓨터에서도 `/plugin install` 후 바로 `/understand-init`/`/understand-docs`만 치면 된다.
-> - 전제: 그 PC에 **Node 22+** 와 **pnpm 또는 npm**, 네트워크(최초 의존성 설치)·또는 사내 레지스트리.
-> - `marketplace.json`의 marketplace 이름이 `understand-anything`이라 설치 시 `@understand-anything`을 붙인다.
-> - **다른 컴퓨터로 옮기기**: fork를 git push 후 `add <owner>/<repo>`, 또는 폴더를 복사해 `add /abs/path`. (빌드 산출물·node_modules는 git 미포함 — 자동 빌드가 처리)
+> **수동 빌드 불필요.** ktds 스킬을 **처음 실행할 때 엔진이 자동 빌드**된다(`scripts/ensure-built.mjs`, 1회). 따라서 다른 컴퓨터에서도 `/plugin install` 후 바로 `/understand-init`/`/understand-docs`만 치면 된다.
+> - **실제 동작**: 첫 실행은 `packages/legacy-core`에서 `pnpm install`을 돌리는데, 루트 `pnpm-workspace.yaml` 때문에 **워크스페이스 전체**가 설치되고(루트 `prepare`가 U-A core까지 빌드), 이어서 legacy-core가 `tsc`로 빌드된다. 즉 **한 번의 자동 빌드로 U-A·ktds 엔진이 모두 준비**된다. (검증: fresh clone에서 `/understand-init` 첫 실행 → `dist/index.js` 생성 확인.)
+> - **소요 시간**: tree-sitter 네이티브 모듈(python/js/ts/ruby/rust/cpp 프리빌드) 다운로드 포함 — cold 환경에서 **약 30초~수분**(네트워크·디스크 캐시에 따라).
+> - **전제**: 그 PC에 **Node 22+** 와 **pnpm 또는 npm**, 그리고 **네트워크(최초 의존성 설치)** 또는 사내 npm 레지스트리(tree-sitter 프리빌드 포함).
+> - **다른 컴퓨터로 옮기기**: repo를 git push 후 `add figure-team/code-atlas`, 또는 폴더를 복사해 `add /abs/path`. (빌드 산출물·node_modules는 git 미포함 — 자동 빌드가 처리)
+
+### 2-1. 설치 후 첫 실행 (smoke test)
+
+분석 대상 프로젝트(`<root>`, **비민감 샘플**)에서:
+
+```bash
+/understand                          # U-A: 코드 분석 → .understand-anything/knowledge-graph.json 생성 (선행 필수)
+/understand-init <root>              # config + .spec/ scaffold (★ 첫 ktds 실행 → 엔진 자동 빌드 1회)
+/understand-docs <root> run-smoke    # knowledge-graph.json → 근거 5종 문서 DRAFT
+/understand-docs <root> review --list           # 검토 대기 목록
+/understand-docs <root> approve --doc <f> --by <handle>   # 승인
+/understand-export <root>            # 독립 실행 HTML (docs/index.html, CDN 없음)
+```
+
+> 순서 주의: `/understand-docs`는 U-A가 만든 `knowledge-graph.json`을 읽으므로 **`/understand` 가 먼저** 돌아야 한다. 운영 상세는 [`OPERATOR.md`](./OPERATOR.md), 오류는 [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md).
 
 ## 3. 오프라인 설치 (폐쇄망 대비 — Phase 2 본격 지원)
 
 ```bash
-git clone <ktds-fork-repo> ./ktds-legacy        # fork 전체(U-A 포함) 복제
-cd ktds-legacy
+git clone https://github.com/figure-team/code-atlas ./code-atlas   # fork 전체(U-A 포함) 복제
+cd code-atlas
 corepack prepare pnpm@10.6.2 --activate
-pnpm install                                     # 외부 CDN 의존 없음
+pnpm install                                     # 외부 CDN 의존 없음 (tree-sitter는 프리빌드)
 pnpm -r build                                    # @understand-anything/core + @ktds/legacy-core
-# Claude Code에 로컬 마켓플레이스로 추가
-/plugin marketplace add ./ktds-legacy
+# Claude Code에 로컬 마켓플레이스로 추가 (이름 ktds)
+/plugin marketplace add ./code-atlas
+/plugin install understand-anything@ktds
+/plugin install ktds-legacy@ktds
 ```
+
+> 오프라인에서 미리 `pnpm -r build`까지 해두면 `dist/`가 존재하므로 **첫 실행 자동 빌드가 생략**된다(`ensure-built.mjs`가 `dist/index.js` 존재를 보고 즉시 반환).
 
 빌드 검증:
 ```bash

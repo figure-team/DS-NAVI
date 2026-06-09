@@ -10,10 +10,12 @@
 // 결정론 skeleton만 생성. 실제 LLM 산문은 host CLI(Claude)가 SKILL.md 지시로 채운다.
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import {
+import { ensureBuilt } from "./ensure-built.mjs";
+
+const {
   runDocsPipeline, listDrafts, startReview, approveDoc, returnDoc,
-  readAudit, getDocState, loadApprovals,
-} from "../packages/legacy-core/dist/index.js";
+  readAudit, getDocState,
+} = await import(await ensureBuilt());
 
 const SUBS = ["review", "approve", "return", "audit"];
 const argv = process.argv.slice(2);

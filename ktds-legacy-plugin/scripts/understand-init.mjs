@@ -3,7 +3,9 @@
 // 사용: node understand-init.mjs [projectRoot]
 import { writeFile, access } from "node:fs/promises";
 import { join } from "node:path";
-import { defaultConfig, scaffoldSpecDir } from "../packages/legacy-core/dist/index.js";
+import { ensureBuilt } from "./ensure-built.mjs";
+
+const { defaultConfig, scaffoldSpecDir } = await import(await ensureBuilt());
 
 const root = process.argv[2] ?? process.cwd();
 const configPath = join(root, "understanding.config.json");

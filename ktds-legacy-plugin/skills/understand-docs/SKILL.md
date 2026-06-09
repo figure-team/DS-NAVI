@@ -14,7 +14,7 @@ argument-hint: ["[projectRoot]", "[review --list | approve --doc <f> --by <handl
 ```
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId>
 ```
-이 스크립트는 **결정론 skeleton(근거·태그·구조)** 만 만든다.
+이 스크립트는 **결정론 skeleton(근거·태그·구조)** 만 만든다. (최초 실행 시 엔진 자동 빌드 1회)
 
 ## LLM 산문 (이 단계는 host CLI = 너의 역할)
 생성된 `docs/**/*.md` 의 각 섹션에 대해, **그 섹션의 claim 목록만 근거로** 자연스러운 설명 산문을 작성해 채운다. 규칙:

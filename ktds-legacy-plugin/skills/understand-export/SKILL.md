@@ -12,7 +12,7 @@ argument-hint: ["[projectRoot]", "[outFile]"]
 ```
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-export.mjs <projectRoot> [outFile]
 ```
-기본 출력: `<projectRoot>/docs/index.html`.
+기본 출력: `<projectRoot>/docs/index.html`. (최초 실행 시 엔진 자동 빌드 1회)
 
 - PPT/Word 추가 포맷은 MVP+.
 - 엔진: `@ktds/legacy-core`(export).

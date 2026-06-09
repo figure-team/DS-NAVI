@@ -16,11 +16,16 @@ ktds는 `Lum1104/Understand-Anything`의 **fork**이며, U-A 스킬(`/understand
 ## 2. 온라인 설치 (개방형/유형3)
 
 ```bash
-# Claude Code 안에서
-/plugin marketplace add <ktds-fork-repo>
-/plugin install understand-anything   # U-A (/understand)
-/plugin install ktds-legacy           # ktds (/understand-init, -docs, -export)
+# Claude Code 안에서 (GitHub fork 또는 로컬 경로 모두 가능)
+/plugin marketplace add <fork>                            # owner/repo 또는 /abs/local/path
+/plugin install understand-anything@understand-anything   # U-A (/understand)
+/plugin install ktds-legacy@understand-anything           # ktds (/understand-init, -docs, -export)
 ```
+
+> **수동 빌드 불필요.** ktds 스킬을 **처음 실행할 때 엔진이 자동 빌드**된다(`pnpm`/`npm` + `tsc`, 수 초~수십 초, 1회). 따라서 다른 컴퓨터에서도 `/plugin install` 후 바로 `/understand-init`/`/understand-docs`만 치면 된다.
+> - 전제: 그 PC에 **Node 22+** 와 **pnpm 또는 npm**, 네트워크(최초 의존성 설치)·또는 사내 레지스트리.
+> - `marketplace.json`의 marketplace 이름이 `understand-anything`이라 설치 시 `@understand-anything`을 붙인다.
+> - **다른 컴퓨터로 옮기기**: fork를 git push 후 `add <owner>/<repo>`, 또는 폴더를 복사해 `add /abs/path`. (빌드 산출물·node_modules는 git 미포함 — 자동 빌드가 처리)
 
 ## 3. 오프라인 설치 (폐쇄망 대비 — Phase 2 본격 지원)
 

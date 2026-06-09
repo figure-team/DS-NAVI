@@ -3,7 +3,9 @@
 // 사용: node understand-export.mjs [projectRoot] [outFile]
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { readKnowledgeGraph, generateDocs, exportHtml } from "../packages/legacy-core/dist/index.js";
+import { ensureBuilt } from "./ensure-built.mjs";
+
+const { readKnowledgeGraph, generateDocs, exportHtml } = await import(await ensureBuilt());
 
 const root = process.argv[2] ?? process.cwd();
 const out = process.argv[3] ?? join(root, "docs", "index.html");

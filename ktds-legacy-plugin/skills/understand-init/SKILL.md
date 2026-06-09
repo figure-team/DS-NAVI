@@ -14,7 +14,7 @@ argument-hint: ["[projectRoot]"]
 ```
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-init.mjs <projectRoot>
 ```
-- idempotent 재실행: 기존 config 보존(신규만 생성).
-- 엔진: `@ktds/legacy-core`(config). VCS 감지·`--merge`/`--force`는 후속.
+- **최초 1회 자동 빌드**: dist가 없으면 엔진(`@ktds/legacy-core`)을 자동 빌드한다(pnpm/npm, 수 초~수십 초). 이후 실행은 즉시. 수동 빌드 불필요.
+- idempotent 재실행: 기존 config 보존(신규만 생성). VCS 감지·`--merge`/`--force`는 후속.
 
 선행: U-A 플러그인으로 `/understand` 를 먼저 실행해 `.understand-anything/knowledge-graph.json` 을 만들어 둔다.

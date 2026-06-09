@@ -1,16 +1,31 @@
 ---
 name: understand-docs
-description: 근거 기반 5종 문서 생성(기술스택/아키텍처/기능명세/API명세/DB명세) + 검토(review)/승인(approve)/감사(audit)
-argument-hint: ["[review --list|--doc <f>] [approve --doc <f> --by <name>] [audit --list|--date <d>|--export <dir>]"]
+description: 근거 기반 5종 문서 생성(기술스택/아키텍처/기능명세/API명세/DB명세) + 검토/승인/감사
+argument-hint: ["[projectRoot]", "[review --list | approve --doc <f> --by <handle>]"]
 ---
 
 # /understand-docs
 
-> ⚠️ STUB — 구현 예정 (plan 단계2~3). 비민감 샘플 전용.
+> ⚠️ 비민감 샘플 전용 (보안 게이트는 Phase 2).
 
-`.understand-anything/knowledge-graph.json`(U-A `/understand` 산출, 버전 필드 `version`)을 kg-reader로 읽어 근거 붙은 5종 문서를 생성하고 DRAFT→UNDER_REVIEW→APPROVED 흐름을 관리한다.
+`.understand-anything/knowledge-graph.json`(U-A `/understand` 산출)을 읽어 **근거 붙은 5종 문서**를 DRAFT로 생성한다. 흐름: lock → graph 로드(version+fingerprint 가드) → 5종 생성(staging) → 근거 검증(CONFIRMED_AI에 evidence 없으면 RETURNED) → `[추정]` 비율 게이트(block 0.6 초과 시 RUN_ABORTED) → atomic publish → DRAFT 등록 + 감사.
 
-- `[확정(AI)]` 문장은 evidence 필수(없으면 RETURNED). `[추정]` 비율 block 0.6 초과 시 RUN_ABORTED.
-- review/approve/audit 서브커맨드. 승인자는 핸들/이니셜만 기록(실명/사번 미저장).
+## 생성 (결정론 skeleton)
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId>
+```
+이 스크립트는 **결정론 skeleton(근거·태그·구조)** 만 만든다.
 
-엔진: `@ktds/legacy-core`(kg-reader, evidence, doc-generator, doc-state, approval, audit).
+## LLM 산문 (이 단계는 host CLI = 너의 역할)
+생성된 `docs/**/*.md` 의 각 섹션에 대해, **그 섹션의 claim 목록만 근거로** 자연스러운 설명 산문을 작성해 채운다. 규칙:
+- claim에 없는 사실을 지어내지 말 것. 근거(`파일:라인`) 밖의 단정 금지.
+- `[추정]`/`[확인 필요]` 항목은 추정임을 명시.
+- 출력 언어는 config `outputLanguage`(ko).
+
+## 검토 / 승인 / 감사 (엔진: doc-state·approval·audit)
+- `review --list` → DRAFT 목록 + [추정]/[확인 필요] 수
+- `review --doc <f>` → [추정] 인터랙티브 확정 → [확정(담당자)], DRAFT→UNDER_REVIEW
+- `approve --doc <f> --by <handle>` → UNDER_REVIEW→APPROVED, approvals.json + DOC_APPROVED (승인자는 핸들/이니셜만, 실명 미저장)
+- `audit --list | --date <d>` → `.spec/audit/*.jsonl`
+
+엔진: `@ktds/legacy-core`(orchestrator·kg-reader·evidence·doc-generator·doc-state·approval·audit·lock).

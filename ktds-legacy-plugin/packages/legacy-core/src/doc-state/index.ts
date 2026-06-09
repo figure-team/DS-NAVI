@@ -79,6 +79,16 @@ export async function setDocState(specDir: string, doc: string, to: DocState): P
   return to;
 }
 
+/** Register a freshly generated doc as DRAFT (idempotent; no transition check). */
+export async function registerDraft(specDir: string, doc: string): Promise<void> {
+  const map = await loadDocStatus(specDir);
+  if (map[doc]) return; // already tracked → leave its state
+  map[doc] = "DRAFT";
+  const path = join(specDir, STATUS_FILE);
+  await mkdir(dirname(path), { recursive: true });
+  await writeFile(path, JSON.stringify(map, null, 2), "utf-8");
+}
+
 function isENOENT(err: unknown): boolean {
   return typeof err === "object" && err !== null && (err as { code?: string }).code === "ENOENT";
 }

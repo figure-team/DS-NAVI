@@ -1,16 +1,20 @@
 ---
 name: understand-init
-description: ktds 프로젝트 초기화 — VCS 감지, understanding.config.json 생성, .spec 디렉터리·템플릿 scaffold (비민감 샘플 전용)
-argument-hint: ["[--network-type 3] [--merge|--force]"]
+description: ktds 프로젝트 초기화 — understanding.config.json 생성, .spec/ 디렉터리·템플릿 scaffold (비민감 샘플 전용)
+argument-hint: ["[projectRoot]"]
 ---
 
 # /understand-init
 
-> ⚠️ STUB — 구현 예정 (plan 단계1.3 config·scaffold / 단계4.2 VCS 감지·idempotent). 비민감 샘플 전용.
+> ⚠️ MVP는 **비민감 샘플 전용**. 실제 고객 코드 금지 (보안 게이트는 Phase 2).
 
-프로젝트를 분석 가능 상태로 만든다: `understanding.config.json` 생성, `.spec/00_MASTER.md`·`.spec/templates/*`·`docs/README.md` scaffold.
+프로젝트를 분석 가능 상태로 만든다: `understanding.config.json`(networkType 3 / outputLanguage ko / [추정] 임계값 0.3·0.6 / supportedSchemaVersions ["1.0.0"]) + `.spec/00_MASTER.md`·`.spec/templates/` scaffold.
 
-- networkType는 MVP 기본 3(개방형). 자동 탐지하지 않고 선언.
-- idempotent 재실행: (기본) 보존·신규만 / `--merge` 백업 후 병합 / `--force` 덮어쓰기 → `INIT_RERUN` 감사.
+## 실행
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-init.mjs <projectRoot>
+```
+- idempotent 재실행: 기존 config 보존(신규만 생성).
+- 엔진: `@ktds/legacy-core`(config). VCS 감지·`--merge`/`--force`는 후속.
 
-엔진: `@ktds/legacy-core`(config).
+선행: U-A 플러그인으로 `/understand` 를 먼저 실행해 `.understand-anything/knowledge-graph.json` 을 만들어 둔다.

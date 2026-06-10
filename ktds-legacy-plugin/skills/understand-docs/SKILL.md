@@ -24,9 +24,9 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId>
 
 ## 검토 / 승인 / 감사 (엔진: doc-state·approval·audit)
 - `review --list` → DRAFT 목록 + [추정]/[확정(AI)]/[확인 필요] 수
-- `review --doc <f> [--by <handle>]` → DRAFT→UNDER_REVIEW; TTY면 인터랙티브 확정 세션 진입
-- **인터랙티브 확정 세션** (`confirm --doc <f>` TTY, 또는 위 `review --doc`): 확정 대상 목록을 보여주고 **항목 번호로 콕 집어** [확정(담당자)] 승격. 담당자 핸들은 **세션 시작 시 1회만 입력→재사용**(이번 실행 동안 메모리만, 디스크 미저장), 세션 중 `by <핸들>`로 **변경 가능**. `a`=남은 전체 확정, `q`/Ctrl+D=종료. 확정마다 DOC_ITEM_CONFIRMED 감사(실제 사용 핸들 기록).
-- `confirm --doc <f> --list` / `confirm --doc <f> --item <n> --by <handle>` → 비대화(자동화) 확정 — UNDER_REVIEW에서만 허용
+- `review --doc <f> [--by <handle>]` → 검토만 시작(DRAFT→UNDER_REVIEW); TTY면 이어서 확정 세션 진입. (confirm이 자동 검토 시작하므로 필수는 아님)
+- **인터랙티브 확정 세션** (`confirm --doc <f>` TTY): 확정 대상 목록을 보여주고 **항목 번호로 콕 집어** [확정(담당자)] 승격. **문서가 DRAFT면 자동으로 검토 시작**(UNDER_REVIEW)하므로 `review --doc`를 먼저 칠 필요 없다. 담당자 핸들은 **세션 시작 시 1회만 입력→재사용**(이번 실행 동안 메모리만, 디스크 미저장), 세션 중 `by <핸들>`로 **변경 가능**. `a`=남은 전체 확정, `q`/Ctrl+D=종료. 확정마다 DOC_ITEM_CONFIRMED 감사(실제 사용 핸들 기록).
+- `confirm --doc <f> --list` / `confirm --doc <f> --item <n> --by <handle>` → 목록 / 비대화(자동화) 단건 확정. `--item` 확정도 DRAFT면 자동 검토 시작. (RETURNED/APPROVED 문서는 거부)
   - **확정 대상 = [확정(담당자)]가 아닌 모든 claim**: [추정](근거 없음) · [확정(AI)](AI 근거 있음 → 담당자가 검증·책임 인수) · [확인 필요](사람 판단 필요 → 담당자가 검토·확정). [확정(AI)]→[확정(담당자)] 승격 시 근거(`파일:라인`) cite는 그대로 보존된다.
 - `approve --doc <f> --by <handle>` → UNDER_REVIEW→APPROVED, approvals.json + DOC_APPROVED (승인자는 핸들/이니셜만, 실명 미저장)
 - `audit --list | --date <d>` → `.spec/audit/*.jsonl`

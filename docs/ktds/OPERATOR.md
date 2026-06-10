@@ -89,12 +89,12 @@ node …/understand-docs.mjs <root> audit --list
 node …/understand-docs.mjs <root> audit --date 2026-06-09
 ```
 
-### 4-1. 항목 확정 ([추정]·[확정(AI)] → [확정(담당자)])
+### 4-1. 항목 확정 ([추정]·[확정(AI)]·[확인 필요] → [확정(담당자)])
 
 승인(approve)은 **문서 단위**다. 그 전에, 문서 안의 개별 claim을 담당자가 **항목 단위**로 확정한다. 확정 대상은 **[확정(담당자)]가 아닌 모든 claim** — **[추정]**(근거 없음) · **[확정(AI)]**(AI 근거 있음 → 담당자가 검증·책임 인수) · **[확인 필요]**(순환 의존 후보 등 사람 판단 필요 → 담당자가 검토·확정).
 
 ```bash
-# (권장) 인터랙티브 확정 세션 — UNDER_REVIEW 문서에서
+# (권장) 인터랙티브 확정 세션 — DRAFT면 자동으로 검토 시작(UNDER_REVIEW)하므로 review --doc 불필요
 node …/understand-docs.mjs <root> confirm --doc 04_api-spec.md
 #   · 담당자 핸들은 세션 시작 시 1회만 입력 → 이후 재사용 (이번 실행 동안 메모리만, 디스크 미저장)
 #   · 목록에서 "번호"를 입력해 해당 항목만 콕 집어 확정
@@ -108,7 +108,7 @@ node …/understand-docs.mjs <root> confirm --doc 04_api-spec.md --item 3 --by i
 
 > 담당자 핸들을 **디스크에 저장하지 않으므로**(O3), 같은 머신에서 사람이 바뀌면 인터랙티브 세션에서 `by <핸들>`로 바꾸거나 비대화 `--by`로 명시한다. 감사 로그에는 항상 **그 항목을 실제로 확정한 핸들**이 박힌다.
 
-상태기계: `DRAFT → UNDER_REVIEW → APPROVED`, 반려는 `UNDER_REVIEW → RETURNED → DRAFT`. 불법 전이(예: DRAFT를 바로 approve)는 거부된다. 항목 확정은 `UNDER_REVIEW`에서만 허용된다.
+상태기계: `DRAFT → UNDER_REVIEW → APPROVED`, 반려는 `UNDER_REVIEW → RETURNED → DRAFT`. 불법 전이(예: DRAFT를 바로 approve)는 거부된다. 항목 확정은 `UNDER_REVIEW`에서만 허용되나, **`confirm`은 DRAFT 문서를 자동으로 `UNDER_REVIEW`로 올린 뒤 진행**한다(`review --doc` 생략 가능). 단 RETURNED/APPROVED 문서는 자동 전이하지 않고 거부된다 — 반려본은 수정 후 재생성한다.
 
 **산출 상태 파일** (`<root>/.spec/`)
 - `doc-status.json` — 문서별 상태

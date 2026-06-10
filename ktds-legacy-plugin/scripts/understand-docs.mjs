@@ -35,6 +35,18 @@ const has = (n) => rest.includes(n);
 const spec = join(root, ".spec");
 const docDir = join(root, "docs");
 
+// confirm 진입 편의: DRAFT면 자동으로 검토 시작(DRAFT→UNDER_REVIEW, 감사 남김) 후
+// 확정으로 이어간다. 그 외 상태(UNDER_REVIEW 통과, RETURNED/APPROVED 차단)는
+// confirmLine 가드에 맡긴다. review --doc 를 먼저 칠 필요가 없어진다.
+// 단일 프로세스/단일 리뷰어 가정 — getDocState→startReview 사이 경쟁 시
+// setDocState가 illegal transition으로 안전 실패(상태 오염 없음).
+async function ensureUnderReview(doc) {
+  if ((await getDocState(spec, doc)) === "DRAFT") {
+    await startReview(spec, doc);
+    console.log(`  (검토 자동 시작: ${doc} → UNDER_REVIEW)`);
+  }
+}
+
 // 확정 대상 태그별 개수 — 펜스 안 claim만(engine listConfirmableItems와 동일 기준).
 // review --list/--doc 가 같은 카운터를 쓰도록 통일(prose 속 유사 태그 미집계).
 async function confirmableCounts(doc) {
@@ -133,10 +145,12 @@ try {
     if (!doc) throw new Error("usage: confirm --doc <file> [--list | --item <n> --by <handle>]");
     if (!n) {
       if (!process.stdin.isTTY) throw new Error("usage: confirm --doc <file> --item <n> --by <handle> (비대화 모드)");
+      await ensureUnderReview(doc);
       await interactiveConfirm(doc, by);
     } else {
       if (!by) throw new Error("usage: confirm --doc <file> --item <n> --by <handle>");
       if (!/^\d+$/.test(n) || Number(n) < 1) throw new Error(`--item 은 1 이상의 정수여야 합니다: ${n}`);
+      await ensureUnderReview(doc);
       const items = await listConfirmableItems(docDir, doc);
       if (items.length === 0) throw new Error(`확정 대상 없음 (${doc})`);
       const it = items.find((x) => x.index === Number(n));

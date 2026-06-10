@@ -22,6 +22,14 @@ export const CONFIDENCE_TAG: Record<Confidence, string> = {
   NEEDS_REVIEW: "[확인 필요]",
 };
 
+/**
+ * 발행 .md에서 claim 불릿 영역을 표시하는 펜스 (renderMarkdown ↔ listInferredItems 계약).
+ * LLM prose가 `- [추정] …` 모양의 불릿을 흉내 내도 펜스 밖이면 claim으로 취급하지
+ * 않는다 — 확정/감사 대상은 doc-generator가 만든 claim 라인뿐이다.
+ */
+export const CLAIMS_FENCE_OPEN = "<!-- claims -->";
+export const CLAIMS_FENCE_CLOSE = "<!-- /claims -->";
+
 export interface Evidence {
   path: string;
   symbol?: string;

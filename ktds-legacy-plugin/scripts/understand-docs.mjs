@@ -2,7 +2,9 @@
 // /understand-docs — 근거 기반 5종 문서 생성 + 검토/승인/감사.
 //   생성:   node understand-docs.mjs <projectRoot> [runId]
 //   검토:   node understand-docs.mjs <projectRoot> review --list
-//           node understand-docs.mjs <projectRoot> review --doc <file>
+//           node understand-docs.mjs <projectRoot> review --doc <file> [--by <handle>]   (TTY면 [추정] 인터랙티브 확정)
+//   확정:   node understand-docs.mjs <projectRoot> confirm --doc <file> --list
+//           node understand-docs.mjs <projectRoot> confirm --doc <file> --item <n> --by <handle>
 //   승인:   node understand-docs.mjs <projectRoot> approve --doc <file> --by <handle>
 //   반려:   node understand-docs.mjs <projectRoot> return  --doc <file>
 //   감사:   node understand-docs.mjs <projectRoot> audit --list | audit --date <YYYY-MM-DD>
@@ -10,14 +12,15 @@
 // 결정론 skeleton만 생성. 실제 LLM 산문은 host CLI(Claude)가 SKILL.md 지시로 채운다.
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { createInterface } from "node:readline/promises";
 import { ensureBuilt } from "./ensure-built.mjs";
 
 const {
   runDocsPipeline, listDrafts, startReview, approveDoc, returnDoc,
-  readAudit, getDocState,
+  readAudit, getDocState, listInferredItems, confirmInferredLine,
 } = await import(await ensureBuilt());
 
-const SUBS = ["review", "approve", "return", "audit"];
+const SUBS = ["review", "approve", "return", "audit", "confirm"];
 const argv = process.argv.slice(2);
 const root = argv[0] && !argv[0].startsWith("-") && !SUBS.includes(argv[0]) ? argv[0] : process.cwd();
 const rest = argv[0] === root ? argv.slice(1) : argv;
@@ -35,6 +38,33 @@ async function tagCounts(doc) {
   };
 }
 
+// [추정] 항목을 하나씩 보여주며 y/n/q 로 확정하는 인터랙티브 루프 (plan A17b).
+// 확정 즉시 .md 태그 치환 + DOC_ITEM_CONFIRMED 감사. 라인 번호가 안정 키라서
+// 도중 확정으로 순번이 줄어도 스냅샷 순회가 안전하다(태그 치환은 라인 수 불변).
+async function interactiveConfirm(doc, byFlag) {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  // EOF(Ctrl+D)로 닫히면 question이 reject → null 반환해 정상 종료(q와 동일) 처리.
+  const ask = (q) => rl.question(q).catch(() => null);
+  try {
+    const by = byFlag?.trim() || ((await ask("확정 담당자 핸들/이니셜 (엔터 = 확정 생략): ")) ?? "").trim();
+    if (!by) { console.log("  핸들 미입력 — 확정 단계 생략"); return; }
+    const items = await listInferredItems(docDir, doc);
+    let confirmed = 0;
+    for (const it of items) {
+      const ans = (await ask(`  [${it.index}/${items.length}] ${it.text}\n    [확정(담당자)]로 확정? [y/N/q] `))
+        ?.trim().toLowerCase();
+      if (ans == null || ans === "q") break;
+      if (ans !== "y") continue;
+      await confirmInferredLine(spec, docDir, doc, it.line, by);
+      confirmed++;
+      console.log(`    → [확정(담당자)] (by ${by})`);
+    }
+    console.log(`  확정 ${confirmed}건 / [추정] 잔여 ${items.length - confirmed}건`);
+  } finally {
+    rl.close();
+  }
+}
+
 try {
   if (sub === "review" && has("--list")) {
     const drafts = await listDrafts(spec);
@@ -49,6 +79,32 @@ try {
     const t = await tagCounts(doc);
     console.log(`검토 시작: ${doc} → ${await getDocState(spec, doc)}`);
     console.log(`  확정 검토 대상: [추정] ${t.inferred}건, [확인 필요] ${t.review}건 (담당자 확정 후 approve)`);
+    if (t.inferred > 0) {
+      if (process.stdin.isTTY) await interactiveConfirm(doc, flag("--by"));
+      else console.log(`  비대화 모드 — confirm --doc ${doc} --list 로 확인 후 confirm --doc ${doc} --item <n> --by <handle>`);
+    }
+  } else if (sub === "confirm" && has("--list")) {
+    const doc = flag("--doc");
+    if (!doc) throw new Error("usage: confirm --doc <file> --list");
+    const items = await listInferredItems(docDir, doc);
+    console.log(`[추정] ${items.length}건 (${doc}):`);
+    for (const it of items) console.log(`  ${it.index}. (L${it.line}) ${it.text}`);
+  } else if (sub === "confirm") {
+    const doc = flag("--doc"), by = flag("--by")?.trim(), n = flag("--item");
+    if (!doc) throw new Error("usage: confirm --doc <file> [--list | --item <n> --by <handle>]");
+    if (!n) {
+      if (!process.stdin.isTTY) throw new Error("usage: confirm --doc <file> --item <n> --by <handle> (비대화 모드)");
+      await interactiveConfirm(doc, by);
+    } else {
+      if (!by) throw new Error("usage: confirm --doc <file> --item <n> --by <handle>");
+      if (!/^\d+$/.test(n) || Number(n) < 1) throw new Error(`--item 은 1 이상의 정수여야 합니다: ${n}`);
+      const items = await listInferredItems(docDir, doc);
+      if (items.length === 0) throw new Error(`[추정] 항목 없음 (${doc})`);
+      const it = items.find((x) => x.index === Number(n));
+      if (!it) throw new Error(`[추정] 항목 ${n} 없음 (현재 1..${items.length})`);
+      await confirmInferredLine(spec, docDir, doc, it.line, by);
+      console.log(`확정: ${doc} #${it.index} "${it.text}" → [확정(담당자)] (by ${by})`);
+    }
   } else if (sub === "approve") {
     const doc = flag("--doc"), by = flag("--by");
     if (!doc || !by) throw new Error("usage: approve --doc <file> --by <handle>");

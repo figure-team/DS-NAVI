@@ -1,7 +1,7 @@
 import type {
   CanonicalGraph, CanonicalNode, CanonicalEdge, Claim, DocSection, GeneratedDoc, ProjectMeta,
 } from "../types.js";
-import { CONFIDENCE_TAG } from "../types.js";
+import { CONFIDENCE_TAG, CLAIMS_FENCE_OPEN, CLAIMS_FENCE_CLOSE } from "../types.js";
 
 /**
  * doc-generator (plan §3.2 / §2.3): 5종 근거 문서 생성.
@@ -209,7 +209,12 @@ export function renderMarkdown(doc: GeneratedDoc): string {
     lines.push(`## ${s.heading}`, "");
     if (s.prose && s.prose.trim()) lines.push(s.prose.trim(), "");
     if (s.claims.length === 0) lines.push("_(항목 없음)_", "");
-    else { for (const c of s.claims) lines.push(renderClaim(c)); lines.push(""); }
+    else {
+      // claim 영역 펜스 — prose 속 유사 불릿과 구분 (approval listInferredItems 계약)
+      lines.push(CLAIMS_FENCE_OPEN);
+      for (const c of s.claims) lines.push(renderClaim(c));
+      lines.push(CLAIMS_FENCE_CLOSE, "");
+    }
   }
   return lines.join("\n").replace(/\n+$/, "\n");
 }

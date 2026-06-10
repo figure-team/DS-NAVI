@@ -7,6 +7,7 @@ argument-hint: ["[projectRoot]"]
 # /understand-init
 
 > ⚠️ MVP는 **비민감 샘플 전용**. 실제 고객 코드 금지 (보안 게이트는 Phase 2).
+> 🌐 **언어:** 사용자에게 보여주는 모든 설명·질문·진행 안내는 **한국어**로 한다(config `outputLanguage`, 기본값 `ko`). 영어로 답하지 말 것.
 
 프로젝트를 분석 가능 상태로 만든다: `understanding.config.json`(networkType 3 / outputLanguage ko / [추정] 임계값 0.3·0.6 / supportedSchemaVersions ["1.0.0"]) + `.spec/00_MASTER.md`·`.spec/templates/` scaffold.
 

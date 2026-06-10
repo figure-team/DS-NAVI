@@ -6,6 +6,8 @@ argument-hint: ["[projectRoot]", "[outFile]"]
 
 # /understand-export
 
+> 🌐 **언어:** 사용자에게 보여주는 모든 설명·진행 안내는 **한국어**로 한다(config `outputLanguage`, 기본값 `ko`). 영어로 답하지 말 것.
+
 `.understand-anything/knowledge-graph.json` 으로부터 5종 문서를 단일 HTML로 묶어 내보낸다: CSS 인라인(외부 CDN/리소스 0), 카테고리별 사이드바 TOC, 신뢰도 태그 색상 표시. 폐쇄망 배포 가능(A9).
 
 ## 실행

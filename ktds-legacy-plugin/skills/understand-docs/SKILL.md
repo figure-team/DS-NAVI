@@ -7,6 +7,7 @@ argument-hint: ["[projectRoot]", "[review --list | review --doc <f> | confirm --
 # /understand-docs
 
 > ⚠️ 비민감 샘플 전용 (보안 게이트는 Phase 2).
+> 🌐 **언어:** 사용자에게 보여주는 모든 설명·질문·요약·진행 안내는 **한국어**로 한다(프로젝트 config `outputLanguage`, 기본값 `ko`). CLI 출력도 한국어다. — 영어로 답하지 말 것.
 
 `.understand-anything/knowledge-graph.json`(U-A `/understand` 산출)을 읽어 **근거 붙은 5종 문서**를 DRAFT로 생성한다. 흐름: lock → graph 로드(version+fingerprint 가드) → 5종 생성(staging) → 근거 검증(CONFIRMED_AI에 evidence 없으면 RETURNED) → `[추정]` 비율 게이트(block 0.6 초과 시 RUN_ABORTED) → atomic publish → DRAFT 등록 + 감사.
 
@@ -28,7 +29,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId>
 - **인터랙티브 확정 세션** (`confirm --doc <f>` — **터미널에서 직접 node 실행할 때만**, 즉 stdin이 TTY): 확정 대상 목록을 보여주고 **항목 번호로 콕 집어** [확정(담당자)] 승격. DRAFT면 자동 검토 시작(UNDER_REVIEW)하므로 `review --doc` 불필요. 담당자 핸들은 세션 시작 시 1회 입력→재사용(메모리만, 디스크 미저장), 세션 중 `by <핸들>`로 변경 가능. `a`=남은 전체, `q`/Ctrl+D=종료.
 - `confirm --doc <f> --list` → 확정 대상 목록만. `confirm --doc <f> --item <n> --by <handle>` → 비대화 단건 확정. `confirm --doc <f> --all --by <handle>` → 명시적 전체 확정. `--item`/`--all`도 DRAFT면 자동 검토 시작. (RETURNED/APPROVED 문서는 거부)
 
-> ⚠️ **플러그인(슬래시)으로 confirm할 때 = 네가(host) 실행하는 것이며 stdin은 비-TTY다 → 인터랙티브 세션이 동작하지 않는다.** 절대 임의로 전부 확정하지 말 것. 반드시 이 절차를 따른다:
+> ⚠️ **플러그인(슬래시)으로 confirm할 때 = 네가(host) 실행하는 것이며 stdin은 비-TTY다 → 인터랙티브 세션이 동작하지 않는다.** 절대 임의로 전부 확정하지 말 것. **사용자에게 하는 목록 안내·질문·확정 결과 보고는 모두 한국어로 한다.** 반드시 이 절차를 따른다:
 > 1. `confirm --doc <f> --list` 를 실행해 확정 대상 목록을 사용자에게 보여준다.
 > 2. 사용자에게 **어느 항목(들)을 확정할지**와 **담당자 핸들/이니셜**을 묻는다.
 > 3. 사용자가 고른 항목만 `confirm --doc <f> --item <n> --by <handle>` 로 하나씩 확정한다.

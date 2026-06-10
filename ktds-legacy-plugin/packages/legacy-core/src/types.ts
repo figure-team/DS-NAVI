@@ -151,4 +151,6 @@ export interface ApprovalRecord {
   /** handle/initials only (O3). */
   by: string;
   at: string;
+  /** 미확정 항목([확정(담당자)] 아닌 claim)이 남은 채 --force로 강제 승인된 경우 true. */
+  forced?: boolean;
 }

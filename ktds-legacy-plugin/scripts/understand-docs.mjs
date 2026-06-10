@@ -7,7 +7,7 @@
 //           node understand-docs.mjs <projectRoot> confirm --doc <file> --list
 //           node understand-docs.mjs <projectRoot> confirm --doc <file> --item <n> --by <handle>   (비대화 1건 — 자동화/플러그인용)
 //           node understand-docs.mjs <projectRoot> confirm --doc <file> --all  --by <handle>       (명시적 전체 확정)
-//   승인:   node understand-docs.mjs <projectRoot> approve --doc <file> --by <handle>
+//   승인:   node understand-docs.mjs <projectRoot> approve --doc <file> --by <handle> [--force]   (미확정 항목 남으면 거부; --force로 우회)
 //   반려:   node understand-docs.mjs <projectRoot> return  --doc <file>
 //   감사:   node understand-docs.mjs <projectRoot> audit --list | audit --date <YYYY-MM-DD>
 //
@@ -193,10 +193,11 @@ try {
     }
   } else if (sub === "approve") {
     const doc = flag("--doc"), by = flag("--by")?.trim();
-    if (!doc) throw new Error("usage: approve --doc <file> --by <handle>");
+    if (!doc) throw new Error("usage: approve --doc <file> --by <handle> [--force]");
     assertHandle(by, "approve --doc <file> --by <handle>");
-    const rec = await approveDoc(spec, doc, by);
-    console.log(`승인 완료: ${doc} → ${await getDocState(spec, doc)} (by ${rec.by}, ${rec.at})`);
+    // 게이트: docDir 전달 → [확정(담당자)] 아닌 항목 남으면 거부. --force로 우회(forced 기록).
+    const rec = await approveDoc(spec, doc, by, { docsDir: docDir, force: has("--force") });
+    console.log(`승인 완료${rec.forced ? " (⚠️ 강제 --force: 미확정 항목 잔여)" : ""}: ${doc} → ${await getDocState(spec, doc)} (by ${rec.by}, ${rec.at})`);
   } else if (sub === "return") {
     const doc = flag("--doc");
     if (!doc) throw new Error("usage: return --doc <file>");

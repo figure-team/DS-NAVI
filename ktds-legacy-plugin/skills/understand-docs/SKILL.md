@@ -39,7 +39,8 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId>
 >
 > (`confirm --doc <f>` 를 인자 없이 비-TTY로 실행하면 목록과 위 안내만 출력되고 아무것도 확정되지 않는다.)
   - **확정 대상 = [확정(담당자)]가 아닌 모든 claim**: [추정](근거 없음) · [확정(AI)](AI 근거 있음 → 담당자가 검증·책임 인수) · [확인 필요](사람 판단 필요 → 담당자가 검토·확정). [확정(AI)]→[확정(담당자)] 승격 시 근거(`파일:라인`) cite는 그대로 보존된다.
-- `approve --doc <f> --by <handle>` → UNDER_REVIEW→APPROVED, approvals.json + DOC_APPROVED (승인자는 핸들/이니셜만, 실명 미저장)
+- `approve --doc <f> --by <handle> [--force]` → UNDER_REVIEW→APPROVED, approvals.json + DOC_APPROVED (승인자는 핸들/이니셜만, 실명 미저장)
+  - **승인 게이트**: `[확정(담당자)]`가 아닌 항목([추정]·[확정(AI)]·[확인 필요])이 하나라도 남으면 **승인 거부**(모두 confirm 필요). `--force`로 우회하면 강제 승인하되 approvals.json·감사에 `forced` 표기.
 - `audit --list | --date <d>` → `.spec/audit/*.jsonl`
 
 엔진: `@ktds/legacy-core`(orchestrator·kg-reader·evidence·doc-generator·doc-state·approval·audit·lock).

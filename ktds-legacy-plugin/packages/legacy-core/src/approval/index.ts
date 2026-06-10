@@ -197,24 +197,67 @@ export async function loadApprovals(specDir: string): Promise<ApprovalRecord[]> 
   return parsed as ApprovalRecord[];
 }
 
+export interface ApproveOptions {
+  /**
+   * 발행 docs 디렉터리. 주어지면 **미확정 항목 게이트**를 적용한다 — [확정(담당자)]가
+   * 아닌 claim([추정]/[확정(AI)]/[확인 필요])이 하나라도 남아 있으면 승인을 거부한다.
+   * (생략 시 게이트 미적용 — 상태기계만 검증.)
+   */
+  docsDir?: string;
+  /** 미확정 항목이 남아도 강제 승인. 기록/감사에 forced 표기(강제 승인 흔적). */
+  force?: boolean;
+}
+
 /**
  * Approve a doc: UNDER_REVIEW → APPROVED. `by` = handle/initials (O3).
- * Ordering (crash-gap safety): validate the transition early (illegal approve
- * records nothing), persist approvals.json + audit, then flip state LAST — so a
+ * 승인 게이트(정책): `options.docsDir`가 주어지면 [확정(담당자)] 아닌 항목이 0개여야
+ * 승인된다(`listConfirmableItems`가 비어야 함). 잔여가 있으면 거부하되 `force`로 우회
+ * 가능하며, 이 경우 ApprovalRecord/감사에 `forced`가 기록된다.
+ * Ordering (crash-gap safety): validate the transition + gate early (illegal/blocked
+ * approve records nothing), persist approvals.json + audit, then flip state LAST — so a
  * mid-write failure leaves the doc UNDER_REVIEW (retryable) rather than an
  * APPROVED doc with no approval record.
  */
-export async function approveDoc(specDir: string, doc: string, by: string): Promise<ApprovalRecord> {
+export async function approveDoc(
+  specDir: string,
+  doc: string,
+  by: string,
+  options: ApproveOptions = {}
+): Promise<ApprovalRecord> {
   const from = await getDocState(specDir, doc);
   transition(from, "APPROVED"); // pure validation; throws if not UNDER_REVIEW, persists nothing
 
-  const record: ApprovalRecord = { doc, by, at: new Date().toISOString() };
+  // 승인 게이트: 발행 docs가 주어지면 미확정 항목 잔여를 검사.
+  // 파일 부재(ENOENT)만 "발행 안 됨 = 잔여 0"으로 허용하고, 손상/권한오류 등은
+  // 그대로 던진다(loadApprovals와 동일 기준 — 안전장치가 fail-open되지 않게).
+  // (동시 검토자 경쟁은 범위 밖: confirmLine과 동일한 UNDER_REVIEW 단일 검토자 가정.)
+  let forced = false;
+  let pendingCount = 0;
+  if (options.docsDir) {
+    const pending = await listConfirmableItems(options.docsDir, doc).catch((err) => {
+      if (isENOENT(err)) return [];
+      throw err;
+    });
+    pendingCount = pending.length;
+    if (pendingCount > 0) {
+      if (!options.force) {
+        const head = pending.slice(0, 3).map((p) => `${CONFIDENCE_TAG[p.from]} ${p.text}`).join(" / ");
+        throw new Error(
+          `[approval] ${doc}: 미확정 항목 ${pendingCount}개가 남아 승인할 수 없습니다 ` +
+            `(모두 confirm 하거나 --force). 잔여 예: ${head}${pendingCount > 3 ? " …" : ""}`
+        );
+      }
+      forced = true;
+    }
+  }
+
+  const record: ApprovalRecord = { doc, by, at: new Date().toISOString(), ...(forced ? { forced: true } : {}) };
   const approvals = await loadApprovals(specDir);
   approvals.push(record);
   const path = join(specDir, APPROVALS_FILE);
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, JSON.stringify(approvals, null, 2), "utf-8");
-  await logEvent(specDir, "DOC_APPROVED", { doc, by });
+  await logEvent(specDir, "DOC_APPROVED", { doc, by, ...(forced ? { detail: { forced: true, pending: pendingCount } } : {}) });
 
   await setDocState(specDir, doc, "APPROVED"); // flip state last
   return record;

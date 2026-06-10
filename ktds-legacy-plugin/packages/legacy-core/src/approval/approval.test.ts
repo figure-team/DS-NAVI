@@ -263,13 +263,65 @@ describe("approval workflow", () => {
       const lines = (await listConfirmableItems(docsDir, DOC)).map((i) => i.line);
       for (const line of lines) await confirmLine(dir, docsDir, DOC, line, "kim");
       expect(await listConfirmableItems(docsDir, DOC)).toEqual([]);
-      await approveDoc(dir, DOC, "kim");
+      await approveDoc(dir, DOC, "kim", { docsDir }); // 게이트 통과(잔여 0)
       expect(await getDocState(dir, DOC)).toBe("APPROVED");
 
       const types = (await readAudit(dir)).map((e) => e.type);
       expect(types).toEqual([
         "DOC_ITEM_CONFIRMED", "DOC_ITEM_CONFIRMED", "DOC_ITEM_CONFIRMED", "DOC_APPROVED",
       ]);
+    });
+
+    it("approve 게이트: 미확정 항목이 남으면 거부(아무것도 기록 안 함)", async () => {
+      await startReview(dir, DOC); // 확정 안 함 — [추정]×2 + [확정(AI)]×1 잔여
+      await expect(approveDoc(dir, DOC, "kim", { docsDir }))
+        .rejects.toThrow(/미확정 항목 3개가 남아 승인할 수 없습니다/);
+      // 거부 시 무변경: approvals 없음, 감사에 DOC_APPROVED 없음, 상태 UNDER_REVIEW 유지
+      expect(await loadApprovals(dir)).toEqual([]);
+      expect((await readAudit(dir)).some((e) => e.type === "DOC_APPROVED")).toBe(false);
+      expect(await getDocState(dir, DOC)).toBe("UNDER_REVIEW");
+    });
+
+    it("approve --force: 미확정 잔여를 강제 승인 + forced 기록 + 감사 흔적", async () => {
+      await startReview(dir, DOC);
+      const rec = await approveDoc(dir, DOC, "kim", { docsDir, force: true });
+      expect(rec.forced).toBe(true);
+      expect(await getDocState(dir, DOC)).toBe("APPROVED");
+
+      const approvals = await loadApprovals(dir);
+      expect(approvals[0].forced).toBe(true); // approvals.json에 강제 표기
+      const approved = (await readAudit(dir)).find((e) => e.type === "DOC_APPROVED");
+      expect(approved?.detail).toMatchObject({ forced: true, pending: 3 }); // 감사 흔적
+    });
+
+    it("approve 게이트: 잔여 4건 이상이면 메시지에 첫 3개 예시 + ' …'", async () => {
+      const doc: GeneratedDoc = {
+        filename: DOC, title: "아키텍처",
+        sections: [{ heading: "레이어", claims: [
+          inferred("A"), inferred("B"), inferred("C"), inferred("D"),
+        ] }],
+      };
+      await writeFile(join(docsDir, DOC), renderMarkdown(doc), "utf-8");
+      await startReview(dir, DOC);
+      await expect(approveDoc(dir, DOC, "kim", { docsDir }))
+        .rejects.toThrow(/미확정 항목 4개가 남아.*\[추정\] A \/ \[추정\] B \/ \[추정\] C …/s);
+    });
+
+    it("approve 게이트: 손상/읽기불가 docs 파일은 통과시키지 않고 throw(fail-open 방지)", async () => {
+      await startReview(dir, DOC);
+      // docsDir/DOC 를 디렉터리로 만들어 readFile이 ENOENT가 아닌 오류를 던지게 한다
+      await rm(join(docsDir, DOC), { force: true });
+      await mkdir(join(docsDir, DOC), { recursive: true });
+      await expect(approveDoc(dir, DOC, "kim", { docsDir })).rejects.toThrow();
+      expect(await getDocState(dir, DOC)).toBe("UNDER_REVIEW"); // 승인 안 됨
+      expect(await loadApprovals(dir)).toEqual([]);
+    });
+
+    it("approve 게이트는 docsDir 미지정 시 미적용(상태기계만)", async () => {
+      await startReview(dir, DOC); // 잔여 있어도
+      const rec = await approveDoc(dir, DOC, "kim"); // docsDir 없음 → 게이트 생략
+      expect(rec.forced).toBeUndefined();
+      expect(await getDocState(dir, DOC)).toBe("APPROVED");
     });
   });
 

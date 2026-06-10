@@ -79,7 +79,9 @@ node …/understand-docs.mjs <root> review --list
 node …/understand-docs.mjs <root> review --doc 04_api-spec.md
 
 # 승인 (UNDER_REVIEW→APPROVED) — by 는 핸들/이니셜(실명·사번 금지)
+#   ★ 승인 게이트: [확정(담당자)] 아닌 항목이 남으면 거부 → 먼저 모두 confirm. --force 로 우회(강제 승인 기록).
 node …/understand-docs.mjs <root> approve --doc 04_api-spec.md --by ipark
+node …/understand-docs.mjs <root> approve --doc 04_api-spec.md --by ipark --force   # 미확정 잔여 강제 승인(forced)
 
 # 반려 (UNDER_REVIEW→RETURNED)
 node …/understand-docs.mjs <root> return --doc 03_feature-spec.md
@@ -112,6 +114,8 @@ node …/understand-docs.mjs <root> confirm --doc 04_api-spec.md --all  --by ipa
 > **플러그인(슬래시 `/understand-docs`)으로 confirm할 때**: 인터랙티브 세션은 **터미널 직접 실행(TTY)에서만** 동작한다. 슬래시는 host(Claude)가 비-TTY로 실행하므로 `confirm --doc <f>`(인자 없이)는 **목록과 안내만 출력하고 아무것도 확정하지 않는다**(임의 전체 확정 방지). host는 목록을 보여주고 **어느 항목·담당자**를 물은 뒤 선택분만 `--item`으로 확정하며, 사용자가 "전체"를 명시한 경우에만 `--all`을 쓴다.
 
 상태기계: `DRAFT → UNDER_REVIEW → APPROVED`, 반려는 `UNDER_REVIEW → RETURNED → DRAFT`. 불법 전이(예: DRAFT를 바로 approve)는 거부된다. 항목 확정은 `UNDER_REVIEW`에서만 허용되나, **`confirm`은 DRAFT 문서를 자동으로 `UNDER_REVIEW`로 올린 뒤 진행**한다(`review --doc` 생략 가능). 단 RETURNED/APPROVED 문서는 자동 전이하지 않고 거부된다 — 반려본은 수정 후 재생성한다.
+
+> **승인 게이트(정책):** `approve`는 문서의 모든 claim이 `[확정(담당자)]`일 때만 통과한다. `[추정]`·`[확정(AI)]`·`[확인 필요]`가 하나라도 남으면 거부하며, 남은 개수와 예시를 알려준다. 급히 승인해야 하면 `--force`로 우회하되, 그 승인은 `approvals.json`과 감사 로그(`DOC_APPROVED` detail)에 `forced`로 남아 추적된다.
 
 **산출 상태 파일** (`<root>/.spec/`)
 - `doc-status.json` — 문서별 상태

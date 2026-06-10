@@ -9,12 +9,15 @@
   - `fixtures/`, `docs/ktds/`
 - 통합은 U-A 내부 TS API import가 아니라 on-disk `knowledge-graph.json` 계약을 통한다.
 
-## 알려진 merge 충돌점 (additive 2곳)
-ktds가 손대는 upstream 매니페스트는 **단 2개**, 둘 다 additive:
+## 알려진 merge 충돌점 (additive 2곳 + 최소 예외 1곳)
+ktds가 손대는 upstream 매니페스트는 **2개**(둘 다 additive). 추가로 무수정 예외가 **1곳**:
 1. `pnpm-workspace.yaml` — `ktds-legacy-plugin/packages/*`, `ktds-legacy-plugin` glob 추가
 2. `.claude-plugin/marketplace.json` — `plugins[]`에 `ktds-legacy` 항목 추가
 
-upstream merge 시 이 2개 파일에서만 충돌 가능 → ours/theirs 수동 병합 후 위 additive 라인 재적용.
+**무수정 예외 1곳** (fork 제품화상 불가피 — 한국 고객 기본 언어):
+3. `understand-anything-plugin/packages/dashboard/vite.config.ts` — dev server `/config.json` 핸들러의 fallback `outputLanguage` 기본값을 `"en"` → **`"ko"`** (1줄). 대시보드는 분석 프로젝트 `.understand-anything/config.json`의 `outputLanguage`로 UI 언어를 정하는데, 그 파일이 없을 때의 기본값이다. ktds 파이프라인(`understand-init`)이 `.understand-anything/config.json`에 `outputLanguage:ko`를 써두므로 데이터로도 보장되지만, 순수 U-A 경로(`/understand`→`/understand-dashboard`만)를 위한 안전망. **U-A의 i18n·`ko.ts` 번역은 원본 그대로 활용**(코드 추가 없음).
+
+upstream merge 시 1·2는 additive 라인 재적용, 3은 해당 1줄(`outputLanguage: "ko"`)을 재적용한다.
 
 ## 절차
 ```bash

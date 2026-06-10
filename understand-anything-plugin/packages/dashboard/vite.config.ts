@@ -287,7 +287,8 @@ export default defineConfig({
                 }
               }
             }
-            sendJson(res, 200, { autoUpdate: false, outputLanguage: "en" });
+            // ktds fork 기본 언어: config.json 부재 시 한국어로 fallback (upstream: "en").
+            sendJson(res, 200, { autoUpdate: false, outputLanguage: "ko" });
             return;
           }
 

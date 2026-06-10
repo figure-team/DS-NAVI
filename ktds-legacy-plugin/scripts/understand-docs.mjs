@@ -3,9 +3,10 @@
 //   생성:   node understand-docs.mjs <projectRoot> [runId]
 //   검토:   node understand-docs.mjs <projectRoot> review --list
 //           node understand-docs.mjs <projectRoot> review --doc <file> [--by <handle>]   (TTY면 [추정]·[확정(AI)] 인터랙티브 확정)
-//   확정:   node understand-docs.mjs <projectRoot> confirm --doc <file>                            (TTY: 항목 골라 확정 세션 — 담당자 1회 입력, 세션 중 변경 가능)
+//   확정:   node understand-docs.mjs <projectRoot> confirm --doc <file>                            (TTY: 항목 골라 확정 세션; 비-TTY: 목록+안내만)
 //           node understand-docs.mjs <projectRoot> confirm --doc <file> --list
-//           node understand-docs.mjs <projectRoot> confirm --doc <file> --item <n> --by <handle>   (비대화 1건 — 자동화용)
+//           node understand-docs.mjs <projectRoot> confirm --doc <file> --item <n> --by <handle>   (비대화 1건 — 자동화/플러그인용)
+//           node understand-docs.mjs <projectRoot> confirm --doc <file> --all  --by <handle>       (명시적 전체 확정)
 //   승인:   node understand-docs.mjs <projectRoot> approve --doc <file> --by <handle>
 //   반려:   node understand-docs.mjs <projectRoot> return  --doc <file>
 //   감사:   node understand-docs.mjs <projectRoot> audit --list | audit --date <YYYY-MM-DD>
@@ -26,6 +27,14 @@ const {
 const SUBS = ["review", "approve", "return", "audit", "confirm"];
 // 확정 대상의 현재 신뢰도 → 표시 태그 (engine ConfirmableItem.from).
 const TAGLABEL = { INFERRED: "[추정]", CONFIRMED_AI: "[확정(AI)]", NEEDS_REVIEW: "[확인 필요]" };
+
+// --by 핸들 검증: 비어있거나 '-'로 시작하면 거부. `--by --all` 처럼 다른 플래그가
+// 핸들로 오인돼 의도치 않은 일괄 확정으로 새는 것을 막는다(O3 핸들 무결성).
+function assertHandle(by, usage) {
+  if (!by || by.startsWith("-")) {
+    throw new Error(`usage: ${usage} (핸들은 비어있거나 '-'로 시작할 수 없음)`);
+  }
+}
 const argv = process.argv.slice(2);
 const root = argv[0] && !argv[0].startsWith("-") && !SUBS.includes(argv[0]) ? argv[0] : process.cwd();
 const rest = argv[0] === root ? argv.slice(1) : argv;
@@ -132,7 +141,7 @@ try {
     console.log(`  확정 대상 ${items.length}건 ([추정] ${nInf} · [확정(AI)] ${nAi} · [확인 필요] ${nNr}) (담당자 확정 후 approve)`);
     if (items.length > 0) {
       if (process.stdin.isTTY) await interactiveConfirm(doc, flag("--by"));
-      else console.log(`  비대화 모드 — confirm --doc ${doc} --list 로 확인 후 confirm --doc ${doc} --item <n> --by <handle>`);
+      else console.log(`  비대화 모드 — confirm --doc ${doc} --list 로 확인 후 confirm --doc ${doc} --item <n> --by <handle> (전체는 --all --by <handle>)`);
     }
   } else if (sub === "confirm" && has("--list")) {
     const doc = flag("--doc");
@@ -140,15 +149,39 @@ try {
     const items = await listConfirmableItems(docDir, doc);
     console.log(`확정 대상 ${items.length}건 (${doc}):`);
     for (const it of items) console.log(`  ${it.index}. (L${it.line}) ${TAGLABEL[it.from]} ${it.text}`);
+  } else if (sub === "confirm" && has("--all")) {
+    // 명시적 전체 확정 (사용자가 "전체"를 분명히 요청했을 때만). 임의 호출 금지는 SKILL.md 지시.
+    const doc = flag("--doc"), by = flag("--by")?.trim();
+    if (!doc) throw new Error("usage: confirm --doc <file> --all --by <handle>");
+    assertHandle(by, "confirm --doc <file> --all --by <handle>");
+    await ensureUnderReview(doc);
+    const items = await listConfirmableItems(docDir, doc);
+    if (items.length === 0) { console.log(`확정 대상 없음 (${doc})`); }
+    else {
+      let ok = 0;
+      for (const it of items) {
+        try { await confirmLine(spec, docDir, doc, it.line, by); ok++; }
+        catch (e) { console.log(`  #${it.index} 건너뜀 — ${e.message}`); }
+      }
+      console.log(`전체 확정: ${ok}/${items.length}건 → [확정(담당자)] (by ${by})`);
+    }
   } else if (sub === "confirm") {
     const doc = flag("--doc"), by = flag("--by")?.trim(), n = flag("--item");
-    if (!doc) throw new Error("usage: confirm --doc <file> [--list | --item <n> --by <handle>]");
+    if (!doc) throw new Error("usage: confirm --doc <file> [--list | --item <n> --by <handle> | --all --by <handle>]");
     if (!n) {
-      if (!process.stdin.isTTY) throw new Error("usage: confirm --doc <file> --item <n> --by <handle> (비대화 모드)");
-      await ensureUnderReview(doc);
-      await interactiveConfirm(doc, by);
+      if (!process.stdin.isTTY) {
+        // 비대화(플러그인 host 등): stdin 인터랙티브 세션 불가 → 목록 + 안내만 출력.
+        // 임의로 전체 확정하지 않는다. host는 사용자에게 항목/담당자를 물어 --item 으로 확정.
+        const items = await listConfirmableItems(docDir, doc);
+        console.log(`확정 대상 ${items.length}건 (${doc}) — 비대화 모드 (인터랙티브 세션은 터미널 직접 실행 시에만):`);
+        for (const it of items) console.log(`  ${it.index}. (L${it.line}) ${TAGLABEL[it.from]} ${it.text}`);
+        console.log(`개별: confirm --doc ${doc} --item <n> --by <handle>  ·  전체(명시): confirm --doc ${doc} --all --by <handle>`);
+      } else {
+        await ensureUnderReview(doc);
+        await interactiveConfirm(doc, by);
+      }
     } else {
-      if (!by) throw new Error("usage: confirm --doc <file> --item <n> --by <handle>");
+      assertHandle(by, "confirm --doc <file> --item <n> --by <handle>");
       if (!/^\d+$/.test(n) || Number(n) < 1) throw new Error(`--item 은 1 이상의 정수여야 합니다: ${n}`);
       await ensureUnderReview(doc);
       const items = await listConfirmableItems(docDir, doc);
@@ -159,8 +192,9 @@ try {
       console.log(`확정: ${doc} #${it.index} ${TAGLABEL[it.from]} "${it.text}" → [확정(담당자)] (by ${by})`);
     }
   } else if (sub === "approve") {
-    const doc = flag("--doc"), by = flag("--by");
-    if (!doc || !by) throw new Error("usage: approve --doc <file> --by <handle>");
+    const doc = flag("--doc"), by = flag("--by")?.trim();
+    if (!doc) throw new Error("usage: approve --doc <file> --by <handle>");
+    assertHandle(by, "approve --doc <file> --by <handle>");
     const rec = await approveDoc(spec, doc, by);
     console.log(`승인 완료: ${doc} → ${await getDocState(spec, doc)} (by ${rec.by}, ${rec.at})`);
   } else if (sub === "return") {

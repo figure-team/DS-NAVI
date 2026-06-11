@@ -1,21 +1,27 @@
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
+import { createHash } from "node:crypto";
 import { scanJavaFile, type JavaFileFacts } from "./java-facts.js";
 import { assignRouteIds, sortBatchEntries } from "./route-key.js";
 import { buildCensus } from "./census.js";
 import {
   gitCommitHash,
+  writeCandidates,
   writeCensus,
   writeEdges,
   writeRoutes,
+  writeSkeleton,
   writeSlices,
 } from "./persist.js";
 import {
   type BatchEntry,
+  type CandidatesReport,
   type CensusReport,
+  type ConfirmedPlan,
   type EdgesReport,
   type RouteEntry,
   type RoutesReport,
+  type SkeletonReport,
   type SlicesReport,
 } from "./types.js";
 import {
@@ -24,6 +30,9 @@ import {
   collectEdges,
 } from "./edges.js";
 import { buildSlices, DEFAULT_DEPTH_CAP } from "./slices.js";
+import { buildCandidates } from "./classify.js";
+import { buildSkeleton } from "./skeleton.js";
+import { buildAutoPlan, readConfirmedPlan, writeConfirmedPlan } from "./confirm.js";
 import { buildSpringIndexes, extractSpringRoutes } from "./routes/spring.js";
 import { buildActionBeanIndex, extractStripesRoutes } from "./routes/stripes.js";
 import { extractWebXmlRoutes } from "./routes/web-xml.js";
@@ -162,33 +171,101 @@ export async function extractEdges(
 }
 
 /**
- * Stage-14/15 entry point: census (S1) + routes (S2) + call-chain edges (S3) +
- * reachability slices (S4), persisted to .spec/map/. Independent of
- * /understand — the KG is consulted only for the cross-check report (ADR D5).
+ * U-A KG의 sha256 fingerprint — domain-graph freshness 대조용 (S10/18.2).
+ * KG 부재 시 null (D5: /understand와 순서 무관).
+ */
+export async function kgFingerprint(projectRoot: string): Promise<string | null> {
+  try {
+    const raw = await fs.readFile(
+      path.join(projectRoot, ".understand-anything", "knowledge-graph.json"),
+    );
+    return createHash("sha256").update(raw).digest("hex");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Stage-14~16 entry point: census (S1) + routes (S2) + call-chain edges (S3) +
+ * reachability slices (S4) + domain candidates (S4-S5) — 그리고 확정 플랜이
+ * 있으면(또는 autoApprove) skeleton (S6)까지, 전부 .spec/map/에 영속.
+ * Independent of /understand — the KG is consulted only for the cross-check
+ * report and the freshness fingerprint (ADR D5).
  */
 export async function scanDomainMap(
   projectRoot: string,
-  options: { depthCap?: number } = {},
+  options: {
+    depthCap?: number;
+    /**
+     * 게이트 자동 승인 — true면 decidedBy "auto", 문자열이면 그 핸들로 기록.
+     * confirmed plan은 단 한 번 쓴다 (이중 쓰기/crash 창 제거 — 리뷰 반영).
+     */
+    autoApprove?: boolean | string;
+    stepCap?: number;
+  } = {},
 ): Promise<{
   census: CensusReport;
   routes: RoutesReport;
   edges: EdgesReport;
   slices: SlicesReport;
+  candidates: CandidatesReport;
+  /** 확정 플랜 — 게이트 미통과 시 null (skeleton도 null). */
+  confirmed: ConfirmedPlan | null;
+  /** 이번 실행이 confirmed plan을 새로 영속했으면 true (감사 기록 트리거). */
+  confirmedCreated: boolean;
+  skeleton: SkeletonReport | null;
   censusPath: string;
   routesPath: string;
   edgesPath: string;
   slicesPath: string;
+  candidatesPath: string;
+  skeletonPath: string | null;
 }> {
   const census = await buildCensus(projectRoot);
   const javaFacts = await parseJavaFacts(projectRoot, census);
   const routes = await extractRoutes(projectRoot, census, javaFacts);
   const edges = await extractEdges(projectRoot, census, javaFacts);
   const slices = buildSlices(census, routes, edges, options.depthCap ?? DEFAULT_DEPTH_CAP);
+  const candidates = buildCandidates(census, routes, slices);
+
+  let confirmed = await readConfirmedPlan(projectRoot);
+  let confirmedCreated = false;
+  if (!confirmed && options.autoApprove) {
+    const decidedBy =
+      typeof options.autoApprove === "string" ? options.autoApprove : "auto";
+    confirmed = buildAutoPlan(candidates, decidedBy);
+    await writeConfirmedPlan(projectRoot, confirmed);
+    confirmedCreated = true;
+  }
+  const skeleton = confirmed
+    ? buildSkeleton(confirmed, candidates, routes, slices, edges, javaFacts, {
+        stepCap: options.stepCap,
+      })
+    : null;
+
   const censusPath = await writeCensus(projectRoot, census);
   const routesPath = await writeRoutes(projectRoot, routes);
   const edgesPath = await writeEdges(projectRoot, edges);
   const slicesPath = await writeSlices(projectRoot, slices);
-  return { census, routes, edges, slices, censusPath, routesPath, edgesPath, slicesPath };
+  const candidatesPath = await writeCandidates(projectRoot, candidates);
+  const skeletonPath = skeleton ? await writeSkeleton(projectRoot, skeleton) : null;
+
+  return {
+    census,
+    routes,
+    edges,
+    slices,
+    candidates,
+    confirmed,
+    confirmedCreated,
+    skeleton,
+    censusPath,
+    routesPath,
+    edgesPath,
+    slicesPath,
+    candidatesPath,
+    skeletonPath,
+  };
 }
 
 /**

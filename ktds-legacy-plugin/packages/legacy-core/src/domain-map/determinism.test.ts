@@ -8,9 +8,11 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 import { scanDomainMap } from "./extract.js";
 import {
+  CandidatesReportSchema,
   CensusReportSchema,
   EdgesReportSchema,
   RoutesReportSchema,
+  SkeletonReportSchema,
   SlicesReportSchema,
 } from "./types.js";
 
@@ -32,31 +34,35 @@ afterEach(async () => {
   await rm(dir, { recursive: true, force: true });
 });
 
-test("scanDomainMap 2회 실행 → census/routes/edges/slices byte-diff=0", async () => {
+test("scanDomainMap 2회 실행 → 전 산출물 byte-diff=0 (skeleton 포함, M1)", async () => {
   await cp(join(FIXTURES, "spring-basic"), dir, { recursive: true });
 
+  const artifacts = [
+    "census.json",
+    "routes.json",
+    "edges.json",
+    "slices.json",
+    "candidates.json",
+    "skeleton.json",
+  ];
+  // autoApprove 1회차가 confirmed plan을 영속 → 2회차는 게이트 생략(멱등)
+  await scanDomainMap(dir, { autoApprove: true });
+  const first = await Promise.all(
+    artifacts.map((f) => readFile(join(dir, ".spec/map", f), "utf-8")),
+  );
   await scanDomainMap(dir);
-  const census1 = await readFile(join(dir, ".spec/map/census.json"), "utf-8");
-  const routes1 = await readFile(join(dir, ".spec/map/routes.json"), "utf-8");
-  const edges1 = await readFile(join(dir, ".spec/map/edges.json"), "utf-8");
-  const slices1 = await readFile(join(dir, ".spec/map/slices.json"), "utf-8");
-
-  await scanDomainMap(dir);
-  const census2 = await readFile(join(dir, ".spec/map/census.json"), "utf-8");
-  const routes2 = await readFile(join(dir, ".spec/map/routes.json"), "utf-8");
-  const edges2 = await readFile(join(dir, ".spec/map/edges.json"), "utf-8");
-  const slices2 = await readFile(join(dir, ".spec/map/slices.json"), "utf-8");
-
-  expect(census2).toBe(census1);
-  expect(routes2).toBe(routes1);
-  expect(edges2).toBe(edges1);
-  expect(slices2).toBe(slices1);
+  const second = await Promise.all(
+    artifacts.map((f) => readFile(join(dir, ".spec/map", f), "utf-8")),
+  );
+  expect(second).toEqual(first);
 
   // 산출물은 스키마에 적합해야 한다 (14.1 DoD)
-  expect(() => CensusReportSchema.parse(JSON.parse(census1))).not.toThrow();
-  expect(() => RoutesReportSchema.parse(JSON.parse(routes1))).not.toThrow();
-  expect(() => EdgesReportSchema.parse(JSON.parse(edges1))).not.toThrow();
-  expect(() => SlicesReportSchema.parse(JSON.parse(slices1))).not.toThrow();
+  expect(() => CensusReportSchema.parse(JSON.parse(first[0]))).not.toThrow();
+  expect(() => RoutesReportSchema.parse(JSON.parse(first[1]))).not.toThrow();
+  expect(() => EdgesReportSchema.parse(JSON.parse(first[2]))).not.toThrow();
+  expect(() => SlicesReportSchema.parse(JSON.parse(first[3]))).not.toThrow();
+  expect(() => CandidatesReportSchema.parse(JSON.parse(first[4]))).not.toThrow();
+  expect(() => SkeletonReportSchema.parse(JSON.parse(first[5]))).not.toThrow();
 });
 
 test("git 모드: 2회 실행 byte-diff=0 + gitCommit 40-hex (리뷰 반영 — 실전 주 경로)", async () => {

@@ -3,14 +3,18 @@ import * as path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import {
+  CANDIDATES_FILENAME,
   CENSUS_FILENAME,
   EDGES_FILENAME,
   ROUTES_FILENAME,
+  SKELETON_FILENAME,
   SLICES_FILENAME,
   SPEC_MAP_DIR,
+  type CandidatesReport,
   type CensusReport,
   type EdgesReport,
   type RoutesReport,
+  type SkeletonReport,
   type SlicesReport,
 } from "./types.js";
 
@@ -37,7 +41,11 @@ export async function writeMapArtifact(
   const dir = specMapDir(projectRoot);
   await fs.mkdir(dir, { recursive: true });
   const filePath = path.join(dir, filename);
-  await fs.writeFile(filePath, stableJson(value), "utf-8");
+  // temp+rename: crash가 절단된 산출물을 남기지 않는다(리뷰 반영). 산출물
+  // 집합 전체의 원자성은 없음 — 재실행이 전체를 재생성해 자가 치유한다.
+  const tmpPath = `${filePath}.tmp`;
+  await fs.writeFile(tmpPath, stableJson(value), "utf-8");
+  await fs.rename(tmpPath, filePath);
   return filePath;
 }
 
@@ -67,6 +75,20 @@ export async function writeSlices(
   slices: SlicesReport,
 ): Promise<string> {
   return writeMapArtifact(projectRoot, SLICES_FILENAME, slices);
+}
+
+export async function writeCandidates(
+  projectRoot: string,
+  candidates: CandidatesReport,
+): Promise<string> {
+  return writeMapArtifact(projectRoot, CANDIDATES_FILENAME, candidates);
+}
+
+export async function writeSkeleton(
+  projectRoot: string,
+  skeleton: SkeletonReport,
+): Promise<string> {
+  return writeMapArtifact(projectRoot, SKELETON_FILENAME, skeleton);
 }
 
 /** HEAD commit hash, or null outside a git work tree (SVN/no-VCS projects). */

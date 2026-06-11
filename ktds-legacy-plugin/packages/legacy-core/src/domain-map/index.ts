@@ -25,6 +25,8 @@ export {
   writeRoutes,
   writeEdges,
   writeSlices,
+  writeCandidates,
+  writeSkeleton,
 } from "./persist.js";
 export {
   extractRoutes,
@@ -32,7 +34,26 @@ export {
   parseJavaFacts,
   scanDomainMap,
   gitCommitHash,
+  kgFingerprint,
 } from "./extract.js";
+export {
+  buildCandidates,
+  classifyByDirectory,
+  prefixToken,
+  tokenizeBasename,
+} from "./classify.js";
+export { buildSkeleton, DEFAULT_STEP_CAP, STEP_DEPTH_CAP } from "./skeleton.js";
+export {
+  buildAutoPlan,
+  renameDomain,
+  mergeDomains,
+  moveRoot,
+  excludeDomain,
+  detectPlanDrift,
+  planTable,
+  readConfirmedPlan,
+  writeConfirmedPlan,
+} from "./confirm.js";
 export {
   buildClassIndex,
   buildMapperNamespaceIndex,

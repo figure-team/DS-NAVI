@@ -131,7 +131,9 @@ export type AuditEventType =
   | "DOC_APPROVED"
   | "RUN_ABORTED"
   | "INIT_RERUN"
-  | "STALE_LOCK_REMOVED";
+  | "STALE_LOCK_REMOVED"
+  /** /understand-map 도메인 경계 확정 (S7 게이트 — Stage-16). */
+  | "MAP_PLAN_CONFIRMED";
 
 export interface AuditEvent {
   /** ISO timestamp. */

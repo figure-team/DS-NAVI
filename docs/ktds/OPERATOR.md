@@ -7,7 +7,11 @@
 ```
 U-A /understand                → .understand-anything/knowledge-graph.json
   → ktds /understand-init      → understanding.config.json + .spec/
-  → ktds /understand-docs      → docs/*.md (5종, DRAFT) + 근거·태그
+  → ktds /understand-map       → .understand-anything/domain-graph.json (03 기능명세의 공급원)
+      scan                     → census/라우트/콜체인/도달성/도메인 후보 (.spec/map/, 결정론)
+      plan · confirm           → ✋ 도메인 경계 확정 게이트 (영속 + MAP_PLAN_CONFIRMED 감사)
+      bundle → (LLM 채움) → emit → 인용 기계검증([확인 필요] 강등) + domain-graph emit
+  → ktds /understand-docs      → docs/*.md (5종, DRAFT) + 근거·태그 (domain-graph 자동 병합)
       review --list/--doc      → DRAFT→UNDER_REVIEW
       confirm --doc            → 항목 확정 [추정]·[확정(AI)]→[확정(담당자)] + 감사
       approve --doc --by       → UNDER_REVIEW→APPROVED + 감사
@@ -51,12 +55,33 @@ node ktds-legacy-plugin/scripts/understand-init.mjs <projectRoot>
 | `supportedSchemaVersions` | `["1.0.0"]` | 허용 U-A 그래프 버전 |
 | `configFiles` | `[]` | 빌드 파일(pom.xml 등) — 언어/프레임워크 근거 |
 
+## 2-1. 도메인 맵 (/understand-map — 03 기능명세의 공급원)
+
+표준 `/understand`는 domain/flow/step 노드를 만들지 않아 03_feature-spec이 빈다. `/understand-map`이 이를 **결정론으로** 공급한다 (ADR-001). `/understand`와 실행 순서 무관 — KG는 교차검증·힌트로만 쓴다.
+
+```bash
+node ktds-legacy-plugin/scripts/understand-map.mjs <projectRoot> scan     # 스캔 (결정론, 재실행 byte-diff=0)
+node ktds-legacy-plugin/scripts/understand-map.mjs <projectRoot> plan    # 후보 표 (key·루트·엔트리·모호/미해소 큐)
+node ktds-legacy-plugin/scripts/understand-map.mjs <projectRoot> confirm # ✋ 경계 확정 (TTY 인터랙티브)
+node ktds-legacy-plugin/scripts/understand-map.mjs <projectRoot> bundle  # LLM 입력 번들 (.spec/map/bundle/)
+# (LLM 채움: 슬래시 사용 시 Claude가 SKILL.md 계약대로 fill/<key>.json 작성 — 모든 사실 주장에 파일:라인+스니펫 인용 의무)
+node ktds-legacy-plugin/scripts/understand-map.mjs <projectRoot> emit    # 인용 기계검증 + domain-graph.json
+node ktds-legacy-plugin/scripts/understand-map.mjs <projectRoot> status # 게이트 확정 상태
+```
+
+- **✋ 게이트는 생략 불가** (자동 도메인 경계의 전문가 일치율 한계 — ADR §1.3). TTY 세션 명령: `a`=승인 / `r <key> <새이름>`=개명 / `m <from> <into>`=병합 / `v <루트경로> <key>`=루트 이동 / `x <key>`=제외 / `q`=저장 없이 종료. 일괄 승인은 `confirm --auto-approve --by <핸들>`. 디스패처성 후보(web.xml의 `web` 등)는 보통 제외 대상.
+- 확정은 `.spec/map/domain-plan.confirmed.json`으로 영속(재실행의 결정론 닻) + `MAP_PLAN_CONFIRMED` 감사. 코드가 변해 루트가 증감하면 scan이 **드리프트 경고**를 낸다 → 재확정.
+- emit의 기계검증: 인용 경로 실존 → 라인 범위 → 텍스트 일치 → 사소 스니펫 무효. 실패 항목은 삭제 대신 **`[확인 필요]` 강등** — 03 문서에서 항목 확정 워크플로(§4-1)에 자연 합류한다. 근거율 리포트: `.spec/map/verify-report.json`. 실패 도메인만 fill 재작성 후 emit 재실행(멱등).
+- 슬래시(비-TTY) confirm은 임의 전체 확정이 차단되고 Claude가 항목 단위로 묻는다 (`understand-docs` confirm과 동일 원칙).
+
 ## 3. 문서 생성
 
 ```bash
 node ktds-legacy-plugin/scripts/understand-docs.mjs <projectRoot>
 ```
 → `docs/`에 5종 DRAFT 생성: `01_tech-stack` · `02_architecture` · `03_feature-spec` · `04_api-spec` · `05_db-spec`. 감사에 `DOC_GENERATED` 기록.
+- `domain-graph.json`이 있으면 **자동 병합**되어 03에 도메인/엔터티/업무 규칙이 근거와 함께 렌더된다. domain 노드가 없으면 "/understand-map 먼저" 경고.
+- domain-graph가 KG·생성 commit보다 오래되면 **freshness 경고** → `emit` 재실행 권장.
 
 > 스크립트는 **결정론 skeleton**(근거·태그·구조)만 생성한다. 자연스러운 산문 본문은 host CLI(Claude)가 SKILL.md 지시에 따라 각 섹션의 claim만 근거로 채운다.
 

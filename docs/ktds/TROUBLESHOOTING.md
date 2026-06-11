@@ -68,6 +68,30 @@
 
 ---
 
+## 4-1. 도메인 맵 (/understand-map)
+
+### `skeleton.json 없음 — 먼저 scan + 도메인 경계 확정(confirm)을 실행하세요` (emit 시)
+- **원인:** ✋게이트 미통과 — `domain-plan.confirmed.json`이 없어 skeleton이 생성되지 않음.
+- **대응:** `confirm`(TTY 인터랙티브) 또는 `confirm --auto-approve --by <핸들>` 후 재시도.
+
+### `⚠ 확정 플랜 드리프트 감지 — 재확정(confirm) 권장` (scan 시)
+- **원인:** 게이트 확정 이후 코드가 변해 엔트리(루트)가 생기거나 사라짐.
+- **대응:** 표시된 새/사라진 루트를 확인하고 재확정. 기존 확정을 갈아엎으려면 `.spec/map/domain-plan.confirmed.json` 삭제 후 confirm.
+
+### `✗ fill 스키마 위반 [key]` / `✗ 구조 위반 기각 [domainId] <ref>` (emit 시)
+- **원인:** fill이 인용 의무(citations≥1, snippet≥8자)를 어겼거나, 모르는/타 도메인의 flow·step ID를 건드림(구조는 read-only).
+- **대응:** 해당 도메인의 `fill/<key>.json`만 계약대로 재작성 후 emit 재실행(멱등 — 다른 도메인은 영향 없음).
+
+### 근거율이 낮음 / `[확인 필요]` 강등 다수 (verify-report.json)
+- **원인:** 인용 실패 — `no-file`(경로 오타/환각), `line-out-of-range`, `text-mismatch`(라인 내용 불일치 — 코드가 변했거나 스니펫 조작), `trivial-snippet`(`") {"` 같은 무의미 토막), `path-escape`(프로젝트 밖 경로).
+- **대응:** `.spec/map/verify-report.json`에서 status별 원인 확인 → fill의 인용을 번들 소스 슬라이스의 실제 라인으로 수정. `⚠ skeleton이 옛 commit 산물` 경고가 함께 떴다면 scan부터 재실행(라인 이동).
+
+### `[understand-docs] 도메인 분석이 knowledge-graph보다 오래됨` / `생성 commit이 KG commit과 다름`
+- **원인:** domain-graph emit 이후 `/understand` 재실행 또는 코드 변경 (freshness 대조 — 구조 투영 기준이라 단순 재실행로는 오발하지 않음).
+- **대응:** 차단 아님(문서는 생성됨). 최신화하려면 `scan` → (드리프트 시 재확정) → `emit` 재실행.
+
+---
+
 ## 5. 내보내기 / 빌드
 
 - **HTML이 비어 보임/항목 없음:** 해당 노드 타입이 그래프에 없을 수 있음. **feature-spec(03)이 비면 `/understand-map`을 실행**하라 — scan→✋경계 확정→bundle→LLM 채움→emit으로 `domain-graph.json`이 생성되고, `/understand-docs`가 자동 병합한다(미실행 시 생성 단계에서 안내 경고가 뜬다). domain-graph가 KG보다 오래되면 freshness 경고가 뜬다 → `emit` 재실행.

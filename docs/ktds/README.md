@@ -8,6 +8,7 @@
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) — 장애 대응 (실제 에러 메시지별 원인·대응)
 
 ## 기술 레퍼런스
+- [ADR-001-understand-map.md](./ADR-001-understand-map.md) — `/understand-map` 결정 기록 (결정론 skeleton → ✋게이트 → LLM 채움 → 기계 검증 → 병합, 수용 기준 M1~M7 — **Accepted**)
 - [UA_BASELINE.md](./UA_BASELINE.md) — U-A v2.7.3 검증된 노드/엣지 타입·필드 (kg-reader 기준)
 - [UPSTREAM_MERGE.md](./UPSTREAM_MERGE.md) — U-A fork upstream 추종 절차
 

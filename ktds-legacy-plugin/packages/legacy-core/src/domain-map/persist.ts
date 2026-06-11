@@ -8,6 +8,7 @@ import {
   EDGES_FILENAME,
   ROUTES_FILENAME,
   SKELETON_FILENAME,
+  SkeletonReportSchema,
   SLICES_FILENAME,
   SPEC_MAP_DIR,
   type CandidatesReport,
@@ -89,6 +90,23 @@ export async function writeSkeleton(
   skeleton: SkeletonReport,
 ): Promise<string> {
   return writeMapArtifact(projectRoot, SKELETON_FILENAME, skeleton);
+}
+
+/** 디스크의 skeleton.json — 부재 시 null, 손상은 throw (fail-closed). */
+export async function readSkeleton(
+  projectRoot: string,
+): Promise<SkeletonReport | null> {
+  let raw: string;
+  try {
+    raw = await fs.readFile(
+      path.join(specMapDir(projectRoot), SKELETON_FILENAME),
+      "utf-8",
+    );
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw err;
+  }
+  return SkeletonReportSchema.parse(JSON.parse(raw));
 }
 
 /** HEAD commit hash, or null outside a git work tree (SVN/no-VCS projects). */

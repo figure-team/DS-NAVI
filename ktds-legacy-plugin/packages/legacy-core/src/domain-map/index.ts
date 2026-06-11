@@ -27,6 +27,7 @@ export {
   writeSlices,
   writeCandidates,
   writeSkeleton,
+  readSkeleton,
 } from "./persist.js";
 export {
   extractRoutes,
@@ -43,6 +44,38 @@ export {
   tokenizeBasename,
 } from "./classify.js";
 export { buildSkeleton, DEFAULT_STEP_CAP, STEP_DEPTH_CAP } from "./skeleton.js";
+export {
+  buildBundles,
+  safeKeyFilename,
+  BUNDLE_DIR,
+  DEFAULT_SLICE_LINES,
+  DEFAULT_BUNDLE_CHAR_CAP,
+  DomainBundleSchema,
+} from "./bundle.js";
+export {
+  applyFills,
+  readFills,
+  unfilledNodes,
+  fillDir,
+  fillPathFor,
+  FILL_DIR,
+  CitationSchema,
+  ClaimSchema,
+  DomainFillSchema,
+} from "./fill.js";
+export {
+  verifyFills,
+  writeVerifyReport,
+  VERIFY_REPORT_FILENAME,
+  VerifyReportSchema,
+} from "./verify.js";
+export {
+  demoteUnverified,
+  emitDomainGraph,
+  DOMAIN_GRAPH_FILENAME,
+  NEEDS_REVIEW_MARKER,
+} from "./emit.js";
+export { runFillPipeline } from "./fill-pipeline.js";
 export {
   buildAutoPlan,
   renameDomain,

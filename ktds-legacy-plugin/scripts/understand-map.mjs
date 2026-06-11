@@ -5,6 +5,8 @@
 //   확정:   node understand-map.mjs <projectRoot> confirm            (TTY: 인터랙티브 게이트)
 //           node understand-map.mjs <projectRoot> confirm --auto-approve --by <handle>
 //   상태:   node understand-map.mjs <projectRoot> status
+//   번들:   node understand-map.mjs <projectRoot> bundle      (S8 LLM 입력 — .spec/map/bundle/)
+//   채움반영: node understand-map.mjs <projectRoot> emit      (fill/*.json → 검증 → domain-graph.json)
 //
 // 게이트(S7)는 자동 도메인 경계의 전문가 일치율 한계(ADR §1.3) 때문에 생략
 // 불가다. 비-TTY에서 confirm은 후보 표 + 안내만 출력한다(임의 전체 확정 방지,
@@ -19,10 +21,10 @@ process.stdout.on("error", (e) => { if (e.code === "EPIPE") process.exit(0); });
 const {
   scanDomainMap, planTable, buildAutoPlan, renameDomain, mergeDomains,
   moveRoot, excludeDomain, detectPlanDrift, readConfirmedPlan,
-  writeConfirmedPlan, logEvent,
+  writeConfirmedPlan, logEvent, buildBundles, runFillPipeline,
 } = await import(await ensureBuilt());
 
-const SUBS = ["scan", "plan", "confirm", "status"];
+const SUBS = ["scan", "plan", "confirm", "status", "bundle", "emit"];
 
 function assertHandle(by, usage) {
   if (!by || by.startsWith("-")) {
@@ -116,6 +118,29 @@ if (sub === "scan") {
   } else {
     await interactiveConfirm(r);
   }
+} else if (sub === "bundle") {
+  const r = await scanDomainMap(root);
+  if (!r.skeleton) {
+    console.error("skeleton 없음 — 먼저 도메인 경계를 확정하세요 (confirm)");
+    process.exit(2);
+  }
+  const { bundles, paths } = await buildBundles(root, r.skeleton);
+  for (let i = 0; i < bundles.length; i++) {
+    const b = bundles[i];
+    console.log(`${b.key}: flow ${b.flows.length} · step ${b.steps.length} · 파일 ${b.files.length}${b.sliceOmitted.length ? ` (슬라이스 생략 ${b.sliceOmitted.length})` : ""} → ${paths[i]}`);
+  }
+  console.log(`다음: 도메인별로 fill/<key>.json 작성 후 emit (계약: name/summary/domainMeta만, 모든 사실 주장에 파일:라인+스니펫 인용)`);
+} else if (sub === "emit") {
+  const result = await runFillPipeline(root);
+  const o = result.report.overall;
+  console.log(`검증: 항목 ${o.itemTotal} (GROUNDED ${o.itemGrounded}) · 인용 ${o.citationTotal} (ok ${o.citationOk}) · 근거율 ${o.groundedPct}%`);
+  if (result.pending.length) console.log(`미채움 도메인: ${result.pending.join(", ")}`);
+  for (const inv of result.invalid) console.log(`✗ fill 스키마 위반 [${inv.key}]: ${inv.error.split("\n")[0]}`);
+  for (const rej of result.rejected) console.log(`✗ 구조 위반 기각 [${rej.domainId}] ${rej.ref}: ${rej.reason}`);
+  if (result.unfilled.length) console.log(`빈칸 잔여 노드 ${result.unfilled.length}개 (재시도: 해당 도메인 fill만 재작성)`);
+  if (result.staleSkeleton) console.log("⚠ skeleton이 옛 commit 산물 — 라인 이동으로 인용이 어긋날 수 있음. scan 재실행 권장.");
+  console.log(`domain-graph: ${result.domainGraphPath}`);
+  console.log(`verify-report: ${result.verifyReportPath}`);
 } else {
   console.error(`unknown subcommand: ${sub} (${SUBS.join("|")})`);
   process.exit(2);

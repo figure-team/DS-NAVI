@@ -18,11 +18,14 @@ ktds가 손대는 upstream 매니페스트는 **2개**(둘 다 additive). 추가
 3. `understand-anything-plugin/packages/dashboard/vite.config.ts` — dev server `/config.json` 핸들러의 fallback `outputLanguage` 기본값을 `"en"` → **`"ko"`** (1줄). 대시보드는 분석 프로젝트 `.understand-anything/config.json`의 `outputLanguage`로 UI 언어를 정하는데, 그 파일이 없을 때의 기본값이다. ktds 파이프라인(`understand-init`)이 `.understand-anything/config.json`에 `outputLanguage:ko`를 써두므로 데이터로도 보장되지만, 순수 U-A 경로(`/understand`→`/understand-dashboard`만)를 위한 안전망. **U-A의 i18n·`ko.ts` 번역은 원본 그대로 활용**(코드 추가 없음).
 
 **무수정 예외 #2** (2026-06-12, ADR-002 부록 A.3 — diff 오버레이 가독성, PL 실사용 피드백):
-4. `understand-anything-plugin/packages/dashboard/src/components/` 4파일 — diff 오버레이의 변경/영향을 **명시 배지·집계 칩**으로 표시. 전 수정부에 `// ktds-fork` 주석 마커. 신규 locale 키 없음(기존 `t.diffToggle.changed/affected` 재사용), 신규 파일 없음:
+4. `understand-anything-plugin/packages/dashboard/src/components/` 8파일 — diff 오버레이의 변경/영향을 **명시 배지·집계 칩·fade/글로우**로 표시. 전 수정부에 `// ktds-fork` 주석 마커. 신규 locale 키 없음(기존 `t.diffToggle.changed/affected` 재사용), 신규 파일 없음:
    - `CustomNode.tsx` — 노드 헤더에 "변경됨"/"영향받음" 배지 칩 (ring 색만으로는 구분 불가 피드백)
    - `ContainerNode.tsx` — 변경/영향 **개수 칩** + 테두리 색 구분(변경 포함=적색, 영향만=호박색 — 기존엔 둘 다 적색 단일 플래그)
-   - `LayerClusterNode.tsx` — 계층(오버뷰 첫 화면) 카드에 동일 칩+테두리 (어느 계층을 봐야 하는지 드릴인 없이 식별)
-   - `GraphView.tsx` — `diffContainers` Set→개수 Map, `useOverviewGraph`에 계층별 diff 집계 배선
+   - `LayerClusterNode.tsx` — 계층(오버뷰 첫 화면) 카드에 동일 칩+테두리+글로우, 무관 계층 `diff-faded` 흐림
+   - `GraphView.tsx` — `diffContainers` Set→개수 Map, `useOverviewGraph`에 계층별 diff 집계·fade 배선
+   - `DomainGraphView.tsx` — 도메인 뷰 투영: 오버레이 KG id→filePath 환산(store nodesById), 도메인/흐름 멤버(entry∪step 파일) 집계, step filePath 조인
+   - `DomainClusterNode.tsx` / `FlowNode.tsx` — 개수 칩+테두리+글로우, 무관 노드 흐림
+   - `StepNode.tsx` — "변경됨"/"영향받음" 배지+테두리, 무관 step 흐림
 
 upstream merge 시 1·2는 additive 라인 재적용, 3은 해당 1줄(`outputLanguage: "ko"`) 재적용, 4는 `// ktds-fork` 마커 블록을 재적용한다(충돌 시 `git log -p -- <파일>`로 ktds 커밋 diff 참조).
 

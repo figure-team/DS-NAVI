@@ -278,9 +278,11 @@ function useOverviewGraph() {
           aggregateComplexity,
           layerColorIndex: i,
           searchMatchCount: searchMatchByLayer.get(layer.id),
-          // ktds-fork: 계층 카드 diff 칩
+          // ktds-fork: 계층 카드 diff 칩 + 무관 계층 흐림(노드 fade와 동일 시각 언어).
+          // diffByLayer.size 가드: 변경 파일이 어떤 계층에도 안 속하면 전체 fade 방지.
           diffChangedCount: diffByLayer.get(layer.id)?.changed,
           diffAffectedCount: diffByLayer.get(layer.id)?.affected,
+          isDiffFaded: diffMode && diffByLayer.size > 0 && !diffByLayer.has(layer.id),
           onDrillIn: drillIntoLayer,
         },
       };

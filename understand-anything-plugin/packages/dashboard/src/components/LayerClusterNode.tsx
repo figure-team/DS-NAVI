@@ -21,6 +21,8 @@ export interface LayerClusterData extends Record<string, unknown> {
   // ktds-fork: 계층 내 변경/영향 노드 수 — 첫 화면에서 어느 계층을 봐야 하는지
   diffChangedCount?: number;
   diffAffectedCount?: number;
+  /** ktds-fork: diff 모드에서 변경/영향이 없는 계층 — 노드 fade와 동일하게 흐림 */
+  isDiffFaded?: boolean;
   onDrillIn: (layerId: string) => void;
 }
 
@@ -34,7 +36,9 @@ function LayerClusterNode({
     complexityColors[data.aggregateComplexity] ?? complexityColors.simple;
   const { t } = useI18n();
 
-  // ktds-fork: 변경 포함=적색, 영향만=호박색 테두리
+  // ktds-fork: 변경 포함=적색, 영향만=호박색 테두리 + 글로우, 무관 계층=흐림.
+  // 글로우는 인라인 boxShadow가 .diff-*-glow 클래스를 덮어쓰므로 인라인으로 합성
+  // (값은 index.css .diff-changed-glow/.diff-affected-glow와 동일 계열).
   const diffChanged = data.diffChangedCount ?? 0;
   const diffAffected = data.diffAffectedCount ?? 0;
   const diffBorder =
@@ -43,13 +47,20 @@ function LayerClusterNode({
       : diffAffected > 0
         ? { borderColor: "var(--color-diff-affected)" }
         : {};
+  const baseShadow = "0 4px 16px rgba(0,0,0,0.4)";
+  const boxShadow =
+    diffChanged > 0
+      ? `${baseShadow}, 0 0 16px rgba(224, 82, 82, 0.35)`
+      : diffAffected > 0
+        ? `${baseShadow}, 0 0 12px rgba(212, 160, 48, 0.3)`
+        : baseShadow;
 
   return (
     <div
-      className="relative rounded-xl bg-elevated border border-border-subtle overflow-hidden cursor-pointer transition-all duration-200 hover:border-gold/40 hover:shadow-lg group"
+      className={`relative rounded-xl bg-elevated border border-border-subtle overflow-hidden cursor-pointer transition-all duration-200 hover:border-gold/40 hover:shadow-lg group${data.isDiffFaded ? " diff-faded" : ""}`}
       style={{
         width: 300,
-        boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+        boxShadow,
         ...diffBorder,
       }}
       onClick={() => data.onDrillIn(data.layerId)}

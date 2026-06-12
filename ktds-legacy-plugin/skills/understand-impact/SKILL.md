@@ -54,12 +54,12 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-impact.mjs <projectRoot> analyze -
 - **흐름/도메인은 `[추정]`**: step 입도가 라우트-선언-파일 단위라 '실 호출'이 아닌 '체인 내 도달'이다.
 - **비-Java 시드(JSP/TS/web.xml)**: edges가 java 기반이라 역방향이 빈약 → `[확인 필요]` 강등, host 보강 권장.
 
-## 5) 대시보드 시각화 (자동)
-analyze가 `.understand-anything/knowledge-graph.json`이 있으면 영향 범위를 `.understand-anything/diff-overlay.json`으로 자동 발행한다 — U-A 대시보드가 이미 소비하는 입력 계약이라 **U-A 코드는 무수정**이다. 사용자에게 안내할 것:
-- `/understand-anything:understand-dashboard`를 실행하면 구조 뷰에서 **적색=시드("변경됨" 배지), 호박색=영향("영향받음" 배지), 무관 노드=흐림**으로 표시된다(`d` 키로 토글). 계층(첫 화면) 카드와 폴더 컨테이너에는 **변경/영향 개수 칩**이 떠서 드릴인 없이 위치를 좁힐 수 있다. **도메인 뷰**에도 같은 표시가 투영된다(도메인/흐름 카드=개수 칩, step=배지 — 단 라우트 체인에 등장하는 파일만). 재분석 후엔 브라우저 새로고침만 하면 된다.
-- 한계: 상류/하류 구분 색·API/DB 영향 표는 대시보드에 안 나온다(보고서 .md가 정본). 범례·배지의 "변경됨"=시드를 뜻한다.
+## 5) 대시보드 시각화 (자동 — 예측 채널)
+analyze가 `.understand-anything/knowledge-graph.json`이 있으면 영향 범위를 **`.understand-anything/impact-overlay.json`(예측 전용 채널)**로 자동 발행한다. 사용자에게 안내할 것:
+- `/understand-anything:understand-dashboard`에서 **'영향도' 토글(`i` 키)**: 적색="시드" 배지, 호박색="영향" 배지, 무관 노드=흐림. 계층(첫 화면)·폴더 컨테이너·도메인 뷰에도 동일한 칩/배지가 투영된다(도메인 뷰는 라우트 체인 등장 파일만). 재분석 후엔 브라우저 새로고침.
+- **Diff 토글(`d` 키)은 별개** — 실측 비교(/understand-review, "변경됨/영향받음")용이다. 두 토글은 동시에 켜지지 않고, 둘 다 데이터가 있으면 최신 분석이 자동 활성된다.
+- 한계: 상류/하류 구분 색·API/DB 영향 표는 대시보드에 안 나온다(보고서 .md가 정본).
 - KG가 없으면 오버레이는 생략된다(`/understand` 후 재분석 시 생성). 엔진이 "KG 미조인 N"을 보고하면 `/understand` 분석 범위가 영향 파일을 포함하는지 확인하라.
-- `/understand-diff`가 쓴 기존 오버레이는 `.bak`으로 보존 후 덮어쓴다(같은 파일 경합 — 마지막 실행이 화면에 뜬다).
 
 ## 6) 상태
 ```

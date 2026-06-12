@@ -140,7 +140,9 @@ export type AuditEventType =
   /** /understand-map 도메인 경계 확정 (S7 게이트 — Stage-16). */
   | "MAP_PLAN_CONFIRMED"
   /** /understand-impact 변경 영향도 분석 실행 (Stage-19, ADR-002). */
-  | "IMPACT_ANALYZED";
+  | "IMPACT_ANALYZED"
+  /** /understand-review 변경분 실측 리뷰 실행 (Stage-21, ADR-002 부록 B). */
+  | "REVIEW_ANALYZED";
 
 export interface AuditEvent {
   /** ISO timestamp. */

@@ -6,9 +6,13 @@ import type { ImpactResult } from "./types.js";
 import {
   buildDiffOverlay,
   normalizeKgPath,
-  publishDiffOverlay,
+  publishImpactOverlay,
+  publishReviewOverlay,
+  cleanupLegacyImpactDiffOverlay,
   DIFF_OVERLAY_FILENAME,
+  IMPACT_OVERLAY_FILENAME,
   OVERLAY_BASE_BRANCH,
+  REVIEW_OVERLAY_PREFIX,
   type KgOverlayNode,
 } from "./overlay.js";
 
@@ -131,32 +135,32 @@ async function writeKg(nodes: Array<Record<string, unknown>>): Promise<void> {
   );
 }
 
-test("publishDiffOverlay — KG 부재면 null (오버레이 생략)", async () => {
-  expect(await publishDiffOverlay(dir, makeResult({ seeds: ["a.java"] }))).toBeNull();
+test("publishImpactOverlay — KG 부재면 null (오버레이 생략)", async () => {
+  expect(await publishImpactOverlay(dir, makeResult({ seeds: ["a.java"] }))).toBeNull();
 });
 
-test("publishDiffOverlay — KG 손상(비JSON·null·nodes 비배열)도 null (감사 경로 보호)", async () => {
+test("publishImpactOverlay — KG 손상(비JSON·null·nodes 비배열)도 null (감사 경로 보호)", async () => {
   const kgPath = join(dir, ".understand-anything", "knowledge-graph.json");
   await mkdir(join(dir, ".understand-anything"), { recursive: true });
   for (const broken of ["{not json", "null", JSON.stringify({ nodes: "oops" })]) {
     await writeFile(kgPath, broken, "utf-8");
-    expect(await publishDiffOverlay(dir, makeResult({ seeds: ["a.java"] })), broken).toBeNull();
+    expect(await publishImpactOverlay(dir, makeResult({ seeds: ["a.java"] })), broken).toBeNull();
   }
 });
 
-test("publishDiffOverlay — 계약 필드 + ktds 확장 + nowIso 주입", async () => {
+test("publishImpactOverlay — 예측 채널: impact-overlay.json + 계약 필드 + nowIso 주입", async () => {
   await writeKg([
     { id: "file:src/Svc.java", type: "file", filePath: "src/Svc.java" },
     { id: "file:src/Ctrl.java", type: "file", filePath: "src/Ctrl.java" },
   ]);
-  const res = await publishDiffOverlay(
+  const res = await publishImpactOverlay(
     dir,
     makeResult({ seeds: ["src/Svc.java"], up: ["src/Ctrl.java"], gitCommit: "abc" }),
     { nowIso: "2026-06-12T00:00:00.000Z" },
   );
   expect(res).not.toBeNull();
   expect(res!.backedUp).toBe(false);
-  const raw = JSON.parse(await readFile(join(dir, ".understand-anything", DIFF_OVERLAY_FILENAME), "utf-8"));
+  const raw = JSON.parse(await readFile(join(dir, ".understand-anything", IMPACT_OVERLAY_FILENAME), "utf-8"));
   expect(raw).toEqual({
     version: "1.0.0",
     baseBranch: OVERLAY_BASE_BRANCH,
@@ -174,29 +178,55 @@ test("publishDiffOverlay — 계약 필드 + ktds 확장 + nowIso 주입", async
   });
 });
 
-test("publishDiffOverlay — 다른 출처 기존 파일은 .bak 보존, ktds 것은 그냥 덮어씀", async () => {
+test("publishReviewOverlay — 실측 채널: diff-overlay.json + ktds-review:<base> 마커", async () => {
   await writeKg([{ id: "file:a.java", type: "file", filePath: "a.java" }]);
-  const overlayPath = join(dir, ".understand-anything", DIFF_OVERLAY_FILENAME);
-  // /understand-diff가 만든 외부 오버레이
-  await writeFile(overlayPath, JSON.stringify({ baseBranch: "main", changedNodeIds: ["x"] }), "utf-8");
-
-  const first = await publishDiffOverlay(dir, makeResult({ seeds: ["a.java"] }), { nowIso: "t" });
-  expect(first!.backedUp).toBe(true);
-  const bak = JSON.parse(await readFile(`${overlayPath}.bak`, "utf-8"));
-  expect(bak.baseBranch).toBe("main");
-
-  // 우리 파일 재발행 — 추가 백업 없음 (.bak 불변)
-  const second = await publishDiffOverlay(dir, makeResult({ seeds: ["a.java"] }), { nowIso: "t2" });
-  expect(second!.backedUp).toBe(false);
-  expect(JSON.parse(await readFile(`${overlayPath}.bak`, "utf-8")).baseBranch).toBe("main");
-  expect(JSON.parse(await readFile(overlayPath, "utf-8")).generatedAt).toBe("t2");
+  const res = await publishReviewOverlay(dir, makeResult({ seeds: ["a.java"] }), "origin/main", { nowIso: "t" });
+  const raw = JSON.parse(await readFile(join(dir, ".understand-anything", DIFF_OVERLAY_FILENAME), "utf-8"));
+  expect(raw.baseBranch).toBe(`${REVIEW_OVERLAY_PREFIX}origin/main`);
+  expect(res!.backedUp).toBe(false);
 });
 
-test("publishDiffOverlay — 비JSON 기존 오버레이도 출처 미상으로 .bak 보존", async () => {
+test("publishReviewOverlay — 타 출처(.bak 보존) vs ktds 마커(impact 잔재 포함)는 그냥 덮어씀", async () => {
+  await writeKg([{ id: "file:a.java", type: "file", filePath: "a.java" }]);
+  const overlayPath = join(dir, ".understand-anything", DIFF_OVERLAY_FILENAME);
+  // /understand-diff가 만든 외부 오버레이 → .bak
+  await writeFile(overlayPath, JSON.stringify({ baseBranch: "main", changedNodeIds: ["x"] }), "utf-8");
+  const first = await publishReviewOverlay(dir, makeResult({ seeds: ["a.java"] }), "b1", { nowIso: "t" });
+  expect(first!.backedUp).toBe(true);
+  expect(JSON.parse(await readFile(`${overlayPath}.bak`, "utf-8")).baseBranch).toBe("main");
+
+  // ktds-review 재발행 — 추가 백업 없음 (.bak 불변)
+  const second = await publishReviewOverlay(dir, makeResult({ seeds: ["a.java"] }), "b2", { nowIso: "t2" });
+  expect(second!.backedUp).toBe(false);
+  expect(JSON.parse(await readFile(`${overlayPath}.bak`, "utf-8")).baseBranch).toBe("main");
+  expect(JSON.parse(await readFile(overlayPath, "utf-8")).baseBranch).toBe(`${REVIEW_OVERLAY_PREFIX}b2`);
+
+  // 0.8.0 잔재(ktds-impact가 diff 채널에 쓴 파일)도 우리 것 — 백업 없이 덮어씀
+  await writeFile(overlayPath, JSON.stringify({ baseBranch: OVERLAY_BASE_BRANCH, changedNodeIds: ["y"] }), "utf-8");
+  const third = await publishReviewOverlay(dir, makeResult({ seeds: ["a.java"] }), "b3", { nowIso: "t3" });
+  expect(third!.backedUp).toBe(false);
+});
+
+test("publishReviewOverlay — 비JSON 기존 오버레이도 출처 미상으로 .bak 보존", async () => {
   await writeKg([{ id: "file:a.java", type: "file", filePath: "a.java" }]);
   const overlayPath = join(dir, ".understand-anything", DIFF_OVERLAY_FILENAME);
   await writeFile(overlayPath, "not-json-at-all", "utf-8");
-  const res = await publishDiffOverlay(dir, makeResult({ seeds: ["a.java"] }), { nowIso: "t" });
+  const res = await publishReviewOverlay(dir, makeResult({ seeds: ["a.java"] }), "b", { nowIso: "t" });
   expect(res!.backedUp).toBe(true);
   expect(await readFile(`${overlayPath}.bak`, "utf-8")).toBe("not-json-at-all");
+});
+
+test("cleanupLegacyImpactDiffOverlay — ktds-impact 잔재만 제거, 타 출처/비JSON/부재는 무해", async () => {
+  const overlayPath = join(dir, ".understand-anything", DIFF_OVERLAY_FILENAME);
+  expect(await cleanupLegacyImpactDiffOverlay(dir)).toBe(false); // 부재
+  await mkdir(join(dir, ".understand-anything"), { recursive: true });
+  await writeFile(overlayPath, JSON.stringify({ baseBranch: "main" }), "utf-8");
+  expect(await cleanupLegacyImpactDiffOverlay(dir)).toBe(false); // 타 출처 보존
+  expect(await readFile(overlayPath, "utf-8")).toContain("main");
+  await writeFile(overlayPath, "not-json", "utf-8");
+  expect(await cleanupLegacyImpactDiffOverlay(dir)).toBe(false); // 비JSON(출처 미상) 보존
+  expect(await readFile(overlayPath, "utf-8")).toBe("not-json");
+  await writeFile(overlayPath, JSON.stringify({ baseBranch: OVERLAY_BASE_BRANCH }), "utf-8");
+  expect(await cleanupLegacyImpactDiffOverlay(dir)).toBe(true); // 잔재 제거
+  await expect(readFile(overlayPath, "utf-8")).rejects.toThrow();
 });

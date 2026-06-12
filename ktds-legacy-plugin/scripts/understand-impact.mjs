@@ -9,8 +9,8 @@
 // 분석을 하지 않고 카탈로그+안내만 낸다(fail-closed). 전제: /understand-map
 // scan이 .spec/map/ 산출물을 만들어둬야 한다(없으면 안내).
 // --sr: 분석 사본을 .spec/impact/<SR-ID>/에 보관 (status --list로 이력 조회).
-// 분석 후 .understand-anything/diff-overlay.json을 발행해 U-A 대시보드가
-// 영향 범위를 시각화한다 (KG 없으면 생략 — U-A 무수정, 입력 계약만 사용).
+// 분석 후 .understand-anything/impact-overlay.json(예측 채널)을 발행해 대시보드
+// '영향도' 토글이 시각화한다 (KG 없으면 생략). 실측 비교는 /understand-review.
 import { join } from "node:path";
 import { ensureBuilt } from "./ensure-built.mjs";
 
@@ -18,7 +18,8 @@ process.stdout.on("error", (e) => { if (e.code === "EPIPE") process.exit(0); });
 
 const {
   analyzeImpact, buildChangeImpact, publishChangeImpact, loadImpactInputs,
-  publishDiffOverlay, archiveImpactRun, listImpactRuns, assertSrId,
+  publishImpactOverlay, cleanupLegacyImpactDiffOverlay,
+  archiveImpactRun, listImpactRuns, assertSrId,
   ImpactInputMissingError, logEvent,
 } = await import(await ensureBuilt());
 
@@ -85,9 +86,9 @@ try {
       } else {
         console.log(`=== SR 영향분석 보관 ${runs.length}건 (.spec/impact/) ===`);
         for (const r of runs) {
-          if (!r.valid) { console.log(`  ${r.srId}  [손상 — impact.json 파싱 실패, 재분석 권장]`); continue; }
+          if (!r.valid) { console.log(`  ${r.srId}  [손상 — 보관본 파싱 실패, 재분석 권장]`); continue; }
           const pct = r.groundedPct === null ? "?" : `${r.groundedPct}%`;
-          console.log(`  ${r.srId}  시드 ${r.seeds.map(basename).join(", ")} · 상류 ${r.upstreamFiles} · API ${r.api} · 매퍼 ${r.mappers} · 검토필요 ${r.needsReview} · 근거율 ${pct}`);
+          console.log(`  ${r.srId}  시드 ${r.seeds.map(basename).join(", ")} · 상류 ${r.upstreamFiles} · API ${r.api} · 매퍼 ${r.mappers} · 검토필요 ${r.needsReview} · 근거율 ${pct}${r.hasReview ? " · [리뷰 있음]" : ""}${r.predictionCorrupt ? " · [예측 손상 — 재분석 권장]" : ""}`);
         }
       }
     } else {
@@ -145,8 +146,11 @@ try {
       catch (e) { archiveError = e.message; }
     }
     let overlay = null, overlayError = null;
-    try { overlay = await publishDiffOverlay(root, result); }
+    try { overlay = await publishImpactOverlay(root, result); }
     catch (e) { overlayError = e.message; }
+    // 0.8.0 잔재(예측이 diff-overlay.json에 쓰던 파일) 정리 — 실패해도 무해(독립 경고)
+    try { await cleanupLegacyImpactDiffOverlay(root); }
+    catch (e) { console.warn(`잔재 diff-overlay 정리 실패(무해): ${e.message}`); }
     await logEvent(spec, "IMPACT_ANALYZED", {
       by,
       detail: {
@@ -177,12 +181,11 @@ try {
     if (archiveError) console.error(`SR 보관 실패: ${archiveError} (분석·보고서는 발행됨, 감사에 archiveError 기록)`);
     if (overlay) {
       const k = overlay.overlay.ktdsImpact;
-      console.log(`대시보드 오버레이: ${overlay.path} (시드 ${overlay.overlay.changedNodeIds.length} · 영향 ${overlay.overlay.affectedNodeIds.length}${k.unresolved.length ? ` · KG 미조인 ${k.unresolved.length}` : ""})`);
-      if (overlay.backedUp) console.warn("  주의: 기존 diff-overlay.json(다른 출처)을 .bak으로 보존하고 덮어썼습니다.");
+      console.log(`대시보드 영향도 오버레이: ${overlay.path} (시드 ${overlay.overlay.changedNodeIds.length} · 영향 ${overlay.overlay.affectedNodeIds.length}${k.unresolved.length ? ` · KG 미조인 ${k.unresolved.length}` : ""})`);
       if (overlay.overlay.changedNodeIds.length === 0) {
         console.warn("  주의: 시드가 KG에 매칭되지 않아 대시보드가 오버레이를 표시하지 않습니다 (/understand 분석 범위 확인).");
       } else {
-        console.log("  /understand-dashboard 실행 → 적색=시드 · 호박색=영향 (d 키로 토글, 재분석 후 새로고침).");
+        console.log("  /understand-dashboard 실행 → '영향도' 토글(i 키): 적색=시드 · 호박색=영향. 재분석 후 새로고침.");
       }
     } else if (overlayError) {
       console.error(`대시보드 오버레이 실패: ${overlayError} (분석·보고서는 발행됨, 감사에 overlayError 기록)`);

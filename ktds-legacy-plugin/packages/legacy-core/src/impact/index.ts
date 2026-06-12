@@ -47,11 +47,15 @@ export {
 } from "./doc.js";
 export {
   buildDiffOverlay,
-  publishDiffOverlay,
+  publishImpactOverlay,
+  publishReviewOverlay,
+  cleanupLegacyImpactDiffOverlay,
   loadKgOverlayNodes,
   normalizeKgPath,
   DIFF_OVERLAY_FILENAME,
+  IMPACT_OVERLAY_FILENAME,
   OVERLAY_BASE_BRANCH,
+  REVIEW_OVERLAY_PREFIX,
   type DiffOverlay,
   type KgOverlayNode,
   type OverlayCore,
@@ -60,6 +64,7 @@ export {
 } from "./overlay.js";
 export {
   archiveImpactRun,
+  archiveReviewRun,
   listImpactRuns,
   assertSrId,
   srImpactDir,
@@ -68,3 +73,20 @@ export {
   type ArchiveImpactRunInput,
   type ImpactRunSummary,
 } from "./archive.js";
+export {
+  collectChangedFiles,
+  changesToSeeds,
+  filterChangesToInventory,
+  buildReviewComparison,
+  buildReviewChecklist,
+  publishReviewChecklist,
+  ReviewGitError,
+  REVIEW_REPORT_FILENAME,
+  REVIEW_VERIFY_FILENAME,
+  REVIEW_CHECKLIST_FILENAME,
+  REVIEW_STATUS_LINE,
+  type ChangedFile,
+  type CollectedChanges,
+  type ReviewChecklistExtras,
+  type ReviewComparison,
+} from "./review.js";

@@ -376,7 +376,16 @@ export async function analyzeImpact(
   projectRoot: string,
   seeds: readonly ImpactSeed[],
   optionsInput?: Partial<ImpactOptions>,
+  /** 산출물 파일명 오버라이드 — /understand-review가 review.json으로 써서 예측(impact.json)을 보존(T12). */
+  artifacts?: { reportFilename?: string; verifyFilename?: string },
 ): Promise<AnalyzeImpactResult> {
+  // 파일명 가드 — writeMapArtifact가 path.join하므로 경로 세그먼트/숨김 파일은
+  // .spec/map 밖 탈출 여지. 공개 API라 fail-closed (리뷰 minor).
+  for (const name of [artifacts?.reportFilename, artifacts?.verifyFilename]) {
+    if (name !== undefined && (path.basename(name) !== name || name.startsWith(".") || name.length === 0)) {
+      throw new Error(`잘못된 산출물 파일명: ${JSON.stringify(name)} — 경로 없는 일반 파일명만 허용`);
+    }
+  }
   const inputs = await loadImpactInputs(projectRoot);
   const options = ImpactOptionsSchema.parse(optionsInput ?? {});
   const kgTableCatalog = await loadKgTableCatalog(projectRoot);
@@ -390,12 +399,20 @@ export async function analyzeImpact(
     mapperNamespaceByPath,
     mapperLineCounts,
   });
-  const impactPath = await writeMapArtifact(projectRoot, IMPACT_REPORT_FILENAME, result);
+  const impactPath = await writeMapArtifact(
+    projectRoot,
+    artifacts?.reportFilename ?? IMPACT_REPORT_FILENAME,
+    result,
+  );
 
   const items = buildClaimItems(result);
   await fillClaimSnippets(projectRoot, items);
   const verify = await verifyImpactClaims(projectRoot, items, inputs.gitCommit);
-  const verifyPath = await writeMapArtifact(projectRoot, IMPACT_VERIFY_FILENAME, verify);
+  const verifyPath = await writeMapArtifact(
+    projectRoot,
+    artifacts?.verifyFilename ?? IMPACT_VERIFY_FILENAME,
+    verify,
+  );
 
   return { result, verify, impactPath, verifyPath, inputs };
 }

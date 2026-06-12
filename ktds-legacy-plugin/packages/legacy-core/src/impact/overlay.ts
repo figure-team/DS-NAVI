@@ -16,8 +16,14 @@ import type { ImpactResult } from "./types.js";
 // 표현 불가(필요 시 fork 수정으로 상승, 이 조인 로직은 재사용).
 
 export const DIFF_OVERLAY_FILENAME = "diff-overlay.json";
-/** 오버레이 출처 마커 — 다른 생산자(/understand-diff)의 파일과 경합 판별용. */
+/** 예측(영향도) 전용 채널 — 대시보드 "영향도" 토글이 읽는다 (ktds 분기 계약). */
+export const IMPACT_OVERLAY_FILENAME = "impact-overlay.json";
+/** 예측 오버레이 출처 마커. */
 export const OVERLAY_BASE_BRANCH = "ktds-impact";
+/** 실측(리뷰) 오버레이 출처 마커 prefix — `ktds-review:<baseRef>`. */
+export const REVIEW_OVERLAY_PREFIX = "ktds-review:";
+/** ktds가 쓴 오버레이인지(타 생산자 .bak 보존 판별) — 마커 공통 prefix. */
+const OWN_MARKER_RE = /^ktds-/;
 
 export interface KgOverlayNode {
   id: string;
@@ -30,10 +36,11 @@ export interface OverlayUnresolved {
   reason: string;
 }
 
-/** diff-overlay.json 본문 (U-A 계약 필드 + ktds 확장). */
+/** 오버레이 본문 (U-A diff-overlay 계약 필드 + ktds 확장 — 예측/실측 채널 공용). */
 export interface DiffOverlay {
   version: "1.0.0";
-  baseBranch: typeof OVERLAY_BASE_BRANCH;
+  /** 출처 마커: 예측="ktds-impact", 실측="ktds-review:<baseRef>", U-A diff=브랜치명. */
+  baseBranch: string;
   generatedAt: string;
   changedFiles: string[];
   changedNodeIds: string[];
@@ -182,14 +189,15 @@ export async function loadKgOverlayNodes(projectRoot: string): Promise<KgOverlay
 }
 
 /**
- * 오버레이 발행 (IO 래퍼). KG 부재/손상이면 null(생략). 다른 생산자
- * (/understand-diff 등 baseBranch≠ktds-impact)의 기존 파일은 .bak으로 보존 후
- * 덮어쓴다 — 같은 경로 last-writer-wins 경합의 완화책. generatedAt은 IO 경계
- * 에서만 찍는다(순수 변환은 결정론 유지; .spec/map 산출물 아님 — U-A 계약 필드).
+ * 오버레이 발행 (IO 래퍼, 채널 공용). KG 부재/손상이면 null(생략). 다른 생산자
+ * (/understand-diff 등 — baseBranch가 ktds- 마커가 아닌)의 기존 파일은 .bak으로
+ * 보존 후 덮어쓴다. generatedAt은 IO 경계에서만 찍는다(순수 변환은 결정론 유지;
+ * .spec/map 산출물 아님 — U-A 계약 필드).
  */
-export async function publishDiffOverlay(
+async function publishOverlay(
   projectRoot: string,
   result: ImpactResult,
+  channel: { filename: string; baseBranch: string },
   opts: { nowIso?: string } = {},
 ): Promise<PublishOverlayResult | null> {
   const nodes = await loadKgOverlayNodes(projectRoot);
@@ -197,7 +205,7 @@ export async function publishDiffOverlay(
   const core = buildDiffOverlay(result, nodes, projectRoot);
   const overlay: DiffOverlay = {
     version: "1.0.0",
-    baseBranch: OVERLAY_BASE_BRANCH,
+    baseBranch: channel.baseBranch,
     generatedAt: opts.nowIso ?? new Date().toISOString(),
     changedFiles: core.changedFiles,
     changedNodeIds: core.changedNodeIds,
@@ -212,7 +220,7 @@ export async function publishDiffOverlay(
   };
 
   const dir = path.join(projectRoot, ".understand-anything");
-  const filePath = path.join(dir, DIFF_OVERLAY_FILENAME);
+  const filePath = path.join(dir, channel.filename);
   let backedUp = false;
   let existing: string | null = null;
   try {
@@ -221,14 +229,15 @@ export async function publishDiffOverlay(
     if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
   }
   if (existing !== null) {
-    // 출처 판별: ktds 마커가 아니면(비JSON·null 포함 — 출처 미상도) 보존 대상.
+    // 출처 판별: ktds 마커(ktds-*)가 아니면(비JSON·null 포함 — 출처 미상도) 보존 대상.
     let foreign = true;
     try {
       const parsed: unknown = JSON.parse(existing);
       foreign =
         parsed === null ||
         typeof parsed !== "object" ||
-        (parsed as { baseBranch?: unknown }).baseBranch !== OVERLAY_BASE_BRANCH;
+        typeof (parsed as { baseBranch?: unknown }).baseBranch !== "string" ||
+        !OWN_MARKER_RE.test((parsed as { baseBranch: string }).baseBranch);
     } catch {
       /* 비JSON — foreign 유지 */
     }
@@ -243,4 +252,61 @@ export async function publishDiffOverlay(
   await fs.writeFile(tmpPath, JSON.stringify(overlay, null, 2) + "\n", "utf-8");
   await fs.rename(tmpPath, filePath);
   return { path: filePath, overlay, backedUp };
+}
+
+/** 예측(영향도) 오버레이 → impact-overlay.json — 대시보드 "영향도" 토글 채널. */
+export async function publishImpactOverlay(
+  projectRoot: string,
+  result: ImpactResult,
+  opts: { nowIso?: string } = {},
+): Promise<PublishOverlayResult | null> {
+  return publishOverlay(
+    projectRoot,
+    result,
+    { filename: IMPACT_OVERLAY_FILENAME, baseBranch: OVERLAY_BASE_BRANCH },
+    opts,
+  );
+}
+
+/**
+ * 실측(리뷰) 오버레이 → diff-overlay.json — 대시보드 Diff 토글 채널.
+ * changed=실제 git 변경 파일(시드), affected=도달성 영향 — U-A diff 의미론과 일치.
+ */
+export async function publishReviewOverlay(
+  projectRoot: string,
+  result: ImpactResult,
+  baseRef: string,
+  opts: { nowIso?: string } = {},
+): Promise<PublishOverlayResult | null> {
+  return publishOverlay(
+    projectRoot,
+    result,
+    { filename: DIFF_OVERLAY_FILENAME, baseBranch: `${REVIEW_OVERLAY_PREFIX}${baseRef}` },
+    opts,
+  );
+}
+
+/**
+ * 0.8.0 잔재 정리: 과거 예측 분석이 diff-overlay.json(공유 채널)에 직접 쓰던
+ * 시절의 우리 파일("ktds-impact")이 남아 있으면 제거 — 안 지우면 Diff 토글이
+ * 낡은 예측을 "변경됨"으로 표시한다. 타 출처 파일은 건드리지 않는다.
+ */
+export async function cleanupLegacyImpactDiffOverlay(projectRoot: string): Promise<boolean> {
+  const filePath = path.join(projectRoot, ".understand-anything", DIFF_OVERLAY_FILENAME);
+  let raw: string;
+  try {
+    raw = await fs.readFile(filePath, "utf-8");
+  } catch {
+    return false;
+  }
+  try {
+    const parsed = JSON.parse(raw) as { baseBranch?: unknown };
+    if (parsed && parsed.baseBranch === OVERLAY_BASE_BRANCH) {
+      await fs.unlink(filePath);
+      return true;
+    }
+  } catch {
+    /* 비JSON — 출처 미상, 보존 */
+  }
+  return false;
 }

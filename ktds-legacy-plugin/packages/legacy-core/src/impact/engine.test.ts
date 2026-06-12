@@ -57,6 +57,24 @@ test("analyzeImpact 2회 실행 → impact.json byte-diff=0 (N1)", async () => {
   expect(stableJson(result)).toBe(first);
 });
 
+test("analyzeImpact artifacts 오버라이드 — review.json으로 쓰고 impact.json은 안 만든다 (T12)", async () => {
+  await cp(join(FIXTURES, "spring-basic"), dir, { recursive: true });
+  await scanDomainMap(dir, { autoApprove: true });
+  const census: CensusReport = JSON.parse(await readFile(join(dir, ".spec/map/census.json"), "utf-8"));
+  const javaFile = census.files.find((f) => f.lang === "java")!;
+  await analyzeImpact(
+    dir,
+    [{ relPath: javaFile.relPath, origin: "git", confidence: "CONFIRMED_AI" }],
+    undefined,
+    { reportFilename: "review.json", verifyFilename: "review-verify-report.json" },
+  );
+  const review = ImpactResultSchema.parse(
+    JSON.parse(await readFile(join(dir, ".spec/map/review.json"), "utf-8")),
+  );
+  expect(review.seeds[0].origin).toBe("git");
+  await expect(readFile(join(dir, ".spec/map/impact.json"), "utf-8")).rejects.toThrow(); // 예측 산출물 미오염
+});
+
 test(".spec/map 부재 → ImpactInputMissingError (안내 throw)", async () => {
   await expect(
     analyzeImpact(dir, [{ relPath: "X.java", origin: "path", confidence: "CONFIRMED_HUMAN" }]),

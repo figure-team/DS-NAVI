@@ -70,6 +70,8 @@ export const SEED_ORIGINS = [
   "route",
   /** Derived from a domain/flow node. */
   "domain",
+  /** /understand-review: git diff가 보고한 실제 변경 파일 (결정론 사실). */
+  "git",
 ] as const;
 
 export const ImpactSeedSchema = z.object({

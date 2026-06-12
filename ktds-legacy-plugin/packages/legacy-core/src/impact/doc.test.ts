@@ -7,6 +7,7 @@ import { DEFAULT_STATUS_LINE, renderMarkdown } from "../doc-generator/index.js";
 import type { ImpactResult } from "./types.js";
 import type { ImpactVerifyReport } from "./verify.js";
 import {
+  aggregateImpactCounts,
   buildChangeImpact,
   CHANGE_IMPACT_FILENAME,
   IMPACT_STATUS_LINE,
@@ -110,3 +111,92 @@ test("발행: docs/09_release/에 쓰고 경로 반환 (registerDraft 미호출 
 function escapeRe(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+// ── T11: 영향 규모 집계 (공수 산정 입력) ─────────────────────────────────────
+
+// 실형상 픽스처 (리뷰 critical 반영): ConfirmedDomain.roots는 디렉터리가 아니라
+// 라우트/배치 엔트리 **파일 경로**다. 귀속은 slices ownership(relPath→owner
+// root 파일들)으로만 결정한다.
+const AGG_RESULT: ImpactResult = {
+  ...RESULT,
+  upstream: {
+    ...RESULT.upstream,
+    files: [
+      { relPath: "src/order/OrderSvc.java", viaKinds: ["field-type"], minDepth: 1, citation: null }, // sole → 주문
+      { relPath: "src/common/Util.java", viaKinds: ["field-type"], minDepth: 2, citation: null }, // 복수 도메인 → (공용)
+      { relPath: "src/acct/AcctCtrl.java", viaKinds: ["field-type"], minDepth: 1, citation: null }, // 루트 자신 → 계정
+      { relPath: "src/legacy/LegacySvc.java", viaKinds: ["field-type"], minDepth: 3, citation: null }, // owners 전원 confirmed 밖 → (미분류)
+      { relPath: "src/dead/Unreached.java", viaKinds: ["field-type"], minDepth: 4, citation: null }, // ownership 밖 → (미분류)
+    ],
+  },
+  downstream: {
+    // 같은 도메인의 root 2개가 공유 — 도메인 단위론 단일 → 주문
+    files: [{ relPath: "src/order/M.xml", viaKinds: ["mapper-xml"], minDepth: 1, citation: null }],
+  },
+};
+
+const AGG_CENSUS = [
+  { relPath: "src/order/OrderSvc.java", lang: "java" },
+  { relPath: "src/common/Util.java", lang: "java" },
+  { relPath: "src/acct/AcctCtrl.java", lang: "java" },
+  { relPath: "src/legacy/LegacySvc.java", lang: "java" },
+  { relPath: "src/order/M.xml", lang: "xml" },
+  // src/dead/Unreached.java는 census 밖 — "(census 밖)" 라벨 검증용
+];
+
+const AGG_CONFIRMED = {
+  schemaVersion: 1 as const,
+  gitCommit: null,
+  decidedBy: "pl",
+  domains: [
+    { key: "order", name: "주문", roots: ["src/order/OrderCtrl.java", "src/order/OrderBatch.java"], aliasKeys: [] },
+    { key: "acct", name: "계정", roots: ["src/acct/AcctCtrl.java"], aliasKeys: [] },
+  ],
+  excludedKeys: ["legacy"],
+};
+
+const AGG_OWNERSHIP = [
+  { relPath: "src/order/OrderSvc.java", status: "sole" as const, owners: ["src/order/OrderCtrl.java"] },
+  { relPath: "src/order/M.xml", status: "shared" as const, owners: ["src/order/OrderBatch.java", "src/order/OrderCtrl.java"] },
+  { relPath: "src/common/Util.java", status: "shared" as const, owners: ["src/acct/AcctCtrl.java", "src/order/OrderCtrl.java"] },
+  { relPath: "src/legacy/LegacySvc.java", status: "sole" as const, owners: ["src/legacy/Old.java"] },
+];
+
+const AGG_INPUTS = { census: AGG_CENSUS, confirmed: AGG_CONFIRMED, ownership: AGG_OWNERSHIP };
+
+test("aggregateImpactCounts — ownership 귀속: sole/루트 자신/도메인 내 공유→도메인, 교차→(공용), 밖→(미분류)", () => {
+  const agg = aggregateImpactCounts(AGG_RESULT, AGG_INPUTS);
+  expect(agg.byDomain).toEqual([
+    // 계 내림차순, 동률은 라벨 코드포인트 오름차순("(" < 한글)
+    { label: "(미분류)", upstream: 2, downstream: 0 },
+    { label: "주문 (order)", upstream: 1, downstream: 1 },
+    { label: "(공용)", upstream: 1, downstream: 0 },
+    { label: "계정 (acct)", upstream: 1, downstream: 0 },
+  ]);
+  expect(agg.byLang).toEqual([
+    { label: "java", upstream: 4, downstream: 0 },
+    { label: "(census 밖)", upstream: 1, downstream: 0 },
+    { label: "xml", upstream: 0, downstream: 1 },
+  ]);
+});
+
+test("aggregate 제공 시 8섹션(2번째=집계, 표+합계), 미제공 시 기존 7섹션 불변", () => {
+  const doc = buildChangeImpact(AGG_RESULT, VERIFY, AGG_INPUTS);
+  expect(doc.sections).toHaveLength(8);
+  expect(doc.sections[1].heading).toBe("영향 규모 집계 (공수 산정 입력)");
+  expect(doc.sections[1].claims).toEqual([]); // 확정 대상 아님 (파생 집계)
+  const prose = doc.sections[1].prose!;
+  expect(prose).toContain("| 주문 (order) | 1 | 1 | 2 |");
+  expect(prose).toContain("| **계** | 5 | 1 | 6 |");
+  expect(prose).toContain("**언어별**");
+
+  expect(buildChangeImpact(AGG_RESULT, VERIFY).sections).toHaveLength(7);
+});
+
+test("aggregate — confirmed 부재면 도메인 미확정 안내 + 언어별만", () => {
+  const doc = buildChangeImpact(AGG_RESULT, VERIFY, { ...AGG_INPUTS, confirmed: null });
+  const prose = doc.sections[1].prose!;
+  expect(prose).toContain("도메인 미확정");
+  expect(prose).not.toContain("**도메인별**");
+  expect(prose).toContain("**언어별**");
+});

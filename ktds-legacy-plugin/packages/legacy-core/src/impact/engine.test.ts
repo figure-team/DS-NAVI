@@ -3,6 +3,7 @@ import { cp, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { scanDomainMap } from "../domain-map/extract.js";
+import { stableJson } from "../domain-map/persist.js";
 import type {
   CensusReport,
   EdgesReport,
@@ -42,7 +43,7 @@ test("analyzeImpact 2회 실행 → impact.json byte-diff=0 (N1)", async () => {
 
   await analyzeImpact(dir, seeds);
   const first = await readFile(join(dir, ".spec/map/impact.json"), "utf-8");
-  await analyzeImpact(dir, seeds);
+  const { result } = await analyzeImpact(dir, seeds);
   const second = await readFile(join(dir, ".spec/map/impact.json"), "utf-8");
   expect(second).toBe(first);
 
@@ -50,6 +51,10 @@ test("analyzeImpact 2회 실행 → impact.json byte-diff=0 (N1)", async () => {
   expect(parsed.seeds[0].relPath).toBe(javaFile!.relPath);
   // impact.json엔 스니펫(파일 읽기 산물)이 안 들어간다 (결정론 경량 앵커만)
   expect(first).not.toMatch(/"snippet"/);
+  // 반환 result도 변이 금지 — fillClaimSnippets가 인용 사본에만 snippet을 채워야
+  // 이후 직렬화(SR 보관, T11)가 디스크 정본과 byte-동일하다 (회귀: 참조 공유 버그)
+  expect(JSON.stringify(result)).not.toMatch(/"snippet"/);
+  expect(stableJson(result)).toBe(first);
 });
 
 test(".spec/map 부재 → ImpactInputMissingError (안내 throw)", async () => {

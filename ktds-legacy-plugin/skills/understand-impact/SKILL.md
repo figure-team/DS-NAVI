@@ -33,11 +33,13 @@ argument-hint: ["[projectRoot]", "[seeds | analyze | status]"]
 ## 2) 분석
 확정된 시드로:
 ```
-node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-impact.mjs <projectRoot> analyze --path <파일> [--path <파일2> ...] [--by <핸들>]
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-impact.mjs <projectRoot> analyze --path <파일> [--path <파일2> ...] [--sr <SR-ID>] [--by <핸들>]
 ```
-산출: `.spec/map/impact.json`(결정론) + `impact-verify-report.json`(근거율) + `docs/09_release/change-impact-analysis.md`(읽기전용) + `IMPACT_ANALYZED` 감사. 한국어 요약(상류 N·API M·DB K·흐름 J·검토필요·근거율)을 사용자에게 보고한다.
+산출: `.spec/map/impact.json`(결정론) + `impact-verify-report.json`(근거율) + `docs/09_release/change-impact-analysis.md`(읽기전용) + `IMPACT_ANALYZED` 감사. 보고서에는 **영향 규모 집계**(도메인×상류/하류, 언어×상류/하류 파일 수 — 공수 산정 입력)가 포함된다. 한국어 요약(상류 N·API M·DB K·흐름 J·검토필요·근거율)을 사용자에게 보고한다.
 
 > ⚠️ `--path` 없이 호출하면 엔진은 임의 분석을 하지 않고 카탈로그+안내만 낸다(fail-closed). 반드시 시드를 지정하라.
+
+**SR 보관 (`--sr`):** 사용자가 SR(변경 요청) 번호를 언급하면 `--sr <SR-ID>`를 붙여라 — 분석 사본(impact.json+verify+보고서)이 `.spec/impact/<SR-ID>/`에 보관되어 SR별 이력이 남는다(같은 SR 재분석은 덮어씀 = 그 SR의 최신). SR ID는 영숫자로 시작, 영숫자·점·하이픈·밑줄만 가능(예: `SR-2026-0612-001`). 언급이 없으면 SR 번호가 있는지 한 번 물어보고, 없다고 하면 생략한다.
 
 ## 3) DB 테이블/컬럼 보강 — host의 역할
 엔진은 **영향 매퍼 XML까지만** 결정론으로 산출하고(테이블/컬럼은 KG에 신뢰 가능한 형태로 없다), `tableCandidateSlots`에 각 매퍼의 SQL 슬라이스 위치를 닻으로 남긴다. host는:
@@ -52,10 +54,17 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-impact.mjs <projectRoot> analyze -
 - **흐름/도메인은 `[추정]`**: step 입도가 라우트-선언-파일 단위라 '실 호출'이 아닌 '체인 내 도달'이다.
 - **비-Java 시드(JSP/TS/web.xml)**: edges가 java 기반이라 역방향이 빈약 → `[확인 필요]` 강등, host 보강 권장.
 
-## 5) 상태
+## 5) 대시보드 시각화 (자동)
+analyze가 `.understand-anything/knowledge-graph.json`이 있으면 영향 범위를 `.understand-anything/diff-overlay.json`으로 자동 발행한다 — U-A 대시보드가 이미 소비하는 입력 계약이라 **U-A 코드는 무수정**이다. 사용자에게 안내할 것:
+- `/understand-anything:understand-dashboard`를 실행하면 구조 뷰에서 **적색 ring=시드, 호박색 ring=영향(상류∪하류), 무관 노드=흐림**으로 표시된다(`d` 키로 토글). 재분석 후엔 브라우저 새로고침만 하면 된다.
+- 한계: diff 의미론 2분류뿐 — 상류/하류 구분 색·API/DB 영향 표는 대시보드에 안 나온다(보고서 .md가 정본). 범례의 "변경됨"=시드를 뜻한다.
+- KG가 없으면 오버레이는 생략된다(`/understand` 후 재분석 시 생성). 엔진이 "KG 미조인 N"을 보고하면 `/understand` 분석 범위가 영향 파일을 포함하는지 확인하라.
+- `/understand-diff`가 쓴 기존 오버레이는 `.bak`으로 보존 후 덮어쓴다(같은 파일 경합 — 마지막 실행이 화면에 뜬다).
+
+## 6) 상태
 ```
-node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-impact.mjs <projectRoot> status
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-impact.mjs <projectRoot> status [--list]
 ```
-마지막 분석 요약.
+`status` = 마지막 분석 요약. `status --list` = SR 보관 이력(`.spec/impact/`) — SR별 시드·상류·API·매퍼·검토필요·근거율.
 
 > 이 문서는 **읽기전용 분석물**이다 — `/understand-docs`의 5종처럼 검토·승인 상태기계에 넣지 않는다(영향 추정은 [추정] 다수). 검토·확정이 필요하면 Phase 2.

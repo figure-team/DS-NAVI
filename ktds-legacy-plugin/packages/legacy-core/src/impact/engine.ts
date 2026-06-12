@@ -79,6 +79,8 @@ export interface AnalyzeImpactResult {
   verify: ImpactVerifyReport;
   impactPath: string;
   verifyPath: string;
+  /** 로드된 .spec/map 입력 — 호출자가 집계(buildChangeImpact aggregate) 등에 재사용(재로드 0회). */
+  inputs: ImpactInputs;
 }
 
 function cmp(a: string, b: string): number {
@@ -316,19 +318,23 @@ export function buildImpactReport(
 
 // 검증 대상 항목 — 인용 보유분은 기계 검증, 인용 없는 항목(흐름/도메인/SQL/
 // 근거 없는 파일)은 uncited로 포함해 groundedPct 분모 편향을 투명화한다(MED-4).
+// 인용은 반드시 **사본**으로 담는다: fillClaimSnippets가 snippet을 채우는데,
+// result의 citation을 참조 공유하면 result 자체가 변이돼 이후 직렬화(SR 보관 등)
+// 가 "앵커만" 계약(types.ts ImpactCitationSchema)을 깬다 — T11에서 실제로 발생.
 function buildClaimItems(result: ImpactResult): ImpactClaimItem[] {
+  const copy = (c: { filePath: string; line: number }) => ({ filePath: c.filePath, line: c.line });
   const items: ImpactClaimItem[] = [];
   for (const f of result.upstream.files) {
-    items.push({ kind: "upstream", ref: f.relPath, text: `상류 영향 파일: ${f.relPath}`, citations: f.citation ? [f.citation] : [] });
+    items.push({ kind: "upstream", ref: f.relPath, text: `상류 영향 파일: ${f.relPath}`, citations: f.citation ? [copy(f.citation)] : [] });
   }
   for (const f of result.downstream.files) {
-    items.push({ kind: "downstream", ref: f.relPath, text: `하류 의존 파일: ${f.relPath}`, citations: f.citation ? [f.citation] : [] });
+    items.push({ kind: "downstream", ref: f.relPath, text: `하류 의존 파일: ${f.relPath}`, citations: f.citation ? [copy(f.citation)] : [] });
   }
   for (const a of result.upstream.api) {
     items.push({ kind: "api", ref: a.id, text: `진입점 영향: ${a.id}`, citations: [{ filePath: a.filePath, line: a.line }] });
   }
   for (const m of result.upstream.persistence.mappers) {
-    items.push({ kind: "mapper", ref: m.relPath, text: `영속성 영향: ${m.relPath}`, citations: m.citation ? [m.citation] : [] });
+    items.push({ kind: "mapper", ref: m.relPath, text: `영속성 영향: ${m.relPath}`, citations: m.citation ? [copy(m.citation)] : [] });
   }
   for (const s of result.upstream.persistence.sqlFiles) {
     items.push({ kind: "sql", ref: s.relPath, text: `영속성(SQL): ${s.relPath}`, citations: [] });
@@ -391,5 +397,5 @@ export async function analyzeImpact(
   const verify = await verifyImpactClaims(projectRoot, items, inputs.gitCommit);
   const verifyPath = await writeMapArtifact(projectRoot, IMPACT_VERIFY_FILENAME, verify);
 
-  return { result, verify, impactPath, verifyPath };
+  return { result, verify, impactPath, verifyPath, inputs };
 }

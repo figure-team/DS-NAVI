@@ -38,6 +38,33 @@ export {
 export {
   buildChangeImpact,
   publishChangeImpact,
+  aggregateImpactCounts,
   CHANGE_IMPACT_FILENAME,
   IMPACT_STATUS_LINE,
+  type ImpactAggregate,
+  type ImpactAggregateInputs,
+  type ImpactAggregateRow,
 } from "./doc.js";
+export {
+  buildDiffOverlay,
+  publishDiffOverlay,
+  loadKgOverlayNodes,
+  normalizeKgPath,
+  DIFF_OVERLAY_FILENAME,
+  OVERLAY_BASE_BRANCH,
+  type DiffOverlay,
+  type KgOverlayNode,
+  type OverlayCore,
+  type OverlayUnresolved,
+  type PublishOverlayResult,
+} from "./overlay.js";
+export {
+  archiveImpactRun,
+  listImpactRuns,
+  assertSrId,
+  srImpactDir,
+  srImpactRoot,
+  SR_IMPACT_DIRNAME,
+  type ArchiveImpactRunInput,
+  type ImpactRunSummary,
+} from "./archive.js";

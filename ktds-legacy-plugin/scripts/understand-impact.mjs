@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 // /understand-impact 엔진 진입점 — 결정론 변경 영향도 분석 (ADR-002).
 //   카탈로그: node understand-impact.mjs <projectRoot> seeds
-//   분석:     node understand-impact.mjs <projectRoot> analyze --path <file> [--path <file2> ...] [--by <handle>]
-//   상태:     node understand-impact.mjs <projectRoot> status
+//   분석:     node understand-impact.mjs <projectRoot> analyze --path <file> [--path <file2> ...] [--sr <SR-ID>] [--by <handle>]
+//   상태:     node understand-impact.mjs <projectRoot> status [--list]
 //
 // 자연어→시드 매핑은 host(Claude) 역할이다(SKILL.md). 엔진은 --path로 받은
 // 파일 집합만 입력으로 쓴다. 비-TTY/슬래시에서 시드 없이 analyze하면 임의
 // 분석을 하지 않고 카탈로그+안내만 낸다(fail-closed). 전제: /understand-map
 // scan이 .spec/map/ 산출물을 만들어둬야 한다(없으면 안내).
+// --sr: 분석 사본을 .spec/impact/<SR-ID>/에 보관 (status --list로 이력 조회).
+// 분석 후 .understand-anything/diff-overlay.json을 발행해 U-A 대시보드가
+// 영향 범위를 시각화한다 (KG 없으면 생략 — U-A 무수정, 입력 계약만 사용).
 import { join } from "node:path";
 import { ensureBuilt } from "./ensure-built.mjs";
 
@@ -15,6 +18,7 @@ process.stdout.on("error", (e) => { if (e.code === "EPIPE") process.exit(0); });
 
 const {
   analyzeImpact, buildChangeImpact, publishChangeImpact, loadImpactInputs,
+  publishDiffOverlay, archiveImpactRun, listImpactRuns, assertSrId,
   ImpactInputMissingError, logEvent,
 } = await import(await ensureBuilt());
 
@@ -74,22 +78,42 @@ try {
   if (sub === "seeds") {
     await printCatalog();
   } else if (sub === "status") {
-    const inputs = await loadImpactInputs(root).catch(() => null);
-    if (!inputs) { console.log("미실행 — .spec/map 산출물 없음 (먼저 /understand-map scan)"); }
-    else {
-      const { readFile } = await import("node:fs/promises");
-      const p = join(spec, "map", "impact.json");
-      const raw = await readFile(p, "utf-8").catch(() => null);
-      if (!raw) console.log("impact.json 없음 — analyze를 먼저 실행하세요.");
+    if (rest.includes("--list")) {
+      const runs = await listImpactRuns(root);
+      if (runs.length === 0) {
+        console.log("SR 보관 없음 — analyze --sr <SR-ID> 로 분석을 보관하세요 (.spec/impact/).");
+      } else {
+        console.log(`=== SR 영향분석 보관 ${runs.length}건 (.spec/impact/) ===`);
+        for (const r of runs) {
+          if (!r.valid) { console.log(`  ${r.srId}  [손상 — impact.json 파싱 실패, 재분석 권장]`); continue; }
+          const pct = r.groundedPct === null ? "?" : `${r.groundedPct}%`;
+          console.log(`  ${r.srId}  시드 ${r.seeds.map(basename).join(", ")} · 상류 ${r.upstreamFiles} · API ${r.api} · 매퍼 ${r.mappers} · 검토필요 ${r.needsReview} · 근거율 ${pct}`);
+        }
+      }
+    } else {
+      const inputs = await loadImpactInputs(root).catch(() => null);
+      if (!inputs) { console.log("미실행 — .spec/map 산출물 없음 (먼저 /understand-map scan)"); }
       else {
-        const r = JSON.parse(raw);
-        console.log(`마지막 분석: 시드 ${r.seeds.map((s) => basename(s.relPath)).join(", ")} · 상류 ${r.upstream.files.length} · API ${r.upstream.api.length} · 검토필요 ${r.needsReview.length}`);
+        const { readFile } = await import("node:fs/promises");
+        const p = join(spec, "map", "impact.json");
+        const raw = await readFile(p, "utf-8").catch(() => null);
+        if (!raw) console.log("impact.json 없음 — analyze를 먼저 실행하세요.");
+        else {
+          const r = JSON.parse(raw);
+          console.log(`마지막 분석: 시드 ${r.seeds.map((s) => basename(s.relPath)).join(", ")} · 상류 ${r.upstream.files.length} · API ${r.upstream.api.length} · 검토필요 ${r.needsReview.length}`);
+        }
       }
     }
   } else if (sub === "analyze") {
     const paths = multiFlag("--path");
     const by = flag("--by");
+    const srId = flag("--sr");
     assertHandle(by, "analyze --path <file> ... --by <handle>");
+    // fail-closed: --sr 값 누락을 침묵 무보관으로 흘리지 않는다 (리뷰 minor)
+    if (rest.includes("--sr") && srId === undefined) {
+      throw new Error("usage: analyze --path <파일> ... --sr <SR-ID> (--sr 값 누락)");
+    }
+    if (srId !== undefined) assertSrId(srId); // 디렉터리명 안전성 fail-closed
     if (paths.length === 0) {
       // fail-closed: 시드 없이 임의 분석 금지
       console.log("시드(--path)가 없습니다. 임의 분석을 하지 않습니다.");
@@ -106,25 +130,67 @@ try {
       process.exit(0);
     }
     const seeds = paths.map((relPath) => ({ relPath, origin: "path", confidence: "CONFIRMED_HUMAN" }));
-    const { result, verify, impactPath, verifyPath } = await analyzeImpact(root, seeds);
-    const doc = buildChangeImpact(result, verify);
+    const { result, verify, impactPath, verifyPath, inputs } = await analyzeImpact(root, seeds);
+    const doc = buildChangeImpact(result, verify, {
+      census: inputs.census.files,
+      confirmed: inputs.confirmed,
+      ownership: inputs.slices.ownership,
+    });
     const docPath = await publishChangeImpact(root, doc);
+    // 보관/오버레이 실패가 감사(IMPACT_ANALYZED)를 유실시키지 않게 — 오류는
+    // 감사 detail에 기록하고 출력 후 비제로 종료 (리뷰 minor).
+    let archiveDir = null, archiveError = null;
+    if (srId !== undefined) {
+      try { archiveDir = await archiveImpactRun(root, srId, { result, verify, doc }); }
+      catch (e) { archiveError = e.message; }
+    }
+    let overlay = null, overlayError = null;
+    try { overlay = await publishDiffOverlay(root, result); }
+    catch (e) { overlayError = e.message; }
     await logEvent(spec, "IMPACT_ANALYZED", {
       by,
       detail: {
         seeds: seeds.map((s) => s.relPath),
+        ...(srId !== undefined ? { srId } : {}),
+        ...(archiveError ? { archiveError } : {}),
+        ...(overlayError ? { overlayError } : {}),
         upstreamFiles: result.upstream.files.length,
         api: result.upstream.api.length,
         mappers: result.upstream.persistence.mappers.length,
         hubCount: result.overEdges.hubNodes.length,
         groundedPct: verify.overall.groundedPct,
+        overlay: overlay
+          ? {
+              changed: overlay.overlay.changedNodeIds.length,
+              affected: overlay.overlay.affectedNodeIds.length,
+              unresolved: overlay.overlay.ktdsImpact.unresolved.length,
+              backedUp: overlay.backedUp,
+            }
+          : null,
       },
     });
     summarize(result, verify);
     console.log(`\nimpact: ${impactPath}`);
     console.log(`verify: ${verifyPath}`);
     console.log(`문서: ${docPath} (읽기전용 분석물 — 검토·승인 상태기계 밖)`);
+    if (archiveDir) console.log(`SR 보관: ${archiveDir} (status --list로 이력 조회)`);
+    if (archiveError) console.error(`SR 보관 실패: ${archiveError} (분석·보고서는 발행됨, 감사에 archiveError 기록)`);
+    if (overlay) {
+      const k = overlay.overlay.ktdsImpact;
+      console.log(`대시보드 오버레이: ${overlay.path} (시드 ${overlay.overlay.changedNodeIds.length} · 영향 ${overlay.overlay.affectedNodeIds.length}${k.unresolved.length ? ` · KG 미조인 ${k.unresolved.length}` : ""})`);
+      if (overlay.backedUp) console.warn("  주의: 기존 diff-overlay.json(다른 출처)을 .bak으로 보존하고 덮어썼습니다.");
+      if (overlay.overlay.changedNodeIds.length === 0) {
+        console.warn("  주의: 시드가 KG에 매칭되지 않아 대시보드가 오버레이를 표시하지 않습니다 (/understand 분석 범위 확인).");
+      } else {
+        console.log("  /understand-dashboard 실행 → 적색=시드 · 호박색=영향 (d 키로 토글, 재분석 후 새로고침).");
+      }
+    } else if (overlayError) {
+      console.error(`대시보드 오버레이 실패: ${overlayError} (분석·보고서는 발행됨, 감사에 overlayError 기록)`);
+    } else {
+      console.log("대시보드 오버레이: 생략 (.understand-anything/knowledge-graph.json 없음/손상 — /understand 후 재분석 시 생성)");
+    }
     console.log("DB 테이블/컬럼은 tableCandidateSlots의 SQL 슬라이스에서 host가 인용 추출하세요(SKILL.md).");
+    if (archiveError || overlayError) process.exit(1);
   } else {
     console.error(`unknown subcommand: ${sub} (${SUBS.join("|")})`);
     process.exit(2);

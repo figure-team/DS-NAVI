@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import { getLayerColor } from "./LayerLegend";
+import { useI18n } from "../contexts/I18nContext";
 
 const complexityColors: Record<string, string> = {
   simple: "text-node-function",
@@ -17,6 +18,9 @@ export interface LayerClusterData extends Record<string, unknown> {
   aggregateComplexity: string;
   layerColorIndex: number;
   searchMatchCount?: number;
+  // ktds-fork: 계층 내 변경/영향 노드 수 — 첫 화면에서 어느 계층을 봐야 하는지
+  diffChangedCount?: number;
+  diffAffectedCount?: number;
   onDrillIn: (layerId: string) => void;
 }
 
@@ -28,6 +32,17 @@ function LayerClusterNode({
   const color = getLayerColor(data.layerColorIndex);
   const complexityColor =
     complexityColors[data.aggregateComplexity] ?? complexityColors.simple;
+  const { t } = useI18n();
+
+  // ktds-fork: 변경 포함=적색, 영향만=호박색 테두리
+  const diffChanged = data.diffChangedCount ?? 0;
+  const diffAffected = data.diffAffectedCount ?? 0;
+  const diffBorder =
+    diffChanged > 0
+      ? { borderColor: "var(--color-diff-changed)" }
+      : diffAffected > 0
+        ? { borderColor: "var(--color-diff-affected)" }
+        : {};
 
   return (
     <div
@@ -35,6 +50,7 @@ function LayerClusterNode({
       style={{
         width: 300,
         boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+        ...diffBorder,
       }}
       onClick={() => data.onDrillIn(data.layerId)}
     >
@@ -63,6 +79,17 @@ function LayerClusterNode({
             {data.searchMatchCount != null && data.searchMatchCount > 0 && (
               <span className="text-[10px] font-mono bg-gold/20 text-gold px-1.5 py-0.5 rounded">
                 {data.searchMatchCount} match{data.searchMatchCount !== 1 ? "es" : ""}
+              </span>
+            )}
+            {/* ktds-fork: 계층 diff 칩 — 드릴인 없이 변경/영향 위치 식별 */}
+            {diffChanged > 0 && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)]">
+                {t.diffToggle.changed} {diffChanged}
+              </span>
+            )}
+            {diffAffected > 0 && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap bg-[var(--color-diff-affected-dim)] text-[var(--color-diff-affected)]">
+                {t.diffToggle.affected} {diffAffected}
               </span>
             )}
             <span className={`text-[10px] font-mono ${complexityColor}`}>

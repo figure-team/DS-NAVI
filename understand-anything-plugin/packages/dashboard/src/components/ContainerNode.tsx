@@ -1,6 +1,7 @@
 import { memo } from "react";
 import type { NodeProps, Node } from "@xyflow/react";
 import { getLayerColor } from "./LayerLegend";
+import { useI18n } from "../contexts/I18nContext";
 
 export interface ContainerNodeData extends Record<string, unknown> {
   containerId: string;
@@ -12,6 +13,10 @@ export interface ContainerNodeData extends Record<string, unknown> {
   hasSearchHits: boolean;
   searchHitCount?: number;
   isDiffAffected: boolean;
+  // ktds-fork: 컨테이너 내 변경/영향 노드 수 — 단일 플래그(빨강)만으로는
+  // 변경 포함 여부와 규모를 알 수 없다는 PL 피드백
+  diffChangedCount?: number;
+  diffAffectedCount?: number;
   isFocusedViaChild: boolean;
   onToggle: (containerId: string) => void;
 }
@@ -20,12 +25,18 @@ export type ContainerFlowNode = Node<ContainerNodeData, "container">;
 
 function ContainerNodeComponent({ data, width, height }: NodeProps<ContainerFlowNode>) {
   const color = getLayerColor(data.colorIndex);
+  const { t } = useI18n();
 
-  const borderColor = data.isDiffAffected
+  // ktds-fork: 변경 포함=적색, 영향만=호박색 (기존: 둘 다 적색)
+  const diffChanged = data.diffChangedCount ?? 0;
+  const diffAffected = data.diffAffectedCount ?? 0;
+  const borderColor = diffChanged > 0
     ? "var(--color-diff-changed)"
-    : data.isExpanded || data.isFocusedViaChild
-      ? "rgba(212,165,116,0.6)"
-      : "rgba(212,165,116,0.25)";
+    : diffAffected > 0 || data.isDiffAffected
+      ? "var(--color-diff-affected)"
+      : data.isExpanded || data.isFocusedViaChild
+        ? "rgba(212,165,116,0.6)"
+        : "rgba(212,165,116,0.25)";
   const borderWidth = data.isExpanded || data.isFocusedViaChild ? 1.5 : 1;
 
   const labelDimmed = data.name === "~";
@@ -86,6 +97,39 @@ function ContainerNodeComponent({ data, width, height }: NodeProps<ContainerFlow
               }}
             >
               {data.searchHitCount} hit{data.searchHitCount !== 1 ? "s" : ""}
+            </span>
+          )}
+          {/* ktds-fork: 변경/영향 개수 칩 — 접힌 상태에서도 내부 규모가 보이게 */}
+          {diffChanged > 0 && (
+            <span
+              style={{
+                marginLeft: 6,
+                fontSize: 10,
+                fontWeight: 600,
+                background: "var(--color-diff-changed-dim)",
+                color: "var(--color-diff-changed)",
+                padding: "1px 6px",
+                borderRadius: 8,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.diffToggle.changed} {diffChanged}
+            </span>
+          )}
+          {diffAffected > 0 && (
+            <span
+              style={{
+                marginLeft: 6,
+                fontSize: 10,
+                fontWeight: 600,
+                background: "var(--color-diff-affected-dim)",
+                color: "var(--color-diff-affected)",
+                padding: "1px 6px",
+                borderRadius: 8,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.diffToggle.affected} {diffAffected}
             </span>
           )}
         </span>

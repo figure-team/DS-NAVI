@@ -56,8 +56,8 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-impact.mjs <projectRoot> analyze -
 
 ## 5) 대시보드 시각화 (자동)
 analyze가 `.understand-anything/knowledge-graph.json`이 있으면 영향 범위를 `.understand-anything/diff-overlay.json`으로 자동 발행한다 — U-A 대시보드가 이미 소비하는 입력 계약이라 **U-A 코드는 무수정**이다. 사용자에게 안내할 것:
-- `/understand-anything:understand-dashboard`를 실행하면 구조 뷰에서 **적색 ring=시드, 호박색 ring=영향(상류∪하류), 무관 노드=흐림**으로 표시된다(`d` 키로 토글). 재분석 후엔 브라우저 새로고침만 하면 된다.
-- 한계: diff 의미론 2분류뿐 — 상류/하류 구분 색·API/DB 영향 표는 대시보드에 안 나온다(보고서 .md가 정본). 범례의 "변경됨"=시드를 뜻한다.
+- `/understand-anything:understand-dashboard`를 실행하면 구조 뷰에서 **적색=시드("변경됨" 배지), 호박색=영향("영향받음" 배지), 무관 노드=흐림**으로 표시된다(`d` 키로 토글). 계층(첫 화면) 카드와 폴더 컨테이너에는 **변경/영향 개수 칩**이 떠서 드릴인 없이 위치를 좁힐 수 있다. 재분석 후엔 브라우저 새로고침만 하면 된다.
+- 한계: 상류/하류 구분 색·API/DB 영향 표는 대시보드에 안 나온다(보고서 .md가 정본). 범례·배지의 "변경됨"=시드를 뜻한다.
 - KG가 없으면 오버레이는 생략된다(`/understand` 후 재분석 시 생성). 엔진이 "KG 미조인 N"을 보고하면 `/understand` 분석 범위가 영향 파일을 포함하는지 확인하라.
 - `/understand-diff`가 쓴 기존 오버레이는 `.bak`으로 보존 후 덮어쓴다(같은 파일 경합 — 마지막 실행이 화면에 뜬다).
 

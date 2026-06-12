@@ -154,6 +154,17 @@ function CustomNodeComponent({
             {data.nodeType}
           </span>
           <div className="flex items-center gap-1.5">
+            {/* ktds-fork: 명시적 diff 배지 — ring 색만으로는 변경/영향 구분이 안 보인다는 PL 피드백 */}
+            {data.isDiffChanged && (
+              <span className="text-[9px] font-semibold px-1.5 py-px rounded bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)] whitespace-nowrap">
+                {t.diffToggle.changed}
+              </span>
+            )}
+            {!data.isDiffChanged && data.isDiffAffected && (
+              <span className="text-[9px] font-semibold px-1.5 py-px rounded bg-[var(--color-diff-affected-dim)] text-[var(--color-diff-affected)] whitespace-nowrap">
+                {t.diffToggle.affected}
+              </span>
+            )}
             <span className={`text-[9px] font-mono ${complexityColor}`}>
               {data.complexity}
             </span>

@@ -214,6 +214,11 @@ function useOverviewGraph() {
   const nodeIdToLayerId = useDashboardStore((s) => s.nodeIdToLayerId);
   const searchResults = useDashboardStore((s) => s.searchResults);
   const drillIntoLayer = useDashboardStore((s) => s.drillIntoLayer);
+  // ktds-fork: 오버뷰(계층) 수준 diff 집계 — 어느 계층에 변경/영향이 있는지
+  // 첫 화면에서 보이지 않아 전부 드릴인해야 한다는 PL 피드백
+  const diffMode = useDashboardStore((s) => s.diffMode);
+  const changedNodeIds = useDashboardStore((s) => s.changedNodeIds);
+  const affectedNodeIds = useDashboardStore((s) => s.affectedNodeIds);
 
   // Build cluster nodes / flow edges / dims synchronously; only the layout
   // call itself is async, so we memo the structural pieces and run ELK in an
@@ -240,6 +245,20 @@ function useOverviewGraph() {
       }
     }
 
+    // ktds-fork: 계층별 변경/영향 노드 수 (searchMatchByLayer와 동일 패턴)
+    const diffByLayer = new Map<string, { changed: number; affected: number }>();
+    if (diffMode) {
+      const bump = (id: string, key: "changed" | "affected") => {
+        const lid = nodeIdToLayerId.get(id);
+        if (!lid) return;
+        const e = diffByLayer.get(lid) ?? { changed: 0, affected: 0 };
+        e[key] += 1;
+        diffByLayer.set(lid, e);
+      };
+      for (const id of changedNodeIds) bump(id, "changed");
+      for (const id of affectedNodeIds) bump(id, "affected");
+    }
+
     // Create cluster nodes. Per-layer aggregation goes through
     // `computeLayerStats`, which iterates `layer.nodeIds` against the
     // `nodesById` index — O(K) per layer instead of the previous
@@ -259,6 +278,9 @@ function useOverviewGraph() {
           aggregateComplexity,
           layerColorIndex: i,
           searchMatchCount: searchMatchByLayer.get(layer.id),
+          // ktds-fork: 계층 카드 diff 칩
+          diffChangedCount: diffByLayer.get(layer.id)?.changed,
+          diffAffectedCount: diffByLayer.get(layer.id)?.affected,
           onDrillIn: drillIntoLayer,
         },
       };
@@ -284,7 +306,8 @@ function useOverviewGraph() {
     }
 
     return { clusterNodes, flowEdges, dims };
-  }, [graph, nodesById, nodeIdToLayerId, searchResults, drillIntoLayer]);
+    // ktds-fork: diff 상태도 오버뷰 재계산 트리거
+  }, [graph, nodesById, nodeIdToLayerId, searchResults, drillIntoLayer, diffMode, changedNodeIds, affectedNodeIds]);
 
   const [overview, setOverview] = useState<{ nodes: Node[]; edges: Edge[] }>({
     nodes: [],
@@ -1031,19 +1054,21 @@ function useLayerDetailGraph() {
     return m;
   }, [searchResults, topo.nodeToContainer]);
 
-  // O(changed + affected) — set of container atoms touched by the diff.
+  // O(changed + affected) — per-container diff counts (ktds-fork: 변경/영향
+  // 구분+개수 — 단일 Set으로는 컨테이너가 무엇을 몇 개 품는지 안 보임).
   const diffContainers = useMemo(() => {
-    const s = new Set<string>();
-    if (!diffMode) return s;
-    for (const id of changedNodeIds) {
+    const m = new Map<string, { changed: number; affected: number }>();
+    if (!diffMode) return m;
+    const bump = (id: string, key: "changed" | "affected") => {
       const cid = topo.nodeToContainer.get(id);
-      if (cid && cid !== id) s.add(cid);
-    }
-    for (const id of affectedNodeIds) {
-      const cid = topo.nodeToContainer.get(id);
-      if (cid && cid !== id) s.add(cid);
-    }
-    return s;
+      if (!cid || cid === id) return;
+      const e = m.get(cid) ?? { changed: 0, affected: 0 };
+      e[key] += 1;
+      m.set(cid, e);
+    };
+    for (const id of changedNodeIds) bump(id, "changed");
+    for (const id of affectedNodeIds) bump(id, "affected");
+    return m;
   }, [diffMode, changedNodeIds, affectedNodeIds, topo.nodeToContainer]);
 
   // O(filteredEdges) — focus node's container + 1-hop neighbor containers.
@@ -1117,7 +1142,10 @@ function useLayerDetailGraph() {
         const rawHits = searchHitsByContainer.get(cid) ?? 0;
         const hasSearchHits = rawHits > 0;
         const searchHitCount = hasSearchHits ? rawHits : undefined;
-        const isDiffAffected = diffContainers.has(cid);
+        const diffCounts = diffContainers.get(cid);
+        const diffChangedCount = diffCounts?.changed ?? 0;
+        const diffAffectedCount = diffCounts?.affected ?? 0;
+        const isDiffAffected = diffChangedCount + diffAffectedCount > 0;
         const isFocusedViaChild =
           focusContainerIds.has(cid) || selectionContainerIds.has(cid);
 
@@ -1127,6 +1155,8 @@ function useLayerDetailGraph() {
           data.hasSearchHits === hasSearchHits &&
           data.searchHitCount === searchHitCount &&
           data.isDiffAffected === isDiffAffected &&
+          data.diffChangedCount === diffChangedCount &&
+          data.diffAffectedCount === diffAffectedCount &&
           data.isFocusedViaChild === isFocusedViaChild
         ) {
           return node;
@@ -1140,6 +1170,8 @@ function useLayerDetailGraph() {
             hasSearchHits,
             searchHitCount,
             isDiffAffected,
+            diffChangedCount,
+            diffAffectedCount,
             isFocusedViaChild,
           },
         };

@@ -143,10 +143,20 @@
 - **노드 조인**: `file:<relPath>` 직조인 → type=file → type=config(매퍼 XML 실측 패턴) → id 사전순. **대표 1노드/파일**(범례 카운트=파일 수 유지). KG `filePath`가 절대경로인 프로젝트 대응으로 projectRoot 상대화 정규화를 변환기에 내장 — 서버 normalizeGraphPath와 방향 동일하되 **더 엄격**(dot-segment 거부, 분리자 경계 요구; 미조인은 unresolved 표면화라 fail-closed가 오답보다 낫다). 미조인은 `ktdsImpact.unresolved`로 echo(은폐 금지).
 - **결정론 경계**: 순수 변환(buildDiffOverlay)은 결정론, `generatedAt`만 IO 경계에서 스탬프(U-A 계약 필드, App.tsx 미사용, `.spec/map` 산출물 아님).
 - **경합**: `/understand-diff`와 같은 파일 — `baseBranch:"ktds-impact"` 마커로 출처 판별, 타 출처 파일은 `.bak` 보존 후 덮어씀(last-writer-wins 완화).
-- **한계(수용)**: diff 의미론 2분류뿐 — 시드/상류/하류 3색·깊이·API/DB 표·근거율 게이지는 표현 불가. 그 요구가 확정되면 fork 수정(C안)으로 상승하되 본 조인 로직은 재사용. 오버레이는 구조 뷰 전용(도메인/지식 뷰 미표시), dev 서버 전제. 대시보드 스키마 검증에서 drop된 노드는 범례 카운트에만 남고 하이라이트되지 않을 수 있다(오버레이는 디스크 KG 실존 id만 내보내므로 통상 불발생).
+- **한계(수용)**: diff 의미론 2분류뿐 — 시드/상류/하류 3색·깊이·API/DB 표·근거율 게이지는 표현 불가. 그 요구가 확정되면 fork 수정(C안)으로 상승하되 본 조인 로직은 재사용 — **가독성 한정으로 A.3에서 일부 선행됨**. 오버레이는 구조 뷰 전용(도메인/지식 뷰 미표시), dev 서버 전제. 대시보드 스키마 검증에서 drop된 노드는 범례 카운트에만 남고 하이라이트되지 않을 수 있다(오버레이는 디스크 KG 실존 id만 내보내므로 통상 불발생).
 
 ### A.2 SR 워크벤치 (T11 — `--sr` 보관 + 집계)
 
 - `analyze --sr <SR-ID>` → 분석 사본(impact.json+verify+보고서)을 `.spec/impact/<SR-ID>/`에 보관(원자 쓰기). `.spec/map/impact.json`(최신 1건)·`docs/09_release/`(최신 보고서) 의미론 불변 — 보관본은 항상 사본. `status --list`로 이력 조회(손상 보관본 valid:false 표면화). SR ID는 디렉터리명 안전성 fail-closed(`^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$`).
 - 보고서에 **영향 규모 집계** 섹션(공수 산정 입력): 도메인×상류/하류·언어×상류/하류 파일 수. 도메인 귀속=**슬라이스 ownership 기반**(owner root 파일→confirmed 도메인; 루트 자신·단일 도메인=해당 도메인, 복수 도메인=`(공용)`, 미도달·확정 밖=`(미분류)`, census 밖 lang=`(census 밖)`) — ConfirmedDomain.roots는 디렉터리가 아니라 엔트리 **파일 경로**라 prefix 매칭은 전건 미분류로 쏠리는 오답(독립 리뷰 critical로 검출·정정). ownership·roots 모두 정렬 산출물이라 결정론. 집계는 claims가 아니라 prose(파생 수치 — 확정 대상 아님).
 - **수반 수정**: engine `buildClaimItems`가 인용을 **사본**으로 담도록 정정 — 기존엔 result의 citation 참조 공유로 `fillClaimSnippets`가 in-memory result를 변이했고(디스크 정본은 변이 전 기록이라 무사), SR 보관 직렬화에서 "앵커만" 계약 위반으로 표면화. 회귀 테스트: 반환 result의 stableJson == 디스크 정본.
+
+### A.3 오버레이 가독성 — fork 최소 수정 (C안 일부 선행, 2026-06-12)
+
+PL 실사용 피드백 2건으로 C안의 **가독성 부분만** 선행 채택: ① ring 색만으로는 노드의 변경/영향 구분이 안 보임, ② 오버뷰(계층) 첫 화면에 diff 표시가 전혀 없어 전 계층을 드릴인해야 함. 둘 다 U-A 렌더 경로에 표시 수단 자체가 없어 **무수정으로는 해소 불가** → 대시보드 4파일 최소 수정 (무수정 예외 #2, [UPSTREAM_MERGE.md](./UPSTREAM_MERGE.md) §충돌점 4 — `// ktds-fork` 마커 격리, 신규 locale 키·신규 파일 없음):
+
+- `CustomNode.tsx`: 노드 헤더 배지 "변경됨"(적)/"영향받음"(호박) — 기존 `t.diffToggle` 라벨 재사용(6개 locale 자동).
+- `ContainerNode.tsx`: 변경/영향 **개수 칩** + 테두리 변경 포함=적/영향만=호박(기존: 단일 플래그·둘 다 적색).
+- `LayerClusterNode.tsx` + `GraphView.tsx`(useOverviewGraph): 계층 카드에 동일 칩·테두리 — `nodeIdToLayerId`로 changed/affected를 계층별 집계(searchMatchByLayer와 동일 패턴). 디테일 레벨 `diffContainers`는 Set→개수 Map.
+
+여전히 미해소(완전 C안 영역): 시드/상류/하류 3색, minDepth 깊이, API/DB 영향 표·근거율 게이지 패널, 도메인/지식 뷰 표시. 변경 파일이 어느 계층에도 안 속하면 계층 칩에는 안 잡힌다(디테일 뷰에서는 보임).

@@ -9,15 +9,22 @@
   - `fixtures/`, `docs/ktds/`
 - 통합은 U-A 내부 TS API import가 아니라 on-disk `knowledge-graph.json` 계약을 통한다.
 
-## 알려진 merge 충돌점 (additive 2곳 + 최소 예외 1곳)
-ktds가 손대는 upstream 매니페스트는 **2개**(둘 다 additive). 추가로 무수정 예외가 **1곳**:
+## 알려진 merge 충돌점 (additive 2곳 + 무수정 예외 2건)
+ktds가 손대는 upstream 매니페스트는 **2개**(둘 다 additive). 추가로 무수정 예외가 **2건**:
 1. `pnpm-workspace.yaml` — `ktds-legacy-plugin/packages/*`, `ktds-legacy-plugin` glob 추가
 2. `.claude-plugin/marketplace.json` — `plugins[]`에 `ktds-legacy` 항목 추가
 
-**무수정 예외 1곳** (fork 제품화상 불가피 — 한국 고객 기본 언어):
+**무수정 예외 #1** (fork 제품화상 불가피 — 한국 고객 기본 언어):
 3. `understand-anything-plugin/packages/dashboard/vite.config.ts` — dev server `/config.json` 핸들러의 fallback `outputLanguage` 기본값을 `"en"` → **`"ko"`** (1줄). 대시보드는 분석 프로젝트 `.understand-anything/config.json`의 `outputLanguage`로 UI 언어를 정하는데, 그 파일이 없을 때의 기본값이다. ktds 파이프라인(`understand-init`)이 `.understand-anything/config.json`에 `outputLanguage:ko`를 써두므로 데이터로도 보장되지만, 순수 U-A 경로(`/understand`→`/understand-dashboard`만)를 위한 안전망. **U-A의 i18n·`ko.ts` 번역은 원본 그대로 활용**(코드 추가 없음).
 
-upstream merge 시 1·2는 additive 라인 재적용, 3은 해당 1줄(`outputLanguage: "ko"`)을 재적용한다.
+**무수정 예외 #2** (2026-06-12, ADR-002 부록 A.3 — diff 오버레이 가독성, PL 실사용 피드백):
+4. `understand-anything-plugin/packages/dashboard/src/components/` 4파일 — diff 오버레이의 변경/영향을 **명시 배지·집계 칩**으로 표시. 전 수정부에 `// ktds-fork` 주석 마커. 신규 locale 키 없음(기존 `t.diffToggle.changed/affected` 재사용), 신규 파일 없음:
+   - `CustomNode.tsx` — 노드 헤더에 "변경됨"/"영향받음" 배지 칩 (ring 색만으로는 구분 불가 피드백)
+   - `ContainerNode.tsx` — 변경/영향 **개수 칩** + 테두리 색 구분(변경 포함=적색, 영향만=호박색 — 기존엔 둘 다 적색 단일 플래그)
+   - `LayerClusterNode.tsx` — 계층(오버뷰 첫 화면) 카드에 동일 칩+테두리 (어느 계층을 봐야 하는지 드릴인 없이 식별)
+   - `GraphView.tsx` — `diffContainers` Set→개수 Map, `useOverviewGraph`에 계층별 diff 집계 배선
+
+upstream merge 시 1·2는 additive 라인 재적용, 3은 해당 1줄(`outputLanguage: "ko"`) 재적용, 4는 `// ktds-fork` 마커 블록을 재적용한다(충돌 시 `git log -p -- <파일>`로 ktds 커밋 diff 참조).
 
 ## 절차
 ```bash

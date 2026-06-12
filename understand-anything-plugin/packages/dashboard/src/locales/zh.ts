@@ -133,6 +133,15 @@ export const zh = {
     changed: "已修改",
     affected: "受影响",
   },
+  // ktds: 예측(영향도) 오버레이 채널 토글
+  impactToggle: {
+    label: "影响",
+    hideOverlay: "隐藏影响叠加层",
+    showOverlay: "显示影响叠加层",
+    noData: "未加载影响分析",
+    seed: "种子",
+    affected: "受影响",
+  },
   learnPanel: {
     finish: "完成",
     next: "下一步",
@@ -206,6 +215,7 @@ export const zh = {
     nextStep: "下一步导览",
     prevStep: "上一步导览",
     toggleDiff: "切换差异模式",
+    toggleImpact: "切换影响模式",
     toggleFilter: "切换筛选面板",
     toggleExport: "切换导出菜单",
     openPathFinder: "打开路径查找器",

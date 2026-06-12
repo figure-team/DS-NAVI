@@ -3,6 +3,7 @@ import { Handle, Position } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import { getLayerColor } from "./LayerLegend";
 import { useI18n } from "../contexts/I18nContext";
+import { useDashboardStore } from "../store";
 
 const complexityColors: Record<string, string> = {
   simple: "text-node-function",
@@ -35,6 +36,10 @@ function LayerClusterNode({
   const complexityColor =
     complexityColors[data.aggregateComplexity] ?? complexityColors.simple;
   const { t } = useI18n();
+  // ktds: 활성 채널 라벨 (diff="변경됨/영향받음", impact="시드/영향")
+  const overlaySource = useDashboardStore((s) => s.overlaySource);
+  const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
+  const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;
 
   // ktds-fork: 변경 포함=적색, 영향만=호박색 테두리 + 글로우, 무관 계층=흐림.
   // 글로우는 인라인 boxShadow가 .diff-*-glow 클래스를 덮어쓰므로 인라인으로 합성
@@ -95,12 +100,12 @@ function LayerClusterNode({
             {/* ktds-fork: 계층 diff 칩 — 드릴인 없이 변경/영향 위치 식별 */}
             {diffChanged > 0 && (
               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)]">
-                {t.diffToggle.changed} {diffChanged}
+                {lblChanged} {diffChanged}
               </span>
             )}
             {diffAffected > 0 && (
               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap bg-[var(--color-diff-affected-dim)] text-[var(--color-diff-affected)]">
-                {t.diffToggle.affected} {diffAffected}
+                {lblAffected} {diffAffected}
               </span>
             )}
             <span className={`text-[10px] font-mono ${complexityColor}`}>

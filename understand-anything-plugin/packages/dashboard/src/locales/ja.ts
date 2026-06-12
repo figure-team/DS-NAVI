@@ -133,6 +133,15 @@ export const ja = {
     changed: "変更済み",
     affected: "影響あり",
   },
+  // ktds: 예측(영향도) 오버레이 채널 토글
+  impactToggle: {
+    label: "影響",
+    hideOverlay: "影響オーバーレイを隠す",
+    showOverlay: "影響オーバーレイを表示",
+    noData: "影響分析が読み込まれていません",
+    seed: "シード",
+    affected: "影響",
+  },
   learnPanel: {
     finish: "完了",
     next: "次へ",
@@ -206,6 +215,7 @@ export const ja = {
     nextStep: "次のツアーステップ",
     prevStep: "前のツアーステップ",
     toggleDiff: "差分モード切り替え",
+    toggleImpact: "影響モード切替",
     toggleFilter: "フィルターパネル切り替え",
     toggleExport: "エクスポートメニュー切り替え",
     openPathFinder: "パスファインダーを開く",

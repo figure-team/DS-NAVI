@@ -3,6 +3,7 @@ import { Handle, Position } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { NodeType } from "@understand-anything/core/types";
 import { useI18n } from "../contexts/I18nContext";
+import { useDashboardStore } from "../store";
 
 // Color maps keyed by NodeType — must be kept in sync with core NodeType union.
 const typeColors: Record<NodeType, string> = {
@@ -90,6 +91,10 @@ function CustomNodeComponent({
   const textColor = typeTextColors[knownType] ?? typeTextColors.file;
   const complexityColor = complexityColors[data.complexity] ?? complexityColors.simple;
   const { t } = useI18n();
+  // ktds: 활성 오버레이 채널에 맞는 배지 라벨 — diff="변경됨/영향받음", impact="시드/영향"
+  const overlaySource = useDashboardStore((s) => s.overlaySource);
+  const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
+  const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;
 
   if (import.meta.env.DEV && !(knownType in typeColors)) {
     console.warn(`[CustomNode] Unknown node type "${data.nodeType}" — using "file" colors`);
@@ -157,12 +162,12 @@ function CustomNodeComponent({
             {/* ktds-fork: 명시적 diff 배지 — ring 색만으로는 변경/영향 구분이 안 보인다는 PL 피드백 */}
             {data.isDiffChanged && (
               <span className="text-[9px] font-semibold px-1.5 py-px rounded bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)] whitespace-nowrap">
-                {t.diffToggle.changed}
+                {lblChanged}
               </span>
             )}
             {!data.isDiffChanged && data.isDiffAffected && (
               <span className="text-[9px] font-semibold px-1.5 py-px rounded bg-[var(--color-diff-affected-dim)] text-[var(--color-diff-affected)] whitespace-nowrap">
-                {t.diffToggle.affected}
+                {lblAffected}
               </span>
             )}
             <span className={`text-[9px] font-mono ${complexityColor}`}>

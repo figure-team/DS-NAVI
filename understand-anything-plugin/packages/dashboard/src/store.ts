@@ -97,6 +97,13 @@ function buildGraphIndexes(graph: KnowledgeGraph): {
 /** Maximum number of entries in the sidebar navigation history. */
 const MAX_HISTORY = 50;
 
+/** 오버레이 채널 원본 (ktds) — generatedAt(ISO)으로 자동 활성 우선순위 결정. */
+export interface OverlayChannelData {
+  changed: string[];
+  affected: string[];
+  generatedAt: string;
+}
+
 interface DashboardStore {
   graph: KnowledgeGraph | null;
   /** id → node lookup, rebuilt by setGraph. Empty before any graph loads. */
@@ -126,9 +133,15 @@ interface DashboardStore {
 
   persona: Persona;
 
+  // 오버레이 2채널 (ktds): diff=실측(git 변경, /understand-review·understand-diff),
+  // impact=예측(/understand-impact 시드 기반 도달성). diffMode/changedNodeIds/
+  // affectedNodeIds는 "활성 채널"의 뷰 상태 — 모든 뷰가 이것만 읽는다.
   diffMode: boolean;
   changedNodeIds: Set<string>;
   affectedNodeIds: Set<string>;
+  overlaySource: "diff" | "impact" | null;
+  diffOverlayData: OverlayChannelData | null;
+  impactOverlayData: OverlayChannelData | null;
 
   // Focus mode: isolate a node's 1-hop neighborhood
   focusNodeId: string | null;
@@ -172,6 +185,10 @@ interface DashboardStore {
 
   setDiffOverlay: (changed: string[], affected: string[]) => void;
   toggleDiffMode: () => void;
+  /** 채널 원본 적재 + 자동 활성(시드 보유 && 더 최신이거나 유일할 때). */
+  setOverlayData: (source: "diff" | "impact", data: OverlayChannelData) => void;
+  /** 채널 토글 — 활성 채널 재토글=숨김, 비활성 채널=전환 (동시 표시 없음). */
+  toggleOverlay: (source: "diff" | "impact") => void;
   clearDiffOverlay: () => void;
 
   toggleFilterPanel: () => void;
@@ -312,6 +329,9 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   diffMode: false,
   changedNodeIds: new Set<string>(),
   affectedNodeIds: new Set<string>(),
+  overlaySource: null,
+  diffOverlayData: null,
+  impactOverlayData: null,
 
   focusNodeId: null,
   nodeHistory: [],
@@ -548,14 +568,46 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   expandCodeViewer: () => set({ codeViewerExpanded: true }),
   collapseCodeViewer: () => set({ codeViewerExpanded: false }),
 
+  // 하위호환 별칭 — diff 채널 적재 (generatedAt 미상 = 빈 문자열: 항상 최저 우선)
   setDiffOverlay: (changed, affected) =>
-    set({
-      diffMode: true,
-      changedNodeIds: new Set(changed),
-      affectedNodeIds: new Set(affected),
+    get().setOverlayData("diff", { changed, affected, generatedAt: "" }),
+
+  toggleDiffMode: () => get().toggleOverlay("diff"),
+
+  setOverlayData: (source, data) =>
+    set((state) => {
+      const next: Partial<DashboardStore> =
+        source === "diff" ? { diffOverlayData: data } : { impactOverlayData: data };
+      // 자동 활성: 시드가 있고, (활성 가능한 다른 채널이 없거나 || 이 채널이 더
+      // 최신)일 때. 빈 채널(changed=0 — KG 미조인 발행)은 경쟁자가 아니다(리뷰
+      // minor: 빈 채널의 최신 generatedAt이 유효 채널의 자동 활성을 막는 순서
+      // 의존 제거). 두 채널이 비동기로 도착해도 최종 활성 = 최신 유효 분석.
+      const other = source === "diff" ? state.impactOverlayData : state.diffOverlayData;
+      const newer =
+        other === null || other.changed.length === 0 || data.generatedAt >= other.generatedAt;
+      if (data.changed.length > 0 && newer) {
+        next.overlaySource = source;
+        next.diffMode = true;
+        next.changedNodeIds = new Set(data.changed);
+        next.affectedNodeIds = new Set(data.affected);
+      }
+      return next;
     }),
 
-  toggleDiffMode: () => set((state) => ({ diffMode: !state.diffMode })),
+  toggleOverlay: (source) =>
+    set((state) => {
+      const data = source === "diff" ? state.diffOverlayData : state.impactOverlayData;
+      if (!data || data.changed.length === 0) return {};
+      if (state.overlaySource === source && state.diffMode) {
+        return { diffMode: false }; // 같은 채널 재토글 = 숨김 (채널 기억)
+      }
+      return {
+        overlaySource: source,
+        diffMode: true,
+        changedNodeIds: new Set(data.changed),
+        affectedNodeIds: new Set(data.affected),
+      };
+    }),
 
   clearDiffOverlay: () =>
     set({

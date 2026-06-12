@@ -25,6 +25,10 @@ function DomainClusterNode({ data }: NodeProps<DomainClusterFlowNode>) {
   const selectNode = useDashboardStore((s) => s.selectNode);
   const isSelected = selectedNodeId === data.domainId;
   const { t } = useI18n();
+  // ktds: 활성 채널 라벨 (diff="변경됨/영향받음", impact="시드/영향")
+  const overlaySource = useDashboardStore((s) => s.overlaySource);
+  const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
+  const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;
 
   // ktds-fork: 변경 포함=적, 영향만=호박 (테두리+글로우 — 계층 카드와 동일 시각 언어)
   const diffChanged = data.diffChangedCount ?? 0;
@@ -57,12 +61,12 @@ function DomainClusterNode({ data }: NodeProps<DomainClusterFlowNode>) {
         {/* ktds-fork: 변경/영향 개수 칩 */}
         {diffChanged > 0 && (
           <span className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)]">
-            {t.diffToggle.changed} {diffChanged}
+            {lblChanged} {diffChanged}
           </span>
         )}
         {diffAffected > 0 && (
           <span className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap bg-[var(--color-diff-affected-dim)] text-[var(--color-diff-affected)]">
-            {t.diffToggle.affected} {diffAffected}
+            {lblAffected} {diffAffected}
           </span>
         )}
       </div>

@@ -54,6 +54,7 @@ function dataUrl(fileName: string, token: string | null): string {
       "domain-graph.json": import.meta.env.VITE_DOMAIN_GRAPH_URL,
       "meta.json": import.meta.env.VITE_META_URL,
       "diff-overlay.json": import.meta.env.VITE_DIFF_OVERLAY_URL,
+      "impact-overlay.json": import.meta.env.VITE_IMPACT_OVERLAY_URL,
       "config.json": import.meta.env.VITE_CONFIG_URL,
     };
     const url = envMap[fileName];
@@ -108,7 +109,7 @@ function App() {
 function Dashboard({ accessToken }: { accessToken: string }) {
   const setGraph = useDashboardStore((s) => s.setGraph);
   const setDomainGraph = useDashboardStore((s) => s.setDomainGraph);
-  const setDiffOverlay = useDashboardStore((s) => s.setDiffOverlay);
+  const setOverlayData = useDashboardStore((s) => s.setOverlayData);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [graphIssues, setGraphIssues] = useState<GraphIssue[]>([]);
   const [metaTheme, setMetaTheme] = useState<ThemeConfig | null>(null);
@@ -162,29 +163,40 @@ function Dashboard({ accessToken }: { accessToken: string }) {
       });
   }, [setGraph]);
 
+  // ktds: 오버레이 2채널 로드 — diff(실측: review/understand-diff)와
+  // impact(예측: understand-impact). 자동 활성은 store가 generatedAt 최신으로 결정.
   useEffect(() => {
-    fetch(dataUrl("diff-overlay.json", accessToken))
-      .then((res) => {
-        if (!res.ok) return null;
-        return res.json();
-      })
-      .then((data: unknown) => {
-        if (
-          data &&
-          typeof data === "object" &&
-          "changedNodeIds" in data &&
-          "affectedNodeIds" in data &&
-          Array.isArray((data as Record<string, unknown>).changedNodeIds) &&
-          Array.isArray((data as Record<string, unknown>).affectedNodeIds)
-        ) {
-          const d = data as { changedNodeIds: string[]; affectedNodeIds: string[] };
-          if (d.changedNodeIds.length > 0) {
-            setDiffOverlay(d.changedNodeIds, d.affectedNodeIds);
+    const loadOverlay = (fileName: string, source: "diff" | "impact") =>
+      fetch(dataUrl(fileName, accessToken))
+        .then((res) => {
+          if (!res.ok) return null;
+          return res.json();
+        })
+        .then((data: unknown) => {
+          if (
+            data &&
+            typeof data === "object" &&
+            "changedNodeIds" in data &&
+            "affectedNodeIds" in data &&
+            Array.isArray((data as Record<string, unknown>).changedNodeIds) &&
+            Array.isArray((data as Record<string, unknown>).affectedNodeIds)
+          ) {
+            const d = data as {
+              changedNodeIds: string[];
+              affectedNodeIds: string[];
+              generatedAt?: unknown;
+            };
+            setOverlayData(source, {
+              changed: d.changedNodeIds,
+              affected: d.affectedNodeIds,
+              generatedAt: typeof d.generatedAt === "string" ? d.generatedAt : "",
+            });
           }
-        }
-      })
-      .catch(() => {});
-  }, [setDiffOverlay]);
+        })
+        .catch(() => {});
+    loadOverlay("diff-overlay.json", "diff");
+    loadOverlay("impact-overlay.json", "impact");
+  }, [setOverlayData]);
 
   useEffect(() => {
     fetch(dataUrl("domain-graph.json", accessToken))
@@ -347,7 +359,16 @@ function DashboardContent({
         description: t.keyboardShortcuts.toggleDiff,
         action: () => {
           const state = useDashboardStore.getState();
-          state.toggleDiffMode();
+          state.toggleOverlay("diff");
+        },
+        category: "View",
+      },
+      {
+        key: "i",
+        description: t.keyboardShortcuts.toggleImpact,
+        action: () => {
+          const state = useDashboardStore.getState();
+          state.toggleOverlay("impact");
         },
         category: "View",
       },

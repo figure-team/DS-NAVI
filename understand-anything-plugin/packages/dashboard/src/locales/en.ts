@@ -133,6 +133,15 @@ export const en = {
     changed: "Changed",
     affected: "Affected",
   },
+  // ktds: 예측(영향도) 오버레이 채널 토글
+  impactToggle: {
+    label: "Impact",
+    hideOverlay: "Hide impact overlay",
+    showOverlay: "Show impact overlay",
+    noData: "No impact analysis loaded",
+    seed: "Seed",
+    affected: "Impacted",
+  },
   learnPanel: {
     finish: "Finish",
     next: "Next",
@@ -206,6 +215,7 @@ export const en = {
     nextStep: "Next tour step",
     prevStep: "Previous tour step",
     toggleDiff: "Toggle diff mode",
+    toggleImpact: "Toggle impact mode",
     toggleFilter: "Toggle filter panel",
     toggleExport: "Toggle export menu",
     openPathFinder: "Open path finder",

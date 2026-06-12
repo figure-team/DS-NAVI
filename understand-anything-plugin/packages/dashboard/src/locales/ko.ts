@@ -133,6 +133,15 @@ export const ko = {
     changed: "변경됨",
     affected: "영향받음",
   },
+  // ktds: 예측(영향도) 오버레이 채널 토글
+  impactToggle: {
+    label: "영향도",
+    hideOverlay: "영향도 오버레이 숨기기",
+    showOverlay: "영향도 오버레이 표시",
+    noData: "영향도 분석이 로드되지 않음",
+    seed: "시드",
+    affected: "영향",
+  },
   learnPanel: {
     finish: "완료",
     next: "다음",
@@ -206,6 +215,7 @@ export const ko = {
     nextStep: "다음 투어 단계",
     prevStep: "이전 투어 단계",
     toggleDiff: "차분 모드 전환",
+    toggleImpact: "영향도 모드 전환",
     toggleFilter: "필터 패널 전환",
     toggleExport: "내보내기 메뉴 전환",
     openPathFinder: "경로 찾기 열기",

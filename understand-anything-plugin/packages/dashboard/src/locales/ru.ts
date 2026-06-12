@@ -133,6 +133,15 @@ export const ru = {
     changed: "Изменено",
     affected: "Затронуто",
   },
+  // ktds: 예측(영향도) 오버레이 채널 토글
+  impactToggle: {
+    label: "Влияние",
+    hideOverlay: "Скрыть слой влияния",
+    showOverlay: "Показать слой влияния",
+    noData: "Анализ влияния не загружен",
+    seed: "Изменяемый",
+    affected: "Затронут",
+  },
   learnPanel: {
     finish: "Завершить",
     next: "Далее",
@@ -206,6 +215,7 @@ export const ru = {
     nextStep: "Следующий шаг обзора",
     prevStep: "Предыдущий шаг обзора",
     toggleDiff: "Переключить режим изменений",
+    toggleImpact: "Переключить режим влияния",
     toggleFilter: "Переключить панель фильтров",
     toggleExport: "Переключить меню экспорта",
     openPathFinder: "Открыть поиск пути",

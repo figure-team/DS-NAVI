@@ -139,8 +139,8 @@ export const ru = {
     hideOverlay: "Скрыть слой влияния",
     showOverlay: "Показать слой влияния",
     noData: "Анализ влияния не загружен",
-    seed: "Изменяемый",
-    affected: "Затронут",
+    seed: "Будет изменено",
+    affected: "Затронуто",
   },
   learnPanel: {
     finish: "Завершить",

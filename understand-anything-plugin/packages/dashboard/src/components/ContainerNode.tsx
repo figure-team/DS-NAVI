@@ -27,7 +27,7 @@ export type ContainerFlowNode = Node<ContainerNodeData, "container">;
 function ContainerNodeComponent({ data, width, height }: NodeProps<ContainerFlowNode>) {
   const color = getLayerColor(data.colorIndex);
   const { t } = useI18n();
-  // ktds: 활성 채널 라벨 (diff="변경됨/영향받음", impact="시드/영향")
+  // ktds: 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
   const overlaySource = useDashboardStore((s) => s.overlaySource);
   const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
   const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;

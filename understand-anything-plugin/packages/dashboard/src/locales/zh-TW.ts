@@ -139,7 +139,7 @@ export const zhTW = {
     hideOverlay: "隱藏影響疊加層",
     showOverlay: "顯示影響疊加層",
     noData: "未載入影響分析",
-    seed: "種子",
+    seed: "待修改",
     affected: "受影響",
   },
   learnPanel: {

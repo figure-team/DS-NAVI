@@ -139,8 +139,8 @@ export const en = {
     hideOverlay: "Hide impact overlay",
     showOverlay: "Show impact overlay",
     noData: "No impact analysis loaded",
-    seed: "Seed",
-    affected: "Impacted",
+    seed: "Will change",
+    affected: "Affected",
   },
   learnPanel: {
     finish: "Finish",

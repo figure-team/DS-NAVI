@@ -185,7 +185,7 @@ try {
       if (overlay.overlay.changedNodeIds.length === 0) {
         console.warn("  주의: 시드가 KG에 매칭되지 않아 대시보드가 오버레이를 표시하지 않습니다 (/understand 분석 범위 확인).");
       } else {
-        console.log("  /understand-dashboard 실행 → '영향도' 토글(i 키): 적색=시드 · 호박색=영향. 재분석 후 새로고침.");
+        console.log("  /understand-dashboard 실행 → '영향도' 토글(i 키): 적색=변경예정 · 호박색=영향받음. 재분석 후 새로고침.");
       }
     } else if (overlayError) {
       console.error(`대시보드 오버레이 실패: ${overlayError} (분석·보고서는 발행됨, 감사에 overlayError 기록)`);

@@ -139,8 +139,8 @@ export const ko = {
     hideOverlay: "영향도 오버레이 숨기기",
     showOverlay: "영향도 오버레이 표시",
     noData: "영향도 분석이 로드되지 않음",
-    seed: "시드",
-    affected: "영향",
+    seed: "변경예정",
+    affected: "영향받음",
   },
   learnPanel: {
     finish: "완료",

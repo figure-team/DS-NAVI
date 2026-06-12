@@ -56,7 +56,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-impact.mjs <projectRoot> analyze -
 
 ## 5) 대시보드 시각화 (자동 — 예측 채널)
 analyze가 `.understand-anything/knowledge-graph.json`이 있으면 영향 범위를 **`.understand-anything/impact-overlay.json`(예측 전용 채널)**로 자동 발행한다. 사용자에게 안내할 것:
-- `/understand-anything:understand-dashboard`에서 **'영향도' 토글(`i` 키)**: 적색="시드" 배지, 호박색="영향" 배지, 무관 노드=흐림. 계층(첫 화면)·폴더 컨테이너·도메인 뷰에도 동일한 칩/배지가 투영된다(도메인 뷰는 라우트 체인 등장 파일만). 재분석 후엔 브라우저 새로고침.
+- `/understand-anything:understand-dashboard`에서 **'영향도' 토글(`i` 키)**: 적색="변경예정" 배지, 호박색="영향받음" 배지, 무관 노드=흐림. 계층(첫 화면)·폴더 컨테이너·도메인 뷰에도 동일한 칩/배지가 투영된다(도메인 뷰는 라우트 체인 등장 파일만). 재분석 후엔 브라우저 새로고침.
 - **Diff 토글(`d` 키)은 별개** — 실측 비교(/understand-review, "변경됨/영향받음")용이다. 두 토글은 동시에 켜지지 않고, 둘 다 데이터가 있으면 최신 분석이 자동 활성된다.
 - 한계: 상류/하류 구분 색·API/DB 영향 표는 대시보드에 안 나온다(보고서 .md가 정본).
 - KG가 없으면 오버레이는 생략된다(`/understand` 후 재분석 시 생성). 엔진이 "KG 미조인 N"을 보고하면 `/understand` 분석 범위가 영향 파일을 포함하는지 확인하라.

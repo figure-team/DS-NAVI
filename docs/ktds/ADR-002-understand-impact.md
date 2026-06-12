@@ -177,6 +177,6 @@ PL 실사용 피드백 2건으로 C안의 **가독성 부분만** 선행 채택:
 
 ### B.2 오버레이 2채널 (대시보드 — ADR-003 분기 후 자유 개조)
 
-- **채널**: 예측=`impact-overlay.json`(마커 `ktds-impact`, '영향도' 토글 `i`, 라벨 "시드/영향") / 실측=`diff-overlay.json`(마커 `ktds-review:<base>`, Diff 토글 `d`, 라벨 "변경됨/영향받음" — U-A understand-diff 의미론과 일치, 그 파일과의 경합은 기존 `.bak` 규칙 유지). A안의 "라벨 변경됨=시드 오독"과 last-writer-wins 경합이 구조적으로 해소.
+- **채널**: 예측=`impact-overlay.json`(마커 `ktds-impact`, '영향도' 토글 `i`, 라벨 "변경예정/영향받음" — 사용자 확정 표기) / 실측=`diff-overlay.json`(마커 `ktds-review:<base>`, Diff 토글 `d`, 라벨 "변경됨/영향받음" — U-A understand-diff 의미론과 일치, 그 파일과의 경합은 기존 `.bak` 규칙 유지). A안의 "라벨 변경됨=시드 오독"과 last-writer-wins 경합이 구조적으로 해소.
 - **배타 표시**: store가 채널 원본 2개 + 활성 1개(`overlaySource`) — 토글은 배타 전환, 자동 활성은 `generatedAt` 최신. 모든 뷰(구조/계층/도메인)는 활성 집합만 읽으므로 기존 배지·칩·fade가 두 채널에 그대로 작동하고, 라벨만 `overlaySource` 구독으로 전환. locale 7파일에 `impactToggle`·`toggleImpact` 키 추가.
 - **마이그레이션**: ≤0.8.0의 예측이 diff-overlay.json에 직접 쓴 잔재(`baseBranch:"ktds-impact"`)는 impact analyze 시 자동 제거(타 출처는 보존).

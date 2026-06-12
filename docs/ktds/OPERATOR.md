@@ -97,7 +97,7 @@ node ktds-legacy-plugin/scripts/understand-impact.mjs <projectRoot> status --lis
 - **자연어→시드 매핑은 host(Claude) 역할:** 엔진은 `--path` 파일만 받는다. 슬래시 사용 시 Claude가 `seeds` 카탈로그로 자연어를 후보 파일에 매핑하고 **✋사용자 확인 게이트**를 거친 뒤 `--path`로 실행한다(SKILL.md). `--path` 없이 호출하면 임의 분석을 하지 않고 카탈로그+안내만 낸다(fail-closed).
 - **산출:** `.spec/map/impact.json`(결정론, 동일 시드+commit byte-diff=0) + `impact-verify-report.json`(근거율) + `docs/09_release/change-impact-analysis.md`(읽기전용 — 5종과 달리 **검토·승인 상태기계 밖**, registerDraft 미호출) + `IMPACT_ANALYZED` 감사. 보고서에는 **영향 규모 집계**(도메인×상류/하류·언어×상류/하류 파일 수 — 공수 산정 입력, 도메인 귀속=슬라이스 ownership: 단일 도메인=해당 도메인 · 복수=`(공용)` · 미도달/확정 밖=`(미분류)`)가 포함된다.
 - **SR 보관 (`--sr <SR-ID>`):** 분석 사본(impact.json+verify+보고서)을 `.spec/impact/<SR-ID>/`에 보관 — 동시 다발 SR을 다루는 PL의 건별 이력. 같은 SR 재분석은 덮어씀(그 SR의 최신). `status --list`로 조회. SR ID는 영숫자 시작, 영숫자·점·하이픈·밑줄만(fail-closed). 보관본도 읽기전용 분석물이다(상태기계 밖).
-- **대시보드 시각화 (자동 — 예측 채널):** analyze가 KG(`.understand-anything/knowledge-graph.json`)가 있으면 **`.understand-anything/impact-overlay.json`(예측 전용 채널)**을 발행한다. `/understand-dashboard`의 **'영향도' 토글(`i` 키)** — 적색="시드" 배지, 호박색="영향" 배지, 재분석 후 새로고침:
+- **대시보드 시각화 (자동 — 예측 채널):** analyze가 KG(`.understand-anything/knowledge-graph.json`)가 있으면 **`.understand-anything/impact-overlay.json`(예측 전용 채널)**을 발행한다. `/understand-dashboard`의 **'영향도' 토글(`i` 키)** — 적색="변경예정" 배지, 호박색="영향받음" 배지, 재분석 후 새로고침:
   - **구조 뷰** — 노드 배지 + 무관 노드 흐림. **계층(첫 화면) 카드·폴더 컨테이너**에 개수 칩 + 적/호박 테두리(무관 계층 흐림) — 드릴인 없이 위치 식별.
   - **도메인 뷰** — 도메인/흐름 카드에 개수 칩, step에 배지(체인에 등장하는 파일만 — 도달 폐포 전체는 구조 뷰·보고서가 정본).
   - **Diff 토글(`d` 키)은 별개 채널** — 실측 비교(§2-3 /understand-review, 라벨 "변경됨/영향받음"). 두 토글은 배타적이고, 둘 다 데이터가 있으면 최신 분석이 자동 활성.

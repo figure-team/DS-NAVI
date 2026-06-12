@@ -139,8 +139,8 @@ export const ja = {
     hideOverlay: "影響オーバーレイを隠す",
     showOverlay: "影響オーバーレイを表示",
     noData: "影響分析が読み込まれていません",
-    seed: "シード",
-    affected: "影響",
+    seed: "変更予定",
+    affected: "影響あり",
   },
   learnPanel: {
     finish: "完了",

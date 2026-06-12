@@ -157,6 +157,6 @@ PL 실사용 피드백 2건으로 C안의 **가독성 부분만** 선행 채택:
 
 - `CustomNode.tsx`: 노드 헤더 배지 "변경됨"(적)/"영향받음"(호박) — 기존 `t.diffToggle` 라벨 재사용(6개 locale 자동).
 - `ContainerNode.tsx`: 변경/영향 **개수 칩** + 테두리 변경 포함=적/영향만=호박(기존: 단일 플래그·둘 다 적색).
-- `LayerClusterNode.tsx` + `GraphView.tsx`(useOverviewGraph): 계층 카드에 동일 칩·테두리 — `nodeIdToLayerId`로 changed/affected를 계층별 집계(searchMatchByLayer와 동일 패턴). 디테일 레벨 `diffContainers`는 Set→개수 Map.
+- `LayerClusterNode.tsx` + `GraphView.tsx`(useOverviewGraph): 계층 카드에 동일 칩·테두리 — `nodeIdToLayerId`로 changed/affected를 계층별 집계(searchMatchByLayer와 동일 패턴). 디테일 레벨 `diffContainers`는 Set→개수 Map. **diff 모드에서 변경/영향이 없는 계층은 흐림(`diff-faded`), 포함 계층은 적/호박 글로우** — 노드 fade와 동일한 시각 언어(글로우는 인라인 boxShadow 합성 — 클래스가 인라인에 덮이므로). 단 변경 파일이 어느 계층에도 안 속하면 전체 fade를 막기 위해 fade 미적용.
 
 여전히 미해소(완전 C안 영역): 시드/상류/하류 3색, minDepth 깊이, API/DB 영향 표·근거율 게이지 패널, 도메인/지식 뷰 표시. 변경 파일이 어느 계층에도 안 속하면 계층 칩에는 안 잡힌다(디테일 뷰에서는 보임).

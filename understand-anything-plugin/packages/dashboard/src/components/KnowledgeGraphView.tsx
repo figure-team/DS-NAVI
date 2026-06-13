@@ -94,7 +94,11 @@ function computeLayout(
 }
 
 function KnowledgeGraphViewInner() {
-  const graph = useDashboardStore((s) => s.graph);
+  // ktds-fork (ADR-004): "문서" 모드면 위키 그래프를, 아니면 메인(코드/knowledge) 그래프를 렌더.
+  const storeGraph = useDashboardStore((s) => s.graph);
+  const wikiGraph = useDashboardStore((s) => s.wikiGraph);
+  const viewMode = useDashboardStore((s) => s.viewMode);
+  const graph = viewMode === "wiki" && wikiGraph ? wikiGraph : storeGraph;
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const focusNodeId = useDashboardStore((s) => s.focusNodeId);
   const selectNode = useDashboardStore((s) => s.selectNode);

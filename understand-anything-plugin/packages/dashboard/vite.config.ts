@@ -252,6 +252,7 @@ export default defineConfig({
             pathname === "/domain-graph.json" ||
             pathname === "/diff-overlay.json" ||
             pathname === "/impact-overlay.json" || // ktds: 예측(영향도) 채널
+            pathname === "/wiki-graph.json" || // ktds: 세분화 위키 그래프(문서 토글, ADR-004)
             pathname === "/meta.json" ||
             pathname === "/config.json" ||
             pathname === "/file-content.json";
@@ -302,6 +303,8 @@ export default defineConfig({
               ? "meta.json"
               : pathname === "/domain-graph.json"
               ? "domain-graph.json"
+              : pathname === "/wiki-graph.json"
+              ? "wiki-graph.json" // ktds: 세분화 위키 그래프(ADR-004)
               : "knowledge-graph.json";
 
           const candidates = graphFileCandidates(fileName);

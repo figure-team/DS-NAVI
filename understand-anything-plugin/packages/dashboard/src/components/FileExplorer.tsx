@@ -87,12 +87,14 @@ function FileTreeRow({
   expanded,
   toggleFolder,
   openFile,
+  singleClickOpen, // ktds-fork (ADR-004): 문서 모드 단일 클릭 선택
 }: {
   entry: FileEntry;
   depth: number;
   expanded: Set<string>;
   toggleFolder: (path: string) => void;
   openFile: (nodeId: string) => void;
+  singleClickOpen: boolean;
 }) {
   const isExpanded = expanded.has(entry.path);
   const paddingLeft = 12 + depth * 14;
@@ -119,6 +121,7 @@ function FileTreeRow({
               expanded={expanded}
               toggleFolder={toggleFolder}
               openFile={openFile}
+              singleClickOpen={singleClickOpen}
             />
           ))}
       </>
@@ -128,10 +131,11 @@ function FileTreeRow({
   return (
     <button
       type="button"
+      onClick={singleClickOpen ? () => entry.nodeId && openFile(entry.nodeId) : undefined}
       onDoubleClick={() => entry.nodeId && openFile(entry.nodeId)}
       className="w-full flex items-center gap-1.5 py-1.5 pr-3 text-left text-xs text-text-secondary hover:text-accent hover:bg-accent/5 transition-colors"
       style={{ paddingLeft }}
-      title={`${entry.path} - double-click to open`}
+      title={singleClickOpen ? entry.path : `${entry.path} - double-click to open`}
     >
       <span className="w-3 text-text-muted">-</span>
       <span className="truncate font-mono">{entry.name}</span>
@@ -140,7 +144,11 @@ function FileTreeRow({
 }
 
 export default function FileExplorer() {
-  const graph = useDashboardStore((s) => s.graph);
+  // ktds-fork (ADR-004): "문서" 모드면 위키 문서 트리(feature/api/table)를 보인다.
+  const storeGraph = useDashboardStore((s) => s.graph);
+  const wikiGraph = useDashboardStore((s) => s.wikiGraph);
+  const viewMode = useDashboardStore((s) => s.viewMode);
+  const graph = viewMode === "wiki" && wikiGraph ? wikiGraph : storeGraph;
   const openCodeViewer = useDashboardStore((s) => s.openCodeViewer);
   const navigateToNode = useDashboardStore((s) => s.navigateToNode);
   const { t } = useI18n();
@@ -149,10 +157,12 @@ export default function FileExplorer() {
 
   // Navigate the graph first (drills into layer + selects node, which clears the
   // code viewer), then re-open the viewer so the source panel stays visible.
+  // ktds-fork (ADR-004): 문서 모드는 노드 선택만(WikiReader가 본문 표시) — raw CodeViewer 미오픈.
   const handleOpenFile = (nodeId: string) => {
     navigateToNode(nodeId);
-    openCodeViewer(nodeId);
+    if (viewMode !== "wiki") openCodeViewer(nodeId);
   };
+  const singleClickOpen = viewMode === "wiki"; // 문서 모드: 단일 클릭으로 선택
 
   const toggleFolder = (folderPath: string) => {
     setExpanded((current) => {
@@ -205,6 +215,7 @@ export default function FileExplorer() {
               expanded={expanded}
               toggleFolder={toggleFolder}
               openFile={handleOpenFile}
+              singleClickOpen={singleClickOpen}
             />
           ))
         )}

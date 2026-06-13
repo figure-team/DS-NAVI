@@ -5,6 +5,7 @@ import { useDashboardStore } from "./store";
 import GraphView from "./components/GraphView";
 import DomainGraphView from "./components/DomainGraphView";
 import KnowledgeGraphView from "./components/KnowledgeGraphView";
+import WikiReader from "./components/WikiReader"; // ktds-fork (ADR-004): 문서 모드 리더
 import SearchBar from "./components/SearchBar";
 import NodeInfo from "./components/NodeInfo";
 import LayerLegend from "./components/LayerLegend";
@@ -109,6 +110,7 @@ function App() {
 function Dashboard({ accessToken }: { accessToken: string }) {
   const setGraph = useDashboardStore((s) => s.setGraph);
   const setDomainGraph = useDashboardStore((s) => s.setDomainGraph);
+  const setWikiGraph = useDashboardStore((s) => s.setWikiGraph); // ktds-fork (ADR-004)
   const setOverlayData = useDashboardStore((s) => s.setOverlayData);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [graphIssues, setGraphIssues] = useState<GraphIssue[]>([]);
@@ -216,6 +218,22 @@ function Dashboard({ accessToken }: { accessToken: string }) {
       .catch(() => {});
   }, [setDomainGraph]);
 
+  // ktds-fork (ADR-004): 세분화 위키 그래프 로드 → "문서" 토글 소스. 없으면 토글 미표시.
+  useEffect(() => {
+    fetch(dataUrl("wiki-graph.json", accessToken))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: unknown) => {
+        if (!data) return;
+        const result = validateGraph(data);
+        if (result.success && result.data) {
+          setWikiGraph(result.data);
+        } else if (result.fatal) {
+          console.warn(`[wiki-graph] validation failed: ${result.fatal}`);
+        }
+      })
+      .catch(() => {});
+  }, [setWikiGraph]);
+
   return (
     <I18nProvider language={outputLanguage ?? "en"}>
       <ThemeProvider metaTheme={metaTheme}>
@@ -267,6 +285,7 @@ function DashboardContent({
   const setViewMode = useDashboardStore((s) => s.setViewMode);
   const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
+  const wikiGraph = useDashboardStore((s) => s.wikiGraph); // ktds-fork (ADR-004)
   const layoutIssues = useDashboardStore((s) => s.layoutIssues);
   const isMobile = useIsMobile();
   const { t } = useI18n();
@@ -359,6 +378,7 @@ function DashboardContent({
         description: t.keyboardShortcuts.toggleDiff,
         action: () => {
           const state = useDashboardStore.getState();
+          if (state.viewMode === "wiki") return; // ktds-fork (ADR-004): 문서 모드는 오버레이 비해당
           state.toggleOverlay("diff");
         },
         category: "View",
@@ -368,6 +388,7 @@ function DashboardContent({
         description: t.keyboardShortcuts.toggleImpact,
         action: () => {
           const state = useDashboardStore.getState();
+          if (state.viewMode === "wiki") return; // ktds-fork (ADR-004): 문서 모드는 오버레이 비해당
           state.toggleOverlay("impact");
         },
         category: "View",
@@ -470,22 +491,12 @@ function DashboardContent({
           </h1>
           <div className="w-px h-5 bg-border-subtle hidden sm:block" />
           <PersonaSelector />
-          {graph && !isKnowledgeGraph && domainGraph && (
+          {/* ktds-fork (ADR-004): 코드/도메인 토글에 "문서"(세분화 위키) 추가. wikiGraph 또는
+              domainGraph가 있을 때 토글 그룹 표시(둘 중 하나만 있어도 코드↔해당 전환). */}
+          {graph && !isKnowledgeGraph && (domainGraph || wikiGraph) && (
             <>
               <div className="w-px h-5 bg-border-subtle" />
               <div className="flex items-center bg-elevated rounded-lg p-0.5">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("domain")}
-                  title={t.drawer.domain}
-                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                    viewMode === "domain"
-                      ? "bg-accent/20 text-accent"
-                      : "text-text-muted hover:text-text-secondary"
-                  }`}
-                >
-                  {t.drawer.domain}
-                </button>
                 <button
                   type="button"
                   onClick={() => setViewMode("structural")}
@@ -498,13 +509,44 @@ function DashboardContent({
                 >
                   {t.drawer.structural}
                 </button>
+                {domainGraph && (
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("domain")}
+                    title={t.drawer.domain}
+                    className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                      viewMode === "domain"
+                        ? "bg-accent/20 text-accent"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                  >
+                    {t.drawer.domain}
+                  </button>
+                )}
+                {wikiGraph && (
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("wiki")}
+                    title="세분화 위키 문서"
+                    className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                      viewMode === "wiki"
+                        ? "bg-accent/20 text-accent"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                  >
+                    문서
+                  </button>
+                )}
               </div>
             </>
           )}
         </div>
 
         {/* Middle — scrollable legends */}
+        {/* ktds-fork (ADR-004): "문서"(wiki) 모드는 헤더 범례·레이어 전부 숨김(flex-1 스페이서만 유지) */}
         <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+          {/* ktds-fork (ADR-004): 문서 모드는 이 블록 전체를 숨김(아래 개별 가드 불필요) */}
+          {viewMode !== "wiki" && (
           <div className="flex items-center gap-4 w-max">
             <DiffToggle />
             {/* Detail level: file view (architecture) / class view (code structure) */}
@@ -588,6 +630,7 @@ function DashboardContent({
             </div>
             <LayerLegend />
           </div>
+          )}
         </div>
 
         {/* Right — fixed actions */}
@@ -658,6 +701,9 @@ function DashboardContent({
         <div className="flex-1 min-w-0 min-h-0 relative">
           {viewMode === "knowledge" ? (
             <KnowledgeGraphView />
+          ) : /* ktds-fork (ADR-004): "문서" 모드 = 그래프 대신 문서 리더(메타+전체 본문) */
+          viewMode === "wiki" && wikiGraph ? (
+            <WikiReader />
           ) : viewMode === "domain" && domainGraph ? (
             <DomainGraphView />
           ) : (
@@ -669,8 +715,20 @@ function DashboardContent({
         </div>
 
         {/* Right sidebar — telescopes at narrower widths */}
+        {/* ktds-fork (ADR-004): "문서" 모드 사이드바 = 폴더 트리(네비게이션). 정보는 메인 리더로. */}
         <aside className="w-[260px] md:w-[300px] lg:w-[360px] shrink-0 bg-surface border-l border-border-subtle overflow-auto">
-          {sidebarContent}
+          {viewMode === "wiki" && wikiGraph ? (
+            <div className="h-full flex flex-col min-h-0">
+              <div className="flex items-center px-3 py-2 border-b border-border-subtle bg-surface shrink-0 text-xs font-semibold uppercase tracking-wider text-text-muted">
+                문서 폴더
+              </div>
+              <div className="flex-1 min-h-0 overflow-auto">
+                <FileExplorer />
+              </div>
+            </div>
+          ) : (
+            sidebarContent
+          )}
         </aside>
 
         {/* Code viewer slide-up overlay (collapsed state) */}

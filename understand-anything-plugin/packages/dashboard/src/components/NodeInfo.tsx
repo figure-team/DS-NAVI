@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown"; // ktds-fork: knowledge 노트 본문 마크다운 렌더 (ADR-004 ID9)
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
 import type { NodeType, EdgeType, KnowledgeGraph, GraphNode } from "@understand-anything/core/types";
@@ -123,11 +124,34 @@ function KnowledgeNodeDetails({ node, graph }: { node: GraphNode; graph: Knowled
       {meta?.content && (
         <div>
           <h4 className="text-[10px] uppercase tracking-wider text-text-muted mb-1">{t.common.preview}</h4>
-          <div className="text-[11px] text-text-secondary leading-relaxed bg-elevated rounded-lg p-3 max-h-[300px] overflow-auto whitespace-pre-wrap font-mono">
-            {meta.content.slice(0, 1500)}
-            {meta.content.length > 1500 && (
-              <span className="text-text-muted">... {t.common.truncated}</span>
-            )}
+          {/* ktds-fork (ADR-004 ID9): raw font-mono 미리보기 → 마크다운 렌더 + 전체 본문(1500자 캡 제거).
+              ktds knowledge-graph.json은 knowledgeMeta.content에 노트 전체 본문을 담는다(U-A 파서 text[:3000] 미경유). */}
+          <div className="text-[11px] text-text-secondary leading-relaxed bg-elevated rounded-lg p-3 max-h-[420px] overflow-auto tour-markdown">
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => <h1 className="text-[13px] font-semibold text-text-primary mb-1.5">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-[12px] font-semibold text-text-primary mt-2 mb-1">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-[11px] font-semibold text-text-primary mt-1.5 mb-1">{children}</h3>,
+                p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
+                strong: ({ children }) => <strong className="font-semibold text-text-primary">{children}</strong>,
+                // 본문 내 링크는 의도적으로 비활성(span) — 노트 간 이동은 위 위키링크/백링크(related 엣지)
+                // 버튼으로만 한다. 미리보기 패널에서 임의 외부 URL 클릭을 막는다(ktds-fork).
+                a: ({ children }) => <span className="text-accent">{children}</span>,
+                blockquote: ({ children }) => <blockquote className="border-l-2 border-border pl-2 text-text-muted">{children}</blockquote>,
+                code: ({ className, children }) => {
+                  const isBlock = className?.includes("language-");
+                  return isBlock ? (
+                    <code className="block bg-base rounded px-2 py-1.5 mb-1.5 overflow-x-auto text-[11px] leading-relaxed">{children}</code>
+                  ) : (
+                    <code className="bg-base rounded px-1 py-0.5 text-[11px]">{children}</code>
+                  );
+                },
+                ul: ({ children }) => <ul className="list-disc list-inside mb-1.5 space-y-0.5">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-inside mb-1.5 space-y-0.5">{children}</ol>,
+              }}
+            >
+              {meta.content}
+            </ReactMarkdown>
           </div>
         </div>
       )}
@@ -271,8 +295,15 @@ export default function NodeInfo() {
   const focusNodeId = useDashboardStore((s) => s.focusNodeId);
   const viewMode = useDashboardStore((s) => s.viewMode);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
+  const wikiGraph = useDashboardStore((s) => s.wikiGraph); // ktds-fork (ADR-004)
 
-  const activeGraph = viewMode === "domain" && domainGraph ? domainGraph : graph;
+  // ktds-fork (ADR-004): "문서" 모드면 위키 그래프에서 노드 조회(본문·위키링크·백링크).
+  const activeGraph =
+    viewMode === "wiki" && wikiGraph
+      ? wikiGraph
+      : viewMode === "domain" && domainGraph
+      ? domainGraph
+      : graph;
   const node = activeGraph?.nodes.find((n) => n.id === selectedNodeId) ?? null;
 
   // Resolve history node names for the breadcrumb trail

@@ -14,7 +14,8 @@ export type NavigationLevel = "overview" | "layer-detail";
 export type NodeType = "file" | "function" | "class" | "module" | "concept" | "config" | "document" | "service" | "table" | "endpoint" | "pipeline" | "schema" | "resource" | "domain" | "flow" | "step" | "article" | "entity" | "topic" | "claim" | "source";
 export type Complexity = "simple" | "moderate" | "complex";
 export type EdgeCategory = "structural" | "behavioral" | "data-flow" | "dependencies" | "semantic" | "infrastructure" | "domain" | "knowledge";
-export type ViewMode = "structural" | "domain" | "knowledge";
+// ktds-fork (ADR-004): "wiki" = 코드그래프 위에 세분화 위키를 "문서" 토글로 오버레이.
+export type ViewMode = "structural" | "domain" | "knowledge" | "wiki";
 export type DetailLevel = "file" | "class";
 
 export interface FilterState {
@@ -209,9 +210,12 @@ interface DashboardStore {
   viewMode: ViewMode;
   isKnowledgeGraph: boolean;
   domainGraph: KnowledgeGraph | null;
+  /** ktds-fork (ADR-004): 세분화 위키 그래프(별도 wiki-graph.json). "문서" 토글 소스. */
+  wikiGraph: KnowledgeGraph | null;
   activeDomainId: string | null;
 
   setDomainGraph: (graph: KnowledgeGraph) => void;
+  setWikiGraph: (graph: KnowledgeGraph) => void; // ktds-fork (ADR-004)
   setViewMode: (mode: ViewMode) => void;
   setIsKnowledgeGraph: (value: boolean) => void;
   navigateToDomain: (domainId: string) => void;
@@ -724,10 +728,15 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   viewMode: "structural",
   isKnowledgeGraph: false,
   domainGraph: null,
+  wikiGraph: null, // ktds-fork (ADR-004)
   activeDomainId: null,
 
   setDomainGraph: (graph) => {
     set({ domainGraph: graph });
+  },
+
+  setWikiGraph: (graph) => { // ktds-fork (ADR-004)
+    set({ wikiGraph: graph });
   },
 
   setIsKnowledgeGraph: (value) => {

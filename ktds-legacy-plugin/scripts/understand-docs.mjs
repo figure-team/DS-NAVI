@@ -1,6 +1,10 @@
 #!/usr/bin/env node
-// /understand-docs — 근거 기반 5종 문서 생성 + 검토/승인/감사.
-//   생성:   node understand-docs.mjs <projectRoot> [runId]
+// /understand-docs — 근거 기반 5종 문서 생성 + 세분화 위키 + 검토/승인/감사.
+//   생성:   node understand-docs.mjs <projectRoot> [runId] [--steps] [--no-wiki]
+//             기본 = 5종 + 위키(4계층: domain/flow/endpoint/table). --steps로 step 포함,
+//             --no-wiki로 순수 5종(위키 도입 전과 바이트 동일).
+//   위키:   node understand-docs.mjs <projectRoot> wiki [--steps]   (5종 위에 위키만 재생성/갱신)
+//           node understand-docs.mjs <projectRoot> wiki status       (위키 산출 상태 조회)
 //   검토:   node understand-docs.mjs <projectRoot> review --list
 //           node understand-docs.mjs <projectRoot> review --doc <file> [--by <handle>]   (TTY면 [추정]·[확정(AI)] 인터랙티브 확정)
 //   확정:   node understand-docs.mjs <projectRoot> confirm --doc <file>                            (TTY: 항목 골라 확정 세션; 비-TTY: 목록+안내만)
@@ -22,9 +26,10 @@ process.stdout.on("error", (e) => { if (e.code === "EPIPE") process.exit(0); });
 const {
   runDocsPipeline, listDrafts, startReview, approveDoc, returnDoc,
   readAudit, getDocState, listConfirmableItems, confirmLine,
+  generateWiki, loadProjectGraph,
 } = await import(await ensureBuilt());
 
-const SUBS = ["review", "approve", "return", "audit", "confirm"];
+const SUBS = ["review", "approve", "return", "audit", "confirm", "wiki"];
 // 확정 대상의 현재 신뢰도 → 표시 태그 (engine ConfirmableItem.from).
 const TAGLABEL = { INFERRED: "[추정]", CONFIRMED_AI: "[확정(AI)]", NEEDS_REVIEW: "[확인 필요]" };
 
@@ -43,6 +48,16 @@ const flag = (n) => { const i = rest.indexOf(n); return i >= 0 ? rest[i + 1] : u
 const has = (n) => rest.includes(n);
 const spec = join(root, ".spec");
 const docDir = join(root, "docs");
+
+// 위키 graph/meta 타임스탬프는 **입력 KG의 project.analyzedAt**에서 가져온다(wall-clock 금지)
+// — 같은 입력 → 같은 산출(byte-diff=0, 재실행 멱등). 없으면 "".
+async function sourceStamp() {
+  const { readFile } = await import("node:fs/promises");
+  try {
+    const kg = JSON.parse(await readFile(join(root, ".understand-anything", "knowledge-graph.json"), "utf-8"));
+    return typeof kg?.project?.analyzedAt === "string" ? kg.project.analyzedAt : "";
+  } catch { return ""; }
+}
 
 // confirm 진입 편의: DRAFT면 자동으로 검토 시작(DRAFT→UNDER_REVIEW, 감사 남김) 후
 // 확정으로 이어간다. 그 외 상태(UNDER_REVIEW 통과, RETURNED/APPROVED 차단)는
@@ -210,11 +225,55 @@ try {
     for (const e of events) {
       console.log(`  ${e.ts}  ${e.type}${e.doc ? " · " + e.doc : ""}${e.by ? " · by " + e.by : ""}`);
     }
+  } else if (sub === "wiki") {
+    // 위키만 재생성/갱신 (5종은 건드리지 않음 — 멱등). status는 산출 상태 조회.
+    if (rest[1] === "status") {
+      const kgPath = join(root, ".understand-anything", "wiki-graph.json");
+      const metaPath = join(root, ".understand-anything", "wiki-meta.json");
+      const { readFile } = await import("node:fs/promises");
+      try {
+        const meta = JSON.parse(await readFile(metaPath, "utf-8"));
+        console.log(`위키 상태: 노트 ${meta.noteCount}건 · step ${meta.includeSteps ? "포함" : "제외"}${meta.generatedAt ? ` · ${meta.generatedAt}` : ""}`);
+        console.log(`  graph: ${kgPath}`);
+        console.log(`  대시보드: GRAPH_DIR=${root} 로 U-A dev 서버 기동 → 상단 "문서" 토글`);
+      } catch (e) {
+        if (e.code === "ENOENT") console.log("위키 미생성 — understand-docs.mjs <root> wiki 로 생성하세요.");
+        else throw e;
+      }
+    } else {
+      const graph = await loadProjectGraph(root);
+      const stamp = await sourceStamp();
+      const res = await generateWiki(root, graph, {
+        includeSteps: has("--steps"),
+        runId: `wiki-${Date.now()}`,
+        analyzedAt: stamp,
+        generatedAt: stamp,
+      });
+      console.log(`위키 생성: 노트 ${res.noteCount}건 · 허브 ${res.hubsInjected.length} 주입 · ${res.graphPath}`);
+      if (res.unresolvedEndpoints.length) {
+        console.log(`  [확인 필요] 소유 기능 미상 엔드포인트 ${res.unresolvedEndpoints.length}건: ${res.unresolvedEndpoints.slice(0, 3).join(", ")}${res.unresolvedEndpoints.length > 3 ? "…" : ""}`);
+      }
+      console.log(`  대시보드: GRAPH_DIR=${root} 로 U-A dev 서버 기동 → 코드 그래프와 같은 화면 상단 "문서" 토글 (옵시디언은 docs/ 폴더를 vault로)`);
+    }
   } else {
+    // 기본 = 5종 + 위키(4계층). --no-wiki=순수 5종, --steps=step 포함.
     const runId = rest[0] && !rest[0].startsWith("-") ? rest[0] : `run-${Date.now()}`;
     const res = await runDocsPipeline(root, { runId });
     console.log(`DRAFT 생성: ${res.published.join(", ")}`);
-    console.log(`→ ${res.docsDir} · 검토: understand-docs.mjs ${root} review --list`);
+    if (has("--no-wiki")) {
+      console.log(`→ ${res.docsDir} (순수 5종, --no-wiki) · 검토: understand-docs.mjs ${root} review --list`);
+    } else {
+      const stamp = await sourceStamp();
+      const wiki = await generateWiki(root, res.graph, {
+        includeSteps: has("--steps"),
+        runId: `${runId}-wiki`,
+        analyzedAt: stamp,
+        generatedAt: stamp,
+      });
+      console.log(`위키 생성: 노트 ${wiki.noteCount}건${has("--steps") ? " (step 포함)" : ""} · 허브 ${wiki.hubsInjected.length} 주입`);
+      console.log(`→ ${res.docsDir} · 검토: understand-docs.mjs ${root} review --list`);
+      console.log(`  대시보드: GRAPH_DIR=${root} 로 U-A dev 서버 기동 → 상단 "문서" 토글`);
+    }
   }
 } catch (err) {
   console.error(`오류: ${err.message}`);

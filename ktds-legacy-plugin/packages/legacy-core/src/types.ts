@@ -142,7 +142,9 @@ export type AuditEventType =
   /** /understand-impact 변경 영향도 분석 실행 (Stage-19, ADR-002). */
   | "IMPACT_ANALYZED"
   /** /understand-review 변경분 실측 리뷰 실행 (Stage-21, ADR-002 부록 B). */
-  | "REVIEW_ANALYZED";
+  | "REVIEW_ANALYZED"
+  /** /understand-docs wiki 세분화 노트 vault 발행 (Stage-22, ADR-004 — 감사 전용, doc-state 상태 추적 아님). */
+  | "WIKI_GENERATED";
 
 export interface AuditEvent {
   /** ISO timestamp. */

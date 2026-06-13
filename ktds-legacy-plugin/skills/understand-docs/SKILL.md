@@ -1,7 +1,7 @@
 ---
 name: understand-docs
-description: 근거 기반 5종 문서 생성(기술스택/아키텍처/기능명세/API명세/DB명세) + 검토/승인/감사
-argument-hint: ["[projectRoot]", "[review --list | review --doc <f> | confirm --doc <f> --list | confirm --doc <f> --item <n> --by <handle> | approve --doc <f> --by <handle> | return --doc <f> | audit --list]"]
+description: 근거 기반 5종 문서 생성(기술스택/아키텍처/기능명세/API명세/DB명세) + 세분화 위키(옵시디언/대시보드) + 검토/승인/감사
+argument-hint: ["[projectRoot]", "[--steps | --no-wiki | wiki [--steps] | wiki status | review --list | review --doc <f> | confirm --doc <f> --item <n> --by <handle> | approve --doc <f> --by <handle> | return --doc <f> | audit --list]"]
 ---
 
 # /understand-docs
@@ -13,9 +13,25 @@ argument-hint: ["[projectRoot]", "[review --list | review --doc <f> | confirm --
 
 ## 생성 (결정론 skeleton)
 ```
-node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId>
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId>            # 기본 = 5종 + 위키(4계층)
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId> --steps    # + step 계층
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId> --no-wiki   # 순수 5종(위키 도입 전과 바이트 동일)
 ```
 이 스크립트는 **결정론 skeleton(근거·태그·구조)** 만 만든다. (최초 실행 시 엔진 자동 빌드 1회)
+
+## 세분화 위키 (ADR-004 — 기본 동작, 옵시디언/대시보드)
+**기본으로 5종과 함께** domain/flow/endpoint/table 4계층의 세분화 노트를 생성한다(`docs/feature`·`docs/api`·`docs/table`/*.md), 각 노트는 frontmatter + 근거 claim(5종과 동일 태그·cite) + `[[위키링크]]` 관계. `docs/index.md`(옵시디언 진입) + 5 허브(`docs/0N.md`)에 "세분화 항목" 링크섹션을 멱등 주입 + **대시보드용 `docs/.understand-anything/knowledge-graph.json`을 결정론으로 직접 emit**(U-A 파서/LLM 미사용, 전체 본문 포함). 5종은 `docs/0N.md` 위치 불변(상태키 보존), 대시보드에선 "00_개요" layer로 묶여 맨 위 표시.
+- `--steps` → step 계층 포함(폭증 구간이라 기본 제외, 명시적으로만). 비-TTY(슬래시)에서도 `--steps` 명시했을 때만 포함.
+- `--no-wiki` → 순수 5종만(루트 0N.md, 링크섹션 없음). 위키 도입 전과 **바이트 동일**.
+- `wiki [--steps]` 서브커맨드 → 5종은 건드리지 않고 **위키만 재생성/갱신**(멱등). `wiki status` → 노트 수·step 포함 여부·graph 경로.
+
+### 노트 산문 주입 (host = 너의 역할, 선택)
+세분화 노트도 5종과 같은 계약으로 산문을 채울 수 있다 — 각 노트의 claim 목록만 근거로, 근거(`파일:라인`) 밖 단정·환각 금지, `[추정]`/`[확인 필요]`는 추정 명시, 한국어. (산문 미주입 시 skeleton 그대로도 유효 — 근거·관계는 이미 채워짐.)
+
+### 읽기 동선 (주 뷰어 = U-A 웹 대시보드)
+1. **대시보드 기동**: U-A dev 서버를 `GRAPH_DIR=<projectRoot>/docs` 로 띄운다 → knowledge 뷰가 `docs/.understand-anything/knowledge-graph.json`을 로드.
+2. **읽기**: 노드 클릭 → **Info 탭**(NodeInfo)에서 위키링크/백링크 + 본문 마크다운(전체) 렌더. **Files 탭**은 폴더 트리 탐색(feature/api/table/00_개요).
+3. **옵시디언(선택)**: `docs/` 폴더를 vault로 직접 열면 같은 Karpathy 포맷이라 그래프·백링크·로컬그래프가 그대로 동작(별도 앱, 작업 0).
 
 ## LLM 산문 (이 단계는 host CLI = 너의 역할)
 생성된 `docs/**/*.md` 의 각 섹션에 대해, **그 섹션의 claim 목록만 근거로** 자연스러운 설명 산문을 작성해 채운다. 규칙:

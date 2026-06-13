@@ -1,8 +1,10 @@
-import type {
-  CanonicalGraph, CanonicalNode, CanonicalEdge, Claim, DocSection, Evidence, GeneratedDoc, ProjectMeta,
-} from "../types.js";
-import { CONFIDENCE_TAG, CLAIMS_FENCE_OPEN, CLAIMS_FENCE_CLOSE } from "../types.js";
-import { NEEDS_REVIEW_MARKER } from "../domain-map/emit.js";
+import type { CanonicalGraph, Claim, GeneratedDoc } from "../types.js";
+import { CLAIMS_FENCE_OPEN, CLAIMS_FENCE_CLOSE } from "../types.js";
+// claim 헬퍼는 claims.ts로 추출(ADR-004 ID11/T1) — wiki와 공유, 중복 구현 금지.
+import {
+  nodesOfKind, edgesOfType, edgeClaim, claimForNode, inferredClaim,
+  configClaim, domainMetaClaims, summaryEvidence, renderClaim,
+} from "./claims.js";
 
 /**
  * doc-generator (plan §3.2 / §2.3): 5종 근거 문서 생성.
@@ -23,54 +25,6 @@ export type ProseProvider = (req: ProseRequest) => Promise<string>;
 
 /** 산문 없음(skeleton-only) — 결정론 테스트/저비용 실행용 기본값. */
 export const nullProseProvider: ProseProvider = async () => "";
-
-// ── helpers ─────────────────────────────────────────────────────────────────
-const byUid = (a: CanonicalNode, b: CanonicalNode) => (a.uid < b.uid ? -1 : a.uid > b.uid ? 1 : 0);
-
-/** Total order over edges by (source, target, type) — returns 0 on ties (A2/A11 determinism). */
-const cmpEdge = (a: CanonicalEdge, b: CanonicalEdge): number =>
-  a.sourceUid < b.sourceUid ? -1 : a.sourceUid > b.sourceUid ? 1 :
-  a.targetUid < b.targetUid ? -1 : a.targetUid > b.targetUid ? 1 :
-  a.type < b.type ? -1 : a.type > b.type ? 1 : 0;
-
-function nodesOfKind(graph: CanonicalGraph, ...kinds: string[]): CanonicalNode[] {
-  const set = new Set(kinds);
-  return graph.nodes.filter((n) => set.has(n.kind)).sort(byUid);
-}
-function edgesOfType(graph: CanonicalGraph, ...types: string[]): CanonicalEdge[] {
-  const set = new Set(types);
-  return graph.edges.filter((e) => set.has(e.type)).sort(cmpEdge);
-}
-
-/** Edge → claim carrying the SOURCE node's evidence when available. */
-function edgeClaim(graph: CanonicalGraph, e: CanonicalEdge, text: string): Claim {
-  const src = graph.nodes.find((n) => n.uid === e.sourceUid);
-  return src ? claimForNode(src, text) : inferredClaim(text);
-}
-
-/** Node-backed claim → CONFIRMED_AI(근거 있음) / INFERRED(근거 없음). */
-function claimForNode(node: CanonicalNode, text: string): Claim {
-  const ev = node.evidence;
-  // CONFIRMED_AI only with real path evidence (A5); ev narrows to non-undefined here.
-  return ev?.path
-    ? { claim: text, confidence: "CONFIRMED_AI", evidence: [ev], requires_human_review: false }
-    : { claim: text, confidence: "INFERRED", evidence: [], requires_human_review: true };
-}
-/** Project/layer-derived claim → INFERRED(파일 근거 없음, 검토 권장). */
-function inferredClaim(text: string): Claim {
-  return { claim: text, confidence: "INFERRED", evidence: [], requires_human_review: true };
-}
-
-/**
- * 언어/프레임워크 claim — build/config 파일(pom.xml 등)을 근거로 인용하면 CONFIRMED_AI
- * (§5.2 파일 경로만 있어도 허용). configFiles 없으면 INFERRED로 격하.
- */
-function configClaim(project: ProjectMeta, text: string): Claim {
-  const path = project.configFiles[0];
-  return path
-    ? { claim: text, confidence: "CONFIRMED_AI", evidence: [{ path }], requires_human_review: false }
-    : inferredClaim(text);
-}
 
 // ── 순환 의존 탐지 (02_architecture) ─────────────────────────────────────────
 /** depends_on + imports 엣지에서 사이클에 속한 uid 집합을 결정론적으로 반환. */
@@ -142,69 +96,6 @@ export function buildArchitecture(graph: CanonicalGraph): GeneratedDoc {
   };
 }
 
-// domainMeta의 항목(entities/businessRules/crossDomainInteractions)을 claim으로
-// 렌더 (Stage-18.1 — 이전엔 name/summary만 소비, 리뷰 B-1). 근거는 /understand-map이
-// domainMeta.ktdsClaims(passthrough)에 동봉한 파일:라인 인용에서 가져온다:
-//   인용 있음 → CONFIRMED_AI / 없음 → INFERRED /
-//   기계 검증 강등 마커("[확인 필요] " 접두) → NEEDS_REVIEW (마커는 떼고
-//   CONFIDENCE_TAG 렌더가 다시 붙인다 — 이중 표기 방지)
-function domainMetaClaims(n: CanonicalNode): Claim[] {
-  const meta = n.domainMeta;
-  if (!meta) return [];
-  // (kind, text) 복합 키 — 종류가 다른 항목이 같은 텍스트를 가져도 근거가
-  // 섞이지 않는다(리뷰 반영).
-  const evidenceByKey = new Map<string, Evidence[]>();
-  if (Array.isArray(meta.ktdsClaims)) {
-    for (const c of meta.ktdsClaims as Array<Record<string, unknown>>) {
-      if (typeof c?.text === "string" && typeof c?.kind === "string" && Array.isArray(c.citations)) {
-        const ev = (c.citations as Array<Record<string, unknown>>)
-          .filter((x) => typeof x?.filePath === "string")
-          .map((x) => ({ path: x.filePath as string, line: x.line as number | undefined }));
-        const key = `${c.kind} ${c.text}`;
-        if (ev.length > 0 && !evidenceByKey.has(key)) evidenceByKey.set(key, ev);
-      }
-    }
-  }
-  const out: Claim[] = [];
-  for (const [field, kind, label] of [
-    ["entities", "entity", "엔터티"],
-    ["businessRules", "businessRule", "업무 규칙"],
-    ["crossDomainInteractions", "crossDomain", "도메인 간 상호작용"],
-  ] as const) {
-    const items = meta[field];
-    if (!Array.isArray(items)) continue;
-    for (const raw of items) {
-      if (typeof raw !== "string" || raw.length === 0) continue;
-      const demoted = raw.startsWith(NEEDS_REVIEW_MARKER);
-      const text = demoted ? raw.slice(NEEDS_REVIEW_MARKER.length) : raw;
-      const evidence = evidenceByKey.get(`${kind} ${text}`) ?? [];
-      const claimText = `${n.name} ${label}: ${text}`;
-      if (demoted) {
-        out.push({ claim: claimText, confidence: "NEEDS_REVIEW", evidence, requires_human_review: true });
-      } else if (evidence.length > 0) {
-        out.push({ claim: claimText, confidence: "CONFIRMED_AI", evidence, requires_human_review: false });
-      } else {
-        out.push({ claim: claimText, confidence: "INFERRED", evidence: [], requires_human_review: true });
-      }
-    }
-  }
-  return out;
-}
-
-/** domainMeta.ktdsClaims에서 summary 인용 → Evidence[] (없으면 []). */
-function summaryEvidence(n: CanonicalNode): Evidence[] {
-  const claims = n.domainMeta?.ktdsClaims;
-  if (!Array.isArray(claims)) return [];
-  for (const c of claims as Array<Record<string, unknown>>) {
-    if (c?.kind === "summary" && Array.isArray(c.citations)) {
-      return (c.citations as Array<Record<string, unknown>>)
-        .filter((x) => typeof x?.filePath === "string")
-        .map((x) => ({ path: x.filePath as string, line: x.line as number | undefined }));
-    }
-  }
-  return [];
-}
-
 export function buildFeatureSpec(graph: CanonicalGraph): GeneratedDoc {
   const domainNodes = nodesOfKind(graph, "domain");
   // 도메인은 단일 파일 증거가 없지만(여러 파일의 묶음), /understand-map의
@@ -273,13 +164,6 @@ export function buildDbSpec(graph: CanonicalGraph): GeneratedDoc {
 const BUILDERS = [buildTechStack, buildArchitecture, buildFeatureSpec, buildApiSpec, buildDbSpec];
 
 // ── 렌더링 (결정론) ──────────────────────────────────────────────────────────
-function renderClaim(c: Claim): string {
-  const tag = CONFIDENCE_TAG[c.confidence];
-  const ev = c.evidence[0];
-  const cite = ev ? ` — 근거: \`${ev.path}${ev.line != null ? ":" + ev.line : ""}\`` : "";
-  return `- ${tag} ${c.claim}${cite}`;
-}
-
 /** 발행 헤더 상태문 기본값 (5종 문서) — statusLine 미지정 시 골든 불변. */
 export const DEFAULT_STATUS_LINE = "상태: DRAFT · ktds doc-generator · 근거 기반 자동 생성";
 

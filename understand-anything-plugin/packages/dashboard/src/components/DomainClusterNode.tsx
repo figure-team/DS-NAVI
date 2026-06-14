@@ -2,7 +2,7 @@ import { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
 import { useDashboardStore } from "../store";
-import { useI18n } from "../contexts/I18nContext";
+import { useDiffLabels } from "../hooks/useDiffLabels";
 
 export interface DomainClusterData extends Record<string, unknown> {
   label: string;
@@ -11,7 +11,7 @@ export interface DomainClusterData extends Record<string, unknown> {
   flowCount: number;
   businessRules?: string[];
   domainId: string;
-  // ktds-fork: 도메인 내 변경/영향 파일 수 + 무관 도메인 흐림
+  // ktds-fork (ADR-003): 도메인 내 변경/영향 파일 수 + 무관 도메인 흐림
   diffChangedCount?: number;
   diffAffectedCount?: number;
   isDiffFaded?: boolean;
@@ -24,13 +24,10 @@ function DomainClusterNode({ data }: NodeProps<DomainClusterFlowNode>) {
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const selectNode = useDashboardStore((s) => s.selectNode);
   const isSelected = selectedNodeId === data.domainId;
-  const { t } = useI18n();
-  // ktds: 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
-  const overlaySource = useDashboardStore((s) => s.overlaySource);
-  const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
-  const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;
+  // ktds-fork (ADR-003): 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
+  const { lblChanged, lblAffected } = useDiffLabels();
 
-  // ktds-fork: 변경 포함=적, 영향만=호박 (테두리+글로우 — 계층 카드와 동일 시각 언어)
+  // ktds-fork (ADR-003): 변경 포함=적, 영향만=호박 (테두리+글로우 — 계층 카드와 동일 시각 언어)
   const diffChanged = data.diffChangedCount ?? 0;
   const diffAffected = data.diffAffectedCount ?? 0;
   const diffStyle =
@@ -58,7 +55,7 @@ function DomainClusterNode({ data }: NodeProps<DomainClusterFlowNode>) {
         <span className="font-heading text-sm text-accent font-semibold truncate">
           {data.label}
         </span>
-        {/* ktds-fork: 변경/영향 개수 칩 */}
+        {/* ktds-fork (ADR-003): 변경/영향 개수 칩 */}
         {diffChanged > 0 && (
           <span className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)]">
             {lblChanged} {diffChanged}

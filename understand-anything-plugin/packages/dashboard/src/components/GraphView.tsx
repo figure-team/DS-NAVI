@@ -53,6 +53,8 @@ import {
 import { deriveContainers } from "../utils/containers";
 import type { DerivedContainer } from "../utils/containers";
 import { computeLayerStats } from "../utils/layerStats";
+// ktds-fork (ADR-003): 흩어진 diff 집계 로직 통합
+import { useDiffByLayer, useDiffByContainer } from "../hooks/useDiffAggregation";
 
 const nodeTypes = {
   custom: CustomNode,
@@ -214,11 +216,11 @@ function useOverviewGraph() {
   const nodeIdToLayerId = useDashboardStore((s) => s.nodeIdToLayerId);
   const searchResults = useDashboardStore((s) => s.searchResults);
   const drillIntoLayer = useDashboardStore((s) => s.drillIntoLayer);
-  // ktds-fork: 오버뷰(계층) 수준 diff 집계 — 어느 계층에 변경/영향이 있는지
-  // 첫 화면에서 보이지 않아 전부 드릴인해야 한다는 PL 피드백
+  // ktds-fork (ADR-003): 오버뷰(계층) 수준 diff 집계 — 어느 계층에 변경/영향이 있는지
+  // 첫 화면에서 보이지 않아 전부 드릴인해야 한다는 PL 피드백. 계층별 변경/영향 수
+  // 집계는 useDiffByLayer 훅으로 이관(GraphView 흩어진 diff 로직 통합).
   const diffMode = useDashboardStore((s) => s.diffMode);
-  const changedNodeIds = useDashboardStore((s) => s.changedNodeIds);
-  const affectedNodeIds = useDashboardStore((s) => s.affectedNodeIds);
+  const diffByLayer = useDiffByLayer(nodeIdToLayerId);
 
   // Build cluster nodes / flow edges / dims synchronously; only the layout
   // call itself is async, so we memo the structural pieces and run ELK in an
@@ -245,19 +247,8 @@ function useOverviewGraph() {
       }
     }
 
-    // ktds-fork: 계층별 변경/영향 노드 수 (searchMatchByLayer와 동일 패턴)
-    const diffByLayer = new Map<string, { changed: number; affected: number }>();
-    if (diffMode) {
-      const bump = (id: string, key: "changed" | "affected") => {
-        const lid = nodeIdToLayerId.get(id);
-        if (!lid) return;
-        const e = diffByLayer.get(lid) ?? { changed: 0, affected: 0 };
-        e[key] += 1;
-        diffByLayer.set(lid, e);
-      };
-      for (const id of changedNodeIds) bump(id, "changed");
-      for (const id of affectedNodeIds) bump(id, "affected");
-    }
+    // ktds-fork (ADR-003): 계층별 변경/영향 노드 수는 useDiffByLayer 훅(위에서 호출)이
+    // 산출 — searchMatchByLayer와 동일 패턴이나 diff 집계 로직은 한 모듈로 통합.
 
     // Create cluster nodes. Per-layer aggregation goes through
     // `computeLayerStats`, which iterates `layer.nodeIds` against the
@@ -308,8 +299,8 @@ function useOverviewGraph() {
     }
 
     return { clusterNodes, flowEdges, dims };
-    // ktds-fork: diff 상태도 오버뷰 재계산 트리거
-  }, [graph, nodesById, nodeIdToLayerId, searchResults, drillIntoLayer, diffMode, changedNodeIds, affectedNodeIds]);
+    // ktds-fork (ADR-003): diff 상태도 오버뷰 재계산 트리거 — diffByLayer 맵(useDiffByLayer)
+  }, [graph, nodesById, nodeIdToLayerId, searchResults, drillIntoLayer, diffMode, diffByLayer]);
 
   const [overview, setOverview] = useState<{ nodes: Node[]; edges: Edge[] }>({
     nodes: [],
@@ -1056,22 +1047,10 @@ function useLayerDetailGraph() {
     return m;
   }, [searchResults, topo.nodeToContainer]);
 
-  // O(changed + affected) — per-container diff counts (ktds-fork: 변경/영향
-  // 구분+개수 — 단일 Set으로는 컨테이너가 무엇을 몇 개 품는지 안 보임).
-  const diffContainers = useMemo(() => {
-    const m = new Map<string, { changed: number; affected: number }>();
-    if (!diffMode) return m;
-    const bump = (id: string, key: "changed" | "affected") => {
-      const cid = topo.nodeToContainer.get(id);
-      if (!cid || cid === id) return;
-      const e = m.get(cid) ?? { changed: 0, affected: 0 };
-      e[key] += 1;
-      m.set(cid, e);
-    };
-    for (const id of changedNodeIds) bump(id, "changed");
-    for (const id of affectedNodeIds) bump(id, "affected");
-    return m;
-  }, [diffMode, changedNodeIds, affectedNodeIds, topo.nodeToContainer]);
+  // O(changed + affected) — per-container diff counts (ktds-fork (ADR-003): 변경/영향
+  // 구분+개수 — 단일 Set으로는 컨테이너가 무엇을 몇 개 품는지 안 보임). 집계 로직은
+  // useDiffByContainer 훅으로 이관(GraphView 흩어진 diff 로직 통합).
+  const diffContainers = useDiffByContainer(topo.nodeToContainer);
 
   // O(filteredEdges) — focus node's container + 1-hop neighbor containers.
   const focusContainerIds = useMemo(() => {

@@ -2,7 +2,7 @@ import { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
 import { useDashboardStore } from "../store";
-import { useI18n } from "../contexts/I18nContext";
+import { useDiffLabels } from "../hooks/useDiffLabels";
 
 export interface StepNodeData extends Record<string, unknown> {
   label: string;
@@ -10,7 +10,7 @@ export interface StepNodeData extends Record<string, unknown> {
   filePath?: string;
   stepId: string;
   order: number;
-  // ktds-fork: step 파일의 diff 상태 배지 + 무관 step 흐림
+  // ktds-fork (ADR-003): step 파일의 diff 상태 배지 + 무관 step 흐림
   diffStatus?: "changed" | "affected";
   isDiffFaded?: boolean;
 }
@@ -21,13 +21,10 @@ function StepNode({ data }: NodeProps<StepFlowNode>) {
   const selectNode = useDashboardStore((s) => s.selectNode);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const isSelected = selectedNodeId === data.stepId;
-  const { t } = useI18n();
-  // ktds: 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
-  const overlaySource = useDashboardStore((s) => s.overlaySource);
-  const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
-  const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;
+  // ktds-fork (ADR-003): 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
+  const { lblChanged, lblAffected } = useDiffLabels();
 
-  // ktds-fork: 변경=적, 영향=호박 (구조 뷰 노드 배지와 동일 시각 언어)
+  // ktds-fork (ADR-003): 변경=적, 영향=호박 (구조 뷰 노드 배지와 동일 시각 언어)
   const diffStyle =
     data.diffStatus === "changed"
       ? { borderColor: "var(--color-diff-changed)", boxShadow: "0 0 10px rgba(224, 82, 82, 0.3)" }
@@ -55,7 +52,7 @@ function StepNode({ data }: NodeProps<StepFlowNode>) {
         <span className="text-[11px] font-medium text-text-primary truncate">
           {data.label}
         </span>
-        {/* ktds-fork: 명시 배지 */}
+        {/* ktds-fork (ADR-003): 명시 배지 */}
         {data.diffStatus === "changed" && (
           <span className="ml-auto shrink-0 text-[8px] font-semibold px-1 py-px rounded whitespace-nowrap bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)]">
             {lblChanged}

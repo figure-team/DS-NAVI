@@ -3,7 +3,7 @@ import { Handle, Position } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { NodeType } from "@understand-anything/core/types";
 import { useI18n } from "../contexts/I18nContext";
-import { useDashboardStore } from "../store";
+import { useDiffLabels } from "../hooks/useDiffLabels";
 
 // Color maps keyed by NodeType — must be kept in sync with core NodeType union.
 const typeColors: Record<NodeType, string> = {
@@ -91,10 +91,8 @@ function CustomNodeComponent({
   const textColor = typeTextColors[knownType] ?? typeTextColors.file;
   const complexityColor = complexityColors[data.complexity] ?? complexityColors.simple;
   const { t } = useI18n();
-  // ktds: 활성 오버레이 채널에 맞는 배지 라벨 — diff="변경됨/영향받음", impact="변경예정/영향받음"
-  const overlaySource = useDashboardStore((s) => s.overlaySource);
-  const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
-  const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;
+  // ktds-fork (ADR-003): 활성 오버레이 채널에 맞는 배지 라벨 — diff="변경됨/영향받음", impact="변경예정/영향받음"
+  const { lblChanged, lblAffected } = useDiffLabels();
 
   if (import.meta.env.DEV && !(knownType in typeColors)) {
     console.warn(`[CustomNode] Unknown node type "${data.nodeType}" — using "file" colors`);

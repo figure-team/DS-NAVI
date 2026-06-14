@@ -38,7 +38,7 @@ interface BuiltGraph {
   dims: Map<string, { width: number; height: number }>;
 }
 
-// ktds-fork: 영향도(diff) 오버레이의 도메인 뷰 투영 — 변경/영향 "파일 경로" 집합.
+// ktds-fork (ADR-003): 영향도(diff) 오버레이의 도메인 뷰 투영 — 변경/영향 "파일 경로" 집합.
 // 오버레이의 노드 id는 KG(file:/config:) id라 도메인 그래프 id와 직접 매칭이
 // 안 되고, step/flow 노드의 filePath로 조인한다(둘 다 서버가 상대화해 서빙).
 interface DomainDiffSets {
@@ -58,7 +58,7 @@ function buildDomainOverview(graph: KnowledgeGraph, diff: DomainDiffSets | null)
     }
   }
 
-  // ktds-fork: 도메인별 변경/영향 파일 수 — 멤버 = 흐름 entry 파일 ∪ step 파일
+  // ktds-fork (ADR-003): 도메인별 변경/영향 파일 수 — 멤버 = 흐름 entry 파일 ∪ step 파일
   // (경로 단위 dedupe). 한 파일이 여러 도메인에 도달하면 각 도메인에 계상.
   let diffByDomain: Map<string, { changed: number; affected: number }> | null = null;
   if (diff) {
@@ -104,7 +104,7 @@ function buildDomainOverview(graph: KnowledgeGraph, diff: DomainDiffSets | null)
       flowCount: flowCountMap.get(node.id) ?? 0,
       businessRules: meta?.businessRules as string[] | undefined,
       domainId: node.id,
-      // ktds-fork: diff 칩 + 무관 도메인 흐림
+      // ktds-fork (ADR-003): diff 칩 + 무관 도메인 흐림
       diffChangedCount: diffByDomain?.get(node.id)?.changed,
       diffAffectedCount: diffByDomain?.get(node.id)?.affected,
       isDiffFaded: anyDomainDiff && !diffByDomain?.has(node.id),
@@ -169,7 +169,7 @@ function buildDomainDetail(
 
   const dims = new Map<string, { width: number; height: number }>();
 
-  // ktds-fork: step 파일 경로 ↔ 변경/영향 집합 조인. 흐름은 entry 파일 ∪
+  // ktds-fork (ADR-003): step 파일 경로 ↔ 변경/영향 집합 조인. 흐름은 entry 파일 ∪
   // 소속 step 파일을 멤버로 집계(경로 dedupe).
   let stepStatus: Map<string, "changed" | "affected"> | null = null;
   let flowDiff: Map<string, { changed: number; affected: number }> | null = null;
@@ -262,7 +262,7 @@ function DomainGraphViewInner() {
   const clearActiveDomain = useDashboardStore((s) => s.clearActiveDomain);
   const { t } = useI18n();
 
-  // ktds-fork: diff 오버레이를 도메인 뷰에 투영 — 오버레이의 KG 노드 id를
+  // ktds-fork (ADR-003): diff 오버레이를 도메인 뷰에 투영 — 오버레이의 KG 노드 id를
   // 구조 그래프 인덱스(nodesById)로 filePath 집합으로 환산한다.
   const diffMode = useDashboardStore((s) => s.diffMode);
   const changedNodeIds = useDashboardStore((s) => s.changedNodeIds);

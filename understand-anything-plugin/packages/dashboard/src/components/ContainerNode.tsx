@@ -1,8 +1,7 @@
 import { memo } from "react";
 import type { NodeProps, Node } from "@xyflow/react";
 import { getLayerColor } from "./LayerLegend";
-import { useI18n } from "../contexts/I18nContext";
-import { useDashboardStore } from "../store";
+import { useDiffLabels } from "../hooks/useDiffLabels";
 
 export interface ContainerNodeData extends Record<string, unknown> {
   containerId: string;
@@ -26,11 +25,8 @@ export type ContainerFlowNode = Node<ContainerNodeData, "container">;
 
 function ContainerNodeComponent({ data, width, height }: NodeProps<ContainerFlowNode>) {
   const color = getLayerColor(data.colorIndex);
-  const { t } = useI18n();
-  // ktds: 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
-  const overlaySource = useDashboardStore((s) => s.overlaySource);
-  const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
-  const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;
+  // ktds-fork (ADR-003): 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
+  const { lblChanged, lblAffected } = useDiffLabels();
 
   // ktds-fork: 변경 포함=적색, 영향만=호박색 (기존: 둘 다 적색)
   const diffChanged = data.diffChangedCount ?? 0;

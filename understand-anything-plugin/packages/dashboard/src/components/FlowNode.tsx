@@ -2,7 +2,7 @@ import { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
 import { useDashboardStore } from "../store";
-import { useI18n } from "../contexts/I18nContext";
+import { useDiffLabels } from "../hooks/useDiffLabels";
 
 export interface FlowNodeData extends Record<string, unknown> {
   label: string;
@@ -11,7 +11,7 @@ export interface FlowNodeData extends Record<string, unknown> {
   entryType?: string;
   stepCount: number;
   flowId: string;
-  // ktds-fork: 흐름(entry+step) 내 변경/영향 파일 수 + 무관 흐름 흐림
+  // ktds-fork (ADR-003): 흐름(entry+step) 내 변경/영향 파일 수 + 무관 흐름 흐림
   diffChangedCount?: number;
   diffAffectedCount?: number;
   isDiffFaded?: boolean;
@@ -23,13 +23,10 @@ function FlowNode({ data }: NodeProps<FlowFlowNode>) {
   const selectNode = useDashboardStore((s) => s.selectNode);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const isSelected = selectedNodeId === data.flowId;
-  const { t } = useI18n();
-  // ktds: 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
-  const overlaySource = useDashboardStore((s) => s.overlaySource);
-  const lblChanged = overlaySource === "impact" ? t.impactToggle.seed : t.diffToggle.changed;
-  const lblAffected = overlaySource === "impact" ? t.impactToggle.affected : t.diffToggle.affected;
+  // ktds-fork (ADR-003): 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
+  const { lblChanged, lblAffected } = useDiffLabels();
 
-  // ktds-fork: 변경 포함=적, 영향만=호박
+  // ktds-fork (ADR-003): 변경 포함=적, 영향만=호박
   const diffChanged = data.diffChangedCount ?? 0;
   const diffAffected = data.diffAffectedCount ?? 0;
   const diffStyle =
@@ -61,7 +58,7 @@ function FlowNode({ data }: NodeProps<FlowFlowNode>) {
         <span className="text-xs font-semibold text-text-primary truncate">
           {data.label}
         </span>
-        {/* ktds-fork: 변경/영향 개수 칩 */}
+        {/* ktds-fork (ADR-003): 변경/영향 개수 칩 */}
         {diffChanged > 0 && (
           <span className="shrink-0 text-[9px] font-semibold px-1 py-px rounded whitespace-nowrap bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)]">
             {lblChanged} {diffChanged}

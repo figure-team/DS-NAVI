@@ -1,31 +1,16 @@
 import { resolve } from "node:path";
 import { describe, it, expect } from "vitest";
-import type { CanonicalGraph, CanonicalNode, CanonicalEdge } from "../types.js";
 import { readKnowledgeGraph } from "../kg-reader/index.js";
 import {
   generateDocs, generateMarkdown, renderMarkdown, renderSkeleton,
   buildTechStack, buildArchitecture, buildFeatureSpec, buildApiSpec, buildDbSpec,
   detectCycles, nullProseProvider, type ProseProvider,
 } from "./index.js";
-
-const edge = (s: string, t: string, type: string): CanonicalEdge => ({
-  sourceUid: s, targetUid: t, type, direction: "forward", weight: 1,
-});
+import { node, edge, graphOf } from "../test-helpers.js";
 
 const FIXTURE = resolve(import.meta.dirname, "../../../../../fixtures/ua-sample-graph.v2_7_3.json");
 
 const EXPECTED = ["01_tech-stack.md", "02_architecture.md", "03_feature-spec.md", "04_api-spec.md", "05_db-spec.md"];
-
-function node(uid: string, kind: string, extra: Partial<CanonicalNode> = {}): CanonicalNode {
-  return { uid, kind: kind as CanonicalNode["kind"], name: uid, summary: "s", tags: [], ...extra };
-}
-function graphOf(nodes: CanonicalNode[], edges: CanonicalEdge[] = [], extra: Partial<CanonicalGraph> = {}): CanonicalGraph {
-  return {
-    sourceVersion: "1.0.0", fingerprint: "x",
-    project: { name: "p", languages: [], frameworks: [], description: "", gitCommitHash: "", configFiles: [] },
-    layers: [], nodes, edges, ...extra,
-  };
-}
 
 describe("generate 5 docs from the real v2.7.3 fixture", () => {
   it("produces exactly the 5 expected files", async () => {

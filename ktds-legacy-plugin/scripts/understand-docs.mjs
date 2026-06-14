@@ -19,9 +19,9 @@
 import { join } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { ensureBuilt } from "./ensure-built.mjs";
+import { installEpipeGuard, parseArgv, assertRequiredHandle } from "./cli-utils.mjs";
 
-// `... | head` 처럼 reader가 먼저 닫히면 stdout EPIPE가 throw된다 — 정상 종료로 흡수.
-process.stdout.on("error", (e) => { if (e.code === "EPIPE") process.exit(0); });
+installEpipeGuard();
 
 const {
   runDocsPipeline, listDrafts, startReview, approveDoc, returnDoc,
@@ -33,20 +33,7 @@ const SUBS = ["review", "approve", "return", "audit", "confirm", "wiki"];
 // 확정 대상의 현재 신뢰도 → 표시 태그 (engine ConfirmableItem.from).
 const TAGLABEL = { INFERRED: "[추정]", CONFIRMED_AI: "[확정(AI)]", NEEDS_REVIEW: "[확인 필요]" };
 
-// --by 핸들 검증: 비어있거나 '-'로 시작하면 거부. `--by --all` 처럼 다른 플래그가
-// 핸들로 오인돼 의도치 않은 일괄 확정으로 새는 것을 막는다(O3 핸들 무결성).
-function assertHandle(by, usage) {
-  if (!by || by.startsWith("-")) {
-    throw new Error(`usage: ${usage} (핸들은 비어있거나 '-'로 시작할 수 없음)`);
-  }
-}
-const argv = process.argv.slice(2);
-const root = argv[0] && !argv[0].startsWith("-") && !SUBS.includes(argv[0]) ? argv[0] : process.cwd();
-const rest = argv[0] === root ? argv.slice(1) : argv;
-const sub = rest[0];
-const flag = (n) => { const i = rest.indexOf(n); return i >= 0 ? rest[i + 1] : undefined; };
-const has = (n) => rest.includes(n);
-const spec = join(root, ".spec");
+const { root, rest, sub, flag, has, spec } = parseArgv(SUBS);
 const docDir = join(root, "docs");
 
 // 위키 graph/meta 타임스탬프는 **입력 KG의 project.analyzedAt**에서 가져온다(wall-clock 금지)
@@ -168,7 +155,7 @@ try {
     // 명시적 전체 확정 (사용자가 "전체"를 분명히 요청했을 때만). 임의 호출 금지는 SKILL.md 지시.
     const doc = flag("--doc"), by = flag("--by")?.trim();
     if (!doc) throw new Error("usage: confirm --doc <file> --all --by <handle>");
-    assertHandle(by, "confirm --doc <file> --all --by <handle>");
+    assertRequiredHandle(by, "confirm --doc <file> --all --by <handle>");
     await ensureUnderReview(doc);
     const items = await listConfirmableItems(docDir, doc);
     if (items.length === 0) { console.log(`확정 대상 없음 (${doc})`); }
@@ -196,7 +183,7 @@ try {
         await interactiveConfirm(doc, by);
       }
     } else {
-      assertHandle(by, "confirm --doc <file> --item <n> --by <handle>");
+      assertRequiredHandle(by, "confirm --doc <file> --item <n> --by <handle>");
       if (!/^\d+$/.test(n) || Number(n) < 1) throw new Error(`--item 은 1 이상의 정수여야 합니다: ${n}`);
       await ensureUnderReview(doc);
       const items = await listConfirmableItems(docDir, doc);
@@ -209,7 +196,7 @@ try {
   } else if (sub === "approve") {
     const doc = flag("--doc"), by = flag("--by")?.trim();
     if (!doc) throw new Error("usage: approve --doc <file> --by <handle> [--force]");
-    assertHandle(by, "approve --doc <file> --by <handle>");
+    assertRequiredHandle(by, "approve --doc <file> --by <handle>");
     // 게이트: docDir 전달 → [확정(담당자)] 아닌 항목 남으면 거부. --force로 우회(forced 기록).
     const rec = await approveDoc(spec, doc, by, { docsDir: docDir, force: has("--force") });
     console.log(`승인 완료${rec.forced ? " (⚠️ 강제 --force: 미확정 항목 잔여)" : ""}: ${doc} → ${await getDocState(spec, doc)} (by ${rec.by}, ${rec.at})`);

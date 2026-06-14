@@ -1,4 +1,5 @@
 import type { EdgeKind, FileEdge } from "../domain-map/types.js";
+import { cmp } from "../utils/cmp.js";
 
 // T1 — 역/정 도달성 코어 (ADR-002 ID3). slices.ts:86-106 bfs를 거울 반전한
 // 순수함수. edges.json은 FORWARD 의존(source가 target에 의존)이므로:
@@ -33,10 +34,6 @@ export interface ReachedFile {
   viaKinds: EdgeKind[];
   /** 근거 인용 (filePath:line) — line 없는 간선만으로 도달 시 null. */
   citation: { filePath: string; line: number } | null;
-}
-
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 /**

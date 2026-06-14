@@ -3,6 +3,7 @@ import * as path from "node:path";
 import { z } from "zod";
 import { writeMapArtifact } from "./persist.js";
 import type { Citation, DomainFill } from "./fill.js";
+import { cmp } from "../utils/cmp.js";
 
 // 17.3 기계 검증기 — S9.
 // U-A /understand-domain의 구조적 결함("validateGraph에 파일시스템 접근
@@ -234,6 +235,3 @@ function pct(num: number, den: number): number {
   return den === 0 ? 100 : Math.round((num / den) * 1000) / 10;
 }
 
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
-}

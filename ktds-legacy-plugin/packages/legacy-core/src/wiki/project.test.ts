@@ -1,10 +1,7 @@
 import { expect, test } from "vitest";
 import { projectNotes } from "./project.js";
-import type { CanonicalGraph, CanonicalNode } from "../types.js";
-
-function node(uid: string, kind: string, extra: Partial<CanonicalNode> = {}): CanonicalNode {
-  return { uid, kind: kind as CanonicalNode["kind"], name: uid, summary: "요약", tags: [], ...extra };
-}
+import type { CanonicalGraph } from "../types.js";
+import { node } from "../test-helpers.js";
 
 const graph: CanonicalGraph = {
   sourceVersion: "1.0.0",

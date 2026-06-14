@@ -5,6 +5,7 @@ import type {
   SkeletonReport,
 } from "../domain-map/types.js";
 import type { DomainImpact, FlowImpact, NeedsReviewItem } from "./types.js";
+import { cmp } from "../utils/cmp.js";
 
 // T4 — 업무흐름/도메인 영향 (ADR-002 ID3/ID7). 영향 흐름 = seed ∪ upstream을
 // 포함하는 flow. 정밀 경로는 skeleton의 엣지만으로 결정론 역추적:
@@ -22,10 +23,6 @@ export interface FlowImpactResult {
   flows: FlowImpact[];
   domains: DomainImpact[];
   needsReview: NeedsReviewItem[];
-}
-
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 const FLOW_PREFIX = "flow:";

@@ -3,6 +3,7 @@ import * as path from "node:path";
 import { z } from "zod";
 import { CITATION_STATUS, type CitationStatus } from "../domain-map/verify.js";
 import { ImpactCitationSchema, type ImpactCitation } from "./types.js";
+import { cmp } from "../utils/cmp.js";
 
 // T5 — 인용 검증 (ADR-002 ID6). domain-map/verify.ts:71-132의 normalize/
 // isTrivialSnippet/verifyCitation를 그대로 복제한다. 원본은 module-private이고
@@ -112,10 +113,6 @@ export interface ImpactClaimItem {
   ref: string;
   text: string;
   citations: ImpactCitation[];
-}
-
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 function pct(num: number, den: number): number {

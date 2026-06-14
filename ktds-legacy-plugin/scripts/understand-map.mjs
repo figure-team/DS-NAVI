@@ -12,11 +12,11 @@
 // 불가다. 비-TTY에서 confirm은 후보 표 + 안내만 출력한다(임의 전체 확정 방지,
 // Stage-12f 패턴) — 호스트(Claude)는 SKILL.md 지시대로 사용자에게 항목 단위로
 // 묻고 --auto-approve --by 또는 TTY 세션을 권한다.
-import { join } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { ensureBuilt } from "./ensure-built.mjs";
+import { installEpipeGuard, parseArgv, assertRequiredHandle, assertOptionalHandle } from "./cli-utils.mjs";
 
-process.stdout.on("error", (e) => { if (e.code === "EPIPE") process.exit(0); });
+installEpipeGuard();
 
 const {
   scanDomainMap, planTable, buildAutoPlan, renameDomain, mergeDomains,
@@ -26,19 +26,8 @@ const {
 
 const SUBS = ["scan", "plan", "confirm", "status", "bundle", "emit"];
 
-function assertHandle(by, usage) {
-  if (!by || by.startsWith("-")) {
-    throw new Error(`usage: ${usage} (핸들은 비어있거나 '-'로 시작할 수 없음)`);
-  }
-}
-
-const argv = process.argv.slice(2);
-const root = argv[0] && !argv[0].startsWith("-") && !SUBS.includes(argv[0]) ? argv[0] : process.cwd();
-const rest = argv[0] === root ? argv.slice(1) : argv;
+const { root, rest, flag, has, spec } = parseArgv(SUBS);
 const sub = rest[0] ?? "scan";
-const flag = (n) => { const i = rest.indexOf(n); return i >= 0 ? rest[i + 1] : undefined; };
-const has = (n) => rest.includes(n);
-const spec = join(root, ".spec");
 
 function summarize(r) {
   console.log(`census ${r.census.fileCount}파일 | 라우트 ${r.routes.routes.length} | 배치 ${r.routes.batchEntries.length} | 간선 ${r.edges.edges.length} (미해소 ${r.edges.unresolved.length}) | 슬라이스 ${r.slices.slices.length}`);
@@ -65,7 +54,7 @@ async function auditConfirm(plan, mode) {
 if (sub === "scan") {
   if (has("--auto-approve")) {
     const by = flag("--by");
-    if (by !== undefined) assertHandle(by, "scan --auto-approve --by <handle>");
+    assertOptionalHandle(by, "scan --auto-approve --by <handle>");
     // 핸들은 scanDomainMap에 전달 — confirmed plan은 정확한 decidedBy로
     // 단 한 번만 쓰인다 (이중 쓰기/crash 귀속 손실 제거, 리뷰 반영)
     const r = await scanDomainMap(root, { autoApprove: by ?? true });
@@ -99,7 +88,7 @@ if (sub === "scan") {
   const r = await scanDomainMap(root);
   if (has("--auto-approve")) {
     const by = flag("--by");
-    assertHandle(by, "confirm --auto-approve --by <handle>");
+    assertRequiredHandle(by, "confirm --auto-approve --by <handle>");
     if (await readConfirmedPlan(root)) {
       console.log("이미 확정됨 — 변경하려면 .spec/map/domain-plan.confirmed.json 삭제 후 재확정 또는 TTY confirm 세션 사용.");
     } else {

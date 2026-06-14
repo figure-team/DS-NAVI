@@ -10,6 +10,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { ensureBuilt } from "./ensure-built.mjs";
+import { round1 } from "./cli-utils.mjs";
 
 function usage(message) {
   if (message) console.error(`오류: ${message}`);
@@ -127,6 +128,3 @@ if (flags.minPrecision !== null && overallPrecision < flags.minPrecision) {
 }
 process.exit(exitCode);
 
-function round1(n) {
-  return Math.round(n * 10) / 10;
-}

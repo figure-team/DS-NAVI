@@ -11,6 +11,8 @@ import {
   type UaGraphEdge,
   type UaGraphNode,
 } from "./types.js";
+import { cmp } from "../utils/cmp.js";
+import { groupBy } from "../utils/collections.js";
 
 // S6 skeleton 조립기 (Stage-16, task 16.4).
 // U-A domain-graph 호환 domain/flow/step 노드와 contains_flow/flow_step/
@@ -303,17 +305,6 @@ function assertUniqueNodeIds(nodes: UaGraphNode[]): void {
   }
 }
 
-function groupBy<T>(items: T[], keyFn: (item: T) => string): Map<string, T[]> {
-  const map = new Map<string, T[]>();
-  for (const item of items) {
-    const key = keyFn(item);
-    const list = map.get(key);
-    if (list) list.push(item);
-    else map.set(key, [item]);
-  }
-  return map;
-}
-
 function stripPrefix(s: string, prefix: string): string {
   return s.startsWith(prefix) ? s.slice(prefix.length) : s;
 }
@@ -322,6 +313,3 @@ function round4(n: number): number {
   return Math.round(n * 10000) / 10000;
 }
 
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
-}

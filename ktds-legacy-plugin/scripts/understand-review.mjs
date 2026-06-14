@@ -12,8 +12,9 @@
 // --sr이면 사전 예측(.spec/impact/<ID>/impact.json)과 대조 + 리뷰 보관.
 import { join } from "node:path";
 import { ensureBuilt } from "./ensure-built.mjs";
+import { installEpipeGuard, parseArgv, assertOptionalHandle, basename } from "./cli-utils.mjs";
 
-process.stdout.on("error", (e) => { if (e.code === "EPIPE") process.exit(0); });
+installEpipeGuard();
 
 const {
   analyzeImpact, loadImpactInputs, scanDomainMap,
@@ -26,20 +27,8 @@ const {
 
 const SUBS = ["analyze"];
 
-function assertHandle(by, usage) {
-  if (by !== undefined && (by === "" || by.startsWith("-"))) {
-    throw new Error(`usage: ${usage} (핸들은 비어있거나 '-'로 시작할 수 없음)`);
-  }
-}
-
-const argv = process.argv.slice(2);
-const root = argv[0] && !argv[0].startsWith("-") && !SUBS.includes(argv[0]) ? argv[0] : process.cwd();
-const rest = argv[0] === root ? argv.slice(1) : argv;
+const { root, rest, flag, spec } = parseArgv(SUBS);
 const sub = rest[0] && !rest[0].startsWith("-") ? rest[0] : "analyze";
-const flag = (n) => { const i = rest.indexOf(n); return i >= 0 ? rest[i + 1] : undefined; };
-const spec = join(root, ".spec");
-
-function basename(p) { return p.split("/").pop(); }
 
 try {
   if (sub !== "analyze") {
@@ -48,7 +37,7 @@ try {
   }
   const by = flag("--by");
   const srId = flag("--sr");
-  assertHandle(by, "analyze [--base <ref>] [--sr <SR-ID>] --by <handle>");
+  assertOptionalHandle(by, "analyze [--base <ref>] [--sr <SR-ID>] --by <handle>");
   if (rest.includes("--sr") && srId === undefined) {
     throw new Error("usage: analyze [--base <ref>] --sr <SR-ID> (--sr 값 누락)");
   }

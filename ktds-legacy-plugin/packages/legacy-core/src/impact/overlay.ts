@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import type { ImpactResult } from "./types.js";
+import { cmp } from "../utils/cmp.js";
 
 // T10 — 대시보드 오버레이 (ADR-002 부록 A). impact.json의 시드/도달 집합을
 // U-A 대시보드가 이미 소비하는 입력 계약 `.understand-anything/diff-overlay.json`
@@ -60,10 +61,6 @@ export interface PublishOverlayResult {
   overlay: DiffOverlay;
   /** 다른 생산자의 기존 오버레이를 .bak으로 보존했는지. */
   backedUp: boolean;
-}
-
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 /**

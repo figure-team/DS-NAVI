@@ -1,5 +1,6 @@
 import type { BatchEntry, FileOwnership, RouteEntry } from "../domain-map/types.js";
 import type { ApiImpact } from "./types.js";
+import { cmp } from "../utils/cmp.js";
 
 // T2 — API/배치 진입점 영향 (ADR-002 ID3). 2단 계산으로 정확도와 교차검증을
 // 동시에 얻는다:
@@ -14,10 +15,6 @@ import type { ApiImpact } from "./types.js";
 export interface ApiImpactResult {
   api: ApiImpact[];
   crossCheckDiff: Array<{ id: string; side: "ownership-only" | "reverse-only" }>;
-}
-
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 export function computeApiImpact(

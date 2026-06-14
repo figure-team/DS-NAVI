@@ -4,14 +4,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { generateWiki } from "./orchestrate.js";
 import { readAudit } from "../audit/index.js";
-import type { CanonicalGraph, CanonicalNode, CanonicalEdge } from "../types.js";
-
-function node(uid: string, kind: string, extra: Partial<CanonicalNode> = {}): CanonicalNode {
-  return { uid, kind: kind as CanonicalNode["kind"], name: uid, summary: "s", tags: [], ...extra };
-}
-function edge(s: string, t: string, type: string): CanonicalEdge {
-  return { sourceUid: s, targetUid: t, type, direction: "forward", weight: 1 };
-}
+import type { CanonicalGraph } from "../types.js";
+import { node, edge } from "../test-helpers.js";
 
 const graph: CanonicalGraph = {
   sourceVersion: "1.0.0", fingerprint: "fp",

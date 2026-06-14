@@ -9,6 +9,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
+import { round1 } from "./cli-utils.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -104,6 +105,3 @@ if (flags.min !== null && report.overallRecallPct < flags.min) {
   process.exit(1);
 }
 
-function round1(n) {
-  return Math.round(n * 10) / 10;
-}

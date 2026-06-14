@@ -12,6 +12,7 @@ import {
   REVIEW_STATUS_LINE,
   REVIEW_VERIFY_FILENAME,
 } from "./review.js";
+import { writeFileAtomic } from "../utils/fs.js";
 
 // T11 — SR 영향분석 워크벤치 (중간 점검 P1). PL은 동시 다발 SR(변경 요청)을
 // 다루므로 분석 결과를 SR 단위로 `.spec/impact/<SR-ID>/`에 보관한다.
@@ -42,19 +43,6 @@ export function srImpactDir(projectRoot: string, srId: string): string {
   return path.join(srImpactRoot(projectRoot), srId);
 }
 
-async function writeAtomic(filePath: string, content: string): Promise<void> {
-  // pid 접미사: 동일 SR 동시 실행의 tmp 경합 방지. 실패 시 tmp 잔존을 치운다
-  // (다음 실행이 덮어써 자가 치유하지만 깨끗하게).
-  const tmpPath = `${filePath}.tmp.${process.pid}`;
-  try {
-    await fs.writeFile(tmpPath, content, "utf-8");
-    await fs.rename(tmpPath, filePath);
-  } catch (err) {
-    await fs.unlink(tmpPath).catch(() => {});
-    throw err;
-  }
-}
-
 export interface ArchiveImpactRunInput {
   result: ImpactResult;
   verify: ImpactVerifyReport;
@@ -70,9 +58,9 @@ export async function archiveImpactRun(
 ): Promise<string> {
   const dir = srImpactDir(projectRoot, srId);
   await fs.mkdir(dir, { recursive: true });
-  await writeAtomic(path.join(dir, IMPACT_REPORT_FILENAME), stableJson(input.result));
-  await writeAtomic(path.join(dir, IMPACT_VERIFY_FILENAME), stableJson(input.verify));
-  await writeAtomic(
+  await writeFileAtomic(path.join(dir, IMPACT_REPORT_FILENAME), stableJson(input.result));
+  await writeFileAtomic(path.join(dir, IMPACT_VERIFY_FILENAME), stableJson(input.verify));
+  await writeFileAtomic(
     path.join(dir, CHANGE_IMPACT_FILENAME),
     renderMarkdown(input.doc, IMPACT_STATUS_LINE),
   );
@@ -91,9 +79,9 @@ export async function archiveReviewRun(
 ): Promise<string> {
   const dir = srImpactDir(projectRoot, srId);
   await fs.mkdir(dir, { recursive: true });
-  await writeAtomic(path.join(dir, REVIEW_REPORT_FILENAME), stableJson(input.result));
-  await writeAtomic(path.join(dir, REVIEW_VERIFY_FILENAME), stableJson(input.verify));
-  await writeAtomic(
+  await writeFileAtomic(path.join(dir, REVIEW_REPORT_FILENAME), stableJson(input.result));
+  await writeFileAtomic(path.join(dir, REVIEW_VERIFY_FILENAME), stableJson(input.verify));
+  await writeFileAtomic(
     path.join(dir, REVIEW_CHECKLIST_FILENAME),
     renderMarkdown(input.doc, REVIEW_STATUS_LINE),
   );

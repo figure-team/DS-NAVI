@@ -41,6 +41,7 @@ import {
   type KgTableEntry,
   type NeedsReviewItem,
 } from "./types.js";
+import { cmp } from "../utils/cmp.js";
 
 // T6 — 엔진 조립 + 결정론 (ADR-002 ID4). 순수 조립(buildImpactReport)과 IO
 // 래퍼(analyzeImpact)를 분리한다. 엔진은 .spec/map/ 영속 산출물을 재스캔 0회로
@@ -81,10 +82,6 @@ export interface AnalyzeImpactResult {
   verifyPath: string;
   /** 로드된 .spec/map 입력 — 호출자가 집계(buildChangeImpact aggregate) 등에 재사용(재로드 0회). */
   inputs: ImpactInputs;
-}
-
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 // ── 입력 로드 (재스캔 0회) ────────────────────────────────────────────────────

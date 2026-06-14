@@ -1,5 +1,6 @@
 import type { CensusFile, FileEdge, FileOwnership } from "../domain-map/types.js";
 import type { KgTableEntry, PersistenceImpact } from "./types.js";
+import { cmp } from "../utils/cmp.js";
 
 // T3 — DB/영속성 영향 (ADR-002 ID3, §1.3 정정). 핵심 의미론: DB 영향은
 // DOWNSTREAM(정방향)이다 — 시드가 *건드리는* 매퍼/테이블은 시드가 의존하는
@@ -28,10 +29,6 @@ export interface PersistenceInputs {
   mapperLineCounts?: Map<string, number>;
   ownership?: readonly FileOwnership[];
   kgTableCatalog?: readonly KgTableEntry[];
-}
-
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 export function computePersistenceImpact(

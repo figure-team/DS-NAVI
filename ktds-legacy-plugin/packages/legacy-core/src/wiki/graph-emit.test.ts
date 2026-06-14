@@ -2,15 +2,9 @@ import { expect, test } from "vitest";
 import { projectNotes } from "./project.js";
 import { deriveLinks } from "./links.js";
 import { buildKnowledgeGraph, type HubArticle } from "./graph-emit.js";
-import type { CanonicalGraph, CanonicalNode, CanonicalEdge } from "../types.js";
+import type { CanonicalGraph } from "../types.js";
 import type { DashboardGraph } from "./types.js";
-
-function node(uid: string, kind: string, extra: Partial<CanonicalNode> = {}): CanonicalNode {
-  return { uid, kind: kind as CanonicalNode["kind"], name: uid, summary: "요약", tags: [], ...extra };
-}
-function edge(s: string, t: string, type: string): CanonicalEdge {
-  return { sourceUid: s, targetUid: t, type, direction: "forward", weight: 1 };
-}
+import { node, edge } from "../test-helpers.js";
 
 const graph: CanonicalGraph = {
   sourceVersion: "1.0.0", fingerprint: "fp",

@@ -13,8 +13,9 @@
 // '영향도' 토글이 시각화한다 (KG 없으면 생략). 실측 비교는 /understand-review.
 import { join } from "node:path";
 import { ensureBuilt } from "./ensure-built.mjs";
+import { installEpipeGuard, parseArgv, assertOptionalHandle, basename } from "./cli-utils.mjs";
 
-process.stdout.on("error", (e) => { if (e.code === "EPIPE") process.exit(0); });
+installEpipeGuard();
 
 const {
   analyzeImpact, buildChangeImpact, publishChangeImpact, loadImpactInputs,
@@ -25,21 +26,9 @@ const {
 
 const SUBS = ["seeds", "analyze", "status"];
 
-function assertHandle(by, usage) {
-  if (by !== undefined && (by === "" || by.startsWith("-"))) {
-    throw new Error(`usage: ${usage} (핸들은 비어있거나 '-'로 시작할 수 없음)`);
-  }
-}
-
-const argv = process.argv.slice(2);
-const root = argv[0] && !argv[0].startsWith("-") && !SUBS.includes(argv[0]) ? argv[0] : process.cwd();
-const rest = argv[0] === root ? argv.slice(1) : argv;
+const { root, rest, flag, spec } = parseArgv(SUBS);
 const sub = rest[0] ?? "analyze";
-const flag = (n) => { const i = rest.indexOf(n); return i >= 0 ? rest[i + 1] : undefined; };
 const multiFlag = (n) => rest.flatMap((v, i) => (v === n && rest[i + 1] ? [rest[i + 1]] : []));
-const spec = join(root, ".spec");
-
-function basename(p) { return p.split("/").pop(); }
 
 async function printCatalog() {
   const inputs = await loadImpactInputs(root);
@@ -109,7 +98,7 @@ try {
     const paths = multiFlag("--path");
     const by = flag("--by");
     const srId = flag("--sr");
-    assertHandle(by, "analyze --path <file> ... --by <handle>");
+    assertOptionalHandle(by, "analyze --path <file> ... --by <handle>");
     // fail-closed: --sr 값 누락을 침묵 무보관으로 흘리지 않는다 (리뷰 minor)
     if (rest.includes("--sr") && srId === undefined) {
       throw new Error("usage: analyze --path <파일> ... --sr <SR-ID> (--sr 값 누락)");

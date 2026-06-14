@@ -1,14 +1,8 @@
 import { expect, test } from "vitest";
 import { projectNotes } from "./project.js";
 import { deriveLinks } from "./links.js";
-import type { CanonicalGraph, CanonicalNode, CanonicalEdge } from "../types.js";
-
-function node(uid: string, kind: string, extra: Partial<CanonicalNode> = {}): CanonicalNode {
-  return { uid, kind: kind as CanonicalNode["kind"], name: uid, summary: "s", tags: [], ...extra };
-}
-function edge(s: string, t: string, type: string): CanonicalEdge {
-  return { sourceUid: s, targetUid: t, type, direction: "forward", weight: 1 };
-}
+import type { CanonicalGraph } from "../types.js";
+import { node, edge } from "../test-helpers.js";
 
 // domain → flow → step, endpoint(같은 파일=flow) → table(reads_from)
 const graph: CanonicalGraph = {

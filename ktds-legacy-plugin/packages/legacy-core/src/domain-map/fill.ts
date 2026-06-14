@@ -4,6 +4,7 @@ import { z } from "zod";
 import { specMapDir } from "./persist.js";
 import { safeKeyFilename } from "./bundle.js";
 import { SKELETON_BLANK, type SkeletonReport, type UaGraphNode } from "./types.js";
+import { cmp } from "../utils/cmp.js";
 
 // 17.2 LLM 채움 계약 — S8.
 // 디스패치 자체는 호스트(Claude)가 SKILL.md 지시로 수행한다: 도메인당 1회,
@@ -202,6 +203,3 @@ export function unfilledNodes(nodes: UaGraphNode[]): string[] {
     .sort();
 }
 
-function cmp(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
-}

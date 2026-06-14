@@ -28,6 +28,7 @@ import { renderNote, extractProse } from "./render.js";
 import { toWikiTarget } from "./slug.js";
 import { HUB_DEFS } from "./hubs.js";
 import type { WikiLink, WikiNote } from "./types.js";
+import { writeFileAtomic } from "../utils/fs.js";
 
 /** 노트 본문 산문 주입자(host) — 미지정 시 skeleton-only(결정론). */
 export type WikiProseProvider = (note: WikiNote) => Promise<string>;
@@ -63,14 +64,6 @@ export interface GenerateWikiResult {
 
 /** 노트 계층 하위 폴더(원자 교체 단위). feature/step은 feature 아래라 별도 불필요. */
 const NOTE_LAYER_DIRS = ["feature", "api", "table"] as const;
-
-/** temp+rename 단일 파일 원자 쓰기. */
-async function writeFileAtomic(filePath: string, content: string): Promise<void> {
-  await mkdir(dirname(filePath), { recursive: true });
-  const tmp = `${filePath}.tmp`;
-  await writeFile(tmp, content, "utf-8");
-  await rename(tmp, filePath);
-}
 
 async function pathExists(p: string): Promise<boolean> {
   // access는 내용을 읽지 않고 파일/디렉터리를 동형으로 판정(EISDIR 의존 제거).

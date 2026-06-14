@@ -68,6 +68,9 @@ ktds-legacy plugin (this fork's addition) carries its own version in **two** mor
 - `ktds-legacy-plugin/.claude-plugin/plugin.json` → `"version"` field
 - `ktds-legacy-plugin/packages/legacy-core/package.json` → `"version"` field
 
+## ktds-legacy development
+Module map + shared-helper conventions: **`docs/ktds/ARCHITECTURE.md`**. When writing ktds engine/CLI code, reuse the shared homes instead of re-duplicating: `src/utils/{cmp,collections,fs}.ts`, `src/test-helpers.ts` (test fixtures), `scripts/cli-utils.mjs` (CLI arg parsing/handle guards), and `CONFIDENCE_VALUES` in `types.ts` (single source for the Confidence type + Zod enum). CLI `.mjs` scripts are thin wrappers — keep business logic in the tested engine and load it via `await import(await ensureBuilt())`.
+
 ## Testing Local Plugin Changes
 
 Claude Code caches installed plugins at `~/.claude/plugins/cache/understand-anything/understand-anything/<version>/`. Symlinks don't work because Claude's Search/Glob tools can't follow them. To test local changes:

@@ -7,11 +7,9 @@
 // 이하로 떨어지면 휴리스틱 개선이 아니라 누락 원인 분석이 먼저다 — "Java 내부
 // 해소가 주요 누락 원인으로 드러나면 파서 재검토"(ADR-001 §3).
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join, resolve } from "node:path";
+import { resolve } from "node:path";
 import { round1 } from "./cli-utils.mjs";
-
-const here = dirname(fileURLToPath(import.meta.url));
+import { ensureBuilt } from "./ensure-built.mjs";
 
 function usage(message) {
   if (message) console.error(`오류: ${message}`);
@@ -45,9 +43,7 @@ for (const chain of expected.chains) {
     usage(`빈 mustReach: ${chain.root ?? "(root 미지정)"}`);
   }
 }
-const { scanDomainMap } = await import(
-  join(here, "../packages/legacy-core/dist/domain-map/index.js")
-);
+const { scanDomainMap } = await import(await ensureBuilt());
 const { slices } = await scanDomainMap(projectRoot);
 const reachedByRoot = new Map(slices.slices.map((s) => [s.root, new Set(s.reached)]));
 

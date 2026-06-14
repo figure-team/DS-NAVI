@@ -1,6 +1,8 @@
-import { resolve } from "node:path";
+import { resolve, join } from "node:path";
+import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { describe, it, expect, vi } from "vitest";
-import { readKnowledgeGraph, parseRawGraph, checkVersion, checkFingerprint, computeFingerprint, mergeDomainGraph } from "./index.js";
+import { readKnowledgeGraph, parseRawGraph, checkVersion, checkFingerprint, computeFingerprint, mergeDomainGraph, readKgAnalyzedAt } from "./index.js";
 
 const FIXTURE = resolve(
   import.meta.dirname,
@@ -314,3 +316,38 @@ describe("domainMeta passthrough + domain-graph 병합 (Stage-18.1)", () => {
     expect(twice.graph.nodes).toHaveLength(1);
   });
 });
+
+describe("readKgAnalyzedAt — 위키 멱등 스탬프 (CLI sourceStamp 이관)", () => {
+  async function tmpRoot(kg?: unknown): Promise<string> {
+    const root = await mkdtemp(join(tmpdir(), "kgstamp-"));
+    if (kg !== undefined) {
+      await mkdir(join(root, ".understand-anything"), { recursive: true });
+      await writeFile(join(root, ".understand-anything", "knowledge-graph.json"), JSON.stringify(kg), "utf-8");
+    }
+    return root;
+  }
+
+  it("project.analyzedAt 문자열을 반환", async () => {
+    const root = await tmpRoot({ project: { analyzedAt: "2026-06-09T00:00:00.000Z" } });
+    try { expect(await readKgAnalyzedAt(root)).toBe("2026-06-09T00:00:00.000Z"); }
+    finally { await rm(root, { recursive: true, force: true }); }
+  });
+
+  it("파일 부재 → ''", async () => {
+    const root = await tmpRoot(); // KG 미작성
+    try { expect(await readKgAnalyzedAt(root)).toBe(""); }
+    finally { await rm(root, { recursive: true, force: true }); }
+  });
+
+  it("analyzedAt 필드 부재/비문자열 → ''", async () => {
+    const a = await tmpRoot({ project: {} });
+    const b = await tmpRoot({ project: { analyzedAt: 123 } });
+    try {
+      expect(await readKgAnalyzedAt(a)).toBe("");
+      expect(await readKgAnalyzedAt(b)).toBe("");
+    } finally {
+      await rm(a, { recursive: true, force: true });
+      await rm(b, { recursive: true, force: true });
+    }
+  });
+})

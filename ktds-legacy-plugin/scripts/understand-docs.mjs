@@ -26,7 +26,7 @@ installEpipeGuard();
 const {
   runDocsPipeline, listDrafts, startReview, approveDoc, returnDoc,
   readAudit, getDocState, listConfirmableItems, confirmLine,
-  generateWiki, loadProjectGraph,
+  generateWiki, loadProjectGraph, readKgAnalyzedAt,
 } = await import(await ensureBuilt());
 
 const SUBS = ["review", "approve", "return", "audit", "confirm", "wiki"];
@@ -35,16 +35,6 @@ const TAGLABEL = { INFERRED: "[추정]", CONFIRMED_AI: "[확정(AI)]", NEEDS_REV
 
 const { root, rest, sub, flag, has, spec } = parseArgv(SUBS);
 const docDir = join(root, "docs");
-
-// 위키 graph/meta 타임스탬프는 **입력 KG의 project.analyzedAt**에서 가져온다(wall-clock 금지)
-// — 같은 입력 → 같은 산출(byte-diff=0, 재실행 멱등). 없으면 "".
-async function sourceStamp() {
-  const { readFile } = await import("node:fs/promises");
-  try {
-    const kg = JSON.parse(await readFile(join(root, ".understand-anything", "knowledge-graph.json"), "utf-8"));
-    return typeof kg?.project?.analyzedAt === "string" ? kg.project.analyzedAt : "";
-  } catch { return ""; }
-}
 
 // confirm 진입 편의: DRAFT면 자동으로 검토 시작(DRAFT→UNDER_REVIEW, 감사 남김) 후
 // 확정으로 이어간다. 그 외 상태(UNDER_REVIEW 통과, RETURNED/APPROVED 차단)는
@@ -229,7 +219,7 @@ try {
       }
     } else {
       const graph = await loadProjectGraph(root);
-      const stamp = await sourceStamp();
+      const stamp = await readKgAnalyzedAt(root);
       const res = await generateWiki(root, graph, {
         includeSteps: has("--steps"),
         runId: `wiki-${Date.now()}`,
@@ -251,7 +241,7 @@ try {
     if (has("--no-wiki")) {
       console.log(`→ ${res.docsDir} (순수 5종, --no-wiki) · 검토: understand-docs.mjs ${root} review --list`);
     } else {
-      const stamp = await sourceStamp();
+      const stamp = await readKgAnalyzedAt(root);
       const wiki = await generateWiki(root, res.graph, {
         includeSteps: has("--steps"),
         runId: `${runId}-wiki`,

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import type {
   CanonicalEdge, CanonicalGraph, CanonicalKind, CanonicalNode, Layer, ProjectMeta,
 } from "../types.js";
@@ -430,4 +431,19 @@ export function mergeDomainGraph(
     merged: addedNodes.length,
     skipped,
   };
+}
+
+/**
+ * 입력 KG(`.understand-anything/knowledge-graph.json`)의 `project.analyzedAt`만 읽는다 —
+ * 위키 graph/meta의 멱등 스탬프용(wall-clock 금지: 같은 입력 → 같은 산출). 파일 부재·파싱
+ * 실패·필드 부재는 모두 ""로 흡수. (CLI sourceStamp에서 엔진으로 이관 — 테스트 가능화.)
+ */
+export async function readKgAnalyzedAt(projectRoot: string): Promise<string> {
+  try {
+    const raw = await readFile(join(projectRoot, ".understand-anything", "knowledge-graph.json"), "utf-8");
+    const kg = JSON.parse(raw) as { project?: { analyzedAt?: unknown } };
+    return typeof kg?.project?.analyzedAt === "string" ? kg.project.analyzedAt : "";
+  } catch {
+    return "";
+  }
 }

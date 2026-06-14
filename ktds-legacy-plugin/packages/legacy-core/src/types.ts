@@ -8,11 +8,14 @@
  */
 
 // ── 근거 계약 (plan §5 / 02 §3.2) ───────────────────────────────────────
-export type Confidence =
-  | "CONFIRMED_AI"
-  | "CONFIRMED_HUMAN"
-  | "INFERRED"
-  | "NEEDS_REVIEW";
+/** Confidence 값의 단일 출처 — 타입과 Zod enum(impact/types.ts) 모두 여기서 파생. */
+export const CONFIDENCE_VALUES = [
+  "CONFIRMED_AI",
+  "CONFIRMED_HUMAN",
+  "INFERRED",
+  "NEEDS_REVIEW",
+] as const;
+export type Confidence = (typeof CONFIDENCE_VALUES)[number];
 
 /** Rendering tag per confidence (plan §5.1). */
 export const CONFIDENCE_TAG: Record<Confidence, string> = {

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { EDGE_KINDS } from "../domain-map/types.js";
+import { CONFIDENCE_VALUES } from "../types.js";
 
 // /understand-impact Stage-19 artifact contracts (ADR-002 ID3/ID4).
 // The engine output `impact.json` lives under .spec/map/ alongside the
@@ -16,14 +17,8 @@ import { EDGE_KINDS } from "../domain-map/types.js";
 
 export const IMPACT_REPORT_FILENAME = "impact.json";
 
-/** Mirrors legacy-core types.ts `Confidence` (kept as a zod-usable const here). */
-export const IMPACT_CONFIDENCE = [
-  "CONFIRMED_AI",
-  "CONFIRMED_HUMAN",
-  "INFERRED",
-  "NEEDS_REVIEW",
-] as const;
-export const ImpactConfidenceSchema = z.enum(IMPACT_CONFIDENCE);
+/** Confidence는 legacy-core types.ts CONFIDENCE_VALUES 단일 출처에서 파생(수동 동기화 제거). */
+export const ImpactConfidenceSchema = z.enum(CONFIDENCE_VALUES);
 
 /**
  * Default reverse-reachability edge filter = every structural kind EXCEPT

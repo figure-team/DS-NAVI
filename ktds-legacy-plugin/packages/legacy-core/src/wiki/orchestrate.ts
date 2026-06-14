@@ -24,7 +24,7 @@ import { deriveLinks } from "./links.js";
 import { buildIndex } from "./index-gen.js";
 import { injectHubLinks } from "./hub-inject.js";
 import { buildKnowledgeGraph, type HubArticle } from "./graph-emit.js";
-import { renderNote } from "./render.js";
+import { renderNote, extractProse } from "./render.js";
 import { toWikiTarget } from "./slug.js";
 import { HUB_DEFS } from "./hubs.js";
 import type { WikiLink, WikiNote } from "./types.js";
@@ -37,6 +37,12 @@ export interface GenerateWikiOptions {
   includeSteps?: boolean;
   /** 노트 산문 주입(기본 없음 = skeleton). */
   prose?: WikiProseProvider;
+  /**
+   * 디스크에 이미 발행된 노트 .md에서 host가 채운 산문을 다시 읽어 재주입(기본 false).
+   * `prose`가 명시되면 그쪽이 우선(이 옵션 무시). 재생성·전체 재실행에도 host 편집이
+   * 보존되고 wiki-graph.json(대시보드 정본)까지 산문이 전파된다(ADR-004 후속, .md 단일 출처).
+   */
+  reingestProse?: boolean;
   /** 감사·staging 식별. */
   runId?: string;
   /** knowledge-graph.json project.analyzedAt(골든 제외). */
@@ -72,6 +78,31 @@ async function pathExists(p: string): Promise<boolean> {
 }
 
 /**
+ * 기존 발행 노트 .md에서 host 산문을 재흡수해 relPath→prose provider를 만든다. 파일 부재
+ * (최초 실행)는 산문 없음으로 흡수 — extractProse가 ""를 주면 renderNote가 skeleton과 byte
+ * 동일이라 무해하다. ENOENT만 허용(그 외 IO 오류는 전파). 슬러그(relPath) 안정성에 의존하므로
+ * 노드 자연키가 바뀌면 해당 산문은 매칭 실패(=유실, 의도된 한계 — host 재편집).
+ */
+async function buildReingestProvider(
+  docsDir: string,
+  notes: WikiNote[],
+): Promise<WikiProseProvider> {
+  const byRelPath = new Map<string, string>();
+  for (const n of notes) {
+    let md: string;
+    try {
+      md = await readFile(join(docsDir, n.relPath), "utf-8");
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === "ENOENT") continue;
+      throw err;
+    }
+    const prose = extractProse(md);
+    if (prose) byRelPath.set(n.relPath, prose);
+  }
+  return async (note) => byRelPath.get(note.relPath) ?? "";
+}
+
+/**
  * 5종 발행 후 위키 산출. graph는 (병합된) CanonicalGraph. docs/ 허브는 이미 디스크에
  * 있어야 함(읽어서 주입·graph article에 포함).
  */
@@ -88,10 +119,17 @@ export async function generateWiki(
   // 1) 노트 + 링크
   const { notes, unresolvedEndpoints } = deriveLinks(graph, projectNotes(graph, { includeSteps }));
 
-  // 2) 노트 본문 렌더(산문 옵션)
+  // 2) 노트 본문 렌더(산문 옵션). prose 명시 > reingest > skeleton.
+  //    재흡수는 staging 스왑(6단계) 전에 기존 .md를 읽으므로 단일 프로세스에선 파일이 아직
+  //    제자리에 있다(projectNotes/deriveLinks/renderNote도 모두 락 밖에서 도는 기존 패턴과 동일).
+  //    동시 writer는 락(6단계)이 직렬화하지만 재흡수 read는 락 밖이라, 동시 스왑 중인 .md를
+  //    읽으면 해당 노트 산문이 ENOENT로 조용히 누락될 수 있다(단일-writer 전제, O3).
+  const proseProvider: WikiProseProvider | undefined =
+    options.prose ??
+    (options.reingestProse ? await buildReingestProvider(docsDir, notes) : undefined);
   const contentByUid = new Map<string, string>();
   for (const n of notes) {
-    const prose = options.prose ? await options.prose(n) : undefined;
+    const prose = proseProvider ? await proseProvider(n) : undefined;
     contentByUid.set(n.nodeUid, renderNote(n, prose));
   }
 

@@ -22,7 +22,7 @@ export {
   type HubArticle,
   type BuildKnowledgeGraphInput,
 } from "./graph-emit.js";
-export { renderNote, renderWikiSkeleton, WIKI_NOTE_STATUS_LINE } from "./render.js";
+export { renderNote, renderWikiSkeleton, extractProse, WIKI_NOTE_STATUS_LINE } from "./render.js";
 export { HUB_DEFS, type HubDef } from "./hubs.js";
 export {
   generateWiki,

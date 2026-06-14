@@ -55,3 +55,32 @@ export function renderNote(note: WikiNote, prose?: string): string {
 export function renderWikiSkeleton(notes: WikiNote[]): Map<string, string> {
   return new Map(notes.map((n) => [n.relPath, renderNote(n)]));
 }
+
+/** 산문 영역의 종료 마커들 — host 산문은 상태문과 claims 블록 사이에만 존재. */
+const PROSE_TERMINATORS = [CLAIMS_FENCE_OPEN, "_(항목 없음)_", "## 관계"];
+
+/**
+ * renderNote의 역연산 — 발행된 노트 .md에서 host가 채운 산문 본문만 추출한다(ADR-004 후속,
+ * .md 재흡수). 산문 = 상태문(`> WIKI_NOTE_STATUS_LINE`) 다음부터 claims 펜스/`_(항목 없음)_`/
+ * `## 관계` 중 먼저 나오는 것 직전까지의 본문(trim). 상태문이 없거나(5종 허브·비노트) 산문이
+ * 비어 있으면 "" 반환 → renderNote(note, "")는 skeleton과 byte 동일이라 재주입이 무해하다.
+ *
+ * host가 산문을 claims 위(H1 본문)에 둔다는 SKILL 계약에만 의존 — claims·관계 절은 엔진이
+ * 재생성하므로 추출 대상이 아니다.
+ *
+ * 한계(의도된, 수렴·무손상): 종료 마커는 **줄 전체 정확 일치**(`startsWith` 아님)라 `## 관계
+ * 모델` 같은 실제 헤딩은 안전하나, 산문에 **단독 줄** `## 관계`/`<!-- claims -->`/`_(항목 없음)_`
+ * (코드펜스 안 포함)가 있으면 그 줄부터 잘린다. 결과는 1회 후 안정(중복·claims 누출 없음).
+ * → SKILL이 "노트 산문에 이 마커 줄을 단독으로 두지 말 것"을 host에게 안내한다.
+ */
+export function extractProse(md: string): string {
+  const lines = md.split("\n");
+  const statusLine = `> ${WIKI_NOTE_STATUS_LINE}`;
+  const start = lines.indexOf(statusLine);
+  if (start < 0) return "";
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (PROSE_TERMINATORS.includes(lines[i].trim())) { end = i; break; }
+  }
+  return lines.slice(start + 1, end).join("\n").trim();
+}

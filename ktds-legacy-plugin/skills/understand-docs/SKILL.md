@@ -27,6 +27,9 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId> --n
 
 ### 노트 산문 주입 (host = 너의 역할, 선택)
 세분화 노트도 5종과 같은 계약으로 산문을 채울 수 있다 — 각 노트의 claim 목록만 근거로, 근거(`파일:라인`) 밖 단정·환각 금지, `[추정]`/`[확인 필요]`는 추정 명시, 한국어. (산문 미주입 시 skeleton 그대로도 유효 — 근거·관계는 이미 채워짐.)
+- **쓰는 위치**: 노트 `.md`의 상태문(`> ktds 위키 노트 …`) **다음 줄부터 `<!-- claims -->` 펜스 직전까지**. claims·`## 관계` 절은 엔진이 재생성하므로 건드리지 말 것.
+- **재흡수(durable)**: `wiki`(또는 기본 `/understand-docs`) 재실행 시 엔진이 이 영역을 다시 읽어 **보존하고 대시보드 정본(`wiki-graph.json`)까지 전파**한다. 즉 `.md`가 산문 단일 출처 — 옵시디언·대시보드 양쪽에 반영된다.
+- **주의**: 산문 안에 **단독 줄**로 `## 관계`·`<!-- claims -->`·`_(항목 없음)_`을 두지 말 것(그 줄부터 잘린다). `## 관계 모델`처럼 마커를 포함한 다른 헤딩은 안전.
 
 ### 읽기 동선 (주 뷰어 = U-A 웹 대시보드)
 1. **대시보드 기동**: U-A dev 서버를 `GRAPH_DIR=<projectRoot>/docs` 로 띄운다 → knowledge 뷰가 `docs/.understand-anything/knowledge-graph.json`을 로드.

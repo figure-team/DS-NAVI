@@ -248,6 +248,7 @@ try {
         runId: `wiki-${Date.now()}`,
         analyzedAt: stamp,
         generatedAt: stamp,
+        reingestProse: true, // host가 .md에 채운 산문 보존·재전파(.md 단일 출처)
       });
       console.log(`위키 생성: 노트 ${res.noteCount}건 · 허브 ${res.hubsInjected.length} 주입 · ${res.graphPath}`);
       if (res.unresolvedEndpoints.length) {
@@ -269,6 +270,7 @@ try {
         runId: `${runId}-wiki`,
         analyzedAt: stamp,
         generatedAt: stamp,
+        reingestProse: true, // host가 .md에 채운 산문 보존·재전파(.md 단일 출처)
       });
       console.log(`위키 생성: 노트 ${wiki.noteCount}건${has("--steps") ? " (step 포함)" : ""} · 허브 ${wiki.hubsInjected.length} 주입`);
       console.log(`→ ${res.docsDir} · 검토: understand-docs.mjs ${root} review --list`);

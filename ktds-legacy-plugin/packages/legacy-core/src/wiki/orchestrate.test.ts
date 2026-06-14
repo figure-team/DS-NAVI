@@ -115,6 +115,49 @@ test("재실행 시 stale 노트 제거(이름 변경된 노드)", async () => {
   expect(featureEntries).not.toContain("step");
 });
 
+test("reingestProse: host가 .md에 채운 산문이 재실행에 보존 + graph 전파", async () => {
+  // 1) skeleton 발행
+  await generateWiki(root, graph, { runId: "r1", analyzedAt: "", generatedAt: "" });
+  // 2) host가 노트 .md 산문 영역(상태문~claims 펜스 사이)을 직접 편집
+  const notePath = join(root, "docs", "feature", "로그인.md");
+  const skeleton = await readFile(notePath, "utf-8");
+  const prose = "로그인 흐름은 인증 토큰을 발급한다.";
+  const edited = skeleton.replace("<!-- claims -->", `${prose}\n\n<!-- claims -->`);
+  await writeFile(notePath, edited, "utf-8");
+  // 3) reingest 켜고 재실행 → .md 산문 보존 + claims/관계 재생성
+  await generateWiki(root, graph, { runId: "r2", reingestProse: true, analyzedAt: "", generatedAt: "" });
+  const after = await read("feature/로그인.md");
+  expect(after).toContain(prose);
+  expect(after.indexOf(prose)).toBeLessThan(after.indexOf("<!-- claims -->"));
+  // 4) 대시보드 정본(wiki-graph.json)의 knowledgeMeta.content 까지 산문 전파
+  const kg = JSON.parse(await readRoot("wiki-graph.json"));
+  const flowNode = kg.nodes.find((n: { id: string }) => n.id === "flow:login");
+  expect(flowNode.knowledgeMeta.content).toContain(prose);
+});
+
+test("reingestProse: 산문 없는 노트는 skeleton과 byte 동일(무해)", async () => {
+  await generateWiki(root, graph, { runId: "r1", analyzedAt: "", generatedAt: "" });
+  const before = await read("feature/계정.md");
+  await generateWiki(root, graph, { runId: "r2", reingestProse: true, analyzedAt: "", generatedAt: "" });
+  expect(await read("feature/계정.md")).toBe(before);
+});
+
+test("reingestProse: prose 명시가 reingest보다 우선", async () => {
+  await generateWiki(root, graph, { runId: "r1", analyzedAt: "", generatedAt: "" });
+  // 디스크 .md에 산문 심기
+  const notePath = join(root, "docs", "feature", "로그인.md");
+  const sk = await readFile(notePath, "utf-8");
+  await writeFile(notePath, sk.replace("<!-- claims -->", "디스크 산문\n\n<!-- claims -->"), "utf-8");
+  // prose 콜백 명시 → 디스크 재흡수 대신 콜백 사용
+  await generateWiki(root, graph, {
+    runId: "r2", reingestProse: true, analyzedAt: "", generatedAt: "",
+    prose: async () => "콜백 산문",
+  });
+  const after = await read("feature/로그인.md");
+  expect(after).toContain("콜백 산문");
+  expect(after).not.toContain("디스크 산문");
+});
+
 test("크래시-안전 스왑: .old 백업 잔재 없음 + 락 해제", async () => {
   await generateWiki(root, graph, { runId: "r1", includeSteps: true });
   await generateWiki(root, graph, { runId: "r2" }); // 재실행(백업 경유 스왑)

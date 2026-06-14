@@ -255,13 +255,22 @@ function collectCtorParams(
       }
     }
     if (!typeNode) continue;
-    const line = lineOf(param);
-    into.push({ typeName: stripGenerics(typeNode.text), line });
-    // Generic arguments are signals too: Service(List<Handler> handlers).
-    for (const arg of genericArgNames(typeNode.text)) {
-      into.push({ typeName: arg, line });
-    }
+    pushParamType(typeNode.text, lineOf(param), into);
   }
+}
+
+/**
+ * 파라미터 타입 1개를 주입 신호로 확장: 형식 타입(제네릭 strip) + 제네릭 인자들
+ * (Service(List<Handler> handlers) → List, Handler). collectCtorParams의 "타입 탐색"과
+ * "신호 확장" 책임을 분리(리팩토링 2026-06).
+ */
+function pushParamType(
+  typeText: string,
+  line: number,
+  into: Array<{ typeName: string; line: number }>,
+): void {
+  into.push({ typeName: stripGenerics(typeText), line });
+  for (const arg of genericArgNames(typeText)) into.push({ typeName: arg, line });
 }
 
 /** Keywords/wildcards that can appear inside generic argument lists. */

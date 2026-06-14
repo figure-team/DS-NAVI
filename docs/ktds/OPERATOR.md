@@ -220,7 +220,7 @@ node …/understand-docs.mjs <root> confirm --doc 04_api-spec.md --all  --by ipa
 - `approvals.json` — 승인 기록(doc·by·at)
 - `audit/YYYY-MM-DD.jsonl` — 감사 로그(append-only)
 
-감사 이벤트: `LLM_REQUEST` · `DOC_GENERATED` · `DOC_ITEM_CONFIRMED` · `DOC_APPROVED` · `RUN_ABORTED` · `INIT_RERUN` · `STALE_LOCK_REMOVED` · `MAP_PLAN_CONFIRMED`(도메인 경계 확정) · `IMPACT_ANALYZED`(변경 영향 분석). (보안 이벤트는 Phase 2)
+감사 이벤트: `LLM_REQUEST` · `DOC_GENERATED` · `DOC_ITEM_CONFIRMED` · `DOC_APPROVED` · `RUN_ABORTED` · `INIT_RERUN` · `STALE_LOCK_REMOVED` · `MAP_PLAN_CONFIRMED`(도메인 경계 확정) · `IMPACT_ANALYZED`(변경 영향 분석) · `REVIEW_ANALYZED`(변경분 실측 리뷰) · `WIKI_GENERATED`(세분화 위키 발행 — 상태기계 밖). (보안 이벤트는 Phase 2)
 
 ## 5. 내보내기
 

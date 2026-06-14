@@ -2,6 +2,13 @@
 
 > ⚠️ **MVP는 비민감 샘플 전용** (보안 게이트는 Phase 2).
 
+## 빠른 시작
+```
+U-A /understand → ktds /understand-init → /understand-map → /understand-docs → /understand-export
+                                          (영향도/리뷰: /understand-impact · /understand-review)
+```
+전체 흐름과 MVP+ 커맨드는 **[OPERATOR.md §0 전체 흐름](./OPERATOR.md)** 참조.
+
 ## 운영 매뉴얼
 - [INSTALL.md](./INSTALL.md) — 설치 가이드 (온라인/오프라인, 전제 조건, **플러그인 업데이트·삭제**, upstream 추종)
 - [OPERATOR.md](./OPERATOR.md) — 운영자 매뉴얼 (전체 흐름, 명령 레퍼런스, config, 검토/승인/감사)

@@ -115,7 +115,7 @@
 
 ## 6. 미결 (Open Questions)
 
-1. 명령 네이밍 확정: `understand-map` vs `understand-domains` (U-A `/understand-domain`과의 혼동 방지 관점)
+1. ~~명령 네이밍 확정: `understand-map` vs `understand-domains`~~ — **해소**: `understand-map`으로 확정 구현·게시됨.
 2. E2E 5분 게이트(A10)에서 `/understand-map` 시간의 포지셔닝 — 별도 측정인지 E2E 포함인지 (기획 명시 없음)
 3. jwork류 XML 액션매핑 시그널의 구현 우선순위 — 대상 고객 코드 확보 후 결정
 4. domain-graph.json 스키마의 upstream 드리프트 가드 — fingerprint 가드(A14)의 도메인 경로 확장 시점

@@ -1,6 +1,6 @@
 # ADR-002: /understand-impact — 변경 영향도 분석 (결정론 도달성 + host 운전)
 
-- 상태: **승인 (Accepted)** — T0~T9 구현 완료, N1~N7 충족, 독립 리뷰 2패스(엔진·표면) APPROVE (2026-06-12). 게시(버전 bump·푸시)는 사용자 승인 대기.
+- 상태: **승인 (Accepted)** — T0~T9 구현 완료, N1~N7 충족, 독립 리뷰 2패스(엔진·표면) APPROVE (2026-06-12). 게시: ktds-legacy 0.7.0(2026-06-12).
 - 작성일: 2026-06-12
 - 결정 범위: ktds-legacy-plugin (U-A fork 격리 확장)
 - 관련: `plan/03_MVP발표(Phase2포함).md` §8 (유스케이스 ③ MVP+), `plan/02_MVP기획안.md` MVP+ 표, ADR-001(/understand-map), 구현 계획 `.omc/plans/understand-impact-tasks.md`

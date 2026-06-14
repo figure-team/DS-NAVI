@@ -11,7 +11,7 @@
 | git | 필요 | fork 추적·offline clone |
 | U-A 플러그인 | **선행 설치** | ktds는 U-A가 만든 `knowledge-graph.json`을 읽는다 |
 
-ktds는 `Lum1104/Understand-Anything`의 **fork**이며, U-A 스킬(`/understand`)과 ktds 스킬(`/understand-init`, `/understand-docs`, `/understand-export`)을 **하나의 마켓플레이스**로 제공한다.
+ktds는 `Lum1104/Understand-Anything`의 **fork**이며, U-A 스킬(`/understand`)과 ktds 스킬 6종(`/understand-init`, `/understand-map`, `/understand-docs`, `/understand-impact`, `/understand-review`, `/understand-export`)을 **하나의 마켓플레이스**로 제공한다. (전체 워크플로는 [OPERATOR.md §0](./OPERATOR.md) 참조.)
 
 ## 2. 온라인 설치 (개방형/유형3)
 
@@ -21,7 +21,7 @@ ktds는 `Lum1104/Understand-Anything`의 **fork**이며, U-A 스킬(`/understand
 # Claude Code 안에서 (GitHub repo 또는 로컬 경로 모두 가능)
 /plugin marketplace add figure-team/code-atlas    # 또는 /abs/local/path
 /plugin install understand-anything@ktds          # U-A (/understand)
-/plugin install ktds-legacy@ktds                  # ktds (/understand-init, -docs, -export)
+/plugin install ktds-legacy@ktds                  # ktds (/understand-init, -map, -docs, -impact, -review, -export)
 ```
 
 > **수동 빌드 불필요.** ktds 스킬을 **처음 실행할 때 엔진이 자동 빌드**된다(`scripts/ensure-built.mjs`, 1회). 따라서 다른 컴퓨터에서도 `/plugin install` 후 바로 `/understand-init`/`/understand-docs`만 치면 된다.
@@ -37,10 +37,11 @@ ktds는 `Lum1104/Understand-Anything`의 **fork**이며, U-A 스킬(`/understand
 ```bash
 /understand                          # U-A: 코드 분석 → .understand-anything/knowledge-graph.json 생성 (선행 필수)
 /understand-init <root>              # config + .spec/ scaffold (★ 첫 ktds 실행 → 엔진 자동 빌드 1회)
-/understand-docs <root> run-smoke    # knowledge-graph.json → 근거 5종 문서 DRAFT
+/understand-docs <root>              # knowledge-graph.json → 근거 5종 문서 DRAFT (+ 세분화 위키)
 /understand-docs <root> review --list           # 검토 대기 목록
 /understand-docs <root> approve --doc <f> --by <handle>   # 승인
-/understand-export <root>            # 독립 실행 HTML (docs/index.html, CDN 없음)
+/understand-export <root>            # 독립 실행 HTML (docs/index.html, CDN 없음 — 5종만, 위키 제외)
+# MVP+ 워크플로(도메인 맵/영향도/리뷰)는 OPERATOR.md §0 전체 흐름 참조.
 ```
 
 > 순서 주의: `/understand-docs`는 U-A가 만든 `knowledge-graph.json`을 읽으므로 **`/understand` 가 먼저** 돌아야 한다. 운영 상세는 [`OPERATOR.md`](./OPERATOR.md), 오류는 [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md).
@@ -99,7 +100,7 @@ pnpm -r build                                    # @understand-anything/core + @
 
 빌드 검증:
 ```bash
-pnpm --filter @ktds/legacy-core test     # 126 tests 통과 확인
+pnpm --filter @ktds/legacy-core test     # 전체 테스트 통과 확인 (현재 380+)
 ```
 
 ## 6. 디렉터리 구조 (fork 내 격리)
@@ -108,8 +109,8 @@ pnpm --filter @ktds/legacy-core test     # 126 tests 통과 확인
 <ktds-fork>/
 ├ understand-anything-plugin/     U-A 원본 (무수정)
 ├ ktds-legacy-plugin/             ★ ktds
-│  ├ skills/{understand-init,-docs,-export}/SKILL.md
-│  ├ scripts/understand-{init,docs,export}.mjs
+│  ├ skills/understand-{init,map,docs,impact,review,export}/SKILL.md
+│  ├ scripts/understand-{init,map,docs,impact,review,export}.mjs  (+ cli-utils·ensure-built·*-recall)
 │  └ packages/legacy-core/        엔진 (@ktds/legacy-core)
 ├ .claude-plugin/marketplace.json  ★ additive (ktds plugin 등록)
 ├ pnpm-workspace.yaml              ★ additive

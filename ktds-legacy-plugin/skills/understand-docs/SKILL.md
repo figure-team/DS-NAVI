@@ -20,7 +20,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId> --n
 이 스크립트는 **결정론 skeleton(근거·태그·구조)** 만 만든다. (최초 실행 시 엔진 자동 빌드 1회)
 
 ## 세분화 위키 (ADR-004 — 기본 동작, 옵시디언/대시보드)
-**기본으로 5종과 함께** domain/flow/endpoint/table 4계층의 세분화 노트를 생성한다(`docs/feature`·`docs/api`·`docs/table`/*.md), 각 노트는 frontmatter + 근거 claim(5종과 동일 태그·cite) + `[[위키링크]]` 관계. `docs/index.md`(옵시디언 진입) + 5 허브(`docs/0N.md`)에 "세분화 항목" 링크섹션을 멱등 주입 + **대시보드용 `docs/.understand-anything/knowledge-graph.json`을 결정론으로 직접 emit**(U-A 파서/LLM 미사용, 전체 본문 포함). 5종은 `docs/0N.md` 위치 불변(상태키 보존), 대시보드에선 "00_개요" layer로 묶여 맨 위 표시.
+**기본으로 5종과 함께** domain/flow/endpoint/table 4계층의 세분화 노트를 생성한다(`docs/feature`·`docs/api`·`docs/table`/*.md), 각 노트는 frontmatter + 근거 claim(5종과 동일 태그·cite) + `[[위키링크]]` 관계. `docs/index.md`(옵시디언 진입) + 5 허브(`docs/0N.md`)에 "세분화 항목" 링크섹션을 멱등 주입 + **대시보드용 `<projectRoot>/.understand-anything/wiki-graph.json`을 결정론으로 직접 emit**(코드그래프 옆, U-A 파서/LLM 미사용, 전체 본문 포함). 5종은 `docs/0N.md` 위치 불변(상태키 보존), 대시보드에선 "00_개요" layer로 묶여 맨 위 표시.
 - `--steps` → step 계층 포함(폭증 구간이라 기본 제외, 명시적으로만). 비-TTY(슬래시)에서도 `--steps` 명시했을 때만 포함.
 - `--no-wiki` → 순수 5종만(루트 0N.md, 링크섹션 없음). 위키 도입 전과 **바이트 동일**.
 - `wiki [--steps]` 서브커맨드 → 5종은 건드리지 않고 **위키만 재생성/갱신**(멱등). `wiki status` → 노트 수·step 포함 여부·graph 경로.
@@ -32,7 +32,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-docs.mjs <projectRoot> <runId> --n
 - **주의**: 산문 안에 **단독 줄**로 `## 관계`·`<!-- claims -->`·`_(항목 없음)_`을 두지 말 것(그 줄부터 잘린다). `## 관계 모델`처럼 마커를 포함한 다른 헤딩은 안전.
 
 ### 읽기 동선 (주 뷰어 = U-A 웹 대시보드)
-1. **대시보드 기동**: U-A dev 서버를 `GRAPH_DIR=<projectRoot>/docs` 로 띄운다 → knowledge 뷰가 `docs/.understand-anything/knowledge-graph.json`을 로드.
+1. **대시보드 기동**: U-A dev 서버를 `GRAPH_DIR=<projectRoot>` 로 띄운다 → 코드/도메인 그래프와 같은 화면에서 상단 **"문서" 토글**이 루트 `.understand-anything/wiki-graph.json`을 로드.
 2. **읽기**: 노드 클릭 → **Info 탭**(NodeInfo)에서 위키링크/백링크 + 본문 마크다운(전체) 렌더. **Files 탭**은 폴더 트리 탐색(feature/api/table/00_개요).
 3. **옵시디언(선택)**: `docs/` 폴더를 vault로 직접 열면 같은 Karpathy 포맷이라 그래프·백링크·로컬그래프가 그대로 동작(별도 앱, 작업 0).
 

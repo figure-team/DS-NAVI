@@ -7,7 +7,7 @@ argument-hint: ["[projectRoot]", "[seeds | analyze | status]"]
 # /understand-impact
 
 > ⚠️ 비민감 샘플 전용 (보안 게이트는 Phase 2).
-> 🌐 **언어:** 사용자에게 보여주는 모든 설명·질문·요약은 **한국어**로 한다.
+> 🌐 **언어:** 사용자에게 보여주는 모든 설명·질문·요약·진행 안내는 **한국어**로 한다(config `outputLanguage`, 기본값 `ko`). 영어로 답하지 말 것.
 
 "이 파일/기능을 바꾸면 어디까지 영향이 갈까?"를 **결정론 정적분석**으로 답한다 (ADR-002). /understand-map이 만든 `.spec/map/` 산출물(census·routes·edges·slices·skeleton) 위에서 **재스캔 없이** 역/정 도달성을 계산한다:
 

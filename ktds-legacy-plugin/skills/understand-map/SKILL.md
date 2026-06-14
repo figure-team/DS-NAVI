@@ -7,7 +7,7 @@ argument-hint: ["[projectRoot]", "[scan | plan | confirm | bundle | emit | statu
 # /understand-map
 
 > ⚠️ 비민감 샘플 전용 (보안 게이트는 Phase 2).
-> 🌐 **언어:** 사용자에게 보여주는 모든 설명·질문·요약은 **한국어**로 한다.
+> 🌐 **언어:** 사용자에게 보여주는 모든 설명·질문·요약·진행 안내는 **한국어**로 한다(config `outputLanguage`, 기본값 `ko`). 영어로 답하지 말 것.
 
 레거시 코드의 **도메인/기능 분석을 결정론으로 생산**한다 (ADR-001). U-A `/understand-domain`과 달리 구조(skeleton)는 LLM 이전에 100% 확정되고, LLM은 빈칸(name/summary/domainMeta)만 채우며, 모든 사실 주장은 `파일:라인` 인용이 의무이고 기계 검증(실파일 대조)을 통과해야 한다. 산출물 `domain-graph.json`은 U-A 대시보드 도메인 뷰와 `/understand-docs`의 03_feature-spec이 그대로 소비한다.
 

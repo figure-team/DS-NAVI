@@ -21,6 +21,7 @@ U-A /understand → ktds /understand-init → /understand-map → /understand-do
 - [UA_BASELINE.md](./UA_BASELINE.md) — U-A v2.7.3 검증된 노드/엣지 타입·필드 (kg-reader 기준)
 - [ADR-003-upstream-strategy.md](./ADR-003-upstream-strategy.md) — upstream 추종 전략 개정: **대시보드 부분 분기** (대시보드=ktds 소유·merge 시 ours·선별 cherry-pick, 분석 파이프라인=추종 유지 — **Accepted**)
 - [ADR-004-obsidian-wiki.md](./ADR-004-obsidian-wiki.md) — `/understand-docs` 세분화 위키 결정 기록 (domain/flow/endpoint/table 노트 + 위키링크 메시 + 결정론 직접 emit, 기본 동작·`--steps`/`--no-wiki`. **Accepted**. §8 구현 개정: 위키 그래프를 루트 `wiki-graph.json`에 두고 코드 그래프와 **같은 대시보드의 "문서" 뷰 토글 + 리더 레이아웃**으로 통합 — 도메인 뷰 패턴)
+- [ADR-005-aidd-doc-contract.md](./ADR-005-aidd-doc-contract.md) — `/understand-docs` 문서 + 신설 AIDD 위임구현의 작업 스토리를 **하나의 계약**으로 통일 + 개발 방법론(BMad 등)을 **교체 가능한 모듈**로 분리. 3계층(불변 코어 → 방법론-중립 IR → 선언형 모듈) + 2프로파일(참조 R/작업 W) + 출처 기반 근거 게이트 — **Accepted**(설계 확정). 근시일=R+모듈 시스템, 보류=W/위임구현(신설 기능 착수 시)
 - [UPSTREAM_MERGE.md](./UPSTREAM_MERGE.md) — U-A fork upstream 추종 절차 (소유 경계·merge ours 절차 — ADR-003 반영)
 
 ## 기획서 (상위)

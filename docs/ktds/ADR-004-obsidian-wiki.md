@@ -198,3 +198,18 @@
 
 ### 8.4 검증 (jpetstore E2E)
 기본 37노트(domain4+flow4=feature8 / endpoint6 / table23) · `--steps` 69 · 루트에 코드(243)/도메인(40)/위키(46, article42) 3그래프 공존 · U-A `validateGraph` 통과(46n/83e, drop0) · 근거율 100% · `--no-wiki` 5종 바이트 동일 · `wiki-graph.json` 3회 멱등 · legacy-core 373 테스트 · 대시보드 빌드 clean.
+
+## 9. 구현 개정 — 도메인 노드 → 문서 진입점 (2026-06-15)
+
+§8까지 문서 열람 동선은 "문서 토글 → 목차/폴더 트리에서 선택"뿐이었다. **코드/도메인 그래프를 보다가 "이 노드의 문서"로 바로 가는 진입점**이 없었다. 사용자 요청으로 **도메인 뷰 NodeInfo에 "관련 문서" 섹션**을 신설했다.
+
+### 9.1 결정
+- **R-ID6. 직접 매칭으로 역참조** — 도메인 노드 id == `CanonicalNode.uid` == `WikiNote.nodeUid` == wiki-graph 노드 id로 **같은 값 직접 매칭**된다(`kg-reader/index.ts:388` → `wiki/project.ts:95` → `wiki/graph-emit.ts:107`). 신규 인덱스·emit·스키마 변경 없이 `wikiGraph.nodes.find(n => n.id === node.id && n.type === "article")` 단순 조회로 해소.
+- **R-ID7. 진입점 = NodeInfo "관련 문서" 섹션** — domain/flow/step 노드 선택 시, 매칭되는 article이 있으면 문서명+파일경로 버튼 1개 표시. 클릭 → **문서 뷰 전환 + 해당 노트 선택**(신규 `openWikiDoc` 액션 — `setViewMode`가 selection을 비우는 문제를 `navigateToDomain` 패턴으로 원자화).
+- **R-ID8. 코드 탭은 범위 외** — 구조(코드) 그래프 노드는 U-A ordinal id(`ep:..`,`cls:..`)라 canonical uid와 네임스페이스가 달라 매칭되지 않는다. 동일 조회가 코드 뷰에선 자연히 빈 결과 → 섹션 미표시(안전). 코드 탭 연동은 후속(빌드타임 `uid` 브릿지 필요).
+
+### 9.2 변경 파일 (대시보드 = ktds 소유, ADR-003 — merge 시 ours)
+- 대시보드 fork(`// ktds-fork`): `store.ts`(`openWikiDoc` 액션 신설) · `NodeInfo.tsx`(`RelatedDocsSection` 컴포넌트 신설, domain/flow/step 렌더). understand-anything 대시보드 파일 수정 → UA 버전 bump(5파일).
+
+### 9.3 검증
+- dashboard 빌드(tsc) clean · 수정 2파일 ESLint clean · emit 계약 확인(graph-emit.ts:106-118 — wiki 노드 `id==nodeUid`·`type:"article"`·`filePath` 존재) · 네비게이션 흐름 추적(openWikiDoc → viewMode=wiki+selectedNodeId → WikiReader 본문 렌더). 라이브 E2E는 두 그래프(domain+wiki) 공존 프로젝트에서 수동 확인 필요(저장소 샘플 없음).

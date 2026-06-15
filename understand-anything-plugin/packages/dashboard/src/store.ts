@@ -216,6 +216,8 @@ interface DashboardStore {
 
   setDomainGraph: (graph: KnowledgeGraph) => void;
   setWikiGraph: (graph: KnowledgeGraph) => void; // ktds-fork (ADR-004)
+  /** ktds-fork: "문서" 뷰로 전환하며 해당 위키 노드를 선택(원자적). NodeInfo "관련 문서"용. */
+  openWikiDoc: (nodeId: string) => void;
   setViewMode: (mode: ViewMode) => void;
   setIsKnowledgeGraph: (value: boolean) => void;
   navigateToDomain: (domainId: string) => void;
@@ -738,6 +740,18 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   setWikiGraph: (graph) => { // ktds-fork (ADR-004)
     set({ wikiGraph: graph });
   },
+
+  // ktds-fork: setViewMode는 selectedNodeId를 비우므로(뷰 전환+선택을 한 번에 못 함)
+  // navigateToDomain 패턴을 따라 원자적으로 wiki 뷰 전환 + 문서 선택.
+  openWikiDoc: (nodeId) =>
+    set({
+      viewMode: "wiki" as const,
+      selectedNodeId: nodeId,
+      focusNodeId: null,
+      codeViewerOpen: false,
+      codeViewerNodeId: null,
+      codeViewerExpanded: false,
+    }),
 
   setIsKnowledgeGraph: (value) => {
     set({ isKnowledgeGraph: value });

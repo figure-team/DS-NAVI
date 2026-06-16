@@ -56,7 +56,20 @@ An open-source tool combining LLM intelligence + static analysis to produce inte
 - `scripts/generate-large-graph.mjs` — Generates a fake knowledge graph for performance testing (e.g. large-graph layout). Writes to `.understand-anything/knowledge-graph.json`. Usage: `node scripts/generate-large-graph.mjs [nodeCount]` (default: 3000 nodes). Not part of the production pipeline.
 
 ## Versioning
-When pushing to remote, bump the version in **all five** of these files (keep them in sync):
+
+**Understand-anything (U-A) version = base-tracking scheme `<upstream-base>-ktds.<N>`.**
+This fork follows the upstream `Egonex-AI/Understand-Anything` lineage, so the version number tracks **which upstream U-A release the fork is built on** plus a ktds increment — it does NOT invent an independent number. Format:
+- `<upstream-base>` = the upstream `understand-anything-plugin/package.json` version the current tree is merged up to (e.g. `2.7.6`). Find it via `git merge-base origin/main upstream/main` → that commit's U-A version.
+- `<N>` = ktds release counter on that base, starting at `1`.
+- Current: **`2.7.6-ktds.1`** (fork sits on upstream 2.7.6; no upstream code merged yet beyond the fork point).
+
+Bump rules:
+- **ktds-only changes** (no upstream merge): increment `N` → `2.7.6-ktds.2`, `2.7.6-ktds.3`, …
+- **After merging upstream** (e.g. up to 2.7.7): set base to the new upstream version and reset N → `2.7.7-ktds.1`.
+
+> History note: the fork previously self-incremented to a `2.8.x` line independent of upstream (it was never an upstream merge — just self-bumping from the 2.7.6 base). That collided semantically with upstream's own 2.x line, so versioning was reset to base-tracking. `2.7.6-ktds.1` may appear "lower" than the old `2.8.3` to tooling that compares semver — acceptable because the fork is not published into the same registry as upstream U-A.
+
+When pushing to remote, keep the U-A version in sync across **all five** files:
 - `understand-anything-plugin/package.json` → `"version"` field
 - `understand-anything-plugin/.claude-plugin/plugin.json` → `"version"` field
 - `.claude-plugin/plugin.json` → `"version"` field

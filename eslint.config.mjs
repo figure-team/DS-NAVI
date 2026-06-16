@@ -10,6 +10,10 @@ export default tseslint.config(
       '**/build/**',
       '**/public/**',
       '**/coverage/**',
+      // Route-extraction fixtures are sample framework apps fed to the parser as
+      // INPUT (deliberately mimic real-world code: unused `request` handlers,
+      // Next.js `any` props). They are test data, not project source — not linted.
+      '**/fixtures/route-extraction/**',
       '**/.understand-anything/**',
       '**/.claude-plugin/**',
       '**/.cursor-plugin/**',

@@ -14,7 +14,7 @@ function quoteIfNeeded(v: string): string {
   const unsafe =
     v === "" ||
     /^\s|\s$/.test(v) ||
-    /[:#\[\]{}&*!|>'"%@`,]/.test(v) ||
+    /[:#[\]{}&*!|>'"%@`,]/.test(v) ||
     /[\n\r\t]/.test(v) ||
     /^[-?]/.test(v);
   if (!unsafe) return v;

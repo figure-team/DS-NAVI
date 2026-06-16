@@ -36,7 +36,7 @@ describe("generate 5 docs from the real v2.7.3 fixture", () => {
   it("every rendered line that is a claim carries a confidence tag", async () => {
     const graph = await readKnowledgeGraph(FIXTURE);
     const md = await generateMarkdown(graph);
-    const tagRe = /^\- \[(확정\(AI\)|확정\(담당자\)|추정|확인 필요)\] /;
+    const tagRe = /^- \[(확정\(AI\)|확정\(담당자\)|추정|확인 필요)\] /;
     for (const text of md.values()) {
       for (const line of text.split("\n")) {
         if (line.startsWith("- ")) expect(line, line).toMatch(tagRe);

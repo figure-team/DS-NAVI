@@ -9,7 +9,6 @@ import type {
   CensusReport,
   EdgesReport,
   RoutesReport,
-  SlicesReport,
 } from "./types.js";
 import { buildSlices } from "./slices.js";
 

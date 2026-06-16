@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   computeSpineLayout,
+  orderSpineSequence,
+  spineColumnIndex,
   SPINE_COLUMNS,
   COL_W,
   HEADER_H,
@@ -128,5 +130,34 @@ describe("computeSpineLayout — scale (110-step flow)", () => {
       if (seen[p.col] !== undefined) expect(p.y).toBeGreaterThan(seen[p.col]);
       seen[p.col] = p.y;
     }
+  });
+});
+
+describe("orderSpineSequence — pipeline-column order, stable within column", () => {
+  it("reorders a non-monotone sequence into api→service→dao→db→other", () => {
+    // Mimics the Catalog flow: an api base class emitted AFTER the service step.
+    const seq = [
+      step("catalogActionBean", "api"),
+      step("category", "unknown"),
+      step("catalogService", "service"),
+      step("abstractActionBean", "api"),
+      step("categoryMapper", "dao"),
+    ];
+    const ordered = orderSpineSequence(seq).map((s) => s.id);
+    expect(ordered).toEqual([
+      "catalogActionBean",
+      "abstractActionBean", // both api → grouped, no backward jump
+      "catalogService",
+      "categoryMapper",
+      "category", // unknown/other lane last
+    ]);
+    // Column indices are now non-decreasing → every cross-layer edge flows right.
+    const cols = orderSpineSequence(seq).map((s) => spineColumnIndex(s.layer));
+    for (let i = 1; i < cols.length; i++) expect(cols[i]).toBeGreaterThanOrEqual(cols[i - 1]);
+  });
+
+  it("preserves incoming order within the same column (stable)", () => {
+    const seq = [step("a", "dao"), step("b", "api"), step("c", "api"), step("d", "dao")];
+    expect(orderSpineSequence(seq).map((s) => s.id)).toEqual(["b", "c", "a", "d"]);
   });
 });

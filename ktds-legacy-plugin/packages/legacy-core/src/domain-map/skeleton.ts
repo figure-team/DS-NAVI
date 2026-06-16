@@ -131,6 +131,10 @@ export function buildSkeleton(
       // step 체인은 flow가 아니라 루트 파일에 결정된다(동일 파일의 모든
       // flow가 같은 체인을 공유) — flow마다 동일 체인을 복제 등재한다.
       const chain = stepChain(root, adjacency, stepCap);
+      // 곁가지 접기(v1): 추상 베이스 클래스는 흐름의 독립 단계가 아니라 하위
+      // 구현이 상속하는 공통 인프라(부모 플레이밍)다 — 하위 step과 중복이므로
+      // step에서 접는다. 루트(진입 파일)는 라우트의 닻이라 항상 보존한다.
+      const stepFiles = chain.files.filter((f) => f === root || !isAbstractBase(f, javaFacts));
 
       for (const flow of flows) {
         const flowKey = stripPrefix(flow.flowId, "flow:");
@@ -141,9 +145,9 @@ export function buildSkeleton(
           summary: SKELETON_BLANK,
           tags: [d.key],
           complexity:
-            chain.files.length <= 3
+            stepFiles.length <= 3
               ? "simple"
-              : chain.files.length <= 6
+              : stepFiles.length <= 6
                 ? "moderate"
                 : "complex",
           filePath: root,
@@ -158,7 +162,7 @@ export function buildSkeleton(
           weight: 1,
         });
 
-        chain.files.forEach((file, i) => {
+        stepFiles.forEach((file, i) => {
           const stepId = `step:${flowKey}:${file}`;
           const anchor = stepAnchor(file, javaFacts, file === root ? flow.line : null);
           nodes.push({
@@ -185,9 +189,26 @@ export function buildSkeleton(
             target: stepId,
             type: "flow_step",
             direction: "forward",
-            weight: round4((i + 1) / chain.files.length),
+            weight: round4((i + 1) / stepFiles.length),
           });
         });
+        // 실제 호출/의존 토폴로지(부모→자식) — 합성 순서가 아니라 진짜 파일
+        // 인접을 step→step 'calls' 엣지로 emit한다. 대시보드가 이것으로 팬아웃/
+        // 분기를 정확히 그린다(예: ActionBean이 두 서비스를 각각 호출 = fan-out이지,
+        // 서비스끼리 호출 아님). 양 끝이 모두 이 flow의 step일 때만 등재.
+        const inChain = new Set(stepFiles);
+        for (const fileA of stepFiles) {
+          for (const fileB of adjacency.get(fileA) ?? []) {
+            if (!inChain.has(fileB)) continue;
+            edges.push({
+              source: `step:${flowKey}:${fileA}`,
+              target: `step:${flowKey}:${fileB}`,
+              type: "calls",
+              direction: "forward",
+              weight: 1,
+            });
+          }
+        }
         if (chain.dropped.length > 0) {
           truncatedSteps.push({ flowId: flow.flowId, dropped: chain.dropped });
         }
@@ -224,6 +245,7 @@ export function buildSkeleton(
     contains_flow: 0,
     flow_step: 1,
     cross_domain: 2,
+    calls: 3,
   };
   edges.sort(
     (a, b) =>
@@ -286,6 +308,11 @@ function stepAnchor(
   const cls = javaFacts.get(relPath)?.classes[0];
   if (cls) return { line: cls.line, className: cls.name };
   return { line: 1, className: null };
+}
+
+/** 주 클래스가 abstract인 파일 = 추상 베이스(공통 인프라). 곁가지 접기 대상. */
+function isAbstractBase(relPath: string, javaFacts: Map<string, JavaFileFacts>): boolean {
+  return javaFacts.get(relPath)?.classes[0]?.isAbstract ?? false;
 }
 
 function buildAdjacency(edgesReport: EdgesReport): Map<string, string[]> {

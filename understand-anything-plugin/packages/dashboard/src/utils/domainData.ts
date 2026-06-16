@@ -13,7 +13,7 @@ import type { KnowledgeGraph, GraphNode } from "@understand-anything/core/types"
  */
 
 /** A flow's HTTP-style category, used for the method badge + usecase grouping. */
-export type FlowMethod = "GET" | "POST" | "PUT" | "DELETE" | "BATCH" | "EVENT" | "FLOW";
+export type FlowMethod = "GET" | "POST" | "PUT" | "DELETE" | "ANY" | "BATCH" | "EVENT" | "FLOW";
 
 export interface DomainFlow {
   /** Flow node id (= store activeFlowId target). */
@@ -125,7 +125,9 @@ function readEntryMeta(node: GraphNode): { entryPoint?: string; entryType?: stri
  * Derive the flow's method badge + display path from its entry metadata.
  *
  * - http entry → HTTP verb parsed from `entryPoint` ("POST /orders" → POST,
- *   "/orders/{id}" path). Falls back to GET when no verb is present.
+ *   "/orders/{id}" path). A leading "ANY" (the engine's token for an entry with
+ *   no fixed HTTP verb, e.g. event-dispatched Stripes actions) shows as ANY;
+ *   a verb-less http entry also resolves to ANY (never a fabricated GET).
  * - cron / batch → BATCH, event → EVENT. Non-http entries show their
  *   `entryPoint` (job name) or the flow label as the path.
  */
@@ -137,13 +139,15 @@ function deriveMethodAndPath(
   const type = (entryType ?? "").toLowerCase();
   if (type === "http") {
     const raw = (entryPoint ?? "").trim();
-    const m = raw.match(/^(GET|POST|PUT|DELETE|PATCH)\b\s*(.*)$/i);
+    const m = raw.match(/^(GET|POST|PUT|DELETE|PATCH|ANY)\b\s*(.*)$/i);
     if (m) {
       const verb = m[1].toUpperCase();
+      // PATCH folds into the PUT badge; ANY and the real verbs pass through.
       const method = (verb === "PATCH" ? "PUT" : verb) as FlowMethod;
       return { method, path: m[2].trim() || node.name };
     }
-    return { method: "GET", path: raw || node.name };
+    // Verb-less http entry → ANY (honest "no fixed HTTP verb"), not a guessed GET.
+    return { method: "ANY", path: raw || node.name };
   }
   if (type === "cron" || type === "batch" || type === "schedule") {
     return { method: "BATCH", path: entryPoint || node.name };

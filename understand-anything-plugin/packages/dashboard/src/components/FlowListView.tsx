@@ -36,6 +36,7 @@ const METHOD_STYLE: Record<FlowMethod, { bg: string; color: string }> = {
   POST: { bg: "rgba(74,124,155,0.2)", color: "#7dd3fc" },
   PUT: { bg: "rgba(201,160,108,0.2)", color: "#fcd34d" },
   DELETE: { bg: "rgba(248,113,113,0.2)", color: "#f87171" },
+  ANY: { bg: "rgba(203,213,225,0.18)", color: "#cbd5e1" },
   BATCH: { bg: "rgba(167,139,250,0.2)", color: "#a78bfa" },
   EVENT: { bg: "rgba(56,189,248,0.2)", color: "#38bdf8" },
   FLOW: { bg: "rgba(212,165,116,0.18)", color: "#d4a574" },

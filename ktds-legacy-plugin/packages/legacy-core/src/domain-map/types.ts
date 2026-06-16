@@ -341,7 +341,10 @@ export type UaGraphNode = z.infer<typeof UaGraphNodeSchema>;
 export const UaGraphEdgeSchema = z.object({
   source: z.string(),
   target: z.string(),
-  type: z.enum(["contains_flow", "flow_step", "cross_domain"]),
+  // calls = 실제 step→step 호출/의존(부모→자식) 엣지. flow_step(flow→step,
+  // 멤버십·순서)과 별개로 진짜 호출 토폴로지를 실어 대시보드가 fan-out/분기를
+  // 정확히 그린다(합성 순서 엣지 대체). core EdgeType의 "calls" 재사용.
+  type: z.enum(["contains_flow", "flow_step", "cross_domain", "calls"]),
   direction: z.enum(["forward", "backward", "bidirectional"]),
   description: z.string().optional(),
   weight: z.number().min(0).max(1),

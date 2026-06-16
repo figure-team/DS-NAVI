@@ -203,6 +203,53 @@ test("step 노드는 엔진 layer를 보유 (대시보드 ground-truth)", async 
   }
 });
 
+test("곁가지 접기: 추상 베이스 클래스는 step에서 제외 (루트·구현은 보존)", async () => {
+  const c = census();
+  const r = routes();
+  const e = edges();
+  const s = buildSlices(c, r, e);
+  const candidates = buildCandidates(c, r, s);
+  const plan = buildAutoPlan(candidates, "auto");
+  // OrderService(FILES[1])만 추상으로 — 흐름의 곁가지(공통 인프라)로 접혀야 한다.
+  // 체인은 Controller→Service→Repo지만, Repo는 BFS로 여전히 도달(접기는 표시
+  // 단계에서만 일어나고 도달성은 보존)하므로 step은 Controller + Repo로 남는다.
+  const jf = new Map<string, JavaFileFacts>();
+  for (const f of FILES) {
+    const cls = (f.split("/").pop() ?? "").replace(".java", "");
+    const decl = f === FILES[1] ? "public abstract" : "public";
+    jf.set(f, await scanJavaFile(`package shop;\n${decl} class ${cls} {}`));
+  }
+  const sk = buildSkeleton(plan, candidates, r, s, e, jf);
+  const stepIds = sk.nodes
+    .filter((n) => n.type === "step" && n.id.startsWith("step:POST /orders:"))
+    .map((n) => n.id);
+  expect(stepIds).toContain(`step:POST /orders:${FILES[0]}`); // 루트 Controller
+  expect(stepIds).toContain(`step:POST /orders:${FILES[2]}`); // 구현 Repo
+  expect(stepIds).not.toContain(`step:POST /orders:${FILES[1]}`); // 추상 Service 접힘
+  // weight 재정규화: 2 step → 0.5, 1 (접힌 노드는 분모에서 빠진다)
+  const ws = sk.edges
+    .filter((ed) => ed.type === "flow_step" && ed.source === "flow:POST /orders")
+    .map((ed) => ed.weight);
+  expect(ws).toEqual([0.5, 1]);
+});
+
+test("calls 엣지: 실제 step→step 호출 토폴로지 (합성 순서 체인 아님)", async () => {
+  const sk = await build();
+  // 픽스처 인접: Controller→Service(field-type), Service→Repo(ctor-param).
+  // Controller→Repo 직접 엣지는 없다 → calls에도 없어야 한다(가짜 체인 금지).
+  const calls = sk.edges
+    .filter((e) => e.type === "calls" && e.source.startsWith("step:POST /orders:"))
+    .map((e) => [e.source.split(":").pop(), e.target.split(":").pop()]);
+  expect(calls).toContainEqual([FILES[0], FILES[1]]); // Controller → Service
+  expect(calls).toContainEqual([FILES[1], FILES[2]]); // Service → Repo
+  expect(calls).not.toContainEqual([FILES[0], FILES[2]]); // 직접 호출 아님
+  // calls 엣지도 스키마 적합 + step→step (양 끝 step)
+  for (const e of sk.edges.filter((x) => x.type === "calls")) {
+    expect(e.source.startsWith("step:")).toBe(true);
+    expect(e.target.startsWith("step:")).toBe(true);
+  }
+});
+
 test("결정론: 2회 조립 → JSON 동일 + 중복 노드 ID 불변식", async () => {
   const a = JSON.stringify(await build());
   const b = JSON.stringify(await build());

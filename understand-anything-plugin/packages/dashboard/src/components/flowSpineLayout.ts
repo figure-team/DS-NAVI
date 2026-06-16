@@ -60,6 +60,29 @@ const COLUMN_INDEX: Record<FlowLayer, number> = {
   unknown: 4,
 };
 
+/** Column index for a layer (api=0 … unknown=4); unknown for anything off-map. */
+export function spineColumnIndex(layer: FlowLayer): number {
+  return COLUMN_INDEX[layer] ?? COLUMN_INDEX.unknown;
+}
+
+/**
+ * Order a step sequence for spine display: by pipeline column (api→service→dao→
+ * db→other), preserving the incoming order within a column as a stable tiebreak.
+ *
+ * The spine pins every step to its layer column, and the continuous edges connect
+ * *consecutive* steps in this sequence — so if the sequence isn't column-monotone
+ * the edges jump backwards (e.g. an api base class emitted after the service step
+ * draws a line back to the api lane). Sorting by column makes every cross-layer
+ * edge flow left→right. Callers pass steps already ordered by the engine's
+ * flow_step weight (call order); that order survives as the within-column order.
+ */
+export function orderSpineSequence<T extends SpineStep>(steps: readonly T[]): T[] {
+  return steps
+    .map((step, i) => ({ step, i }))
+    .sort((a, b) => spineColumnIndex(a.step.layer) - spineColumnIndex(b.step.layer) || a.i - b.i)
+    .map(({ step }) => step);
+}
+
 /**
  * Compute absolute spine coordinates for an ordered step sequence.
  *

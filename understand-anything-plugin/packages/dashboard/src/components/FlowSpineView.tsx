@@ -7,6 +7,7 @@ import { deriveLayer, orderFlowSteps } from "../utils/flowLayer";
 import type { FlowLayer, StepSource } from "../utils/flowLayer";
 import {
   computeSpineLayout,
+  orderSpineSequence,
   SPINE_COLUMNS,
   COL_W,
   HEADER_H,
@@ -23,6 +24,7 @@ const METHOD_COLOR: Record<FlowMethod, string> = {
   POST: "#6ee7b7",
   PUT: "#fcd34d",
   DELETE: "#f87171",
+  ANY: "#cbd5e1",
   BATCH: "#a78bfa",
   EVENT: "#d4a574",
   FLOW: "#94a3b8",
@@ -130,35 +132,47 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
       .filter((e) => e.type === "flow_step" && e.source === activeFlowId)
       .map((e) => ({ id: e.target, weight: e.weight }));
     // Raw-weight order, tie-broken by id, NaN last (plan R5 — never Math.round).
-    return orderFlowSteps(refs)
+    const byWeight = orderFlowSteps(refs)
       .map((ref): ResolvedStep | null => {
         const node = nodesById.get(ref.id);
         if (!node) return null;
         return { id: node.id, layer: deriveLayer(node, readStepSource(node)), node };
       })
       .filter((s): s is ResolvedStep => s !== null);
+    // Lay the sequence out in pipeline order (api→service→dao→db→other) so the
+    // continuous cross-layer edges flow left→right; engine weight (call order)
+    // is preserved as the within-column tiebreak.
+    return orderSpineSequence(byWeight);
   }, [domainGraph, activeFlowId]);
 
   const layout = useMemo(() => computeSpineLayout(steps), [steps]);
 
   const edges = useMemo(() => {
     const out: Array<{ key: string; d: string; crossLayer: boolean; color: string }> = [];
-    for (let i = 0; i < steps.length - 1; i++) {
-      const from = layout.placements.get(steps[i].id);
-      const to = layout.placements.get(steps[i + 1].id);
+    if (!domainGraph) return out;
+    // Draw the REAL call/dependency topology (engine `calls` step→step edges),
+    // not a synthetic consecutive-step chain. This shows fan-out honestly: an
+    // ActionBean that calls two services renders two edges branching out, never
+    // a fabricated service→service link (the old sequence chain's artifact).
+    const stepIds = new Set(steps.map((s) => s.id));
+    const layerById = new Map(steps.map((s) => [s.id, s.layer]));
+    for (const e of domainGraph.edges) {
+      if (e.type !== "calls" || !stepIds.has(e.source) || !stepIds.has(e.target)) continue;
+      const from = layout.placements.get(e.source);
+      const to = layout.placements.get(e.target);
       if (!from || !to) continue;
       const { d, crossLayer } = buildEdgePath(from, to);
       out.push({
-        key: `${steps[i].id}->${steps[i + 1].id}`,
+        key: `${e.source}->${e.target}`,
         d,
         crossLayer,
         // Edge takes the source step's layer color so the line stays continuous
         // with the node it leaves (cross-layer edges included).
-        color: LAYER_COLOR[steps[i].layer],
+        color: LAYER_COLOR[layerById.get(e.source) ?? "unknown"],
       });
     }
     return out;
-  }, [steps, layout]);
+  }, [domainGraph, steps, layout]);
 
   const onStepKeyDown = (e: KeyboardEvent<HTMLDivElement>, id: string) => {
     if (e.key === "Enter" || e.key === " ") {

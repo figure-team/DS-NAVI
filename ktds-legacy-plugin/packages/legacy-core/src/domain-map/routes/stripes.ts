@@ -1,4 +1,8 @@
-import type { JavaFileFacts } from "../java-facts.js";
+import type {
+  JavaClassFacts,
+  JavaFileFacts,
+  JavaMethodFacts,
+} from "../java-facts.js";
 import { normalizePath } from "../route-key.js";
 import type { RouteEntry } from "../types.js";
 
@@ -76,6 +80,46 @@ function isActionBeanLink(
   );
 }
 
+/**
+ * A Stripes event handler: a non-static method returning a *Resolution
+ * (jpetstore `public Resolution newAccount()`). Each maps to a distinct URL
+ * event — parity with Spring emitting one route per @GetMapping method.
+ */
+interface EventHandler {
+  method: JavaMethodFacts;
+  /** @HandlesEvent value if present, else the method name. */
+  event: string;
+  /** Method carries @DefaultHandler — addressable at the bare base URL. */
+  isDefault: boolean;
+}
+
+/**
+ * Event handlers of an ActionBean, sorted deterministically by (line, name).
+ * Base classes (AbstractActionBean getContext/setContext) are excluded because
+ * their methods do not return a *Resolution.
+ */
+function eventHandlers(cls: JavaClassFacts): EventHandler[] {
+  const handlers: EventHandler[] = [];
+  for (const method of cls.methods) {
+    if (method.isStatic) continue;
+    if (!/Resolution$/.test(method.returnType ?? "")) continue;
+    const isDefault = method.annotations.some(
+      (a) => a.name === "DefaultHandler",
+    );
+    const handlesEvent = method.annotations.find(
+      (a) => a.name === "HandlesEvent",
+    );
+    const event = handlesEvent?.args["value"]?.strings[0] ?? method.name;
+    handlers.push({ method, event, isDefault });
+  }
+  handlers.sort(
+    (a, b) =>
+      a.method.line - b.method.line ||
+      a.method.name.localeCompare(b.method.name),
+  );
+  return handlers;
+}
+
 export function extractStripesRoutes(
   relPath: string,
   facts: JavaFileFacts,
@@ -85,42 +129,60 @@ export function extractStripesRoutes(
   for (const cls of facts.classes) {
     if (cls.kind !== "class") continue;
 
+    let base: string;
+    let baseNotes: string[];
+    let baseLine: number;
+
     const urlBinding = cls.annotations.find((a) => a.name === "UrlBinding");
     if (urlBinding) {
       const raw = urlBinding.args["value"]?.strings[0];
-      if (raw) {
-        routes.push({
-          method: "ANY",
-          path: normalizePath(raw),
-          rawPath: raw,
-          kind: "form",
-          framework: "stripes",
-          filePath: relPath,
-          line: urlBinding.line,
-          handler: cls.name,
-          notes: [],
-        });
+      if (!raw) continue;
+      base = raw;
+      baseNotes = [];
+      baseLine = urlBinding.line;
+    } else {
+      // Name-based convention: concrete ActionBean without @UrlBinding.
+      // Abstract bases (jpetstore AbstractActionBean) are not addressable.
+      if (cls.isAbstract || !actionBeanIndex.has(cls.name)) {
+        continue;
       }
+      base = nameBasedBinding(facts.packageName, cls.name);
+      baseNotes = ["name-based-convention"];
+      baseLine = cls.line;
+    }
+
+    const handlers = eventHandlers(cls);
+    if (handlers.length === 0) {
+      // Fallback: no detectable event handler — keep the single bean-level
+      // route so nothing is lost (parity with the previous behaviour).
+      routes.push({
+        method: "ANY",
+        path: normalizePath(base),
+        rawPath: base,
+        kind: "form",
+        framework: "stripes",
+        filePath: relPath,
+        line: baseLine,
+        handler: cls.name,
+        notes: baseNotes,
+      });
       continue;
     }
 
-    // Name-based convention: concrete ActionBean without @UrlBinding.
-    // Abstract bases (jpetstore AbstractActionBean) are not addressable.
-    if (cls.isAbstract || !actionBeanIndex.has(cls.name)) {
-      continue;
+    for (const { method, event, isDefault } of handlers) {
+      const rawPath = isDefault ? base : `${base}?${event}`;
+      routes.push({
+        method: "ANY",
+        path: normalizePath(rawPath),
+        rawPath,
+        kind: "form",
+        framework: "stripes",
+        filePath: relPath,
+        line: method.line,
+        handler: `${cls.name}#${method.name}`,
+        notes: [...baseNotes, "stripes-event"],
+      });
     }
-    const raw = nameBasedBinding(facts.packageName, cls.name);
-    routes.push({
-      method: "ANY",
-      path: normalizePath(raw),
-      rawPath: raw,
-      kind: "form",
-      framework: "stripes",
-      filePath: relPath,
-      line: cls.line,
-      handler: cls.name,
-      notes: ["name-based-convention"],
-    });
   }
   return routes;
 }

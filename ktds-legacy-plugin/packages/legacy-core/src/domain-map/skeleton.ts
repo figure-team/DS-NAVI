@@ -109,6 +109,8 @@ export function buildSkeleton(
         entryPoint: string;
         entryType: "http" | "cron" | "cli";
         line: number;
+        /** Class#method 핸들러의 method 부분 — 라우트만 보유(배치는 undefined). */
+        handlerMethod?: string;
       }> = [];
       for (const r of routesByFile.get(root) ?? []) {
         flows.push({
@@ -116,6 +118,7 @@ export function buildSkeleton(
           entryPoint: `${r.method} ${r.path}`,
           entryType: "http",
           line: r.line,
+          handlerMethod: handlerMethodOf(r.handler),
         });
       }
       for (const b of batchByFile.get(root) ?? []) {
@@ -128,16 +131,26 @@ export function buildSkeleton(
       }
       flows.sort((a, b) => cmp(a.flowId, b.flowId));
 
-      // step 체인은 flow가 아니라 루트 파일에 결정된다(동일 파일의 모든
-      // flow가 같은 체인을 공유) — flow마다 동일 체인을 복제 등재한다.
-      const chain = stepChain(root, adjacency, stepCap);
-      // 곁가지 접기(v1): 추상 베이스 클래스는 흐름의 독립 단계가 아니라 하위
-      // 구현이 상속하는 공통 인프라(부모 플레이밍)다 — 하위 step과 중복이므로
-      // step에서 접는다. 루트(진입 파일)는 라우트의 닻이라 항상 보존한다.
-      const stepFiles = chain.files.filter((f) => f === root || !isAbstractBase(f, javaFacts));
-
       for (const flow of flows) {
         const flowKey = stripPrefix(flow.flowId, "flow:");
+
+        // step 체인은 핸들러별로 결정된다(Phase B): 핸들러 method가 실제로
+        // 호출하는 필드/타입만 root의 시드로 삼아 그 하위만 펼친다 — 같은
+        // ActionBean의 signon/signoff가 서로 다른 체인을 갖는다. method/클래스
+        // facts가 없으면(seeds === null) 기존 전체 체인으로 폴백(픽스처 호환).
+        const seeds =
+          flow.handlerMethod !== undefined
+            ? handlerSeedFiles(root, flow.handlerMethod, adjacency, javaFacts)
+            : null;
+        const chain =
+          seeds !== null
+            ? stepChainForSeeds(root, seeds, adjacency, stepCap)
+            : stepChain(root, adjacency, stepCap);
+        // 곁가지 접기(v1): 추상 베이스 클래스는 흐름의 독립 단계가 아니라 하위
+        // 구현이 상속하는 공통 인프라(부모 플레이밍)다 — 하위 step과 중복이므로
+        // step에서 접는다. 루트(진입 파일)는 라우트의 닻이라 항상 보존한다.
+        const stepFiles = chain.files.filter((f) => f === root || !isAbstractBase(f, javaFacts));
+
         nodes.push({
           id: flow.flowId,
           type: "flow",
@@ -294,6 +307,95 @@ function stepChain(
     .sort((a, b) => a[1] - b[1] || cmp(a[0], b[0]))
     .map(([file]) => file);
   return { files: ordered.slice(0, stepCap), dropped: ordered.slice(stepCap) };
+}
+
+/**
+ * 핸들러 method 본문이 실제로 참조하는 root의 이웃 파일 집합(Phase B 시드).
+ * class/method facts가 없으면 null(→ 전체 체인 폴백 신호). 빈 Set은 정상
+ * (핸들러가 root의 어떤 이웃 필드도 호출하지 않음 — 예: form-only 핸들러).
+ */
+function handlerSeedFiles(
+  root: string,
+  methodName: string,
+  adjacency: Map<string, string[]>,
+  javaFacts: Map<string, JavaFileFacts>,
+): Set<string> | null {
+  const cls = javaFacts.get(root)?.classes[0];
+  if (!cls) return null;
+  const method = cls.methods.find((m) => m.name === methodName);
+  if (!method) return null;
+
+  // typeToField: 클래스명 → 필드명. field 우선, ctor param은 best-effort 보강.
+  const typeToField = new Map<string, string>();
+  for (const f of cls.fields) {
+    if (!typeToField.has(f.typeName)) typeToField.set(f.typeName, f.name);
+  }
+  for (const cp of cls.ctorParamTypes) {
+    if (!typeToField.has(cp.typeName)) {
+      typeToField.set(cp.typeName, lowerFirst(cp.typeName));
+    }
+  }
+
+  const body = method.bodyText ?? "";
+  const seeds = new Set<string>();
+  for (const nb of adjacency.get(root) ?? []) {
+    const nbClass = javaFacts.get(nb)?.classes[0]?.name;
+    if (nbClass === undefined) continue;
+    const fieldName = typeToField.get(nbClass);
+    if (fieldName === undefined) continue;
+    const re = new RegExp(`\\b${escapeRegExp(fieldName)}\\b`);
+    if (re.test(body)) seeds.add(nb);
+  }
+  return seeds;
+}
+
+/**
+ * stepChain과 동일한 반환 형태 — root는 seeds로만 펼치고(전체 인접 아님),
+ * 그 외 노드는 전체 adjacency로 펼친다. 깊이 순서·(depth, path) 정렬·stepCap
+ * 슬라이스 로직은 stepChain과 정확히 동일하게 유지(결정론 보존).
+ */
+function stepChainForSeeds(
+  root: string,
+  seeds: Set<string>,
+  adjacency: Map<string, string[]>,
+  stepCap: number,
+): { files: string[]; dropped: string[] } {
+  const depthOf = new Map<string, number>([[root, 0]]);
+  let frontier = [root];
+  for (let depth = 0; depth < STEP_DEPTH_CAP && frontier.length > 0; depth++) {
+    const next: string[] = [];
+    for (const file of frontier) {
+      const targets = file === root ? [...seeds].sort() : (adjacency.get(file) ?? []);
+      for (const target of targets) {
+        if (!depthOf.has(target)) {
+          depthOf.set(target, depth + 1);
+          next.push(target);
+        }
+      }
+    }
+    frontier = next;
+  }
+  const ordered = [...depthOf.entries()]
+    .sort((a, b) => a[1] - b[1] || cmp(a[0], b[0]))
+    .map(([file]) => file);
+  return { files: ordered.slice(0, stepCap), dropped: ordered.slice(stepCap) };
+}
+
+/** RouteEntry.handler "Class#method" → "method"; null/무 # → undefined. */
+function handlerMethodOf(handler: string | null): string | undefined {
+  if (!handler) return undefined;
+  const hash = handler.indexOf("#");
+  if (hash < 0) return undefined;
+  const method = handler.slice(hash + 1);
+  return method.length > 0 ? method : undefined;
+}
+
+function lowerFirst(s: string): string {
+  return s.length > 0 ? s[0].toLowerCase() + s.slice(1) : s;
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function stepAnchor(

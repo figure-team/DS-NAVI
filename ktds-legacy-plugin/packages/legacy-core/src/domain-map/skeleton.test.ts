@@ -250,6 +250,169 @@ test("calls 엣지: 실제 step→step 호출 토폴로지 (합성 순서 체인
   }
 });
 
+test("Phase B: 핸들러별 step 체인 — 본문이 호출하는 서비스만 포함, 미호출은 제외", async () => {
+  // ActionBean 한 파일에 두 서비스 필드(accountService, catalogService)가 주입되고,
+  // signon() 본문은 accountService만 호출한다 → signon 체인은 root + AccountService,
+  // CatalogService는 제외되어야 한다(핸들러가 호출하지 않으므로).
+  const ROOT = "src/com/shop/AccountActionBean.java";
+  const ACCT = "src/com/shop/AccountService.java";
+  const CAT = "src/com/shop/CatalogService.java";
+  const files = [ROOT, ACCT, CAT];
+
+  const c: CensusReport = {
+    schemaVersion: 1,
+    gitCommit: "b".repeat(40),
+    fileCount: files.length,
+    files: files.map((relPath) => ({ relPath, lang: "java" as const })),
+    kgCrossCheck: null,
+  };
+  const r: RoutesReport = {
+    schemaVersion: 1,
+    gitCommit: "b".repeat(40),
+    contextPath: null,
+    routes: [
+      {
+        routeId: "route:GET /signon",
+        method: "GET" as const,
+        path: "/signon",
+        rawPath: "/signon",
+        kind: "api" as const,
+        framework: "stripes" as const,
+        filePath: ROOT,
+        line: 10,
+        handler: "AccountActionBean#signon",
+        notes: [],
+      },
+    ],
+    batchEntries: [],
+  };
+  const e: EdgesReport = {
+    schemaVersion: 1,
+    gitCommit: "b".repeat(40),
+    edges: [
+      // 클래스 레벨 인접: ActionBean이 두 서비스를 모두 참조(필드)지만,
+      // signon 핸들러는 accountService만 호출한다.
+      { source: ROOT, target: ACCT, kind: "field-type" as const, line: 3 },
+      { source: ROOT, target: CAT, kind: "field-type" as const, line: 4 },
+    ],
+    unresolved: [],
+  };
+
+  const jf = new Map<string, JavaFileFacts>();
+  jf.set(
+    ROOT,
+    await scanJavaFile(
+      [
+        "package shop;",
+        "public class AccountActionBean {",
+        "  private AccountService accountService;",
+        "  private CatalogService catalogService;",
+        "  public String signon() { return accountService.login(); }",
+        "}",
+      ].join("\n"),
+    ),
+  );
+  jf.set(ACCT, await scanJavaFile("package shop;\npublic class AccountService {}"));
+  jf.set(CAT, await scanJavaFile("package shop;\npublic class CatalogService {}"));
+
+  const s = buildSlices(c, r, e);
+  const candidates = buildCandidates(c, r, s);
+  const plan = buildAutoPlan(candidates, "auto");
+  const sk = buildSkeleton(plan, candidates, r, s, e, jf);
+
+  const stepIds = sk.nodes
+    .filter((n) => n.type === "step" && n.id.startsWith("step:GET /signon:"))
+    .map((n) => n.id);
+  expect(stepIds).toContain(`step:GET /signon:${ROOT}`); // root는 항상 step 1
+  expect(stepIds).toContain(`step:GET /signon:${ACCT}`); // 호출됨
+  expect(stepIds).not.toContain(`step:GET /signon:${CAT}`); // 미호출 → 제외
+});
+
+test("Phase B: 빈 시드(form-only 핸들러)는 root만, 무핸들러 배치는 전체 체인 폴백", async () => {
+  // 같은 ActionBean에 form-only 핸들러(newAccountForm: 어떤 서비스도 호출 안 함)와
+  // 무핸들러 배치 엔트리. form 핸들러 체인 = root만, 배치 = 전체 체인(폴백).
+  const ROOT = "src/com/shop/AccountActionBean.java";
+  const ACCT = "src/com/shop/AccountService.java";
+  const files = [ROOT, ACCT];
+
+  const c: CensusReport = {
+    schemaVersion: 1,
+    gitCommit: "c".repeat(40),
+    fileCount: files.length,
+    files: files.map((relPath) => ({ relPath, lang: "java" as const })),
+    kgCrossCheck: null,
+  };
+  const r: RoutesReport = {
+    schemaVersion: 1,
+    gitCommit: "c".repeat(40),
+    contextPath: null,
+    routes: [
+      {
+        routeId: "route:GET /newAccountForm",
+        method: "GET" as const,
+        path: "/newAccountForm",
+        rawPath: "/newAccountForm",
+        kind: "api" as const,
+        framework: "stripes" as const,
+        filePath: ROOT,
+        line: 12,
+        handler: "AccountActionBean#newAccountForm",
+        notes: [],
+      },
+    ],
+    batchEntries: [
+      {
+        entryId: `batch:${ROOT}#main`,
+        trigger: "main" as const,
+        schedule: null,
+        filePath: ROOT,
+        line: 30,
+        handler: "AccountActionBean#main",
+        notes: [],
+      },
+    ],
+  };
+  const e: EdgesReport = {
+    schemaVersion: 1,
+    gitCommit: "c".repeat(40),
+    edges: [{ source: ROOT, target: ACCT, kind: "field-type" as const, line: 3 }],
+    unresolved: [],
+  };
+
+  const jf = new Map<string, JavaFileFacts>();
+  jf.set(
+    ROOT,
+    await scanJavaFile(
+      [
+        "package shop;",
+        "public class AccountActionBean {",
+        "  private AccountService accountService;",
+        "  public String newAccountForm() { return \"form\"; }",
+        "}",
+      ].join("\n"),
+    ),
+  );
+  jf.set(ACCT, await scanJavaFile("package shop;\npublic class AccountService {}"));
+
+  const s = buildSlices(c, r, e);
+  const candidates = buildCandidates(c, r, s);
+  const plan = buildAutoPlan(candidates, "auto");
+  const sk = buildSkeleton(plan, candidates, r, s, e, jf);
+
+  // form-only 핸들러: 빈 시드 → root만 step
+  const formSteps = sk.nodes
+    .filter((n) => n.type === "step" && n.id.startsWith("step:GET /newAccountForm:"))
+    .map((n) => n.id);
+  expect(formSteps).toEqual([`step:GET /newAccountForm:${ROOT}`]);
+
+  // 무핸들러 배치: 전체 체인 폴백 → root + AccountService
+  const batchSteps = sk.nodes
+    .filter((n) => n.type === "step" && n.id.startsWith(`step:batch:${ROOT}#main:`))
+    .map((n) => n.id);
+  expect(batchSteps).toContain(`step:batch:${ROOT}#main:${ROOT}`);
+  expect(batchSteps).toContain(`step:batch:${ROOT}#main:${ACCT}`);
+});
+
 test("결정론: 2회 조립 → JSON 동일 + 중복 노드 ID 불변식", async () => {
   const a = JSON.stringify(await build());
   const b = JSON.stringify(await build());

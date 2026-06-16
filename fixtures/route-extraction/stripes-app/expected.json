@@ -1,9 +1,11 @@
 {
-  "description": "Stripes 기대 명세표 (14.4 — jpetstore Stripes 케이스 자체 작성): @UrlBinding 명시 + NameBasedActionResolver 이름규약(base package 뒤 세그먼트 + 클래스명 suffix 제거 + .action), abstract 베이스 제외",
+  "description": "Stripes 기대 명세표 (14.4 + Phase A — 이벤트 핸들러당 1 라우트): @UrlBinding 명시 + NameBasedActionResolver 이름규약(base package 뒤 세그먼트 + 클래스명 suffix 제거 + .action), abstract 베이스 제외. 각 ActionBean의 Resolution 반환 비정적 메서드를 이벤트 핸들러로 보고 @DefaultHandler는 base URL, 그 외는 base?event 로 분리한다.",
   "routes": [
-    { "method": "ANY", "path": "/actions/Catalog.action", "kind": "form", "framework": "stripes", "handler": "CatalogActionBean", "notes": ["name-based-convention"] },
-    { "method": "ANY", "path": "/actions/Checkout.action", "kind": "form", "framework": "stripes", "handler": "CheckoutBean", "notes": ["name-based-convention"] },
-    { "method": "ANY", "path": "/shop/cart.action", "kind": "form", "framework": "stripes", "handler": "CartActionBean", "notes": [] }
+    { "method": "ANY", "path": "/shop/cart.action", "kind": "form", "framework": "stripes", "handler": "CartActionBean#view", "notes": ["stripes-event"] },
+    { "method": "ANY", "path": "/shop/cart.action?addItem", "kind": "form", "framework": "stripes", "handler": "CartActionBean#addItem", "notes": ["stripes-event"] },
+    { "method": "ANY", "path": "/actions/Catalog.action", "kind": "form", "framework": "stripes", "handler": "CatalogActionBean#list", "notes": ["name-based-convention", "stripes-event"] },
+    { "method": "ANY", "path": "/actions/Catalog.action?viewCategory", "kind": "form", "framework": "stripes", "handler": "CatalogActionBean#viewCategory", "notes": ["name-based-convention", "stripes-event"] },
+    { "method": "ANY", "path": "/actions/Checkout.action?placeOrder", "kind": "form", "framework": "stripes", "handler": "CheckoutBean#submit", "notes": ["name-based-convention", "stripes-event"] }
   ],
   "batchEntries": []
 }

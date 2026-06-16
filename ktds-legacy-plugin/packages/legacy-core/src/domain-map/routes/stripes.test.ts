@@ -105,41 +105,60 @@ public class CheckoutBean extends BaseActionBean {}
 // ── extractStripesRoutes ──────────────────────────────────────────────────────
 
 describe("extractStripesRoutes — @UrlBinding", () => {
-  test("@UrlBinding 명시 → 해당 경로 사용", async () => {
+  test("@UrlBinding + 이벤트 핸들러 → 핸들러당 1 라우트", async () => {
     const source = `
 package com.example.web;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.HandlesEvent;
+import net.sourceforge.stripes.action.Resolution;
 @UrlBinding("/account/manage.action")
-public class AccountActionBean {}
+public class AccountActionBean {
+    @DefaultHandler
+    public Resolution view() { return null; }
+    @HandlesEvent("save")
+    public Resolution store() { return null; }
+}
 `;
     const facts = await scanJavaFile(source);
     const idx = buildActionBeanIndex(new Map([["Account.java", facts]]));
     const routes = extractStripesRoutes("src/Account.java", facts, idx);
-    expect(routes).toHaveLength(1);
-    const r = routes[0];
-    expect(r.method).toBe("ANY");
-    expect(r.path).toBe("/account/manage.action");
-    expect(r.rawPath).toBe("/account/manage.action");
-    expect(r.kind).toBe("form");
-    expect(r.framework).toBe("stripes");
-    expect(r.handler).toBe("AccountActionBean");
-    expect(r.notes).toEqual([]);
+    expect(routes).toHaveLength(2);
+
+    const def = routes.find((r) => r.handler === "AccountActionBean#view")!;
+    expect(def.method).toBe("ANY");
+    expect(def.path).toBe("/account/manage.action");
+    expect(def.rawPath).toBe("/account/manage.action");
+    expect(def.kind).toBe("form");
+    expect(def.framework).toBe("stripes");
+    expect(def.notes).toEqual(["stripes-event"]);
+
+    const evt = routes.find((r) => r.handler === "AccountActionBean#store")!;
+    expect(evt.path).toBe("/account/manage.action?save");
+    expect(evt.rawPath).toBe("/account/manage.action?save");
+    expect(evt.notes).toEqual(["stripes-event"]);
   });
 
-  test("@UrlBinding 있으면 name-based-convention 노트 없음", async () => {
+  test("@UrlBinding 핸들러 없음 → bean 단위 폴백 라우트 1개", async () => {
     const source = `
+package com.example.web;
+import net.sourceforge.stripes.action.UrlBinding;
 @UrlBinding("/explicit.action")
 public class ExplicitActionBean {}
 `;
     const facts = await scanJavaFile(source);
     const idx = buildActionBeanIndex(new Map([["E.java", facts]]));
     const routes = extractStripesRoutes("E.java", facts, idx);
+    expect(routes).toHaveLength(1);
+    expect(routes[0].path).toBe("/explicit.action");
+    expect(routes[0].handler).toBe("ExplicitActionBean");
+    expect(routes[0].notes).toEqual([]);
     expect(routes[0].notes).not.toContain("name-based-convention");
   });
 });
 
 describe("extractStripesRoutes — name-based convention", () => {
-  test("ActionBean 접미사 + index에 있음 → name-based route", async () => {
+  test("핸들러 없음 → bean 단위 name-based 폴백 라우트", async () => {
     const source = `
 package com.example.web.actions;
 public class CatalogActionBean {}
@@ -149,7 +168,57 @@ public class CatalogActionBean {}
     const routes = extractStripesRoutes("src/Catalog.java", facts, idx);
     expect(routes).toHaveLength(1);
     expect(routes[0].path).toBe("/actions/Catalog.action");
-    expect(routes[0].notes).toContain("name-based-convention");
+    expect(routes[0].handler).toBe("CatalogActionBean");
+    expect(routes[0].notes).toEqual(["name-based-convention"]);
+  });
+
+  test("name-based + 이벤트 핸들러 → 핸들러당 1 라우트 (event 분리)", async () => {
+    const source = `
+package com.example.web.actions;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.Resolution;
+public class CatalogActionBean {
+    @DefaultHandler
+    public Resolution list() { return null; }
+    public Resolution viewCategory() { return null; }
+}
+`;
+    const facts = await scanJavaFile(source);
+    const idx = buildActionBeanIndex(new Map([["Catalog.java", facts]]));
+    const routes = extractStripesRoutes("src/Catalog.java", facts, idx);
+    expect(routes).toHaveLength(2);
+
+    const def = routes.find((r) => r.handler === "CatalogActionBean#list")!;
+    expect(def.path).toBe("/actions/Catalog.action");
+    expect(def.notes).toEqual(["name-based-convention", "stripes-event"]);
+
+    const evt = routes.find(
+      (r) => r.handler === "CatalogActionBean#viewCategory",
+    )!;
+    expect(evt.path).toBe("/actions/Catalog.action?viewCategory");
+    expect(evt.notes).toEqual(["name-based-convention", "stripes-event"]);
+  });
+
+  test("이벤트 핸들러는 비정적 Resolution 반환 메서드만 — 베이스 getter 제외", async () => {
+    const source = `
+package com.example.web.actions;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.Resolution;
+public class OrderActionBean {
+    private ActionBeanContext context;
+    public ActionBeanContext getContext() { return context; }
+    public void setContext(ActionBeanContext c) { this.context = c; }
+    public static Resolution helper() { return null; }
+    @DefaultHandler
+    public Resolution submit() { return null; }
+}
+`;
+    const facts = await scanJavaFile(source);
+    const idx = buildActionBeanIndex(new Map([["Order.java", facts]]));
+    const routes = extractStripesRoutes("src/Order.java", facts, idx);
+    expect(routes).toHaveLength(1);
+    expect(routes[0].handler).toBe("OrderActionBean#submit");
   });
 
   test("추상 ActionBean → 라우트 없음", async () => {

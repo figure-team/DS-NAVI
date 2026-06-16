@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Code Atlas · 도메인 흐름 뷰 — 중간 발표</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-soft: #141210;
+    --panel: #17150f;
+    --gold: #d4a574;
+    --gold-bright: #e8c89a;
+    --ink: #ece7df;
+    --ink-dim: #9a948a;
+    --line: #2a2620;
+    --api: #d4a574;
+    --service: #5fc6b8;
+    --dao: #c98fd6;
+    --db: #6f9ce0;
+    --other: #6b665d;
+    --ok: #7bcf9a;
+    --warn: #e0b65f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(1200px 800px at 70% -10%, #1d1810 0%, var(--bg) 55%);
+    color: var(--ink);
+    font-family: "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    overflow: hidden;
+  }
+  .deck { height: 100vh; width: 100vw; position: relative; }
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6vh 9vw;
+    animation: fade .45s ease;
+  }
+  .slide.active { display: flex; }
+  @keyframes fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  .serif { font-family: "DM Serif Display", "Noto Serif KR", Georgia, serif; }
+  .kicker {
+    color: var(--gold);
+    letter-spacing: .28em;
+    font-size: .8rem;
+    text-transform: uppercase;
+    margin-bottom: 1.4rem;
+  }
+  h1 { font-size: clamp(2.4rem, 5.5vw, 4.6rem); line-height: 1.05; font-weight: 800; letter-spacing: -.02em; }
+  h1 .accent { color: var(--gold); }
+  h2 { font-size: clamp(1.7rem, 3.6vw, 2.7rem); font-weight: 800; letter-spacing: -.01em; margin-bottom: .4rem; }
+  .sub { color: var(--ink-dim); font-size: clamp(1rem, 1.5vw, 1.25rem); margin-top: 1.2rem; max-width: 60ch; line-height: 1.6; }
+  .lead { color: var(--gold-bright); font-size: 1.05rem; margin-bottom: 2.2rem; }
+
+  ul.points { list-style: none; margin-top: 1.6rem; display: grid; gap: 1rem; max-width: 70ch; }
+  ul.points li { position: relative; padding-left: 1.8rem; font-size: clamp(1rem, 1.7vw, 1.3rem); line-height: 1.5; color: var(--ink); }
+  ul.points li::before { content: "▸"; position: absolute; left: 0; color: var(--gold); }
+  ul.points li b { color: var(--gold-bright); font-weight: 700; }
+  ul.points li small { color: var(--ink-dim); }
+
+  .grid { display: grid; gap: 1.2rem; margin-top: 2rem; }
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .card {
+    background: linear-gradient(180deg, var(--panel), #100e09);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.5rem 1.4rem;
+  }
+  .card .n { color: var(--gold); font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; }
+  .card h3 { font-size: 1.2rem; margin: .5rem 0 .55rem; font-weight: 700; }
+  .card p { color: var(--ink-dim); font-size: .98rem; line-height: 1.55; }
+
+  /* pipeline / spine viz */
+  .lanes { display: grid; grid-template-columns: repeat(5, 1fr); gap: .8rem; margin-top: 2rem; }
+  .lane { border: 1px solid var(--line); border-radius: 12px; padding: 1rem .8rem; text-align: center; background: #100e09; }
+  .lane .name { font-weight: 700; letter-spacing: .04em; font-size: .95rem; }
+  .lane .meta { color: var(--ink-dim); font-size: .8rem; margin-top: .3rem; }
+  .lane .count { font-size: 1.8rem; font-weight: 800; margin-top: .5rem; }
+  .lane.api { border-color: rgba(212,165,116,.5); } .lane.api .count, .lane.api .name { color: var(--api); }
+  .lane.service { border-color: rgba(95,198,184,.5); } .lane.service .count, .lane.service .name { color: var(--service); }
+  .lane.dao { border-color: rgba(201,143,214,.5); } .lane.dao .count, .lane.dao .name { color: var(--dao); }
+  .lane.db { border-color: rgba(111,156,224,.5); } .lane.db .count, .lane.db .name { color: var(--db); }
+  .lane.other { border-color: rgba(107,102,93,.6); } .lane.other .count, .lane.other .name { color: var(--ink); }
+
+  .stat-row { display: flex; gap: 2.4rem; margin-top: 2.2rem; flex-wrap: wrap; }
+  .stat { }
+  .stat .big { font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 800; color: var(--gold); line-height: 1; }
+  .stat .lbl { color: var(--ink-dim); margin-top: .5rem; font-size: .95rem; }
+
+  .badge { display: inline-block; padding: .25rem .7rem; border-radius: 999px; font-size: .78rem; font-weight: 700; letter-spacing: .03em; }
+  .badge.ok { background: rgba(123,207,154,.12); color: var(--ok); border: 1px solid rgba(123,207,154,.4); }
+  .badge.warn { background: rgba(224,182,95,.12); color: var(--warn); border: 1px solid rgba(224,182,95,.4); }
+  .badge.next { background: rgba(212,165,116,.12); color: var(--gold); border: 1px solid rgba(212,165,116,.4); }
+
+  .flowchain { display: flex; align-items: center; gap: .5rem; margin-top: 2.4rem; flex-wrap: wrap; }
+  .node { padding: .7rem 1.1rem; border-radius: 10px; font-weight: 700; font-size: .95rem; border: 1px solid var(--line); background: #100e09; }
+  .node.api { color: var(--api); border-color: rgba(212,165,116,.5); }
+  .node.service { color: var(--service); border-color: rgba(95,198,184,.5); }
+  .node.dao { color: var(--dao); border-color: rgba(201,143,214,.5); }
+  .node.db { color: var(--db); border-color: rgba(111,156,224,.5); }
+  .arrow { color: var(--gold); font-size: 1.3rem; }
+
+  table.road { width: 100%; border-collapse: collapse; margin-top: 1.8rem; font-size: 1.02rem; }
+  table.road td { padding: .85rem 1rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  table.road tr td:first-child { width: 1%; white-space: nowrap; }
+  table.road .done { color: var(--ok); font-weight: 700; }
+  table.road .now { color: var(--gold); font-weight: 700; }
+  table.road .todo { color: var(--ink-dim); }
+
+  /* footer / nav */
+  .foot { position: fixed; bottom: 2.2vh; left: 9vw; right: 9vw; display: flex; justify-content: space-between; align-items: center; color: var(--ink-dim); font-size: .82rem; }
+  .progressbar { position: fixed; top: 0; left: 0; height: 3px; background: var(--gold); transition: width .3s ease; z-index: 10; }
+  .hint { color: var(--ink-dim); font-size: .8rem; }
+  kbd { background: #201d16; border: 1px solid var(--line); border-radius: 5px; padding: .1rem .4rem; font-size: .75rem; color: var(--ink); }
+  .pageno { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="progressbar" id="bar"></div>
+<div class="deck" id="deck">
+
+  <!-- 1 · Title -->
+  <section class="slide active">
+    <div class="kicker">Code Atlas · Understand-Anything (ktds fork)</div>
+    <h1 class="serif">레거시 코드를<br><span class="accent">도메인 흐름</span>으로 읽다</h1>
+    <p class="sub">LLM 지능 + 정적 분석으로, 레거시 백엔드의 요청 → 서비스 → 데이터 호출 흐름을
+      계층을 가로질러 한 화면에 그려내는 도메인 모드 — 중간 진행 발표</p>
+    <div class="stat-row">
+      <div class="stat"><div class="big">2026.06</div><div class="lbl">발표 시점</div></div>
+      <div class="stat"><div class="big">jpetstore-6</div><div class="lbl">실데이터 검증 대상</div></div>
+      <div class="stat"><div class="big">0.13.2</div><div class="lbl">ktds-legacy 엔진</div></div>
+    </div>
+  </section>
+
+  <!-- 2 · Problem -->
+  <section class="slide">
+    <div class="kicker">문제</div>
+    <h2>레거시는 "한 기능이 어디까지 흐르는지"가 안 보인다</h2>
+    <ul class="points">
+      <li>코드는 API · Service · DAO · DB로 <b>계층마다 흩어져</b> 있는데, 한 요청이 그 계층들을 어떻게 관통하는지는 어디에도 그려져 있지 않다.</li>
+      <li>기존 구조 그래프는 <b>파일/클래스 단위 의존성</b>만 보여줘 "기능 단위 흐름"과는 거리가 멀다.</li>
+      <li>Spring · Stripes 등 <b>프레임워크마다 진입점 규칙이 달라</b> 흐름의 시작점을 일관되게 잡기 어렵다.</li>
+      <li>비개발자 / 신규 인력이 <b>도메인 관점</b>으로 시스템을 이해할 진입로가 없다.</li>
+    </ul>
+  </section>
+
+  <!-- 3 · Approach -->
+  <section class="slide">
+    <div class="kicker">접근 · ADR-006</div>
+    <h2>도메인 모드 = 3-스크린 독립 경험</h2>
+    <p class="lead">도메인 그래프가 있으면 대시보드는 도메인 탭으로 착지 — 프로토타입 충실 흐름</p>
+    <div class="grid cols-3">
+      <div class="card">
+        <div class="n">Screen 1</div>
+        <h3>Domain Map</h3>
+        <p>도메인 카드 랜딩 + 통계. 시스템을 도메인 단위로 조망하는 진입 화면.</p>
+      </div>
+      <div class="card">
+        <div class="n">Screen 2</div>
+        <h3>Flow List</h3>
+        <p>마스터-디테일 흐름 목록 + 인라인 스파인 미리보기. 기능(흐름)을 골라 들어간다.</p>
+      </div>
+      <div class="card">
+        <div class="n">Screen 3</div>
+        <h3>Flow Spine</h3>
+        <p>한 흐름의 백엔드 호출 체인을 API→Service→DAO→DB 레인에 가로로 펼친 <b>메인 스파인</b>.</p>
+      </div>
+    </div>
+    <div class="flowchain">
+      <span class="node api">API</span><span class="arrow">→</span>
+      <span class="node service">Service</span><span class="arrow">→</span>
+      <span class="node dao">DAO</span><span class="arrow">→</span>
+      <span class="node db">DB</span>
+      <span style="margin-left:1rem;color:var(--ink-dim);font-size:.9rem">+ Other 레인(흐르는 데이터·엔터티)</span>
+    </div>
+  </section>
+
+  <!-- 4 · What we built -->
+  <section class="slide">
+    <div class="kicker">진행 현황 · 무엇을 구현했나</div>
+    <h2>휴리스틱 추측에서 → 엔진 Ground-Truth로</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="n">#1 · 엔진 Layer Emit</div>
+        <h3>step 노드가 직접 layer를 안다</h3>
+        <p>예전엔 대시보드가 <b>파일명 휴리스틱</b>으로 레인을 추측 → jpetstore 패키지명 <code>org.mybatis</code>의 "mybatis" 토큰 때문에 <b>전건 DB 오분류</b>. 이제 엔진이 route/edge 근거로 api·service·dao layer를 직접 부착.</p>
+      </div>
+      <div class="card">
+        <div class="n">A · 이벤트별 흐름 분리</div>
+        <h3>ActionBean 1개 → 핸들러별 흐름</h3>
+        <p>Spring은 이미 메서드마다 흐름인데 Stripes만 클래스당 1개로 뭉쳐 있던 비일관 해소. 이벤트 핸들러마다 라우트 emit → <b>Account 1 → 7 흐름</b>.</p>
+      </div>
+      <div class="card">
+        <div class="n">B · 실제 calls 엣지</div>
+        <h3>가짜 합성 순서가 아닌 진짜 호출</h3>
+        <p>step→step 엣지를 실제 호출 토폴로지로 emit + 핸들러 bodyText에서 주입 필드를 추출해 <b>핸들러별로 다른 step 체인</b> 구성.</p>
+      </div>
+      <div class="card">
+        <div class="n">C · 곁가지 접기 + 파이프라인 안정화</div>
+        <h3>노이즈 제거 · stale-dist 회귀 픽스</h3>
+        <p>추상 베이스 클래스를 step에서 제외(루트 보존). <code>ensure-built</code>가 구버전 dist를 조용히 실행하던 회귀를 버전 스탬프 검사로 차단.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · Validation -->
+  <section class="slide">
+    <div class="kicker">검증 · jpetstore-6 실데이터</div>
+    <h2>분류가 깨끗한가? — 전수 확인 완료</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="big">21</div><div class="lbl">분리된 흐름 (flow)</div></div>
+      <div class="stat"><div class="big">107</div><div class="lbl">step 노드 · <span style="color:var(--ok)">전건 layer emit</span></div></div>
+      <div class="stat"><div class="big">145</div><div class="lbl">실제 calls 엣지</div></div>
+    </div>
+    <div class="lanes">
+      <div class="lane api"><div class="name">API</div><div class="count">21</div><div class="meta">진입점</div></div>
+      <div class="lane service"><div class="name">Service</div><div class="count">14</div><div class="meta">비즈니스</div></div>
+      <div class="lane dao"><div class="name">DAO</div><div class="count">23</div><div class="meta">매퍼</div></div>
+      <div class="lane db"><div class="name">DB</div><div class="count">0</div><div class="meta">—</div></div>
+      <div class="lane other"><div class="name">Other</div><div class="count">49</div><div class="meta">엔터티</div></div>
+    </div>
+    <p class="sub" style="margin-top:1.4rem">Other(unknown) 49개는 <b style="color:var(--warn)">오분류가 아니라</b> 흐름을 따라 흐르는 도메인 데이터입니다 — 다음 장에서 전수 확인.</p>
+  </section>
+
+  <!-- 6 · unknown deep dive -->
+  <section class="slide">
+    <div class="kicker">검증 · Other 레인 전수 확인</div>
+    <h2>unknown 49 = 100% 도메인 엔터티 <span class="badge ok">오분류 0건</span></h2>
+    <p class="sub">49개 step 전부 경로가 <code>src/main/java/org/mybatis/jpetstore/<b>domain/</b></code> 하위.
+      호출 레이어(api·service·dao) 클래스는 단 하나도 섞이지 않음.</p>
+    <div class="grid cols-3" style="margin-top:1.6rem">
+      <div class="card"><div class="n">고유 엔터티 9종</div><h3>Item · Product · Category</h3><p>10 · 8 · 7회 — 카탈로그 도메인의 핵심 POJO. 여러 흐름에 반복 등장.</p></div>
+      <div class="card"><div class="n">주문 · 장바구니</div><h3>Order · LineItem · Cart · CartItem</h3><p>4 · 3 · 2 · 3회 — 주문/카트 흐름을 타고 흐르는 데이터.</p></div>
+      <div class="card"><div class="n">계정 · 시퀀스</div><h3>Account · Sequence</h3><p>3 · 3회 — 순수 POJO. 호출 체인 레이어가 아닌 "흐르는 값".</p></div>
+    </div>
+    <p class="sub" style="margin-top:1.4rem">비율이 46%로 오른 건 흐름이 7배로 분리되며 <b>같은 엔터티가 여러 흐름에 반복 등장</b>한 결과 — 분류 품질 저하가 아님.</p>
+  </section>
+
+  <!-- 7 · Roadmap -->
+  <section class="slide">
+    <div class="kicker">로드맵</div>
+    <h2>다음 단계</h2>
+    <table class="road">
+      <tr><td><span class="badge ok">완료</span></td><td><b>#1 엔진 layer emit</b> · 이벤트별 흐름 분리 · 실제 calls 엣지 · 곁가지 접기 · stale-dist 픽스</td></tr>
+      <tr><td><span class="badge ok">완료</span></td><td><b>jpetstore 실데이터 검증</b> — 전건 layer · Other 레인 엔터티 100% 확인</td></tr>
+      <tr><td><span class="badge next">다음</span></td><td>#6 Diff/영향도 <b>도메인 투영</b> · #7 화면 전환 애니메이션 · #8 라이트테마 레인색</td></tr>
+      <tr><td><span class="badge next">다음</span></td><td>#9 스파인 접근성(a11y) · #10 모바일 레이아웃 · #11 마켓 게시</td></tr>
+      <tr><td><span class="badge warn">백로그</span></td><td><code>stepSource</code> 직렬화 보존 · 비개발자 내러티브 문서 · <code>/understand</code> 기본 언어 ko</td></tr>
+    </table>
+  </section>
+
+  <!-- 8 · Close -->
+  <section class="slide">
+    <div class="kicker">정리</div>
+    <h1 class="serif">계층을 가로지르는<br><span class="accent">기능의 지도</span>가 생겼다</h1>
+    <ul class="points" style="margin-top:2rem">
+      <li>레거시 한 기능의 <b>API→Service→DAO 호출 체인</b>을 한 화면에서 따라간다.</li>
+      <li>레인 분류는 <b>휴리스틱 추측이 아닌 엔진 근거</b> — 실데이터에서 전수 검증 완료.</li>
+      <li>다음은 <b>영향도 도메인 투영</b>과 발표/배포 마감.</li>
+    </ul>
+  </section>
+
+</div>
+
+<div class="foot">
+  <span class="hint"><kbd>←</kbd> <kbd>→</kbd> 또는 <kbd>Space</kbd> 로 이동</span>
+  <span class="pageno"><span id="cur">1</span> / <span id="total">8</span></span>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let i = 0;
+  const bar = document.getElementById('bar');
+  const cur = document.getElementById('cur');
+  document.getElementById('total').textContent = slides.length;
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    cur.textContent = i + 1;
+  }
+  function next() { show(i + 1); }
+  function prev() { show(i - 1); }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('a')) next(); });
+  show(0);
+</script>
+</body>
+</html>

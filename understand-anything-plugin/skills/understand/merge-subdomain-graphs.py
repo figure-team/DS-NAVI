@@ -33,6 +33,55 @@ def _num(v: Any) -> float:
         return 0.0
 
 
+# ── Schema normalization (parity with merge-batch-graphs.py) ──────────────
+# Mirrors packages/core/src/schema.ts so the dashboard validator has nothing
+# left to auto-correct. Without this, LLM file-analyzer output that omits these
+# fields (e.g. `endpoint` nodes lack `complexity`, `routes` edges lack
+# `direction`) reaches knowledge-graph.json unfixed and the dashboard surfaces
+# an "[Auto-corrected]" banner on every load.
+COMPLEXITY_MAP: dict[str, str] = {
+    "low": "simple",
+    "easy": "simple",
+    "medium": "moderate",
+    "intermediate": "moderate",
+    "high": "complex",
+    "hard": "complex",
+    "difficult": "complex",
+}
+VALID_COMPLEXITY: frozenset[str] = frozenset({"simple", "moderate", "complex"})
+
+_DIRECTION_ALIASES: dict[str, str] = {"both": "bidirectional", "mutual": "bidirectional"}
+_VALID_DIRECTIONS: frozenset[str] = frozenset({"forward", "backward", "bidirectional"})
+
+
+def normalize_complexity(value: Any) -> str:
+    """Canonicalize a node `complexity` value to a schema enum member."""
+    if isinstance(value, str):
+        lower = value.strip().lower()
+        if lower in VALID_COMPLEXITY:
+            return lower
+        if lower in COMPLEXITY_MAP:
+            return COMPLEXITY_MAP[lower]
+        return "moderate"
+    if isinstance(value, (int, float)):
+        n = int(value)
+        if n <= 3:
+            return "simple"
+        if n <= 6:
+            return "moderate"
+        return "complex"
+    return "moderate"
+
+
+def normalize_direction(value: Any) -> str:
+    """Canonicalize an edge `direction` value to a schema enum member."""
+    candidate = value.lower() if isinstance(value, str) else ""
+    candidate = _DIRECTION_ALIASES.get(candidate, candidate)
+    if candidate not in _VALID_DIRECTIONS:
+        return "forward"
+    return candidate
+
+
 def load_graph(path: Path) -> dict[str, Any] | None:
     """Load and minimally validate a knowledge graph JSON file."""
     try:
@@ -212,6 +261,24 @@ def merge_graphs(graphs: list[dict[str, Any]]) -> tuple[dict[str, Any], list[str
     # Output stats
     report.append("")
     report.append(f"Output: {len(nodes_by_id)} nodes, {len(valid_edges)} edges, {len(layers_by_id)} layers, {len(all_tour_steps)} tour steps")
+
+    # ── Normalize complexity (nodes) & direction (edges) in place ─────
+    # Fill/canonicalize schema enums so the persisted graph is valid and the
+    # dashboard has nothing to auto-correct (see helper note above).
+    complexity_defaulted = 0
+    for node in nodes_by_id.values():
+        if not node.get("complexity"):
+            complexity_defaulted += 1
+        node["complexity"] = normalize_complexity(node.get("complexity"))
+    direction_defaulted = 0
+    for edge in valid_edges:
+        if not edge.get("direction"):
+            direction_defaulted += 1
+        edge["direction"] = normalize_direction(edge.get("direction"))
+    if complexity_defaulted:
+        report.append(f'  normalized: {complexity_defaulted} node "complexity" defaulted to "moderate"')
+    if direction_defaulted:
+        report.append(f'  normalized: {direction_defaulted} edge "direction" defaulted to "forward"')
 
     merged: dict[str, Any] = {
         "version": "1.0.0",

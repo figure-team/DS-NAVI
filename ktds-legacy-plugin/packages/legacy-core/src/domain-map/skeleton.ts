@@ -11,6 +11,7 @@ import {
   type UaGraphEdge,
   type UaGraphNode,
 } from "./types.js";
+import { buildLayerSignals, deriveStepLayer } from "./step-layer.js";
 import { cmp } from "../utils/cmp.js";
 import { groupBy } from "../utils/collections.js";
 
@@ -87,6 +88,8 @@ export function buildSkeleton(
   const routesByFile = groupBy(routes.routes, (r) => r.filePath);
   const batchByFile = groupBy(routes.batchEntries, (b) => b.filePath);
   const adjacency = buildAdjacency(edgesReport);
+  // layer 신호 집합은 루프 밖에서 한 번만 도출(파일당 재계산 금지).
+  const layerSignals = buildLayerSignals(routes, edgesReport);
 
   for (const d of domains) {
     const fileCount = [...domainByFile.values()].filter((k) => k === d.key).length;
@@ -167,6 +170,9 @@ export function buildSkeleton(
             complexity: "simple",
             filePath: file,
             lineRange: [anchor.line, anchor.line],
+            // 엔진 ground-truth layer (api/service/dao/db/unknown) — 대시보드가
+            // 파일명 추측 대신 진실을 읽는다. routes/edges 간선 신호 + 파일명 폴백.
+            layer: deriveStepLayer(file, anchor.className, layerSignals),
           });
           stepSources.push({
             stepId,

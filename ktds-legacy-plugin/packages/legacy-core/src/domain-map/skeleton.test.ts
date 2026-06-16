@@ -188,6 +188,21 @@ test("stepCap 초과분은 truncatedSteps로 보고 (조용한 누락 금지)", 
   expect(trunc?.dropped).toEqual([FILES[2]]);
 });
 
+test("step 노드는 엔진 layer를 보유 (대시보드 ground-truth)", async () => {
+  const sk = await build();
+  // Controller(route 엔트리) → api, Service → service, Repo → unknown(이름 폴백
+  // 만으로는 Repo만 dao; OrderRepo는 *Repository가 아니라 unknown).
+  const ctrl = sk.nodes.find((n) => n.id === `step:POST /orders:${FILES[0]}`)!;
+  expect(ctrl.layer).toBe("api");
+  const svc = sk.nodes.find((n) => n.id === `step:POST /orders:${FILES[1]}`)!;
+  expect(svc.layer).toBe("service");
+  // 모든 step 노드는 layer를 가지며, flow/domain 노드는 갖지 않는다.
+  for (const n of sk.nodes) {
+    if (n.type === "step") expect(n.layer).toBeDefined();
+    else expect(n.layer).toBeUndefined();
+  }
+});
+
 test("결정론: 2회 조립 → JSON 동일 + 중복 노드 ID 불변식", async () => {
   const a = JSON.stringify(await build());
   const b = JSON.stringify(await build());

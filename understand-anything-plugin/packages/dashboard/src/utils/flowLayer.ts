@@ -20,6 +20,23 @@ import type { GraphNode } from "@understand-anything/core/types";
 
 export type FlowLayer = "api" | "service" | "dao" | "db" | "unknown";
 
+const FLOW_LAYERS: readonly FlowLayer[] = ["api", "service", "dao", "db", "unknown"];
+
+/**
+ * The ktds /understand-map engine now emits a per-step `layer` (ground truth
+ * derived from routes/edges + filename — domain-map/step-layer.ts). When
+ * present we trust it over the heuristic below: the engine knows e.g. a mybatis
+ * edge = definitely DAO, which a filename scan can't. Read defensively (old
+ * graphs / non-step nodes have no `layer`) and validate against the 5 enum
+ * values; anything else falls through to the heuristic.
+ */
+function engineLayer(node: GraphNode): FlowLayer | null {
+  const raw = (node as { layer?: unknown }).layer;
+  return typeof raw === "string" && (FLOW_LAYERS as readonly string[]).includes(raw)
+    ? (raw as FlowLayer)
+    : null;
+}
+
 /**
  * Optional stronger identity signal that may ride along on a step node.
  * Mirrors ktds `StepSource` (domain-map/types.ts:348-354): className is the
@@ -111,6 +128,12 @@ function nameToLayer(name: string): FlowLayer {
  * with no recognizable signal resolves to `unknown` (the "Other" lane).
  */
 export function deriveLayer(node: GraphNode, stepSource?: StepSource): FlowLayer {
+  // 0. Engine ground truth (strongest of all) — short-circuit when the node
+  //    carries a valid `layer` from /understand-map. Old graphs lack it and
+  //    fall through to the filename heuristic below (kept intact).
+  const fromEngine = engineLayer(node);
+  if (fromEngine) return fromEngine;
+
   // 1. className (strongest)
   if (stepSource?.className) {
     const byClass = classNameToLayer(stepSource.className);

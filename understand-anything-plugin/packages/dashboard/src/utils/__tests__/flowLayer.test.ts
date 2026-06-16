@@ -99,6 +99,33 @@ describe("deriveLayer — unknown fallback", () => {
   });
 });
 
+describe("deriveLayer — engine layer (ground truth) short-circuit", () => {
+  it("trusts node.layer verbatim when present, ignoring filename heuristic", () => {
+    // className/filePath would heuristically say "service", but the engine says "dao".
+    const node = step({ id: "a", filePath: "src/x/service/OrderService.java", name: "OrderService" });
+    (node as { layer?: string }).layer = "dao";
+    expect(deriveLayer(node, { className: "OrderService", relPath: "src/x/service/OrderService.java" })).toBe("dao");
+  });
+
+  it("returns each valid engine layer verbatim", () => {
+    for (const layer of ["api", "service", "dao", "db", "unknown"] as const) {
+      const node = step({ id: "a", name: "doStuff" });
+      (node as { layer?: string }).layer = layer;
+      expect(deriveLayer(node)).toBe(layer);
+    }
+  });
+
+  it("ignores an invalid engine layer and falls back to the heuristic", () => {
+    const node = step({ id: "a", name: "OrderController" });
+    (node as { layer?: string }).layer = "bogus";
+    expect(deriveLayer(node, { className: "OrderController", relPath: "x.java" })).toBe("api");
+  });
+
+  it("falls back to the heuristic when node.layer is absent (old graphs)", () => {
+    expect(deriveLayer(step({ id: "a", name: "OrderMapper" }), { className: "OrderMapper", relPath: "x.java" })).toBe("dao");
+  });
+});
+
 describe("orderFlowSteps — raw weight asc, tie-broken by id, NaN last", () => {
   it("orders by raw weight (no Math.round bucketing)", () => {
     // Two weights that round to the same *10 bucket but must stay ordered.

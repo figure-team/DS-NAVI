@@ -328,6 +328,12 @@ export const UaGraphNodeSchema = z
     tags: z.array(z.string()),
     complexity: z.enum(["simple", "moderate", "complex"]),
     domainMeta: UaDomainMetaSchema.optional(),
+    /**
+     * step 노드의 계층 역할(엔진 ground-truth). non-step 노드와 옛 그래프는
+     * 이 필드가 없으므로 optional — 대시보드는 있으면 그대로 읽고 없으면
+     * 파일명 휴리스틱으로 폴백한다. domain-map/step-layer.ts가 채운다.
+     */
+    layer: z.enum(["api", "service", "dao", "db", "unknown"]).optional(),
   })
   .passthrough();
 export type UaGraphNode = z.infer<typeof UaGraphNodeSchema>;

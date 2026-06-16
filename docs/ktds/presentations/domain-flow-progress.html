@@ -3,218 +3,390 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Code Atlas · 도메인 흐름 뷰 — 중간 발표</title>
+<title>Code Atlas · 레거시 코드 이해 플랫폼 — 중간 발표</title>
 <style>
   :root {
-    --bg: #0a0a0a;
-    --bg-soft: #141210;
-    --panel: #17150f;
-    --gold: #d4a574;
-    --gold-bright: #e8c89a;
-    --ink: #ece7df;
-    --ink-dim: #9a948a;
+    --bg: #0a0a0a; --bg-soft: #141210; --panel: #17150f; --panel2:#100e09;
+    --gold: #d4a574; --gold-bright: #e8c89a; --ink: #ece7df; --ink-dim: #9a948a;
     --line: #2a2620;
-    --api: #d4a574;
-    --service: #5fc6b8;
-    --dao: #c98fd6;
-    --db: #6f9ce0;
-    --other: #6b665d;
-    --ok: #7bcf9a;
-    --warn: #e0b65f;
+    --api: #d4a574; --service: #5fc6b8; --dao: #c98fd6; --db: #6f9ce0; --other: #8a857b;
+    --ok: #7bcf9a; --warn: #e0b65f; --info:#6f9ce0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    background: radial-gradient(1200px 800px at 70% -10%, #1d1810 0%, var(--bg) 55%);
+    background: radial-gradient(1200px 800px at 72% -12%, #1d1810 0%, var(--bg) 55%);
     color: var(--ink);
     font-family: "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
     overflow: hidden;
   }
   .deck { height: 100vh; width: 100vw; position: relative; }
   .slide {
-    position: absolute; inset: 0;
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    padding: 6vh 9vw;
-    animation: fade .45s ease;
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; justify-content: center;
+    padding: 5.5vh 8vw 9vh; animation: fade .4s ease; overflow: hidden;
   }
   .slide.active { display: flex; }
-  @keyframes fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 
   .serif { font-family: "DM Serif Display", "Noto Serif KR", Georgia, serif; }
-  .kicker {
-    color: var(--gold);
-    letter-spacing: .28em;
-    font-size: .8rem;
-    text-transform: uppercase;
-    margin-bottom: 1.4rem;
-  }
-  h1 { font-size: clamp(2.4rem, 5.5vw, 4.6rem); line-height: 1.05; font-weight: 800; letter-spacing: -.02em; }
+  .kicker { color: var(--gold); letter-spacing: .26em; font-size: .76rem; text-transform: uppercase; margin-bottom: 1.1rem; }
+  h1 { font-size: clamp(2.2rem, 5vw, 4.4rem); line-height: 1.05; font-weight: 800; letter-spacing: -.02em; }
   h1 .accent { color: var(--gold); }
-  h2 { font-size: clamp(1.7rem, 3.6vw, 2.7rem); font-weight: 800; letter-spacing: -.01em; margin-bottom: .4rem; }
-  .sub { color: var(--ink-dim); font-size: clamp(1rem, 1.5vw, 1.25rem); margin-top: 1.2rem; max-width: 60ch; line-height: 1.6; }
-  .lead { color: var(--gold-bright); font-size: 1.05rem; margin-bottom: 2.2rem; }
+  h2 { font-size: clamp(1.5rem, 3.2vw, 2.5rem); font-weight: 800; letter-spacing: -.01em; margin-bottom: .3rem; }
+  h2 .accent { color: var(--gold); }
+  .sub { color: var(--ink-dim); font-size: clamp(.95rem, 1.4vw, 1.2rem); margin-top: 1rem; max-width: 64ch; line-height: 1.6; }
+  .lead { color: var(--gold-bright); font-size: 1.02rem; margin-bottom: 1.4rem; }
+  code { font-family: "JetBrains Mono","SF Mono",Consolas,monospace; font-size: .88em; color: var(--gold-bright); background: #201d16; padding: .08em .35em; border-radius: 4px; }
 
-  ul.points { list-style: none; margin-top: 1.6rem; display: grid; gap: 1rem; max-width: 70ch; }
-  ul.points li { position: relative; padding-left: 1.8rem; font-size: clamp(1rem, 1.7vw, 1.3rem); line-height: 1.5; color: var(--ink); }
+  ul.points { list-style: none; margin-top: 1.2rem; display: grid; gap: .75rem; max-width: 78ch; }
+  ul.points li { position: relative; padding-left: 1.6rem; font-size: clamp(.95rem, 1.5vw, 1.18rem); line-height: 1.5; }
   ul.points li::before { content: "▸"; position: absolute; left: 0; color: var(--gold); }
   ul.points li b { color: var(--gold-bright); font-weight: 700; }
-  ul.points li small { color: var(--ink-dim); }
 
-  .grid { display: grid; gap: 1.2rem; margin-top: 2rem; }
-  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-  .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-  .card {
-    background: linear-gradient(180deg, var(--panel), #100e09);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 1.5rem 1.4rem;
-  }
-  .card .n { color: var(--gold); font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; }
-  .card h3 { font-size: 1.2rem; margin: .5rem 0 .55rem; font-weight: 700; }
-  .card p { color: var(--ink-dim); font-size: .98rem; line-height: 1.55; }
+  .grid { display: grid; gap: 1rem; margin-top: 1.4rem; }
+  .grid.c2 { grid-template-columns: repeat(2, 1fr); }
+  .grid.c3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.c4 { grid-template-columns: repeat(4, 1fr); }
+  .card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--line); border-radius: 13px; padding: 1.15rem 1.15rem; }
+  .card .n { color: var(--gold); font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; }
+  .card h3 { font-size: 1.08rem; margin: .4rem 0 .45rem; font-weight: 700; }
+  .card h3.sm { font-size: .98rem; }
+  .card p { color: var(--ink-dim); font-size: .9rem; line-height: 1.5; }
+  .card p b { color: var(--ink); font-weight: 600; }
 
-  /* pipeline / spine viz */
-  .lanes { display: grid; grid-template-columns: repeat(5, 1fr); gap: .8rem; margin-top: 2rem; }
-  .lane { border: 1px solid var(--line); border-radius: 12px; padding: 1rem .8rem; text-align: center; background: #100e09; }
-  .lane .name { font-weight: 700; letter-spacing: .04em; font-size: .95rem; }
-  .lane .meta { color: var(--ink-dim); font-size: .8rem; margin-top: .3rem; }
-  .lane .count { font-size: 1.8rem; font-weight: 800; margin-top: .5rem; }
+  .stat-row { display: flex; gap: 2.2rem; margin-top: 1.6rem; flex-wrap: wrap; }
+  .stat .big { font-size: clamp(1.9rem, 4.4vw, 3.2rem); font-weight: 800; color: var(--gold); line-height: 1; }
+  .stat .lbl { color: var(--ink-dim); margin-top: .45rem; font-size: .9rem; }
+
+  .badge { display: inline-block; padding: .2rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
+  .badge.ok { background: rgba(123,207,154,.12); color: var(--ok); border: 1px solid rgba(123,207,154,.4); }
+  .badge.warn { background: rgba(224,182,95,.12); color: var(--warn); border: 1px solid rgba(224,182,95,.4); }
+  .badge.next { background: rgba(212,165,116,.12); color: var(--gold); border: 1px solid rgba(212,165,116,.4); }
+  .badge.info { background: rgba(111,156,224,.12); color: var(--info); border: 1px solid rgba(111,156,224,.4); }
+
+  /* lanes / nodes */
+  .lanes { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; margin-top: 1.5rem; }
+  .lane { border: 1px solid var(--line); border-radius: 11px; padding: .85rem .6rem; text-align: center; background: var(--panel2); }
+  .lane .name { font-weight: 700; font-size: .9rem; }
+  .lane .meta { color: var(--ink-dim); font-size: .74rem; margin-top: .25rem; }
+  .lane .count { font-size: 1.7rem; font-weight: 800; margin-top: .35rem; }
   .lane.api { border-color: rgba(212,165,116,.5); } .lane.api .count, .lane.api .name { color: var(--api); }
   .lane.service { border-color: rgba(95,198,184,.5); } .lane.service .count, .lane.service .name { color: var(--service); }
   .lane.dao { border-color: rgba(201,143,214,.5); } .lane.dao .count, .lane.dao .name { color: var(--dao); }
   .lane.db { border-color: rgba(111,156,224,.5); } .lane.db .count, .lane.db .name { color: var(--db); }
-  .lane.other { border-color: rgba(107,102,93,.6); } .lane.other .count, .lane.other .name { color: var(--ink); }
+  .lane.other { border-color: rgba(138,133,123,.55); } .lane.other .count, .lane.other .name { color: var(--other); }
 
-  .stat-row { display: flex; gap: 2.4rem; margin-top: 2.2rem; flex-wrap: wrap; }
-  .stat { }
-  .stat .big { font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 800; color: var(--gold); line-height: 1; }
-  .stat .lbl { color: var(--ink-dim); margin-top: .5rem; font-size: .95rem; }
-
-  .badge { display: inline-block; padding: .25rem .7rem; border-radius: 999px; font-size: .78rem; font-weight: 700; letter-spacing: .03em; }
-  .badge.ok { background: rgba(123,207,154,.12); color: var(--ok); border: 1px solid rgba(123,207,154,.4); }
-  .badge.warn { background: rgba(224,182,95,.12); color: var(--warn); border: 1px solid rgba(224,182,95,.4); }
-  .badge.next { background: rgba(212,165,116,.12); color: var(--gold); border: 1px solid rgba(212,165,116,.4); }
-
-  .flowchain { display: flex; align-items: center; gap: .5rem; margin-top: 2.4rem; flex-wrap: wrap; }
-  .node { padding: .7rem 1.1rem; border-radius: 10px; font-weight: 700; font-size: .95rem; border: 1px solid var(--line); background: #100e09; }
+  .flowchain { display: flex; align-items: center; gap: .45rem; margin-top: 1.6rem; flex-wrap: wrap; }
+  .node { padding: .6rem 1rem; border-radius: 9px; font-weight: 700; font-size: .9rem; border: 1px solid var(--line); background: var(--panel2); }
   .node.api { color: var(--api); border-color: rgba(212,165,116,.5); }
   .node.service { color: var(--service); border-color: rgba(95,198,184,.5); }
   .node.dao { color: var(--dao); border-color: rgba(201,143,214,.5); }
   .node.db { color: var(--db); border-color: rgba(111,156,224,.5); }
-  .arrow { color: var(--gold); font-size: 1.3rem; }
+  .arrow { color: var(--gold); font-size: 1.15rem; }
 
-  table.road { width: 100%; border-collapse: collapse; margin-top: 1.8rem; font-size: 1.02rem; }
-  table.road td { padding: .85rem 1rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  /* stack layers */
+  .stack { display: grid; gap: .6rem; margin-top: 1.3rem; }
+  .layer { display: grid; grid-template-columns: 4.2rem 1fr; gap: 1rem; align-items: center; border: 1px solid var(--line); border-radius: 11px; padding: .8rem 1rem; background: var(--panel2); }
+  .layer .lv { font-weight: 800; color: var(--gold); font-size: 1.05rem; text-align: center; }
+  .layer .body h3 { font-size: 1rem; font-weight: 700; }
+  .layer .body p { color: var(--ink-dim); font-size: .86rem; margin-top: .15rem; }
+  .layer.base { opacity: .82; }
+  .layer.new { border-color: rgba(212,165,116,.45); background: linear-gradient(180deg, var(--panel), var(--panel2)); }
+  .layer .body .tag { color: var(--gold-bright); font-size: .78rem; }
+
+  /* pipeline horizontal */
+  .pipe { display: flex; align-items: stretch; gap: .35rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .pstep { flex: 1 1 0; min-width: 90px; border: 1px solid var(--line); border-radius: 9px; padding: .7rem .55rem; background: var(--panel2); text-align: center; }
+  .pstep .ph { color: var(--gold); font-size: .68rem; letter-spacing: .08em; }
+  .pstep .pt { font-weight: 700; font-size: .82rem; margin-top: .25rem; }
+  .pstep .pd { color: var(--ink-dim); font-size: .68rem; margin-top: .25rem; }
+  .pstep.det { border-color: rgba(95,198,184,.4); }
+  .pstep.llm { border-color: rgba(212,165,116,.45); }
+
+  /* tables */
+  table.tbl { width: 100%; border-collapse: collapse; margin-top: 1.2rem; font-size: .92rem; }
+  table.tbl th { text-align: left; color: var(--gold); font-weight: 700; padding: .55rem .8rem; border-bottom: 1px solid var(--gold); font-size: .8rem; letter-spacing: .05em; text-transform: uppercase; }
+  table.tbl td { padding: .6rem .8rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.tbl td:first-child { white-space: nowrap; color: var(--gold-bright); font-weight: 600; }
+  table.tbl td.dim { color: var(--ink-dim); }
+
+  table.road { width: 100%; border-collapse: collapse; margin-top: 1.4rem; font-size: .98rem; }
+  table.road td { padding: .72rem .9rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
   table.road tr td:first-child { width: 1%; white-space: nowrap; }
-  table.road .done { color: var(--ok); font-weight: 700; }
-  table.road .now { color: var(--gold); font-weight: 700; }
-  table.road .todo { color: var(--ink-dim); }
+
+  /* timeline */
+  .timeline { margin-top: 1.3rem; display: grid; gap: .5rem; max-height: 62vh; overflow: hidden; }
+  .tl { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; align-items: baseline; border-left: 2px solid var(--line); padding: .25rem 0 .25rem 1rem; position: relative; }
+  .tl::before { content: ""; position: absolute; left: -5px; top: .55rem; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+  .tl .stage { color: var(--gold); font-weight: 700; font-size: .82rem; }
+  .tl .what { font-size: .92rem; }
+  .tl .what b { color: var(--gold-bright); }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; margin-top: 1.2rem; }
+  .panelbox { border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem 1.2rem; background: var(--panel2); }
+  .panelbox h3 { color: var(--gold); font-size: .95rem; margin-bottom: .6rem; letter-spacing: .04em; }
+  .panelbox ul { list-style: none; display: grid; gap: .5rem; }
+  .panelbox li { padding-left: 1.2rem; position: relative; font-size: .9rem; line-height: 1.45; }
+  .panelbox li::before { content: "·"; position: absolute; left: .3rem; color: var(--gold); font-weight: 800; }
 
   /* footer / nav */
-  .foot { position: fixed; bottom: 2.2vh; left: 9vw; right: 9vw; display: flex; justify-content: space-between; align-items: center; color: var(--ink-dim); font-size: .82rem; }
+  .foot { position: fixed; bottom: 1.8vh; left: 8vw; right: 8vw; display: flex; justify-content: space-between; align-items: center; color: var(--ink-dim); font-size: .78rem; z-index: 5; }
   .progressbar { position: fixed; top: 0; left: 0; height: 3px; background: var(--gold); transition: width .3s ease; z-index: 10; }
-  .hint { color: var(--ink-dim); font-size: .8rem; }
-  kbd { background: #201d16; border: 1px solid var(--line); border-radius: 5px; padding: .1rem .4rem; font-size: .75rem; color: var(--ink); }
+  .sectiontag { position: fixed; top: 1.6vh; right: 8vw; color: var(--ink-dim); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; z-index: 5; }
+  kbd { background: #201d16; border: 1px solid var(--line); border-radius: 5px; padding: .08rem .38rem; font-size: .72rem; color: var(--ink); }
   .pageno { font-variant-numeric: tabular-nums; }
+  .muted { color: var(--ink-dim); }
 </style>
 </head>
 <body>
 <div class="progressbar" id="bar"></div>
+<div class="sectiontag" id="sectiontag"></div>
 <div class="deck" id="deck">
 
   <!-- 1 · Title -->
-  <section class="slide active">
+  <section class="slide" data-sec="개요">
     <div class="kicker">Code Atlas · Understand-Anything (ktds fork)</div>
-    <h1 class="serif">레거시 코드를<br><span class="accent">도메인 흐름</span>으로 읽다</h1>
-    <p class="sub">LLM 지능 + 정적 분석으로, 레거시 백엔드의 요청 → 서비스 → 데이터 호출 흐름을
-      계층을 가로질러 한 화면에 그려내는 도메인 모드 — 중간 진행 발표</p>
+    <h1 class="serif">레거시 코드를<br><span class="accent">이해 가능한 자산</span>으로</h1>
+    <p class="sub">LLM 지능과 결정론적 정적 분석을 결합해, 레거시 코드베이스를 인터랙티브 대시보드 ·
+      근거 기반 문서 · 변경 영향도로 풀어내는 코드 이해 플랫폼 — 전체 기능 및 진행 현황 중간 발표</p>
     <div class="stat-row">
-      <div class="stat"><div class="big">2026.06</div><div class="lbl">발표 시점</div></div>
-      <div class="stat"><div class="big">jpetstore-6</div><div class="lbl">실데이터 검증 대상</div></div>
-      <div class="stat"><div class="big">0.13.2</div><div class="lbl">ktds-legacy 엔진</div></div>
+      <div class="stat"><div class="big">5계층</div><div class="lbl">이해 → 도메인 → 문서 → 영향도 → 위임구현</div></div>
+      <div class="stat"><div class="big">14+</div><div class="lbl">슬래시 커맨드</div></div>
+      <div class="stat"><div class="big">6</div><div class="lbl">설계 결정(ADR)</div></div>
     </div>
   </section>
 
-  <!-- 2 · Problem -->
-  <section class="slide">
-    <div class="kicker">문제</div>
-    <h2>레거시는 "한 기능이 어디까지 흐르는지"가 안 보인다</h2>
-    <ul class="points">
-      <li>코드는 API · Service · DAO · DB로 <b>계층마다 흩어져</b> 있는데, 한 요청이 그 계층들을 어떻게 관통하는지는 어디에도 그려져 있지 않다.</li>
-      <li>기존 구조 그래프는 <b>파일/클래스 단위 의존성</b>만 보여줘 "기능 단위 흐름"과는 거리가 멀다.</li>
-      <li>Spring · Stripes 등 <b>프레임워크마다 진입점 규칙이 달라</b> 흐름의 시작점을 일관되게 잡기 어렵다.</li>
-      <li>비개발자 / 신규 인력이 <b>도메인 관점</b>으로 시스템을 이해할 진입로가 없다.</li>
-    </ul>
+  <!-- 2 · What is it -->
+  <section class="slide" data-sec="개요">
+    <div class="kicker">한눈에</div>
+    <h2>Code Atlas란?</h2>
+    <p class="lead">오픈소스 Understand-Anything(U-A)을 기업 레거시 인수·운영에 맞게 확장한 ktds fork</p>
+    <div class="grid c3">
+      <div class="card"><div class="n">기반</div><h3>U-A 코드 이해 엔진</h3><p>소스 → 지식 그래프(노드·엣지)로 구조화. 기술스택·아키텍처·API·DB를 자동 추출하고 React 대시보드로 시각화.</p></div>
+      <div class="card"><div class="n">ktds 확장</div><h3>결정론 + LLM 2단계</h3><p>구조(skeleton)는 100% 결정론으로 만들고 LLM은 빈칸(이름·설명·규칙)만 채움. 모든 사실에 <code>파일:라인</code> 인용 의무.</p></div>
+      <div class="card"><div class="n">목표</div><h3>이해 → 변경 → 위임</h3><p>레거시를 이해하고, 변경 영향을 예측하고, 근거 있는 문서 위에서 AI에게 구현을 위임하는 완결 파이프라인.</p></div>
+    </div>
+    <p class="sub">U-A가 <b style="color:var(--ink)">"구조 그래프"</b>까지라면, ktds는 그 위에 <b style="color:var(--gold-bright)">도메인 맵 · 세분화 위키 · 변경 영향도</b> 3개 엔진을 더 쌓았습니다.</p>
   </section>
 
-  <!-- 3 · Approach -->
-  <section class="slide">
-    <div class="kicker">접근 · ADR-006</div>
-    <h2>도메인 모드 = 3-스크린 독립 경험</h2>
-    <p class="lead">도메인 그래프가 있으면 대시보드는 도메인 탭으로 착지 — 프로토타입 충실 흐름</p>
-    <div class="grid cols-3">
-      <div class="card">
-        <div class="n">Screen 1</div>
-        <h3>Domain Map</h3>
-        <p>도메인 카드 랜딩 + 통계. 시스템을 도메인 단위로 조망하는 진입 화면.</p>
+  <!-- 3 · Stack L0-L4 -->
+  <section class="slide" data-sec="아키텍처">
+    <div class="kicker">전체 아키텍처</div>
+    <h2>5계층 스택 — 코드에서 위임구현까지</h2>
+    <div class="stack">
+      <div class="layer base"><div class="lv">L0</div><div class="body"><h3>코드 이해 · <code>/understand</code> <span class="badge info">U-A 기반</span></h3><p>소스 → knowledge-graph.json. 7단계 에이전트 파이프라인이 노드·엣지·계층·투어를 생성.</p></div></div>
+      <div class="layer new"><div class="lv">L1</div><div class="body"><h3>도메인/흐름 맵 · <code>/understand-map</code> <span class="badge next">ktds 신규</span></h3><p>결정론 skeleton(라우트·콜체인) → ✋사람 게이트 → LLM 보강 → 기계 검증. 비즈니스 흐름을 자체 생산. <span class="tag">ADR-001</span></p></div></div>
+      <div class="layer new"><div class="lv">L2</div><div class="body"><h3>문서 + 위키 · <code>/understand-docs</code> <span class="badge next">ktds 신규</span></h3><p>5종 근거 기반 문서 + domain/flow/endpoint/table 세분화 위키(옵시디언 호환) + 승인 상태기계. <span class="tag">ADR-004 · ADR-005</span></p></div></div>
+      <div class="layer new"><div class="lv">L3</div><div class="body"><h3>변경 영향도 · <code>/understand-impact</code> · <code>-review</code> <span class="badge next">ktds 신규</span></h3><p>역/정 BFS 도달성으로 영향 범위 결정론 계산. 예측(impact)↔실측(review) 2채널 대조. <span class="tag">ADR-002</span></p></div></div>
+      <div class="layer base"><div class="lv">L4</div><div class="body"><h3>AI 위임구현 <span class="badge warn">설계 완료 · Phase 2</span></h3><p>변경 스토리 자동 생성 → 출처 기반 근거 게이트 → AI 코드 구현 → 승인. <span class="tag">ADR-005</span></p></div></div>
+    </div>
+  </section>
+
+  <!-- 4 · L0 understand + pipeline -->
+  <section class="slide" data-sec="L0 코드 이해">
+    <div class="kicker">L0 · 기반 엔진</div>
+    <h2><code>/understand</code> — 7단계 분석 파이프라인</h2>
+    <p class="sub">소스 코드를 결정론 + LLM 하이브리드로 분석해 지식 그래프를 만든다. 300파일 ≈ 4분(최대 5배치 병렬).</p>
+    <div class="pipe">
+      <div class="pstep det"><div class="ph">P1</div><div class="pt">Scan</div><div class="pd">파일·언어·FW 인벤토리</div></div>
+      <div class="pstep det"><div class="ph">P1.5</div><div class="pt">Batch</div><div class="pd">의미론적 배치 분할</div></div>
+      <div class="pstep llm"><div class="ph">P2</div><div class="pt">Analyze</div><div class="pd">파일별 노드·엣지(병렬)</div></div>
+      <div class="pstep det"><div class="ph">P2+</div><div class="pt">Merge</div><div class="pd">정규화·조립</div></div>
+      <div class="pstep llm"><div class="ph">P4</div><div class="pt">Architecture</div><div class="pd">3~10 계층 도출</div></div>
+      <div class="pstep llm"><div class="ph">P5</div><div class="pt">Tour</div><div class="pd">학습 경로 5~15단계</div></div>
+      <div class="pstep det"><div class="ph">P7</div><div class="pt">Save</div><div class="pd">fingerprint·KG 저장</div></div>
+    </div>
+    <div class="grid c4" style="margin-top:1.3rem">
+      <div class="card"><div class="n">에이전트</div><h3 class="sm">project-scanner</h3><p>파일/언어/프레임워크 센서스</p></div>
+      <div class="card"><div class="n">에이전트</div><h3 class="sm">file-analyzer ×N</h3><p>26종 엣지 타입 추출(병렬)</p></div>
+      <div class="card"><div class="n">에이전트</div><h3 class="sm">architecture-analyzer</h3><p>계층 자동 할당</p></div>
+      <div class="card"><div class="n">에이전트</div><h3 class="sm">tour-builder · graph-reviewer</h3><p>학습 투어 + 품질 검수</p></div>
+    </div>
+    <p class="sub muted">중간 산출물은 <code>.understand-anything/intermediate/</code>에 디스크로 흘려 컨텍스트를 절약하고, 조립 후 정리.</p>
+  </section>
+
+  <!-- 5 · KG data model -->
+  <section class="slide" data-sec="L0 코드 이해">
+    <div class="kicker">L0 · 데이터 모델</div>
+    <h2>지식 그래프 — 구조 + 의미를 하나의 JSON으로</h2>
+    <div class="two">
+      <div class="panelbox">
+        <h3>노드 — 13 구조 타입 + 3 도메인 타입</h3>
+        <ul>
+          <li><b>구조:</b> file · function · class · module · concept · config · document · service · table · endpoint · pipeline · schema · resource</li>
+          <li><b>도메인:</b> domain → flow → step (L1에서 추가)</li>
+          <li>노드마다 복잡도 · 계층 · 인용 메타 보유</li>
+        </ul>
       </div>
-      <div class="card">
-        <div class="n">Screen 2</div>
-        <h3>Flow List</h3>
-        <p>마스터-디테일 흐름 목록 + 인라인 스파인 미리보기. 기능(흐름)을 골라 들어간다.</p>
+      <div class="panelbox">
+        <h3>엣지 — 29 관계 타입</h3>
+        <ul>
+          <li>imports · exports · contains · calls · configures · documents · deploys · triggers …</li>
+          <li>도메인: contains_flow · flow_step · cross_domain · calls(step→step)</li>
+          <li>가중치 규칙으로 레이아웃·집계에 사용</li>
+        </ul>
       </div>
-      <div class="card">
-        <div class="n">Screen 3</div>
-        <h3>Flow Spine</h3>
-        <p>한 흐름의 백엔드 호출 체인을 API→Service→DAO→DB 레인에 가로로 펼친 <b>메인 스파인</b>.</p>
+    </div>
+    <div class="grid c3" style="margin-top:1.1rem">
+      <div class="card"><div class="n">계층</div><h3 class="sm">Layers</h3><p>자동 아키텍처 계층(ID·이름·설명·노드 집합)</p></div>
+      <div class="card"><div class="n">투어</div><h3 class="sm">Tour</h3><p>순서 있는 학습 경로(노드 묶음 + 언어 레슨)</p></div>
+      <div class="card"><div class="n">무결성</div><h3 class="sm">Schema + fingerprint</h3><p>로드 시 검증 + 스키마 드리프트 가드</p></div>
+    </div>
+  </section>
+
+  <!-- 6 · Dashboard overview -->
+  <section class="slide" data-sec="대시보드">
+    <div class="kicker">대시보드 · 뷰 모드</div>
+    <h2>하나의 그래프, 여러 관점</h2>
+    <p class="sub">React + React Flow + Zustand. 다크 럭셔리 테마(딥블랙 + 골드). 헤더 탭 <code>구조 · 도메인 · 문서</code> + <code>Diff · 영향도</code>.</p>
+    <div class="grid c3">
+      <div class="card"><div class="n">구조</div><h3 class="sm">Structural Graph</h3><p>계층/컨테이너 클러스터, ELK 자동 레이아웃, 미니맵·팬·줌.</p></div>
+      <div class="card"><div class="n">도메인</div><h3 class="sm">Domain Mode (3스크린)</h3><p>도메인 지도 → 흐름 목록 → 메인 스파인. 전체화면 독립 페이지. <span class="badge next">최근 집중 작업</span></p></div>
+      <div class="card"><div class="n">문서</div><h3 class="sm">Wiki Reader</h3><p>리더 레이아웃(가운데 본문 + 우측 폴더 트리), 백링크·연결 칩.</p></div>
+      <div class="card"><div class="n">의미</div><h3 class="sm">Knowledge Graph</h3><p>개념·인용·모순·구현 관계를 포스 레이아웃으로.</p></div>
+      <div class="card"><div class="n">변경</div><h3 class="sm">Diff · Impact 2채널</h3><p>실측(git diff) + 예측(영향도) 오버레이 토글, 계층/컨테이너 집계 칩.</p></div>
+      <div class="card"><div class="n">탐색</div><h3 class="sm">Search · Filter · PathFinder</h3><p>노드 검색, 타입/복잡도/계층 필터, A→B 최단 경로.</p></div>
+    </div>
+  </section>
+
+  <!-- 7 · Dashboard detail -->
+  <section class="slide" data-sec="대시보드">
+    <div class="kicker">대시보드 · 그 외</div>
+    <h2>읽는 사람에 맞추는 UX</h2>
+    <div class="grid c2">
+      <div class="card"><div class="n">사이드바</div><h3 class="sm">Info · Files 탭</h3><p><b>Info</b>: 선택 노드의 타입·복잡도·엣지·지식 메타. <b>Files</b>: 구조 그래프 기반 파일 트리.</p></div>
+      <div class="card"><div class="n">코드</div><h3 class="sm">Code Viewer</h3><p>파일 노드 클릭 시 하단에서 슬라이드업, 확장 모달. Prism 구문강조. 토큰+경로 허용목록 게이트.</p></div>
+      <div class="card"><div class="n">페르소나</div><h3 class="sm">Overview · Learn · DeepDive</h3><p>기술 수준별 렌더 전략. Learn은 투어 단계를 순차 재생하는 LearnPanel 제공.</p></div>
+      <div class="card"><div class="n">접근성·국제화</div><h3 class="sm">Theme · i18n · Export</h3><p>다크/라이트 프리셋·액센트·폰트 커스터마이즈, 5개 언어, SVG/GraphML 내보내기.</p></div>
+    </div>
+    <p class="sub muted">스키마 검증 실패 시 경고 배너 · 첫 방문 온보딩 오버레이 · 단축키 도움말 모달.</p>
+  </section>
+
+  <!-- 8 · ADR-001 map -->
+  <section class="slide" data-sec="L1 도메인 맵">
+    <div class="kicker">ADR-001 · <code>/understand-map</code></div>
+    <h2>도메인 맵을 <span class="accent">자체 생산</span>한다</h2>
+    <p class="sub">U-A는 도메인/흐름을 안 만들어 기능명세가 비어 있었음. 자동 도메인 경계의 전문가 일치율은 ~56% → 사람 확인이 필수.</p>
+    <div class="pipe">
+      <div class="pstep det"><div class="ph">S1~S6</div><div class="pt">결정론 Skeleton</div><div class="pd">라우트·콜체인·BFS 도달성</div></div>
+      <div class="pstep"><div class="ph">S7 ✋</div><div class="pt">경계 확정 게이트</div><div class="pd">사람이 병합/분할/개명</div></div>
+      <div class="pstep llm"><div class="ph">S8</div><div class="pt">LLM 빈칸 채움</div><div class="pd">이름·요약·규칙(인용 의무)</div></div>
+      <div class="pstep det"><div class="ph">S9</div><div class="pt">기계 검증</div><div class="pd">인용 실존·라인·텍스트 일치</div></div>
+      <div class="pstep det"><div class="ph">S10</div><div class="pt">KG 병합</div><div class="pd">domain-graph.json emit</div></div>
+    </div>
+    <div class="grid c3" style="margin-top:1.3rem">
+      <div class="card"><div class="n">근거</div><h3 class="sm">사실은 LLM을 안 거친다</h3><p>구조의 최대 지분이 결정론. LLM 인용은 검증 실패 시 <code>[확인 필요]</code>로 강등.</p></div>
+      <div class="card"><div class="n">결정론</div><h3 class="sm">재실행 byte-diff = 0</h3><p>골든 스냅샷 목표. 타임스탬프 금지·정렬 강제.</p></div>
+      <div class="card"><div class="n">독립성</div><h3 class="sm"><code>/understand</code>와 순서 무관</h3><p>콜드 프로젝트에서 도메인만 분석 가능.</p></div>
+    </div>
+  </section>
+
+  <!-- 9 · ADR-002 impact -->
+  <section class="slide" data-sec="L3 영향도">
+    <div class="kicker">ADR-002 · <code>/understand-impact</code> · <code>-review</code></div>
+    <h2>"이 파일 바꾸면 어디까지?"</h2>
+    <p class="sub">map 산출물(edges·ownership·routes) 위에서 역/정 BFS로 영향 범위를 결정론 계산. 재스캔 0회.</p>
+    <div class="two">
+      <div class="panelbox">
+        <h3>예측 — /understand-impact</h3>
+        <ul>
+          <li><b>역 BFS</b>(상류): 영향받는 호출자 → API/배치 진입점</li>
+          <li><b>정 BFS</b>(하류): 매퍼·SQL 파일까지 DB 영향 추적</li>
+          <li>신뢰도 3단계 CONFIRMED / INFERRED / NEEDS_REVIEW</li>
+          <li><b>근거 게이트</b>: 구현-임계 사실은 건별 하드차단, 위험은 표면화만</li>
+        </ul>
       </div>
+      <div class="panelbox">
+        <h3>실측 — /understand-review</h3>
+        <ul>
+          <li>실제 <b>git diff</b>를 사전 예측과 대조</li>
+          <li>예측 밖 변경 → 경고, 체크리스트 산출</li>
+          <li><code>--sr &lt;SR-ID&gt;</code>로 변경 단위 스냅샷 보관</li>
+          <li>예측 ↔ 실측 <b>2채널 루프</b>로 "계획 vs 현실"</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub muted">대시보드 오버레이 라벨: <b style="color:var(--ink)">변경예정(시드)</b> · <b style="color:var(--ink)">영향받음</b> — 노드 배지 + 계층/컨테이너 집계 칩.</p>
+  </section>
+
+  <!-- 10 · ADR-004/005 docs+wiki -->
+  <section class="slide" data-sec="L2 문서·위키">
+    <div class="kicker">ADR-004 · ADR-005 · <code>/understand-docs</code></div>
+    <h2>거대 단일 파일 → <span class="accent">세분화 위키 메시</span></h2>
+    <div class="two">
+      <div class="panelbox">
+        <h3>5종 근거 문서 + 상태기계</h3>
+        <ul>
+          <li>00 기술스택 · 01 아키텍처 · 02 기능명세 · 03 API · 04 DB</li>
+          <li>신뢰도 4태그 · <code>파일:라인</code> 근거 · 근거율 투명 보고</li>
+          <li>DRAFT → UNDER_REVIEW → CONFIRMED → APPROVED 승인 흐름</li>
+          <li>감사 추적 <code>.spec/audit/*.jsonl</code></li>
+        </ul>
+      </div>
+      <div class="panelbox">
+        <h3>세분화 위키(옵시디언 호환)</h3>
+        <ul>
+          <li>index.md + domain/flow/endpoint/table 노트 + <code>[[위키링크]]</code> 메시</li>
+          <li>결정론 <code>wiki-graph.json</code> emit (LLM 미경유 → 환각 0)</li>
+          <li>기본 4계층, <code>--steps</code>로만 step 폭증 구간 opt-in</li>
+          <li>대시보드 "문서" 뷰 = 리더 레이아웃으로 그대로 소비</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub"><b style="color:var(--gold-bright)">ADR-005 AIDD 계약:</b> 참조(R, as-built)와 작업 스토리(W, 변경당)를 하나의 계약으로 통일하되, 개발 방법론(BMad 등)을 교체 가능한 모듈로 분리 — L4 위임구현의 토대.</p>
+  </section>
+
+  <!-- 11 · ADR-003 upstream + design principles -->
+  <section class="slide" data-sec="원칙">
+    <div class="kicker">ADR-003 · 설계 원칙</div>
+    <h2>fork 전략과 품질 규율</h2>
+    <div class="grid c2">
+      <div class="card"><div class="n">ADR-003</div><h3 class="sm">대시보드는 ktds 소유, 파이프라인은 추종</h3><p>UI는 자유 개조(영향도·도메인 뷰), 분석 파이프라인은 upstream 개선을 계속 흡수. 충돌점은 workspace·marketplace 2곳뿐.</p></div>
+      <div class="card"><div class="n">결정론</div><h3 class="sm">동일 입력 → 동일 byte</h3><p>타임스탬프·랜덤·순서 비결정 금지, 정렬 강제. 재실행 diff=0이 회귀 신호.</p></div>
+      <div class="card"><div class="n">근거 우선</div><h3 class="sm">인용 없으면 강등</h3><p>모든 LLM 사실에 <code>파일:라인</code>. 자동 검증 실패 → <code>[확인 필요]</code>. 지어낸 인용 100% 감지.</p></div>
+      <div class="card"><div class="n">신호 우선순위</div><h3 class="sm">간선 신호 &gt; 파일명 토큰</h3><p>호출/매퍼 간선이 진실. 파일명 휴리스틱은 폴백일 뿐 — 다음 장의 실데이터 사례가 증명.</p></div>
+    </div>
+  </section>
+
+  <!-- 12 · ADR-006 cross-layer -->
+  <section class="slide" data-sec="L1 흐름 뷰 (최근)">
+    <div class="kicker">ADR-006 · 최근 집중 작업</div>
+    <h2>교차계층 흐름 뷰 — 도메인 모드 3스크린</h2>
+    <p class="lead">계층별로 쪼개져 한 기능의 흐름을 못 보던 통증을, 전체화면 독립 페이지로 해소</p>
+    <div class="grid c3">
+      <div class="card"><div class="n">Screen 1</div><h3>Domain Map</h3><p>도메인 카드 그리드 + 통계. 시스템을 도메인 단위로 조망하는 진입.</p></div>
+      <div class="card"><div class="n">Screen 2</div><h3>Flow List</h3><p>흐름 마스터-디테일 + 인라인 스파인 미리보기. 기능을 골라 진입.</p></div>
+      <div class="card"><div class="n">Screen 3</div><h3>Flow Spine</h3><p>한 흐름의 호출 체인을 API→Service→DAO→DB 레인에 가로로 펼친 <b>메인 스파인</b>.</p></div>
     </div>
     <div class="flowchain">
       <span class="node api">API</span><span class="arrow">→</span>
       <span class="node service">Service</span><span class="arrow">→</span>
       <span class="node dao">DAO</span><span class="arrow">→</span>
       <span class="node db">DB</span>
-      <span style="margin-left:1rem;color:var(--ink-dim);font-size:.9rem">+ Other 레인(흐르는 데이터·엔터티)</span>
+      <span style="margin-left:.8rem;color:var(--ink-dim);font-size:.85rem">+ Other 레인(흐르는 데이터·엔터티)</span>
     </div>
   </section>
 
-  <!-- 4 · What we built -->
-  <section class="slide">
-    <div class="kicker">진행 현황 · 무엇을 구현했나</div>
-    <h2>휴리스틱 추측에서 → 엔진 Ground-Truth로</h2>
-    <div class="grid cols-2">
-      <div class="card">
-        <div class="n">#1 · 엔진 Layer Emit</div>
-        <h3>step 노드가 직접 layer를 안다</h3>
-        <p>예전엔 대시보드가 <b>파일명 휴리스틱</b>으로 레인을 추측 → jpetstore 패키지명 <code>org.mybatis</code>의 "mybatis" 토큰 때문에 <b>전건 DB 오분류</b>. 이제 엔진이 route/edge 근거로 api·service·dao layer를 직접 부착.</p>
-      </div>
-      <div class="card">
-        <div class="n">A · 이벤트별 흐름 분리</div>
-        <h3>ActionBean 1개 → 핸들러별 흐름</h3>
-        <p>Spring은 이미 메서드마다 흐름인데 Stripes만 클래스당 1개로 뭉쳐 있던 비일관 해소. 이벤트 핸들러마다 라우트 emit → <b>Account 1 → 7 흐름</b>.</p>
-      </div>
-      <div class="card">
-        <div class="n">B · 실제 calls 엣지</div>
-        <h3>가짜 합성 순서가 아닌 진짜 호출</h3>
-        <p>step→step 엣지를 실제 호출 토폴로지로 emit + 핸들러 bodyText에서 주입 필드를 추출해 <b>핸들러별로 다른 step 체인</b> 구성.</p>
-      </div>
-      <div class="card">
-        <div class="n">C · 곁가지 접기 + 파이프라인 안정화</div>
-        <h3>노이즈 제거 · stale-dist 회귀 픽스</h3>
-        <p>추상 베이스 클래스를 step에서 제외(루트 보존). <code>ensure-built</code>가 구버전 dist를 조용히 실행하던 회귀를 버전 스탬프 검사로 차단.</p>
-      </div>
+  <!-- 13 · recent engine work -->
+  <section class="slide" data-sec="L1 흐름 뷰 (최근)">
+    <div class="kicker">최근 작업 · 휴리스틱 추측 → 엔진 Ground-Truth</div>
+    <h2>흐름 정확도를 끌어올린 4가지</h2>
+    <div class="grid c2">
+      <div class="card"><div class="n">#1 · 엔진 Layer Emit</div><h3 class="sm">step이 직접 레이어를 안다</h3><p>예전엔 대시보드가 파일명으로 레인을 추측 → jpetstore 패키지명 <code>org.mybatis</code>의 "mybatis" 토큰 때문에 <b>전건 DB 오분류</b>. 이제 엔진이 route/edge 근거로 직접 부착.</p></div>
+      <div class="card"><div class="n">A · 이벤트별 흐름 분리</div><h3 class="sm">ActionBean 1개 → 핸들러별 흐름</h3><p>Stripes만 클래스당 1흐름으로 뭉쳐 있던 비일관 해소. 이벤트 핸들러마다 라우트 → <b>Account 1 → 7 흐름</b>.</p></div>
+      <div class="card"><div class="n">B · 실제 calls 엣지</div><h3 class="sm">가짜 합성 순서가 아닌 진짜 호출</h3><p>step→step을 실제 호출 토폴로지로 emit + 핸들러 bodyText에서 주입 필드 추출해 핸들러별 다른 체인.</p></div>
+      <div class="card"><div class="n">C · 곁가지 접기 + 안정화</div><h3 class="sm">노이즈 제거 · stale-dist 픽스</h3><p>추상 베이스 클래스를 step에서 제외. <code>ensure-built</code>가 구 dist를 조용히 실행하던 회귀를 버전 스탬프로 차단.</p></div>
     </div>
   </section>
 
-  <!-- 5 · Validation -->
-  <section class="slide">
+  <!-- 14 · validation -->
+  <section class="slide" data-sec="검증">
     <div class="kicker">검증 · jpetstore-6 실데이터</div>
-    <h2>분류가 깨끗한가? — 전수 확인 완료</h2>
+    <h2>분류가 깨끗한가? — 전수 확인</h2>
     <div class="stat-row">
-      <div class="stat"><div class="big">21</div><div class="lbl">분리된 흐름 (flow)</div></div>
-      <div class="stat"><div class="big">107</div><div class="lbl">step 노드 · <span style="color:var(--ok)">전건 layer emit</span></div></div>
+      <div class="stat"><div class="big">21</div><div class="lbl">분리된 흐름(flow)</div></div>
+      <div class="stat"><div class="big">107</div><div class="lbl">step · <span style="color:var(--ok)">전건 layer emit</span></div></div>
       <div class="stat"><div class="big">145</div><div class="lbl">실제 calls 엣지</div></div>
     </div>
     <div class="lanes">
@@ -224,52 +396,86 @@
       <div class="lane db"><div class="name">DB</div><div class="count">0</div><div class="meta">—</div></div>
       <div class="lane other"><div class="name">Other</div><div class="count">49</div><div class="meta">엔터티</div></div>
     </div>
-    <p class="sub" style="margin-top:1.4rem">Other(unknown) 49개는 <b style="color:var(--warn)">오분류가 아니라</b> 흐름을 따라 흐르는 도메인 데이터입니다 — 다음 장에서 전수 확인.</p>
+    <p class="sub" style="margin-top:1.2rem">Other(unknown) 49개는 <b style="color:var(--warn)">오분류가 아니라</b> 흐름을 따라 흐르는 도메인 데이터 — 다음 장 전수 확인.</p>
   </section>
 
-  <!-- 6 · unknown deep dive -->
-  <section class="slide">
+  <!-- 15 · unknown deep dive -->
+  <section class="slide" data-sec="검증">
     <div class="kicker">검증 · Other 레인 전수 확인</div>
     <h2>unknown 49 = 100% 도메인 엔터티 <span class="badge ok">오분류 0건</span></h2>
-    <p class="sub">49개 step 전부 경로가 <code>src/main/java/org/mybatis/jpetstore/<b>domain/</b></code> 하위.
-      호출 레이어(api·service·dao) 클래스는 단 하나도 섞이지 않음.</p>
-    <div class="grid cols-3" style="margin-top:1.6rem">
-      <div class="card"><div class="n">고유 엔터티 9종</div><h3>Item · Product · Category</h3><p>10 · 8 · 7회 — 카탈로그 도메인의 핵심 POJO. 여러 흐름에 반복 등장.</p></div>
-      <div class="card"><div class="n">주문 · 장바구니</div><h3>Order · LineItem · Cart · CartItem</h3><p>4 · 3 · 2 · 3회 — 주문/카트 흐름을 타고 흐르는 데이터.</p></div>
-      <div class="card"><div class="n">계정 · 시퀀스</div><h3>Account · Sequence</h3><p>3 · 3회 — 순수 POJO. 호출 체인 레이어가 아닌 "흐르는 값".</p></div>
+    <p class="sub">49개 step 전부 경로가 <code>…/jpetstore/<b>domain/</b></code> 하위. 호출 레이어(api·service·dao) 클래스는 단 하나도 섞이지 않음.</p>
+    <div class="grid c3" style="margin-top:1.4rem">
+      <div class="card"><div class="n">카탈로그 도메인</div><h3 class="sm">Item · Product · Category</h3><p>10 · 8 · 7회 — 여러 흐름에 반복 등장하는 핵심 POJO.</p></div>
+      <div class="card"><div class="n">주문·장바구니</div><h3 class="sm">Order · LineItem · Cart · CartItem</h3><p>4 · 3 · 2 · 3회 — 주문/카트 흐름을 타고 흐르는 데이터.</p></div>
+      <div class="card"><div class="n">계정·시퀀스</div><h3 class="sm">Account · Sequence</h3><p>3 · 3회 — 순수 POJO. 호출 체인이 아닌 "흐르는 값".</p></div>
     </div>
-    <p class="sub" style="margin-top:1.4rem">비율이 46%로 오른 건 흐름이 7배로 분리되며 <b>같은 엔터티가 여러 흐름에 반복 등장</b>한 결과 — 분류 품질 저하가 아님.</p>
+    <p class="sub" style="margin-top:1.2rem">비율 46%↑는 흐름이 7배로 분리되며 <b>같은 엔터티가 여러 흐름에 반복 등장</b>한 결과 — 분류 품질 저하가 아님. <b style="color:var(--gold-bright)">엔진 layer 분류는 깨끗함을 확정.</b></p>
   </section>
 
-  <!-- 7 · Roadmap -->
-  <section class="slide">
+  <!-- 16 · legacy framework coverage -->
+  <section class="slide" data-sec="엔진">
+    <div class="kicker">ktds-legacy 엔진</div>
+    <h2>레거시 프레임워크 정적 분석 능력</h2>
+    <p class="sub">tree-sitter(Java AST) + 정규식 + BFS 도달성. <code>git ls-files</code> 전수(샘플링 0%).</p>
+    <table class="tbl">
+      <tr><th>프레임워크</th><th>추출 항목</th></tr>
+      <tr><td>Spring</td><td class="dim">@GetMapping 등 메서드 애너테이션 라우트, 컴포즈드 메타 확인, 상수 해석, 컴포넌트 스캔, DI</td></tr>
+      <tr><td>Stripes</td><td class="dim">ActionBean 상속 추적, @UrlBinding + NameBasedActionResolver 규칙, 이벤트 핸들러별 라우트</td></tr>
+      <tr><td>MyBatis</td><td class="dim">매퍼 XML 네임스페이스 매핑, SQL 파일 소유권 추적(DB 영향 연결)</td></tr>
+      <tr><td>Batch</td><td class="dim">@Scheduled(cron/fixedRate) · @Schedules · Quartz XML beans · public static void main</td></tr>
+      <tr><td>JSP / Next.js</td><td class="dim">JSP 스크립틀릿 호출 패턴 · Next app 라우트(route.ts/page.ts) 규칙</td></tr>
+    </table>
+    <p class="sub muted">모듈: <code>domain-map/</code>(census·routes·edges·skeleton·step-layer·classify·confirm·fill·emit) · <code>impact/</code>(reach·api·flow·persistence·engine·overlay·verify).</p>
+  </section>
+
+  <!-- 17 · timeline -->
+  <section class="slide" data-sec="진행 이력">
+    <div class="kicker">진행 이력 · Stage / ADR</div>
+    <h2>여기까지 온 길</h2>
+    <div class="timeline">
+      <div class="tl"><div class="stage">Stage 15~18</div><div class="what"><b>/understand-map</b> — 콜체인 간선 · 도메인 분류 · ✋확정 게이트 · LLM 채움 · 검증 · domain-graph emit <span class="muted">(ADR-001)</span></div></div>
+      <div class="tl"><div class="stage">Stage 19~20</div><div class="what"><b>/understand-impact</b> — 결정론 도달성 + SR 워크벤치 + 대시보드 diff-overlay <span class="muted">(ADR-002)</span></div></div>
+      <div class="tl"><div class="stage">Stage 21</div><div class="what"><b>/understand-review</b> — 변경분 실측 리뷰 + 오버레이 2채널(예측↔실측)</div></div>
+      <div class="tl"><div class="stage">Stage 22</div><div class="what"><b>세분화 위키</b> — /understand-docs 위키 + "문서" 뷰 리더 레이아웃 + 근거 배지 <span class="muted">(ADR-004)</span></div></div>
+      <div class="tl"><div class="stage">리팩토링</div><div class="what">Phase 1~6 — 공유 유틸 추출 · Confidence 단일출처 · 테스트 +160 · ARCHITECTURE.md</div></div>
+      <div class="tl"><div class="stage">ADR-005</div><div class="what"><b>AIDD 문서 계약</b> — 방법론 플러그형 R+W 2프로파일 · 출처 근거 게이트 · STALE 게이트</div></div>
+      <div class="tl"><div class="stage">ADR-006</div><div class="what"><b>교차계층 흐름 뷰</b> — 도메인 모드 독립 페이지화(3스크린)</div></div>
+      <div class="tl"><div class="stage">최근</div><div class="what"><b>흐름 정확도</b> — step layer emit · 이벤트별 흐름 분리 · 실제 calls 엣지 · 곁가지 접기 · jpetstore 검증</div></div>
+    </div>
+  </section>
+
+  <!-- 18 · roadmap -->
+  <section class="slide" data-sec="로드맵">
     <div class="kicker">로드맵</div>
     <h2>다음 단계</h2>
     <table class="road">
-      <tr><td><span class="badge ok">완료</span></td><td><b>#1 엔진 layer emit</b> · 이벤트별 흐름 분리 · 실제 calls 엣지 · 곁가지 접기 · stale-dist 픽스</td></tr>
-      <tr><td><span class="badge ok">완료</span></td><td><b>jpetstore 실데이터 검증</b> — 전건 layer · Other 레인 엔터티 100% 확인</td></tr>
+      <tr><td><span class="badge ok">완료</span></td><td><b>L0~L3 핵심</b> — 코드 이해 · 도메인 맵 · 세분화 위키 · 변경 영향도(예측+실측)</td></tr>
+      <tr><td><span class="badge ok">완료</span></td><td><b>흐름 정확도</b> — 엔진 layer · 이벤트별 흐름 · 실제 calls 엣지 + jpetstore 전수 검증</td></tr>
       <tr><td><span class="badge next">다음</span></td><td>#6 Diff/영향도 <b>도메인 투영</b> · #7 화면 전환 애니메이션 · #8 라이트테마 레인색</td></tr>
       <tr><td><span class="badge next">다음</span></td><td>#9 스파인 접근성(a11y) · #10 모바일 레이아웃 · #11 마켓 게시</td></tr>
+      <tr><td><span class="badge info">설계됨</span></td><td><b>L4 AI 위임구현</b> — 변경 스토리 생성 → 근거 게이트 → AI 구현 → 승인 <span class="muted">(ADR-005)</span></td></tr>
       <tr><td><span class="badge warn">백로그</span></td><td><code>stepSource</code> 직렬화 보존 · 비개발자 내러티브 문서 · <code>/understand</code> 기본 언어 ko</td></tr>
     </table>
   </section>
 
-  <!-- 8 · Close -->
-  <section class="slide">
+  <!-- 19 · close -->
+  <section class="slide" data-sec="정리">
     <div class="kicker">정리</div>
-    <h1 class="serif">계층을 가로지르는<br><span class="accent">기능의 지도</span>가 생겼다</h1>
-    <ul class="points" style="margin-top:2rem">
-      <li>레거시 한 기능의 <b>API→Service→DAO 호출 체인</b>을 한 화면에서 따라간다.</li>
-      <li>레인 분류는 <b>휴리스틱 추측이 아닌 엔진 근거</b> — 실데이터에서 전수 검증 완료.</li>
-      <li>다음은 <b>영향도 도메인 투영</b>과 발표/배포 마감.</li>
+    <h1 class="serif">레거시를 <span class="accent">읽고 · 바꾸고 · 위임</span>한다</h1>
+    <ul class="points" style="margin-top:1.6rem">
+      <li>코드 → <b>지식 그래프 · 도메인 맵 · 세분화 위키</b>로 이해의 진입로를 만든다.</li>
+      <li>변경 영향을 <b>결정론으로 예측</b>하고 실측과 대조한다(2채널 루프).</li>
+      <li>레인 분류부터 영향 범위까지 <b>휴리스틱 추측이 아닌 엔진 근거</b> — 실데이터로 전수 검증.</li>
+      <li>다음은 <b>도메인 영향 투영</b>과 <b>AI 위임구현(L4)</b>.</li>
     </ul>
+    <p class="sub muted" style="margin-top:1.6rem">Code Atlas · Understand-Anything (ktds fork) — 감사합니다.</p>
   </section>
 
 </div>
 
 <div class="foot">
-  <span class="hint"><kbd>←</kbd> <kbd>→</kbd> 또는 <kbd>Space</kbd> 로 이동</span>
-  <span class="pageno"><span id="cur">1</span> / <span id="total">8</span></span>
+  <span><kbd>←</kbd> <kbd>→</kbd> / <kbd>Space</kbd> 이동 · <kbd>Home</kbd> <kbd>End</kbd></span>
+  <span class="pageno"><span id="cur">1</span> / <span id="total">19</span></span>
 </div>
 
 <script>
@@ -277,20 +483,22 @@
   let i = 0;
   const bar = document.getElementById('bar');
   const cur = document.getElementById('cur');
+  const sectiontag = document.getElementById('sectiontag');
   document.getElementById('total').textContent = slides.length;
   function show(n) {
     i = Math.max(0, Math.min(slides.length - 1, n));
     slides.forEach((s, k) => s.classList.toggle('active', k === i));
     bar.style.width = ((i + 1) / slides.length * 100) + '%';
     cur.textContent = i + 1;
+    sectiontag.textContent = slides[i].dataset.sec || '';
   }
-  function next() { show(i + 1); }
-  function prev() { show(i - 1); }
+  const next = () => show(i + 1);
+  const prev = () => show(i - 1);
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
-    else if (e.key === 'Home') show(0);
-    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'Home') { e.preventDefault(); show(0); }
+    else if (e.key === 'End') { e.preventDefault(); show(slides.length - 1); }
   });
   document.addEventListener('click', e => { if (!e.target.closest('a')) next(); });
   show(0);

@@ -1,0 +1,3368 @@
+{
+  "version": "1.0.0",
+  "kind": "codebase",
+  "project": {
+    "name": "ktds-shop (domain-map fixture)",
+    "languages": [
+      "java"
+    ],
+    "frameworks": [
+      "Spring",
+      "MyBatis"
+    ],
+    "description": "Spring-flavored e-commerce domain-map fixture for the cross-layer flow view.",
+    "analyzedAt": "2026-06-15T00:00:00.000Z",
+    "gitCommitHash": "fixture0000000000000000000000000000000000"
+  },
+  "nodes": [
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "주문 도메인",
+      "id": "domain:order",
+      "type": "domain",
+      "name": "주문",
+      "domainMeta": {
+        "entities": [
+          "Order",
+          "OrderItem"
+        ]
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "상품 도메인",
+      "id": "domain:product",
+      "type": "domain",
+      "name": "상품",
+      "domainMeta": {
+        "entities": [
+          "Product",
+          "Stock"
+        ]
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "회원 도메인",
+      "id": "domain:member",
+      "type": "domain",
+      "name": "회원",
+      "domainMeta": {
+        "entities": [
+          "Member"
+        ]
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "결제 도메인",
+      "id": "domain:payment",
+      "type": "domain",
+      "name": "결제",
+      "domainMeta": {
+        "entities": [
+          "Payment"
+        ]
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "POST /orders 주문생성",
+      "id": "flow:order-create",
+      "type": "flow",
+      "name": "POST /orders 주문생성",
+      "domainMeta": {
+        "entryPoint": "POST /orders",
+        "entryType": "http"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "OrderController.createOrder",
+      "id": "order-create:ctrl",
+      "type": "step",
+      "name": "OrderController.createOrder",
+      "filePath": "src/main/java/com/ktds/shop/order/web/OrderController.java",
+      "lineRange": [
+        42,
+        42
+      ],
+      "stepSource": {
+        "stepId": "order-create:ctrl",
+        "relPath": "src/main/java/com/ktds/shop/order/web/OrderController.java",
+        "line": 42,
+        "className": "ordercreateController"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "OrderServiceImpl.create",
+      "id": "order-create:svc",
+      "type": "step",
+      "name": "OrderServiceImpl.create",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/OrderServiceImpl.java",
+      "lineRange": [
+        88,
+        88
+      ],
+      "stepSource": {
+        "stepId": "order-create:svc",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/OrderServiceImpl.java",
+        "line": 88,
+        "className": "OrderServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "OrderMapper.insertOrder",
+      "id": "order-create:dao",
+      "type": "step",
+      "name": "OrderMapper.insertOrder",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/OrderMapper.java",
+      "lineRange": [
+        17,
+        17
+      ],
+      "stepSource": {
+        "stepId": "order-create:dao",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/OrderMapper.java",
+        "line": 17,
+        "className": "OrderMapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_HEADER",
+      "id": "order-create:db",
+      "type": "step",
+      "name": "ORDER_HEADER",
+      "filePath": "src/main/resources/sql/order/OrderMapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-create:db",
+        "relPath": "src/main/resources/sql/order/OrderMapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "결제 정산 배치",
+      "id": "flow:payment-settle",
+      "type": "flow",
+      "name": "결제 정산 배치",
+      "domainMeta": {
+        "entryPoint": "settlePaymentJob",
+        "entryType": "cron"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "PaymentController.settle",
+      "id": "payment-settle:ctrl",
+      "type": "step",
+      "name": "PaymentController.settle",
+      "filePath": "src/main/java/com/ktds/shop/payment/web/PaymentController.java",
+      "lineRange": [
+        30,
+        30
+      ],
+      "stepSource": {
+        "stepId": "payment-settle:ctrl",
+        "relPath": "src/main/java/com/ktds/shop/payment/web/PaymentController.java",
+        "line": 30,
+        "className": "PaymentController"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "PaymentSettlementFacade.run",
+      "id": "payment-settle:facade",
+      "type": "step",
+      "name": "PaymentSettlementFacade.run",
+      "filePath": "src/main/java/com/ktds/shop/payment/PaymentSettlementFacade.java",
+      "lineRange": [
+        12,
+        12
+      ],
+      "stepSource": {
+        "stepId": "payment-settle:facade",
+        "relPath": "src/main/java/com/ktds/shop/payment/PaymentSettlementFacade.java",
+        "line": 12,
+        "className": "PaymentSettlementFacade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "SettlementBatchJob.execute",
+      "id": "payment-settle:job",
+      "type": "step",
+      "name": "SettlementBatchJob.execute",
+      "filePath": "src/main/java/com/ktds/shop/payment/SettlementBatchJob.java",
+      "lineRange": [
+        55,
+        55
+      ],
+      "stepSource": {
+        "stepId": "payment-settle:job",
+        "relPath": "src/main/java/com/ktds/shop/payment/SettlementBatchJob.java",
+        "line": 55,
+        "className": "SettlementBatchJob"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "PaymentDao.updateSettled",
+      "id": "payment-settle:dao",
+      "type": "step",
+      "name": "PaymentDao.updateSettled",
+      "filePath": "src/main/java/com/ktds/shop/payment/dao/PaymentDao.java",
+      "lineRange": [
+        21,
+        21
+      ],
+      "stepSource": {
+        "stepId": "payment-settle:dao",
+        "relPath": "src/main/java/com/ktds/shop/payment/dao/PaymentDao.java",
+        "line": 21,
+        "className": "PaymentDao"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "TB_PAYMENT_SETTLEMENT",
+      "id": "payment-settle:db",
+      "type": "step",
+      "name": "TB_PAYMENT_SETTLEMENT",
+      "filePath": "src/main/resources/sql/payment/PaymentMapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "payment-settle:db",
+        "relPath": "src/main/resources/sql/payment/PaymentMapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "no backend steps",
+      "id": "flow:product-empty",
+      "type": "flow",
+      "name": "상품 미구현 플로우",
+      "domainMeta": {
+        "entryPoint": "TBD",
+        "entryType": "manual"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "POST /members/login 로그인",
+      "id": "flow:member-login",
+      "type": "flow",
+      "name": "POST /members/login 로그인",
+      "domainMeta": {
+        "entryPoint": "POST /members/login",
+        "entryType": "http"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "MemberController.login",
+      "id": "member-login:ctrl",
+      "type": "step",
+      "name": "MemberController.login",
+      "filePath": "src/main/java/com/ktds/shop/member/web/MemberController.java",
+      "lineRange": [
+        24,
+        24
+      ],
+      "stepSource": {
+        "stepId": "member-login:ctrl",
+        "relPath": "src/main/java/com/ktds/shop/member/web/MemberController.java",
+        "line": 24,
+        "className": "MemberController"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "MemberService.authenticate",
+      "id": "member-login:svc",
+      "type": "step",
+      "name": "MemberService.authenticate",
+      "filePath": "src/main/java/com/ktds/shop/member/service/MemberService.java",
+      "lineRange": [
+        60,
+        60
+      ],
+      "stepSource": {
+        "stepId": "member-login:svc",
+        "relPath": "src/main/java/com/ktds/shop/member/service/MemberService.java",
+        "line": 60,
+        "className": "MemberService"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "MemberRepository.findByLoginId",
+      "id": "member-login:repo",
+      "type": "step",
+      "name": "MemberRepository.findByLoginId",
+      "filePath": "src/main/java/com/ktds/shop/member/repository/MemberRepository.java",
+      "lineRange": [
+        14,
+        14
+      ],
+      "stepSource": {
+        "stepId": "member-login:repo",
+        "relPath": "src/main/java/com/ktds/shop/member/repository/MemberRepository.java",
+        "line": 14,
+        "className": "MemberRepository"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "주문 상세 대용량 조회",
+      "id": "flow:order-detail-big",
+      "type": "flow",
+      "name": "주문 상세 대용량 조회",
+      "domainMeta": {
+        "entryPoint": "GET /orders/{id}/detail",
+        "entryType": "http"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order0Controller.handle",
+      "id": "order-detail:0",
+      "type": "step",
+      "name": "Order0Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order0Controller.java",
+      "lineRange": [
+        10,
+        10
+      ],
+      "stepSource": {
+        "stepId": "order-detail:0",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order0Controller.java",
+        "line": 10,
+        "className": "Order0Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order1ServiceImpl.process",
+      "id": "order-detail:1",
+      "type": "step",
+      "name": "Order1ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order1ServiceImpl.java",
+      "lineRange": [
+        21,
+        21
+      ],
+      "stepSource": {
+        "stepId": "order-detail:1",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order1ServiceImpl.java",
+        "line": 21,
+        "className": "Order1ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order2Mapper.select",
+      "id": "order-detail:2",
+      "type": "step",
+      "name": "Order2Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order2Mapper.java",
+      "lineRange": [
+        32,
+        32
+      ],
+      "stepSource": {
+        "stepId": "order-detail:2",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order2Mapper.java",
+        "line": 32,
+        "className": "Order2Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_3",
+      "id": "order-detail:3",
+      "type": "step",
+      "name": "ORDER_DETAIL_3",
+      "filePath": "src/main/resources/sql/order/Order3Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:3",
+        "relPath": "src/main/resources/sql/order/Order3Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order4Controller.handle",
+      "id": "order-detail:4",
+      "type": "step",
+      "name": "Order4Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order4Controller.java",
+      "lineRange": [
+        14,
+        14
+      ],
+      "stepSource": {
+        "stepId": "order-detail:4",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order4Controller.java",
+        "line": 14,
+        "className": "Order4Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order5ServiceImpl.process",
+      "id": "order-detail:5",
+      "type": "step",
+      "name": "Order5ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order5ServiceImpl.java",
+      "lineRange": [
+        25,
+        25
+      ],
+      "stepSource": {
+        "stepId": "order-detail:5",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order5ServiceImpl.java",
+        "line": 25,
+        "className": "Order5ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order6Mapper.select",
+      "id": "order-detail:6",
+      "type": "step",
+      "name": "Order6Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order6Mapper.java",
+      "lineRange": [
+        36,
+        36
+      ],
+      "stepSource": {
+        "stepId": "order-detail:6",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order6Mapper.java",
+        "line": 36,
+        "className": "Order6Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_7",
+      "id": "order-detail:7",
+      "type": "step",
+      "name": "ORDER_DETAIL_7",
+      "filePath": "src/main/resources/sql/order/Order7Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:7",
+        "relPath": "src/main/resources/sql/order/Order7Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order8Controller.handle",
+      "id": "order-detail:8",
+      "type": "step",
+      "name": "Order8Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order8Controller.java",
+      "lineRange": [
+        18,
+        18
+      ],
+      "stepSource": {
+        "stepId": "order-detail:8",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order8Controller.java",
+        "line": 18,
+        "className": "Order8Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order9ServiceImpl.process",
+      "id": "order-detail:9",
+      "type": "step",
+      "name": "Order9ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order9ServiceImpl.java",
+      "lineRange": [
+        29,
+        29
+      ],
+      "stepSource": {
+        "stepId": "order-detail:9",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order9ServiceImpl.java",
+        "line": 29,
+        "className": "Order9ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order10Mapper.select",
+      "id": "order-detail:10",
+      "type": "step",
+      "name": "Order10Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order10Mapper.java",
+      "lineRange": [
+        40,
+        40
+      ],
+      "stepSource": {
+        "stepId": "order-detail:10",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order10Mapper.java",
+        "line": 40,
+        "className": "Order10Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order11Facade.orchestrate",
+      "id": "order-detail:11",
+      "type": "step",
+      "name": "Order11Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order11Facade.java",
+      "lineRange": [
+        51,
+        51
+      ],
+      "stepSource": {
+        "stepId": "order-detail:11",
+        "relPath": "src/main/java/com/ktds/shop/order/Order11Facade.java",
+        "line": 51,
+        "className": "Order11Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order12Controller.handle",
+      "id": "order-detail:12",
+      "type": "step",
+      "name": "Order12Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order12Controller.java",
+      "lineRange": [
+        22,
+        22
+      ],
+      "stepSource": {
+        "stepId": "order-detail:12",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order12Controller.java",
+        "line": 22,
+        "className": "Order12Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order13ServiceImpl.process",
+      "id": "order-detail:13",
+      "type": "step",
+      "name": "Order13ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order13ServiceImpl.java",
+      "lineRange": [
+        33,
+        33
+      ],
+      "stepSource": {
+        "stepId": "order-detail:13",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order13ServiceImpl.java",
+        "line": 33,
+        "className": "Order13ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order14Mapper.select",
+      "id": "order-detail:14",
+      "type": "step",
+      "name": "Order14Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order14Mapper.java",
+      "lineRange": [
+        44,
+        44
+      ],
+      "stepSource": {
+        "stepId": "order-detail:14",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order14Mapper.java",
+        "line": 44,
+        "className": "Order14Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_15",
+      "id": "order-detail:15",
+      "type": "step",
+      "name": "ORDER_DETAIL_15",
+      "filePath": "src/main/resources/sql/order/Order15Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:15",
+        "relPath": "src/main/resources/sql/order/Order15Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order16Controller.handle",
+      "id": "order-detail:16",
+      "type": "step",
+      "name": "Order16Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order16Controller.java",
+      "lineRange": [
+        26,
+        26
+      ],
+      "stepSource": {
+        "stepId": "order-detail:16",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order16Controller.java",
+        "line": 26,
+        "className": "Order16Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order17ServiceImpl.process",
+      "id": "order-detail:17",
+      "type": "step",
+      "name": "Order17ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order17ServiceImpl.java",
+      "lineRange": [
+        37,
+        37
+      ],
+      "stepSource": {
+        "stepId": "order-detail:17",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order17ServiceImpl.java",
+        "line": 37,
+        "className": "Order17ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order18Mapper.select",
+      "id": "order-detail:18",
+      "type": "step",
+      "name": "Order18Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order18Mapper.java",
+      "lineRange": [
+        48,
+        48
+      ],
+      "stepSource": {
+        "stepId": "order-detail:18",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order18Mapper.java",
+        "line": 48,
+        "className": "Order18Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_19",
+      "id": "order-detail:19",
+      "type": "step",
+      "name": "ORDER_DETAIL_19",
+      "filePath": "src/main/resources/sql/order/Order19Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:19",
+        "relPath": "src/main/resources/sql/order/Order19Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order20Controller.handle",
+      "id": "order-detail:20",
+      "type": "step",
+      "name": "Order20Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order20Controller.java",
+      "lineRange": [
+        30,
+        30
+      ],
+      "stepSource": {
+        "stepId": "order-detail:20",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order20Controller.java",
+        "line": 30,
+        "className": "Order20Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order21ServiceImpl.process",
+      "id": "order-detail:21",
+      "type": "step",
+      "name": "Order21ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order21ServiceImpl.java",
+      "lineRange": [
+        41,
+        41
+      ],
+      "stepSource": {
+        "stepId": "order-detail:21",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order21ServiceImpl.java",
+        "line": 41,
+        "className": "Order21ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order22Mapper.select",
+      "id": "order-detail:22",
+      "type": "step",
+      "name": "Order22Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order22Mapper.java",
+      "lineRange": [
+        52,
+        52
+      ],
+      "stepSource": {
+        "stepId": "order-detail:22",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order22Mapper.java",
+        "line": 52,
+        "className": "Order22Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order23Facade.orchestrate",
+      "id": "order-detail:23",
+      "type": "step",
+      "name": "Order23Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order23Facade.java",
+      "lineRange": [
+        63,
+        63
+      ],
+      "stepSource": {
+        "stepId": "order-detail:23",
+        "relPath": "src/main/java/com/ktds/shop/order/Order23Facade.java",
+        "line": 63,
+        "className": "Order23Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order24Controller.handle",
+      "id": "order-detail:24",
+      "type": "step",
+      "name": "Order24Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order24Controller.java",
+      "lineRange": [
+        34,
+        34
+      ],
+      "stepSource": {
+        "stepId": "order-detail:24",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order24Controller.java",
+        "line": 34,
+        "className": "Order24Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order25ServiceImpl.process",
+      "id": "order-detail:25",
+      "type": "step",
+      "name": "Order25ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order25ServiceImpl.java",
+      "lineRange": [
+        45,
+        45
+      ],
+      "stepSource": {
+        "stepId": "order-detail:25",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order25ServiceImpl.java",
+        "line": 45,
+        "className": "Order25ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order26Mapper.select",
+      "id": "order-detail:26",
+      "type": "step",
+      "name": "Order26Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order26Mapper.java",
+      "lineRange": [
+        56,
+        56
+      ],
+      "stepSource": {
+        "stepId": "order-detail:26",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order26Mapper.java",
+        "line": 56,
+        "className": "Order26Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_27",
+      "id": "order-detail:27",
+      "type": "step",
+      "name": "ORDER_DETAIL_27",
+      "filePath": "src/main/resources/sql/order/Order27Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:27",
+        "relPath": "src/main/resources/sql/order/Order27Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order28Controller.handle",
+      "id": "order-detail:28",
+      "type": "step",
+      "name": "Order28Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order28Controller.java",
+      "lineRange": [
+        38,
+        38
+      ],
+      "stepSource": {
+        "stepId": "order-detail:28",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order28Controller.java",
+        "line": 38,
+        "className": "Order28Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order29ServiceImpl.process",
+      "id": "order-detail:29",
+      "type": "step",
+      "name": "Order29ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order29ServiceImpl.java",
+      "lineRange": [
+        49,
+        49
+      ],
+      "stepSource": {
+        "stepId": "order-detail:29",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order29ServiceImpl.java",
+        "line": 49,
+        "className": "Order29ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order30Mapper.select",
+      "id": "order-detail:30",
+      "type": "step",
+      "name": "Order30Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order30Mapper.java",
+      "lineRange": [
+        60,
+        60
+      ],
+      "stepSource": {
+        "stepId": "order-detail:30",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order30Mapper.java",
+        "line": 60,
+        "className": "Order30Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_31",
+      "id": "order-detail:31",
+      "type": "step",
+      "name": "ORDER_DETAIL_31",
+      "filePath": "src/main/resources/sql/order/Order31Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:31",
+        "relPath": "src/main/resources/sql/order/Order31Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order32Controller.handle",
+      "id": "order-detail:32",
+      "type": "step",
+      "name": "Order32Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order32Controller.java",
+      "lineRange": [
+        42,
+        42
+      ],
+      "stepSource": {
+        "stepId": "order-detail:32",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order32Controller.java",
+        "line": 42,
+        "className": "Order32Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order33ServiceImpl.process",
+      "id": "order-detail:33",
+      "type": "step",
+      "name": "Order33ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order33ServiceImpl.java",
+      "lineRange": [
+        53,
+        53
+      ],
+      "stepSource": {
+        "stepId": "order-detail:33",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order33ServiceImpl.java",
+        "line": 53,
+        "className": "Order33ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order34Mapper.select",
+      "id": "order-detail:34",
+      "type": "step",
+      "name": "Order34Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order34Mapper.java",
+      "lineRange": [
+        64,
+        64
+      ],
+      "stepSource": {
+        "stepId": "order-detail:34",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order34Mapper.java",
+        "line": 64,
+        "className": "Order34Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order35Facade.orchestrate",
+      "id": "order-detail:35",
+      "type": "step",
+      "name": "Order35Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order35Facade.java",
+      "lineRange": [
+        75,
+        75
+      ],
+      "stepSource": {
+        "stepId": "order-detail:35",
+        "relPath": "src/main/java/com/ktds/shop/order/Order35Facade.java",
+        "line": 75,
+        "className": "Order35Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order36Controller.handle",
+      "id": "order-detail:36",
+      "type": "step",
+      "name": "Order36Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order36Controller.java",
+      "lineRange": [
+        46,
+        46
+      ],
+      "stepSource": {
+        "stepId": "order-detail:36",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order36Controller.java",
+        "line": 46,
+        "className": "Order36Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order37ServiceImpl.process",
+      "id": "order-detail:37",
+      "type": "step",
+      "name": "Order37ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order37ServiceImpl.java",
+      "lineRange": [
+        57,
+        57
+      ],
+      "stepSource": {
+        "stepId": "order-detail:37",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order37ServiceImpl.java",
+        "line": 57,
+        "className": "Order37ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order38Mapper.select",
+      "id": "order-detail:38",
+      "type": "step",
+      "name": "Order38Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order38Mapper.java",
+      "lineRange": [
+        68,
+        68
+      ],
+      "stepSource": {
+        "stepId": "order-detail:38",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order38Mapper.java",
+        "line": 68,
+        "className": "Order38Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_39",
+      "id": "order-detail:39",
+      "type": "step",
+      "name": "ORDER_DETAIL_39",
+      "filePath": "src/main/resources/sql/order/Order39Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:39",
+        "relPath": "src/main/resources/sql/order/Order39Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order40Controller.handle",
+      "id": "order-detail:40",
+      "type": "step",
+      "name": "Order40Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order40Controller.java",
+      "lineRange": [
+        50,
+        50
+      ],
+      "stepSource": {
+        "stepId": "order-detail:40",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order40Controller.java",
+        "line": 50,
+        "className": "Order40Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order41ServiceImpl.process",
+      "id": "order-detail:41",
+      "type": "step",
+      "name": "Order41ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order41ServiceImpl.java",
+      "lineRange": [
+        61,
+        61
+      ],
+      "stepSource": {
+        "stepId": "order-detail:41",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order41ServiceImpl.java",
+        "line": 61,
+        "className": "Order41ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order42Mapper.select",
+      "id": "order-detail:42",
+      "type": "step",
+      "name": "Order42Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order42Mapper.java",
+      "lineRange": [
+        72,
+        72
+      ],
+      "stepSource": {
+        "stepId": "order-detail:42",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order42Mapper.java",
+        "line": 72,
+        "className": "Order42Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_43",
+      "id": "order-detail:43",
+      "type": "step",
+      "name": "ORDER_DETAIL_43",
+      "filePath": "src/main/resources/sql/order/Order43Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:43",
+        "relPath": "src/main/resources/sql/order/Order43Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order44Controller.handle",
+      "id": "order-detail:44",
+      "type": "step",
+      "name": "Order44Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order44Controller.java",
+      "lineRange": [
+        54,
+        54
+      ],
+      "stepSource": {
+        "stepId": "order-detail:44",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order44Controller.java",
+        "line": 54,
+        "className": "Order44Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order45ServiceImpl.process",
+      "id": "order-detail:45",
+      "type": "step",
+      "name": "Order45ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order45ServiceImpl.java",
+      "lineRange": [
+        65,
+        65
+      ],
+      "stepSource": {
+        "stepId": "order-detail:45",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order45ServiceImpl.java",
+        "line": 65,
+        "className": "Order45ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order46Mapper.select",
+      "id": "order-detail:46",
+      "type": "step",
+      "name": "Order46Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order46Mapper.java",
+      "lineRange": [
+        76,
+        76
+      ],
+      "stepSource": {
+        "stepId": "order-detail:46",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order46Mapper.java",
+        "line": 76,
+        "className": "Order46Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order47Facade.orchestrate",
+      "id": "order-detail:47",
+      "type": "step",
+      "name": "Order47Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order47Facade.java",
+      "lineRange": [
+        87,
+        87
+      ],
+      "stepSource": {
+        "stepId": "order-detail:47",
+        "relPath": "src/main/java/com/ktds/shop/order/Order47Facade.java",
+        "line": 87,
+        "className": "Order47Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order48Controller.handle",
+      "id": "order-detail:48",
+      "type": "step",
+      "name": "Order48Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order48Controller.java",
+      "lineRange": [
+        58,
+        58
+      ],
+      "stepSource": {
+        "stepId": "order-detail:48",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order48Controller.java",
+        "line": 58,
+        "className": "Order48Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order49ServiceImpl.process",
+      "id": "order-detail:49",
+      "type": "step",
+      "name": "Order49ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order49ServiceImpl.java",
+      "lineRange": [
+        69,
+        69
+      ],
+      "stepSource": {
+        "stepId": "order-detail:49",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order49ServiceImpl.java",
+        "line": 69,
+        "className": "Order49ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order50Mapper.select",
+      "id": "order-detail:50",
+      "type": "step",
+      "name": "Order50Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order50Mapper.java",
+      "lineRange": [
+        80,
+        80
+      ],
+      "stepSource": {
+        "stepId": "order-detail:50",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order50Mapper.java",
+        "line": 80,
+        "className": "Order50Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_51",
+      "id": "order-detail:51",
+      "type": "step",
+      "name": "ORDER_DETAIL_51",
+      "filePath": "src/main/resources/sql/order/Order51Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:51",
+        "relPath": "src/main/resources/sql/order/Order51Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order52Controller.handle",
+      "id": "order-detail:52",
+      "type": "step",
+      "name": "Order52Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order52Controller.java",
+      "lineRange": [
+        62,
+        62
+      ],
+      "stepSource": {
+        "stepId": "order-detail:52",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order52Controller.java",
+        "line": 62,
+        "className": "Order52Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order53ServiceImpl.process",
+      "id": "order-detail:53",
+      "type": "step",
+      "name": "Order53ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order53ServiceImpl.java",
+      "lineRange": [
+        73,
+        73
+      ],
+      "stepSource": {
+        "stepId": "order-detail:53",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order53ServiceImpl.java",
+        "line": 73,
+        "className": "Order53ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order54Mapper.select",
+      "id": "order-detail:54",
+      "type": "step",
+      "name": "Order54Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order54Mapper.java",
+      "lineRange": [
+        84,
+        84
+      ],
+      "stepSource": {
+        "stepId": "order-detail:54",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order54Mapper.java",
+        "line": 84,
+        "className": "Order54Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_55",
+      "id": "order-detail:55",
+      "type": "step",
+      "name": "ORDER_DETAIL_55",
+      "filePath": "src/main/resources/sql/order/Order55Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:55",
+        "relPath": "src/main/resources/sql/order/Order55Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order56Controller.handle",
+      "id": "order-detail:56",
+      "type": "step",
+      "name": "Order56Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order56Controller.java",
+      "lineRange": [
+        66,
+        66
+      ],
+      "stepSource": {
+        "stepId": "order-detail:56",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order56Controller.java",
+        "line": 66,
+        "className": "Order56Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order57ServiceImpl.process",
+      "id": "order-detail:57",
+      "type": "step",
+      "name": "Order57ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order57ServiceImpl.java",
+      "lineRange": [
+        77,
+        77
+      ],
+      "stepSource": {
+        "stepId": "order-detail:57",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order57ServiceImpl.java",
+        "line": 77,
+        "className": "Order57ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order58Mapper.select",
+      "id": "order-detail:58",
+      "type": "step",
+      "name": "Order58Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order58Mapper.java",
+      "lineRange": [
+        88,
+        88
+      ],
+      "stepSource": {
+        "stepId": "order-detail:58",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order58Mapper.java",
+        "line": 88,
+        "className": "Order58Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order59Facade.orchestrate",
+      "id": "order-detail:59",
+      "type": "step",
+      "name": "Order59Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order59Facade.java",
+      "lineRange": [
+        99,
+        99
+      ],
+      "stepSource": {
+        "stepId": "order-detail:59",
+        "relPath": "src/main/java/com/ktds/shop/order/Order59Facade.java",
+        "line": 99,
+        "className": "Order59Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order60Controller.handle",
+      "id": "order-detail:60",
+      "type": "step",
+      "name": "Order60Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order60Controller.java",
+      "lineRange": [
+        70,
+        70
+      ],
+      "stepSource": {
+        "stepId": "order-detail:60",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order60Controller.java",
+        "line": 70,
+        "className": "Order60Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order61ServiceImpl.process",
+      "id": "order-detail:61",
+      "type": "step",
+      "name": "Order61ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order61ServiceImpl.java",
+      "lineRange": [
+        81,
+        81
+      ],
+      "stepSource": {
+        "stepId": "order-detail:61",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order61ServiceImpl.java",
+        "line": 81,
+        "className": "Order61ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order62Mapper.select",
+      "id": "order-detail:62",
+      "type": "step",
+      "name": "Order62Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order62Mapper.java",
+      "lineRange": [
+        92,
+        92
+      ],
+      "stepSource": {
+        "stepId": "order-detail:62",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order62Mapper.java",
+        "line": 92,
+        "className": "Order62Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_63",
+      "id": "order-detail:63",
+      "type": "step",
+      "name": "ORDER_DETAIL_63",
+      "filePath": "src/main/resources/sql/order/Order63Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:63",
+        "relPath": "src/main/resources/sql/order/Order63Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order64Controller.handle",
+      "id": "order-detail:64",
+      "type": "step",
+      "name": "Order64Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order64Controller.java",
+      "lineRange": [
+        74,
+        74
+      ],
+      "stepSource": {
+        "stepId": "order-detail:64",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order64Controller.java",
+        "line": 74,
+        "className": "Order64Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order65ServiceImpl.process",
+      "id": "order-detail:65",
+      "type": "step",
+      "name": "Order65ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order65ServiceImpl.java",
+      "lineRange": [
+        85,
+        85
+      ],
+      "stepSource": {
+        "stepId": "order-detail:65",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order65ServiceImpl.java",
+        "line": 85,
+        "className": "Order65ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order66Mapper.select",
+      "id": "order-detail:66",
+      "type": "step",
+      "name": "Order66Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order66Mapper.java",
+      "lineRange": [
+        96,
+        96
+      ],
+      "stepSource": {
+        "stepId": "order-detail:66",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order66Mapper.java",
+        "line": 96,
+        "className": "Order66Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_67",
+      "id": "order-detail:67",
+      "type": "step",
+      "name": "ORDER_DETAIL_67",
+      "filePath": "src/main/resources/sql/order/Order67Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:67",
+        "relPath": "src/main/resources/sql/order/Order67Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order68Controller.handle",
+      "id": "order-detail:68",
+      "type": "step",
+      "name": "Order68Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order68Controller.java",
+      "lineRange": [
+        78,
+        78
+      ],
+      "stepSource": {
+        "stepId": "order-detail:68",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order68Controller.java",
+        "line": 78,
+        "className": "Order68Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order69ServiceImpl.process",
+      "id": "order-detail:69",
+      "type": "step",
+      "name": "Order69ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order69ServiceImpl.java",
+      "lineRange": [
+        89,
+        89
+      ],
+      "stepSource": {
+        "stepId": "order-detail:69",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order69ServiceImpl.java",
+        "line": 89,
+        "className": "Order69ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order70Mapper.select",
+      "id": "order-detail:70",
+      "type": "step",
+      "name": "Order70Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order70Mapper.java",
+      "lineRange": [
+        100,
+        100
+      ],
+      "stepSource": {
+        "stepId": "order-detail:70",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order70Mapper.java",
+        "line": 100,
+        "className": "Order70Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order71Facade.orchestrate",
+      "id": "order-detail:71",
+      "type": "step",
+      "name": "Order71Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order71Facade.java",
+      "lineRange": [
+        111,
+        111
+      ],
+      "stepSource": {
+        "stepId": "order-detail:71",
+        "relPath": "src/main/java/com/ktds/shop/order/Order71Facade.java",
+        "line": 111,
+        "className": "Order71Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order72Controller.handle",
+      "id": "order-detail:72",
+      "type": "step",
+      "name": "Order72Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order72Controller.java",
+      "lineRange": [
+        82,
+        82
+      ],
+      "stepSource": {
+        "stepId": "order-detail:72",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order72Controller.java",
+        "line": 82,
+        "className": "Order72Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order73ServiceImpl.process",
+      "id": "order-detail:73",
+      "type": "step",
+      "name": "Order73ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order73ServiceImpl.java",
+      "lineRange": [
+        93,
+        93
+      ],
+      "stepSource": {
+        "stepId": "order-detail:73",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order73ServiceImpl.java",
+        "line": 93,
+        "className": "Order73ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order74Mapper.select",
+      "id": "order-detail:74",
+      "type": "step",
+      "name": "Order74Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order74Mapper.java",
+      "lineRange": [
+        104,
+        104
+      ],
+      "stepSource": {
+        "stepId": "order-detail:74",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order74Mapper.java",
+        "line": 104,
+        "className": "Order74Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_75",
+      "id": "order-detail:75",
+      "type": "step",
+      "name": "ORDER_DETAIL_75",
+      "filePath": "src/main/resources/sql/order/Order75Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:75",
+        "relPath": "src/main/resources/sql/order/Order75Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order76Controller.handle",
+      "id": "order-detail:76",
+      "type": "step",
+      "name": "Order76Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order76Controller.java",
+      "lineRange": [
+        86,
+        86
+      ],
+      "stepSource": {
+        "stepId": "order-detail:76",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order76Controller.java",
+        "line": 86,
+        "className": "Order76Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order77ServiceImpl.process",
+      "id": "order-detail:77",
+      "type": "step",
+      "name": "Order77ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order77ServiceImpl.java",
+      "lineRange": [
+        97,
+        97
+      ],
+      "stepSource": {
+        "stepId": "order-detail:77",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order77ServiceImpl.java",
+        "line": 97,
+        "className": "Order77ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order78Mapper.select",
+      "id": "order-detail:78",
+      "type": "step",
+      "name": "Order78Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order78Mapper.java",
+      "lineRange": [
+        108,
+        108
+      ],
+      "stepSource": {
+        "stepId": "order-detail:78",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order78Mapper.java",
+        "line": 108,
+        "className": "Order78Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_79",
+      "id": "order-detail:79",
+      "type": "step",
+      "name": "ORDER_DETAIL_79",
+      "filePath": "src/main/resources/sql/order/Order79Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:79",
+        "relPath": "src/main/resources/sql/order/Order79Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order80Controller.handle",
+      "id": "order-detail:80",
+      "type": "step",
+      "name": "Order80Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order80Controller.java",
+      "lineRange": [
+        90,
+        90
+      ],
+      "stepSource": {
+        "stepId": "order-detail:80",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order80Controller.java",
+        "line": 90,
+        "className": "Order80Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order81ServiceImpl.process",
+      "id": "order-detail:81",
+      "type": "step",
+      "name": "Order81ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order81ServiceImpl.java",
+      "lineRange": [
+        101,
+        101
+      ],
+      "stepSource": {
+        "stepId": "order-detail:81",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order81ServiceImpl.java",
+        "line": 101,
+        "className": "Order81ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order82Mapper.select",
+      "id": "order-detail:82",
+      "type": "step",
+      "name": "Order82Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order82Mapper.java",
+      "lineRange": [
+        112,
+        112
+      ],
+      "stepSource": {
+        "stepId": "order-detail:82",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order82Mapper.java",
+        "line": 112,
+        "className": "Order82Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order83Facade.orchestrate",
+      "id": "order-detail:83",
+      "type": "step",
+      "name": "Order83Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order83Facade.java",
+      "lineRange": [
+        123,
+        123
+      ],
+      "stepSource": {
+        "stepId": "order-detail:83",
+        "relPath": "src/main/java/com/ktds/shop/order/Order83Facade.java",
+        "line": 123,
+        "className": "Order83Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order84Controller.handle",
+      "id": "order-detail:84",
+      "type": "step",
+      "name": "Order84Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order84Controller.java",
+      "lineRange": [
+        94,
+        94
+      ],
+      "stepSource": {
+        "stepId": "order-detail:84",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order84Controller.java",
+        "line": 94,
+        "className": "Order84Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order85ServiceImpl.process",
+      "id": "order-detail:85",
+      "type": "step",
+      "name": "Order85ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order85ServiceImpl.java",
+      "lineRange": [
+        105,
+        105
+      ],
+      "stepSource": {
+        "stepId": "order-detail:85",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order85ServiceImpl.java",
+        "line": 105,
+        "className": "Order85ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order86Mapper.select",
+      "id": "order-detail:86",
+      "type": "step",
+      "name": "Order86Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order86Mapper.java",
+      "lineRange": [
+        116,
+        116
+      ],
+      "stepSource": {
+        "stepId": "order-detail:86",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order86Mapper.java",
+        "line": 116,
+        "className": "Order86Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_87",
+      "id": "order-detail:87",
+      "type": "step",
+      "name": "ORDER_DETAIL_87",
+      "filePath": "src/main/resources/sql/order/Order87Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:87",
+        "relPath": "src/main/resources/sql/order/Order87Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order88Controller.handle",
+      "id": "order-detail:88",
+      "type": "step",
+      "name": "Order88Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order88Controller.java",
+      "lineRange": [
+        98,
+        98
+      ],
+      "stepSource": {
+        "stepId": "order-detail:88",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order88Controller.java",
+        "line": 98,
+        "className": "Order88Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order89ServiceImpl.process",
+      "id": "order-detail:89",
+      "type": "step",
+      "name": "Order89ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order89ServiceImpl.java",
+      "lineRange": [
+        109,
+        109
+      ],
+      "stepSource": {
+        "stepId": "order-detail:89",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order89ServiceImpl.java",
+        "line": 109,
+        "className": "Order89ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order90Mapper.select",
+      "id": "order-detail:90",
+      "type": "step",
+      "name": "Order90Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order90Mapper.java",
+      "lineRange": [
+        120,
+        120
+      ],
+      "stepSource": {
+        "stepId": "order-detail:90",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order90Mapper.java",
+        "line": 120,
+        "className": "Order90Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_91",
+      "id": "order-detail:91",
+      "type": "step",
+      "name": "ORDER_DETAIL_91",
+      "filePath": "src/main/resources/sql/order/Order91Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:91",
+        "relPath": "src/main/resources/sql/order/Order91Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order92Controller.handle",
+      "id": "order-detail:92",
+      "type": "step",
+      "name": "Order92Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order92Controller.java",
+      "lineRange": [
+        102,
+        102
+      ],
+      "stepSource": {
+        "stepId": "order-detail:92",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order92Controller.java",
+        "line": 102,
+        "className": "Order92Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order93ServiceImpl.process",
+      "id": "order-detail:93",
+      "type": "step",
+      "name": "Order93ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order93ServiceImpl.java",
+      "lineRange": [
+        113,
+        113
+      ],
+      "stepSource": {
+        "stepId": "order-detail:93",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order93ServiceImpl.java",
+        "line": 113,
+        "className": "Order93ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order94Mapper.select",
+      "id": "order-detail:94",
+      "type": "step",
+      "name": "Order94Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order94Mapper.java",
+      "lineRange": [
+        124,
+        124
+      ],
+      "stepSource": {
+        "stepId": "order-detail:94",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order94Mapper.java",
+        "line": 124,
+        "className": "Order94Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order95Facade.orchestrate",
+      "id": "order-detail:95",
+      "type": "step",
+      "name": "Order95Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order95Facade.java",
+      "lineRange": [
+        135,
+        135
+      ],
+      "stepSource": {
+        "stepId": "order-detail:95",
+        "relPath": "src/main/java/com/ktds/shop/order/Order95Facade.java",
+        "line": 135,
+        "className": "Order95Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order96Controller.handle",
+      "id": "order-detail:96",
+      "type": "step",
+      "name": "Order96Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order96Controller.java",
+      "lineRange": [
+        106,
+        106
+      ],
+      "stepSource": {
+        "stepId": "order-detail:96",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order96Controller.java",
+        "line": 106,
+        "className": "Order96Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order97ServiceImpl.process",
+      "id": "order-detail:97",
+      "type": "step",
+      "name": "Order97ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order97ServiceImpl.java",
+      "lineRange": [
+        117,
+        117
+      ],
+      "stepSource": {
+        "stepId": "order-detail:97",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order97ServiceImpl.java",
+        "line": 117,
+        "className": "Order97ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order98Mapper.select",
+      "id": "order-detail:98",
+      "type": "step",
+      "name": "Order98Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order98Mapper.java",
+      "lineRange": [
+        128,
+        128
+      ],
+      "stepSource": {
+        "stepId": "order-detail:98",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order98Mapper.java",
+        "line": 128,
+        "className": "Order98Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_99",
+      "id": "order-detail:99",
+      "type": "step",
+      "name": "ORDER_DETAIL_99",
+      "filePath": "src/main/resources/sql/order/Order99Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:99",
+        "relPath": "src/main/resources/sql/order/Order99Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order100Controller.handle",
+      "id": "order-detail:100",
+      "type": "step",
+      "name": "Order100Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order100Controller.java",
+      "lineRange": [
+        110,
+        110
+      ],
+      "stepSource": {
+        "stepId": "order-detail:100",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order100Controller.java",
+        "line": 110,
+        "className": "Order100Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order101ServiceImpl.process",
+      "id": "order-detail:101",
+      "type": "step",
+      "name": "Order101ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order101ServiceImpl.java",
+      "lineRange": [
+        121,
+        121
+      ],
+      "stepSource": {
+        "stepId": "order-detail:101",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order101ServiceImpl.java",
+        "line": 121,
+        "className": "Order101ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order102Mapper.select",
+      "id": "order-detail:102",
+      "type": "step",
+      "name": "Order102Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order102Mapper.java",
+      "lineRange": [
+        132,
+        132
+      ],
+      "stepSource": {
+        "stepId": "order-detail:102",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order102Mapper.java",
+        "line": 132,
+        "className": "Order102Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "ORDER_DETAIL_103",
+      "id": "order-detail:103",
+      "type": "step",
+      "name": "ORDER_DETAIL_103",
+      "filePath": "src/main/resources/sql/order/Order103Mapper.xml",
+      "lineRange": [
+        1,
+        1
+      ],
+      "stepSource": {
+        "stepId": "order-detail:103",
+        "relPath": "src/main/resources/sql/order/Order103Mapper.xml",
+        "line": 1,
+        "className": null
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order104Controller.handle",
+      "id": "order-detail:104",
+      "type": "step",
+      "name": "Order104Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order104Controller.java",
+      "lineRange": [
+        114,
+        114
+      ],
+      "stepSource": {
+        "stepId": "order-detail:104",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order104Controller.java",
+        "line": 114,
+        "className": "Order104Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order105ServiceImpl.process",
+      "id": "order-detail:105",
+      "type": "step",
+      "name": "Order105ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order105ServiceImpl.java",
+      "lineRange": [
+        125,
+        125
+      ],
+      "stepSource": {
+        "stepId": "order-detail:105",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order105ServiceImpl.java",
+        "line": 125,
+        "className": "Order105ServiceImpl"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order106Mapper.select",
+      "id": "order-detail:106",
+      "type": "step",
+      "name": "Order106Mapper.select",
+      "filePath": "src/main/java/com/ktds/shop/order/mapper/Order106Mapper.java",
+      "lineRange": [
+        136,
+        136
+      ],
+      "stepSource": {
+        "stepId": "order-detail:106",
+        "relPath": "src/main/java/com/ktds/shop/order/mapper/Order106Mapper.java",
+        "line": 136,
+        "className": "Order106Mapper"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order107Facade.orchestrate",
+      "id": "order-detail:107",
+      "type": "step",
+      "name": "Order107Facade.orchestrate",
+      "filePath": "src/main/java/com/ktds/shop/order/Order107Facade.java",
+      "lineRange": [
+        147,
+        147
+      ],
+      "stepSource": {
+        "stepId": "order-detail:107",
+        "relPath": "src/main/java/com/ktds/shop/order/Order107Facade.java",
+        "line": 147,
+        "className": "Order107Facade"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order108Controller.handle",
+      "id": "order-detail:108",
+      "type": "step",
+      "name": "Order108Controller.handle",
+      "filePath": "src/main/java/com/ktds/shop/order/web/Order108Controller.java",
+      "lineRange": [
+        118,
+        118
+      ],
+      "stepSource": {
+        "stepId": "order-detail:108",
+        "relPath": "src/main/java/com/ktds/shop/order/web/Order108Controller.java",
+        "line": 118,
+        "className": "Order108Controller"
+      }
+    },
+    {
+      "tags": [],
+      "complexity": "moderate",
+      "summary": "Order109ServiceImpl.process",
+      "id": "order-detail:109",
+      "type": "step",
+      "name": "Order109ServiceImpl.process",
+      "filePath": "src/main/java/com/ktds/shop/order/service/impl/Order109ServiceImpl.java",
+      "lineRange": [
+        129,
+        129
+      ],
+      "stepSource": {
+        "stepId": "order-detail:109",
+        "relPath": "src/main/java/com/ktds/shop/order/service/impl/Order109ServiceImpl.java",
+        "line": 129,
+        "className": "Order109ServiceImpl"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "domain:order",
+      "target": "domain:product",
+      "type": "cross_domain",
+      "description": "주문 생성 시 재고 차감"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "domain:order",
+      "target": "domain:payment",
+      "type": "cross_domain",
+      "description": "주문 생성 시 결제 요청"
+    },
+    {
+      "direction": "bidirectional",
+      "weight": 0.5,
+      "source": "domain:order",
+      "target": "domain:member",
+      "type": "cross_domain",
+      "description": "회원 주문 이력"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "domain:order",
+      "target": "flow:order-create",
+      "type": "contains_flow"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.2,
+      "source": "flow:order-create",
+      "target": "order-create:ctrl",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.4,
+      "source": "flow:order-create",
+      "target": "order-create:svc",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6,
+      "source": "flow:order-create",
+      "target": "order-create:dao",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8,
+      "source": "flow:order-create",
+      "target": "order-create:db",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "domain:payment",
+      "target": "flow:payment-settle",
+      "type": "contains_flow"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.16666666666666666,
+      "source": "flow:payment-settle",
+      "target": "payment-settle:ctrl",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.3333333333333333,
+      "source": "flow:payment-settle",
+      "target": "payment-settle:facade",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "flow:payment-settle",
+      "target": "payment-settle:job",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6666666666666666,
+      "source": "flow:payment-settle",
+      "target": "payment-settle:dao",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8333333333333334,
+      "source": "flow:payment-settle",
+      "target": "payment-settle:db",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "domain:product",
+      "target": "flow:product-empty",
+      "type": "contains_flow"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "domain:member",
+      "target": "flow:member-login",
+      "type": "contains_flow"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.25,
+      "source": "flow:member-login",
+      "target": "member-login:ctrl",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "flow:member-login",
+      "target": "member-login:svc",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.75,
+      "source": "flow:member-login",
+      "target": "member-login:repo",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5,
+      "source": "domain:order",
+      "target": "flow:order-detail-big",
+      "type": "contains_flow"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.009009009009009009,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:0",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.018018018018018018,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:1",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.02702702702702703,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:2",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.036036036036036036,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:3",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.04504504504504504,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:4",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.05405405405405406,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:5",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.06306306306306306,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:6",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.07207207207207207,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:7",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.08108108108108109,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:8",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.09009009009009009,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:9",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.0990990990990991,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:10",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.10810810810810811,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:11",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.11711711711711711,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:12",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.12612612612612611,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:13",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.13513513513513514,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:14",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.14414414414414414,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:15",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.15315315315315314,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:16",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.16216216216216217,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:17",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.17117117117117117,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:18",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.18018018018018017,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:19",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.1891891891891892,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:20",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.1981981981981982,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:21",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.2072072072072072,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:22",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.21621621621621623,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:23",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.22522522522522523,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:24",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.23423423423423423,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:25",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.24324324324324326,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:26",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.25225225225225223,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:27",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.26126126126126126,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:28",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.2702702702702703,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:29",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.27927927927927926,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:30",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.2882882882882883,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:31",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.2972972972972973,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:32",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.3063063063063063,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:33",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.3153153153153153,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:34",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.32432432432432434,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:35",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.3333333333333333,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:36",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.34234234234234234,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:37",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.35135135135135137,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:38",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.36036036036036034,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:39",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.36936936936936937,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:40",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.3783783783783784,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:41",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.38738738738738737,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:42",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.3963963963963964,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:43",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.40540540540540543,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:44",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.4144144144144144,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:45",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.42342342342342343,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:46",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.43243243243243246,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:47",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.44144144144144143,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:48",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.45045045045045046,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:49",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.4594594594594595,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:50",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.46846846846846846,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:51",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.4774774774774775,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:52",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.4864864864864865,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:53",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.4954954954954955,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:54",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5045045045045045,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:55",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5135135135135135,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:56",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5225225225225225,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:57",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5315315315315315,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:58",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5405405405405406,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:59",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5495495495495496,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:60",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5585585585585585,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:61",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5675675675675675,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:62",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5765765765765766,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:63",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5855855855855856,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:64",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.5945945945945946,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:65",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6036036036036037,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:66",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6126126126126126,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:67",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6216216216216216,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:68",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6306306306306306,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:69",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6396396396396397,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:70",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6486486486486487,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:71",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6576576576576577,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:72",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6666666666666666,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:73",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6756756756756757,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:74",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6846846846846847,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:75",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.6936936936936937,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:76",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7027027027027027,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:77",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7117117117117117,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:78",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7207207207207207,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:79",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7297297297297297,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:80",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7387387387387387,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:81",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7477477477477478,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:82",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7567567567567568,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:83",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7657657657657657,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:84",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7747747747747747,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:85",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7837837837837838,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:86",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.7927927927927928,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:87",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8018018018018018,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:88",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8108108108108109,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:89",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8198198198198198,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:90",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8288288288288288,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:91",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8378378378378378,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:92",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8468468468468469,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:93",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8558558558558559,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:94",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8648648648648649,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:95",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8738738738738738,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:96",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8828828828828829,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:97",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.8918918918918919,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:98",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.9009009009009009,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:99",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.9099099099099099,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:100",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.918918918918919,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:101",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.9279279279279279,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:102",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.9369369369369369,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:103",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.9459459459459459,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:104",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.954954954954955,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:105",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.963963963963964,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:106",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.972972972972973,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:107",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.9819819819819819,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:108",
+      "type": "flow_step"
+    },
+    {
+      "direction": "forward",
+      "weight": 0.990990990990991,
+      "source": "flow:order-detail-big",
+      "target": "order-detail:109",
+      "type": "flow_step"
+    }
+  ],
+  "layers": [],
+  "tour": []
+}

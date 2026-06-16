@@ -21,6 +21,7 @@ export type FlowFlowNode = Node<FlowNodeData, "flow-node">;
 
 function FlowNode({ data }: NodeProps<FlowFlowNode>) {
   const selectNode = useDashboardStore((s) => s.selectNode);
+  const navigateToFlow = useDashboardStore((s) => s.navigateToFlow);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const isSelected = selectedNodeId === data.flowId;
   // ktds-fork (ADR-003): 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
@@ -45,6 +46,7 @@ function FlowNode({ data }: NodeProps<FlowFlowNode>) {
       }${data.isDiffFaded ? " diff-faded" : ""}`}
       style={diffStyle}
       onClick={() => selectNode(data.flowId)}
+      onDoubleClick={() => navigateToFlow(data.flowId)}
     >
       <Handle type="target" position={Position.Left} className="!bg-accent/60 !w-2 !h-2" />
       <Handle type="source" position={Position.Right} className="!bg-accent/60 !w-2 !h-2" />

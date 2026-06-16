@@ -72,15 +72,38 @@ interface ResolvedStep extends SpineStep {
   node: GraphNode;
 }
 
-/** A spine edge between two consecutive steps, in absolute canvas coordinates. */
-function buildEdgePath(from: SpinePlacement, to: SpinePlacement): { d: string; crossLayer: boolean } {
+/** Per-edge fan slot so coincident edges attach at distinct node-edge points. */
+interface EdgeSlots {
+  srcSlot: number;
+  srcTotal: number;
+  tgtSlot: number;
+  tgtTotal: number;
+}
+
+/**
+ * Distribute an attach point across a node's height. With N edges sharing a node
+ * (fan-out at the source, fan-in at the target), each gets a distinct y at
+ * (slot+1)/(N+1) of the node height — so coincident lines no longer collapse
+ * onto one another (e.g. ActionBean→entity and Service→entity reaching the same
+ * row stop overlapping/occluding).
+ */
+function attachY(p: SpinePlacement, slot: number, total: number): number {
+  return p.y + (p.h * (slot + 1)) / (total + 1);
+}
+
+/** A spine edge between two steps, attaching at fanned points on each node edge. */
+function buildEdgePath(
+  from: SpinePlacement,
+  to: SpinePlacement,
+  slots: EdgeSlots,
+): { d: string; crossLayer: boolean } {
   const crossLayer = from.col !== to.col;
   if (crossLayer) {
-    // source-right → target-left horizontal S-curve.
+    // source-right → target-left horizontal S-curve, fanned per slot.
     const x1 = from.x + from.w;
-    const y1 = from.y + from.h / 2;
+    const y1 = attachY(from, slots.srcSlot, slots.srcTotal);
     const x2 = to.x;
-    const y2 = to.y + to.h / 2;
+    const y2 = attachY(to, slots.tgtSlot, slots.tgtTotal);
     const cx = x1 + (x2 - x1) * 0.5;
     return { d: `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`, crossLayer };
   }
@@ -156,14 +179,44 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     // a fabricated service→service link (the old sequence chain's artifact).
     const stepIds = new Set(steps.map((s) => s.id));
     const layerById = new Map(steps.map((s) => [s.id, s.layer]));
-    for (const e of domainGraph.edges) {
-      if (e.type !== "calls" || !stepIds.has(e.source) || !stepIds.has(e.target)) continue;
+    const relevant = domainGraph.edges.filter(
+      (e) => e.type === "calls" && stepIds.has(e.source) && stepIds.has(e.target),
+    );
+    const yOf = (id: string) => layout.placements.get(id)?.y ?? 0;
+    const ekey = (e: { source: string; target: string }) => `${e.source}->${e.target}`;
+    // Fan slots: out-edges per source ordered top→bottom by target row; in-edges
+    // per target ordered by source row. Ordering by the other end's row keeps the
+    // fanned attach points from crossing each other near the node.
+    const bySource = new Map<string, typeof relevant>();
+    const byTarget = new Map<string, typeof relevant>();
+    for (const e of relevant) {
+      if (!bySource.has(e.source)) bySource.set(e.source, []);
+      if (!byTarget.has(e.target)) byTarget.set(e.target, []);
+      bySource.get(e.source)!.push(e);
+      byTarget.get(e.target)!.push(e);
+    }
+    const srcSlot = new Map<string, number>();
+    for (const list of bySource.values()) {
+      list.sort((a, b) => yOf(a.target) - yOf(b.target));
+      list.forEach((e, i) => srcSlot.set(ekey(e), i));
+    }
+    const tgtSlot = new Map<string, number>();
+    for (const list of byTarget.values()) {
+      list.sort((a, b) => yOf(a.source) - yOf(b.source));
+      list.forEach((e, i) => tgtSlot.set(ekey(e), i));
+    }
+    for (const e of relevant) {
       const from = layout.placements.get(e.source);
       const to = layout.placements.get(e.target);
       if (!from || !to) continue;
-      const { d, crossLayer } = buildEdgePath(from, to);
+      const { d, crossLayer } = buildEdgePath(from, to, {
+        srcSlot: srcSlot.get(ekey(e)) ?? 0,
+        srcTotal: bySource.get(e.source)?.length ?? 1,
+        tgtSlot: tgtSlot.get(ekey(e)) ?? 0,
+        tgtTotal: byTarget.get(e.target)?.length ?? 1,
+      });
       out.push({
-        key: `${e.source}->${e.target}`,
+        key: ekey(e),
         d,
         crossLayer,
         // Edge takes the source step's layer color so the line stays continuous

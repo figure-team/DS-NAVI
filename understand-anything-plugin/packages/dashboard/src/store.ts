@@ -213,6 +213,17 @@ interface DashboardStore {
   /** ktds-fork (ADR-004): 세분화 위키 그래프(별도 wiki-graph.json). "문서" 토글 소스. */
   wikiGraph: KnowledgeGraph | null;
   activeDomainId: string | null;
+  /** US-002: active flow sub-level within domain viewMode; null = flow list. */
+  activeFlowId: string | null;
+  /**
+   * FIX 3: the flow selected inline in FlowListView (screen 2). Lifted to the
+   * store so it survives the fullscreen round-trip (FlowListView unmounts when
+   * `activeFlowId` promotes to the full-screen spine, then remounts on back).
+   * Distinct from `activeFlowId`: this drives the inline spine without
+   * committing the full-screen view. null = no inline selection.
+   */
+  selectedFlowId: string | null;
+  setSelectedFlow: (flowId: string | null) => void;
 
   setDomainGraph: (graph: KnowledgeGraph) => void;
   setWikiGraph: (graph: KnowledgeGraph) => void; // ktds-fork (ADR-004)
@@ -222,6 +233,10 @@ interface DashboardStore {
   setIsKnowledgeGraph: (value: boolean) => void;
   navigateToDomain: (domainId: string) => void;
   clearActiveDomain: () => void;
+  /** US-002: drill into flow spine view within the current domain. */
+  navigateToFlow: (flowId: string) => void;
+  /** US-002: return from flow spine to the flow list; leaves activeDomainId intact. */
+  clearActiveFlow: () => void;
 
   // Container expand/collapse + lazy layout caches
   expandedContainers: Set<string>;
@@ -410,6 +425,8 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       nodeHistory: [],
       viewMode: keepDomainView ? "domain" as const : "structural" as const,
       activeDomainId: keepDomainView ? activeDomainId : null,
+      activeFlowId: null,
+      selectedFlowId: null,
       containerLayoutCache: new Map(),
       expandedContainers: new Set(),
       pendingFocusContainer: null,
@@ -732,9 +749,21 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   domainGraph: null,
   wikiGraph: null, // ktds-fork (ADR-004)
   activeDomainId: null,
+  activeFlowId: null,
+  selectedFlowId: null,
+
+  setSelectedFlow: (flowId) => set({ selectedFlowId: flowId }),
 
   setDomainGraph: (graph) => {
-    set({ domainGraph: graph });
+    // Land on the domain map as the opening view when a domain graph is
+    // available and the user is still on the initial structural view
+    // (spec di-codeatlas-001 success scene ①: "열자마자 도메인 지도 랜딩").
+    // Fires once on load; a deliberate later switch to "코드"/"문서" is preserved.
+    const { viewMode } = get();
+    set({
+      domainGraph: graph,
+      viewMode: viewMode === "structural" ? "domain" : viewMode,
+    });
   },
 
   setWikiGraph: (graph) => { // ktds-fork (ADR-004)
@@ -762,6 +791,8 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       viewMode: mode,
       selectedNodeId: null,
       focusNodeId: null,
+      activeFlowId: null,
+      selectedFlowId: null,
       codeViewerOpen: false,
       codeViewerNodeId: null,
       codeViewerExpanded: false,
@@ -776,6 +807,8 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     set({
       viewMode: "domain" as const,
       activeDomainId: domainId,
+      activeFlowId: null,
+      selectedFlowId: null,
       focusNodeId: null,
       nodeHistory: newHistory,
     });
@@ -784,6 +817,35 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   clearActiveDomain: () => {
     set({
       activeDomainId: null,
+      activeFlowId: null,
+      selectedFlowId: null,
+      selectedNodeId: null,
+      focusNodeId: null,
+    });
+  },
+
+  // US-002: flow spine navigation — mirrors navigateToDomain / clearActiveDomain
+  navigateToFlow: (flowId) => {
+    const { selectedNodeId, nodeHistory } = get();
+    const newHistory = selectedNodeId
+      ? [...nodeHistory, selectedNodeId].slice(-MAX_HISTORY)
+      : nodeHistory;
+    set({
+      activeFlowId: flowId,
+      // FIX 3: keep inline + fullscreen selection in agreement so the back
+      // round-trip re-shows the same flow's inline spine.
+      selectedFlowId: flowId,
+      selectedNodeId: null,
+      focusNodeId: null,
+      nodeHistory: newHistory,
+    });
+  },
+
+  clearActiveFlow: () => {
+    // FIX 3: clear the full-screen flow but PRESERVE selectedFlowId so that
+    // returning to the flow list re-shows the inline spine for the last flow.
+    set({
+      activeFlowId: null,
       selectedNodeId: null,
       focusNodeId: null,
     });

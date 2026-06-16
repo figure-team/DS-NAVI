@@ -78,6 +78,13 @@
   /* Kbd */
   --kbd-bg: rgba(212, 165, 116, 0.1);
 
+  /* Layer colors (flow spine view) */
+  --color-layer-api: #d4a574;
+  --color-layer-service: #38bdf8;
+  --color-layer-dao: #a78bfa;
+  --color-layer-db: #f87171;
+  --color-layer-other: #6b7280;
+
   /* Typography */
   --font-serif: 'DM Serif Display', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -165,6 +172,18 @@ body {
   }
   to {
     transform: translateY(0);
+  }
+}
+
+/* Flow-row entrance (domain flow list, screen 2) — ported from prototype. */
+@keyframes fadeSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -262,4 +281,18 @@ body {
 
 [data-theme="dark"] {
   color-scheme: dark;
+}
+
+/* ktds-fork: 흐름 스파인 노드 호버/선택 (FIX 2). --node-accent = 노드 계층 색. */
+.spine-node {
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+.spine-node:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px var(--node-accent, var(--color-accent)), 0 4px 14px rgba(0, 0, 0, 0.35);
+  border-color: var(--node-accent, var(--color-accent)) !important;
+  z-index: 5;
+}
+.spine-node-selected {
+  box-shadow: 0 0 0 1px var(--node-accent, var(--color-accent)), 0 0 14px -2px var(--node-accent, var(--color-accent));
 }

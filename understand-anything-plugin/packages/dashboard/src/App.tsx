@@ -3,7 +3,9 @@ import { validateGraph } from "@understand-anything/core/schema";
 import type { GraphIssue } from "@understand-anything/core/schema";
 import { useDashboardStore } from "./store";
 import GraphView from "./components/GraphView";
-import DomainGraphView from "./components/DomainGraphView";
+import DomainMapView from "./components/DomainMapView"; // ktds-fork: 도메인 지도 랜딩 (화면 1)
+import FlowListView from "./components/FlowListView"; // ktds-fork: 흐름 목록 마스터-디테일 (화면 2)
+import FlowSpineView from "./components/FlowSpineView"; // ktds-fork: 도메인 흐름 스파인 뷰 (화면 3)
 import KnowledgeGraphView from "./components/KnowledgeGraphView";
 import WikiReader from "./components/WikiReader"; // ktds-fork (ADR-004): 문서 모드 리더
 import SearchBar from "./components/SearchBar";
@@ -285,6 +287,10 @@ function DashboardContent({
   const setViewMode = useDashboardStore((s) => s.setViewMode);
   const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
+  const activeDomainId = useDashboardStore((s) => s.activeDomainId); // ktds-fork: 흐름 목록(화면 2) 활성 여부
+  const activeFlowId = useDashboardStore((s) => s.activeFlowId); // ktds-fork: 흐름 스파인 활성 여부
+  const clearActiveDomain = useDashboardStore((s) => s.clearActiveDomain); // ktds-fork: 도메인 풀페이지 브레드크럼 네비게이션
+  const clearActiveFlow = useDashboardStore((s) => s.clearActiveFlow); // ktds-fork: 도메인 풀페이지 브레드크럼 네비게이션
   const wikiGraph = useDashboardStore((s) => s.wikiGraph); // ktds-fork (ADR-004)
   const layoutIssues = useDashboardStore((s) => s.layoutIssues);
   const isMobile = useIsMobile();
@@ -293,6 +299,20 @@ function DashboardContent({
     () => [...graphIssues, ...layoutIssues],
     [graphIssues, layoutIssues],
   );
+
+  // ktds-fork: 도메인 탭 = 완전 독립 풀페이지. U-A 크롬(사이드바/검색/코드뷰어/범례/토글)을
+  // 전부 숨기고 도메인 3화면(지도→흐름목록→흐름스파인)만 헤더 아래 전면 노출한다.
+  const isDomainPage = viewMode === "domain" && Boolean(domainGraph);
+
+  // 브레드크럼 세그먼트 이름 — 도메인/흐름 노드는 domainGraph에서 id로 조회.
+  const activeDomainName = useMemo(() => {
+    if (!domainGraph || !activeDomainId) return null;
+    return domainGraph.nodes.find((n) => n.id === activeDomainId)?.name ?? null;
+  }, [domainGraph, activeDomainId]);
+  const activeFlowName = useMemo(() => {
+    if (!domainGraph || !activeFlowId) return null;
+    return domainGraph.nodes.find((n) => n.id === activeFlowId)?.name ?? null;
+  }, [domainGraph, activeFlowId]);
 
   useEffect(() => {
     if (selectedNodeId) setSidebarTab("info");
@@ -328,6 +348,9 @@ function DashboardContent({
             state.closeCodeViewer();
           } else if (state.selectedNodeId) {
             state.selectNode(null);
+          } else if (state.activeFlowId) {
+            // ktds-fork: 선택 없는 흐름 스파인에서 Escape → 흐름 목록(도메인)으로 복귀
+            state.clearActiveFlow();
           } else if (state.navigationLevel === "layer-detail") {
             state.navigateToOverview();
           } else if (state.tourActive) {
@@ -489,8 +512,13 @@ function DashboardContent({
           <h1 className="font-heading text-base sm:text-lg text-text-primary tracking-wide truncate max-w-[160px] sm:max-w-[220px] lg:max-w-none">
             {graph?.project.name ?? t.common.appName}
           </h1>
-          <div className="w-px h-5 bg-border-subtle hidden sm:block" />
-          <PersonaSelector />
+          {/* ktds-fork: PersonaSelector는 구조 전용 — 도메인 풀페이지에서는 숨김. */}
+          {!isDomainPage && (
+            <>
+              <div className="w-px h-5 bg-border-subtle hidden sm:block" />
+              <PersonaSelector />
+            </>
+          )}
           {/* ktds-fork (ADR-004): 코드/도메인 토글에 "문서"(세분화 위키) 추가. wikiGraph 또는
               domainGraph가 있을 때 토글 그룹 표시(둘 중 하나만 있어도 코드↔해당 전환). */}
           {graph && !isKnowledgeGraph && (domainGraph || wikiGraph) && (
@@ -544,6 +572,49 @@ function DashboardContent({
 
         {/* Middle — scrollable legends */}
         {/* ktds-fork (ADR-004): "문서"(wiki) 모드는 헤더 범례·레이어 전부 숨김(flex-1 스페이서만 유지) */}
+        {/* ktds-fork: 도메인 풀페이지에서는 구조 전용 범례 대신 브레드크럼을 노출한다. */}
+        {isDomainPage ? (
+          <nav
+            className="flex-1 min-w-0 overflow-x-auto scrollbar-hide flex items-center gap-1.5 text-sm font-medium"
+            aria-label="breadcrumb"
+          >
+            <button
+              type="button"
+              onClick={() => clearActiveDomain()}
+              className={`whitespace-nowrap transition-colors ${
+                activeDomainId
+                  ? "text-text-muted hover:text-text-secondary"
+                  : "text-accent"
+              }`}
+            >
+              {t.domainMap.breadcrumbRoot}
+            </button>
+            {activeDomainName && (
+              <>
+                <span className="text-text-muted/50 select-none">›</span>
+                <button
+                  type="button"
+                  onClick={() => clearActiveFlow()}
+                  className={`whitespace-nowrap transition-colors truncate max-w-[200px] ${
+                    activeFlowId
+                      ? "text-text-muted hover:text-text-secondary"
+                      : "text-accent"
+                  }`}
+                >
+                  {activeDomainName}
+                </button>
+              </>
+            )}
+            {activeFlowName && (
+              <>
+                <span className="text-text-muted/50 select-none">›</span>
+                <span className="whitespace-nowrap text-accent truncate max-w-[260px]">
+                  {activeFlowName}
+                </span>
+              </>
+            )}
+          </nav>
+        ) : (
         <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
           {/* ktds-fork (ADR-004): 문서 모드는 이 블록 전체를 숨김(아래 개별 가드 불필요) */}
           {viewMode !== "wiki" && (
@@ -632,31 +703,38 @@ function DashboardContent({
           </div>
           )}
         </div>
+        )}
 
         {/* Right — fixed actions */}
+        {/* ktds-fork: 도메인 풀페이지에서는 구조 전용 액션(FilterPanel/ExportMenu/PathFinder)을
+            숨기고 ThemePicker + 키보드 도움말만 유지한다. */}
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          <FilterPanel />
-          <ExportMenu />
-          <button
-            onClick={togglePathFinder}
-            className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-sm bg-elevated text-text-secondary hover:text-text-primary transition-colors"
-            title={t.pathFinder.title}
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-              />
-            </svg>
-            <span className="hidden md:inline">{t.common.path}</span>
-          </button>
+          {!isDomainPage && (
+            <>
+              <FilterPanel />
+              <ExportMenu />
+              <button
+                onClick={togglePathFinder}
+                className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-sm bg-elevated text-text-secondary hover:text-text-primary transition-colors"
+                title={t.pathFinder.title}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  />
+                </svg>
+                <span className="hidden md:inline">{t.common.path}</span>
+              </button>
+            </>
+          )}
           <ThemePicker />
           <button
             onClick={() => setShowKeyboardHelp(true)}
@@ -681,7 +759,8 @@ function DashboardContent({
       </header>
 
       {/* Search */}
-      <SearchBar />
+      {/* ktds-fork: 도메인 풀페이지에서는 SearchBar 숨김. */}
+      {!isDomainPage && <SearchBar />}
 
       {/* Validation warning banner */}
       {allIssues.length > 0 && !loadError && (
@@ -695,7 +774,19 @@ function DashboardContent({
         </div>
       )}
 
-      {/* Main content: Graph + Sidebar */}
+      {/* ktds-fork: 도메인 풀페이지 — 사이드바·코드뷰어 없이 3화면을 전면 노출. */}
+      {isDomainPage ? (
+        <div className="flex-1 min-h-0">
+          {activeFlowId ? (
+            <FlowSpineView />
+          ) : activeDomainId ? (
+            <FlowListView />
+          ) : (
+            <DomainMapView />
+          )}
+        </div>
+      ) : (
+      /* Main content: Graph + Sidebar */
       <div className="flex-1 flex min-h-0 relative">
         {/* Graph area */}
         <div className="flex-1 min-w-0 min-h-0 relative">
@@ -704,9 +795,8 @@ function DashboardContent({
           ) : /* ktds-fork (ADR-004): "문서" 모드 = 그래프 대신 문서 리더(메타+전체 본문) */
           viewMode === "wiki" && wikiGraph ? (
             <WikiReader />
-          ) : viewMode === "domain" && domainGraph ? (
-            <DomainGraphView />
           ) : (
+            /* 도메인 풀페이지는 위 isDomainPage 분기에서 처리 — 여기서는 구조 그래프만. */
             <GraphView />
           )}
           <div className="absolute top-3 right-3 text-sm text-text-muted/60 pointer-events-none select-none">
@@ -740,6 +830,7 @@ function DashboardContent({
           </div>
         )}
       </div>
+      )}
 
       {/* Expanded code viewer modal */}
       {codeViewerOpen && codeViewerExpanded && (

@@ -3,7 +3,8 @@ import type { GraphIssue } from "@understand-anything/core/schema";
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
 import GraphView from "./GraphView";
-import DomainGraphView from "./DomainGraphView";
+import DomainMapView from "./DomainMapView";
+import FlowListView from "./FlowListView";
 import KnowledgeGraphView from "./KnowledgeGraphView";
 import SearchBar from "./SearchBar";
 import NodeInfo from "./NodeInfo";
@@ -42,6 +43,9 @@ export default function MobileLayout({
   const persona = useDashboardStore((s) => s.persona);
   const viewMode = useDashboardStore((s) => s.viewMode);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
+  const activeDomainId = useDashboardStore((s) => s.activeDomainId);
+  const activeFlowId = useDashboardStore((s) => s.activeFlowId);
+  const clearActiveFlow = useDashboardStore((s) => s.clearActiveFlow);
   const codeViewerOpen = useDashboardStore((s) => s.codeViewerOpen);
   const closeCodeViewer = useDashboardStore((s) => s.closeCodeViewer);
   const pathFinderOpen = useDashboardStore((s) => s.pathFinderOpen);
@@ -154,8 +158,25 @@ export default function MobileLayout({
         >
           {viewMode === "knowledge" ? (
             <KnowledgeGraphView />
+          ) : viewMode === "domain" && domainGraph && activeFlowId ? (
+            <div className="flex flex-col items-center justify-center h-full px-6 gap-4 text-center">
+              <p className="text-text-secondary text-sm leading-relaxed">
+                {t.flowView.flowDesktopOnly}
+              </p>
+              <button
+                type="button"
+                onClick={clearActiveFlow}
+                className="px-4 py-2 rounded-lg bg-elevated border border-border-medium text-text-primary text-sm hover:bg-accent/10 hover:border-accent/40 transition-colors"
+              >
+                {t.flowView.backToFlows}
+              </button>
+            </div>
           ) : viewMode === "domain" && domainGraph ? (
-            <DomainGraphView />
+            activeDomainId ? (
+              <FlowListView />
+            ) : (
+              <DomainMapView />
+            )
           ) : (
             <GraphView />
           )}

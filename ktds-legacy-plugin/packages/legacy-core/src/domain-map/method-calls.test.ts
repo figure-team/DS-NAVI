@@ -128,13 +128,16 @@ public class Sandbox extends Base {
   public void viaVar() { var x = getDep(); x.run(); }
   public void viaShadow() { Dep dep = null; dep.run(); this.dep.run(); }
   public void viaChain() { getDep().run(); }
+  public void viaDeepChain() { getDep().self().run(); }
+  public void viaJdkChain() { label().trim(); }
   public Dep getDep() { return dep; }
+  public String label() { return null; }
   public void helper() {}
 }`,
     "a/Base.java": `package a;
 public class Base { public void init() {} }`,
     "a/Dep.java": `package a;
-public class Dep { public void run() {} }`,
+public class Dep { public void run() {} public Dep self() { return this; } }`,
     "a/Ids.java": `package a;
 public class Ids { public static int next() { return 0; } }`,
   };
@@ -197,8 +200,27 @@ public class Ids { public static int next() { return 0; } }`,
     // `dep.run()` binds to the local; `this.dep.run()` to the instance field.
     expect(shadow.map((c) => c.resolution)).toEqual(["local", "field"]);
   });
-  test("chained receiver getX().y() → unresolved", async () => {
-    expect(await kindOf("viaChain")).toMatchObject({ resolution: "unresolved", calleeRelPath: null });
+  // Chains share a startIndex between inner/outer calls, so target by callee name.
+  const callTo = async (method: string, callee: string) => {
+    const graph = await graphOf(FILES);
+    return callsIn(graph, method).find((c) => c.calleeMethod === callee);
+  };
+
+  test("chained receiver getX().y() → chain (resolved via return type)", async () => {
+    expect(await callTo("viaChain", "run")).toMatchObject({
+      resolution: "chain",
+      calleeClass: "Dep",
+      calleeRelPath: "a/Dep.java",
+    });
+  });
+  test("deep chain getX().self().y() → chain (recursive return-type inference)", async () => {
+    expect(await callTo("viaDeepChain", "run")).toMatchObject({ resolution: "chain", calleeClass: "Dep" });
+  });
+  test("chain whose return type is JDK (String) → external, not invented", async () => {
+    expect(await callTo("viaJdkChain", "trim")).toMatchObject({
+      resolution: "external",
+      calleeRelPath: null,
+    });
   });
 });
 

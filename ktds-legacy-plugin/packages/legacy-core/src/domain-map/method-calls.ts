@@ -1,4 +1,4 @@
-import type { JavaFileFacts, JavaLocalVar } from "./java-facts.js";
+import type { JavaFileFacts, JavaClassFacts, JavaLocalVar, ReceiverDesc } from "./java-facts.js";
 import { resolveTypeRef } from "./edges.js";
 import type { ClassIndex } from "./edges.js";
 
@@ -30,6 +30,7 @@ export type CallResolution =
   | "self" // unqualified call or this.m() → the caller's own class
   | "param" // receiver is a parameter of the caller method
   | "local" // receiver is a local / loop variable declared in the method body
+  | "chain" // receiver is a method/field chain resolved via return/field type
   | "static" // receiver is a project type name: Type.m()
   | "super" // super.m()
   | "external" // receiver resolves to a JDK/library type (out of scope)
@@ -149,6 +150,29 @@ function resolveType(typeName: string, facts: JavaFileFacts, index: ClassIndex):
  * consumes the single-parse `javaFacts` (which now carry ordered `calls`) and
  * the cross-file {@link ClassIndex}.
  */
+interface ReceiverType extends TypeTarget {
+  /** How the (top-level) receiver resolved — becomes the call's resolution. */
+  kind: CallResolution;
+}
+
+interface ResolveCtx {
+  relPath: string;
+  facts: JavaFileFacts;
+  cls: JavaClassFacts;
+  params: Map<string, string>;
+  locals: readonly JavaLocalVar[];
+  /** Byte offset of the call — locals must be declared before it. */
+  callStartIndex: number;
+}
+
+/** A member's declared type plus the file that declares it (for import context). */
+interface MemberType {
+  type: string;
+  ownerRelPath: string;
+}
+
+const MAX_SUPER_DEPTH = 8;
+
 export function buildMethodCallGraph(
   javaFacts: Map<string, JavaFileFacts>,
   classIndex: ClassIndex,
@@ -156,31 +180,129 @@ export function buildMethodCallGraph(
   const primaryClassNames = buildPrimaryClassNames(javaFacts);
   const calls: ResolvedCall[] = [];
 
-  const finalize = (
-    base: Omit<ResolvedCall, "calleeRelPath" | "calleeClass" | "resolution">,
-    target: TypeTarget,
-    resolution: CallResolution,
-  ): ResolvedCall => {
-    if (target.external) {
-      return { ...base, calleeRelPath: null, calleeClass: null, resolution: "external" };
+  /** The primary (top-level) class of a file, for superclass walks. */
+  const primaryClassOf = (relPath: string): JavaClassFacts | null => {
+    const fs = javaFacts.get(relPath);
+    if (!fs) return null;
+    return fs.classes.find((c) => c.qualifiedName === c.name) ?? fs.classes[0] ?? null;
+  };
+
+  /** Declared return type of `methodName` on the type in `relPath`, walking supers. */
+  const returnTypeOf = (relPath: string, methodName: string, depth = 0): MemberType | null => {
+    if (depth > MAX_SUPER_DEPTH) return null;
+    const fs = javaFacts.get(relPath);
+    if (!fs) return null;
+    for (const cls of fs.classes) {
+      const m = cls.methods.find((mm) => mm.name === methodName && mm.returnType);
+      if (m?.returnType) return { type: m.returnType, ownerRelPath: relPath };
     }
-    if (target.relPath === null) {
-      return { ...base, calleeRelPath: null, calleeClass: null, resolution: "unresolved" };
+    const primary = primaryClassOf(relPath);
+    if (primary?.superclass) {
+      const sup = resolveType(primary.superclass, fs, classIndex);
+      if (sup.relPath) return returnTypeOf(sup.relPath, methodName, depth + 1);
     }
-    return {
-      ...base,
-      calleeRelPath: target.relPath,
-      calleeClass: primaryClassNames.get(target.relPath) ?? null,
-      resolution,
-    };
+    return null;
+  };
+
+  /** Declared type of field `fieldName` on the type in `relPath`, walking supers. */
+  const fieldTypeOf = (relPath: string, fieldName: string, depth = 0): MemberType | null => {
+    if (depth > MAX_SUPER_DEPTH) return null;
+    const fs = javaFacts.get(relPath);
+    if (!fs) return null;
+    for (const cls of fs.classes) {
+      const f = cls.fields.find((ff) => ff.name === fieldName);
+      if (f) return { type: f.typeName, ownerRelPath: relPath };
+    }
+    const primary = primaryClassOf(relPath);
+    if (primary?.superclass) {
+      const sup = resolveType(primary.superclass, fs, classIndex);
+      if (sup.relPath) return fieldTypeOf(sup.relPath, fieldName, depth + 1);
+    }
+    return null;
+  };
+
+  const unresolvedType = (external = false): ReceiverType => ({
+    relPath: null,
+    external,
+    kind: "unresolved",
+  });
+
+  /** Resolve a member type, using the declaring file's imports for context. */
+  const memberToType = (m: MemberType, kind: CallResolution): ReceiverType => {
+    const ownerFacts = javaFacts.get(m.ownerRelPath);
+    if (!ownerFacts) return unresolvedType();
+    const t = resolveType(m.type, ownerFacts, classIndex);
+    return { relPath: t.relPath, external: t.external, kind };
+  };
+
+  /**
+   * Infer the runtime type of a receiver expression. Recursive: a chained
+   * `getCart().getItems()` resolves `getCart`'s return type, then looks up
+   * `getItems` on it. null/`this` → the caller's own class; everything it can't
+   * follow (lambda params, casts, `var`) → unresolved (never guessed).
+   */
+  const typeOfReceiver = (desc: ReceiverDesc | null, ctx: ResolveCtx): ReceiverType => {
+    if (desc === null || desc.kind === "this") {
+      return { relPath: ctx.relPath, external: false, kind: "self" };
+    }
+    if (desc.kind === "super") {
+      if (!ctx.cls.superclass) return unresolvedType();
+      const t = resolveType(ctx.cls.superclass, ctx.facts, classIndex);
+      return { relPath: t.relPath, external: t.external, kind: "super" };
+    }
+    if (desc.kind === "name") {
+      const name = desc.text;
+      const localDecl = nearestLocal(ctx.locals, name, ctx.callStartIndex);
+      if (localDecl !== null) {
+        if (localDecl.typeName === "var") return unresolvedType();
+        const t = resolveType(localDecl.typeName, ctx.facts, classIndex);
+        return { relPath: t.relPath, external: t.external, kind: "local" };
+      }
+      const paramType = ctx.params.get(name);
+      if (paramType !== undefined) {
+        const t = resolveType(paramType, ctx.facts, classIndex);
+        return { relPath: t.relPath, external: t.external, kind: "param" };
+      }
+      // Instance field, including those inherited from a superclass (e.g. the
+      // Stripes `context` field on a base ActionBean) — resolved via the
+      // declaring class's imports.
+      const fieldMember = fieldTypeOf(ctx.relPath, name);
+      if (fieldMember !== null) {
+        return memberToType(fieldMember, "field");
+      }
+      // Capitalized name that resolves to a project type → static `Type.m()`.
+      if (/^[A-Z]/.test(name)) {
+        const t = resolveType(name, ctx.facts, classIndex);
+        if (t.relPath !== null || t.external) {
+          return { relPath: t.relPath, external: t.external, kind: "static" };
+        }
+      }
+      return unresolvedType();
+    }
+    if (desc.kind === "call") {
+      const owner = typeOfReceiver(desc.on, ctx); // on=null → self
+      if (owner.relPath === null) return unresolvedType(owner.external);
+      const rt = returnTypeOf(owner.relPath, desc.methodName);
+      if (rt === null) return unresolvedType();
+      return memberToType(rt, "chain");
+    }
+    if (desc.kind === "field") {
+      const owner = typeOfReceiver(desc.on, ctx);
+      if (owner.relPath === null) return unresolvedType(owner.external);
+      const ft = fieldTypeOf(owner.relPath, desc.field);
+      if (ft === null) return unresolvedType();
+      // `this.field` / bare-field stays "field"; deeper `a.b.c` is a chain hop.
+      const kind: CallResolution = desc.on === null || desc.on.kind === "this" ? "field" : "chain";
+      return memberToType(ft, kind);
+    }
+    return unresolvedType();
   };
 
   for (const relPath of [...javaFacts.keys()].sort()) {
     const facts = javaFacts.get(relPath)!;
     for (const cls of facts.classes) {
-      const fieldTypes = new Map(cls.fields.map((f) => [f.name, f.typeName] as const));
       for (const method of cls.methods) {
-        const paramTypes = parseParams(method.paramsText);
+        const params = parseParams(method.paramsText);
         for (const call of method.calls) {
           const base = {
             callerRelPath: relPath,
@@ -190,82 +312,30 @@ export function buildMethodCallGraph(
             receiverText: call.receiverText,
             line: call.line,
           };
+          const ctx: ResolveCtx = {
+            relPath,
+            facts,
+            cls,
+            params,
+            locals: method.locals,
+            callStartIndex: call.startIndex,
+          };
+          const target = typeOfReceiver(call.receiver, ctx);
 
-          const R = call.receiverText;
-
-          // Unqualified call or `this.m()` → the caller's own class.
-          if (R === null || R === "this") {
+          if (target.external) {
+            calls.push({ ...base, calleeRelPath: null, calleeClass: null, resolution: "external" });
+          } else if (target.relPath === null) {
+            calls.push({ ...base, calleeRelPath: null, calleeClass: null, resolution: "unresolved" });
+          } else {
             calls.push({
               ...base,
-              calleeRelPath: relPath,
-              calleeClass: cls.name,
-              resolution: "self",
+              calleeRelPath: target.relPath,
+              // `self` keeps the caller's own (possibly nested) class name.
+              calleeClass:
+                target.kind === "self" ? cls.name : primaryClassNames.get(target.relPath) ?? null,
+              resolution: target.kind,
             });
-            continue;
           }
-
-          // `super.m()` → the (resolved) superclass file.
-          if (R === "super") {
-            const target = cls.superclass
-              ? resolveType(cls.superclass, facts, classIndex)
-              : { relPath: null, external: false };
-            calls.push(finalize(base, target, "super"));
-            continue;
-          }
-
-          // Reduce `this.field` → `field`; reject anything not a bare identifier
-          // (chained `getX().y`, qualified `a.b.c`) as unresolved — those need
-          // return-type/dataflow inference, out of foundation scope.
-          let root = R;
-          let thisQualified = false;
-          if (root.startsWith("this.")) {
-            root = root.slice(5);
-            thisQualified = true;
-          }
-          if (!SIMPLE_ID_RE.test(root)) {
-            calls.push({ ...base, calleeRelPath: null, calleeClass: null, resolution: "unresolved" });
-            continue;
-          }
-
-          // Method-scoped names (locals, params) shadow instance fields — but an
-          // explicit `this.x` receiver always means the field, so skip them then.
-          if (!thisQualified) {
-            const localDecl = nearestLocal(method.locals, root, call.startIndex);
-            if (localDecl !== null) {
-              // `var x = …` can't be resolved without type inference — honest
-              // unresolved rather than mis-binding to a same-named field.
-              if (localDecl.typeName === "var") {
-                calls.push({ ...base, calleeRelPath: null, calleeClass: null, resolution: "unresolved" });
-              } else {
-                calls.push(finalize(base, resolveType(localDecl.typeName, facts, classIndex), "local"));
-              }
-              continue;
-            }
-            const paramType = paramTypes.get(root);
-            if (paramType !== undefined) {
-              calls.push(finalize(base, resolveType(paramType, facts, classIndex), "param"));
-              continue;
-            }
-          }
-
-          const fieldType = fieldTypes.get(root);
-          if (fieldType !== undefined) {
-            calls.push(finalize(base, resolveType(fieldType, facts, classIndex), "field"));
-            continue;
-          }
-
-          // Capitalized non-field/param identifier that names a project type →
-          // a static call `Type.m()`. Lowercase roots are local variables we
-          // don't track → unresolved.
-          if (/^[A-Z]/.test(root)) {
-            const target = resolveType(root, facts, classIndex);
-            if (target.relPath !== null || target.external) {
-              calls.push(finalize(base, target, "static"));
-              continue;
-            }
-          }
-
-          calls.push({ ...base, calleeRelPath: null, calleeClass: null, resolution: "unresolved" });
         }
       }
     }

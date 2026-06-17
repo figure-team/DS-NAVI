@@ -34,16 +34,32 @@ export interface JavaAnnotation {
  * raw, unresolved invocation; receiver → target file/class resolution happens in
  * `method-calls.ts` (needs the cross-file ClassIndex, which facts don't have).
  */
+/**
+ * Structured shape of an invocation's receiver expression. Carries just enough
+ * tree shape (without holding AST nodes) for the resolver to follow chains like
+ * `getCart().getItems()` — infer `getCart`'s return type, then resolve `getItems`
+ * on it. Everything it can't model (lambdas, casts, literals) is `other` (opaque).
+ */
+export type ReceiverDesc =
+  | { kind: "this" }
+  | { kind: "super" }
+  | { kind: "name"; text: string }
+  | { kind: "call"; methodName: string; on: ReceiverDesc | null }
+  | { kind: "field"; field: string; on: ReceiverDesc | null }
+  | { kind: "other"; text: string };
+
 export interface JavaMethodInvocation {
   /** Invoked method's simple name (the `name` field of `method_invocation`). */
   methodName: string;
   /**
    * Receiver expression source text exactly as written — `"accountService"`,
    * `"this.account"`, `"CatalogService"` (static), `"getX()"` (chained) — or
-   * null for an unqualified self-call (`foo()`). Resolution decides what it
-   * points at; extraction stays purely syntactic.
+   * null for an unqualified self-call (`foo()`). Kept for display/debug; the
+   * resolver uses {@link receiver}.
    */
   receiverText: string | null;
+  /** Structured receiver (null = unqualified self-call). Drives resolution. */
+  receiver: ReceiverDesc | null;
   line: number;
   /** Byte offset of the invocation in the file — the source-order sort key. */
   startIndex: number;
@@ -436,6 +452,7 @@ function extractInvocations(body: JavaNode): JavaMethodInvocation[] {
         found.push({
           methodName: nameNode.text,
           receiverText: object ? object.text : null,
+          receiver: describeReceiver(object),
           line: lineOf(n),
           startIndex: n.startIndex,
         });
@@ -447,6 +464,42 @@ function extractInvocations(body: JavaNode): JavaMethodInvocation[] {
     }
   }
   return found.sort((a, b) => a.startIndex - b.startIndex);
+}
+
+/**
+ * Describe a receiver expression node as a {@link ReceiverDesc} tree. Purely
+ * syntactic — no name resolution (that needs the cross-file index). null node =
+ * unqualified call. Shapes it can't model collapse to `other` (opaque → the
+ * resolver reports them unresolved rather than guessing).
+ */
+function describeReceiver(node: JavaNode | null): ReceiverDesc | null {
+  if (!node) return null;
+  switch (node.type) {
+    case "this":
+      return { kind: "this" };
+    case "super":
+      return { kind: "super" };
+    case "identifier":
+      return { kind: "name", text: node.text };
+    case "parenthesized_expression": {
+      const inner = node.namedChild(0);
+      return inner ? describeReceiver(inner) : { kind: "other", text: node.text };
+    }
+    case "method_invocation":
+      return {
+        kind: "call",
+        methodName: node.childForFieldName("name")?.text ?? "",
+        on: describeReceiver(node.childForFieldName("object")),
+      };
+    case "field_access":
+      return {
+        kind: "field",
+        field: node.childForFieldName("field")?.text ?? "",
+        on: describeReceiver(node.childForFieldName("object")),
+      };
+    default:
+      return { kind: "other", text: node.text };
+  }
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────

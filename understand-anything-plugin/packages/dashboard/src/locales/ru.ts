@@ -146,6 +146,7 @@ export const ru = {
     branchBadge: "сущности данных",
     expandAllBranches: "Развернуть ветви",
     collapseAllBranches: "Свернуть ветви",
+    methodsUsed: "методы",
   },
   detailLevel: {
     filesTitle: "Только файлы — зависимости архитектурного уровня (быстро)",

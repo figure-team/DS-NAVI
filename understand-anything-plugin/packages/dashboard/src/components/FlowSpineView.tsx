@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { KeyboardEvent } from "react";
 
 import { useDashboardStore } from "../store";
@@ -73,14 +73,8 @@ interface ResolvedStep extends SpineStep {
   node: GraphNode;
 }
 
-/**
- * A spine edge between two consecutive steps, in absolute canvas coordinates.
- * Also returns the path midpoint (`mx`/`my`) so a method-name label can sit on it.
- */
-function buildEdgePath(
-  from: SpinePlacement,
-  to: SpinePlacement,
-): { d: string; crossLayer: boolean; mx: number; my: number } {
+/** A spine edge between two consecutive steps, in absolute canvas coordinates. */
+function buildEdgePath(from: SpinePlacement, to: SpinePlacement): { d: string; crossLayer: boolean } {
   const crossLayer = from.col !== to.col;
   if (crossLayer) {
     // source-right → target-left horizontal S-curve.
@@ -89,19 +83,14 @@ function buildEdgePath(
     const x2 = to.x;
     const y2 = to.y + to.h / 2;
     const cx = x1 + (x2 - x1) * 0.5;
-    return {
-      d: `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`,
-      crossLayer,
-      mx: cx,
-      my: (y1 + y2) / 2,
-    };
+    return { d: `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`, crossLayer };
   }
   // same column siblings: bottom-center → top-center vertical link.
   const x1 = from.x + from.w / 2;
   const y1 = from.y + from.h;
   const x2 = to.x + to.w / 2;
   const y2 = to.y;
-  return { d: `M ${x1} ${y1} L ${x2} ${y2}`, crossLayer, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 };
+  return { d: `M ${x1} ${y1} L ${x2} ${y2}`, crossLayer };
 }
 
 interface FlowSpineViewProps {
@@ -130,6 +119,16 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
   const toggleBranchParent = useDashboardStore((s) => s.toggleBranchParent);
   const setBranchParentsExpanded = useDashboardStore((s) => s.setBranchParentsExpanded);
   const { t } = useI18n();
+
+  // Which nodes have their "used methods" list expanded (view-local, ephemeral).
+  const [openMethods, setOpenMethods] = useState<Set<string>>(() => new Set());
+  const toggleMethods = (id: string) =>
+    setOpenMethods((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const laneLabels: Record<FlowLayer, string> = {
     api: t.flowView.laneApi,
@@ -201,15 +200,7 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     branchParents.length > 0 && branchParents.every((p) => expandedBranchParents.has(p));
 
   const edges = useMemo(() => {
-    const out: Array<{
-      key: string;
-      d: string;
-      crossLayer: boolean;
-      color: string;
-      label: string | null;
-      mx: number;
-      my: number;
-    }> = [];
+    const out: Array<{ key: string; d: string; crossLayer: boolean; color: string }> = [];
     if (!domainGraph) return out;
     // Draw the REAL call/dependency topology (engine `calls` step→step edges),
     // not a synthetic consecutive-step chain. This shows fan-out honestly: an
@@ -238,7 +229,7 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
       const from = layout.placements.get(e.source);
       const to = layout.placements.get(e.target);
       if (!from || !to) continue;
-      const { d, crossLayer, mx, my } = buildEdgePath(from, to);
+      const { d, crossLayer } = buildEdgePath(from, to);
       out.push({
         key: `${e.source}->${e.target}`,
         d,
@@ -246,15 +237,32 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
         // Edge takes the source step's layer color so the line stays continuous
         // with the node it leaves (cross-layer edges included).
         color: LAYER_COLOR[layerById.get(e.source) ?? "unknown"],
-        // Real ordered method calls on this edge (engine `description`), e.g.
-        // "updateAccount → getAccount". Absent on pure structural-dependency edges.
-        label: typeof e.description === "string" && e.description ? e.description : null,
-        mx,
-        my,
       });
     }
     return out;
   }, [domainGraph, steps, layout, partition]);
+
+  // Per-node "used methods": the engine labels each calls edge with the ordered
+  // methods the source invokes on the target (`description`). Aggregated onto the
+  // TARGET node, that is exactly which of this class's methods the flow uses —
+  // shown as an expandable chip under the node (prototype's branch-chip pattern,
+  // repurposed for methods) instead of occluded on-line labels.
+  const methodsByNode = useMemo(() => {
+    const map = new Map<string, string[]>();
+    if (!domainGraph) return map;
+    const renderedIds = new Set(steps.map((s) => s.id));
+    for (const e of domainGraph.edges) {
+      if (e.type !== "calls" || !renderedIds.has(e.target)) continue;
+      const desc = typeof e.description === "string" ? e.description.trim() : "";
+      if (!desc) continue;
+      let list = map.get(e.target);
+      if (!list) map.set(e.target, (list = []));
+      for (const m of desc.split("→").map((s) => s.trim()).filter(Boolean)) {
+        if (!list.includes(m)) list.push(m);
+      }
+    }
+    return map;
+  }, [domainGraph, steps]);
 
   const onStepKeyDown = (e: KeyboardEvent<HTMLDivElement>, id: string) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -521,30 +529,6 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
                 opacity={0.85}
               />
             ))}
-            {/* Real ordered method-call labels (engine emits them on calls edges).
-                Shows e.g. "updateAccount → getAccount" so two calls to the same
-                collaborator are visible — the order the file graph used to lose. */}
-            {edges.map((e) =>
-              e.label ? (
-                <text
-                  key={`${e.key}-label`}
-                  x={e.mx}
-                  y={e.my - 3}
-                  textAnchor="middle"
-                  style={{
-                    fontSize: 9.5,
-                    fontFamily: "var(--font-mono)",
-                    fill: e.color,
-                    stroke: "var(--color-panel, var(--color-surface))",
-                    strokeWidth: 3,
-                    paintOrder: "stroke",
-                    opacity: 0.95,
-                  }}
-                >
-                  {e.label.length > 32 ? `${e.label.slice(0, 31)}…` : e.label}
-                </text>
-              ) : null,
-            )}
           </svg>
 
           {/* Spine step nodes — exactly one DOM node per spine step (AC-5). */}
@@ -628,6 +612,93 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
                       <span>{branchExpanded ? "－" : "＋"}</span>
                       <span>{branchIds.length}</span>
                     </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Used-methods chips — one per node that the flow invokes methods on.
+              "ƒ N 메서드" toggles a list of the actual methods used (engine-labeled
+              call order). Replaces the occluded on-line labels with the prototype's
+              branch-chip pattern, repurposed for methods. */}
+          <div className="absolute top-0 left-0 w-full" style={{ zIndex: 4, pointerEvents: "none" }}>
+            {steps.map((step) => {
+              const p = layout.placements.get(step.id);
+              const methods = methodsByNode.get(step.id);
+              if (!p || !methods || methods.length === 0) return null;
+              const color = LAYER_COLOR[step.layer];
+              const open = openMethods.has(step.id);
+              return (
+                <div
+                  key={`${step.id}-methods`}
+                  className="absolute"
+                  style={{
+                    left: p.x + 10,
+                    top: p.y + NODE_H + 3,
+                    width: NODE_W - 20,
+                    zIndex: open ? 6 : 5,
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleMethods(step.id)}
+                    className="inline-flex items-center gap-1 rounded-full border border-dashed transition-colors hover:brightness-125"
+                    style={{
+                      padding: "2px 9px",
+                      fontSize: 10,
+                      fontFamily: "var(--font-mono)",
+                      lineHeight: 1.4,
+                      color,
+                      borderColor: `${color}55`,
+                      background: "var(--color-panel, var(--color-surface))",
+                      pointerEvents: "auto",
+                    }}
+                    aria-expanded={open}
+                    aria-label={`${methods.length} ${t.flowView.methodsUsed}`}
+                  >
+                    <span style={{ fontStyle: "italic", opacity: 0.85 }}>ƒ</span>
+                    <span>
+                      {methods.length} {t.flowView.methodsUsed}
+                    </span>
+                    <span style={{ fontSize: 8 }}>{open ? "▾" : "▸"}</span>
+                  </button>
+                  {open && (
+                    <div
+                      className="flex flex-col gap-1 mt-1 rounded-md border p-1.5"
+                      style={{
+                        borderColor: "var(--color-border-subtle)",
+                        background: "var(--color-panel, var(--color-surface))",
+                        pointerEvents: "auto",
+                        boxShadow: "0 6px 18px rgba(0,0,0,0.35)",
+                      }}
+                    >
+                      {methods.map((m, i) => (
+                        <div
+                          key={m}
+                          className="flex items-center gap-2 rounded px-2 py-1"
+                          style={{ background: "var(--color-surface)" }}
+                        >
+                          <span
+                            style={{
+                              fontSize: 9,
+                              fontFamily: "var(--font-mono)",
+                              color: "var(--color-text-muted)",
+                              minWidth: 12,
+                            }}
+                          >
+                            {i + 1}
+                          </span>
+                          <span
+                            className="truncate"
+                            style={{ fontSize: 11, fontFamily: "var(--font-mono)", color }}
+                            title={m}
+                          >
+                            {m}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               );

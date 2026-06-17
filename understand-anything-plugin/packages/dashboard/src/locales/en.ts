@@ -146,6 +146,7 @@ export const en = {
     branchBadge: "data entities",
     expandAllBranches: "Expand branches",
     collapseAllBranches: "Collapse branches",
+    methodsUsed: "methods",
   },
   detailLevel: {
     filesTitle: "Files only — architecture-level dependencies (fast)",

@@ -146,6 +146,7 @@ export const zhTW = {
     branchBadge: "資料實體",
     expandAllBranches: "展開分支",
     collapseAllBranches: "摺疊分支",
+    methodsUsed: "方法",
   },
   detailLevel: {
     filesTitle: "僅檔案 — 架構級依賴（快速）",

@@ -143,6 +143,9 @@ export const ko = {
     backToFlows: "흐름 목록으로",
     emptyFlow: "이 흐름에는 표시할 단계가 없습니다.",
     flowDesktopOnly: "흐름 뷰는 데스크톱 전용입니다. 더 큰 화면에서 대시보드를 열어주세요.",
+    branchBadge: "데이터 엔터티",
+    expandAllBranches: "곁가지 펼치기",
+    collapseAllBranches: "곁가지 접기",
   },
   detailLevel: {
     filesTitle: "파일만 — 아키텍처 레벨 의존성 (빠름)",

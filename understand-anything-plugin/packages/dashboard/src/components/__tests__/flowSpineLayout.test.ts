@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   computeSpineLayout,
   orderSpineSequence,
+  partitionSpine,
   spineColumnIndex,
   SPINE_COLUMNS,
   COL_W,
@@ -9,7 +10,7 @@ import {
   NODE_H,
   NODE_W,
 } from "../flowSpineLayout";
-import type { SpineStep } from "../flowSpineLayout";
+import type { SpineStep, SpineCallEdge } from "../flowSpineLayout";
 import type { FlowLayer } from "../../utils/flowLayer";
 
 const NODE_PAD_X = 24;
@@ -19,6 +20,10 @@ const FIRST_Y = HEADER_H + NODE_PAD_Y;
 
 function step(id: string, layer: FlowLayer): SpineStep {
   return { id, layer };
+}
+
+function edge(source: string, target: string): SpineCallEdge {
+  return { source, target };
 }
 
 describe("computeSpineLayout — column assignment (x by derived layer)", () => {
@@ -159,5 +164,108 @@ describe("orderSpineSequence — pipeline-column order, stable within column", (
   it("preserves incoming order within the same column (stable)", () => {
     const seq = [step("a", "dao"), step("b", "api"), step("c", "api"), step("d", "dao")];
     expect(orderSpineSequence(seq).map((s) => s.id)).toEqual(["b", "c", "a", "d"]);
+  });
+});
+
+describe("partitionSpine — backbone vs folded entity branches", () => {
+  // Mirrors the real jpetstore "editAccount" flow: an ActionBean (api) that
+  // calls two services + two entities; AccountService → AccountMapper → Account;
+  // CatalogService → Category/Item/Product; Item → Product. The four `unknown`
+  // domain models (account/category/item/product) are the foldable branches.
+  const steps = [
+    step("bean", "api"),
+    step("account", "unknown"),
+    step("svcA", "service"),
+    step("svcC", "service"),
+    step("category", "unknown"),
+    step("item", "unknown"),
+    step("product", "unknown"),
+    step("mapA", "dao"),
+  ];
+  const calls = [
+    edge("item", "product"),
+    edge("mapA", "account"),
+    edge("svcA", "account"),
+    edge("svcA", "mapA"),
+    edge("svcC", "category"),
+    edge("svcC", "item"),
+    edge("svcC", "product"),
+    edge("bean", "account"),
+    edge("bean", "product"),
+    edge("bean", "svcA"),
+    edge("bean", "svcC"),
+  ];
+
+  it("splits non-unknown steps into the always-visible backbone", () => {
+    const { spine } = partitionSpine(steps, calls);
+    expect(spine.map((s) => s.id)).toEqual(["bean", "svcA", "svcC", "mapA"]);
+  });
+
+  it("classifies every unknown step with a backbone ancestor as a branch (no orphans here)", () => {
+    const { branches, orphans } = partitionSpine(steps, calls);
+    expect(branches.map((s) => s.id).sort()).toEqual(["account", "category", "item", "product"]);
+    expect(orphans).toEqual([]);
+  });
+
+  it("folds a fan-in entity under its EARLIEST-pipeline caller (api before service/dao)", () => {
+    // account is called by bean(api), svcA(service), mapA(dao) → api wins.
+    const { parentOf } = partitionSpine(steps, calls);
+    expect(parentOf.get("account")).toBe("bean");
+  });
+
+  it("resolves a branch reached only via another branch through to the backbone", () => {
+    // product is called by bean(api), svcC(service), and item(unknown). The
+    // transitive climb from item reaches svcC, but bean(api) is earlier → bean.
+    const { parentOf } = partitionSpine(steps, calls);
+    expect(parentOf.get("product")).toBe("bean");
+    // category/item hang only off the catalog service.
+    expect(parentOf.get("category")).toBe("svcC");
+    expect(parentOf.get("item")).toBe("svcC");
+  });
+
+  it("groups branchesByParent in input order", () => {
+    const { branchesByParent } = partitionSpine(steps, calls);
+    expect(branchesByParent.get("bean")).toEqual(["account", "product"]);
+    expect(branchesByParent.get("svcC")).toEqual(["category", "item"]);
+    expect(branchesByParent.has("svcA")).toBe(false);
+    expect(branchesByParent.has("mapA")).toBe(false);
+  });
+
+  it("treats an unknown step with no backbone ancestor as an always-shown orphan", () => {
+    const s = [step("a", "api"), step("loner", "unknown"), step("x", "unknown")];
+    // loner is only called by x (also unknown), x is called by nobody → no
+    // backbone ancestor for either → both orphans.
+    const { branches, orphans, parentOf } = partitionSpine(s, [edge("x", "loner")]);
+    expect(branches).toEqual([]);
+    expect(orphans.map((o) => o.id).sort()).toEqual(["loner", "x"]);
+    expect(parentOf.size).toBe(0);
+  });
+
+  it("with no call edges every unknown step is an orphan (nothing to fold into)", () => {
+    const { spine, branches, orphans } = partitionSpine(steps, []);
+    expect(spine.map((s) => s.id)).toEqual(["bean", "svcA", "svcC", "mapA"]);
+    expect(branches).toEqual([]);
+    expect(orphans.map((o) => o.id).sort()).toEqual(["account", "category", "item", "product"]);
+  });
+
+  it("is deterministic across repeated calls", () => {
+    const a = partitionSpine(steps, calls);
+    const b = partitionSpine(steps, calls);
+    expect([...a.parentOf.entries()]).toEqual([...b.parentOf.entries()]);
+    expect(a.spine.map((s) => s.id)).toEqual(b.spine.map((s) => s.id));
+  });
+
+  it("tolerates cycles in the calls graph without infinite-looping", () => {
+    const s = [step("api1", "api"), step("e1", "unknown"), step("e2", "unknown")];
+    // e1 ↔ e2 cycle, e1 reachable from api1.
+    const { branches, orphans, parentOf } = partitionSpine(s, [
+      edge("api1", "e1"),
+      edge("e1", "e2"),
+      edge("e2", "e1"),
+    ]);
+    expect(parentOf.get("e1")).toBe("api1");
+    expect(parentOf.get("e2")).toBe("api1"); // climbs e2 → e1 → api1
+    expect(branches.map((x) => x.id).sort()).toEqual(["e1", "e2"]);
+    expect(orphans).toEqual([]);
   });
 });

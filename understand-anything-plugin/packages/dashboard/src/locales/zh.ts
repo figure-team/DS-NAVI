@@ -143,6 +143,9 @@ export const zh = {
     backToFlows: "返回流程列表",
     emptyFlow: "此流程没有可显示的步骤。",
     flowDesktopOnly: "流程视图仅在桌面端可用，请在更大的屏幕上打开此仪表板。",
+    branchBadge: "数据实体",
+    expandAllBranches: "展开分支",
+    collapseAllBranches: "折叠分支",
   },
   detailLevel: {
     filesTitle: "仅文件 — 架构级依赖（快速）",

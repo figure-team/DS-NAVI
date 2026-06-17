@@ -8,13 +8,14 @@ import type { FlowLayer, StepSource } from "../utils/flowLayer";
 import {
   computeSpineLayout,
   orderSpineSequence,
+  partitionSpine,
   SPINE_COLUMNS,
   COL_W,
   HEADER_H,
   NODE_W,
   NODE_H,
 } from "./flowSpineLayout";
-import type { SpinePlacement, SpineStep } from "./flowSpineLayout";
+import type { SpinePlacement, SpineStep, SpineCallEdge } from "./flowSpineLayout";
 import { flowBadge } from "../utils/domainData";
 import type { FlowMethod } from "../utils/domainData";
 import type { GraphNode } from "@understand-anything/core/types";
@@ -114,6 +115,9 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
   const clearActiveFlow = useDashboardStore((s) => s.clearActiveFlow);
   const selectNode = useDashboardStore((s) => s.selectNode);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
+  const expandedBranchParents = useDashboardStore((s) => s.expandedBranchParents);
+  const toggleBranchParent = useDashboardStore((s) => s.toggleBranchParent);
+  const setBranchParentsExpanded = useDashboardStore((s) => s.setBranchParentsExpanded);
   const { t } = useI18n();
 
   const laneLabels: Record<FlowLayer, string> = {
@@ -124,8 +128,9 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     unknown: t.flowView.laneOther,
   };
 
-  // Resolve ordered, layer-derived steps for the active flow.
-  const steps = useMemo<ResolvedStep[]>(() => {
+  // Resolve every ordered, layer-derived step for the active flow (the full set,
+  // before branch-folding hides anything).
+  const allSteps = useMemo<ResolvedStep[]>(() => {
     if (!domainGraph || !activeFlowId) return [];
     const nodesById = new Map(domainGraph.nodes.map((n) => [n.id, n]));
     const refs = domainGraph.edges
@@ -145,7 +150,44 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     return orderSpineSequence(byWeight);
   }, [domainGraph, activeFlowId]);
 
+  // Real step→step `calls` edges among this flow's steps — the topology that
+  // partitions the backbone from its folded domain-entity branches.
+  const callEdges = useMemo<SpineCallEdge[]>(() => {
+    if (!domainGraph) return [];
+    const ids = new Set(allSteps.map((s) => s.id));
+    return domainGraph.edges
+      .filter((e) => e.type === "calls" && ids.has(e.source) && ids.has(e.target))
+      .map((e) => ({ source: e.source, target: e.target }));
+  }, [domainGraph, allSteps]);
+
+  // 곁가지 접기 (#4): split backbone (always shown) from foldable `unknown`-lane
+  // branches. Each branch folds under the backbone step that calls it.
+  const partition = useMemo(() => partitionSpine(allSteps, callEdges), [allSteps, callEdges]);
+
+  // Rendered subset: backbone + orphan entities always; a folded branch appears
+  // only while its parent backbone step is disclosed. Default (empty set) =
+  // decluttered backbone-only spine; expanding a parent reveals its entities.
+  const steps = useMemo<ResolvedStep[]>(() => {
+    const byId = new Map(allSteps.map((s) => [s.id, s]));
+    const rendered: ResolvedStep[] = [];
+    for (const s of partition.spine) rendered.push(byId.get(s.id)!);
+    for (const s of partition.orphans) rendered.push(byId.get(s.id)!);
+    for (const b of partition.branches) {
+      const parent = partition.parentOf.get(b.id);
+      if (parent && expandedBranchParents.has(parent)) rendered.push(byId.get(b.id)!);
+    }
+    return orderSpineSequence(rendered);
+  }, [allSteps, partition, expandedBranchParents]);
+
   const layout = useMemo(() => computeSpineLayout(steps), [steps]);
+
+  // Backbone steps that have foldable branches (drives the global expand/collapse).
+  const branchParents = useMemo(
+    () => [...partition.branchesByParent.keys()],
+    [partition],
+  );
+  const allBranchesExpanded =
+    branchParents.length > 0 && branchParents.every((p) => expandedBranchParents.has(p));
 
   const edges = useMemo(() => {
     const out: Array<{ key: string; d: string; crossLayer: boolean; color: string }> = [];
@@ -158,6 +200,22 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     const layerById = new Map(steps.map((s) => [s.id, s.layer]));
     for (const e of domainGraph.edges) {
       if (e.type !== "calls" || !stepIds.has(e.source) || !stepIds.has(e.target)) continue;
+      // Fold-aware edges: a disclosed entity draws ONLY its fold edge (entity ↔
+      // its assigned parent backbone step). A fan-in entity is called by several
+      // backbone steps, but it folds under exactly one; suppressing the other
+      // callers' edges keeps each disclosed parent's branch visually its own
+      // (the bug: expanding the API step also drew Service/DAO lines into the
+      // shared entity). Orphan entities (no parent) keep their real edges.
+      const srcEntity = (layerById.get(e.source) ?? "unknown") === "unknown";
+      const tgtEntity = (layerById.get(e.target) ?? "unknown") === "unknown";
+      if (tgtEntity && !srcEntity) {
+        const parent = partition.parentOf.get(e.target);
+        if (parent !== undefined && parent !== e.source) continue;
+      }
+      if (srcEntity && !tgtEntity) {
+        const parent = partition.parentOf.get(e.source);
+        if (parent !== undefined && parent !== e.target) continue;
+      }
       const from = layout.placements.get(e.source);
       const to = layout.placements.get(e.target);
       if (!from || !to) continue;
@@ -172,7 +230,7 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
       });
     }
     return out;
-  }, [domainGraph, steps, layout]);
+  }, [domainGraph, steps, layout, partition]);
 
   const onStepKeyDown = (e: KeyboardEvent<HTMLDivElement>, id: string) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -184,7 +242,7 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
   // Right sidebar: layer legend (counts per lane) + selected-node detail.
   // Replaces the U-A NodeInfo sidebar that the full-bleed domain page hides;
   // ports the prototype `flowview-sidebar` (legend + detail card) to the right.
-  const selectedStep = selectedNodeId ? steps.find((s) => s.id === selectedNodeId) ?? null : null;
+  const selectedStep = selectedNodeId ? allSteps.find((s) => s.id === selectedNodeId) ?? null : null;
   // FIX 4: which flow is being viewed (prototype sidebar-header). Lane headers
   // already carry the layer legend, so the sidebar legend block is dropped (FIX 1).
   const flowNode = domainGraph?.nodes.find((n) => n.id === activeFlowId) ?? null;
@@ -303,6 +361,18 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
         <span className="text-text-secondary truncate hidden md:inline" style={{ fontSize: 12 }}>
           {flowNode.summary}
         </span>
+      )}
+      {branchParents.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setBranchParentsExpanded(allBranchesExpanded ? null : branchParents)}
+          className="ml-auto shrink-0 flex items-center gap-1.5 rounded-md border border-border-subtle px-2.5 py-1.5 text-xs text-text-secondary hover:border-border-medium hover:text-accent transition-colors"
+          aria-pressed={allBranchesExpanded}
+          title={allBranchesExpanded ? t.flowView.collapseAllBranches : t.flowView.expandAllBranches}
+        >
+          <span style={{ fontSize: 11 }}>{allBranchesExpanded ? "－" : "＋"}</span>
+          {allBranchesExpanded ? t.flowView.collapseAllBranches : t.flowView.expandAllBranches}
+        </button>
       )}
     </div>
   );
@@ -436,6 +506,10 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
               if (!p) return null;
               const color = LAYER_COLOR[step.layer];
               const isSelected = selectedNodeId === step.id;
+              // 곁가지 접기: backbone steps with folded entity branches get a
+              // disclosure badge ("＋N" folded / "－N" disclosed).
+              const branchIds = partition.branchesByParent.get(step.id) ?? [];
+              const branchExpanded = expandedBranchParents.has(step.id);
               return (
                 <div
                   key={step.id}
@@ -479,6 +553,33 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
                     >
                       {step.node.filePath.split("/").pop()}
                     </div>
+                  )}
+                  {branchIds.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        toggleBranchParent(step.id);
+                      }}
+                      onKeyDown={(ev) => ev.stopPropagation()}
+                      className="absolute flex items-center gap-0.5 rounded-full border font-semibold transition-colors hover:brightness-125"
+                      style={{
+                        top: 6,
+                        right: 6,
+                        padding: "1px 6px",
+                        fontSize: 10,
+                        lineHeight: 1.4,
+                        color,
+                        borderColor: `${color}66`,
+                        background: `${color}1f`,
+                      }}
+                      aria-expanded={branchExpanded}
+                      aria-label={`${branchIds.length} ${t.flowView.branchBadge}`}
+                      title={`${branchIds.length} ${t.flowView.branchBadge}`}
+                    >
+                      <span>{branchExpanded ? "－" : "＋"}</span>
+                      <span>{branchIds.length}</span>
+                    </button>
                   )}
                 </div>
               );

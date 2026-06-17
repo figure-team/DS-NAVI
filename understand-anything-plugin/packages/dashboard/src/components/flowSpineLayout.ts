@@ -9,12 +9,24 @@ import type { FlowLayer } from "../utils/flowLayer";
  * This module is intentionally framework-free so column assignment + within-column
  * y accumulation are unit-testable in isolation from React rendering.
  *
- * v1 renders the linear ordered step sequence only. Branch-folding (prototype
- * `node.branches` / chips) is v2 and deliberately NOT modeled here.
+ * Branch-folding (progressive disclosure of the "Other"/`unknown` lane) is layered
+ * on by {@link partitionSpine}, which splits the backbone (api/service/dao/db call
+ * chain) from the domain-entity branches that hang off it. The backbone always
+ * renders; branches fold under their calling backbone step and disclose on demand.
+ * No engine data is fabricated — a branch is exactly an `unknown`-lane step, and a
+ * branch's parent is the backbone step that actually `calls` it (real edge).
  */
 
 /** Column order = pipeline order, left→right, with the visible "Other" lane last. */
 export const SPINE_COLUMNS: readonly FlowLayer[] = ["api", "service", "dao", "db", "unknown"];
+
+/**
+ * The lane treated as foldable branches. `unknown` steps are the "Other" lane —
+ * verified (jpetstore real data) to be 100% domain-entity POJOs threaded through
+ * the call chain as data, not pipeline stages. Folding them declutters the spine
+ * down to the api→service→dao→db backbone without hiding any backbone step.
+ */
+export const BRANCH_LAYER: FlowLayer = "unknown";
 
 // ── Layout constants (mirror prototype lines 1689-1696) ─────────────────────
 export const COL_W = 260; // layer-column width (x stride)
@@ -110,4 +122,113 @@ export function computeSpineLayout(steps: readonly SpineStep[]): SpineLayout {
   const height = Math.max(...colY, HEADER_H + NODE_PAD_Y) + 60;
 
   return { placements, width, height, columnCounts };
+}
+
+// ── Branch folding (progressive disclosure of the Other lane) ────────────────
+
+/** A real step→step `calls` edge, reduced to the ids the partition needs. */
+export interface SpineCallEdge {
+  source: string;
+  target: string;
+}
+
+/**
+ * Split a flow's steps into the always-visible backbone and the foldable
+ * domain-entity branches that hang off it.
+ *
+ * - `spine`   — every non-`unknown` step (api/service/dao/db), in input order.
+ * - `branches`— `unknown`-lane steps that resolve to a backbone parent.
+ * - `orphans` — `unknown`-lane steps with NO backbone ancestor; always rendered
+ *               (we never hide data that has nowhere to fold into).
+ * - `parentOf`        — branch id → its backbone parent step id.
+ * - `branchesByParent`— backbone id → its branch ids (input order preserved).
+ *
+ * Parent resolution is data-honest: a branch's parent is the backbone step that
+ * actually `calls` it. When several backbone steps call the same entity (fan-in,
+ * e.g. an entity touched by both the ActionBean and the Service), the earliest
+ * one in pipeline order wins (api before service before dao before db), so the
+ * entity folds nearest the start of the chain. Branches reached only through
+ * other branches climb the `calls` graph transitively to the nearest backbone
+ * ancestor. Cycles are guarded.
+ */
+export interface SpinePartition {
+  spine: SpineStep[];
+  branches: SpineStep[];
+  orphans: SpineStep[];
+  parentOf: Map<string, string>;
+  branchesByParent: Map<string, string[]>;
+}
+
+export function partitionSpine(
+  steps: readonly SpineStep[],
+  callEdges: readonly SpineCallEdge[],
+): SpinePartition {
+  const stepById = new Map(steps.map((s) => [s.id, s]));
+  const inputIndex = new Map(steps.map((s, i) => [s.id, i] as const));
+  const isBranch = (s: SpineStep) => s.layer === BRANCH_LAYER;
+
+  // callers[target] = backbone/branch steps that call it (known steps only).
+  const callers = new Map<string, string[]>();
+  for (const e of callEdges) {
+    if (!stepById.has(e.source) || !stepById.has(e.target)) continue;
+    const list = callers.get(e.target);
+    if (list) list.push(e.source);
+    else callers.set(e.target, [e.source]);
+  }
+
+  // Earlier = smaller pipeline column, tie-broken by input order (stable).
+  const isEarlier = (a: SpineStep, b: SpineStep) => {
+    const ca = spineColumnIndex(a.layer);
+    const cb = spineColumnIndex(b.layer);
+    if (ca !== cb) return ca < cb;
+    return (inputIndex.get(a.id) ?? 0) < (inputIndex.get(b.id) ?? 0);
+  };
+
+  // Nearest backbone ancestor reachable by walking `calls` edges upward.
+  const resolveParent = (branchId: string): string | null => {
+    const visited = new Set<string>([branchId]);
+    let frontier = [...(callers.get(branchId) ?? [])];
+    let best: SpineStep | null = null;
+    while (frontier.length) {
+      const next: string[] = [];
+      for (const id of frontier) {
+        if (visited.has(id)) continue;
+        visited.add(id);
+        const node = stepById.get(id);
+        if (!node) continue;
+        if (isBranch(node)) {
+          next.push(...(callers.get(id) ?? []));
+        } else if (best === null || isEarlier(node, best)) {
+          best = node;
+        }
+      }
+      frontier = next;
+    }
+    return best?.id ?? null;
+  };
+
+  const spine: SpineStep[] = [];
+  const branches: SpineStep[] = [];
+  const orphans: SpineStep[] = [];
+  const parentOf = new Map<string, string>();
+  const branchesByParent = new Map<string, string[]>();
+
+  for (const s of steps) {
+    if (!isBranch(s)) {
+      spine.push(s);
+      continue;
+    }
+    const parent = resolveParent(s.id);
+    if (parent === null) {
+      orphans.push(s);
+      continue;
+    }
+    branches.push(s);
+    parentOf.set(s.id, parent);
+    const list = branchesByParent.get(parent);
+    if (list) list.push(s.id);
+    else branchesByParent.set(parent, [s.id]);
+  }
+
+  return { spine, branches, orphans, parentOf, branchesByParent };
 }

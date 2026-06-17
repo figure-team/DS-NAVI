@@ -224,6 +224,17 @@ interface DashboardStore {
    */
   selectedFlowId: string | null;
   setSelectedFlow: (flowId: string | null) => void;
+  /**
+   * 곁가지 접기 (#4): backbone step ids whose folded `unknown`-lane branches
+   * (domain entities) are currently disclosed in the spine. Empty = every
+   * branch folded (the decluttered backbone-only default). Keyed by backbone
+   * step id, which embeds its flow, so entries never collide across flows.
+   */
+  expandedBranchParents: Set<string>;
+  /** Toggle one backbone step's branches between folded and disclosed. */
+  toggleBranchParent: (parentId: string) => void;
+  /** Disclose every listed parent's branches (expand all), or `null` to fold all. */
+  setBranchParentsExpanded: (parentIds: string[] | null) => void;
 
   setDomainGraph: (graph: KnowledgeGraph) => void;
   setWikiGraph: (graph: KnowledgeGraph) => void; // ktds-fork (ADR-004)
@@ -427,6 +438,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       activeDomainId: keepDomainView ? activeDomainId : null,
       activeFlowId: null,
       selectedFlowId: null,
+      expandedBranchParents: new Set(),
       containerLayoutCache: new Map(),
       expandedContainers: new Set(),
       pendingFocusContainer: null,
@@ -754,6 +766,17 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
 
   setSelectedFlow: (flowId) => set({ selectedFlowId: flowId }),
 
+  expandedBranchParents: new Set<string>(),
+  toggleBranchParent: (parentId) =>
+    set((state) => {
+      const next = new Set(state.expandedBranchParents);
+      if (next.has(parentId)) next.delete(parentId);
+      else next.add(parentId);
+      return { expandedBranchParents: next };
+    }),
+  setBranchParentsExpanded: (parentIds) =>
+    set({ expandedBranchParents: new Set(parentIds ?? []) }),
+
   setDomainGraph: (graph) => {
     // Land on the domain map as the opening view when a domain graph is
     // available and the user is still on the initial structural view
@@ -793,6 +816,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       focusNodeId: null,
       activeFlowId: null,
       selectedFlowId: null,
+      expandedBranchParents: new Set(),
       codeViewerOpen: false,
       codeViewerNodeId: null,
       codeViewerExpanded: false,

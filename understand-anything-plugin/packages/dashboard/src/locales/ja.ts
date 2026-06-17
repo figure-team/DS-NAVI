@@ -143,6 +143,9 @@ export const ja = {
     backToFlows: "フロー一覧に戻る",
     emptyFlow: "このフローには表示するステップがありません。",
     flowDesktopOnly: "フロービューはデスクトップ専用です。大きな画面でダッシュボードを開いてください。",
+    branchBadge: "データエンティティ",
+    expandAllBranches: "枝を展開",
+    collapseAllBranches: "枝を折りたたむ",
   },
   detailLevel: {
     filesTitle: "ファイルのみ — アーキテクチャレベルの依存関係（高速）",

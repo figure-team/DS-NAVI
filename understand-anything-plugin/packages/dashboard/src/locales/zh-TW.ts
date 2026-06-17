@@ -143,6 +143,9 @@ export const zhTW = {
     backToFlows: "返回流程列表",
     emptyFlow: "此流程沒有可顯示的步驟。",
     flowDesktopOnly: "流程視圖僅在桌面端可用，請在較大的螢幕上開啟此儀表板。",
+    branchBadge: "資料實體",
+    expandAllBranches: "展開分支",
+    collapseAllBranches: "摺疊分支",
   },
   detailLevel: {
     filesTitle: "僅檔案 — 架構級依賴（快速）",

@@ -143,6 +143,9 @@ export const ru = {
     backToFlows: "К списку потоков",
     emptyFlow: "В этом потоке нет шагов для отображения.",
     flowDesktopOnly: "Просмотр потоков доступен только на десктопе. Откройте дашборд на большом экране.",
+    branchBadge: "сущности данных",
+    expandAllBranches: "Развернуть ветви",
+    collapseAllBranches: "Свернуть ветви",
   },
   detailLevel: {
     filesTitle: "Только файлы — зависимости архитектурного уровня (быстро)",

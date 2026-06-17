@@ -143,6 +143,9 @@ export const en = {
     backToFlows: "Back to flows",
     emptyFlow: "This flow has no steps to display.",
     flowDesktopOnly: "Flow view is available on desktop only. Please open this dashboard on a larger screen.",
+    branchBadge: "data entities",
+    expandAllBranches: "Expand branches",
+    collapseAllBranches: "Collapse branches",
   },
   detailLevel: {
     filesTitle: "Files only — architecture-level dependencies (fast)",

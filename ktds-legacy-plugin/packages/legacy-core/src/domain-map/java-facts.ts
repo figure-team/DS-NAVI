@@ -49,6 +49,21 @@ export interface JavaMethodInvocation {
   startIndex: number;
 }
 
+/**
+ * A local variable (or enhanced-for loop variable) declared inside a method
+ * body, with its declared type. Lets the call-graph resolver follow receivers
+ * like `Account a = service.get(); a.foo()` — the single largest source of
+ * `unresolved` receivers when only fields/params are tracked. `var` (Java 10+
+ * inferred) is kept verbatim and treated as un-inferable, never guessed.
+ */
+export interface JavaLocalVar {
+  name: string;
+  /** Declared type, generics + array brackets stripped. "var" stays "var". */
+  typeName: string;
+  /** Byte offset of the declaration — scope/position key (a use must follow it). */
+  startIndex: number;
+}
+
 export interface JavaMethodFacts {
   name: string;
   line: number;
@@ -63,6 +78,8 @@ export interface JavaMethodFacts {
   bodyLine: number | null;
   /** Ordered method invocations in the body (source order) — call-graph input. */
   calls: JavaMethodInvocation[];
+  /** Local + loop variable declarations in the body — call-graph receiver resolution. */
+  locals: JavaLocalVar[];
 }
 
 export interface JavaImport {
@@ -353,7 +370,49 @@ function extractMethod(node: JavaNode): JavaMethodFacts {
     bodyText: body?.text ?? "",
     bodyLine: body ? lineOf(body) : null,
     calls: body ? extractInvocations(body) : [],
+    locals: body ? extractLocals(body) : [],
   };
+}
+
+/** Type text with generics and trailing array brackets stripped ("List<X>[]" → "List"). */
+function bareTypeName(typeText: string): string {
+  return stripGenerics(typeText).replace(/\s*\[\s*\]/g, "").replace(/\.\.\.$/, "").trim();
+}
+
+/**
+ * Collect every local-variable and enhanced-for loop-variable declaration in a
+ * method body, with declared type and source position. Walks the same body
+ * subtree as {@link extractInvocations} (still single-parse). Scope is
+ * approximated by position: the resolver matches a use to the nearest preceding
+ * declaration of that name (cheap, handles redeclaration/shadowing well enough).
+ */
+function extractLocals(body: JavaNode): JavaLocalVar[] {
+  const out: JavaLocalVar[] = [];
+  const stack: JavaNode[] = [body];
+  while (stack.length) {
+    const n = stack.pop()!;
+    if (n.type === "local_variable_declaration") {
+      const typeNode = n.childForFieldName("type");
+      if (typeNode) {
+        const typeName = bareTypeName(typeNode.text);
+        for (const decl of childrenOfType(n, "variable_declarator")) {
+          const name = decl.childForFieldName("name")?.text;
+          if (name) out.push({ name, typeName, startIndex: decl.startIndex });
+        }
+      }
+    } else if (n.type === "enhanced_for_statement") {
+      const typeNode = n.childForFieldName("type");
+      const nameNode = n.childForFieldName("name");
+      if (typeNode && nameNode?.text) {
+        out.push({ name: nameNode.text, typeName: bareTypeName(typeNode.text), startIndex: n.startIndex });
+      }
+    }
+    for (let i = 0; i < n.namedChildCount; i++) {
+      const c = n.namedChild(i);
+      if (c) stack.push(c);
+    }
+  }
+  return out;
 }
 
 /**

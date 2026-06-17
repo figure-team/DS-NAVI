@@ -124,6 +124,9 @@ public class Sandbox extends Base {
   public void viaStatic() { Ids.next(); }
   public void viaExternalField() { items.size(); }
   public void viaLocal() { Dep local = null; local.run(); }
+  public void viaLoop(Dep[] arr) { for (Dep d : arr) { d.run(); } }
+  public void viaVar() { var x = getDep(); x.run(); }
+  public void viaShadow() { Dep dep = null; dep.run(); this.dep.run(); }
   public void viaChain() { getDep().run(); }
   public Dep getDep() { return dep; }
   public void helper() {}
@@ -173,8 +176,26 @@ public class Ids { public static int next() { return 0; } }`,
       calleeRelPath: null,
     });
   });
-  test("local variable receiver → unresolved (not tracked, honestly)", async () => {
-    expect(await kindOf("viaLocal")).toMatchObject({ resolution: "unresolved", calleeRelPath: null });
+  test("local variable receiver → local (resolved via its declared type)", async () => {
+    expect(await kindOf("viaLocal")).toMatchObject({
+      resolution: "local",
+      calleeClass: "Dep",
+      calleeRelPath: "a/Dep.java",
+    });
+  });
+  test("enhanced-for loop variable → local", async () => {
+    expect(await kindOf("viaLoop")).toMatchObject({ resolution: "local", calleeClass: "Dep" });
+  });
+  test("var (inferred) local → unresolved (not guessed)", async () => {
+    const graph = await graphOf(FILES);
+    const run = callsIn(graph, "viaVar").find((c) => c.calleeMethod === "run");
+    expect(run).toMatchObject({ resolution: "unresolved", calleeRelPath: null });
+  });
+  test("local shadows field for bare use, but this.field stays field", async () => {
+    const graph = await graphOf(FILES);
+    const shadow = callsIn(graph, "viaShadow").filter((c) => c.calleeMethod === "run");
+    // `dep.run()` binds to the local; `this.dep.run()` to the instance field.
+    expect(shadow.map((c) => c.resolution)).toEqual(["local", "field"]);
   });
   test("chained receiver getX().y() → unresolved", async () => {
     expect(await kindOf("viaChain")).toMatchObject({ resolution: "unresolved", calleeRelPath: null });

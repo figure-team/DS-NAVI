@@ -1,4 +1,4 @@
-import type { JavaFileFacts } from "./java-facts.js";
+import type { JavaFileFacts, JavaLocalVar } from "./java-facts.js";
 import { resolveTypeRef } from "./edges.js";
 import type { ClassIndex } from "./edges.js";
 
@@ -29,10 +29,11 @@ export type CallResolution =
   | "field" // receiver is an instance field of the caller class
   | "self" // unqualified call or this.m() → the caller's own class
   | "param" // receiver is a parameter of the caller method
+  | "local" // receiver is a local / loop variable declared in the method body
   | "static" // receiver is a project type name: Type.m()
   | "super" // super.m()
   | "external" // receiver resolves to a JDK/library type (out of scope)
-  | "unresolved"; // local var / chained / unresolvable receiver
+  | "unresolved"; // chained / inferred-var / unresolvable receiver
 
 export interface ResolvedCall {
   callerRelPath: string;
@@ -100,6 +101,24 @@ function parseParams(paramsText: string): Map<string, string> {
     if (SIMPLE_ID_RE.test(name) && type) out.set(name, type);
   }
   return out;
+}
+
+/**
+ * Nearest preceding declaration of `name` before byte offset `before`, or null.
+ * Position match approximates lexical scope: a use binds to the most recent
+ * earlier declaration of that name (handles redeclaration/loop shadowing).
+ */
+function nearestLocal(
+  locals: readonly JavaLocalVar[],
+  name: string,
+  before: number,
+): JavaLocalVar | null {
+  let best: JavaLocalVar | null = null;
+  for (const d of locals) {
+    if (d.name !== name || d.startIndex >= before) continue;
+    if (best === null || d.startIndex > best.startIndex) best = d;
+  }
+  return best;
 }
 
 /** relPath → its primary (first top-level) class simple name. */
@@ -195,24 +214,43 @@ export function buildMethodCallGraph(
           }
 
           // Reduce `this.field` → `field`; reject anything not a bare identifier
-          // (chained `getX().y`, qualified `a.b.c`) as unresolved — foundation
-          // scope tracks fields/params/statics, not local-var/chain dataflow.
+          // (chained `getX().y`, qualified `a.b.c`) as unresolved — those need
+          // return-type/dataflow inference, out of foundation scope.
           let root = R;
-          if (root.startsWith("this.")) root = root.slice(5);
+          let thisQualified = false;
+          if (root.startsWith("this.")) {
+            root = root.slice(5);
+            thisQualified = true;
+          }
           if (!SIMPLE_ID_RE.test(root)) {
             calls.push({ ...base, calleeRelPath: null, calleeClass: null, resolution: "unresolved" });
             continue;
           }
 
+          // Method-scoped names (locals, params) shadow instance fields — but an
+          // explicit `this.x` receiver always means the field, so skip them then.
+          if (!thisQualified) {
+            const localDecl = nearestLocal(method.locals, root, call.startIndex);
+            if (localDecl !== null) {
+              // `var x = …` can't be resolved without type inference — honest
+              // unresolved rather than mis-binding to a same-named field.
+              if (localDecl.typeName === "var") {
+                calls.push({ ...base, calleeRelPath: null, calleeClass: null, resolution: "unresolved" });
+              } else {
+                calls.push(finalize(base, resolveType(localDecl.typeName, facts, classIndex), "local"));
+              }
+              continue;
+            }
+            const paramType = paramTypes.get(root);
+            if (paramType !== undefined) {
+              calls.push(finalize(base, resolveType(paramType, facts, classIndex), "param"));
+              continue;
+            }
+          }
+
           const fieldType = fieldTypes.get(root);
           if (fieldType !== undefined) {
             calls.push(finalize(base, resolveType(fieldType, facts, classIndex), "field"));
-            continue;
-          }
-
-          const paramType = paramTypes.get(root);
-          if (paramType !== undefined) {
-            calls.push(finalize(base, resolveType(paramType, facts, classIndex), "param"));
             continue;
           }
 

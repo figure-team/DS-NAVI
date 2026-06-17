@@ -146,7 +146,7 @@ export const ko = {
     branchBadge: "데이터 엔터티",
     expandAllBranches: "곁가지 펼치기",
     collapseAllBranches: "곁가지 접기",
-    methodsUsed: "메서드",
+    methodsUsed: "methods",
   },
   detailLevel: {
     filesTitle: "파일만 — 아키텍처 레벨 의존성 (빠름)",

@@ -15,7 +15,7 @@ import type { FlowLayer } from "../../utils/flowLayer";
 
 const NODE_PAD_X = 24;
 const NODE_PAD_Y = 20;
-const SIBLING_GAP = 16;
+const SIBLING_GAP = 34;
 const FIRST_Y = HEADER_H + NODE_PAD_Y;
 
 function step(id: string, layer: FlowLayer): SpineStep {

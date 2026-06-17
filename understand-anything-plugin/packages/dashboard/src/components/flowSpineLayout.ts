@@ -33,7 +33,7 @@ export const COL_W = 260; // layer-column width (x stride)
 export const NODE_W = 210; // step-node box width
 const NODE_PAD_X = 24; // left inset of a node inside its column
 const NODE_PAD_Y = 20; // gap between the column header and the first node
-const SIBLING_GAP = 16; // vertical gap between sibling nodes in a column
+const SIBLING_GAP = 34; // vertical gap between sibling nodes — room for the under-node method chip
 export const HEADER_H = 44; // sticky column-header height
 export const NODE_H = 78; // step-node box height (fixed in v1; no branch chips)
 

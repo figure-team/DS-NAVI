@@ -307,4 +307,30 @@ public class Mapper { public void persist() {} }`,
     const graph = await graphOf(JPETSTORE);
     expect(traceFlowMethodCalls(graph, "web/AccountActionBean.java", undefined, STEP_FILES).size).toBe(0);
   });
+
+  test("resolves overloads by arity — a 1-arg call doesn't pull the 2-arg overload's calls", async () => {
+    // jpetstore shape: getAccount(u) → byUser, getAccount(u,p) → byUserAndPass.
+    // The handler calls getAccount(u) (1 arg), so only byUser must surface.
+    const FILES = {
+      "web/Bean.java": `package web;
+import svc.Svc;
+public class Bean {
+  private Svc svc;
+  public void handle() { svc.getAccount("u"); }
+}`,
+      "svc/Svc.java": `package svc;
+import dao.Mapper;
+public class Svc {
+  private Mapper mapper;
+  public Object getAccount(String u) { return mapper.byUser(u); }
+  public Object getAccount(String u, String p) { return mapper.byUserAndPass(u, p); }
+}`,
+      "dao/Mapper.java": `package dao;
+public class Mapper { public Object byUser(String u){return null;} public Object byUserAndPass(String u, String p){return null;} }`,
+    };
+    const graph = await graphOf(FILES);
+    const steps = new Set(["web/Bean.java", "svc/Svc.java", "dao/Mapper.java"]);
+    const trace = traceFlowMethodCalls(graph, "web/Bean.java", "handle", steps);
+    expect(trace.get("svc/Svc.java")!.get("dao/Mapper.java")).toEqual(["byUser"]);
+  });
 });

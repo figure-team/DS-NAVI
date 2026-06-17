@@ -40,7 +40,11 @@ export interface ResolvedCall {
   callerRelPath: string;
   callerClass: string;
   callerMethod: string;
+  /** Param count of the CALLER method — its overload key (with callerMethod). */
+  callerArity: number;
   calleeMethod: string;
+  /** Argument count of this call — selects the callee overload (with calleeMethod). */
+  calleeArity: number;
   /** Target file, or null when external/unresolved. */
   calleeRelPath: string | null;
   /** Target class simple name, or null when external/unresolved. */
@@ -308,7 +312,9 @@ export function buildMethodCallGraph(
             callerRelPath: relPath,
             callerClass: cls.name,
             callerMethod: method.name,
+            callerArity: method.paramCount,
             calleeMethod: call.methodName,
+            calleeArity: call.argCount,
             receiverText: call.receiverText,
             line: call.line,
           };
@@ -373,22 +379,39 @@ export function traceFlowMethodCalls(
   const out: FlowCallLabels = new Map();
   if (handlerMethod === undefined) return out;
 
-  // callerFile -> callerMethod -> its resolved calls, in source order.
-  const byMethod = new Map<string, Map<string, ResolvedCall[]>>();
+  // callerFile -> methodName -> paramCount(arity) -> its resolved calls.
+  // Keyed by arity so overloads stay distinct (getAccount(u) vs getAccount(u,p)).
+  const byMethod = new Map<string, Map<string, Map<number, ResolvedCall[]>>>();
   for (const c of graph.calls) {
-    let methods = byMethod.get(c.callerRelPath);
-    if (!methods) byMethod.set(c.callerRelPath, (methods = new Map()));
-    const list = methods.get(c.callerMethod);
+    let byName = byMethod.get(c.callerRelPath);
+    if (!byName) byMethod.set(c.callerRelPath, (byName = new Map()));
+    let byArity = byName.get(c.callerMethod);
+    if (!byArity) byName.set(c.callerMethod, (byArity = new Map()));
+    const list = byArity.get(c.callerArity);
     if (list) list.push(c);
-    else methods.set(c.callerMethod, [c]);
+    else byArity.set(c.callerArity, [c]);
   }
 
+  // Pick the calls of the overload matching `arity`. arity null (the entry
+  // handler — never overloaded) takes every overload. When a concrete arity has
+  // no exact overload, fall back to the sole overload if unambiguous, else to
+  // all (no loss — just the pre-overload behavior for that odd case).
+  const resolveCalls = (byArity: Map<number, ResolvedCall[]>, arity: number | null): ResolvedCall[] => {
+    if (arity === null) return [...byArity.values()].flat();
+    const exact = byArity.get(arity);
+    if (exact) return exact;
+    if (byArity.size === 1) return [...byArity.values()][0];
+    return [...byArity.values()].flat();
+  };
+
   const visited = new Set<string>();
-  const visit = (file: string, method: string): void => {
-    const key = `${file}\n${method}`;
-    if (visited.has(key)) return;
-    visited.add(key);
-    for (const call of byMethod.get(file)?.get(method) ?? []) {
+  const visit = (file: string, method: string, arity: number | null): void => {
+    const vkey = `${file}\n${method}\n${arity ?? -1}`;
+    if (visited.has(vkey)) return;
+    visited.add(vkey);
+    const byArity = byMethod.get(file)?.get(method);
+    if (!byArity) return;
+    for (const call of resolveCalls(byArity, arity)) {
       const callee = call.calleeRelPath;
       if (callee === null || !stepFiles.has(callee)) continue;
       if (callee !== file) {
@@ -401,9 +424,9 @@ export function traceFlowMethodCalls(
           byCallee.set(callee, [call.calleeMethod]);
         }
       }
-      visit(callee, call.calleeMethod);
+      visit(callee, call.calleeMethod, call.calleeArity);
     }
   };
-  visit(rootRelPath, handlerMethod);
+  visit(rootRelPath, handlerMethod, null);
   return out;
 }

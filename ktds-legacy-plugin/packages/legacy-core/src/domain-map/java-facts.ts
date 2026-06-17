@@ -63,6 +63,8 @@ export interface JavaMethodInvocation {
   line: number;
   /** Byte offset of the invocation in the file — the source-order sort key. */
   startIndex: number;
+  /** Number of top-level arguments — distinguishes overloads (getAccount(u) vs getAccount(u,p)). */
+  argCount: number;
 }
 
 /**
@@ -86,6 +88,8 @@ export interface JavaMethodFacts {
   isStatic: boolean;
   /** Parameter list source text, e.g. "(String[] args)". */
   paramsText: string;
+  /** Declared parameter count — the overload key paired with the method name. */
+  paramCount: number;
   returnType: string | null;
   annotations: JavaAnnotation[];
   /** Method body source — only ever regex-tested (api/form signals), never parsed. */
@@ -376,11 +380,15 @@ function extractInterfaces(node: JavaNode): Array<{ name: string; line: number }
 function extractMethod(node: JavaNode): JavaMethodFacts {
   const modifiers = firstChildOfType(node, "modifiers");
   const body = node.childForFieldName("body");
+  const params = node.childForFieldName("parameters");
   return {
     name: node.childForFieldName("name")?.text ?? "",
     line: lineOf(node),
     isStatic: /\bstatic\b/.test(modifiers?.text ?? ""),
-    paramsText: node.childForFieldName("parameters")?.text ?? "()",
+    paramsText: params?.text ?? "()",
+    // namedChildren of `formal_parameters` are the parameters (formal_parameter /
+    // spread_parameter) — the arity that, with the name, identifies the overload.
+    paramCount: params?.namedChildCount ?? 0,
     returnType: node.childForFieldName("type")?.text ?? null,
     annotations: modifiers ? extractAnnotations(modifiers) : [],
     bodyText: body?.text ?? "",
@@ -449,12 +457,16 @@ function extractInvocations(body: JavaNode): JavaMethodInvocation[] {
       const nameNode = n.childForFieldName("name");
       if (nameNode) {
         const object = n.childForFieldName("object");
+        const args = n.childForFieldName("arguments");
         found.push({
           methodName: nameNode.text,
           receiverText: object ? object.text : null,
           receiver: describeReceiver(object),
           line: lineOf(n),
           startIndex: n.startIndex,
+          // namedChildren of `argument_list` are the top-level args → call arity,
+          // matched against an overload's paramCount.
+          argCount: args?.namedChildCount ?? 0,
         });
       }
     }

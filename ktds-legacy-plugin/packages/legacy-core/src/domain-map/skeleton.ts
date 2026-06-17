@@ -12,6 +12,8 @@ import {
   type UaGraphNode,
 } from "./types.js";
 import { buildLayerSignals, deriveStepLayer } from "./step-layer.js";
+import { buildClassIndex } from "./edges.js";
+import { buildMethodCallGraph, traceFlowMethodCalls } from "./method-calls.js";
 import { cmp } from "../utils/cmp.js";
 import { groupBy } from "../utils/collections.js";
 
@@ -90,6 +92,9 @@ export function buildSkeleton(
   const adjacency = buildAdjacency(edgesReport);
   // layer 신호 집합은 루프 밖에서 한 번만 도출(파일당 재계산 금지).
   const layerSignals = buildLayerSignals(routes, edgesReport);
+  // 메서드 단위 호출 그래프 — 흐름별로 핸들러에서 추적해 calls 엣지에 실제
+  // 호출 메서드명·순서를 라벨로 싣는다(파일 인접 토폴로지는 불변, description만 부착).
+  const callGraph = buildMethodCallGraph(javaFacts, buildClassIndex(javaFacts));
 
   for (const d of domains) {
     const fileCount = [...domainByFile.values()].filter((k) => k === d.key).length;
@@ -210,15 +215,23 @@ export function buildSkeleton(
         // 분기를 정확히 그린다(예: ActionBean이 두 서비스를 각각 호출 = fan-out이지,
         // 서비스끼리 호출 아님). 양 끝이 모두 이 flow의 step일 때만 등재.
         const inChain = new Set(stepFiles);
+        // 흐름의 진짜 메서드 호출 시퀀스(핸들러부터 추적) — 파일쌍별 호출 메서드명.
+        const callLabels = traceFlowMethodCalls(callGraph, root, flow.handlerMethod, inChain);
         for (const fileA of stepFiles) {
           for (const fileB of adjacency.get(fileA) ?? []) {
             if (!inChain.has(fileB)) continue;
+            // 실제 호출 메서드들을 순서대로 라벨링(예: "updateAccount → getAccount").
+            // 구조 의존만 있고 호출이 없는 쌍은 description 미부착(정직).
+            const methods = callLabels.get(fileA)?.get(fileB);
             edges.push({
               source: `step:${flowKey}:${fileA}`,
               target: `step:${flowKey}:${fileB}`,
               type: "calls",
               direction: "forward",
               weight: 1,
+              ...(methods && methods.length > 0
+                ? { description: methods.join(" → ") }
+                : {}),
             });
           }
         }

@@ -328,6 +328,83 @@ test("Phase B: 핸들러별 step 체인 — 본문이 호출하는 서비스만 
   expect(stepIds).not.toContain(`step:GET /signon:${CAT}`); // 미호출 → 제외
 });
 
+test("calls 엣지에 흐름의 실제 호출 메서드가 순서대로 description으로 부착된다", async () => {
+  const ROOT = "src/com/shop/AccountActionBean.java";
+  const ACCT = "src/com/shop/AccountService.java";
+  const files = [ROOT, ACCT];
+
+  const c: CensusReport = {
+    schemaVersion: 1,
+    gitCommit: "c".repeat(40),
+    fileCount: files.length,
+    files: files.map((relPath) => ({ relPath, lang: "java" as const })),
+    kgCrossCheck: null,
+  };
+  const r: RoutesReport = {
+    schemaVersion: 1,
+    gitCommit: "c".repeat(40),
+    contextPath: null,
+    routes: [
+      {
+        routeId: "route:POST /editAccount",
+        method: "POST" as const,
+        path: "/editAccount",
+        rawPath: "/editAccount",
+        kind: "api" as const,
+        framework: "stripes" as const,
+        filePath: ROOT,
+        line: 10,
+        handler: "AccountActionBean#editAccount",
+        notes: [],
+      },
+    ],
+    batchEntries: [],
+  };
+  const e: EdgesReport = {
+    schemaVersion: 1,
+    gitCommit: "c".repeat(40),
+    edges: [{ source: ROOT, target: ACCT, kind: "field-type" as const, line: 3 }],
+    unresolved: [],
+  };
+
+  const jf = new Map<string, JavaFileFacts>();
+  jf.set(
+    ROOT,
+    await scanJavaFile(
+      [
+        "package shop;",
+        "public class AccountActionBean {",
+        "  private AccountService accountService;",
+        "  public String editAccount() {",
+        "    accountService.updateAccount();",
+        "    return accountService.getAccount();",
+        "  }",
+        "}",
+      ].join("\n"),
+    ),
+  );
+  jf.set(
+    ACCT,
+    await scanJavaFile(
+      "package shop;\npublic class AccountService { public void updateAccount(){} public String getAccount(){return null;} }",
+    ),
+  );
+
+  const s = buildSlices(c, r, e);
+  const candidates = buildCandidates(c, r, s);
+  const plan = buildAutoPlan(candidates, "auto");
+  const sk = buildSkeleton(plan, candidates, r, s, e, jf);
+
+  const callsEdge = sk.edges.find(
+    (edge) =>
+      edge.type === "calls" &&
+      edge.source === `step:POST /editAccount:${ROOT}` &&
+      edge.target === `step:POST /editAccount:${ACCT}`,
+  );
+  // 같은 협력자로의 두 호출이 순서대로 라벨링된다(파일 그래프가 잃던 정보).
+  expect(callsEdge?.description).toBe("updateAccount → getAccount");
+});
+
 test("Phase B: 빈 시드(form-only 핸들러)는 root만, 무핸들러 배치는 전체 체인 폴백", async () => {
   // 같은 ActionBean에 form-only 핸들러(newAccountForm: 어떤 서비스도 호출 안 함)와
   // 무핸들러 배치 엔트리. form 핸들러 체인 = root만, 배치 = 전체 체인(폴백).

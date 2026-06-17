@@ -73,8 +73,14 @@ interface ResolvedStep extends SpineStep {
   node: GraphNode;
 }
 
-/** A spine edge between two consecutive steps, in absolute canvas coordinates. */
-function buildEdgePath(from: SpinePlacement, to: SpinePlacement): { d: string; crossLayer: boolean } {
+/**
+ * A spine edge between two consecutive steps, in absolute canvas coordinates.
+ * Also returns the path midpoint (`mx`/`my`) so a method-name label can sit on it.
+ */
+function buildEdgePath(
+  from: SpinePlacement,
+  to: SpinePlacement,
+): { d: string; crossLayer: boolean; mx: number; my: number } {
   const crossLayer = from.col !== to.col;
   if (crossLayer) {
     // source-right → target-left horizontal S-curve.
@@ -83,14 +89,19 @@ function buildEdgePath(from: SpinePlacement, to: SpinePlacement): { d: string; c
     const x2 = to.x;
     const y2 = to.y + to.h / 2;
     const cx = x1 + (x2 - x1) * 0.5;
-    return { d: `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`, crossLayer };
+    return {
+      d: `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`,
+      crossLayer,
+      mx: cx,
+      my: (y1 + y2) / 2,
+    };
   }
   // same column siblings: bottom-center → top-center vertical link.
   const x1 = from.x + from.w / 2;
   const y1 = from.y + from.h;
   const x2 = to.x + to.w / 2;
   const y2 = to.y;
-  return { d: `M ${x1} ${y1} L ${x2} ${y2}`, crossLayer };
+  return { d: `M ${x1} ${y1} L ${x2} ${y2}`, crossLayer, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 };
 }
 
 interface FlowSpineViewProps {
@@ -190,7 +201,15 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     branchParents.length > 0 && branchParents.every((p) => expandedBranchParents.has(p));
 
   const edges = useMemo(() => {
-    const out: Array<{ key: string; d: string; crossLayer: boolean; color: string }> = [];
+    const out: Array<{
+      key: string;
+      d: string;
+      crossLayer: boolean;
+      color: string;
+      label: string | null;
+      mx: number;
+      my: number;
+    }> = [];
     if (!domainGraph) return out;
     // Draw the REAL call/dependency topology (engine `calls` step→step edges),
     // not a synthetic consecutive-step chain. This shows fan-out honestly: an
@@ -219,7 +238,7 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
       const from = layout.placements.get(e.source);
       const to = layout.placements.get(e.target);
       if (!from || !to) continue;
-      const { d, crossLayer } = buildEdgePath(from, to);
+      const { d, crossLayer, mx, my } = buildEdgePath(from, to);
       out.push({
         key: `${e.source}->${e.target}`,
         d,
@@ -227,6 +246,11 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
         // Edge takes the source step's layer color so the line stays continuous
         // with the node it leaves (cross-layer edges included).
         color: LAYER_COLOR[layerById.get(e.source) ?? "unknown"],
+        // Real ordered method calls on this edge (engine `description`), e.g.
+        // "updateAccount → getAccount". Absent on pure structural-dependency edges.
+        label: typeof e.description === "string" && e.description ? e.description : null,
+        mx,
+        my,
       });
     }
     return out;
@@ -497,6 +521,30 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
                 opacity={0.85}
               />
             ))}
+            {/* Real ordered method-call labels (engine emits them on calls edges).
+                Shows e.g. "updateAccount → getAccount" so two calls to the same
+                collaborator are visible — the order the file graph used to lose. */}
+            {edges.map((e) =>
+              e.label ? (
+                <text
+                  key={`${e.key}-label`}
+                  x={e.mx}
+                  y={e.my - 3}
+                  textAnchor="middle"
+                  style={{
+                    fontSize: 9.5,
+                    fontFamily: "var(--font-mono)",
+                    fill: e.color,
+                    stroke: "var(--color-panel, var(--color-surface))",
+                    strokeWidth: 3,
+                    paintOrder: "stroke",
+                    opacity: 0.95,
+                  }}
+                >
+                  {e.label.length > 32 ? `${e.label.slice(0, 31)}…` : e.label}
+                </text>
+              ) : null,
+            )}
           </svg>
 
           {/* Spine step nodes — exactly one DOM node per spine step (AC-5). */}

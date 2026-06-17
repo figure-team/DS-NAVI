@@ -343,3 +343,67 @@ export function buildMethodCallGraph(
 
   return { calls };
 }
+
+/**
+ * Per-flow method-call labels: `callerFile → (calleeFile → ordered methods)`.
+ * Nested maps (not string-concatenated keys) so lookups are unambiguous for any
+ * relPath/method.
+ */
+export type FlowCallLabels = Map<string, Map<string, string[]>>;
+
+/**
+ * Trace one flow's real method-call sequence: start at its handler method and
+ * follow resolved calls transitively, restricted to the flow's step files.
+ * Returns, per caller->callee file pair, the ordered unique method names actually
+ * invoked — what the dashboard labels each `calls` edge with so a file->file edge
+ * reads e.g. "updateAccount -> getAccount" and two calls to the same collaborator
+ * are no longer invisible.
+ *
+ * Flow-specific (rooted at the handler), NOT a project-wide file aggregate — so
+ * `editAccount`'s edge shows only editAccount's calls, not `newAccount`'s. Self
+ * calls (`this.helper()`) draw no edge but are still followed, so intra-class
+ * delegation surfaces the deeper service/dao calls it leads to.
+ */
+export function traceFlowMethodCalls(
+  graph: MethodCallGraph,
+  rootRelPath: string,
+  handlerMethod: string | undefined,
+  stepFiles: ReadonlySet<string>,
+): FlowCallLabels {
+  const out: FlowCallLabels = new Map();
+  if (handlerMethod === undefined) return out;
+
+  // callerFile -> callerMethod -> its resolved calls, in source order.
+  const byMethod = new Map<string, Map<string, ResolvedCall[]>>();
+  for (const c of graph.calls) {
+    let methods = byMethod.get(c.callerRelPath);
+    if (!methods) byMethod.set(c.callerRelPath, (methods = new Map()));
+    const list = methods.get(c.callerMethod);
+    if (list) list.push(c);
+    else methods.set(c.callerMethod, [c]);
+  }
+
+  const visited = new Set<string>();
+  const visit = (file: string, method: string): void => {
+    const key = `${file}\n${method}`;
+    if (visited.has(key)) return;
+    visited.add(key);
+    for (const call of byMethod.get(file)?.get(method) ?? []) {
+      const callee = call.calleeRelPath;
+      if (callee === null || !stepFiles.has(callee)) continue;
+      if (callee !== file) {
+        let byCallee = out.get(file);
+        if (!byCallee) out.set(file, (byCallee = new Map()));
+        const methods = byCallee.get(callee);
+        if (methods) {
+          if (!methods.includes(call.calleeMethod)) methods.push(call.calleeMethod);
+        } else {
+          byCallee.set(callee, [call.calleeMethod]);
+        }
+      }
+      visit(callee, call.calleeMethod);
+    }
+  };
+  visit(rootRelPath, handlerMethod);
+  return out;
+}

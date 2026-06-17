@@ -1,7 +1,11 @@
 import { expect, test, describe } from "vitest";
 import { scanJavaFile, type JavaFileFacts } from "./java-facts.js";
 import { buildClassIndex } from "./edges.js";
-import { buildMethodCallGraph, type ResolvedCall } from "./method-calls.js";
+import {
+  buildMethodCallGraph,
+  traceFlowMethodCalls,
+  type ResolvedCall,
+} from "./method-calls.js";
 
 // Method-level call graph unit tests. No disk fixtures — inline sources parsed
 // through the real tree-sitter path, then resolved. The headline case mirrors
@@ -229,5 +233,78 @@ describe("buildMethodCallGraph — determinism", () => {
     const a = await graphOf(JPETSTORE);
     const b = await graphOf(JPETSTORE);
     expect(a.calls).toEqual(b.calls);
+  });
+});
+
+describe("traceFlowMethodCalls — per-flow ordered edge labels", () => {
+  const STEP_FILES = new Set([
+    "web/AccountActionBean.java",
+    "service/AccountService.java",
+    "service/CatalogService.java",
+    "domain/Account.java",
+  ]);
+
+  test("editAccount: each file→file pair carries its ordered, deduped methods", async () => {
+    const graph = await graphOf(JPETSTORE);
+    const trace = traceFlowMethodCalls(graph, "web/AccountActionBean.java", "editAccount", STEP_FILES);
+    const from = trace.get("web/AccountActionBean.java")!;
+    expect(from.get("service/AccountService.java")).toEqual(["updateAccount", "getAccount"]);
+    expect(from.get("service/CatalogService.java")).toEqual(["getProductListByCategory"]);
+    expect(from.get("domain/Account.java")).toEqual(["getUsername", "getFavouriteCategoryId"]);
+  });
+
+  test("is rooted at the handler — a different handler yields different labels", async () => {
+    // newAccount calls insertAccount (not updateAccount); editAccount's labels
+    // must not leak into it even though both live in the same file.
+    const FILES = {
+      ...JPETSTORE,
+      "web/AccountActionBean.java": JPETSTORE["web/AccountActionBean.java"].replace(
+        "public Resolution editAccount() {",
+        `public Resolution newAccount() {
+    accountService.insertAccount(account);
+    return null;
+  }
+  public Resolution editAccount() {`,
+      ),
+    };
+    const graph = await graphOf(FILES);
+    const edit = traceFlowMethodCalls(graph, "web/AccountActionBean.java", "editAccount", STEP_FILES);
+    const neu = traceFlowMethodCalls(graph, "web/AccountActionBean.java", "newAccount", STEP_FILES);
+    expect(edit.get("web/AccountActionBean.java")!.get("service/AccountService.java")).toEqual([
+      "updateAccount",
+      "getAccount",
+    ]);
+    expect(neu.get("web/AccountActionBean.java")!.get("service/AccountService.java")).toEqual([
+      "insertAccount",
+    ]);
+  });
+
+  test("follows the chain transitively (service → mapper)", async () => {
+    const FILES = {
+      "web/Bean.java": `package web;
+import svc.Svc;
+public class Bean {
+  private Svc svc;
+  public void handle() { svc.doWork(); }
+}`,
+      "svc/Svc.java": `package svc;
+import dao.Mapper;
+public class Svc {
+  private Mapper mapper;
+  public void doWork() { mapper.persist(); }
+}`,
+      "dao/Mapper.java": `package dao;
+public class Mapper { public void persist() {} }`,
+    };
+    const graph = await graphOf(FILES);
+    const steps = new Set(["web/Bean.java", "svc/Svc.java", "dao/Mapper.java"]);
+    const trace = traceFlowMethodCalls(graph, "web/Bean.java", "handle", steps);
+    expect(trace.get("web/Bean.java")!.get("svc/Svc.java")).toEqual(["doWork"]);
+    expect(trace.get("svc/Svc.java")!.get("dao/Mapper.java")).toEqual(["persist"]);
+  });
+
+  test("no handler method (batch flow) → empty trace", async () => {
+    const graph = await graphOf(JPETSTORE);
+    expect(traceFlowMethodCalls(graph, "web/AccountActionBean.java", undefined, STEP_FILES).size).toBe(0);
   });
 });

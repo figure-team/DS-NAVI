@@ -26,6 +26,29 @@ export interface JavaAnnotation {
   args: Record<string, JavaAnnotationValue>;
 }
 
+/**
+ * One method invocation inside a method body, captured in source order.
+ *
+ * Net-new for the method-level call graph (the file-level edge layer carries
+ * NO call edges — only structural import/injection/type adjacency). This is the
+ * raw, unresolved invocation; receiver → target file/class resolution happens in
+ * `method-calls.ts` (needs the cross-file ClassIndex, which facts don't have).
+ */
+export interface JavaMethodInvocation {
+  /** Invoked method's simple name (the `name` field of `method_invocation`). */
+  methodName: string;
+  /**
+   * Receiver expression source text exactly as written — `"accountService"`,
+   * `"this.account"`, `"CatalogService"` (static), `"getX()"` (chained) — or
+   * null for an unqualified self-call (`foo()`). Resolution decides what it
+   * points at; extraction stays purely syntactic.
+   */
+  receiverText: string | null;
+  line: number;
+  /** Byte offset of the invocation in the file — the source-order sort key. */
+  startIndex: number;
+}
+
 export interface JavaMethodFacts {
   name: string;
   line: number;
@@ -38,6 +61,8 @@ export interface JavaMethodFacts {
   bodyText: string;
   /** 1-based line where the body block starts (anchors bodyText regex hits to file lines). */
   bodyLine: number | null;
+  /** Ordered method invocations in the body (source order) — call-graph input. */
+  calls: JavaMethodInvocation[];
 }
 
 export interface JavaImport {
@@ -327,7 +352,42 @@ function extractMethod(node: JavaNode): JavaMethodFacts {
     annotations: modifiers ? extractAnnotations(modifiers) : [],
     bodyText: body?.text ?? "",
     bodyLine: body ? lineOf(body) : null,
+    calls: body ? extractInvocations(body) : [],
   };
+}
+
+/**
+ * Collect every `method_invocation` in a method body, in source order.
+ *
+ * Walks the whole body subtree (nested invocations included — an arg call like
+ * `service.f(account.getId())` yields BOTH `f` and `getId`), then sorts by byte
+ * offset so the order matches how the code reads top-to-bottom. Receiver and
+ * name are taken from the grammar's `object` / `name` fields; nothing is
+ * resolved here (that needs the cross-file index — see method-calls.ts).
+ */
+function extractInvocations(body: JavaNode): JavaMethodInvocation[] {
+  const found: JavaMethodInvocation[] = [];
+  const stack: JavaNode[] = [body];
+  while (stack.length) {
+    const n = stack.pop()!;
+    if (n.type === "method_invocation") {
+      const nameNode = n.childForFieldName("name");
+      if (nameNode) {
+        const object = n.childForFieldName("object");
+        found.push({
+          methodName: nameNode.text,
+          receiverText: object ? object.text : null,
+          line: lineOf(n),
+          startIndex: n.startIndex,
+        });
+      }
+    }
+    for (let i = 0; i < n.namedChildCount; i++) {
+      const c = n.namedChild(i);
+      if (c) stack.push(c);
+    }
+  }
+  return found.sort((a, b) => a.startIndex - b.startIndex);
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────

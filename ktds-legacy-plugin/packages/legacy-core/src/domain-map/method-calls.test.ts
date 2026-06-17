@@ -4,6 +4,7 @@ import { buildClassIndex } from "./edges.js";
 import {
   buildMethodCallGraph,
   traceFlowMethodCalls,
+  reachableFlowFiles,
   type ResolvedCall,
 } from "./method-calls.js";
 
@@ -332,5 +333,62 @@ public class Mapper { public Object byUser(String u){return null;} public Object
     const steps = new Set(["web/Bean.java", "svc/Svc.java", "dao/Mapper.java"]);
     const trace = traceFlowMethodCalls(graph, "web/Bean.java", "handle", steps);
     expect(trace.get("svc/Svc.java")!.get("dao/Mapper.java")).toEqual(["byUser"]);
+  });
+});
+
+describe("reachableFlowFiles — call-graph step chain", () => {
+  test("includes only files actually called (excludes injected-but-uncalled collaborators)", async () => {
+    // Bean injects two services but the handler only calls `used`; `unused` and
+    // its mapper must NOT appear (the structural-adjacency chain would include them).
+    const FILES = {
+      "web/Bean.java": `package web;
+import svc.Used; import svc.Unused;
+public class Bean {
+  private Used used;
+  private Unused unused;
+  public void handle() { used.work(); }
+}`,
+      "svc/Used.java": `package svc;
+import dao.Mapper;
+public class Used { private Mapper mapper; public void work() { mapper.run(); } }`,
+      "svc/Unused.java": `package svc;
+import dao.OtherMapper;
+public class Unused { private OtherMapper m; public void idle() { m.run(); } }`,
+      "dao/Mapper.java": `package dao;
+public class Mapper { public void run() {} }`,
+      "dao/OtherMapper.java": `package dao;
+public class OtherMapper { public void run() {} }`,
+    };
+    const graph = await graphOf(FILES);
+    const { files } = reachableFlowFiles(graph, "web/Bean.java", "handle", 8);
+    expect(files).toEqual(["web/Bean.java", "svc/Used.java", "dao/Mapper.java"]);
+    expect(files).not.toContain("svc/Unused.java");
+    expect(files).not.toContain("dao/OtherMapper.java");
+  });
+
+  test("a forward-only handler (no calls) reaches only the root", async () => {
+    const FILES = {
+      "web/Bean.java": `package web;
+public class Bean { public Object form() { return new Object(); } }`,
+    };
+    const graph = await graphOf(FILES);
+    expect(reachableFlowFiles(graph, "web/Bean.java", "form", 8).files).toEqual(["web/Bean.java"]);
+  });
+
+  test("respects stepCap, reporting the overflow as dropped", async () => {
+    const FILES = {
+      "web/Bean.java": `package web;
+import a.A; import a.B; import a.C;
+public class Bean { private A a; private B b; private C c;
+  public void handle() { a.x(); b.x(); c.x(); } }`,
+      "a/A.java": `package a; public class A { public void x() {} }`,
+      "a/B.java": `package a; public class B { public void x() {} }`,
+      "a/C.java": `package a; public class C { public void x() {} }`,
+    };
+    const graph = await graphOf(FILES);
+    const { files, dropped } = reachableFlowFiles(graph, "web/Bean.java", "handle", 3);
+    expect(files).toHaveLength(3);
+    expect(files[0]).toBe("web/Bean.java");
+    expect(dropped).toHaveLength(1);
   });
 });

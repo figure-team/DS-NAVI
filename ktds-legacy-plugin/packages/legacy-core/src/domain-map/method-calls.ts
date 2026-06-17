@@ -357,6 +357,37 @@ export function buildMethodCallGraph(
  */
 export type FlowCallLabels = Map<string, Map<string, string[]>>;
 
+/** callerFile → methodName → paramCount(arity) → that overload's resolved calls. */
+type CallIndex = Map<string, Map<string, Map<number, ResolvedCall[]>>>;
+
+function indexCallsByMethod(graph: MethodCallGraph): CallIndex {
+  const byMethod: CallIndex = new Map();
+  for (const c of graph.calls) {
+    let byName = byMethod.get(c.callerRelPath);
+    if (!byName) byMethod.set(c.callerRelPath, (byName = new Map()));
+    let byArity = byName.get(c.callerMethod);
+    if (!byArity) byName.set(c.callerMethod, (byArity = new Map()));
+    const list = byArity.get(c.callerArity);
+    if (list) list.push(c);
+    else byArity.set(c.callerArity, [c]);
+  }
+  return byMethod;
+}
+
+/**
+ * The calls of the overload matching `arity`. arity null (the entry handler —
+ * never overloaded) takes every overload. A concrete arity with no exact
+ * overload uses the sole overload if unambiguous, else all (recall over the rare
+ * arity-heuristic miss — never the pre-overload conflation when arity DOES match).
+ */
+function selectOverload(byArity: Map<number, ResolvedCall[]>, arity: number | null): ResolvedCall[] {
+  if (arity === null) return [...byArity.values()].flat();
+  const exact = byArity.get(arity);
+  if (exact) return exact;
+  if (byArity.size === 1) return [...byArity.values()][0];
+  return [...byArity.values()].flat();
+}
+
 /**
  * Trace one flow's real method-call sequence: start at its handler method and
  * follow resolved calls transitively, restricted to the flow's step files.
@@ -379,31 +410,7 @@ export function traceFlowMethodCalls(
   const out: FlowCallLabels = new Map();
   if (handlerMethod === undefined) return out;
 
-  // callerFile -> methodName -> paramCount(arity) -> its resolved calls.
-  // Keyed by arity so overloads stay distinct (getAccount(u) vs getAccount(u,p)).
-  const byMethod = new Map<string, Map<string, Map<number, ResolvedCall[]>>>();
-  for (const c of graph.calls) {
-    let byName = byMethod.get(c.callerRelPath);
-    if (!byName) byMethod.set(c.callerRelPath, (byName = new Map()));
-    let byArity = byName.get(c.callerMethod);
-    if (!byArity) byName.set(c.callerMethod, (byArity = new Map()));
-    const list = byArity.get(c.callerArity);
-    if (list) list.push(c);
-    else byArity.set(c.callerArity, [c]);
-  }
-
-  // Pick the calls of the overload matching `arity`. arity null (the entry
-  // handler — never overloaded) takes every overload. When a concrete arity has
-  // no exact overload, fall back to the sole overload if unambiguous, else to
-  // all (no loss — just the pre-overload behavior for that odd case).
-  const resolveCalls = (byArity: Map<number, ResolvedCall[]>, arity: number | null): ResolvedCall[] => {
-    if (arity === null) return [...byArity.values()].flat();
-    const exact = byArity.get(arity);
-    if (exact) return exact;
-    if (byArity.size === 1) return [...byArity.values()][0];
-    return [...byArity.values()].flat();
-  };
-
+  const byMethod = indexCallsByMethod(graph);
   const visited = new Set<string>();
   const visit = (file: string, method: string, arity: number | null): void => {
     const vkey = `${file}\n${method}\n${arity ?? -1}`;
@@ -411,7 +418,7 @@ export function traceFlowMethodCalls(
     visited.add(vkey);
     const byArity = byMethod.get(file)?.get(method);
     if (!byArity) return;
-    for (const call of resolveCalls(byArity, arity)) {
+    for (const call of selectOverload(byArity, arity)) {
       const callee = call.calleeRelPath;
       if (callee === null || !stepFiles.has(callee)) continue;
       if (callee !== file) {
@@ -429,4 +436,53 @@ export function traceFlowMethodCalls(
   };
   visit(rootRelPath, handlerMethod, null);
   return out;
+}
+
+/**
+ * The files a flow actually reaches by FOLLOWING METHOD CALLS from its handler
+ * (transitively), in BFS-by-call-depth order, capped at `stepCap`.
+ *
+ * This is the call-graph alternative to the structural-adjacency step chain: a
+ * file appears only if a method is actually invoked on it along the handler's
+ * path. So `editAccount` (which calls catalogService.getProductListByCategory →
+ * productMapper) reaches ProductMapper but NOT the sibling Category/ItemMapper it
+ * never calls — precise, and smaller, so the step cap is rarely hit. Overload-
+ * aware (follows the matching arity). External/unresolved callees are skipped.
+ *
+ * Returns only the root when the handler's calls don't resolve to any project
+ * file (lambda/framework-heavy handlers); the caller falls back to the
+ * structural chain there so such flows keep their dependency view.
+ */
+export function reachableFlowFiles(
+  graph: MethodCallGraph,
+  rootRelPath: string,
+  handlerMethod: string,
+  stepCap: number,
+): { files: string[]; dropped: string[] } {
+  const byMethod = indexCallsByMethod(graph);
+  const ordered: string[] = [rootRelPath];
+  const seen = new Set<string>([rootRelPath]);
+  const visited = new Set<string>();
+  let frontier: Array<[string, string, number | null]> = [[rootRelPath, handlerMethod, null]];
+  while (frontier.length) {
+    const next: Array<[string, string, number | null]> = [];
+    for (const [file, method, arity] of frontier) {
+      const vkey = `${file}\n${method}\n${arity ?? -1}`;
+      if (visited.has(vkey)) continue;
+      visited.add(vkey);
+      const byArity = byMethod.get(file)?.get(method);
+      if (!byArity) continue;
+      for (const call of selectOverload(byArity, arity)) {
+        const callee = call.calleeRelPath;
+        if (callee === null) continue; // external / unresolved — not a project file
+        if (!seen.has(callee)) {
+          seen.add(callee);
+          ordered.push(callee);
+        }
+        next.push([callee, call.calleeMethod, call.calleeArity]);
+      }
+    }
+    frontier = next;
+  }
+  return { files: ordered.slice(0, stepCap), dropped: ordered.slice(stepCap) };
 }

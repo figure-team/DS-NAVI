@@ -13,7 +13,7 @@ import {
 } from "./types.js";
 import { buildLayerSignals, deriveStepLayer } from "./step-layer.js";
 import { buildClassIndex } from "./edges.js";
-import { buildMethodCallGraph, traceFlowMethodCalls } from "./method-calls.js";
+import { buildMethodCallGraph, traceFlowMethodCalls, reachableFlowFiles } from "./method-calls.js";
 import { cmp } from "../utils/cmp.js";
 import { groupBy } from "../utils/collections.js";
 
@@ -139,18 +139,29 @@ export function buildSkeleton(
       for (const flow of flows) {
         const flowKey = stripPrefix(flow.flowId, "flow:");
 
-        // step 체인은 핸들러별로 결정된다(Phase B): 핸들러 method가 실제로
-        // 호출하는 필드/타입만 root의 시드로 삼아 그 하위만 펼친다 — 같은
-        // ActionBean의 signon/signoff가 서로 다른 체인을 갖는다. method/클래스
-        // facts가 없으면(seeds === null) 기존 전체 체인으로 폴백(픽스처 호환).
-        const seeds =
+        // step 체인은 핸들러부터 **실제 메서드 호출**을 따라 도달한 파일로
+        // 결정된다(호출그래프 기반). editAccount는 catalogService→productMapper만
+        // 부르므로 ProductMapper는 포함, 안 부르는 Category/ItemMapper는 제외 —
+        // 구조 인접보다 정확하고 작다. 호출이 프로젝트 파일로 전혀 안 풀리면
+        // (람다/프레임워크 위주 핸들러) root만 나오므로, 구조 인접 체인으로
+        // 폴백해 의존 뷰를 유지한다(빈 단일노드 흐름 방지). 무핸들러 배치도 폴백.
+        const reached =
           flow.handlerMethod !== undefined
-            ? handlerSeedFiles(root, flow.handlerMethod, adjacency, javaFacts)
+            ? reachableFlowFiles(callGraph, root, flow.handlerMethod, stepCap)
             : null;
-        const chain =
-          seeds !== null
-            ? stepChainForSeeds(root, seeds, adjacency, stepCap)
-            : stepChain(root, adjacency, stepCap);
+        let chain: { files: string[]; dropped: string[] };
+        if (reached !== null && reached.files.length > 1) {
+          chain = reached;
+        } else {
+          const seeds =
+            flow.handlerMethod !== undefined
+              ? handlerSeedFiles(root, flow.handlerMethod, adjacency, javaFacts)
+              : null;
+          chain =
+            seeds !== null
+              ? stepChainForSeeds(root, seeds, adjacency, stepCap)
+              : stepChain(root, adjacency, stepCap);
+        }
         // 곁가지 접기(v1): 추상 베이스 클래스는 흐름의 독립 단계가 아니라 하위
         // 구현이 상속하는 공통 인프라(부모 플레이밍)다 — 하위 step과 중복이므로
         // step에서 접는다. 루트(진입 파일)는 라우트의 닻이라 항상 보존한다.

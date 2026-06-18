@@ -111,3 +111,95 @@ export type {
   OverlayGraph,
   MergedGraph,
 } from './orchestrator/index.js'
+export {
+  claim,
+  confidenceTag,
+  evidenceRate,
+  inferredRatio,
+  renderMarkdown,
+  renderSkeleton,
+  CLAIMS_FENCE_OPEN,
+  CLAIMS_FENCE_CLOSE,
+  EMPTY_SECTION,
+  buildTechStack,
+  buildArchitecture,
+  buildFeatureSpec,
+  buildApiSpec,
+  buildDbSpec,
+  detectCycles,
+  MethodologySchema,
+  DocStatusSchema,
+  EvidenceSchema,
+  ClaimSchema,
+  TableRowSchema,
+  TableSchema,
+  SectionSchema,
+  GeneratedDocSchema,
+  DocMetaSchema,
+  asBuiltMethodology,
+  siStandardMethodology,
+  getMethodology,
+  listMethodologies,
+  DEFAULT_METHODOLOGY,
+} from './doc-generator/index.js'
+export type {
+  Methodology,
+  DocStatus,
+  Evidence,
+  Claim,
+  TableRow,
+  Table,
+  Section,
+  GeneratedDoc,
+  DocMeta,
+  DocInput,
+  MethodologyModule,
+} from './doc-generator/index.js'
+export { enforceEvidence, INFERRED_BLOCK_THRESHOLD } from './evidence/index.js'
+export type { EvidenceVerdict, EvidenceViolation } from './evidence/index.js'
+export {
+  AuditEventTypeSchema,
+  AuditEventSchema,
+  appendAudit,
+  renderAuditLog as renderAuditEvents,
+} from './audit/index.js'
+export type { AuditEventType, AuditEvent } from './audit/index.js'
+export {
+  DocStateSchema,
+  initialDocState,
+  submitForReview,
+  approve,
+  returnForRevision,
+  renderAuditLog,
+} from './doc-state/index.js'
+export type { DocState, Actor, TransitionResult } from './doc-state/index.js'
+export {
+  specDocsDir,
+  docStatePath,
+  writeDocState,
+  readDocState,
+} from './doc-state/persist.js'
+export { buildWikiVault, writeWikiVault, specWikiDir } from './wiki/index.js'
+export { buildOnboardingGuide, tourOrder } from './wiki/index.js'
+export type {
+  WikiFile,
+  WikiVault,
+  MetaResolver,
+  OnboardingInput,
+  OnboardingStop,
+} from './wiki/index.js'
+export { exportHtml, exportVaultHtml, escapeHtml } from './export/index.js'
+export { detectStaleClaims, incrementalReapproval, evidenceAnchor } from './stale/index.js'
+export type {
+  FingerprintMap,
+  StaleClaim,
+  StaleSection,
+  StaleReport,
+  IncrementalReapprovalResult,
+} from './stale/index.js'
+export {
+  ProfileWChangeStorySchema,
+  ProfileWTaskSchema,
+  SourceCitationSchema,
+} from './profile-w/index.js'
+export type { ProfileWChangeStory, ProfileWTask, SourceCitation } from './profile-w/index.js'

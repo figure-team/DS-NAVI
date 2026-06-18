@@ -1,0 +1,102 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`determinism: golden skeleton + double-run > renderSkeleton golden: api-spec 1`] = `
+"## 엔드포인트
+
+<!-- claims:FENCE:OPEN -->
+- [확정] 엔드포인트: POST /orders. 근거: \`src/web/OrderController.java:42\`
+<!-- claims:FENCE:CLOSE -->
+
+## 라우팅 / 미들웨어
+
+<!-- claims:FENCE:OPEN -->
+- [확정] 라우팅/미들웨어: POST /orders → OrderController.placeOrder. 근거: \`src/web/OrderController.java:42\`
+<!-- claims:FENCE:CLOSE -->
+"
+`;
+
+exports[`determinism: golden skeleton + double-run > renderSkeleton golden: architecture 1`] = `
+"## 레이어
+
+_(항목 없음)_
+
+## 의존 방향
+
+<!-- claims:FENCE:OPEN -->
+- [추정] 의존: a → b (calls).
+- [추정] 의존: b → a (calls).
+- [추정] 의존: flow:place → tbl:orders (calls).
+<!-- claims:FENCE:CLOSE -->
+
+## 순환 의존 후보
+
+<!-- claims:FENCE:OPEN -->
+- [확인 필요] 순환 의존 후보: a → b → a.
+<!-- claims:FENCE:CLOSE -->
+"
+`;
+
+exports[`determinism: golden skeleton + double-run > renderSkeleton golden: db-spec 1`] = `
+"## 테이블 / 스키마
+
+<!-- claims:FENCE:OPEN -->
+- [확정] 테이블/스키마: ORDERS. 근거: \`schema/orders.sql:1\`
+<!-- claims:FENCE:CLOSE -->
+
+## 데이터 접근
+
+<!-- claims:FENCE:OPEN -->
+- [추정] 데이터 접근: flow:place →접근→ tbl:orders.
+<!-- claims:FENCE:CLOSE -->
+"
+`;
+
+exports[`determinism: golden skeleton + double-run > renderSkeleton golden: feature-spec 1`] = `
+"## 업무 도메인
+
+<!-- claims:FENCE:OPEN -->
+- [확정] 업무 도메인: 주문 — 주문 처리. 근거: \`src/order/OrderService.java:10\`
+<!-- claims:FENCE:CLOSE -->
+
+## 엔터티 · 업무 규칙
+
+<!-- claims:FENCE:OPEN -->
+- [확정] 엔터티: Order. 근거: \`src/order/OrderService.java:10\`
+- [확정] 엔터티: OrderItem. 근거: \`src/order/OrderService.java:10\`
+- [확정] 업무 규칙: 재고 차감. 근거: \`src/order/OrderService.java:10\`
+<!-- claims:FENCE:CLOSE -->
+
+## 처리 흐름
+
+<!-- claims:FENCE:OPEN -->
+- [확정] 흐름: 주문생성 — 주문 등록. 근거: \`src/order/OrderService.java:20\`
+<!-- claims:FENCE:CLOSE -->
+
+## 처리 단계
+
+<!-- claims:FENCE:OPEN -->
+- [추정] 처리 단계: 검증.
+<!-- claims:FENCE:CLOSE -->
+"
+`;
+
+exports[`determinism: golden skeleton + double-run > renderSkeleton golden: tech-stack 1`] = `
+"## 언어
+
+<!-- claims:FENCE:OPEN -->
+- [추정] 사용 언어: Java.
+<!-- claims:FENCE:CLOSE -->
+
+## 프레임워크 / 주요 라이브러리
+
+<!-- claims:FENCE:OPEN -->
+- [추정] 프레임워크/라이브러리: Spring.
+<!-- claims:FENCE:CLOSE -->
+
+## 모듈
+
+<!-- claims:FENCE:OPEN -->
+- [추정] 모듈: core — 공통 코어.
+<!-- claims:FENCE:CLOSE -->
+"
+`;

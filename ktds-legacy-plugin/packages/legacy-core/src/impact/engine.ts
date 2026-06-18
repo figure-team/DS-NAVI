@@ -33,6 +33,7 @@ import {
   uaDir,
   writeMapArtifact,
 } from '../domain-map/persist.js'
+import { JPA_MODEL_FILENAME, JpaModelSchema, type JpaModel } from '../jpa/types.js'
 import { buildAdjacency, computeFanIn, reachClosure, type ReachedFile } from './reach.js'
 import { computeApiImpact } from './api.js'
 import { computePersistenceImpact } from './persistence.js'
@@ -70,6 +71,8 @@ export interface ImpactInputs {
   slices: SlicesReport
   skeleton: SkeletonReport | null
   confirmed: ConfirmedPlan | null
+  /** JPA 모델(보완 B) — jpa-model.json 있으면 로드, 없으면 null(MyBatis 전용/미스캔). */
+  jpaModel: JpaModel | null
   gitCommit: string | null
 }
 
@@ -113,7 +116,8 @@ export function loadImpactInputs(projectRoot: string): ImpactInputs {
   const slices = readRequired(projectRoot, SLICES_FILENAME, SlicesReportSchema)
   const skeleton = readSkeleton(projectRoot)
   const confirmed = readConfirmedPlan(projectRoot)
-  return { census, routes, edges, slices, skeleton, confirmed, gitCommit: census.gitCommit }
+  const jpaModel = readMapArtifact(projectRoot, JPA_MODEL_FILENAME, JpaModelSchema)
+  return { census, routes, edges, slices, skeleton, confirmed, jpaModel, gitCommit: census.gitCommit }
 }
 
 /** KG table 노드 → DDL 근거 카탈로그(없으면 빈 배열). related 엣지는 채택 안 함. */
@@ -220,6 +224,7 @@ export function buildImpactReport(
     mapperLineCounts: extras.mapperLineCounts,
     ownership: inputs.slices.ownership,
     kgTableCatalog: extras.kgTableCatalog,
+    jpaModel: inputs.jpaModel,
   })
   const flowRes = computeFlowImpact(
     flowSet,

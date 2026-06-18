@@ -153,11 +153,31 @@ export const KgTableEntrySchema = z.object({
 })
 export type KgTableEntry = z.infer<typeof KgTableEntrySchema>
 
+/**
+ * JPA entity↔table 영향(보완 B, AC-16). MyBatis Mapper-XML 대신 @Entity/@Table 애너테이션
+ * 경로로 file:line grounding. 명시 @Table = CONFIRMED, 암묵 명명전략 = INFERRED([추정]).
+ */
+export const JpaTableImpactSchema = z.object({
+  entityClass: z.string(),
+  relPath: z.string(),
+  tableName: z.string(),
+  tableExplicit: z.boolean(),
+  confidence: ImpactConfidenceSchema,
+  citation: ImpactCitationSchema,
+  /** 영향 컬럼(명시=CONFIRMED, 암묵=INFERRED), 정렬. */
+  columns: z.array(
+    z.object({ column: z.string(), confidence: ImpactConfidenceSchema, line: z.number().int().positive() }),
+  ),
+})
+export type JpaTableImpact = z.infer<typeof JpaTableImpactSchema>
+
 export const PersistenceImpactSchema = z.object({
   mappers: z.array(PersistenceMapperSchema),
   sqlFiles: z.array(PersistenceSqlFileSchema),
   tableCandidateSlots: z.array(TableCandidateSlotSchema),
   kgTableCatalog: z.array(KgTableEntrySchema),
+  /** JPA entity↔table 영향(MyBatis 전용 프로젝트는 빈 배열). */
+  jpaTables: z.array(JpaTableImpactSchema).default([]),
   /** 항상 존재하는 노트: SQL 파일은 도달성 그래프 밖. */
   note: z.string(),
 })

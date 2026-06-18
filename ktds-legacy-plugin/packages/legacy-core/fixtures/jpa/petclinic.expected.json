@@ -1,0 +1,92 @@
+{
+  "project": "petclinic",
+  "method": "수동 작성 — JPA 애너테이션을 직접 열람해 작성. 출력 역산 아님.",
+  "entities": [
+    {
+      "className": "Owner",
+      "table": "owners",
+      "tableExplicit": true,
+      "idField": "id",
+      "columns": { "id": "id", "firstName": "first_name", "lastName": "last_name", "city": "city" },
+      "implicitColumns": ["city"],
+      "relations": [
+        { "field": "pets", "kind": "OneToMany", "target": "Pet", "joinColumn": "owner_id" }
+      ]
+    },
+    {
+      "className": "Pet",
+      "table": "pets",
+      "tableExplicit": true,
+      "idField": "id",
+      "columns": { "id": "id", "name": "name" },
+      "implicitColumns": ["id"],
+      "relations": [
+        { "field": "owner", "kind": "ManyToOne", "target": "Owner", "joinColumn": "owner_id" },
+        { "field": "type", "kind": "ManyToOne", "target": "PetType", "joinColumn": "type_id" }
+      ]
+    },
+    {
+      "className": "PetType",
+      "table": "pet_type",
+      "tableExplicit": false,
+      "idField": "id",
+      "columns": { "id": "id", "name": "name" },
+      "implicitColumns": ["id", "name"],
+      "relations": []
+    },
+    {
+      "className": "Vet",
+      "table": "vets",
+      "tableExplicit": true,
+      "idField": "id",
+      "columns": { "id": "id", "firstName": "first_name" },
+      "implicitColumns": ["id"],
+      "relations": [
+        { "field": "specialties", "kind": "ManyToMany", "target": "Specialty", "joinColumn": "vet_id" }
+      ]
+    },
+    {
+      "className": "Specialty",
+      "table": "specialties",
+      "tableExplicit": true,
+      "idField": "id",
+      "columns": { "id": "id", "name": "name" },
+      "implicitColumns": ["id"],
+      "relations": []
+    }
+  ],
+  "repositories": [
+    {
+      "className": "OwnerRepository",
+      "entity": "Owner",
+      "id": "Integer",
+      "baseInterface": "JpaRepository",
+      "derived": {
+        "findByLastName": ["last_name"],
+        "findByFirstNameAndLastName": ["first_name", "last_name"]
+      },
+      "jpql": ["findByCity"],
+      "native": ["searchNative"]
+    },
+    {
+      "className": "VetRepository",
+      "entity": "Vet",
+      "id": "Integer",
+      "baseInterface": "Repository",
+      "derived": {},
+      "jpql": [],
+      "native": []
+    }
+  ],
+  "tierC": ["searchNative"],
+  "coexist": {
+    "jpaRepositories": ["OwnerRepository", "VetRepository"],
+    "notJpa": ["AuditLogMapper"]
+  },
+  "knownGaps": [
+    "암묵 @Id(PetType.id, Pet.id, Vet.id)는 @Column 부재 → 컬럼도 암묵(INFERRED). @Id 자체의 컬럼명은 명명전략으로만 추론.",
+    "@ManyToMany 의 실제 매핑은 조인테이블이 정석이나, 본 픽스처는 @JoinColumn(name=vet_id) 만 검증(추출기는 joinColumn 만 기록).",
+    "VetRepository.findAll() 은 파생쿼리 패턴 미매치 → derivedQueries 비어 있음(의도된 동작).",
+    "PetType.name 의 암묵 컬럼명은 snake_case(name)=name 으로 firstName 등과 달리 변환이 항등."
+  ]
+}

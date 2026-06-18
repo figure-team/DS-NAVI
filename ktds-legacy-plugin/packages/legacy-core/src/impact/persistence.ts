@@ -9,7 +9,8 @@
  * host 에게 인용 추출 닻으로 넘기고, KG table 노드(kgTableCatalog)로 DDL 근거를 붙인다.
  */
 import type { CensusReport, EdgeKind, EdgeRecord, Ownership } from '../domain-map/types.js'
-import type { KgTableEntry, PersistenceImpact } from './types.js'
+import type { JpaModel } from '../jpa/types.js'
+import type { JpaTableImpact, KgTableEntry, PersistenceImpact } from './types.js'
 import { cmp } from '../utils/cmp.js'
 
 const MAPPER_EDGE_KINDS = new Set<EdgeKind>(['mybatis', 'mapper-xml'])
@@ -25,6 +26,35 @@ export interface PersistenceInputs {
   mapperLineCounts?: Map<string, number>
   ownership?: readonly Ownership[]
   kgTableCatalog?: readonly KgTableEntry[]
+  /** JPA 모델(보완 B) — entity↔table 영향 grounding 용. 없으면 jpaTables=[]. */
+  jpaModel?: JpaModel | null
+}
+
+/**
+ * dataImpactSet 에 든 @Entity 파일의 entity↔table 영향(AC-16). 명시 @Table = CONFIRMED,
+ * 암묵 명명전략 = INFERRED. 컬럼도 명시/암묵 신뢰도를 승계. entity 선언 라인을 앵커로.
+ */
+function computeJpaTables(
+  dataImpactSet: ReadonlySet<string>,
+  jpaModel: JpaModel | null | undefined,
+): JpaTableImpact[] {
+  if (!jpaModel) return []
+  const out: JpaTableImpact[] = []
+  for (const e of jpaModel.entities) {
+    if (!dataImpactSet.has(e.relPath)) continue
+    out.push({
+      entityClass: e.className,
+      relPath: e.relPath,
+      tableName: e.tableName,
+      tableExplicit: e.tableExplicit,
+      confidence: e.tableConfidence,
+      citation: { filePath: e.relPath, line: e.line },
+      columns: [...e.columns]
+        .map((c) => ({ column: c.columnName, confidence: c.confidence, line: c.line }))
+        .sort((a, b) => cmp(a.column, b.column)),
+    })
+  }
+  return out.sort((a, b) => cmp(a.relPath, b.relPath) || cmp(a.entityClass, b.entityClass))
 }
 
 export function computePersistenceImpact(
@@ -76,6 +106,7 @@ export function computePersistenceImpact(
   })
 
   const kgTableCatalog = [...(inputs.kgTableCatalog ?? [])].sort((a, b) => cmp(a.name, b.name))
+  const jpaTables = computeJpaTables(dataImpactSet, inputs.jpaModel)
 
-  return { mappers, sqlFiles, tableCandidateSlots, kgTableCatalog, note: PERSISTENCE_NOTE }
+  return { mappers, sqlFiles, tableCandidateSlots, kgTableCatalog, jpaTables, note: PERSISTENCE_NOTE }
 }

@@ -204,3 +204,17 @@ export {
 } from './profile-w/index.js'
 export type { ProfileWChangeStory, ProfileWTask, SourceCitation } from './profile-w/index.js'
 export * from './impact/index.js'
+export * from './jpa/index.js'
+export {
+  CoverageReportSchema,
+  buildCoverageReport,
+  renderCoverageReport,
+} from './coverage-report/index.js'
+export type { CoverageReport, CoverageInputs } from './coverage-report/index.js'
+export {
+  computeFileFingerprints,
+  diffFingerprints,
+  isUnchanged,
+  anchorFingerprints,
+} from './incremental/index.js'
+export type { FileChangeSet } from './incremental/index.js'

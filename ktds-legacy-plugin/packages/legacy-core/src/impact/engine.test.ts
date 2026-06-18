@@ -103,6 +103,7 @@ function makeInputs(): ImpactInputs {
     slices,
     skeleton,
     confirmed,
+    jpaModel: null,
     gitCommit: 'c0ffee',
   }
 }

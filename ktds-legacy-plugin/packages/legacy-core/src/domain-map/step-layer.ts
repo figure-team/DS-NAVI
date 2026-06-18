@@ -7,21 +7,30 @@
  */
 import { basename } from 'node:path'
 import type { EdgesReport, FlowLayer, RoutesReport } from './types.js'
+import type { JpaModel } from '../jpa/types.js'
 
 /** 계층 추론에 쓰는 파일 집합 신호. */
 export interface LayerSignals {
   /** route/batch 진입 파일 → API. */
   routeEntryFiles: ReadonlySet<string>
-  /** mybatis/mapper-xml 엣지 참여 파일 → DAO. */
+  /** mybatis/mapper-xml 엣지 참여 파일 + JPA repository 파일 → DAO. */
   daoFiles: ReadonlySet<string>
-  /** mapper-xml 타겟 / .sql / *Mapper.xml → DB. */
+  /** mapper-xml 타겟 / .sql / *Mapper.xml / JPA @Entity 파일 → DB. */
   dbFiles: ReadonlySet<string>
   /** injection/impl 엣지 타겟 → SERVICE. */
   serviceFiles: ReadonlySet<string>
 }
 
-/** routes + edges 로부터 결정론적으로 신호 집합을 구성. */
-export function buildLayerSignals(routes: RoutesReport, edges: EdgesReport): LayerSignals {
+/**
+ * routes + edges (+ 선택 JPA 모델)로부터 결정론적으로 신호 집합을 구성.
+ * JPA(보완 B): repository 파일 → DAO, @Entity 파일 → DB(table 레일). MyBatis 신호와
+ * 병합되어 혼재 프로젝트(AC-16b)에서 둘 다 반영된다.
+ */
+export function buildLayerSignals(
+  routes: RoutesReport,
+  edges: EdgesReport,
+  jpaModel?: JpaModel | null,
+): LayerSignals {
   const routeEntryFiles = new Set<string>()
   for (const r of routes.routes) routeEntryFiles.add(r.filePath)
   for (const b of routes.batchEntries) routeEntryFiles.add(b.filePath)
@@ -39,6 +48,12 @@ export function buildLayerSignals(routes: RoutesReport, edges: EdgesReport): Lay
     } else if (e.kind === 'injection' || e.kind === 'impl') {
       serviceFiles.add(e.target)
     }
+  }
+
+  // JPA(보완 B, AC-35): repository → dao 레일, @Entity → db 레일.
+  if (jpaModel) {
+    for (const r of jpaModel.repositories) daoFiles.add(r.relPath)
+    for (const e of jpaModel.entities) dbFiles.add(e.relPath)
   }
 
   return { routeEntryFiles, daoFiles, dbFiles, serviceFiles }

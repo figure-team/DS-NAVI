@@ -19,11 +19,22 @@ import {
   writeCandidates,
   writeCensus,
   writeEdges,
+  writeMapArtifact,
   writeMethodCalls,
   writeRoutes,
   writeSkeleton,
   writeSlices,
 } from './persist.js'
+import { extractJpaModel } from '../jpa/extract.js'
+import { JPA_MODEL_FILENAME } from '../jpa/types.js'
+import { buildCoverageReport } from '../coverage-report/index.js'
+import { computeFileFingerprints } from '../incremental/index.js'
+import { readSkeleton } from './persist.js'
+
+/** `.spec/map/` 통합 커버리지 리포트 파일명(보완 D-c). */
+export const COVERAGE_FILENAME = 'coverage.json'
+/** `.spec/map/` 증분 재스캔용 파일 fingerprint 스냅샷 파일명(보완 D-b). */
+export const FINGERPRINTS_FILENAME = 'fingerprints.json'
 import { buildSkeleton } from './skeleton.js'
 import { emitDomainGraph } from './emit.js'
 import { assignRouteIds, sortBatchEntries, sortRoutes } from './route-key.js'
@@ -169,6 +180,21 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   writeEdges(projectRoot, edges)
   writeSlices(projectRoot, slices)
   writeCandidates(projectRoot, candidates)
+  // 보완 B(JPA): jpa-model.json 도 스캔 시 산출 — impact db-grounding 이 동기 로드한다.
+  // (JPA 신호 없는 프로젝트는 entities/repositories 빈 배열. MyBatis 와 공존, AC-16b.)
+  const jpaModel = await extractJpaModel(projectRoot, census)
+  writeMapArtifact(projectRoot, JPA_MODEL_FILENAME, jpaModel)
+  // 보완 D-c/D-b: 통합 커버리지 리포트 + 파일 fingerprint 스냅샷(증분 재스캔 기준).
+  const coverage = buildCoverageReport({
+    census,
+    routes,
+    edges,
+    slices,
+    skeleton: readSkeleton(projectRoot),
+    jpaModel,
+  })
+  writeMapArtifact(projectRoot, COVERAGE_FILENAME, coverage)
+  writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, computeFileFingerprints(projectRoot, census))
   return { census, routes, edges, slices, candidates }
 }
 

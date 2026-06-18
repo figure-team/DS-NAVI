@@ -6,6 +6,7 @@
  */
 import type { UaGraphEdge, UaGraphNode } from '../../domain-map/types.js'
 import type { RoutesReport } from '../../domain-map/types.js'
+import type { JpaModel } from '../../jpa/types.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -22,6 +23,8 @@ export interface DocInput {
   nodes: UaGraphNode[]
   edges: UaGraphEdge[]
   routes?: RoutesReport
+  /** JPA 모델(보완 B) — db-spec 가 entity↔table 매핑 섹션을 grounding 으로 추가(AC-16). */
+  jpaModel?: JpaModel | null
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

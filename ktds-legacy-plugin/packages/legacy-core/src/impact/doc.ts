@@ -213,6 +213,16 @@ export function buildChangeImpact(
   const sqlClaims = result.upstream.persistence.sqlFiles.map((s) =>
     claim(`영속성 영향(SQL): ${s.relPath}`, 'INFERRED', [ev(s.relPath, null)]),
   )
+  // JPA(보완 B, AC-16): entity↔table 애너테이션 경로 db-grounding. 명시=CONFIRMED, 암묵=INFERRED.
+  const jpaClaims = result.upstream.persistence.jpaTables.map((t) => {
+    const cols = t.columns.length ? ` · 컬럼 ${t.columns.length}개` : ''
+    const naming = t.tableExplicit ? '' : ' [암묵 명명전략]'
+    return claim(
+      `영속성 영향(JPA): ${t.entityClass} → 테이블 ${t.tableName}${naming}${cols}`,
+      t.confidence,
+      [ev(t.citation.filePath, t.citation.line)],
+    )
+  })
   const dbProse = [
     result.upstream.persistence.note,
     `host 인용 추출 대상 매퍼 슬라이스 ${result.upstream.persistence.tableCandidateSlots.length}개` +
@@ -241,7 +251,7 @@ export function buildChangeImpact(
     ...(options.aggregate ? [buildAggregateSection(result, options.aggregate)] : []),
     { heading: 'API · 진입점 영향', claims: apiClaims },
     { heading: '업무 흐름 · 도메인 영향', claims: [...flowClaims, ...domainClaims] },
-    { heading: 'DB · 영속성 영향', claims: [...mapperClaims, ...sqlClaims], prose: dbProse },
+    { heading: 'DB · 영속성 영향', claims: [...mapperClaims, ...sqlClaims, ...jpaClaims], prose: dbProse },
     { heading: '연관 모듈 (상류 영향)', claims: upstreamClaims },
     { heading: '연관 협력 (하류 의존 · 보조)', claims: downstreamClaims },
     ...(options.suggestion ? buildCreationSections(options.suggestion) : []),

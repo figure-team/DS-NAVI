@@ -21,23 +21,19 @@
 | P3 | `590a452` | 흐름뷰: 메서드 호출그래프 엔진(8 receiver, 173테스트) + skeleton 메서드정밀화 + 대시보드 fork(FlowSpineView/FlowListView/DomainMapView/KtdsNodeDetail) + 보완 F |
 | P4 | `1ff36a4` | 산출물: doc-generator(5 builders+golden) + doc-state(승인/감사/evidence enforcement) + 방법론 모듈(as-built/si-standard 3종) + 위키/HTML + STALE + Profile-W 스키마 + /understand-docs |
 | P5 | `c46978b` | 영향도/Component 4 + 보완 A: impact 엔진(reach/api/persistence/flow/engine + citation 4체크 재구현, CITATION_STATUS 중립화) + 선례검색(precedents, F3 fail-closed) + 생성예측(3버킷·선례강도강등·net-new CONFIRMED 차단·L1 게이트) + change-impact-analysis.md(read-only)+L3 골든 + Profile-W 생산(AC-25) + /understand-impact 스킬·CLI + petstore impact-recall fixture |
+| P6 | (이 커밋) | 횡단/보완 B(JPA)+D: JPA 추출기(`jpa/` Tier A/B/C·BF1 암묵명명·tree-sitter 재파싱, java-facts 무수정) + step-layer JPA 신호(repo→dao/@Entity→db, AC-35) + impact jpaTables db-grounding(AC-16, schema `.default([])`로 MyBatis 골든 안전) + db-spec JPA 섹션 + MyBatis 혼재(AC-16b) + 커버리지 리포트(`coverage-report/`, AC-30) + 증분 재스캔(`incremental/` fingerprint+STALE 브리지, AC-29) + 1-명령 온보딩(/understand-onboard, AC-28) + petclinic jpa-recall fixture(62/62) |
 
-테스트 현황(P5 시점): legacy-core **451**(+78 impact) + root(UA+dashboard) **226** + UA core **739** 전부 그린. 게이트: core diff=∅ · version-sync OK · impact-recall 100% · chain-recall 100% · dashboard build ✓.
+테스트 현황(P6 시점, **전 phase 완료**): legacy-core **483**(+JPA/coverage/incremental) + root(UA+dashboard) **226** + UA core **739** 전부 그린. 게이트: core diff=∅ · version-sync OK · jpa-recall 62/62 · impact-recall 100% · chain-recall 100% · dashboard build ✓ · **AC-10(5 명령 독립 동작) 합격**(understand-init·map·docs·impact·onboard).
 
 ## 남은 작업
-### P6 — 횡단 / 보완 B(JPA) + 보완 D (의존: P1~P5)
-- P6.0 JPA fixture(spring-petclinic 트림 + fixtures/jpa/ 오라클 + jpa-recall.mjs)
-- P6.1 B: JPA 추출기(Tier A/B/C) + MyBatis 혼재 + step-layer·impact db-grounding·db-spec JPA 경로 (P4 db-spec의 reads_from/writes_to + 컬럼 enrich 여기서)
-- P6.2 D-a 1-명령 온보딩 + P6.3 D-b 증분 재스캔 + D-c 커버리지 리포트
-- 게이트: jpa-recall(AC-18) + 커버리지 + **전체 회귀 + AC-10(5 명령 독립 동작) 최종 합격**
-- AC: AC-15·AC-15b·AC-16·AC-16b·AC-18·AC-28·AC-29·AC-30·AC-35·AC-10(최종)
+**없음 — P0~P6 전부 구현·커밋 완료.** 후속(로드맵, v1 비포함): AIDD(Profile W 구현)·요구사항정의서·docx/한컴 변환·비-Java 결정론 엔진·대시보드 픽셀 시각 QA(헤드리스 미검증).
 
-## 새 세션 재개 방법
+## 새 세션 재개 방법(유지보수)
 1. 작업 디렉터리: `/home/jk/projects/ktds/apm-project/code-2`, 브랜치 `ktds-code-atlas`.
-2. 회귀 확인: `pnpm --filter @ktds/legacy-core test` (373) · `pnpm --filter @understand-anything/dashboard build` · `node scripts/version-sync-check.mjs` · core diff 게이트.
-3. 이 문서의 "남은 작업"에서 **P6부터** 시작. 엔진 작업은 `ktds-legacy-plugin/packages/legacy-core/src/` 에 additive. (P6.1 JPA db-spec 는 P5 impact `persistence`/`computePersistenceImpact` + doc-generator `db-spec` 빌더를 확장.)
-4. 패턴: 블루프린트는 관측 동작/오라클 값만 참고(코드 복사 금지), 결정론(정렬·stable JSON·타임스탬프 금지), 모든 claim에 file:line + 신뢰도(CONFIDENCE_VALUES 단일 소스).
-5. phase 완료 시: architect 검증 → deslop → 회귀 그린 → 사용자 확인 후 커밋.
+2. 회귀 확인: `pnpm --filter @ktds/legacy-core test` (483) · `pnpm test`(226) · `pnpm --filter @understand-anything/core test`(739) · `pnpm --filter @understand-anything/dashboard build` · `node scripts/version-sync-check.mjs` · core diff 게이트(`git diff ua-base..HEAD -- understand-anything-plugin/packages/core`=∅). recall: `packages/legacy-core/scripts/{jpa,impact,chain}-recall.mjs`.
+3. 패턴: 블루프린트는 관측 동작/오라클 값만 참고(코드 복사 금지), 결정론(정렬·stable JSON·타임스탬프 금지), 모든 claim에 file:line + 신뢰도(CONFIDENCE_VALUES 단일 소스).
+4. **gitignore 주의:** `.spec/`·`.understand-anything/`·`coverage/` 가 전역 ignore. fixture 의 사전생성 산출물은 force-add(또는 소스에서 재생성), 신규 소스 디렉터리는 `coverage/` 같은 ignore 이름 회피(→ `coverage-report/`).
+5. phase 작업 시: architect/reviewer 검증 → deslop → 회귀 그린 → 사용자 확인 후 커밋.
 
 ## 알려진 이월(P5/P6에서 해소)
 - db-spec `reads_from`/`writes_to` 엣지 + JPA/MyBatis 컬럼 메타 → P6 enrich (현재 calls 엣지 기반 [추정]).

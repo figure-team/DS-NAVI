@@ -1,0 +1,80 @@
+{
+  "ambiguous": [],
+  "candidates": [
+    {
+      "entryCount": 2,
+      "files": [
+        {
+          "relPath": "src/main/java/com/petstore/domain/Account.java",
+          "via": "reachability"
+        },
+        {
+          "relPath": "src/main/java/com/petstore/persistence/AccountMapper.java",
+          "via": "reachability"
+        },
+        {
+          "relPath": "src/main/java/com/petstore/service/AccountService.java",
+          "via": "reachability"
+        },
+        {
+          "relPath": "src/main/java/com/petstore/service/impl/AccountServiceImpl.java",
+          "via": "reachability"
+        },
+        {
+          "relPath": "src/main/resources/com/petstore/persistence/AccountMapper.xml",
+          "via": "reachability"
+        }
+      ],
+      "key": "account",
+      "roots": [
+        "src/main/java/com/petstore/web/AccountController.java"
+      ]
+    },
+    {
+      "entryCount": 1,
+      "files": [
+        {
+          "relPath": "src/main/java/com/petstore/domain/Product.java",
+          "via": "reachability"
+        },
+        {
+          "relPath": "src/main/java/com/petstore/persistence/ProductMapper.java",
+          "via": "reachability"
+        },
+        {
+          "relPath": "src/main/java/com/petstore/service/CatalogService.java",
+          "via": "reachability"
+        },
+        {
+          "relPath": "src/main/java/com/petstore/service/impl/CatalogServiceImpl.java",
+          "via": "reachability"
+        },
+        {
+          "relPath": "src/main/resources/com/petstore/persistence/ProductMapper.xml",
+          "via": "reachability"
+        }
+      ],
+      "key": "catalog",
+      "roots": [
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ]
+    }
+  ],
+  "common": [
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/AccountController.java",
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/common/StringUtils.java"
+    }
+  ],
+  "directoryDegenerate": null,
+  "gitCommit": "604bea6c1aeffe5716747b7bf8ce7f463edfa6fd",
+  "schemaVersion": 1,
+  "unresolved": [
+    "src/main/java/com/petstore/config/SecurityConfig.java",
+    "src/main/java/com/petstore/orphan/Unused.java",
+    "src/main/resources/db/schema.sql"
+  ]
+}

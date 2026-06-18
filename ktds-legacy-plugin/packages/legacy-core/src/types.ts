@@ -28,6 +28,32 @@ export interface SourceAnchor {
 }
 
 /**
+ * 인용 검증 상태 — 기계 검증기(citation verifier)의 단일 소스(neutral).
+ *
+ * 블루프린트는 이 union 을 `domain-map/verify.ts` 에 두었으나(거기 `DomainFill[]` 와
+ * 강결합), 본 fork 는 도메인-맵/영향도 양쪽 검증기가 import 할 수 있도록 중립
+ * `types.ts` 로 승격한다(계획서 Executor Note). 검증기 구현은 각 모듈이 보유하되
+ * **상태 공간(union)만** 여기서 공유한다 — "같은 상태로 말한다"는 계약.
+ *
+ *   ok                : 경로 실존 + 라인 범위 내 + 텍스트 일치.
+ *   path-escape       : 경로가 프로젝트 루트 밖(탈출/환각/심볼릭링크 우회).
+ *   no-file           : 파일 없음.
+ *   line-out-of-range : 라인 번호가 파일 라인 수 초과.
+ *   text-mismatch     : 그 라인 텍스트가 스니펫을 포함하지 않음.
+ *   trivial-snippet   : 스니펫이 너무 사소해 어디에나 일치(근거 효력 없음 — 게이밍 차단).
+ */
+export const CITATION_STATUS = [
+  'ok',
+  'path-escape',
+  'no-file',
+  'line-out-of-range',
+  'text-mismatch',
+  'trivial-snippet',
+] as const
+
+export type CitationStatus = (typeof CITATION_STATUS)[number]
+
+/**
  * 정규 노드(CanonicalNode) — ktds 오버레이가 다루는 노드의 식별 단위.
  *
  * UA KG 노드와 ktds skeleton 노드를 잇는 안정 키(`id`)를 보유한다.

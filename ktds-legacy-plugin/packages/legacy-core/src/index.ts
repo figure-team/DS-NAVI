@@ -203,3 +203,4 @@ export {
   SourceCitationSchema,
 } from './profile-w/index.js'
 export type { ProfileWChangeStory, ProfileWTask, SourceCitation } from './profile-w/index.js'
+export * from './impact/index.js'

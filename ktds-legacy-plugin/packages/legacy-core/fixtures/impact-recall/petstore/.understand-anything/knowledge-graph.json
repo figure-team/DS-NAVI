@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "kind": "codebase",
+  "project": {
+    "name": "petstore",
+    "languages": ["java", "xml", "sql"],
+    "frameworks": ["spring-mvc", "mybatis"],
+    "description": "MyBatis + Spring-MVC 레거시 픽스처 — 영향도 반증 게이트(P5.0)용. 손으로 작성한 최소 UA 지식 그래프(table 노드 + 선례 신호).",
+    "analyzedAt": "1970-01-01T00:00:00.000Z",
+    "gitCommitHash": "0000000000000000000000000000000000000000"
+  },
+  "nodes": [
+    {
+      "id": "table:account",
+      "type": "table",
+      "name": "account",
+      "filePath": "src/main/resources/db/schema.sql",
+      "lineRange": [1, 4],
+      "summary": "계정(account) 테이블 — id PK + name.",
+      "tags": ["account", "ddl"],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:product",
+      "type": "table",
+      "name": "product",
+      "filePath": "src/main/resources/db/schema.sql",
+      "lineRange": [6, 9],
+      "summary": "상품(product) 테이블 — id PK + name.",
+      "tags": ["product", "ddl"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:AccountController",
+      "type": "file",
+      "name": "AccountController.java",
+      "filePath": "src/main/java/com/petstore/web/AccountController.java",
+      "lineRange": [1, 27],
+      "summary": "계정 도메인 HTTP 진입점(login/signon).",
+      "tags": ["account", "web"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:AccountService",
+      "type": "file",
+      "name": "AccountServiceImpl.java",
+      "filePath": "src/main/java/com/petstore/service/impl/AccountServiceImpl.java",
+      "lineRange": [1, 32],
+      "summary": "계정 서비스 구현 — 매퍼 호출 + 정규화.",
+      "tags": ["account", "service"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:CatalogController",
+      "type": "file",
+      "name": "CatalogController.java",
+      "filePath": "src/main/java/com/petstore/web/CatalogController.java",
+      "lineRange": [1, 21],
+      "summary": "카탈로그 도메인 HTTP 진입점(viewProduct).",
+      "tags": ["catalog", "web"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:AccountController",
+      "target": "file:AccountService",
+      "type": "related",
+      "direction": "forward",
+      "description": "컨트롤러가 서비스에 의존(같은 계정 슬라이스).",
+      "weight": 0.8
+    },
+    {
+      "source": "file:AccountController",
+      "target": "file:CatalogController",
+      "type": "similar_to",
+      "direction": "bidirectional",
+      "description": "동형 컨트롤러 구조(선례 검색 신호).",
+      "weight": 0.6
+    }
+  ],
+  "layers": [],
+  "tour": []
+}

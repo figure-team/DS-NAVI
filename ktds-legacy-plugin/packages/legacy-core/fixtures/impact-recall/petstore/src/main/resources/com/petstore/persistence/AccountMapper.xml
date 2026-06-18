@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.petstore.persistence.AccountMapper">
+  <select id="selectById" resultType="com.petstore.domain.Account">
+    select id, name from account where id = #{id}
+  </select>
+  <insert id="insert" parameterType="com.petstore.domain.Account">
+    insert into account (name) values (#{name})
+  </insert>
+</mapper>

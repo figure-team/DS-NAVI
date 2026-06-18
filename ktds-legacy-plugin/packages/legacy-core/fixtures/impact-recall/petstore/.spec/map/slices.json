@@ -1,0 +1,147 @@
+{
+  "depthCap": 12,
+  "gitCommit": "604bea6c1aeffe5716747b7bf8ce7f463edfa6fd",
+  "ownership": [
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/AccountController.java",
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/common/StringUtils.java",
+      "status": "shared"
+    },
+    {
+      "owners": [],
+      "relPath": "src/main/java/com/petstore/config/SecurityConfig.java",
+      "status": "unreached"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/AccountController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/domain/Account.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/domain/Product.java",
+      "status": "sole"
+    },
+    {
+      "owners": [],
+      "relPath": "src/main/java/com/petstore/orphan/Unused.java",
+      "status": "unreached"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/AccountController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/persistence/AccountMapper.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/persistence/ProductMapper.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/AccountController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/service/AccountService.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/service/CatalogService.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/AccountController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/service/impl/AccountServiceImpl.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/service/impl/CatalogServiceImpl.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/AccountController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/web/AccountController.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ],
+      "relPath": "src/main/java/com/petstore/web/CatalogController.java",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/AccountController.java"
+      ],
+      "relPath": "src/main/resources/com/petstore/persistence/AccountMapper.xml",
+      "status": "sole"
+    },
+    {
+      "owners": [
+        "src/main/java/com/petstore/web/CatalogController.java"
+      ],
+      "relPath": "src/main/resources/com/petstore/persistence/ProductMapper.xml",
+      "status": "sole"
+    },
+    {
+      "owners": [],
+      "relPath": "src/main/resources/db/schema.sql",
+      "status": "unreached"
+    }
+  ],
+  "schemaVersion": 1,
+  "slices": [
+    {
+      "entryIds": [
+        "route:GET /account/login",
+        "route:POST /account/signon"
+      ],
+      "reached": [
+        "src/main/java/com/petstore/common/StringUtils.java",
+        "src/main/java/com/petstore/domain/Account.java",
+        "src/main/java/com/petstore/persistence/AccountMapper.java",
+        "src/main/java/com/petstore/service/AccountService.java",
+        "src/main/java/com/petstore/service/impl/AccountServiceImpl.java",
+        "src/main/java/com/petstore/web/AccountController.java",
+        "src/main/resources/com/petstore/persistence/AccountMapper.xml"
+      ],
+      "root": "src/main/java/com/petstore/web/AccountController.java"
+    },
+    {
+      "entryIds": [
+        "route:GET /catalog/{id}"
+      ],
+      "reached": [
+        "src/main/java/com/petstore/common/StringUtils.java",
+        "src/main/java/com/petstore/domain/Product.java",
+        "src/main/java/com/petstore/persistence/ProductMapper.java",
+        "src/main/java/com/petstore/service/CatalogService.java",
+        "src/main/java/com/petstore/service/impl/CatalogServiceImpl.java",
+        "src/main/java/com/petstore/web/CatalogController.java",
+        "src/main/resources/com/petstore/persistence/ProductMapper.xml"
+      ],
+      "root": "src/main/java/com/petstore/web/CatalogController.java"
+    }
+  ]
+}

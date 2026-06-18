@@ -1,0 +1,68 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`buildChangeImpact + L3 골든 스냅샷 > 결정론 skeleton(펜스 내 claim 만, LLM prose 제외) 골든 1`] = `
+"## 변경 대상 (시드)
+
+<!-- claims:FENCE:OPEN -->
+- [확정] 변경 시드: src/main/java/com/petstore/service/impl/AccountServiceImpl.java (origin: path). 근거: \`src/main/java/com/petstore/service/impl/AccountServiceImpl.java\`
+<!-- claims:FENCE:CLOSE -->
+
+## 영향 규모 집계 (공수 산정 입력)
+
+_(항목 없음)_
+
+## API · 진입점 영향
+
+<!-- claims:FENCE:OPEN -->
+- [확정(AI)] 진입점 영향: route:GET /account/login, handler AccountController#login (검출 both). 근거: \`src/main/java/com/petstore/web/AccountController.java:18\`
+- [확정(AI)] 진입점 영향: route:POST /account/signon, handler AccountController#signon (검출 both). 근거: \`src/main/java/com/petstore/web/AccountController.java:23\`
+<!-- claims:FENCE:CLOSE -->
+
+## 업무 흐름 · 도메인 영향
+
+<!-- claims:FENCE:OPEN -->
+- [추정] 흐름 영향: flow:GET /account/login → 도메인 account (검출 step).
+- [추정] 흐름 영향: flow:POST /account/signon → 도메인 account (검출 step).
+- [추정] 도메인 영향: account.
+<!-- claims:FENCE:CLOSE -->
+
+## DB · 영속성 영향
+
+<!-- claims:FENCE:OPEN -->
+- [확인 필요] 영속성 영향(매퍼): src/main/resources/com/petstore/persistence/AccountMapper.xml [namespace com.petstore.persistence.AccountMapper] · 진입점 1개.
+<!-- claims:FENCE:CLOSE -->
+
+## 연관 모듈 (상류 영향)
+
+<!-- claims:FENCE:OPEN -->
+- [확정(AI)] 연관 모듈(상류): src/main/java/com/petstore/service/AccountService.java (via impl, 깊이 1). 근거: \`src/main/java/com/petstore/service/AccountService.java:5\`
+- [확정(AI)] 연관 모듈(상류): src/main/java/com/petstore/web/AccountController.java (via injection, 깊이 2). 근거: \`src/main/java/com/petstore/web/AccountController.java:15\`
+<!-- claims:FENCE:CLOSE -->
+
+## 연관 협력 (하류 의존 · 보조)
+
+<!-- claims:FENCE:OPEN -->
+- [확정(AI)] 연관 협력(하류): src/main/java/com/petstore/common/StringUtils.java (via field-type, 깊이 1). 근거: \`src/main/java/com/petstore/service/impl/AccountServiceImpl.java:16\`
+- [확정(AI)] 연관 협력(하류): src/main/java/com/petstore/persistence/AccountMapper.java (via injection, 깊이 1). 근거: \`src/main/java/com/petstore/service/impl/AccountServiceImpl.java:13\`
+- [확정(AI)] 연관 협력(하류): src/main/java/com/petstore/service/AccountService.java (via implements, 깊이 1). 근거: \`src/main/java/com/petstore/service/impl/AccountServiceImpl.java:10\`
+- [추정] 연관 협력(하류): src/main/resources/com/petstore/persistence/AccountMapper.xml (via mapper-xml, 깊이 2).
+<!-- claims:FENCE:CLOSE -->
+
+## 신규 생성 권장 — 변경 ([변경])
+
+<!-- claims:FENCE:OPEN -->
+- [확정] [변경] src/main/java/com/petstore/config/SecurityConfig.java — OAuth2 필터 등록. 근거: \`src/main/java/com/petstore/config/SecurityConfig.java:1\`
+<!-- claims:FENCE:CLOSE -->
+
+## 신규 생성 권장 — 생성 ([생성])
+
+<!-- claims:FENCE:OPEN -->
+- [추정] [생성] src/main/java/com/petstore/web/KakaoLoginController.java — KakaoLoginController.callback() (선례 앵커). 근거: \`src/main/java/com/petstore/web/AccountController.java:18\`
+- [추정] [생성] src/main/java/com/petstore/service/KakaoLoginService.java — KakaoLoginService (선례 앵커). 근거: \`src/main/java/com/petstore/service/AccountService.java:1\`
+<!-- claims:FENCE:CLOSE -->
+
+## 검토 필요
+
+_(항목 없음)_
+"
+`;

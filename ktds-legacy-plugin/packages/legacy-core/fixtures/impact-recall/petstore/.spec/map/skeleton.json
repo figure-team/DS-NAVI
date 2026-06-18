@@ -1,0 +1,295 @@
+{
+  "edges": [
+    {
+      "source": "domain:account",
+      "target": "flow:GET /account/login",
+      "type": "contains_flow",
+      "weight": 1
+    },
+    {
+      "source": "domain:account",
+      "target": "flow:POST /account/signon",
+      "type": "contains_flow",
+      "weight": 1
+    },
+    {
+      "source": "domain:catalog",
+      "target": "flow:GET /catalog/{id}",
+      "type": "contains_flow",
+      "weight": 1
+    },
+    {
+      "source": "flow:GET /account/login",
+      "target": "step:GET /account/login:src/main/java/com/petstore/web/AccountController.java",
+      "type": "flow_step",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:GET /account/login",
+      "target": "step:GET /account/login:src/main/java/com/petstore/service/AccountService.java",
+      "type": "flow_step",
+      "weight": 1
+    },
+    {
+      "source": "flow:GET /catalog/{id}",
+      "target": "step:GET /catalog/{id}:src/main/java/com/petstore/web/CatalogController.java",
+      "type": "flow_step",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:GET /catalog/{id}",
+      "target": "step:GET /catalog/{id}:src/main/java/com/petstore/service/CatalogService.java",
+      "type": "flow_step",
+      "weight": 1
+    },
+    {
+      "source": "flow:POST /account/signon",
+      "target": "step:POST /account/signon:src/main/java/com/petstore/web/AccountController.java",
+      "type": "flow_step",
+      "weight": 0.5
+    },
+    {
+      "source": "flow:POST /account/signon",
+      "target": "step:POST /account/signon:src/main/java/com/petstore/service/AccountService.java",
+      "type": "flow_step",
+      "weight": 1
+    },
+    {
+      "source": "step:GET /account/login:src/main/java/com/petstore/web/AccountController.java",
+      "target": "step:GET /account/login:src/main/java/com/petstore/service/AccountService.java",
+      "type": "calls",
+      "weight": 1
+    },
+    {
+      "source": "step:GET /catalog/{id}:src/main/java/com/petstore/web/CatalogController.java",
+      "target": "step:GET /catalog/{id}:src/main/java/com/petstore/service/CatalogService.java",
+      "type": "calls",
+      "weight": 1
+    },
+    {
+      "source": "step:POST /account/signon:src/main/java/com/petstore/web/AccountController.java",
+      "target": "step:POST /account/signon:src/main/java/com/petstore/service/AccountService.java",
+      "type": "calls",
+      "weight": 1
+    }
+  ],
+  "gitCommit": "604bea6c1aeffe5716747b7bf8ce7f463edfa6fd",
+  "nodes": [
+    {
+      "complexity": "simple",
+      "domainMeta": {},
+      "id": "domain:account",
+      "name": "",
+      "summary": "",
+      "tags": [
+        "account"
+      ],
+      "type": "domain"
+    },
+    {
+      "complexity": "simple",
+      "domainMeta": {},
+      "id": "domain:catalog",
+      "name": "",
+      "summary": "",
+      "tags": [
+        "catalog"
+      ],
+      "type": "domain"
+    },
+    {
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "AccountController#login",
+        "entryType": "http"
+      },
+      "filePath": "src/main/java/com/petstore/web/AccountController.java",
+      "id": "flow:GET /account/login",
+      "lineRange": [
+        18,
+        18
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "account"
+      ],
+      "type": "flow"
+    },
+    {
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "CatalogController#viewProduct",
+        "entryType": "http"
+      },
+      "filePath": "src/main/java/com/petstore/web/CatalogController.java",
+      "id": "flow:GET /catalog/{id}",
+      "lineRange": [
+        17,
+        17
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "catalog"
+      ],
+      "type": "flow"
+    },
+    {
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "AccountController#signon",
+        "entryType": "http"
+      },
+      "filePath": "src/main/java/com/petstore/web/AccountController.java",
+      "id": "flow:POST /account/signon",
+      "lineRange": [
+        23,
+        23
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "account"
+      ],
+      "type": "flow"
+    },
+    {
+      "complexity": "simple",
+      "filePath": "src/main/java/com/petstore/service/AccountService.java",
+      "id": "step:GET /account/login:src/main/java/com/petstore/service/AccountService.java",
+      "layer": "service",
+      "lineRange": [
+        5,
+        5
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "account"
+      ],
+      "type": "step"
+    },
+    {
+      "complexity": "simple",
+      "filePath": "src/main/java/com/petstore/web/AccountController.java",
+      "id": "step:GET /account/login:src/main/java/com/petstore/web/AccountController.java",
+      "layer": "api",
+      "lineRange": [
+        18,
+        18
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "account"
+      ],
+      "type": "step"
+    },
+    {
+      "complexity": "simple",
+      "filePath": "src/main/java/com/petstore/service/CatalogService.java",
+      "id": "step:GET /catalog/{id}:src/main/java/com/petstore/service/CatalogService.java",
+      "layer": "service",
+      "lineRange": [
+        5,
+        5
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "catalog"
+      ],
+      "type": "step"
+    },
+    {
+      "complexity": "simple",
+      "filePath": "src/main/java/com/petstore/web/CatalogController.java",
+      "id": "step:GET /catalog/{id}:src/main/java/com/petstore/web/CatalogController.java",
+      "layer": "api",
+      "lineRange": [
+        17,
+        17
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "catalog"
+      ],
+      "type": "step"
+    },
+    {
+      "complexity": "simple",
+      "filePath": "src/main/java/com/petstore/service/AccountService.java",
+      "id": "step:POST /account/signon:src/main/java/com/petstore/service/AccountService.java",
+      "layer": "service",
+      "lineRange": [
+        5,
+        5
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "account"
+      ],
+      "type": "step"
+    },
+    {
+      "complexity": "simple",
+      "filePath": "src/main/java/com/petstore/web/AccountController.java",
+      "id": "step:POST /account/signon:src/main/java/com/petstore/web/AccountController.java",
+      "layer": "api",
+      "lineRange": [
+        23,
+        23
+      ],
+      "name": "",
+      "summary": "",
+      "tags": [
+        "account"
+      ],
+      "type": "step"
+    }
+  ],
+  "schemaVersion": 1,
+  "stepCap": 8,
+  "stepSources": [
+    {
+      "className": "AccountService",
+      "line": 5,
+      "relPath": "src/main/java/com/petstore/service/AccountService.java",
+      "stepId": "step:GET /account/login:src/main/java/com/petstore/service/AccountService.java"
+    },
+    {
+      "className": "AccountController",
+      "line": 18,
+      "relPath": "src/main/java/com/petstore/web/AccountController.java",
+      "stepId": "step:GET /account/login:src/main/java/com/petstore/web/AccountController.java"
+    },
+    {
+      "className": "CatalogService",
+      "line": 5,
+      "relPath": "src/main/java/com/petstore/service/CatalogService.java",
+      "stepId": "step:GET /catalog/{id}:src/main/java/com/petstore/service/CatalogService.java"
+    },
+    {
+      "className": "CatalogController",
+      "line": 17,
+      "relPath": "src/main/java/com/petstore/web/CatalogController.java",
+      "stepId": "step:GET /catalog/{id}:src/main/java/com/petstore/web/CatalogController.java"
+    },
+    {
+      "className": "AccountService",
+      "line": 5,
+      "relPath": "src/main/java/com/petstore/service/AccountService.java",
+      "stepId": "step:POST /account/signon:src/main/java/com/petstore/service/AccountService.java"
+    },
+    {
+      "className": "AccountController",
+      "line": 23,
+      "relPath": "src/main/java/com/petstore/web/AccountController.java",
+      "stepId": "step:POST /account/signon:src/main/java/com/petstore/web/AccountController.java"
+    }
+  ],
+  "truncatedSteps": []
+}

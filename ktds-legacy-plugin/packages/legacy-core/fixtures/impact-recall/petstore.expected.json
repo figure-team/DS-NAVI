@@ -1,0 +1,43 @@
+{
+  "project": "petstore",
+  "method": "수동 작성 정답지 — 픽스처 Java 소스를 직접 열람해 시드(AccountServiceImpl)의 변경이 전이적으로 반드시 도달해야 하는 상류(역방향: 컨트롤러/서비스 인터페이스)·하류(정방향: 매퍼/매퍼XML/공용 허브)·API 진입점을 명시. 산출물에서 역산하지 않음(영향도 반증 게이트의 오라클). 엣지 종류 기본값(STRONG_EDGE_KINDS, import 제외) 기준 — 도메인 POJO(Account.java)는 import-only 라 기본 폐포 밖.",
+  "seeds": [
+    {
+      "seed": "src/main/java/com/petstore/service/impl/AccountServiceImpl.java",
+      "mustInclude": {
+        "upstream": [
+          "src/main/java/com/petstore/web/AccountController.java",
+          "src/main/java/com/petstore/service/AccountService.java"
+        ],
+        "downstream": [
+          "src/main/java/com/petstore/persistence/AccountMapper.java",
+          "src/main/java/com/petstore/common/StringUtils.java",
+          "src/main/java/com/petstore/service/AccountService.java",
+          "src/main/resources/com/petstore/persistence/AccountMapper.xml"
+        ],
+        "api": [
+          "route:GET /account/login",
+          "route:POST /account/signon"
+        ],
+        "mappers": [
+          "src/main/resources/com/petstore/persistence/AccountMapper.xml"
+        ]
+      },
+      "mustNotInclude": [
+        "src/main/java/com/petstore/web/CatalogController.java",
+        "src/main/java/com/petstore/service/CatalogService.java",
+        "src/main/java/com/petstore/service/impl/CatalogServiceImpl.java",
+        "src/main/java/com/petstore/persistence/ProductMapper.java",
+        "src/main/java/com/petstore/domain/Product.java",
+        "src/main/resources/com/petstore/persistence/ProductMapper.xml"
+      ]
+    }
+  ],
+  "knownGaps": [
+    "common/StringUtils.java 는 두 슬라이스(account/catalog) 모두에서 하류로 도달하는 공용 허브 — 시드가 account 측이라 catalog 는 도달하지 않음(허브에 외향 강신호 엣지 없음).",
+    "orphan/Unused.java 는 의도적으로 어떤 루트에서도 도달 불가(unreached 검증용).",
+    "domain/Account.java 는 import-only(약신호)라 STRONG_EDGE_KINDS 기본 폐포 밖 — mustInclude 에 넣지 않음(edges 자체는 정상 import 로 보고됨).",
+    "config/SecurityConfig.java 는 보완 A(카카오 로그인 추가) 데모 대상으로 존재만 함 — Spring Security 타입은 프로젝트 외부라 unresolved=not-found(정상).",
+    "Spring/MyBatis 라이브러리 타입(@Autowired/@Service/@RestController 등)은 프로젝트 외부라 import unresolved=not-found 로 보고됨(정상)."
+  ]
+}

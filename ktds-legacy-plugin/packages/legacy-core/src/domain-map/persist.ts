@@ -6,8 +6,8 @@
  */
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { ConfirmedPlanSchema } from './types.js'
+import { basename, join } from 'node:path'
+import { ConfirmedPlanSchema, SkeletonReportSchema } from './types.js'
 import type {
   CandidatesReport,
   CensusReport,
@@ -24,6 +24,13 @@ import type {
 
 /** 확정 플랜 파일명(`.spec/map/` 하위) — S7 사람 게이트 결정의 영속 닻. */
 export const CONFIRMED_PLAN_FILENAME = 'domain-plan.confirmed.json'
+
+/** `.spec/map/` 정규 산출물 파일명 — 소비자(impact 엔진 등)가 재스캔 0회로 로드. */
+export const CENSUS_FILENAME = 'census.json'
+export const ROUTES_FILENAME = 'routes.json'
+export const EDGES_FILENAME = 'edges.json'
+export const SLICES_FILENAME = 'slices.json'
+export const SKELETON_FILENAME = 'skeleton.json'
 
 /** `.spec/map/` 디렉터리 경로. */
 export function specMapDir(projectRoot: string): string {
@@ -128,7 +135,56 @@ export function readConfirmedPlan(projectRoot: string): ConfirmedPlan | null {
 
 /** skeleton.json 기록(`.spec/map/` mkdir -p 선행) — S6 결정론 골격의 영속. */
 export function writeSkeleton(projectRoot: string, report: SkeletonReport): void {
-  writeReport(projectRoot, 'skeleton.json', report)
+  writeReport(projectRoot, SKELETON_FILENAME, report)
+}
+
+/**
+ * skeleton.json 을 읽는다(있으면). 파일 없음 -> null(흐름 영향은 ownership 폴백).
+ * 권한/IO 오류는 던진다(fail-closed). zod parse 로 손편집/버전 스큐 차단.
+ */
+export function readSkeleton(projectRoot: string): SkeletonReport | null {
+  const file = join(specMapDir(projectRoot), SKELETON_FILENAME)
+  let raw: string
+  try {
+    raw = readFileSync(file, 'utf8')
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw err
+  }
+  return SkeletonReportSchema.parse(JSON.parse(raw))
+}
+
+/**
+ * `.spec/map/<fileName>` 에 임의 정규 산출물을 안정 JSON 으로 기록하고 절대 경로를
+ * 반환한다(impact.json / impact-verify-report.json 등). 파일명 가드: 경로 세그먼트·
+ * 숨김 파일·빈 이름은 거부(fail-closed) — `.spec/map` 밖 탈출 방지.
+ */
+export function writeMapArtifact(projectRoot: string, fileName: string, report: unknown): string {
+  if (basename(fileName) !== fileName || fileName.startsWith('.') || fileName.length === 0) {
+    throw new Error(`잘못된 산출물 파일명: ${JSON.stringify(fileName)} — 경로 없는 일반 파일명만 허용`)
+  }
+  writeReport(projectRoot, fileName, report)
+  return join(specMapDir(projectRoot), fileName)
+}
+
+/**
+ * `.spec/map/<fileName>` 의 정규 산출물을 읽어 스키마로 파싱한다. 파일 없음 -> null.
+ * 권한/IO 오류는 던진다(fail-closed).
+ */
+export function readMapArtifact<T>(
+  projectRoot: string,
+  fileName: string,
+  schema: { parse: (v: unknown) => T },
+): T | null {
+  const file = join(specMapDir(projectRoot), fileName)
+  let raw: string
+  try {
+    raw = readFileSync(file, 'utf8')
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw err
+  }
+  return schema.parse(JSON.parse(raw))
 }
 
 /** method-calls.json 기록(`.spec/map/` mkdir -p 선행) — P3 메서드 단위 호출 그래프. */

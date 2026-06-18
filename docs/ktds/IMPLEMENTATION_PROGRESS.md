@@ -20,7 +20,7 @@
 | P2 | `96fd3c1` | 도메인 지도: classify(reachability>directory>prefix) + confirm 게이트 + skeleton(S6) + 보완 E(이름제안/우선순위/cross-domain) + /understand-map plan|confirm|map |
 | P3 | `590a452` | 흐름뷰: 메서드 호출그래프 엔진(8 receiver, 173테스트) + skeleton 메서드정밀화 + 대시보드 fork(FlowSpineView/FlowListView/DomainMapView/KtdsNodeDetail) + 보완 F |
 | P4 | `1ff36a4` | 산출물: doc-generator(5 builders+golden) + doc-state(승인/감사/evidence enforcement) + 방법론 모듈(as-built/si-standard 3종) + 위키/HTML + STALE + Profile-W 스키마 + /understand-docs |
-| P5 | `f404024` | 영향도/Component 4 + 보완 A: impact 엔진(reach/api/persistence/flow/engine + citation 4체크 재구현, CITATION_STATUS 중립화) + 선례검색(precedents, F3 fail-closed) + 생성예측(3버킷·선례강도강등·net-new CONFIRMED 차단·L1 게이트) + change-impact-analysis.md(read-only)+L3 골든 + Profile-W 생산(AC-25) + /understand-impact 스킬·CLI + petstore impact-recall fixture |
+| P5 | `c46978b` | 영향도/Component 4 + 보완 A: impact 엔진(reach/api/persistence/flow/engine + citation 4체크 재구현, CITATION_STATUS 중립화) + 선례검색(precedents, F3 fail-closed) + 생성예측(3버킷·선례강도강등·net-new CONFIRMED 차단·L1 게이트) + change-impact-analysis.md(read-only)+L3 골든 + Profile-W 생산(AC-25) + /understand-impact 스킬·CLI + petstore impact-recall fixture |
 
 테스트 현황(P5 시점): legacy-core **451**(+78 impact) + root(UA+dashboard) **226** + UA core **739** 전부 그린. 게이트: core diff=∅ · version-sync OK · impact-recall 100% · chain-recall 100% · dashboard build ✓.
 

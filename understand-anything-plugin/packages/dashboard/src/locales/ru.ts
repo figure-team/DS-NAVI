@@ -147,6 +147,7 @@ export const ru = {
     expandAllBranches: "Развернуть ветви",
     collapseAllBranches: "Свернуть ветви",
     methodsUsed: "методы",
+    closeDetail: "Закрыть",
   },
   detailLevel: {
     filesTitle: "Только файлы — зависимости архитектурного уровня (быстро)",

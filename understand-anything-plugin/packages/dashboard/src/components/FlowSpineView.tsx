@@ -53,6 +53,11 @@ const LAYER_COLOR: Record<FlowLayer, string> = {
   unknown: "var(--color-layer-other, #94a3b8)",
 };
 
+// Under-node "used methods" dropdown sizing — used to reserve column space so an
+// open panel pushes lower siblings down (must track the dropdown markup below).
+const METHOD_ROW_H = 28; // height of one method row (px-2 py-1 + gap)
+const METHOD_PANEL_PAD = 18; // panel margin + container padding above/below rows
+
 /**
  * `stepSource` rides along on domain-graph step nodes via schema passthrough; it
  * is not a typed `GraphNode` field. Read it defensively as the strongest layer
@@ -189,7 +194,42 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     return orderSpineSequence(rendered);
   }, [allSteps, partition, expandedBranchParents]);
 
-  const layout = useMemo(() => computeSpineLayout(steps), [steps]);
+  // Per-node "used methods": the engine labels each calls edge with the ordered
+  // methods the source invokes on the target (`description`). Aggregated onto the
+  // TARGET node, that is exactly which of this class's methods the flow uses —
+  // shown as an expandable chip under the node (prototype's branch-chip pattern,
+  // repurposed for methods) instead of occluded on-line labels.
+  const methodsByNode = useMemo(() => {
+    const map = new Map<string, string[]>();
+    if (!domainGraph) return map;
+    const renderedIds = new Set(steps.map((s) => s.id));
+    for (const e of domainGraph.edges) {
+      if (e.type !== "calls" || !renderedIds.has(e.target)) continue;
+      const desc = typeof e.description === "string" ? e.description.trim() : "";
+      if (!desc) continue;
+      let list = map.get(e.target);
+      if (!list) map.set(e.target, (list = []));
+      for (const m of desc.split("→").map((s) => s.trim()).filter(Boolean)) {
+        if (!list.includes(m)) list.push(m);
+      }
+    }
+    return map;
+  }, [domainGraph, steps]);
+
+  // Reserve vertical space below a node whose "used methods" dropdown is open so
+  // the expanded panel pushes the column's lower siblings down instead of
+  // overlapping them. Height ≈ one row per method + the panel's own padding.
+  const extraBelow = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const id of openMethods) {
+      const methods = methodsByNode.get(id);
+      if (!methods || methods.length === 0) continue;
+      m.set(id, methods.length * METHOD_ROW_H + METHOD_PANEL_PAD);
+    }
+    return m;
+  }, [openMethods, methodsByNode]);
+
+  const layout = useMemo(() => computeSpineLayout(steps, extraBelow), [steps, extraBelow]);
 
   // Backbone steps that have foldable branches (drives the global expand/collapse).
   const branchParents = useMemo(
@@ -242,28 +282,6 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     return out;
   }, [domainGraph, steps, layout, partition]);
 
-  // Per-node "used methods": the engine labels each calls edge with the ordered
-  // methods the source invokes on the target (`description`). Aggregated onto the
-  // TARGET node, that is exactly which of this class's methods the flow uses —
-  // shown as an expandable chip under the node (prototype's branch-chip pattern,
-  // repurposed for methods) instead of occluded on-line labels.
-  const methodsByNode = useMemo(() => {
-    const map = new Map<string, string[]>();
-    if (!domainGraph) return map;
-    const renderedIds = new Set(steps.map((s) => s.id));
-    for (const e of domainGraph.edges) {
-      if (e.type !== "calls" || !renderedIds.has(e.target)) continue;
-      const desc = typeof e.description === "string" ? e.description.trim() : "";
-      if (!desc) continue;
-      let list = map.get(e.target);
-      if (!list) map.set(e.target, (list = []));
-      for (const m of desc.split("→").map((s) => s.trim()).filter(Boolean)) {
-        if (!list.includes(m)) list.push(m);
-      }
-    }
-    return map;
-  }, [domainGraph, steps]);
-
   const onStepKeyDown = (e: KeyboardEvent<HTMLDivElement>, id: string) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -271,49 +289,20 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     }
   };
 
-  // Right sidebar: layer legend (counts per lane) + selected-node detail.
-  // Replaces the U-A NodeInfo sidebar that the full-bleed domain page hides;
-  // ports the prototype `flowview-sidebar` (legend + detail card) to the right.
   const selectedStep = selectedNodeId ? allSteps.find((s) => s.id === selectedNodeId) ?? null : null;
-  // FIX 4: which flow is being viewed (prototype sidebar-header). Lane headers
-  // already carry the layer legend, so the sidebar legend block is dropped (FIX 1).
   const flowNode = domainGraph?.nodes.find((n) => n.id === activeFlowId) ?? null;
-  const flowEntry = (() => {
-    const meta = flowNode?.domainMeta as { entryPoint?: unknown } | undefined;
-    return typeof meta?.entryPoint === "string" && meta.entryPoint !== "TBD" ? meta.entryPoint : null;
-  })();
 
-  const sidebar = (
+  // Right sidebar: the selected node's detail card. Shown ONLY while a node is
+  // selected (req: 노드를 눌렀을 때만 해당 노드 설명 표시) — with no selection the
+  // sidebar is removed entirely so the graph claims the full width.
+  const sidebar = selectedStep ? (
     <aside
       className="shrink-0 h-full overflow-y-auto border-l border-border-subtle bg-surface/40"
       style={{ width: 300 }}
     >
-      {/* Selected flow header (FIX 4) */}
-      {flowNode && (
-        <div className="p-4 border-b border-border-subtle">
-          <p className="text-[11px] uppercase tracking-wider text-text-muted mb-1">
-            {t.flowView.selectedFlow}
-          </p>
-          <p className="text-sm font-medium text-text-primary break-words">{flowNode.name}</p>
-          {flowEntry && (
-            <p
-              className="text-[11px] text-text-muted break-all mt-0.5"
-              style={{ fontFamily: "var(--font-mono)" }}
-            >
-              {flowEntry}
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Selected node detail */}
       <div className="p-4">
-        {!selectedStep ? (
-          <div className="text-xs text-text-muted leading-relaxed py-6 text-center">
-            {t.flowView.detailEmpty}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start justify-between gap-2">
             <span
               className="self-start uppercase font-semibold rounded px-1.5 py-0.5"
               style={{
@@ -325,38 +314,48 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
             >
               {laneLabels[selectedStep.layer]}
             </span>
-            <p className="text-sm font-medium text-text-primary break-words">{selectedStep.node.name}</p>
-            {selectedStep.node.filePath && (
-              <p className="text-[11px] text-text-muted break-all" style={{ fontFamily: "var(--font-mono)" }}>
-                {selectedStep.node.filePath}
-                {selectedStep.node.lineRange ? `:${selectedStep.node.lineRange[0]}` : ""}
-              </p>
-            )}
-            {selectedStep.node.summary && (
-              <>
-                <p className="text-[11px] uppercase tracking-wider text-text-muted mt-2">
-                  {t.flowView.detailSummary}
-                </p>
-                <p className="text-xs text-text-secondary leading-relaxed">{selectedStep.node.summary}</p>
-              </>
-            )}
-            {selectedStep.node.tags && selectedStep.node.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {selectedStep.node.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-text-muted"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() => selectNode(null)}
+              className="shrink-0 -mt-0.5 -mr-1 flex items-center justify-center rounded text-text-muted hover:text-accent hover:bg-elevated transition-colors"
+              style={{ width: 22, height: 22, fontSize: 14, lineHeight: 1 }}
+              aria-label={t.flowView.closeDetail}
+              title={t.flowView.closeDetail}
+            >
+              ✕
+            </button>
           </div>
-        )}
+          <p className="text-sm font-medium text-text-primary break-words">{selectedStep.node.name}</p>
+          {selectedStep.node.filePath && (
+            <p className="text-[11px] text-text-muted break-all" style={{ fontFamily: "var(--font-mono)" }}>
+              {selectedStep.node.filePath}
+              {selectedStep.node.lineRange ? `:${selectedStep.node.lineRange[0]}` : ""}
+            </p>
+          )}
+          {selectedStep.node.summary && (
+            <>
+              <p className="text-[11px] uppercase tracking-wider text-text-muted mt-2">
+                {t.flowView.detailSummary}
+              </p>
+              <p className="text-xs text-text-secondary leading-relaxed">{selectedStep.node.summary}</p>
+            </>
+          )}
+          {selectedStep.node.tags && selectedStep.node.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {selectedStep.node.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-text-muted"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </aside>
-  );
+  ) : null;
 
   const badge = flowNode ? flowBadge(flowNode) : null;
 

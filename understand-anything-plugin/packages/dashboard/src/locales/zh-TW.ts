@@ -147,6 +147,7 @@ export const zhTW = {
     expandAllBranches: "展開分支",
     collapseAllBranches: "摺疊分支",
     methodsUsed: "方法",
+    closeDetail: "關閉",
   },
   detailLevel: {
     filesTitle: "僅檔案 — 架構級依賴（快速）",

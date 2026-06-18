@@ -147,6 +147,7 @@ export const en = {
     expandAllBranches: "Expand branches",
     collapseAllBranches: "Collapse branches",
     methodsUsed: "methods",
+    closeDetail: "Close",
   },
   detailLevel: {
     filesTitle: "Files only — architecture-level dependencies (fast)",

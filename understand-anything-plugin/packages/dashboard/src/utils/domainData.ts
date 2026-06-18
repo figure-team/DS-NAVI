@@ -22,7 +22,9 @@ export interface DomainFlow {
   method: FlowMethod;
   /** Path / name shown in mono — entryPoint path or flow label. */
   path: string;
-  /** Short description (flow.summary). */
+  /** Short function label (flow.name) — what the flow does, e.g. "계정 정보 수정 처리". */
+  name: string;
+  /** Long description (flow.summary). */
   desc: string;
   /** Number of `flow_step` steps in this flow. */
   stepCount: number;
@@ -246,6 +248,7 @@ export function buildDomainFlows(graph: KnowledgeGraph, domainId: string): Domai
         id: node.id,
         method,
         path,
+        name: node.name,
         desc: node.summary,
         stepCount: flowStepCount.get(node.id) ?? 0,
         entryType: entryType ?? "",

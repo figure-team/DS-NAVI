@@ -147,6 +147,7 @@ export const ja = {
     expandAllBranches: "枝を展開",
     collapseAllBranches: "枝を折りたたむ",
     methodsUsed: "メソッド",
+    closeDetail: "閉じる",
   },
   detailLevel: {
     filesTitle: "ファイルのみ — アーキテクチャレベルの依存関係（高速）",

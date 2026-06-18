@@ -103,7 +103,16 @@ export function orderSpineSequence<T extends SpineStep>(steps: readonly T[]): T[
  * The output preserves every input step (step count is invariant — an
  * all-`unknown` flow simply stacks entirely in column 4 / the Other lane).
  */
-export function computeSpineLayout(steps: readonly SpineStep[]): SpineLayout {
+export function computeSpineLayout(
+  steps: readonly SpineStep[],
+  /**
+   * Optional extra vertical space to reserve *below* a given step before the next
+   * sibling in its column. Used to push siblings down when a node's under-node
+   * panel (e.g. the expanded "used methods" dropdown) is open, so it stacks the
+   * column instead of overlapping the nodes beneath it.
+   */
+  extraBelow?: ReadonlyMap<string, number>,
+): SpineLayout {
   // Per-column y cursor, seeded below the sticky header.
   const colY: number[] = SPINE_COLUMNS.map(() => HEADER_H + NODE_PAD_Y);
   const columnCounts: number[] = SPINE_COLUMNS.map(() => 0);
@@ -114,7 +123,7 @@ export function computeSpineLayout(steps: readonly SpineStep[]): SpineLayout {
     const x = col * COL_W + NODE_PAD_X;
     const y = colY[col];
     placements.set(stepNode.id, { x, y, w: NODE_W, h: NODE_H, col, layer: stepNode.layer });
-    colY[col] += NODE_H + SIBLING_GAP;
+    colY[col] += NODE_H + SIBLING_GAP + (extraBelow?.get(stepNode.id) ?? 0);
     columnCounts[col] += 1;
   }
 

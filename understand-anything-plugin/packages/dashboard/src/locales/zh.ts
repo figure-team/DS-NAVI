@@ -147,6 +147,7 @@ export const zh = {
     expandAllBranches: "展开分支",
     collapseAllBranches: "折叠分支",
     methodsUsed: "方法",
+    closeDetail: "关闭",
   },
   detailLevel: {
     filesTitle: "仅文件 — 架构级依赖（快速）",

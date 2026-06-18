@@ -118,163 +118,152 @@ export default function FlowListView() {
   const singleGroup = groups.length <= 1;
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden">
-      {/* Top: scrollable flow list */}
-      <div
-        className="overflow-y-auto shrink-0 border-b border-border-subtle"
-        style={{
-          padding: "28px 24px 20px",
-          maxHeight: selectedFlow ? "52vh" : "100%",
-        }}
+    <div className="h-full w-full flex overflow-hidden">
+      {/* LEFT sidebar: flow list. Clicking a row selects the flow and renders its
+          code graph in the center pane. */}
+      <aside
+        className="shrink-0 h-full flex flex-col border-r border-border-subtle bg-surface/40"
+        style={{ width: 320 }}
       >
-        <div className="flex items-start justify-between mb-6 gap-4">
-          <div>
+        {/* sidebar header — breadcrumb (navigation) + back button */}
+        <div className="shrink-0 border-b border-border-subtle" style={{ padding: "16px 16px 14px" }}>
+          <div className="flex items-center justify-between gap-3">
             <p
-              className="uppercase text-text-muted mb-1.5"
-              style={{ fontSize: 11, letterSpacing: "0.12em" }}
+              className="uppercase text-text-muted truncate"
+              style={{ fontSize: 11, letterSpacing: "0.1em", minWidth: 0 }}
             >
-              {/* FIX 5: "업무 도메인" → 도메인 지도로 이동 */}
               <button
                 type="button"
                 onClick={() => clearActiveDomain()}
                 className="uppercase text-text-muted hover:text-accent transition-colors cursor-pointer"
-                style={{ letterSpacing: "0.12em" }}
+                style={{ letterSpacing: "0.1em" }}
               >
                 {t.flowList.eyebrow}
               </button>{" "}
               › {domainNode?.name ?? ""}
             </p>
-            <h2
-              className="font-heading text-text-primary mb-1"
-              style={{ fontSize: 28 }}
-            >
-              {domainNode?.name ?? ""}
-            </h2>
-            <p className="text-text-secondary" style={{ fontSize: 13 }}>
-              {t.flowList.subtitle}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => clearActiveDomain()}
-            className="flex items-center gap-1.5 shrink-0 rounded-md border border-border-subtle text-text-secondary hover:border-border-medium hover:text-accent transition-colors"
-            style={{ padding: "8px 16px", fontSize: 12 }}
-          >
-            {t.flowList.back}
-          </button>
-        </div>
-
-        {groups.map((group, gi) => (
-          <div
-            key={group.key}
-            className="mb-6"
-            style={{ animation: `fadeSlideIn 0.3s ease-out ${gi * 0.1}s both` }}
-          >
-            {!singleGroup && (
-              <div
-                className="flex items-center gap-2 uppercase text-text-muted mb-2.5"
-                style={{ fontSize: 11, letterSpacing: "0.09em" }}
-              >
-                <span>{groupLabel[group.key]}</span>
-                <span className="flex-1 h-px bg-border-subtle" />
-              </div>
-            )}
-            <div className="flex flex-col gap-1.5" style={{ maxWidth: 860 }}>
-              {group.flows.map((flow, fi) => {
-                const isSelected = flow.id === selectedFlowId;
-                return (
-                  <button
-                    key={flow.id}
-                    type="button"
-                    onClick={() => setSelectedFlow(flow.id)}
-                    className="flow-row flex items-center gap-3.5 text-left rounded-lg border cursor-pointer transition-colors"
-                    style={{
-                      padding: "14px 18px",
-                      animation: `fadeSlideRight 0.25s ease-out ${gi * 0.1 + fi * 0.05}s both`,
-                      background: isSelected
-                        ? "rgba(212,165,116,0.07)"
-                        : "var(--color-elevated)",
-                      borderColor: isSelected
-                        ? "var(--color-accent)"
-                        : "var(--color-border-subtle)",
-                      boxShadow: isSelected
-                        ? "0 0 0 1px rgba(212,165,116,0.18) inset"
-                        : undefined,
-                    }}
-                  >
-                    <MethodBadge method={flow.method} />
-                    <span
-                      className="text-text-primary shrink-0 truncate"
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: 12,
-                        minWidth: 0,
-                        maxWidth: 240,
-                      }}
-                      title={flow.path}
-                    >
-                      {flow.path}
-                    </span>
-                    <span
-                      className="text-text-secondary flex-1 truncate"
-                      style={{ fontSize: 12, minWidth: 0 }}
-                      title={flow.desc}
-                    >
-                      {flow.desc}
-                    </span>
-                    <span
-                      className="text-text-muted shrink-0"
-                      style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}
-                    >
-                      {t.flowList.stepCount.replace("{count}", String(flow.stepCount))}
-                    </span>
-                    <span
-                      className="shrink-0 transition-colors"
-                      style={{ fontSize: 12, color: isSelected ? "var(--color-accent)" : "var(--color-text-muted)" }}
-                    >
-                      ›
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Bottom: inline cross-layer graph panel (shown when a flow is selected) */}
-      {selectedFlow && (
-        <div
-          className="flex-1 flex flex-col overflow-hidden bg-root"
-          style={{ animation: "fadeSlideIn 0.28s ease-out" }}
-        >
-          {/* inline header */}
-          <div className="flex items-center gap-2.5 shrink-0 bg-panel border-b border-border-subtle" style={{ padding: "10px 20px" }}>
-            <MethodBadge method={selectedFlow.method} />
-            <span
-              className="text-text-primary"
-              style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}
-            >
-              {selectedFlow.path}
-            </span>
-            <span className="text-text-secondary truncate" style={{ fontSize: 11, minWidth: 0 }}>
-              — {selectedFlow.desc}
-            </span>
             <button
               type="button"
-              onClick={() => navigateToFlow(selectedFlow.id)}
-              className="flex items-center gap-1.5 shrink-0 ml-auto rounded border border-border-subtle text-text-muted hover:border-border-medium hover:text-accent transition-colors"
-              style={{ padding: "5px 12px", fontSize: 11 }}
+              onClick={() => clearActiveDomain()}
+              className="flex items-center shrink-0 rounded-md border border-border-subtle text-text-secondary hover:border-border-medium hover:text-accent transition-colors"
+              style={{ padding: "6px 10px", fontSize: 11 }}
             >
-              {t.flowList.fullscreen}
+              {t.flowList.back}
             </button>
           </div>
-          {/* inline spine */}
-          <div className="flex-1 min-h-0 relative">
-            <FlowSpineView flowId={selectedFlow.id} hideBack />
-          </div>
         </div>
-      )}
+
+        {/* scrollable flow rows */}
+        <div className="flex-1 overflow-y-auto" style={{ padding: "12px" }}>
+          {groups.map((group) => (
+            <div key={group.key} className="mb-5 last:mb-0">
+              {!singleGroup && (
+                <div
+                  className="flex items-center gap-2 uppercase text-text-muted mb-2"
+                  style={{ fontSize: 10, letterSpacing: "0.09em" }}
+                >
+                  <span>{groupLabel[group.key]}</span>
+                  <span className="flex-1 h-px bg-border-subtle" />
+                </div>
+              )}
+              <div className="flex flex-col gap-1.5">
+                {group.flows.map((flow) => {
+                  const isSelected = flow.id === selectedFlowId;
+                  return (
+                    <button
+                      key={flow.id}
+                      type="button"
+                      onClick={() => setSelectedFlow(flow.id)}
+                      className="flow-row flex flex-col gap-1.5 text-left rounded-lg border cursor-pointer transition-colors w-full"
+                      style={{
+                        padding: "10px 12px",
+                        background: isSelected
+                          ? "rgba(212,165,116,0.07)"
+                          : "var(--color-elevated)",
+                        borderColor: isSelected
+                          ? "var(--color-accent)"
+                          : "var(--color-border-subtle)",
+                        boxShadow: isSelected
+                          ? "0 0 0 1px rgba(212,165,116,0.18) inset"
+                          : undefined,
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <MethodBadge method={flow.method} />
+                        <span
+                          className="ml-auto shrink-0 text-text-muted"
+                          style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}
+                        >
+                          {t.flowList.stepCount.replace("{count}", String(flow.stepCount))}
+                        </span>
+                      </div>
+                      {/* Full endpoint — wraps so every character stays visible. */}
+                      <span
+                        className="text-text-primary"
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: 11.5,
+                          wordBreak: "break-all",
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        {flow.path}
+                      </span>
+                      {/* Function label ("어떤 기능인지") — not the long description. */}
+                      <span className="text-text-secondary" style={{ fontSize: 12, lineHeight: 1.4 }}>
+                        {flow.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </aside>
+
+      {/* CENTER + RIGHT: selected flow's code graph (FlowSpineView renders its own
+          right sidebar, which now appears only when a node is clicked). */}
+      <div className="flex-1 min-w-0 h-full flex flex-col bg-root">
+        {selectedFlow ? (
+          <>
+            {/* center header — selected flow context + fullscreen */}
+            <div
+              className="flex items-center gap-2.5 shrink-0 bg-panel border-b border-border-subtle"
+              style={{ padding: "10px 20px" }}
+            >
+              <MethodBadge method={selectedFlow.method} />
+              <span
+                className="text-text-primary whitespace-nowrap"
+                style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}
+              >
+                {selectedFlow.path}
+              </span>
+              <span className="text-text-secondary truncate" style={{ fontSize: 11, minWidth: 0 }}>
+                — {selectedFlow.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => navigateToFlow(selectedFlow.id)}
+                className="flex items-center gap-1.5 shrink-0 ml-auto rounded border border-border-subtle text-text-muted hover:border-border-medium hover:text-accent transition-colors"
+                style={{ padding: "5px 12px", fontSize: 11 }}
+              >
+                {t.flowList.fullscreen}
+              </button>
+            </div>
+            {/* code graph */}
+            <div className="flex-1 min-h-0 relative">
+              <FlowSpineView flowId={selectedFlow.id} hideBack />
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center px-8 text-center">
+            <p className="text-text-muted" style={{ fontSize: 13 }}>
+              {t.flowList.selectPrompt}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

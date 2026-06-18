@@ -12,7 +12,18 @@ import type { Node } from 'web-tree-sitter'
 import { buildCensus } from './census.js'
 import { extractEdges } from './edges.js'
 import { buildSlices } from './slices.js'
-import { writeCensus, writeEdges, writeRoutes, writeSlices } from './persist.js'
+import { buildCandidates } from './classify.js'
+import {
+  readConfirmedPlan,
+  writeCandidates,
+  writeCensus,
+  writeEdges,
+  writeRoutes,
+  writeSkeleton,
+  writeSlices,
+} from './persist.js'
+import { buildSkeleton } from './skeleton.js'
+import { emitDomainGraph } from './emit.js'
 import { assignRouteIds, sortBatchEntries, sortRoutes } from './route-key.js'
 import { parseSource } from './tree-sitter.js'
 import { extractNextjsRoutes } from './routes/nextjs.js'
@@ -28,10 +39,13 @@ import {
 } from './routes/spring.js'
 import type {
   BatchEntry,
+  CandidatesReport,
   CensusReport,
+  ConfirmedPlan,
   EdgesReport,
   RouteEntry,
   RouteMethod,
+  SkeletonReport,
   SlicesReport,
 } from './types.js'
 
@@ -131,24 +145,83 @@ export async function scanRoutes(projectRoot: string): Promise<{
 }
 
 /**
- * 전체 domain-map 스캔: census -> routes -> edges -> slices.
- * 네 산출물을 `.spec/map/` 에 기록하고 모두 반환한다(결정론).
+ * 전체 domain-map 스캔: census -> routes -> edges -> slices -> candidates.
+ * 다섯 산출물을 `.spec/map/` 에 기록하고 모두 반환한다(결정론).
+ * 후보(candidates)는 빌드/기록만 한다 — 확정(confirm)은 별도 사람 게이트 단계다(자동 확정 금지).
  */
 export async function scanDomainMap(projectRoot: string): Promise<{
   census: CensusReport
   routes: Awaited<ReturnType<typeof extractRoutes>>
   edges: EdgesReport
   slices: SlicesReport
+  candidates: CandidatesReport
 }> {
   const census = buildCensus(projectRoot)
   const routes = await extractRoutes(projectRoot, census)
   const edges = await extractEdges(projectRoot, census)
   const slices = buildSlices(census, routes, edges)
+  const candidates = buildCandidates(census, routes, slices)
   writeCensus(projectRoot, census)
   writeRoutes(projectRoot, routes)
   writeEdges(projectRoot, edges)
   writeSlices(projectRoot, slices)
-  return { census, routes, edges, slices }
+  writeCandidates(projectRoot, candidates)
+  return { census, routes, edges, slices, candidates }
+}
+
+/**
+ * 전체 도메인 맵 빌드 — 스캔 후 확정 플랜이 있으면 skeleton/emit 까지.
+ *
+ * 1) scanDomainMap(census→routes→edges→slices→candidates, `.spec/map/` 기록).
+ * 2) readConfirmedPlan:
+ *    - 플랜 있음  → buildSkeleton + emitDomainGraph + writeSkeleton.
+ *                   skeleton.json(`.spec/map/`) + domain-graph.json(`.understand-anything/`).
+ *    - 플랜 없음  → 스캔 결과만 반환(needsConfirm=true). 자동 확정하지 않는다
+ *                   (사람 게이트 필수 — /understand-map confirm).
+ */
+export async function buildMap(
+  projectRoot: string,
+  options: { stepCap?: number } = {},
+): Promise<
+  | {
+      needsConfirm: true
+      census: CensusReport
+      routes: Awaited<ReturnType<typeof extractRoutes>>
+      edges: EdgesReport
+      slices: SlicesReport
+      candidates: CandidatesReport
+    }
+  | {
+      needsConfirm: false
+      census: CensusReport
+      routes: Awaited<ReturnType<typeof extractRoutes>>
+      edges: EdgesReport
+      slices: SlicesReport
+      candidates: CandidatesReport
+      plan: ConfirmedPlan
+      skeleton: SkeletonReport
+    }
+> {
+  const scan = await scanDomainMap(projectRoot)
+  const plan = readConfirmedPlan(projectRoot)
+  if (!plan) {
+    return { needsConfirm: true, ...scan }
+  }
+  const skeleton = await buildSkeleton(
+    projectRoot,
+    {
+      census: scan.census,
+      routes: scan.routes,
+      edges: scan.edges,
+      slices: scan.slices,
+      candidates: scan.candidates,
+      plan,
+    },
+    options,
+  )
+  writeSkeleton(projectRoot, skeleton)
+  emitDomainGraph(projectRoot, skeleton)
+  return { needsConfirm: false, ...scan, plan, skeleton }
 }
 
 /** server.servlet.context-path 를 properties/yaml 에서 best-effort 로 읽는다. */

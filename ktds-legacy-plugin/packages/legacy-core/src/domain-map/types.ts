@@ -156,3 +156,269 @@ export type SlicesReport = z.infer<typeof SlicesReportSchema>
  */
 export const FlowLayerSchema = z.enum(['api', 'service', 'dao', 'db', 'unknown'])
 export type FlowLayer = z.infer<typeof FlowLayerSchema>
+
+/**
+ * 후보 파일에 도메인이 부여된 신호 출처.
+ * reachability(도달성, 주) > directory(디렉토리, 교차검증) > prefix(파일명, 폴백).
+ */
+export const DomainViaSchema = z.enum(['reachability', 'directory', 'prefix'])
+export type DomainVia = z.infer<typeof DomainViaSchema>
+
+/** 후보 도메인 1건의 파일 멤버 — relPath + 부여 신호. */
+export const DomainFileSchema = z.object({
+  relPath: z.string(),
+  via: DomainViaSchema,
+})
+export type DomainFile = z.infer<typeof DomainFileSchema>
+
+/** 단일 도메인 후보 — key 는 불변(다운스트림 skeleton 의 닻). */
+export const DomainCandidateSchema = z.object({
+  key: z.string(),
+  roots: z.array(z.string()),
+  entryCount: z.number().int(),
+  files: z.array(DomainFileSchema),
+})
+export type DomainCandidate = z.infer<typeof DomainCandidateSchema>
+
+/**
+ * candidates.json — 결정론적 도메인 분류(S4-5) 산출물.
+ * 신호 우선순위: 도달성 > 디렉토리 > prefix. 모호/공용/미해소는 절대 누락하지 않는다.
+ */
+export const CandidatesReportSchema = z.object({
+  schemaVersion: z.literal(1),
+  gitCommit: z.string().nullable(),
+  directoryDegenerate: z
+    .object({ reason: z.enum(['too-few-clusters', 'single-cluster-concentration']) })
+    .nullable(),
+  candidates: z.array(DomainCandidateSchema),
+  common: z.array(
+    z.object({
+      relPath: z.string(),
+      owners: z.array(z.string()),
+    }),
+  ),
+  ambiguous: z.array(
+    z.object({
+      relPath: z.string(),
+      reachKey: z.string(),
+      directoryKey: z.string(),
+    }),
+  ),
+  unresolved: z.array(z.string()),
+})
+export type CandidatesReport = z.infer<typeof CandidatesReportSchema>
+
+/** 확정된 단일 도메인 — key 는 불변, name 은 표시용(개명 가능). */
+export const ConfirmedDomainSchema = z.object({
+  key: z.string(),
+  name: z.string(),
+  roots: z.array(z.string()),
+  aliasKeys: z.array(z.string()),
+})
+export type ConfirmedDomain = z.infer<typeof ConfirmedDomainSchema>
+
+/**
+ * domain-plan.confirmed.json — 사람 게이트(S7) 결정의 영속화.
+ * 재실행 결정론의 닻이다. 모든 배열은 정렬되어 byte-identical 을 보장한다.
+ */
+export const ConfirmedPlanSchema = z.object({
+  schemaVersion: z.literal(1),
+  gitCommit: z.string().nullable(),
+  decidedBy: z.string(),
+  domains: z.array(ConfirmedDomainSchema),
+  excludedKeys: z.array(z.string()),
+})
+export type ConfirmedPlan = z.infer<typeof ConfirmedPlanSchema>
+
+// ──────────────────────────────────────────────────────────────────────────
+// SKELETON(S6) — 결정론적 도메인 그래프 골격.
+//
+// U-A domain-graph 호환 domain/flow/step 노드 + contains_flow/flow_step/calls
+// 엣지를 confirmed plan + 스캔 산출물에서 결정론으로 조립한다. 의미 필드
+// (name/summary)는 SKELETON_BLANK — S8 LLM 채움이 P4에서 enrich, S9 인용검증이
+// 이어진다. P2 는 구조 골격만 emit 해 대시보드/dual-load 가 데이터를 갖게 한다.
+//
+// 중요: P2 의 step 은 슬라이스(파일 단위 도달성)에서 STRUCTURALLY 도출한다.
+// 메서드 단위 호출 그래프(8-receiver 해소)는 P3 — 여기서 빌드하지 않는다.
+// (문서화된 폴백: 메서드 정밀 step 은 P3 enhancement.)
+// ──────────────────────────────────────────────────────────────────────────
+
+/** SKELETON 의 비어 있는 의미 필드 — S8 LLM 채움 전까지 name/summary 는 공란. */
+export const SKELETON_BLANK = '' as const
+
+/** flow 당 step 상한 — 초과분은 truncatedSteps 로 보고(조용한 누락 금지). */
+export const DEFAULT_STEP_CAP = 8
+
+/** 그래프 노드 종류. */
+export const UaGraphNodeTypeSchema = z.enum(['domain', 'flow', 'step'])
+export type UaGraphNodeType = z.infer<typeof UaGraphNodeTypeSchema>
+
+/** 복잡도 등급 — 멤버 수/step 수 기반 결정론적 임계값. */
+export const UaComplexitySchema = z.enum(['simple', 'moderate', 'complex'])
+export type UaComplexity = z.infer<typeof UaComplexitySchema>
+
+/** U-A domain-graph 호환 노드(domain/flow/step). name/summary 는 SKELETON_BLANK 로 시작. */
+export const UaGraphNodeSchema = z.object({
+  id: z.string(),
+  type: UaGraphNodeTypeSchema,
+  name: z.string(),
+  filePath: z.string().optional(),
+  lineRange: z.tuple([z.number().int(), z.number().int()]).optional(),
+  summary: z.string(),
+  tags: z.array(z.string()),
+  complexity: UaComplexitySchema,
+  domainMeta: z.record(z.string(), z.unknown()).optional(),
+  layer: FlowLayerSchema.optional(),
+})
+export type UaGraphNode = z.infer<typeof UaGraphNodeSchema>
+
+/** 그래프 엣지 종류 — contains_flow(도메인→흐름)/flow_step(흐름→단계)/calls(단계→단계). */
+export const UaGraphEdgeTypeSchema = z.enum(['contains_flow', 'flow_step', 'calls'])
+export type UaGraphEdgeType = z.infer<typeof UaGraphEdgeTypeSchema>
+
+/** U-A domain-graph 호환 엣지. weight 는 flow_step 의 단조 진행도(마지막≈1). */
+export const UaGraphEdgeSchema = z.object({
+  source: z.string(),
+  target: z.string(),
+  type: UaGraphEdgeTypeSchema,
+  weight: z.number().optional(),
+  description: z.string().optional(),
+})
+export type UaGraphEdge = z.infer<typeof UaGraphEdgeSchema>
+
+/** step 노드의 근거 출처 — 인용 검증(S9)·문서화의 닻. */
+export const StepSourceSchema = z.object({
+  stepId: z.string(),
+  relPath: z.string(),
+  line: z.number().int(),
+  className: z.string().nullable(),
+})
+export type StepSource = z.infer<typeof StepSourceSchema>
+
+/**
+ * skeleton.json — S6 결정론 골격 산출물.
+ * 모든 배열은 자연키로 정렬되어 byte-identical 재실행을 보장한다.
+ * truncatedSteps 는 stepCap 초과로 누락된 step 을 정직하게 보고한다(조용한 cap 금지).
+ */
+export const SkeletonReportSchema = z.object({
+  schemaVersion: z.literal(1),
+  gitCommit: z.string().nullable(),
+  stepCap: z.number().int(),
+  nodes: z.array(UaGraphNodeSchema),
+  edges: z.array(UaGraphEdgeSchema),
+  stepSources: z.array(StepSourceSchema),
+  truncatedSteps: z.array(
+    z.object({
+      flowId: z.string(),
+      dropped: z.array(z.string()),
+    }),
+  ),
+})
+export type SkeletonReport = z.infer<typeof SkeletonReportSchema>
+
+// ──────────────────────────────────────────────────────────────────────────
+// SUPPLEMENT E — 도메인 맵 요약 산출(E-a/E-b/E-c) + AC-3 요약.
+//
+// E-c: 교차 도메인 의존 그래프(AC-33) — 파일 의존 엣지를 도메인 단위로 집계하되
+//      근거(evidence)는 실제 파일 엣지로 GROUNDED 하게 보존한다(합성 금지).
+// E-b: 온보딩 우선순위(AC-32) — "여기부터 보세요" 결정론 랭킹.
+// E-a: LLM 도메인명 제안 CONTEXT(AC-31) — 엔진은 LLM 을 호출하지 않고 컨텍스트만
+//      만든다. 적용은 confirm.renameDomain 으로(키 불변).
+// AC-3: 도메인 맵 요약 — 확정 플랜 + skeleton + 교차도메인 + 우선순위의 결합.
+//
+// 모든 배열은 생산자에서 정렬되어 byte-identical 재실행을 보장한다.
+// ──────────────────────────────────────────────────────────────────────────
+
+/**
+ * 교차 도메인 엣지 1건의 근거 — 집계 이전의 실제 파일 의존 엣지.
+ * source/target 은 census relPath, kind 는 EdgeKind 문자열, line 은 선언 라인(없으면 null).
+ */
+export const CrossDomainEvidenceSchema = z.object({
+  source: z.string(),
+  target: z.string(),
+  kind: z.string(),
+  line: z.number().int().nullable(),
+})
+export type CrossDomainEvidence = z.infer<typeof CrossDomainEvidenceSchema>
+
+/** 교차 도메인 엣지 — from→to 도메인, weight=근거 엣지 수, evidence=근거 파일 엣지. */
+export const CrossDomainEdgeSchema = z.object({
+  from: z.string(),
+  to: z.string(),
+  weight: z.number().int(),
+  evidence: z.array(CrossDomainEvidenceSchema),
+})
+export type CrossDomainEdge = z.infer<typeof CrossDomainEdgeSchema>
+
+/**
+ * 교차 도메인 의존 그래프(E-c, AC-33).
+ * 자기 도메인(self) 엣지는 제외, (from,to) 정렬. 모든 엣지는 grounded(근거 보유).
+ */
+export const CrossDomainGraphSchema = z.object({
+  schemaVersion: z.literal(1),
+  gitCommit: z.string().nullable(),
+  edges: z.array(CrossDomainEdgeSchema),
+})
+export type CrossDomainGraph = z.infer<typeof CrossDomainGraphSchema>
+
+/**
+ * 도메인 온보딩 우선순위(E-b, AC-32).
+ * priorityScore = 복잡도·크기·결합도의 결정론 가중합(고정 정수 가중치, 문서화됨).
+ * rank 는 (priorityScore DESC, key ASC) 정렬의 1-based 위치(결정론 tie-break).
+ */
+export const DomainPrioritySchema = z.object({
+  key: z.string(),
+  sizeScore: z.number().int(),
+  complexityScore: z.number().int(),
+  couplingScore: z.number().int(),
+  priorityScore: z.number().int(),
+  rank: z.number().int(),
+})
+export type DomainPriority = z.infer<typeof DomainPrioritySchema>
+
+/** 도메인 맵 요약의 단일 도메인 행(AC-3). */
+export const DomainMapSummaryDomainSchema = z.object({
+  key: z.string(),
+  name: z.string(),
+  flowCount: z.number().int(),
+  nodeCount: z.number().int(),
+  priorityScore: z.number().int(),
+  rank: z.number().int(),
+  grounded: z.boolean(),
+  sampleAnchors: z.array(z.object({ file: z.string(), line: z.number().int() })),
+})
+export type DomainMapSummaryDomain = z.infer<typeof DomainMapSummaryDomainSchema>
+
+/**
+ * domain-map.json — AC-3 도메인 맵 요약 산출물.
+ * 확정 플랜 표시명 + flow/node 집계 + grounded(앵커 완비 여부) + 우선순위 + 교차도메인.
+ * 모든 배열은 정렬되어 byte-identical 재실행을 보장한다.
+ */
+export const DomainMapSummarySchema = z.object({
+  schemaVersion: z.literal(1),
+  gitCommit: z.string().nullable(),
+  domains: z.array(DomainMapSummaryDomainSchema),
+  crossDomain: CrossDomainGraphSchema,
+})
+export type DomainMapSummary = z.infer<typeof DomainMapSummarySchema>
+
+/** LLM 도메인명 제안 컨텍스트의 단일 도메인(E-a, AC-31). */
+export const NameSuggestionDomainSchema = z.object({
+  key: z.string(),
+  currentName: z.string(),
+  sampleFiles: z.array(z.string()),
+  tokens: z.array(z.string()),
+})
+export type NameSuggestionDomain = z.infer<typeof NameSuggestionDomainSchema>
+
+/**
+ * LLM 도메인명 제안 컨텍스트(E-a, AC-31).
+ * 엔진은 LLM 을 호출하지 않는다 — HOST LLM 이 한국어 이름을 제안할 컨텍스트만 만든다.
+ * 적용은 confirm.renameDomain(plan,key,name) 으로(key 불변).
+ */
+export const NameSuggestionContextSchema = z.object({
+  schemaVersion: z.literal(1),
+  gitCommit: z.string().nullable(),
+  domains: z.array(NameSuggestionDomainSchema),
+})
+export type NameSuggestionContext = z.infer<typeof NameSuggestionContextSchema>

@@ -117,71 +117,7 @@
         "relPath": "src/main/java/com/ktds/shop/order/service/impl/OrderServiceImpl.java",
         "line": 88,
         "className": "OrderServiceImpl"
-      },
-      "variationPoints": [
-        {
-          "kind": "polymorphic",
-          "relPath": "src/main/java/com/ktds/shop/order/service/impl/OrderServiceImpl.java",
-          "method": "create",
-          "line": 95,
-          "discriminant": "DeliveryStrategy",
-          "branches": [
-            {
-              "label": "StandardDelivery",
-              "relPath": "src/main/java/com/ktds/shop/order/delivery/StandardDelivery.java",
-              "line": 8,
-              "calls": []
-            },
-            {
-              "label": "ExpressDelivery",
-              "relPath": "src/main/java/com/ktds/shop/order/delivery/ExpressDelivery.java",
-              "line": 8,
-              "calls": []
-            },
-            {
-              "label": "ColdChainDelivery",
-              "relPath": "src/main/java/com/ktds/shop/order/delivery/ColdChainDelivery.java",
-              "line": 8,
-              "calls": []
-            }
-          ],
-          "extension": "DeliveryStrategy 인터페이스를 구현하는 새 클래스를 추가하세요"
-        },
-        {
-          "kind": "if-chain",
-          "relPath": "src/main/java/com/ktds/shop/order/service/impl/OrderServiceImpl.java",
-          "method": "create",
-          "line": 102,
-          "discriminant": "order.getType()",
-          "branches": [
-            {
-              "label": "\"NORMAL\"",
-              "relPath": null,
-              "line": 102,
-              "calls": [
-                "normalOrderHandler.handle"
-              ]
-            },
-            {
-              "label": "\"SUBSCRIPTION\"",
-              "relPath": null,
-              "line": 104,
-              "calls": [
-                "subscriptionHandler.handle"
-              ]
-            },
-            {
-              "label": "else",
-              "relPath": null,
-              "line": 106,
-              "calls": [
-                "giftOrderHandler.handle"
-              ]
-            }
-          ],
-          "extension": "order.getType() 비교에 새 분기(else if)를 추가하세요"
-        }
-      ]
+      }
     },
     {
       "tags": [],

@@ -148,12 +148,6 @@ export const ja = {
     collapseAllBranches: "枝を折りたたむ",
     methodsUsed: "メソッド",
     closeDetail: "閉じる",
-    variationTitle: "変更点",
-    variationBranches: "分岐",
-    variationExtend: "新しいバリアントを追加",
-    variationKindPolymorphic: "ポリモーフィズム",
-    variationKindSwitch: "switch 分岐",
-    variationKindIf: "条件分岐",
   },
   detailLevel: {
     filesTitle: "ファイルのみ — アーキテクチャレベルの依存関係（高速）",

@@ -148,12 +148,6 @@ export const zhTW = {
     collapseAllBranches: "摺疊分支",
     methodsUsed: "方法",
     closeDetail: "關閉",
-    variationTitle: "變更點",
-    variationBranches: "分支",
-    variationExtend: "新增新變體",
-    variationKindPolymorphic: "多型",
-    variationKindSwitch: "switch 分支",
-    variationKindIf: "條件分支",
   },
   detailLevel: {
     filesTitle: "僅檔案 — 架構級依賴（快速）",

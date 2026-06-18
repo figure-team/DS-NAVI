@@ -148,12 +148,6 @@ export const ko = {
     collapseAllBranches: "곁가지 접기",
     methodsUsed: "methods",
     closeDetail: "닫기",
-    variationTitle: "변경점",
-    variationBranches: "분기",
-    variationExtend: "새 변형 추가",
-    variationKindPolymorphic: "다형성",
-    variationKindSwitch: "switch 분기",
-    variationKindIf: "조건 분기",
   },
   detailLevel: {
     filesTitle: "파일만 — 아키텍처 레벨 의존성 (빠름)",

@@ -148,12 +148,6 @@ export const ru = {
     collapseAllBranches: "Свернуть ветви",
     methodsUsed: "методы",
     closeDetail: "Закрыть",
-    variationTitle: "Точки вариации",
-    variationBranches: "Ветви",
-    variationExtend: "Добавить новый вариант",
-    variationKindPolymorphic: "Полиморфизм",
-    variationKindSwitch: "Switch",
-    variationKindIf: "If-цепочка",
   },
   detailLevel: {
     filesTitle: "Только файлы — зависимости архитектурного уровня (быстро)",

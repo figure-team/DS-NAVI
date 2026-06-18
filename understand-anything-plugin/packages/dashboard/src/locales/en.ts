@@ -148,12 +148,6 @@ export const en = {
     collapseAllBranches: "Collapse branches",
     methodsUsed: "methods",
     closeDetail: "Close",
-    variationTitle: "Variation points",
-    variationBranches: "Branches",
-    variationExtend: "Add a new variant",
-    variationKindPolymorphic: "Polymorphic",
-    variationKindSwitch: "Switch",
-    variationKindIf: "If-chain",
   },
   detailLevel: {
     filesTitle: "Files only — architecture-level dependencies (fast)",

@@ -1,0 +1,13 @@
+{
+  "description": "Batch entry extraction. Java: @Scheduled(cron=..) yields a scheduled entry per annotation (repeated @Scheduled counted separately); public static void main yields a main entry. XML: Spring CronTriggerFactoryBean beans (including nested ones inside a SchedulerFactoryBean list) yield quartz entries with the referenced jobDetail bean id as handler and cron=<cronExpression>; the MethodInvokingJobDetailFactoryBean JobDetail bean is excluded to avoid double counting. <task:scheduled> yields a task-xml entry with ref#method handler and cron=<cron>.",
+  "routes": [],
+  "batchEntries": [
+    { "trigger": "main", "schedule": null, "handler": "ImportCli#main", "filePath": "src/main/java/com/acme/batch/ImportCli.java", "notes": [] },
+    { "trigger": "scheduled", "schedule": "cron=0 0 4 * * ?", "handler": "ReportJob#nightly", "filePath": "src/main/java/com/acme/batch/ReportJob.java", "notes": [] },
+    { "trigger": "scheduled", "schedule": "cron=0 0 6 * * MON", "handler": "ReportJob#weekly", "filePath": "src/main/java/com/acme/batch/ReportJob.java", "notes": [] },
+    { "trigger": "scheduled", "schedule": "cron=0 0 18 * * FRI", "handler": "ReportJob#weekly", "filePath": "src/main/java/com/acme/batch/ReportJob.java", "notes": [] },
+    { "trigger": "quartz", "schedule": "cron=0 30 2 * * ?", "handler": "reportJobDetail", "filePath": "src/main/resources/quartz-context.xml", "notes": [] },
+    { "trigger": "task-xml", "schedule": "cron=0 0 1 * * ?", "handler": "cleanupJob#run", "filePath": "src/main/resources/quartz-context.xml", "notes": [] },
+    { "trigger": "quartz", "schedule": "cron=0 15 3 * * ?", "handler": "nestedJobDetail", "filePath": "src/main/resources/quartz-scheduler.xml", "notes": [] }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "kind": "codebase",
+  "project": {
+    "name": "dual-load-sample",
+    "languages": ["java"],
+    "frameworks": ["spring"],
+    "description": "Small valid UA knowledge graph fixture for dual-load orchestrator tests.",
+    "analyzedAt": "2020-01-01T00:00:00.000Z",
+    "gitCommitHash": "0000000000000000000000000000000000000000"
+  },
+  "nodes": [
+    {
+      "id": "file:src/auth/Auth.java",
+      "type": "file",
+      "name": "Auth.java",
+      "filePath": "src/auth/Auth.java",
+      "lineRange": [1, 50],
+      "summary": "Authentication module entry point.",
+      "tags": ["auth"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/auth/LoginController.java",
+      "type": "file",
+      "name": "LoginController.java",
+      "filePath": "src/auth/LoginController.java",
+      "lineRange": [1, 80],
+      "summary": "Login HTTP controller.",
+      "tags": ["auth", "http"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/order/OrderService.java",
+      "type": "file",
+      "name": "OrderService.java",
+      "filePath": "src/order/OrderService.java",
+      "lineRange": [1, 120],
+      "summary": "Order processing service.",
+      "tags": ["order"],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/auth/LoginController.java",
+      "target": "file:src/auth/Auth.java",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/order/OrderService.java",
+      "target": "file:src/auth/Auth.java",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:app",
+      "name": "Application",
+      "description": "Application source files.",
+      "nodeIds": [
+        "file:src/auth/Auth.java",
+        "file:src/auth/LoginController.java",
+        "file:src/order/OrderService.java"
+      ]
+    }
+  ],
+  "tour": []
+}

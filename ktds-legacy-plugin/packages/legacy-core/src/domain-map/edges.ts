@@ -1,0 +1,328 @@
+/**
+ * EDGES 단계 — 파일↔파일 의존 엣지를 결정론적으로 생산한다.
+ *
+ * 모든 Java 파일을 1회 파싱해 팩트를 모으고, 전체 ClassIndex(단순명/FQN)를 만든 뒤
+ * import/injection/field-type/ctor-param/extends/implements/impl 엣지를 낸다.
+ * MyBatis: *Mapper.xml 의 namespace 와 SqlSession 문자열 호출을 매퍼 인터페이스/XML 로 잇는다.
+ * 미해소 참조는 절대 누락하지 않고 unresolved(ambiguous/not-found)로 보고한다.
+ * 엣지는 (source,target,kind,line), unresolved 는 (source,ref,reason)로 정렬·중복제거.
+ */
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import type { Node } from 'web-tree-sitter'
+import { extractJavaFacts, type JavaFileFacts } from './java-facts.js'
+import { parseSource } from './tree-sitter.js'
+import type { CensusReport, EdgeKind, EdgeRecord, EdgesReport, Unresolved } from './types.js'
+
+/** 주입 어노테이션(필드/생성자). */
+const INJECT_ANNOTATIONS = new Set(['Autowired', 'Resource', 'Inject'])
+
+/** MyBatis SqlSession 호출 메서드 이름. */
+const MYBATIS_METHODS = new Set([
+  'selectOne',
+  'selectList',
+  'selectMap',
+  'selectCursor',
+  'insert',
+  'update',
+  'delete',
+])
+
+/** 전체 클래스 인덱스 — 단순명/FQN -> relPath. */
+interface ClassIndex {
+  /** 단순 클래스명 -> 후보 relPath 목록(정렬, 중복제거). */
+  bySimpleName: Map<string, string[]>
+  /** FQN -> relPath(중복 FQN 은 사전식 최소 relPath 가 이긴다). */
+  byFqn: Map<string, string>
+}
+
+function cmp(a: string | number, b: string | number): number {
+  return a < b ? -1 : a > b ? 1 : 0
+}
+
+/** 전체 Java 팩트로 ClassIndex 를 만든다. */
+function buildClassIndex(allFacts: JavaFileFacts[]): ClassIndex {
+  const simple = new Map<string, Set<string>>()
+  const byFqn = new Map<string, string>()
+  for (const facts of allFacts) {
+    for (const cls of facts.classes) {
+      let set = simple.get(cls.name)
+      if (!set) {
+        set = new Set<string>()
+        simple.set(cls.name, set)
+      }
+      set.add(facts.relPath)
+      const existing = byFqn.get(cls.fqn)
+      if (existing === undefined || facts.relPath < existing) {
+        byFqn.set(cls.fqn, facts.relPath)
+      }
+    }
+  }
+  const bySimpleName = new Map<string, string[]>()
+  for (const [name, set] of simple) {
+    bySimpleName.set(name, [...set].sort(cmp))
+  }
+  return { bySimpleName, byFqn }
+}
+
+/** import FQN 에서 마지막 식별자(단순명). 와일드카드/static 도 처리. */
+function importSimpleName(fqn: string): string {
+  const clean = fqn.replace(/\.\*$/, '')
+  const dot = clean.lastIndexOf('.')
+  return dot >= 0 ? clean.slice(dot + 1) : clean
+}
+
+/**
+ * 단순 타입명을 relPath 로 해소한다.
+ * 1) 동일 파일 내 import 의 FQN 으로 byFqn 매칭, 2) bySimpleName 후보.
+ * 단일 후보 -> relPath. 0 후보 -> not-found. 다중 후보 + FQN 미해소 -> ambiguous.
+ */
+interface Resolution {
+  target: string | null
+  reason?: 'ambiguous' | 'not-found'
+}
+
+function resolveSimpleName(
+  simpleName: string,
+  facts: JavaFileFacts,
+  index: ClassIndex,
+): Resolution {
+  // import 로 FQN 이 명시된 경우 우선.
+  for (const imp of facts.imports) {
+    if (imp.endsWith('.*')) continue
+    if (importSimpleName(imp) === simpleName) {
+      const byFqn = index.byFqn.get(imp)
+      if (byFqn) return { target: byFqn }
+    }
+  }
+  // 같은 패키지 FQN 시도.
+  if (facts.packageName) {
+    const samePkg = index.byFqn.get(`${facts.packageName}.${simpleName}`)
+    if (samePkg) return { target: samePkg }
+  }
+  // 단순명 후보.
+  const candidates = index.bySimpleName.get(simpleName)
+  if (!candidates || candidates.length === 0) return { target: null, reason: 'not-found' }
+  if (candidates.length === 1) return { target: candidates[0] }
+  return { target: null, reason: 'ambiguous' }
+}
+
+/** *Impl 규칙으로 인터페이스 구현 후보를 찾는다(단순명 기준). */
+function resolveImplName(interfaceName: string, index: ClassIndex): string[] {
+  const impl = index.bySimpleName.get(`${interfaceName}Impl`)
+  return impl ? impl : []
+}
+
+/** mapper-xml: *Mapper.xml 의 namespace 추출. */
+function readXmlNamespace(text: string): string | null {
+  const m = text.match(/<mapper\b[^>]*\bnamespace\s*=\s*"([^"]+)"/)
+  return m ? m[1].trim() : null
+}
+
+/** MyBatis 문자열 호출(selectOne("ns.id"))의 namespace 들을 모은다(파일당). */
+function collectMyBatisNamespaces(root: Node): Set<string> {
+  const out = new Set<string>()
+  const stack: Node[] = [root]
+  while (stack.length > 0) {
+    const node = stack.pop()!
+    for (const c of node.namedChildren) {
+      if (!c) continue
+      stack.push(c)
+    }
+    if (node.type !== 'method_invocation') continue
+    const name = node.childForFieldName('name')?.text
+    if (!name || !MYBATIS_METHODS.has(name)) continue
+    const args = node.childForFieldName('arguments')
+    if (!args) continue
+    const first = args.namedChildren.filter((x): x is Node => x !== null)[0]
+    if (!first || first.type !== 'string_literal') continue
+    const frag = first.namedChildren.filter((x): x is Node => x !== null)[0]
+    const value = frag && frag.type === 'string_fragment' ? frag.text : ''
+    const dot = value.lastIndexOf('.')
+    if (dot <= 0) continue
+    out.add(value.slice(0, dot))
+  }
+  return out
+}
+
+/** edges 산출 — census 기반, 파일 기록 없음. */
+export async function extractEdges(
+  projectRoot: string,
+  census: CensusReport,
+): Promise<EdgesReport> {
+  const javaFiles = census.files.filter((f) => f.lang === 'java')
+  const xmlFiles = census.files.filter(
+    (f) => f.lang === 'xml' && f.relPath.endsWith('Mapper.xml'),
+  )
+
+  // 1) Java 팩트 + (mybatis 탐지용) 파싱 루트를 relPath 정렬 순으로 수집.
+  const factsByPath = new Map<string, JavaFileFacts>()
+  const mybatisNs = new Map<string, Set<string>>()
+  const sortedJava = [...javaFiles].sort((a, b) => cmp(a.relPath, b.relPath))
+  for (const f of sortedJava) {
+    let src: string
+    try {
+      src = readFileSync(join(projectRoot, f.relPath), 'utf8')
+    } catch {
+      continue
+    }
+    factsByPath.set(f.relPath, await extractJavaFacts(f.relPath, src))
+    mybatisNs.set(f.relPath, collectMyBatisNamespaces(await parseSource('java', src)))
+  }
+
+  const allFacts = [...factsByPath.values()]
+  const index = buildClassIndex(allFacts)
+
+  // FQN(namespace) -> relPath: 매퍼 인터페이스/클래스 해소용(byFqn 재사용).
+  const edges: EdgeRecord[] = []
+  const unresolved: Unresolved[] = []
+
+  const addEdge = (source: string, target: string, kind: EdgeKind, line: number | null): void => {
+    if (source === target) return // 자기참조 제외.
+    edges.push({ source, target, kind, line })
+  }
+  const addUnresolved = (
+    source: string,
+    ref: string,
+    reason: 'ambiguous' | 'not-found',
+  ): void => {
+    unresolved.push({ source, ref, reason })
+  }
+
+  /** 단순명 -> 엣지 또는 unresolved. */
+  const linkType = (
+    facts: JavaFileFacts,
+    simpleName: string,
+    kind: EdgeKind,
+    line: number | null,
+  ): void => {
+    const res = resolveSimpleName(simpleName, facts, index)
+    if (res.target) {
+      addEdge(facts.relPath, res.target, kind, line)
+    } else if (res.reason) {
+      addUnresolved(facts.relPath, simpleName, res.reason)
+    }
+  }
+
+  for (const facts of allFacts) {
+    // import 엣지: import 의 FQN -> 파일.
+    for (const imp of facts.imports) {
+      if (imp.endsWith('.*')) continue // 와일드카드는 단일 파일로 해소 불가 — 조용히 누락하지 않되 엣지도 없음(별도 not-found 보고도 의미 약함이라 생략하지 않기 위해 simpleName 해소 시도).
+      const byFqn = index.byFqn.get(imp)
+      if (byFqn) {
+        addEdge(facts.relPath, byFqn, 'import', null)
+      } else {
+        // FQN 직접 매칭 실패 -> 단순명으로 보고.
+        const simple = importSimpleName(imp)
+        const candidates = index.bySimpleName.get(simple)
+        if (!candidates || candidates.length === 0) {
+          addUnresolved(facts.relPath, imp, 'not-found')
+        } else if (candidates.length === 1) {
+          addEdge(facts.relPath, candidates[0], 'import', null)
+        } else {
+          addUnresolved(facts.relPath, imp, 'ambiguous')
+        }
+      }
+    }
+
+    for (const cls of facts.classes) {
+      // extends / implements.
+      for (const ext of cls.extends) {
+        linkType(facts, ext, 'extends', cls.line)
+      }
+      for (const impl of cls.implements) {
+        linkType(facts, impl, 'implements', cls.line)
+      }
+      // impl: 인터페이스 -> *Impl(또는 선언된 구현체).
+      if (cls.kind === 'interface') {
+        const implPaths = resolveImplName(cls.name, index)
+        for (const p of implPaths) {
+          addEdge(facts.relPath, p, 'impl', cls.line)
+        }
+      }
+      // 필드: injection vs field-type.
+      for (const field of cls.fields) {
+        const injected = field.annotations.some((a) => INJECT_ANNOTATIONS.has(a))
+        linkType(facts, field.type, injected ? 'injection' : 'field-type', field.line)
+      }
+      // 생성자 파라미터.
+      for (const t of cls.ctorParamTypes) {
+        linkType(facts, t, 'ctor-param', cls.line)
+      }
+    }
+  }
+
+  // MyBatis mapper-xml: 인터페이스(FQN==namespace) -> XML 파일.
+  for (const xf of xmlFiles) {
+    let text: string
+    try {
+      text = readFileSync(join(projectRoot, xf.relPath), 'utf8')
+    } catch {
+      continue
+    }
+    const ns = readXmlNamespace(text)
+    if (!ns) continue
+    const ifacePath = index.byFqn.get(ns)
+    if (ifacePath) {
+      addEdge(ifacePath, xf.relPath, 'mapper-xml', null)
+    } else {
+      // namespace 에 대응하는 매퍼 인터페이스를 못 찾음 — XML 자체를 source 로 보고.
+      addUnresolved(xf.relPath, ns, 'not-found')
+    }
+  }
+
+  // MyBatis 문자열 호출 -> 해당 namespace 의 매퍼 파일.
+  for (const facts of allFacts) {
+    const namespaces = mybatisNs.get(facts.relPath)
+    if (!namespaces) continue
+    for (const ns of [...namespaces].sort(cmp)) {
+      const target = index.byFqn.get(ns)
+      if (target) {
+        addEdge(facts.relPath, target, 'mybatis', null)
+      } else {
+        addUnresolved(facts.relPath, ns, 'not-found')
+      }
+    }
+  }
+
+  return {
+    schemaVersion: 1,
+    gitCommit: census.gitCommit,
+    edges: dedupSortEdges(edges),
+    unresolved: dedupSortUnresolved(unresolved),
+  }
+}
+
+/** 엣지 중복제거 + (source,target,kind,line) 정렬. */
+function dedupSortEdges(edges: EdgeRecord[]): EdgeRecord[] {
+  const seen = new Set<string>()
+  const out: EdgeRecord[] = []
+  for (const e of edges) {
+    const key = `${e.source} ${e.target} ${e.kind} ${e.line ?? ''}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(e)
+  }
+  return out.sort(
+    (a, b) =>
+      cmp(a.source, b.source) ||
+      cmp(a.target, b.target) ||
+      cmp(a.kind, b.kind) ||
+      cmp(a.line ?? -1, b.line ?? -1),
+  )
+}
+
+/** unresolved 중복제거 + (source,ref,reason) 정렬. */
+function dedupSortUnresolved(items: Unresolved[]): Unresolved[] {
+  const seen = new Set<string>()
+  const out: Unresolved[] = []
+  for (const u of items) {
+    const key = `${u.source} ${u.ref} ${u.reason}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(u)
+  }
+  return out.sort(
+    (a, b) => cmp(a.source, b.source) || cmp(a.ref, b.ref) || cmp(a.reason, b.reason),
+  )
+}

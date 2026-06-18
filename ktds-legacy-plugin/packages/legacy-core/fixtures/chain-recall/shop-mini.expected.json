@@ -1,0 +1,32 @@
+{
+  "project": "shop-mini",
+  "method": "수동 작성 정답지 — 픽스처 소스를 직접 열람해 각 루트가 전이적으로 반드시 도달해야 하는 파일을 명시. 산출물에서 역산하지 않음(체인 반증 게이트의 오라클).",
+  "chains": [
+    {
+      "root": "src/main/java/com/shop/web/UserController.java",
+      "mustReach": [
+        "src/main/java/com/shop/service/UserService.java",
+        "src/main/java/com/shop/service/impl/UserServiceImpl.java",
+        "src/main/java/com/shop/mapper/UserMapper.java",
+        "src/main/java/com/shop/domain/User.java",
+        "src/main/java/com/shop/util/FormatUtil.java",
+        "src/main/resources/com/shop/mapper/UserMapper.xml"
+      ]
+    },
+    {
+      "root": "src/main/java/com/shop/web/OrderController.java",
+      "mustReach": [
+        "src/main/java/com/shop/service/OrderService.java",
+        "src/main/java/com/shop/service/impl/OrderServiceImpl.java",
+        "src/main/java/com/shop/mapper/OrderMapper.java",
+        "src/main/java/com/shop/domain/Order.java",
+        "src/main/java/com/shop/util/FormatUtil.java",
+        "src/main/resources/com/shop/mapper/OrderMapper.xml"
+      ]
+    }
+  ],
+  "knownGaps": [
+    "com.shop.orphan.OrphanThing 은 의도적으로 어떤 루트에서도 도달 불가(unreached 검증용).",
+    "Spring/MyBatis 라이브러리 타입(@Autowired/@Service 등)은 프로젝트 외부라 import unresolved=not-found 로 보고됨(정상)."
+  ]
+}

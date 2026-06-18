@@ -1,0 +1,11 @@
+{
+  "description": "Stripes ActionBean route extraction. @UrlBinding gives the base URL verbatim; without it the NameBasedActionResolver convention applies (last package segment + class name minus ActionBean/Bean suffix + .action). Abstract base beans are excluded. Each Resolution-returning non-static handler becomes one route: @DefaultHandler maps to the base URL, every other event maps to base?event (explicit @HandlesEvent name when present, else method name).",
+  "routes": [
+    { "method": "ANY", "path": "/shop/cart.action", "kind": "form", "framework": "stripes", "handler": "CartActionBean#view", "notes": ["stripes-event"] },
+    { "method": "ANY", "path": "/shop/cart.action?addItem", "kind": "form", "framework": "stripes", "handler": "CartActionBean#addItem", "notes": ["stripes-event"] },
+    { "method": "ANY", "path": "/actions/Catalog.action", "kind": "form", "framework": "stripes", "handler": "CatalogActionBean#list", "notes": ["name-based-convention", "stripes-event"] },
+    { "method": "ANY", "path": "/actions/Catalog.action?viewCategory", "kind": "form", "framework": "stripes", "handler": "CatalogActionBean#viewCategory", "notes": ["name-based-convention", "stripes-event"] },
+    { "method": "ANY", "path": "/actions/Checkout.action?placeOrder", "kind": "form", "framework": "stripes", "handler": "CheckoutBean#submit", "notes": ["name-based-convention", "stripes-event"] }
+  ],
+  "batchEntries": []
+}

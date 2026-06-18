@@ -1,0 +1,13 @@
+{
+  "description": "web.xml servlet routing + directly addressable JSP. Each <servlet-mapping> url-pattern (including multiple patterns and CDATA-wrapped values) yields one ANY/servlet/webxml route; handler is the <servlet-class> FQN or the <jsp-file> path; DispatcherServlet carries a dispatcher note. url-pattern values are kept verbatim (extension and prefix patterns unchanged). Commented-out mappings are ignored. JSP files under webapp (but not WEB-INF) are GET/page/jsp routes addressable at their webapp-relative path.",
+  "routes": [
+    { "method": "ANY", "path": "*.do", "kind": "servlet", "framework": "webxml", "handler": "org.springframework.web.servlet.DispatcherServlet", "notes": ["dispatcher"] },
+    { "method": "ANY", "path": "/biz/*", "kind": "servlet", "framework": "webxml", "handler": "com.acme.legacy.BizServlet", "notes": [] },
+    { "method": "ANY", "path": "/cdata/*", "kind": "servlet", "framework": "webxml", "handler": "com.acme.legacy.BizServlet", "notes": [] },
+    { "method": "ANY", "path": "/legacy/report", "kind": "servlet", "framework": "webxml", "handler": "com.acme.legacy.ReportServlet", "notes": [] },
+    { "method": "ANY", "path": "/notice", "kind": "servlet", "framework": "webxml", "handler": "/WEB-INF/jsp/notice.jsp", "notes": [] },
+    { "method": "GET", "path": "/order/list.jsp", "kind": "page", "framework": "jsp", "handler": null, "notes": [] },
+    { "method": "ANY", "path": "/reports/*", "kind": "servlet", "framework": "webxml", "handler": "com.acme.legacy.ReportServlet", "notes": [] }
+  ],
+  "batchEntries": []
+}

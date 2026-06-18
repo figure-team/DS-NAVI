@@ -1,0 +1,67 @@
+{
+  "nodes": [
+    {
+      "id": "domain:auth",
+      "type": "domain",
+      "name": "Authentication",
+      "summary": "User authentication domain.",
+      "tags": ["domain"],
+      "domainMeta": { "entities": ["User"], "entryType": "http" }
+    },
+    {
+      "id": "flow:auth.login",
+      "type": "flow",
+      "name": "Login Flow",
+      "summary": "End-to-end login flow.",
+      "tags": ["flow"]
+    },
+    {
+      "id": "step:auth.login.controller",
+      "type": "step",
+      "name": "Receive login request",
+      "filePath": "src/auth/LoginController.java",
+      "lineRange": [1, 80],
+      "summary": "Controller receives the login request.",
+      "tags": ["step"]
+    },
+    {
+      "id": "step:auth.login.verify",
+      "type": "step",
+      "name": "Verify credentials",
+      "filePath": "src/auth/Auth.java",
+      "lineRange": [1, 50],
+      "summary": "Auth module verifies credentials.",
+      "tags": ["step"]
+    }
+  ],
+  "edges": [
+    {
+      "source": "domain:auth",
+      "target": "flow:auth.login",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:auth.login",
+      "target": "step:auth.login.controller",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "flow:auth.login",
+      "target": "step:auth.login.verify",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/auth/LoginController.java",
+      "target": "file:src/auth/Auth.java",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 1
+    }
+  ]
+}

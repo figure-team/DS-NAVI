@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans">
+
+  <!-- Standard SchedulerFactoryBean with nested trigger beans inside a list -->
+  <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="triggers">
+      <list>
+        <bean id="nestedTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+          <property name="jobDetail" ref="nestedJobDetail"/>
+          <property name="cronExpression" value="0 15 3 * * ?"/>
+        </bean>
+      </list>
+    </property>
+  </bean>
+
+</beans>

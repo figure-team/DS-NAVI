@@ -1,0 +1,183 @@
+/**
+ * domain-map 라우트 추출 오케스트레이션.
+ *
+ * census -> 각 .java 파일 1회 파싱(상수/composed 레지스트리 구축 후 추출) ->
+ * Spring 추출 + Next.js 추출 -> routeId 할당 -> 전순서 정렬 ->
+ * contextPath 해소 -> routes.json/census.json 기록.
+ * 배치(batch)는 @Scheduled / public static void main 만 결정론적으로 탐지한다.
+ */
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import type { Node } from 'web-tree-sitter'
+import { buildCensus } from './census.js'
+import { extractEdges } from './edges.js'
+import { buildSlices } from './slices.js'
+import { writeCensus, writeEdges, writeRoutes, writeSlices } from './persist.js'
+import { assignRouteIds, sortBatchEntries, sortRoutes } from './route-key.js'
+import { parseSource } from './tree-sitter.js'
+import { extractNextjsRoutes } from './routes/nextjs.js'
+import { extractStripesRoutes } from './routes/stripes.js'
+import { extractJspRoutes } from './routes/jsp.js'
+import { extractWebXmlRoutesFromCensus } from './routes/web-xml.js'
+import { extractJavaBatchEntries, extractXmlBatchEntries } from './routes/batch.js'
+import {
+  collectComposedAnnotations,
+  collectConstants,
+  extractSpringRoutes,
+  type SpringContext,
+} from './routes/spring.js'
+import type {
+  BatchEntry,
+  CensusReport,
+  EdgesReport,
+  RouteEntry,
+  RouteMethod,
+  SlicesReport,
+} from './types.js'
+
+/** 프로젝트 루트에서 라우트/배치 보고를 추출한다(파일 기록 없음). */
+export async function extractRoutes(
+  projectRoot: string,
+  census: CensusReport,
+): Promise<{
+  schemaVersion: 1
+  gitCommit: string | null
+  contextPath: string | null
+  routes: RouteEntry[]
+  batchEntries: BatchEntry[]
+}> {
+  const javaFiles = census.files.filter((f) => f.lang === 'java')
+
+  // 1) 모든 Java 파일 1회 파싱(루트 노드 캐시).
+  const parsed = new Map<string, Node>()
+  for (const f of javaFiles) {
+    try {
+      const src = readFileSync(join(projectRoot, f.relPath), 'utf8')
+      parsed.set(f.relPath, await parseSource('java', src))
+    } catch {
+      // 파싱 실패 파일은 조용히 건너뛰지 않고 단순 제외(증거 없는 라우트 금지).
+    }
+  }
+
+  // 2) 상수 + composed 레지스트리 구축(전 파일 스캔).
+  const ctx: SpringContext = {
+    constants: new Map<string, string>(),
+    composedVerb: new Map<string, RouteMethod | undefined>(),
+    composedStereotype: new Set<string>(),
+  }
+  for (const root of parsed.values()) {
+    collectConstants(root, ctx.constants)
+    collectComposedAnnotations(root, ctx.composedVerb, ctx.composedStereotype)
+  }
+
+  // 3) Java 기반 추출(Spring 라우트 + Stripes 라우트 + Java 배치 진입점).
+  //    relPath 정렬 순회로 결정론을 보장한다.
+  const routes: RouteEntry[] = []
+  const batchEntries: BatchEntry[] = []
+  const sortedJava = [...parsed.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+  for (const relPath of sortedJava) {
+    const root = parsed.get(relPath)!
+    routes.push(...extractSpringRoutes(root, relPath, ctx))
+    routes.push(...extractStripesRoutes(root, relPath))
+    batchEntries.push(...extractJavaBatchEntries(root, relPath))
+  }
+
+  // 4) Next.js 라우트 추출(census 기반).
+  routes.push(...(await extractNextjsRoutes(projectRoot, census)))
+
+  // 5) JSP 페이지 + web.xml 서블릿 라우트(census 기반).
+  routes.push(...extractJspRoutes(census))
+  routes.push(...extractWebXmlRoutesFromCensus(projectRoot, census))
+
+  // 6) XML 배치 진입점(Quartz CronTrigger / task:scheduled). xml census 파일 스캔.
+  const sortedXml = census.files
+    .filter((f) => f.lang === 'xml')
+    .map((f) => f.relPath)
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+  for (const relPath of sortedXml) {
+    let text: string
+    try {
+      text = readFileSync(join(projectRoot, relPath), 'utf8')
+    } catch {
+      continue
+    }
+    batchEntries.push(...extractXmlBatchEntries(text, relPath))
+  }
+
+  // 7) routeId 할당 + 정렬.
+  const sortedRoutes = sortRoutes(routes)
+  assignRouteIds(sortedRoutes)
+  const finalRoutes = sortRoutes(sortedRoutes)
+
+  return {
+    schemaVersion: 1,
+    gitCommit: census.gitCommit,
+    contextPath: readContextPath(projectRoot),
+    routes: finalRoutes,
+    batchEntries: sortBatchEntries(batchEntries),
+  }
+}
+
+/** buildCensus -> extractRoutes -> 기록. census/routes 반환. */
+export async function scanRoutes(projectRoot: string): Promise<{
+  census: CensusReport
+  routes: Awaited<ReturnType<typeof extractRoutes>>
+}> {
+  const census = buildCensus(projectRoot)
+  const routes = await extractRoutes(projectRoot, census)
+  writeCensus(projectRoot, census)
+  writeRoutes(projectRoot, routes)
+  return { census, routes }
+}
+
+/**
+ * 전체 domain-map 스캔: census -> routes -> edges -> slices.
+ * 네 산출물을 `.spec/map/` 에 기록하고 모두 반환한다(결정론).
+ */
+export async function scanDomainMap(projectRoot: string): Promise<{
+  census: CensusReport
+  routes: Awaited<ReturnType<typeof extractRoutes>>
+  edges: EdgesReport
+  slices: SlicesReport
+}> {
+  const census = buildCensus(projectRoot)
+  const routes = await extractRoutes(projectRoot, census)
+  const edges = await extractEdges(projectRoot, census)
+  const slices = buildSlices(census, routes, edges)
+  writeCensus(projectRoot, census)
+  writeRoutes(projectRoot, routes)
+  writeEdges(projectRoot, edges)
+  writeSlices(projectRoot, slices)
+  return { census, routes, edges, slices }
+}
+
+/** server.servlet.context-path 를 properties/yaml 에서 best-effort 로 읽는다. */
+function readContextPath(projectRoot: string): string | null {
+  const candidates = [
+    'src/main/resources/application.properties',
+    'src/main/resources/application.yml',
+    'src/main/resources/application.yaml',
+    'application.properties',
+    'application.yml',
+    'application.yaml',
+  ]
+  for (const rel of candidates) {
+    const abs = join(projectRoot, rel)
+    if (!existsSync(abs)) continue
+    let text: string
+    try {
+      text = readFileSync(abs, 'utf8')
+    } catch {
+      continue
+    }
+    if (rel.endsWith('.properties')) {
+      const m = text.match(/^\s*server\.servlet\.context-path\s*[=:]\s*(.+?)\s*$/m)
+      if (m) return m[1].trim()
+    } else {
+      // 단순 yaml: server: \n  servlet: \n    context-path: /foo
+      const m = text.match(/context-path\s*:\s*(.+?)\s*$/m)
+      if (m) return m[1].trim().replace(/^["']|["']$/g, '')
+    }
+  }
+  return null
+}

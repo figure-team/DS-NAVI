@@ -36,6 +36,25 @@ importers:
   ktds-legacy-plugin: {}
 
   ktds-legacy-plugin/packages/legacy-core:
+    dependencies:
+      '@understand-anything/core':
+        specifier: workspace:*
+        version: link:../../../understand-anything-plugin/packages/core
+      ignore:
+        specifier: ^7.0.5
+        version: 7.0.5
+      tree-sitter-java:
+        specifier: ^0.23.5
+        version: 0.23.5
+      tree-sitter-typescript:
+        specifier: ^0.23.2
+        version: 0.23.2
+      web-tree-sitter:
+        specifier: ^0.26.6
+        version: 0.26.6
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

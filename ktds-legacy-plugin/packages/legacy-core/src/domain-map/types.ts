@@ -402,6 +402,75 @@ export const DomainMapSummarySchema = z.object({
 })
 export type DomainMapSummary = z.infer<typeof DomainMapSummarySchema>
 
+// ──────────────────────────────────────────────────────────────────────────
+// METHOD-CALL GRAPH(P3.1) — 메서드 단위 호출 그래프(8-receiver 해소).
+//
+// 모든 메서드 본문의 각 호출(invocation)을 수신자(receiver) 종류별로 해소해
+// 대상 메서드 선언(프로젝트 내 해소 가능 시)으로 잇는다. P2 의 파일 단위 step 을
+// 메서드 정밀로 정련하기 위한 기반(skeleton 의 선택적 refinement).
+//
+// receiverKind 8종:
+//   field/param/local/self/super/static/return-type/external + unresolved(보고, 누락 금지).
+// 결정론: calls 는 (callerFile, callLine, calleeMethod) 자연키 정렬.
+// ──────────────────────────────────────────────────────────────────────────
+
+/**
+ * 호출 수신자 해소 종류 — 8 receiver kinds + unresolved.
+ *   field       : `this.svc.go()` / `svc.go()` (svc=필드) -> 필드 선언 타입.
+ *   param       : `p.go()` (p=메서드 파라미터) -> 파라미터 선언 타입.
+ *   local       : `Foo x = new Foo(); x.go()` -> 지역변수 선언/추론 타입.
+ *   self        : `go()` / `this.go()` (수신자 없음) -> 외곽 클래스(+상위).
+ *   super       : `super.go()` -> 슈퍼클래스.
+ *   static      : `Foo.go()` (Foo=타입명) -> 타입 Foo 의 정적 메서드.
+ *   return-type : `a.b().c()` -> `b()` 의 반환 타입 -> 그 타입의 `.c()`.
+ *   external    : 수신자가 JDK/라이브러리 타입(java.* 등, 프로젝트 내 선언 없음).
+ *   unresolved  : 해소 불가(람다/캐스트/추론불가 var 등) — 보고, 절대 누락 금지.
+ */
+export const ReceiverKindSchema = z.enum([
+  'field',
+  'param',
+  'local',
+  'self',
+  'super',
+  'static',
+  'return-type',
+  'external',
+  'unresolved',
+])
+export type ReceiverKind = z.infer<typeof ReceiverKindSchema>
+
+/**
+ * 해소된 단일 호출 — caller(메서드)에서 callee(메서드)로의 메서드 단위 엣지.
+ * calleeClass/calleeFile 은 external/unresolved 시 null(보고하되 드롭하지 않음).
+ * overloadArity: 동명 오버로드를 argCount 로 선택했을 때 고른 오버로드의 파라미터 수.
+ *   - 정확 일치 1건  -> 그 파라미터 수.
+ *   - 후보 0/모호    -> null(정직성: 임의 선택 금지).
+ */
+export const ResolvedCallSchema = z.object({
+  callerClass: z.string(),
+  callerMethod: z.string(),
+  callerFile: z.string(),
+  callLine: z.number().int(),
+  calleeClass: z.string().nullable(),
+  calleeMethod: z.string(),
+  calleeFile: z.string().nullable(),
+  receiverKind: ReceiverKindSchema,
+  argCount: z.number().int(),
+  overloadArity: z.number().int().nullable(),
+})
+export type ResolvedCall = z.infer<typeof ResolvedCallSchema>
+
+/**
+ * method-calls.json — 메서드 단위 호출 그래프 산출물.
+ * calls 는 (callerFile, callLine, calleeMethod) 자연키 정렬 — byte-identical 재실행 보장.
+ */
+export const MethodCallGraphSchema = z.object({
+  schemaVersion: z.literal(1),
+  gitCommit: z.string().nullable(),
+  calls: z.array(ResolvedCallSchema),
+})
+export type MethodCallGraph = z.infer<typeof MethodCallGraphSchema>
+
 /** LLM 도메인명 제안 컨텍스트의 단일 도메인(E-a, AC-31). */
 export const NameSuggestionDomainSchema = z.object({
   key: z.string(),

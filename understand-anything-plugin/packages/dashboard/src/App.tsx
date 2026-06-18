@@ -33,6 +33,7 @@ const KeyboardShortcutsHelp = lazy(
   () => import("./components/KeyboardShortcutsHelp"),
 );
 const OnboardingOverlay = lazy(() => import("./components/OnboardingOverlay"));
+const KtdsAtlasView = lazy(() => import("./components/KtdsAtlasView"));
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
 const SESSION_TOKEN_KEY = "understand-anything-token";
@@ -245,6 +246,7 @@ function DashboardContent({
   const showFunctionsInClassView = useDashboardStore((s) => s.showFunctionsInClassView);
   const toggleShowFunctionsInClassView = useDashboardStore((s) => s.toggleShowFunctionsInClassView);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
+  const [atlasOpen, setAtlasOpen] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("info");
   const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding);
   const dismissOnboarding = useCallback((remember: boolean) => {
@@ -451,6 +453,19 @@ function DashboardContent({
           </h1>
           <div className="w-px h-5 bg-border-subtle hidden sm:block" />
           <PersonaSelector />
+          <div className="w-px h-5 bg-border-subtle" />
+          <button
+            type="button"
+            onClick={() => setAtlasOpen((v) => !v)}
+            title="ktds Code Atlas (흐름뷰 / 도메인 지도)"
+            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+              atlasOpen
+                ? "bg-accent/20 text-accent"
+                : "text-text-muted hover:text-text-secondary"
+            }`}
+          >
+            Code Atlas
+          </button>
           {graph && !isKnowledgeGraph && domainGraph && (
             <>
               <div className="w-px h-5 bg-border-subtle" />
@@ -637,7 +652,11 @@ function DashboardContent({
       <div className="flex-1 flex min-h-0 relative">
         {/* Graph area */}
         <div className="flex-1 min-w-0 min-h-0 relative">
-          {viewMode === "knowledge" ? (
+          {atlasOpen ? (
+            <Suspense fallback={null}>
+              <KtdsAtlasView accessToken={accessToken} />
+            </Suspense>
+          ) : viewMode === "knowledge" ? (
             <KnowledgeGraphView />
           ) : viewMode === "domain" && domainGraph ? (
             <DomainGraphView />

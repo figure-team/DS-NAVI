@@ -179,7 +179,9 @@ function readSourceFile(url: URL) {
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["src/**/__tests__/**/*.test.ts"],
+    // Collect ALL test files under src (not only those in __tests__/), so ktds
+    // views (src/ktds/*.test.ts) are not silently skipped by the gate.
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
   },
 
   // FIX 1 — bind only to localhost, not 0.0.0.0

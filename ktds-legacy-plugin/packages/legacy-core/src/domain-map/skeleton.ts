@@ -13,14 +13,16 @@
  *   flow:batch:<rel>#<sym>   batch entryId 재사용
  *   step:<flow 자연키>:<relPath>
  *
- * ★ 스코프(P2 폴백): step 은 슬라이스(파일 단위 도달성, slices.ts)에서
- *   STRUCTURALLY 도출한다. 메서드 단위 호출 그래프(8-receiver 해소)는 P3 —
- *   여기서 빌드하지 않는다. 그래서 step 은 "메서드 정밀"이 아니라 "파일 단위
- *   도달 집합"이다. 메서드 정밀 step 은 P3 enhancement(문서화된 폴백).
+ * ★ step 도출(P3): methodCallGraph(선택)가 주어지면 핸들러 메서드에서 실제 호출을
+ *   따라가(reachableFlowFiles, 8-receiver 해소) "메서드 정밀"로 step 을 도출한다.
+ *   호출이 프로젝트 파일로 해소되지 않으면(람다/외부) 슬라이스(파일 단위 도달성,
+ *   slices.ts) 구조적 폴백을 쓴다. methodCallGraph 미제공 시 동작은 P2 와 동일(파일 단위).
+ *   호출 그래프 자체는 buildMap(extract.ts)이 빌드해 주입한다(여기서 빌드하지 않음).
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { extractJavaFacts, type JavaFileFacts } from './java-facts.js'
+import { reachableFlowFiles } from './method-calls.js'
 import { buildLayerSignals, deriveStepLayer, type LayerSignals } from './step-layer.js'
 import {
   DEFAULT_STEP_CAP,
@@ -29,6 +31,7 @@ import {
   type CensusReport,
   type ConfirmedPlan,
   type EdgesReport,
+  type MethodCallGraph,
   type RoutesReport,
   type SkeletonReport,
   type SlicesReport,
@@ -82,6 +85,13 @@ interface BuildSkeletonInput {
   candidates: CandidatesReport
   /** 확정 플랜 — 없으면 throw(자동 확정 금지, 사람 게이트 필수). */
   plan: ConfirmedPlan
+  /**
+   * 선택적 메서드 단위 호출 그래프(P3 refinement). 주어지면 flow 의 step 을
+   * 핸들러 메서드에서 실제 호출을 따라가(reachableFlowFiles) 메서드 정밀로 도출한다.
+   * 핸들러 호출이 어떤 프로젝트 파일로도 해소되지 않으면(람다/외부) 기존 slices
+   * 파일 단위 폴백을 그대로 쓴다. 미제공 시 동작은 P2 와 동일(파일 단위).
+   */
+  methodCallGraph?: MethodCallGraph
 }
 
 /**
@@ -93,7 +103,7 @@ export async function buildSkeleton(
   input: BuildSkeletonInput,
   options: { stepCap?: number } = {},
 ): Promise<SkeletonReport> {
-  const { census, routes, edges, slices, candidates, plan } = input
+  const { census, routes, edges, slices, candidates, plan, methodCallGraph } = input
   if (!plan) {
     throw new Error(
       'skeleton requires a ConfirmedPlan — run /understand-map confirm first',
@@ -189,11 +199,26 @@ export async function buildSkeleton(
       for (const flow of flows) {
         const flowKey = stripPrefix(flow.flowId, 'flow:')
 
-        // step = 이 root 의 슬라이스 도달 파일(파일 단위, P2 폴백). root 는 흐름의
-        // 닻이라 첫 step 으로 항상 보존하고, 나머지는 relPath 정렬. cap 초과는 보고.
-        const reached = reachedByRoot.get(root) ?? new Set<string>([root])
-        const rest = [...reached].filter((f) => f !== root).sort(cmp)
-        const ordered = [root, ...rest]
+        // step 도출: P3 메서드 트레이스(우선) -> P2 슬라이스 파일 단위(폴백).
+        //
+        // methodCallGraph 가 주어지고 핸들러 메서드의 호출이 실제로 프로젝트
+        // 파일로 해소되면(>root 1개), 호출-깊이 순(BFS)을 step 순서로 쓴다 —
+        // 메서드 정밀. 해소가 root 뿐이면(람다/외부-heavy 핸들러) 슬라이스 도달
+        // 파일 단위로 폴백한다(기존 P2 동작 유지, 문서화된 구조적 폴백).
+        let ordered: string[]
+        const traced =
+          methodCallGraph && flow.handlerMethod
+            ? reachableFlowFiles(methodCallGraph, root, flow.handlerMethod)
+            : null
+        if (traced && traced.length > 1) {
+          ordered = traced
+        } else {
+          // P2 폴백: 슬라이스 도달 파일(파일 단위). root 는 흐름의 닻이라 첫 step
+          // 으로 항상 보존하고, 나머지는 relPath 정렬.
+          const reached = reachedByRoot.get(root) ?? new Set<string>([root])
+          const rest = [...reached].filter((f) => f !== root).sort(cmp)
+          ordered = [root, ...rest]
+        }
         const stepFiles = ordered.slice(0, stepCap)
         const dropped = ordered.slice(stepCap)
 
@@ -304,6 +329,19 @@ interface FlowSpec {
   entryPoint: string
   entryType: 'http' | 'cron' | 'cli'
   line: number
+  /** 핸들러 메서드명(라우트/배치 handler) — P3 메서드 트레이스의 시작점. 없으면 null. */
+  handlerMethod: string | null
+}
+
+/**
+ * route/batch handler(`Class#method` 또는 `method`)에서 메서드 트레이스의 시작점인
+ * bare 메서드명만 추출. reachableFlowFiles 가 bare callerMethod 로 매칭하므로
+ * `OrderController#create` -> `create` 로 정규화해야 메서드 정밀 트레이스가 발화한다.
+ */
+function bareMethod(handler: string | null): string | null {
+  if (!handler) return null
+  const hash = handler.lastIndexOf('#')
+  return hash >= 0 ? handler.slice(hash + 1) : handler
 }
 
 /** 한 root 가 선언한 라우트/배치 진입을 flow 스펙으로 모은다(flowId 정렬). */
@@ -319,6 +357,7 @@ function collectFlows(
       entryPoint: r.handler ?? `${r.method} ${r.path}`,
       entryType: 'http',
       line: r.line,
+      handlerMethod: bareMethod(r.handler),
     })
   }
   for (const b of batchByFile.get(root) ?? []) {
@@ -327,6 +366,7 @@ function collectFlows(
       entryPoint: b.handler ?? b.entryId,
       entryType: b.trigger === 'main' ? 'cli' : 'cron',
       line: b.line,
+      handlerMethod: bareMethod(b.handler),
     })
   }
   return flows.sort((a, b) => cmp(a.flowId, b.flowId))

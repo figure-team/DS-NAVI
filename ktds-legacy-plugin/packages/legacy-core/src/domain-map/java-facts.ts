@@ -20,6 +20,68 @@ export interface FieldFact {
   annotations: string[]
 }
 
+/**
+ * 호출 수신자(receiver) 기술자 — 메서드 호출의 수신 표현식을 재귀 형태로 표현한다.
+ * P3 method-call 해소가 8-receiver 종류를 판정하는 입력이다.
+ *   - this        : `this.m()` / 묵시적 self (receiver 가 `this`)
+ *   - super       : `super.m()`
+ *   - name        : 단일 식별자 receiver (`svc`, `p`, `x`, `Foo`) — field/param/local/static 후보
+ *   - call        : 체이닝 호출 receiver (`a.b()` 의 `b()` 부분) — 반환 타입 추론으로 해소
+ *   - field       : 필드 접근 receiver (`a.b` 의 `b` 부분) — 필드 타입 추론으로 해소
+ *   - unknown     : 명시 수신자가 있으나 형태를 따라갈 수 없음(캐스트/람다/배열접근/생성식/
+ *                   삼항 등) — unresolved 로 해소돼야 한다. null(묵시적 self)과 구별하기 위함:
+ *                   null=수신자 없음(self), unknown=수신자 있으나 미해소(절대 self 로 오인 금지).
+ */
+export type ReceiverDesc =
+  | { kind: 'this' }
+  | { kind: 'super' }
+  | { kind: 'name'; text: string }
+  | { kind: 'call'; on: ReceiverDesc | null; methodName: string }
+  | { kind: 'field'; on: ReceiverDesc | null; field: string }
+  | { kind: 'unknown' }
+
+/** 메서드 본문 내 단일 호출 지점(소스 순서 보존). */
+export interface CallSite {
+  /** 호출되는 메서드 이름. */
+  methodName: string
+  /** 호출 인자 개수(오버로드 arity 매칭에 사용). */
+  argCount: number
+  /** 수신자 기술자. receiver 없는 묵시적 self 호출은 null. */
+  receiver: ReceiverDesc | null
+  /** receiver 의 소스 텍스트(없으면 null). */
+  receiverText: string | null
+  /** 1-based 호출 라인. */
+  line: number
+  /** 호출 노드의 바이트 시작 오프셋(지역변수 선언-사용 순서 판정용). */
+  startIndex: number
+}
+
+/** 메서드 본문 내 지역변수 선언(선언-사용 순서로 가장 가까운 선언을 고르기 위함). */
+export interface JavaLocalVar {
+  name: string
+  /** 선언 타입의 외곽 식별자. `var` 는 그대로 'var'(추론 불가 표식). */
+  typeName: string
+  /** 선언 노드의 바이트 시작 오프셋. */
+  startIndex: number
+}
+
+/** 메서드(또는 생성자) 선언 팩트. */
+export interface MethodFact {
+  name: string
+  /** 파라미터 개수(오버로드 arity 키). */
+  paramCount: number
+  /** formal_parameters 의 소스 텍스트(파라미터 타입/이름 파싱용). */
+  paramsText: string
+  /** 반환 타입의 외곽 식별자(없거나 void/기본형이면 null). */
+  returnType: string | null
+  /** 1-based 선언 라인. */
+  line: number
+  /** 메서드 본문 지역변수 선언(선언 순서). */
+  locals: JavaLocalVar[]
+  /** 메서드 본문 내 호출 지점(소스 순서). */
+  calls: CallSite[]
+}
+
 /** 클래스(또는 인터페이스/열거/레코드) 팩트. */
 export interface ClassFact {
   name: string
@@ -36,6 +98,8 @@ export interface ClassFact {
   /** 모든 생성자 파라미터 타입의 외곽 식별자(선언 순서). */
   ctorParamTypes: string[]
   annotations: string[]
+  /** 메서드 선언(선언 순서) — P3 method-call 해소 입력(추가 필드, 기존 소비자 무영향). */
+  methods: MethodFact[]
 }
 
 /** 한 Java 파일의 팩트. */
@@ -214,6 +278,182 @@ function typeListNames(typeList: Node | null): string[] {
   return out
 }
 
+/** 임의 타입 노드에서 외곽 식별자(generic/array/scoped 처리). returnType/local 타입용. */
+function anyTypeOuterName(node: Node | null): string | null {
+  if (!node) return null
+  switch (node.type) {
+    case 'type_identifier':
+    case 'identifier':
+      return node.text
+    case 'generic_type':
+    case 'array_type':
+    case 'scoped_type_identifier':
+      return typeOuterName(node)
+    default:
+      return null
+  }
+}
+
+/** method_declaration 의 반환 타입 노드(이름이 'type' 인 필드 또는 첫 타입). */
+function returnTypeName(method: Node): string | null {
+  const t = method.childForFieldName('type')
+  if (t) return anyTypeOuterName(t)
+  // 폴백: name 앞의 첫 타입 노드.
+  for (const c of method.namedChildren) {
+    if (!c) continue
+    const n = anyTypeOuterName(c)
+    if (n) return n
+  }
+  return null
+}
+
+/**
+ * 표현식 노드를 ReceiverDesc 로 변환한다(재귀). 해소 가능한 형태만 생산하고,
+ * 알 수 없는 형태(캐스트/람다/배열접근/생성식/삼항 등)는 `{ kind: 'unknown' }` 을 돌려
+ * 호출자가 unresolved 로 처리하게 한다. null 은 "수신자 노드 자체가 없음"(묵시적 self)에만
+ * 쓰인다 — 명시 수신자가 있는데 미해소인 경우를 self 로 오인하지 않기 위함.
+ */
+function exprToReceiver(node: Node | null): ReceiverDesc | null {
+  if (!node) return null
+  switch (node.type) {
+    case 'this':
+      return { kind: 'this' }
+    case 'super':
+      return { kind: 'super' }
+    case 'identifier':
+      return { kind: 'name', text: node.text }
+    case 'field_access': {
+      // `<obj>.<field>` — obj 가 super 면 super, this 면 this, 그 외 receiver 재귀.
+      const objNode = node.childForFieldName('object')
+      const fieldNode = node.childForFieldName('field')
+      if (!fieldNode) return { kind: 'unknown' }
+      if (objNode?.type === 'super') {
+        // super.field 는 흔치 않으나 field on super 로 표현.
+        return { kind: 'field', on: { kind: 'super' }, field: fieldNode.text }
+      }
+      const on = objNode ? exprToReceiver(objNode) : null
+      // obj 가 해소 불가(unknown && objNode 존재)면 전체 미해소.
+      if (on?.kind === 'unknown') return { kind: 'unknown' }
+      return { kind: 'field', on, field: fieldNode.text }
+    }
+    case 'method_invocation': {
+      // 체이닝: `<obj>.<name>(...)` — obj 의 반환 타입으로 해소.
+      const objNode = node.childForFieldName('object')
+      const nameNode = node.childForFieldName('name')
+      if (!nameNode) return { kind: 'unknown' }
+      if (objNode?.type === 'super') {
+        return { kind: 'call', on: { kind: 'super' }, methodName: nameNode.text }
+      }
+      const on = objNode ? exprToReceiver(objNode) : null
+      if (on?.kind === 'unknown') return { kind: 'unknown' }
+      return { kind: 'call', on, methodName: nameNode.text }
+    }
+    case 'parenthesized_expression': {
+      const inner = node.namedChildren.filter((c): c is Node => c !== null)[0] ?? null
+      // 괄호 안이 비어 있으면(불가능에 가까움) 미해소. 그 외 내부 식 그대로 해소.
+      return inner ? exprToReceiver(inner) : { kind: 'unknown' }
+    }
+    default:
+      // cast_expression / array_access / object_creation_expression / 람다 / 삼항 등은 미해소.
+      return { kind: 'unknown' }
+  }
+}
+
+/** arguments 노드의 인자 개수(named children 수). */
+function argCountOf(invocation: Node): number {
+  const args = invocation.childForFieldName('arguments')
+  if (!args) return 0
+  return args.namedChildren.filter((c): c is Node => c !== null).length
+}
+
+/**
+ * 메서드 본문에서 호출 지점(소스 순서)과 지역변수 선언을 수집한다.
+ * 호출은 깊이우선 전위순회(소스 순서 ≈ startIndex 오름차순)로 모으되, 마지막에 startIndex 정렬한다.
+ */
+function collectBodyFacts(body: Node): { calls: CallSite[]; locals: JavaLocalVar[] } {
+  const calls: CallSite[] = []
+  const locals: JavaLocalVar[] = []
+  const visit = (node: Node): void => {
+    if (node.type === 'method_invocation') {
+      const nameNode = node.childForFieldName('name')
+      const objNode = node.childForFieldName('object')
+      if (nameNode) {
+        let receiver: ReceiverDesc | null
+        let receiverText: string | null
+        if (!objNode) {
+          // 묵시적 self 호출 — `m(...)`.
+          receiver = null
+          receiverText = null
+        } else {
+          receiver = exprToReceiver(objNode)
+          receiverText = objNode.text
+        }
+        calls.push({
+          methodName: nameNode.text,
+          argCount: argCountOf(node),
+          receiver,
+          receiverText,
+          line: startLine(node),
+          startIndex: node.startIndex,
+        })
+      }
+    } else if (node.type === 'local_variable_declaration') {
+      const typeNode =
+        child(node, 'type_identifier') ??
+        child(node, 'generic_type') ??
+        child(node, 'array_type') ??
+        child(node, 'scoped_type_identifier')
+      let typeName: string | null
+      if (typeNode) {
+        typeName = anyTypeOuterName(typeNode)
+      } else {
+        // `var x = ...` — type 가 식별자 'var' 로 파싱될 수 있음.
+        const firstId = child(node, 'identifier')
+        typeName = firstId && firstId.text === 'var' ? 'var' : null
+      }
+      for (const declr of children(node, 'variable_declarator')) {
+        const nameId = child(declr, 'identifier')
+        if (nameId && typeName) {
+          locals.push({ name: nameId.text, typeName, startIndex: node.startIndex })
+        }
+      }
+    }
+    for (const c of node.namedChildren) {
+      if (c) visit(c)
+    }
+  }
+  visit(body)
+  calls.sort((a, b) => a.startIndex - b.startIndex)
+  return { calls, locals }
+}
+
+/** class_body 등에서 메서드(+생성자) 선언을 MethodFact 로 수집(선언 순서). */
+function collectMethods(body: Node): MethodFact[] {
+  const out: MethodFact[] = []
+  for (const m of children(body, 'method_declaration', 'constructor_declaration')) {
+    const id = child(m, 'identifier')
+    if (!id) continue
+    const fps = child(m, 'formal_parameters')
+    const paramCount = fps
+      ? children(fps, 'formal_parameter', 'spread_parameter').length
+      : 0
+    const mbody = child(m, 'block') ?? child(m, 'constructor_body')
+    const { calls, locals } = mbody
+      ? collectBodyFacts(mbody)
+      : { calls: [], locals: [] }
+    out.push({
+      name: id.text,
+      paramCount,
+      paramsText: fps ? fps.text : '()',
+      returnType: m.type === 'constructor_declaration' ? null : returnTypeName(m),
+      line: startLine(m),
+      locals,
+      calls,
+    })
+  }
+  return out
+}
+
 /** 단일 선언 노드에서 ClassFact 를 만든다. */
 function declToFact(decl: Node, kind: ClassKind, packageName: string | null): ClassFact | null {
   const id = child(decl, 'identifier')
@@ -223,8 +463,10 @@ function declToFact(decl: Node, kind: ClassKind, packageName: string | null): Cl
 
   const fields: FieldFact[] = []
   const ctorParamTypes: string[] = []
+  const methods: MethodFact[] = []
   const body = bodyOf(decl)
   if (body) {
+    methods.push(...collectMethods(body))
     for (const field of children(body, 'field_declaration')) {
       const typeName = typeOuterName(fieldTypeNode(field))
       const fmods = child(field, 'modifiers')
@@ -258,6 +500,7 @@ function declToFact(decl: Node, kind: ClassKind, packageName: string | null): Cl
     fields,
     ctorParamTypes,
     annotations: annotationNames(mods),
+    methods,
   }
 }
 

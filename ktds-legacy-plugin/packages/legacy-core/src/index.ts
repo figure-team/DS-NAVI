@@ -32,6 +32,7 @@ export {
   readConfirmedPlan,
   CONFIRMED_PLAN_FILENAME,
   writeSkeleton,
+  writeMethodCalls,
   writeDomainMapSummary,
   DOMAIN_MAP_SUMMARY_FILENAME,
   writeDomainGraph,
@@ -47,6 +48,17 @@ export {
 } from './domain-map/route-key.js'
 export { extractRoutes, scanRoutes, scanDomainMap, buildMap } from './domain-map/extract.js'
 export { buildSkeleton, DEFAULT_STEP_CAP } from './domain-map/skeleton.js'
+export {
+  buildMethodCallGraph,
+  buildGraphFromFacts,
+  reachableFlowFiles,
+} from './domain-map/method-calls.js'
+export type {
+  MethodFact,
+  CallSite,
+  ReceiverDesc,
+  JavaLocalVar,
+} from './domain-map/java-facts.js'
 export { emitDomainGraph } from './domain-map/emit.js'
 export {
   buildCrossDomainGraph,

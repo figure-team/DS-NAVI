@@ -14,6 +14,7 @@ import type {
   ConfirmedPlan,
   DomainMapSummary,
   EdgesReport,
+  MethodCallGraph,
   RoutesReport,
   SkeletonReport,
   SlicesReport,
@@ -128,6 +129,11 @@ export function readConfirmedPlan(projectRoot: string): ConfirmedPlan | null {
 /** skeleton.json 기록(`.spec/map/` mkdir -p 선행) — S6 결정론 골격의 영속. */
 export function writeSkeleton(projectRoot: string, report: SkeletonReport): void {
   writeReport(projectRoot, 'skeleton.json', report)
+}
+
+/** method-calls.json 기록(`.spec/map/` mkdir -p 선행) — P3 메서드 단위 호출 그래프. */
+export function writeMethodCalls(projectRoot: string, report: MethodCallGraph): void {
+  writeReport(projectRoot, 'method-calls.json', report)
 }
 
 /** domain-map.json 파일명(`.spec/map/` 하위) — AC-3 도메인 맵 요약. */

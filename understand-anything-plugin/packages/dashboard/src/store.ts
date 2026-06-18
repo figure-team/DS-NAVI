@@ -194,6 +194,16 @@ interface DashboardStore {
   domainGraph: KnowledgeGraph | null;
   activeDomainId: string | null;
 
+  /**
+   * Raw ktds Code Atlas domain-graph (nodes+edges from `@ktds/legacy-core`),
+   * loaded on demand by the ktds tab. Kept separate from `domainGraph`
+   * because the raw file does not satisfy the core KnowledgeGraph schema and
+   * its step nodes carry extra ktds fields (`layer`, etc.). Only consumed for
+   * CodeViewer source resolution of ktds step nodes.
+   */
+  ktdsDomainGraph: KnowledgeGraph | null;
+  setKtdsDomainGraph: (graph: KnowledgeGraph | null) => void;
+
   setDomainGraph: (graph: KnowledgeGraph) => void;
   setViewMode: (mode: ViewMode) => void;
   setIsKnowledgeGraph: (value: boolean) => void;
@@ -676,6 +686,11 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
 
   setDomainGraph: (graph) => {
     set({ domainGraph: graph });
+  },
+
+  ktdsDomainGraph: null,
+  setKtdsDomainGraph: (graph) => {
+    set({ ktdsDomainGraph: graph });
   },
 
   setIsKnowledgeGraph: (value) => {

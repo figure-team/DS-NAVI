@@ -82,6 +82,42 @@ export interface JavaLocalVar {
   startIndex: number;
 }
 
+/**
+ * One case/arm of a branch construct, with the byte range of its body so the
+ * variation-point builder can map resolved calls (which carry `startIndex`) into
+ * the arm they execute in — i.e. "the COLD case calls coldHandler.handle".
+ */
+export interface JavaBranchCase {
+  /**
+   * Case value or condition text. switch: the label value as written
+   * (`"AIR"`, `AIR`, `default`). if-chain: each arm's condition text, or
+   * `else` for the trailing else block.
+   */
+  label: string;
+  line: number;
+  /** Byte range [startIndex, endIndex) of this arm's body — maps calls to arms. */
+  startIndex: number;
+  endIndex: number;
+}
+
+/**
+ * A branch construct in a method body — a `switch` or an `if/else-if` chain.
+ * Net-new for variation-point ("변경점") detection: the call list alone is flat
+ * and loses which calls are dispatched per case. This carries just enough shape
+ * (selector + ordered arms + ranges) to recognise type-dispatch and show where a
+ * new variant would slot in, without holding AST nodes. Purely syntactic — the
+ * decision of *which* branches are variation points (the ≥2-arm / shared-token
+ * gate) lives in variation-points.ts, never here.
+ */
+export interface JavaBranch {
+  kind: "switch" | "if-chain";
+  /** switch selector expression (parens stripped); "" for an if-chain. */
+  selector: string;
+  line: number;
+  /** Arms in source order (switch cases incl. `default`, or if/else-if/else). */
+  cases: JavaBranchCase[];
+}
+
 export interface JavaMethodFacts {
   name: string;
   line: number;
@@ -100,6 +136,8 @@ export interface JavaMethodFacts {
   calls: JavaMethodInvocation[];
   /** Local + loop variable declarations in the body — call-graph receiver resolution. */
   locals: JavaLocalVar[];
+  /** switch / if-else-if constructs in the body — variation-point input. */
+  branches: JavaBranch[];
 }
 
 export interface JavaImport {
@@ -395,7 +433,115 @@ function extractMethod(node: JavaNode): JavaMethodFacts {
     bodyLine: body ? lineOf(body) : null,
     calls: body ? extractInvocations(body) : [],
     locals: body ? extractLocals(body) : [],
+    branches: body ? extractBranches(body) : [],
   };
+}
+
+/** "(p.getType())" → "p.getType()" — drop one wrapping paren pair. */
+function stripParens(text: string): string {
+  const t = text.trim();
+  return t.startsWith("(") && t.endsWith(")") ? t.slice(1, -1).trim() : t;
+}
+
+/** "case \"AIR\"" / "case AIR" / "default" → "\"AIR\"" / "AIR" / "default". */
+function switchLabelValue(label: JavaNode): string {
+  const t = label.text.trim();
+  if (t === "default" || t.startsWith("default")) return "default";
+  return t.replace(/^case\s+/, "").replace(/:$/, "").trim();
+}
+
+/**
+ * Collect every switch / if-else-if construct in a method body, in source order.
+ * Walks the same single-parse body subtree as the call/locals collectors. An
+ * else-if is folded into its parent chain (not re-emitted as its own branch):
+ * the alternative `if_statement` nodes are recorded as they are chained and
+ * skipped when the walk reaches them.
+ */
+function extractBranches(body: JavaNode): JavaBranch[] {
+  const out: JavaBranch[] = [];
+  const chainedElseIf = new Set<number>();
+  const stack: JavaNode[] = [body];
+  while (stack.length) {
+    const n = stack.pop()!;
+    if (n.type === "switch_expression") {
+      out.push(buildSwitchBranch(n));
+    } else if (n.type === "if_statement" && !chainedElseIf.has(n.startIndex)) {
+      out.push(buildIfChain(n, chainedElseIf));
+    }
+    for (let i = 0; i < n.namedChildCount; i++) {
+      const c = n.namedChild(i);
+      if (c) stack.push(c);
+    }
+  }
+  return out.sort((a, b) => a.line - b.line);
+}
+
+function buildSwitchBranch(node: JavaNode): JavaBranch {
+  const condition = node.childForFieldName("condition");
+  const block = node.childForFieldName("body");
+  const cases: JavaBranchCase[] = [];
+  if (block) {
+    for (let i = 0; i < block.namedChildCount; i++) {
+      const group = block.namedChild(i);
+      // Colon style (switch_block_statement_group) and arrow style (switch_rule)
+      // both hold switch_label children; one case per group keeps fall-through
+      // groups (empty body) as their own zero-call arm.
+      if (
+        !group ||
+        (group.type !== "switch_block_statement_group" && group.type !== "switch_rule")
+      ) {
+        continue;
+      }
+      const labels = childrenOfType(group, "switch_label");
+      const label =
+        labels.length > 0 ? labels.map(switchLabelValue).join(" | ") : group.text.slice(0, 20);
+      cases.push({
+        label,
+        line: lineOf(group),
+        startIndex: group.startIndex,
+        endIndex: group.endIndex,
+      });
+    }
+  }
+  return {
+    kind: "switch",
+    selector: condition ? stripParens(condition.text) : "",
+    line: lineOf(node),
+    cases,
+  };
+}
+
+function buildIfChain(head: JavaNode, chainedElseIf: Set<number>): JavaBranch {
+  const cases: JavaBranchCase[] = [];
+  let cur: JavaNode | null = head;
+  while (cur && cur.type === "if_statement") {
+    const condition = cur.childForFieldName("condition");
+    const consequence = cur.childForFieldName("consequence");
+    if (consequence) {
+      cases.push({
+        label: condition ? stripParens(condition.text) : "",
+        line: lineOf(cur),
+        startIndex: consequence.startIndex,
+        endIndex: consequence.endIndex,
+      });
+    }
+    const alt: JavaNode | null = cur.childForFieldName("alternative");
+    if (alt && alt.type === "if_statement") {
+      chainedElseIf.add(alt.startIndex); // fold else-if into this chain
+      cur = alt;
+    } else {
+      if (alt) {
+        cases.push({
+          label: "else",
+          line: lineOf(alt),
+          startIndex: alt.startIndex,
+          endIndex: alt.endIndex,
+        });
+      }
+      cur = null;
+    }
+  }
+  return { kind: "if-chain", selector: "", line: lineOf(head), cases };
 }
 
 /** Type text with generics and trailing array brackets stripped ("List<X>[]" → "List"). */

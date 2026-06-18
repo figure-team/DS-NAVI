@@ -317,6 +317,43 @@ export const UaDomainMetaSchema = z
   })
   .passthrough();
 
+// ── Variation points (변경점) — flow 내 분기/확장 지점 ──────────────────────
+// step 노드에 얹히는 결정론 신호(LLM 아님): "기존 상품이 어디서 갈라지나 +
+// 새 변형을 어디에 끼우나". 두 종류를 하나의 앵커(step 파일+메서드+라인)로 통합:
+//   polymorphic — 인터페이스(impl≥2)를 통한 디스패치 호출 지점 (분기 = 구현체)
+//   switch      — switch(판별식) (분기 = case)
+//   if-chain    — 같은 판별식을 상수와 비교하는 if/else-if 체인 (분기 = 상수)
+// 게이트는 variation-points.ts: switch/if 모두 "변형 분기 ≥2"일 때만 VP가 된다.
+export const VARIATION_KINDS = ["polymorphic", "switch", "if-chain"] as const;
+export type VariationKind = (typeof VARIATION_KINDS)[number];
+
+export const VariationBranchSchema = z.object({
+  /** 표시 라벨: 구현체 클래스명 | switch case 값 | if 비교 상수. */
+  label: z.string(),
+  /** 분기가 곧 파일일 때(다형성 구현체)의 대상 파일 — 그 외 null. */
+  relPath: z.string().nullable(),
+  /** 증거 라인(구현체 클래스 선언 / case·조건 라인) — 미상이면 null. */
+  line: z.number().int().positive().nullable(),
+  /** 이 분기에서 실행되는 호출(메서드 분기만) — "그 분기가 무엇을 하는가". */
+  calls: z.array(z.string()),
+});
+export type VariationBranch = z.infer<typeof VariationBranchSchema>;
+
+export const VariationPointSchema = z.object({
+  kind: z.enum(VARIATION_KINDS),
+  /** 디스패치가 일어나는 step 파일(이 VP가 붙는 step). */
+  relPath: z.string(),
+  /** 감싸는 메서드명 — 클래스 레벨(필드 다형성)이면 null. */
+  method: z.string().nullable(),
+  line: z.number().int().positive(),
+  /** 변형 키: 인터페이스명 | switch 판별식 | if 공통 좌변. */
+  discriminant: z.string(),
+  branches: z.array(VariationBranchSchema),
+  /** 결정론 확장 힌트(새 변형 추가법) — LLM이 산문만 다듬을 수 있다. */
+  extension: z.string(),
+});
+export type VariationPoint = z.infer<typeof VariationPointSchema>;
+
 export const UaGraphNodeSchema = z
   .object({
     id: z.string(),
@@ -328,6 +365,12 @@ export const UaGraphNodeSchema = z
     tags: z.array(z.string()),
     complexity: z.enum(["simple", "moderate", "complex"]),
     domainMeta: UaDomainMetaSchema.optional(),
+    /**
+     * 이 step에서 흐름이 상품/유형별로 갈라지는 변경점 — 엔진 ground-truth
+     * (구조 신호). step 노드에만, 있을 때만 존재. domain-map/variation-points.ts가
+     * 채우고 skeleton이 부착한다.
+     */
+    variationPoints: z.array(VariationPointSchema).optional(),
     /**
      * step 노드의 계층 역할(엔진 ground-truth). non-step 노드와 옛 그래프는
      * 이 필드가 없으므로 optional — 대시보드는 있으면 그대로 읽고 없으면

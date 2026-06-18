@@ -14,6 +14,7 @@ import {
 import { buildLayerSignals, deriveStepLayer } from "./step-layer.js";
 import { buildClassIndex } from "./edges.js";
 import { buildMethodCallGraph, traceFlowMethodCalls, reachableFlowFiles } from "./method-calls.js";
+import { buildVariationPoints } from "./variation-points.js";
 import { cmp } from "../utils/cmp.js";
 import { groupBy } from "../utils/collections.js";
 
@@ -93,8 +94,16 @@ export function buildSkeleton(
   // layer 신호 집합은 루프 밖에서 한 번만 도출(파일당 재계산 금지).
   const layerSignals = buildLayerSignals(routes, edgesReport);
   // 메서드 단위 호출 그래프 — 흐름별로 핸들러에서 추적해 calls 엣지에 실제
-  // 호출 메서드명·순서를 라벨로 싣는다(파일 인접 토폴로지는 불변, description만 부착).
-  const callGraph = buildMethodCallGraph(javaFacts, buildClassIndex(javaFacts));
+  // 호출 메서드명·순서를 라벨로 싣고(description), 변경점(변형 분기) 도출의
+  // 공통 입력으로도 쓴다. classIndex/호출그래프는 1회만 도출(결정론).
+  const classIndex = buildClassIndex(javaFacts);
+  const callGraph = buildMethodCallGraph(javaFacts, classIndex);
+  // 변경점(변형 분기) — 파일별로 묶어 step 노드에 부착. 디스패치가 일어나는
+  // 파일이 그 흐름의 step일 때 "여기서 상품별로 갈라진다"를 그래프에 싣는다.
+  const variationsByFile = groupBy(
+    buildVariationPoints(javaFacts, classIndex, edgesReport, callGraph),
+    (v) => v.relPath,
+  );
 
   for (const d of domains) {
     const fileCount = [...domainByFile.values()].filter((k) => k === d.key).length;
@@ -194,6 +203,9 @@ export function buildSkeleton(
         stepFiles.forEach((file, i) => {
           const stepId = `step:${flowKey}:${file}`;
           const anchor = stepAnchor(file, javaFacts, file === root ? flow.line : null);
+          // 이 step 파일의 변경점 — 같은 파일은 여러 흐름의 step일 수 있으나
+          // 디스패치는 흐름과 무관하게 그 파일에 존재하므로 모두에 부착한다.
+          const variationPoints = variationsByFile.get(file);
           nodes.push({
             id: stepId,
             type: "step",
@@ -206,6 +218,7 @@ export function buildSkeleton(
             // 엔진 ground-truth layer (api/service/dao/db/unknown) — 대시보드가
             // 파일명 추측 대신 진실을 읽는다. routes/edges 간선 신호 + 파일명 폴백.
             layer: deriveStepLayer(file, anchor.className, layerSignals),
+            ...(variationPoints && variationPoints.length > 0 ? { variationPoints } : {}),
           });
           stepSources.push({
             stepId,

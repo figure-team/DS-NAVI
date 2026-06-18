@@ -148,6 +148,12 @@ export const zh = {
     collapseAllBranches: "折叠分支",
     methodsUsed: "方法",
     closeDetail: "关闭",
+    variationTitle: "变更点",
+    variationBranches: "分支",
+    variationExtend: "添加新变体",
+    variationKindPolymorphic: "多态",
+    variationKindSwitch: "switch 分支",
+    variationKindIf: "条件分支",
   },
   detailLevel: {
     filesTitle: "仅文件 — 架构级依赖（快速）",

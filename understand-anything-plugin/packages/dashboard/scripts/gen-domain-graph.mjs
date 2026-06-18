@@ -62,6 +62,36 @@ function fourLayerSteps(prefix, basePkg) {
       relPath: `src/main/java/${basePkg}/service/impl/OrderServiceImpl.java`,
       name: "OrderServiceImpl.create",
       line: 88,
+      // 변경점 데모: 주문 생성이 상품/배송 유형별로 갈라지는 두 지점.
+      // 새 상품/배송수단 등록 = 여기에 분기 하나 추가.
+      variationPoints: [
+        {
+          kind: "polymorphic",
+          relPath: `src/main/java/${basePkg}/service/impl/OrderServiceImpl.java`,
+          method: "create",
+          line: 95,
+          discriminant: "DeliveryStrategy",
+          branches: [
+            { label: "StandardDelivery", relPath: `src/main/java/${basePkg}/delivery/StandardDelivery.java`, line: 8, calls: [] },
+            { label: "ExpressDelivery", relPath: `src/main/java/${basePkg}/delivery/ExpressDelivery.java`, line: 8, calls: [] },
+            { label: "ColdChainDelivery", relPath: `src/main/java/${basePkg}/delivery/ColdChainDelivery.java`, line: 8, calls: [] },
+          ],
+          extension: "DeliveryStrategy 인터페이스를 구현하는 새 클래스를 추가하세요",
+        },
+        {
+          kind: "if-chain",
+          relPath: `src/main/java/${basePkg}/service/impl/OrderServiceImpl.java`,
+          method: "create",
+          line: 102,
+          discriminant: "order.getType()",
+          branches: [
+            { label: '"NORMAL"', relPath: null, line: 102, calls: ["normalOrderHandler.handle"] },
+            { label: '"SUBSCRIPTION"', relPath: null, line: 104, calls: ["subscriptionHandler.handle"] },
+            { label: "else", relPath: null, line: 106, calls: ["giftOrderHandler.handle"] },
+          ],
+          extension: "order.getType() 비교에 새 분기(else if)를 추가하세요",
+        },
+      ],
     },
     {
       id: `${prefix}:dao`,
@@ -104,6 +134,8 @@ function authorFlow({ domainId, flowId, flowName, entryPoint, entryType, steps }
       // StepSource shape rides along via schema passthrough (deriveLayer's
       // primary signal). className may be null for pure-SQL artifacts.
       stepSource: { stepId: s.id, relPath: s.relPath, line: s.line, className: s.className },
+      // variationPoints (변경점) ride along the same way — engine ground-truth.
+      ...(s.variationPoints ? { variationPoints: s.variationPoints } : {}),
     });
     addEdge({ source: flowId, target: s.id, type: "flow_step", weight });
   });

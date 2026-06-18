@@ -74,6 +74,60 @@ function readStepSource(node: GraphNode): StepSource | undefined {
   };
 }
 
+/**
+ * Variation points ("변경점") ride along on step nodes via schema passthrough —
+ * engine ground-truth (domain-map/variation-points.ts), not a typed GraphNode
+ * field. Read defensively, same posture as `stepSource`/`layer`. These are the
+ * dispatch sites where a flow branches by product/type, and the hint for where a
+ * new variant slots in.
+ */
+type VariationKind = "polymorphic" | "switch" | "if-chain";
+interface VariationBranch {
+  label: string;
+  relPath: string | null;
+  line: number | null;
+  calls: string[];
+}
+interface VariationPoint {
+  kind: VariationKind;
+  relPath: string;
+  method: string | null;
+  line: number;
+  discriminant: string;
+  branches: VariationBranch[];
+  extension: string;
+}
+
+function readVariationPoints(node: GraphNode): VariationPoint[] {
+  const raw = (node as { variationPoints?: unknown }).variationPoints;
+  if (!Array.isArray(raw)) return [];
+  const out: VariationPoint[] = [];
+  for (const v of raw) {
+    if (!v || typeof v !== "object") continue;
+    const o = v as Record<string, unknown>;
+    if (o.kind !== "polymorphic" && o.kind !== "switch" && o.kind !== "if-chain") continue;
+    if (typeof o.discriminant !== "string" || !Array.isArray(o.branches)) continue;
+    const branches: VariationBranch[] = o.branches
+      .filter((b): b is Record<string, unknown> => !!b && typeof b === "object")
+      .map((b) => ({
+        label: typeof b.label === "string" ? b.label : "",
+        relPath: typeof b.relPath === "string" ? b.relPath : null,
+        line: typeof b.line === "number" ? b.line : null,
+        calls: Array.isArray(b.calls) ? b.calls.filter((c): c is string => typeof c === "string") : [],
+      }));
+    out.push({
+      kind: o.kind,
+      relPath: typeof o.relPath === "string" ? o.relPath : "",
+      method: typeof o.method === "string" ? o.method : null,
+      line: typeof o.line === "number" ? o.line : 0,
+      discriminant: o.discriminant,
+      branches,
+      extension: typeof o.extension === "string" ? o.extension : "",
+    });
+  }
+  return out;
+}
+
 interface ResolvedStep extends SpineStep {
   node: GraphNode;
 }
@@ -290,6 +344,14 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
   };
 
   const selectedStep = selectedNodeId ? allSteps.find((s) => s.id === selectedNodeId) ?? null : null;
+  // 변경점(변형 분기) — 선택 노드에 부착된 엔진 신호(다형성/switch/조건분기).
+  const selectedVps = selectedStep ? readVariationPoints(selectedStep.node) : [];
+  const variationKindLabel = (k: VariationKind): string =>
+    k === "polymorphic"
+      ? t.flowView.variationKindPolymorphic
+      : k === "switch"
+        ? t.flowView.variationKindSwitch
+        : t.flowView.variationKindIf;
   const flowNode = domainGraph?.nodes.find((n) => n.id === activeFlowId) ?? null;
 
   // Right sidebar: the selected node's detail card. Shown ONLY while a node is
@@ -349,6 +411,92 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
                 >
                   {tag}
                 </span>
+              ))}
+            </div>
+          )}
+
+          {/* 변경점(변형 분기) — "기존 상품이 어디서 갈라지나 + 새 변형을
+              어디에 끼우나". 엔진이 도출한 구조 신호(다형성/switch/조건분기). */}
+          {selectedVps.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-border-subtle flex flex-col gap-3">
+              <p
+                className="text-[11px] uppercase tracking-wider flex items-center gap-1"
+                style={{ color: "var(--color-accent, #d4a574)" }}
+              >
+                ◆ {t.flowView.variationTitle}
+              </p>
+              {selectedVps.map((vp, vi) => (
+                <div key={`${vp.kind}-${vp.discriminant}-${vi}`} className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      className="uppercase font-semibold rounded px-1.5 py-0.5"
+                      style={{
+                        fontSize: 9,
+                        letterSpacing: "0.06em",
+                        color: "var(--color-accent, #d4a574)",
+                        background: "rgba(212,165,116,0.12)",
+                      }}
+                    >
+                      {variationKindLabel(vp.kind)}
+                    </span>
+                    <span
+                      className="text-text-secondary break-all"
+                      style={{ fontSize: 11, fontFamily: "var(--font-mono)" }}
+                    >
+                      {vp.discriminant}
+                    </span>
+                  </div>
+                  <p className="text-[10px] uppercase tracking-wider text-text-muted">
+                    {t.flowView.variationBranches} · {vp.branches.length}
+                  </p>
+                  <div className="flex flex-col gap-1">
+                    {vp.branches.map((b, bi) => (
+                      <div
+                        key={`${b.label}-${bi}`}
+                        className="rounded border border-border-subtle bg-elevated/40 px-2 py-1"
+                      >
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span
+                            className="text-text-primary truncate"
+                            style={{ fontSize: 11, fontFamily: "var(--font-mono)" }}
+                            title={b.label}
+                          >
+                            {b.label}
+                          </span>
+                          {b.relPath && (
+                            <span
+                              className="text-text-muted truncate shrink-0"
+                              style={{ fontSize: 9, fontFamily: "var(--font-mono)" }}
+                              title={b.relPath}
+                            >
+                              {b.relPath.split("/").pop()}
+                            </span>
+                          )}
+                        </div>
+                        {b.calls.length > 0 && (
+                          <div
+                            className="text-text-muted truncate mt-0.5"
+                            style={{ fontSize: 9, fontFamily: "var(--font-mono)" }}
+                            title={b.calls.join(", ")}
+                          >
+                            → {b.calls.join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {vp.extension && (
+                    <p
+                      className="text-[11px] leading-relaxed rounded px-2 py-1.5 mt-0.5"
+                      style={{
+                        color: "var(--color-accent, #d4a574)",
+                        background: "rgba(212,165,116,0.08)",
+                      }}
+                    >
+                      ⊕ {t.flowView.variationExtend}: {vp.extension}
+                    </p>
+                  )}
+                </div>
               ))}
             </div>
           )}
@@ -541,6 +689,8 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
               // disclosure badge ("＋N" folded / "－N" disclosed).
               const branchIds = partition.branchesByParent.get(step.id) ?? [];
               const branchExpanded = expandedBranchParents.has(step.id);
+              // 변경점(변형 분기) — 이 step에서 상품/유형별로 흐름이 갈라지는가.
+              const hasVariation = readVariationPoints(step.node).length > 0;
               return (
                 <div
                   key={step.id}
@@ -564,10 +714,19 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
                   }}
                 >
                   <div
-                    className="uppercase font-semibold mb-1"
+                    className="uppercase font-semibold mb-1 flex items-center gap-1"
                     style={{ fontSize: 9, letterSpacing: "0.08em", color }}
                   >
                     {laneLabels[step.layer]}
+                    {hasVariation && (
+                      <span
+                        title={t.flowView.variationTitle}
+                        aria-label={t.flowView.variationTitle}
+                        style={{ color: "var(--color-accent, #d4a574)", fontSize: 10, lineHeight: 1 }}
+                      >
+                        ◆
+                      </span>
+                    )}
                   </div>
                   <div
                     className="text-text-primary font-medium truncate"

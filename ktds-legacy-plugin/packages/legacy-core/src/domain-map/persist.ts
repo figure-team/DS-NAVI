@@ -241,15 +241,18 @@ export const DASHBOARD_CONFIG_FILENAME = 'config.json'
  */
 export function writeDashboardConfig(projectRoot: string): string {
   let outputLanguage = 'ko'
+  let approver: string | undefined
   try {
     const cfg = loadConfig(projectRoot)
     if (cfg?.outputLanguage) outputLanguage = cfg.outputLanguage
+    // P3: approver 핸들(있으면) 을 대시보드로 복사 — 저장 시 기본값(없으면 대시보드 입력).
+    if (typeof cfg?.approver === 'string' && cfg.approver.trim()) approver = cfg.approver.trim()
   } catch {
     // 손상된 understanding.config.json → ko 폴백(대시보드 언어 결정은 비치명적).
   }
   const dir = uaDir(projectRoot)
   mkdirSync(dir, { recursive: true })
   const filePath = join(dir, DASHBOARD_CONFIG_FILENAME)
-  writeFileSync(filePath, stableJson({ outputLanguage }), 'utf8')
+  writeFileSync(filePath, stableJson(approver ? { outputLanguage, approver } : { outputLanguage }), 'utf8')
   return filePath
 }

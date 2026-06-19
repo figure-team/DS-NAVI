@@ -77,7 +77,11 @@ interface NodeDetailTemplate {
 - v1 default: `[{ id:'role', label:'역할', promptHint:'이 흐름에서 이 클래스/파일의 역할' }]`.
 - bundle 이 템플릿 섹션을 LLM 에게 전달, emit/verify 가 섹션별 주장을 검증.
 
-### 4.3 사용자 오버레이 (신규 `.spec/map/node-overrides.json`, 서버 저장)
+### 4.3 사용자 오버레이 (신규 `.understand-anything/node-overrides.json`, 서버 저장)
+> **구현 정정(P3):** 당초 `.spec/map/` 로 적었으나, `.spec/map/` 은 `map` 재실행마다
+> 재생성되는 **중간 산출** 디렉터리라 사용자 확정분이 날아갈 위험이 있다. domain-graph.json
+> 과 같은 **영속 출력 디렉터리 `.understand-anything/`** 에 저장한다 — 재스캔 생존(§6 요구
+> 충족) + dev 서버 경로 로직(graphFileCandidates) 그대로 재사용.
 ```
 {
   "<nodeId>": {
@@ -115,7 +119,7 @@ interface NodeDetailTemplate {
 - 신규: `POST /node-overrides`(토큰 게이트). 바디 `{ nodeId, editedClaims, approver }`.
   - 검증: 토큰 일치 · `nodeId` 가 그래프에 실존 · `editedClaims` 키 화이트리스트(의미 주장만) ·
     `approver` 비어있지 않음.
-  - 동작: `GRAPH_DIR/.spec/map/node-overrides.json` 읽기→해당 nodeId 병합(audit append)→안정 JSON 기록.
+  - 동작: `GRAPH_DIR/.understand-anything/node-overrides.json` 읽기→해당 nodeId 병합(audit append)→JSON 기록.
   - 응답: 갱신된 레코드(대시보드가 즉시 배지 갱신).
 - `GET /node-overrides.json` 추가(읽기 병합용).
 - **approver 출처**: v1 은 `understanding.config.json` 의 핸들 또는 대시보드 1회 입력(미정 — §11).
@@ -147,7 +151,10 @@ interface NodeDetailTemplate {
   (GET/POST node-overrides) · locales(섹션 라벨·확정·편집·저장).
 
 ## 11. 리스크 / 오픈 이슈
-- **approver 출처**: config 핸들 vs 대시보드 입력 vs 인증 — v1 단순화(핸들/입력). Phase 2 보안 게이트와 연계.
+- **approver 출처**: ~~미정~~ → **P3 확정: config 핸들 + 대시보드 1회 입력 폴백**.
+  `understanding.config.json` 의 `approver`(있으면) → `writeDashboardConfig` 가 `.understand-anything/config.json`
+  으로 복사 → 대시보드가 저장 시 기본값으로 사용. 없으면 1회 입력(localStorage `ktds.approver` 기억).
+  진짜 인증은 Phase 2.
 - **편집 시 인용**: v1 은 text 만 편집(인용 보존). 사용자가 text 를 바꾸면 기존 인용과 불일치 가능 →
   오버레이는 "사람 책임(확정)"이라 기계검증 면제(doc-state APPROVED 와 동일 철학). 표시에 "사용자 편집됨" 명시.
 - **stale 오버레이**: 재스캔으로 nodeId 소멸 시 오버레이 고아 → 병합 시 stale 표시(삭제 금지).

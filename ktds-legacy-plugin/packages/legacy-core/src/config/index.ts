@@ -26,6 +26,11 @@ export const ConfigSchema = z
     inferredRatioBlockThreshold: z.number().min(0).max(1).default(0.6),
     supportedSchemaVersions: z.array(z.string()).default(['1.0.0']),
     relayBlock: z.object({ enabled: z.boolean().optional() }).optional(),
+    /**
+     * P3: 노드 편집/확정 시 기록할 사람(핸들). 설정하면 대시보드가 저장 시 approver
+     * 기본값으로 쓴다(없으면 대시보드 1회 입력 폴백). dashboard config 로 복사된다.
+     */
+    approver: z.string().optional(),
   })
   .passthrough()
 

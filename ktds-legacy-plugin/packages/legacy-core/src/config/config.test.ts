@@ -50,4 +50,14 @@ describe('config IO', () => {
     expect(text.endsWith('}\n')).toBe(true)
     expect(text).toContain('\n  "networkType"')
   })
+
+  it('P3: approver 핸들 round-trip(있으면 보존, 없으면 미정의)', () => {
+    writeFileSync(
+      join(dir, CONFIG_FILENAME),
+      JSON.stringify({ outputLanguage: 'ko', approver: 'jun_kyung.lee' }),
+      'utf8',
+    )
+    expect(loadConfig(dir)?.approver).toBe('jun_kyung.lee')
+    expect(defaultConfig().approver).toBeUndefined()
+  })
 })

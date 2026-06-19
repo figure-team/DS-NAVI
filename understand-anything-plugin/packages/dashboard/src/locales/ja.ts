@@ -164,6 +164,9 @@ export const ja = {
     detailMethods: "使用メソッド",
     detailCallsOut: "呼び出し (out)",
     detailCallsIn: "呼び出し元 (in)",
+    detailViewButton: "詳細を見る",
+    detailSectionsEmpty: "詳細は未入力です。",
+    detailSections: { role: "役割" } as Record<string, string>,
   },
   detailLevel: {
     filesTitle: "ファイルのみ — アーキテクチャレベルの依存関係（高速）",

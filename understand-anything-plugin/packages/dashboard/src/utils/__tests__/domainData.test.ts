@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { flowBadge, parseFlowStepClaim } from "../domainData";
+import { flowBadge, parseFlowStepClaim, parseStepDetailSections } from "../domainData";
 import type { GraphNode } from "@understand-anything/core/types";
 
 function flowNode(entryPoint: string, entryType = "http"): GraphNode {
@@ -101,5 +101,47 @@ describe("parseFlowStepClaim — flow/step node grounding (screens 2/3)", () => 
       { kind: "summary", ref: "d#summary", text: "d", verdict: "GROUNDED", citations: [] },
     ]);
     expect(parseFlowStepClaim(node)).toBeNull();
+  });
+});
+
+describe("parseStepDetailSections — P2 step detail sections", () => {
+  it("extracts detail:<id> claims with sectionId, verdict, citations", () => {
+    const node = nodeWithClaims("step", [
+      { kind: "step", ref: "s", text: "summary", verdict: "GROUNDED", citations: [] },
+      {
+        kind: "detail:role",
+        ref: "s#detail:role",
+        text: "서비스 계층 역할",
+        verdict: "GROUNDED",
+        citations: [{ filePath: "src/X.java", line: 5, status: "ok" }],
+      },
+    ]);
+    expect(parseStepDetailSections(node)).toEqual([
+      {
+        sectionId: "role",
+        text: "서비스 계층 역할",
+        verdict: "GROUNDED",
+        citations: [{ filePath: "src/X.java", line: 5, status: "ok" }],
+      },
+    ]);
+  });
+
+  it("preserves NEEDS_REVIEW verdict on detail sections", () => {
+    const node = nodeWithClaims("step", [
+      { kind: "detail:role", ref: "s#detail:role", text: "환각", verdict: "NEEDS_REVIEW", citations: [] },
+    ]);
+    expect(parseStepDetailSections(node)[0].verdict).toBe("NEEDS_REVIEW");
+  });
+
+  it("ignores non-detail claims and empty-text details", () => {
+    const node = nodeWithClaims("step", [
+      { kind: "step", ref: "s", text: "summary", verdict: "GROUNDED", citations: [] },
+      { kind: "detail:role", ref: "s#detail:role", text: "", verdict: "GROUNDED", citations: [] },
+    ]);
+    expect(parseStepDetailSections(node)).toEqual([]);
+  });
+
+  it("returns [] for a node with no ktdsClaims", () => {
+    expect(parseStepDetailSections(flowNode("POST /orders"))).toEqual([]);
   });
 });

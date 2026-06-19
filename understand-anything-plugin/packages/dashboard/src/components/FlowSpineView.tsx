@@ -16,11 +16,12 @@ import {
   NODE_H,
 } from "./flowSpineLayout";
 import type { SpinePlacement, SpineStep, SpineCallEdge } from "./flowSpineLayout";
-import { flowBadge, parseFlowStepClaim } from "../utils/domainData";
+import { flowBadge, parseFlowStepClaim, parseStepDetailSections } from "../utils/domainData";
 import type { FlowMethod } from "../utils/domainData";
 import type { GraphNode } from "@understand-anything/core/types";
 import CitationChip from "./CitationChip";
 import VerdictBadge from "./VerdictBadge";
+import NodeDetailModal from "./NodeDetailModal";
 
 const METHOD_COLOR: Record<FlowMethod, string> = {
   GET: "#38bdf8",
@@ -126,6 +127,9 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
   const toggleBranchParent = useDashboardStore((s) => s.toggleBranchParent);
   const setBranchParentsExpanded = useDashboardStore((s) => s.setBranchParentsExpanded);
   const { t } = useI18n();
+
+  // 상세 모달(P2, 읽기) 열림 상태 — 사이드바 "상세보기"가 토글.
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   // Which nodes have their "used methods" list expanded (view-local, ephemeral).
   const [openMethods, setOpenMethods] = useState<Set<string>>(() => new Set());
@@ -321,6 +325,12 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
     }
     return { methods, callsOut, callsIn };
   }, [domainGraph, selectedNodeId]);
+
+  // P2: 선택 step 의 템플릿 상세 섹션(역할 등) — 모달이 렌더.
+  const selectedDetailSections = useMemo(
+    () => (selectedStep ? parseStepDetailSections(selectedStep.node) : []),
+    [selectedStep],
+  );
   const flowNode = domainGraph?.nodes.find((n) => n.id === activeFlowId) ?? null;
 
   // Right sidebar: the selected node's detail card. Shown ONLY while a node is
@@ -363,6 +373,13 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
               {selectedStep.node.lineRange ? `:${selectedStep.node.lineRange[0]}` : ""}
             </p>
           )}
+          <button
+            type="button"
+            onClick={() => setDetailModalOpen(true)}
+            className="mt-2 w-full rounded-md border border-border-subtle px-3 py-1.5 text-xs text-text-secondary hover:border-accent hover:text-accent transition-colors"
+          >
+            {t.flowView.detailViewButton}
+          </button>
           {selectedStep.node.summary && (
             <>
               <p className="text-[11px] uppercase tracking-wider text-text-muted mt-2">
@@ -815,6 +832,19 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
       </div>
       {sidebar}
       </div>
+      {detailModalOpen && selectedStep && selectedDetail && (
+        <NodeDetailModal
+          node={selectedStep.node}
+          layerColor={LAYER_COLOR[selectedStep.layer]}
+          laneLabel={laneLabels[selectedStep.layer]}
+          methods={selectedDetail.methods}
+          callsOut={selectedDetail.callsOut}
+          callsIn={selectedDetail.callsIn}
+          detailSections={selectedDetailSections}
+          onClose={() => setDetailModalOpen(false)}
+          onSelectNode={selectNode}
+        />
+      )}
     </div>
   );
 }

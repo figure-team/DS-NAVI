@@ -164,6 +164,9 @@ export const ru = {
     detailMethods: "Используемые методы",
     detailCallsOut: "Вызывает (out)",
     detailCallsIn: "Вызывается (in)",
+    detailViewButton: "Подробнее",
+    detailSectionsEmpty: "Детали ещё не заполнены.",
+    detailSections: { role: "Роль" } as Record<string, string>,
   },
   detailLevel: {
     filesTitle: "Только файлы — зависимости архитектурного уровня (быстро)",

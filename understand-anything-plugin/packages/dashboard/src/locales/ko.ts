@@ -164,6 +164,9 @@ export const ko = {
     detailMethods: "사용 메서드",
     detailCallsOut: "호출함 (out)",
     detailCallsIn: "호출됨 (in)",
+    detailViewButton: "상세보기",
+    detailSectionsEmpty: "채워진 상세가 없습니다.",
+    detailSections: { role: "역할" } as Record<string, string>,
   },
   detailLevel: {
     filesTitle: "파일만 — 아키텍처 레벨 의존성 (빠름)",

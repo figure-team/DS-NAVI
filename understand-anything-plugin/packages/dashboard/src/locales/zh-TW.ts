@@ -164,6 +164,9 @@ export const zhTW = {
     detailMethods: "使用的方法",
     detailCallsOut: "呼叫 (out)",
     detailCallsIn: "被呼叫 (in)",
+    detailViewButton: "查看詳情",
+    detailSectionsEmpty: "尚未填寫詳情。",
+    detailSections: { role: "角色" } as Record<string, string>,
   },
   detailLevel: {
     filesTitle: "僅檔案 — 架構級依賴（快速）",

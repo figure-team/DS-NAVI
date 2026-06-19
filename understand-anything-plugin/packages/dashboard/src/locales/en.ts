@@ -164,6 +164,9 @@ export const en = {
     detailMethods: "Used methods",
     detailCallsOut: "Calls (out)",
     detailCallsIn: "Called by (in)",
+    detailViewButton: "View detail",
+    detailSectionsEmpty: "No detail filled yet.",
+    detailSections: { role: "Role" } as Record<string, string>,
   },
   detailLevel: {
     filesTitle: "Files only — architecture-level dependencies (fast)",

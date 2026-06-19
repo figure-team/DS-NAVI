@@ -130,6 +130,42 @@ export function parseFlowStepClaim(node: GraphNode): FlowGrounding | null {
   };
 }
 
+/**
+ * A step node's template detail section (P2) — kind 'detail:<sectionId>', embedded
+ * by emit's embedVerification alongside the step summary. Each is a verified LLM
+ * semantic claim (e.g. 'role') with its own grounding + citations.
+ */
+export interface StepDetailSection {
+  /** Template section id (e.g. "role"). */
+  sectionId: string;
+  text: string;
+  verdict: "GROUNDED" | "NEEDS_REVIEW";
+  citations: DomainClaimCitation[];
+}
+
+/**
+ * Parse a step node's detail sections from `domainMeta.ktdsClaims` (items whose
+ * kind is 'detail:<sectionId>'). Returns [] when the step has no filled detail.
+ * Order is preserved as embedded (verify sorts by section id → deterministic).
+ */
+export function parseStepDetailSections(node: GraphNode): StepDetailSection[] {
+  return readKtdsClaims(node)
+    .map((raw): StepDetailSection | null => {
+      const o = raw as Record<string, unknown>;
+      const kind = typeof o.kind === "string" ? o.kind : "";
+      if (!kind.startsWith("detail:")) return null;
+      const text = typeof o.text === "string" ? o.text : "";
+      if (!text) return null;
+      return {
+        sectionId: kind.slice("detail:".length),
+        text,
+        verdict: o.verdict === "NEEDS_REVIEW" ? "NEEDS_REVIEW" : "GROUNDED",
+        citations: parseCitations(o.citations),
+      };
+    })
+    .filter((x): x is StepDetailSection => x !== null);
+}
+
 /** Parse domainMeta.ktdsClaims (+ groundedPct/counts) embedded by emit's embedVerification. */
 function parseDomainClaims(node: GraphNode): {
   claims: DomainClaim[];

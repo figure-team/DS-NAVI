@@ -164,6 +164,9 @@ export const zh = {
     detailMethods: "使用的方法",
     detailCallsOut: "调用 (out)",
     detailCallsIn: "被调用 (in)",
+    detailViewButton: "查看详情",
+    detailSectionsEmpty: "尚未填写详情。",
+    detailSections: { role: "角色" } as Record<string, string>,
   },
   detailLevel: {
     filesTitle: "仅文件 — 架构级依赖（快速）",

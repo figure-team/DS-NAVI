@@ -54,6 +54,9 @@ export {
   NodeDetailTemplateSchema,
   NodeDetailSectionSchema,
   sectionsForLayer,
+  parseNodeDetailTemplate,
+  parseLayerSections,
+  LAYER_FILE_ALIAS,
 } from './domain-map/node-template.js'
 export type { NodeDetailTemplate, NodeDetailSection } from './domain-map/node-template.js'
 export {

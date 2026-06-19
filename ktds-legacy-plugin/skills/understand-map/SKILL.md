@@ -1,7 +1,7 @@
 ---
 name: understand-map
 description: 결정론 도메인 맵 — 전수 census/라우트/콜체인/도달성 스캔 + 도메인 경계 확정 + 요약 (.spec/map/*.json, 동일 commit byte-diff=0)
-argument-hint: ["[projectRoot]", "[scan|plan|confirm|map|bundle|emit]"]
+argument-hint: ["[projectRoot]", "[scan|plan|confirm|map|bundle|emit|templates]"]
 ---
 
 # /understand-map
@@ -84,7 +84,7 @@ skeleton 이 있어야 한다(없으면 안내 후 종료). 도메인별로 **LL
 
 1. `.spec/map/bundle/<key>.json` 을 읽는다.
 2. 그 안의 소스 슬라이스·구조 신호만 근거로, 도메인/흐름/단계의 `name`·`summary`·`entities`·`businessRules`·`crossDomainInteractions` 을 작성한다.
-3. **단계 상세(P2):** 번들의 `nodeDetailTemplate.sections` 각 섹션을 그 `promptHint` 지시대로 `steps[].detail[<섹션id>]` 에 채운다. v1 은 `role`(역할) 1개 — 이 흐름에서 그 클래스/파일이 맡는 역할을 한 문단으로, step slice 에서 인용. 메서드·호출관계는 채우지 않는다(결정론 — 엔진이 calls 엣지로 보유).
+3. **단계 상세(P2/P4 계층별):** 각 step 의 `layer` 를 보고 `nodeDetailTemplate.byLayer[layer]` 의 섹션들을 그 `promptHint` 지시대로 `steps[].detail[<섹션id>]` 에 채운다. 템플릿은 **계층별 파일**(`templates/node-detail/{api,service,dao,db,other}.md`, 사람 편집 권위·런타임 로드)에서 온다. 기본 시그니처 — api=role+request, service=role+businessLogic, dao=role+persistence, db=role+schema, other(unknown)=role+dataShape. 각 섹션은 step slice 에서 인용. 메서드·호출관계는 채우지 않는다(결정론 — 엔진이 calls 엣지로 보유).
 4. 결과를 `.spec/map/fill/<key>.json` 에 `DomainFill` 스키마로 쓴다.
 
 **계약(반드시 준수):**

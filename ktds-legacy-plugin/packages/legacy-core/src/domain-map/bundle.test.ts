@@ -97,16 +97,27 @@ describe('bundle — 도메인 LLM 입력 묶음', () => {
     expect(svc.slice!.text).toContain('주문은 회원만 생성할 수 있다')
   })
 
-  it('P2: 모든 번들에 nodeDetailTemplate(v1 role 섹션) 동봉', async () => {
+  it('P4: 모든 번들에 계층별 nodeDetailTemplate(v2) 동봉 + 각 계층 role 섹션', async () => {
     const skeleton = await shopSkeleton(root)
     const { bundles } = await buildBundles(root, skeleton)
     expect(bundles.length).toBeGreaterThan(0)
     for (const b of bundles) {
-      expect(b.nodeDetailTemplate.version).toBe(1)
-      const role = b.nodeDetailTemplate.sections.find((s) => s.id === 'role')
-      expect(role).toBeDefined()
-      expect(role!.promptHint.length).toBeGreaterThan(0)
+      expect(b.nodeDetailTemplate.version).toBe(2)
+      // 5개 계층 전부 키 존재 + 각 계층에 role 섹션.
+      for (const layer of ['api', 'service', 'dao', 'db', 'unknown'] as const) {
+        const sections = b.nodeDetailTemplate.byLayer[layer]
+        expect(sections).toBeDefined()
+        expect(sections!.find((s) => s.id === 'role')).toBeDefined()
+      }
     }
+  })
+
+  it('P4: step 에 layer 가 부착된다(호스트가 계층별 섹션 채우게)', async () => {
+    const skeleton = await shopSkeleton(root)
+    const { bundles } = await buildBundles(root, skeleton)
+    const order = bundles.find((b) => b.key === 'order')!
+    // 적어도 한 step 은 계층이 해소돼 layer 가 붙는다.
+    expect(order.steps.some((s) => typeof s.layer === 'string')).toBe(true)
   })
 
   it('charCap=0: 모든 슬라이스 생략(null) + sliceOmitted 전건(정렬) 보고', async () => {

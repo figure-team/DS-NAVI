@@ -63,19 +63,33 @@ steps: z.array(z.object({
 
 ### 4.2 노드 상세 템플릿 (신규 `domain-map/node-template.ts`)
 ```
-// 플러그인 탑재 + 사람 편집 가능(방법론 템플릿과 동형). 추후 사용자 커스텀.
+// 플러그인 탑재 + 사람 편집 가능(방법론 템플릿과 동형). 사용자 커스텀 가능.
 interface NodeDetailTemplate {
-  version: 1
-  sections: Array<{
-    id: string          // 'role' | 'behavior' | ...
-    label: string       // 표시명 (i18n 키 또는 직접 문자열)
-    promptHint: string  // LLM 채움 지시(번들 slice 근거로 작성)
-    layers?: FlowLayer[] // 선택: 특정 계층만(예: dataTouched는 dao/db)
-  }>
+  version: 2
+  // P4: 계층(FlowLayer)별 섹션 세트 — api/service/dao/db/unknown(other) 각각.
+  byLayer: Record<FlowLayer, Array<{
+    id: string          // 'role' | 'request' | 'persistence' | ...
+    label: string       // 표시명
+    promptHint: string  // LLM 채움 지시(번들 slice 근거)
+  }>>
 }
 ```
-- v1 default: `[{ id:'role', label:'역할', promptHint:'이 흐름에서 이 클래스/파일의 역할' }]`.
-- bundle 이 템플릿 섹션을 LLM 에게 전달, emit/verify 가 섹션별 주장을 검증.
+- **v2 default(P4, 계층별 2섹션)**: role(전 계층 공통, promptHint 계층별 상이) + 계층 시그니처:
+  api=`request` · service=`businessLogic` · dao=`persistence` · db=`schema` · other(unknown)=`dataShape`.
+- bundle 이 step 의 `layer` 와 `byLayer` 를 LLM 에게 전달(계층별 섹션 채움), emit/verify 가 섹션별 주장을 검증.
+- 대시보드는 노드에 임베드된 `detail:<id>` 주장을 그대로 렌더(템플릿 비의존), 라벨은 locale `detailSections[id]`.
+- **권위 = 계층별 `.md` 파일(P4): `templates/node-detail/{api,service,dao,db,other}.md`** — 계층마다 파일 1개,
+  사람 편집 단일 권위, 런타임 로드(편집 즉시 반영, 재빌드 불필요). 파일 자체가 계층이므로 본문은 섹션 목록:
+  `## 라벨 {#id}` / 그 아래 본문=promptHint(산문). `other.md` = unknown 계층.
+  - `.mjs`(bundle 단계)가 디렉터리의 각 파일을 읽어 `{layer: md}` 맵 구성 → `parseNodeDetailTemplate(filesByLayer)`
+    (엔진: `parseLayerSections` 로 파일별 파싱 + 스키마 검증)→`buildBundles({nodeDetailTemplate})` 주입(엔진 순수).
+  - 형식오류=명확히 종료(조용한 폴백 금지), 파일 0개=내장 `DEFAULT_NODE_DETAIL_TEMPLATE`(TS, **폴백 안전망**) 경고 후 진행.
+  - 부분 템플릿 허용(일부 계층 파일만 있어도 됨 → 없는 계층은 sectionsForLayer 에서 unknown 폴백).
+  - **프로젝트 우선 override(계층 파일마다)**: `<projectRoot>/.understand-anything/node-detail/<계층>.md` 가 있으면
+    그 계층은 프로젝트본, 없으면 플러그인 동봉본. 계층 단위로 섞인다(예: service 만 프로젝트가 덮고 나머지는 동봉본).
+    어느 출처를 썼는지 bundle 시 로깅(투명성). 조회: `understand-map.mjs <proj> templates` (활성 템플릿 + override 출처, 쓰기 없음).
+  > 비개발자(방법론 담당)가 `.ts` 를 못 만지고 재빌드도 어려우므로 템플릿 권위는 **계층별 .md 파일**. TS const 는 비상 폴백.
+  > (doc-generator 의 `templates/doc-templates.md` 는 아직 spec-only — 런타임 로드 미구현. 통일은 후속.)
 
 ### 4.3 사용자 오버레이 (신규 `.understand-anything/node-overrides.json`, 서버 저장)
 > **구현 정정(P3):** 당초 `.spec/map/` 로 적었으나, `.spec/map/` 은 `map` 재실행마다

@@ -16,10 +16,20 @@
  */
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
+/** 사람 편집 권위 — 계층별 노드 상세 템플릿 디렉터리(파일 1개 = 계층 1개, 런타임 로드). */
+const NODE_TEMPLATE_DIR = join(here, '..', 'templates', 'node-detail')
+/** 계층 키 → 파일명(other.md = unknown 계층). */
+const NODE_TEMPLATE_FILES = {
+  api: 'api.md',
+  service: 'service.md',
+  dao: 'dao.md',
+  db: 'db.md',
+  unknown: 'other.md',
+}
 
 if (!existsSync(distEntry)) {
   console.error(
@@ -32,6 +42,8 @@ if (!existsSync(distEntry)) {
 const projectRoot = process.argv[2] || process.cwd()
 const sub = process.argv[3] || 'scan'
 const flags = process.argv.slice(4)
+/** 프로젝트별 템플릿 override 디렉터리 — 플러그인 동봉본보다 우선. */
+const PROJECT_TEMPLATE_DIR = join(projectRoot, '.understand-anything', 'node-detail')
 
 function flagValue(name) {
   const i = flags.indexOf(name)
@@ -62,9 +74,12 @@ switch (sub) {
   case 'emit':
     await runEmit()
     break
+  case 'templates':
+    runTemplates()
+    break
   default:
     console.error(
-      `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | map | bundle | emit.`,
+      `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | map | bundle | emit | templates.`,
     )
     process.exit(2)
 }
@@ -161,10 +176,65 @@ async function runMap() {
   console.log('산출물: .spec/map/domain-map.json (동일 commit 재실행 byte-diff=0)')
 }
 
+/**
+ * 계층별 노드 상세 템플릿을 읽어 파싱한다 — **계층 파일마다** 프로젝트 override
+ * (`<proj>/.understand-anything/node-detail/<계층>.md`)를 먼저 보고, 없으면 플러그인
+ * 동봉본(`templates/node-detail/<계층>.md`)으로 폴백. 어느 출처를 썼는지 로깅(투명성).
+ * 파일이 하나도 없으면 엔진 내장 기본으로(경고), 형식 오류는 명확히 종료(조용한 폴백 금지).
+ */
+function loadNodeDetailTemplate() {
+  const filesByLayer = {}
+  const overridden = []
+  let found = 0
+  for (const [layer, file] of Object.entries(NODE_TEMPLATE_FILES)) {
+    const projectPath = join(PROJECT_TEMPLATE_DIR, file)
+    const pluginPath = join(NODE_TEMPLATE_DIR, file)
+    if (existsSync(projectPath)) {
+      filesByLayer[layer] = readFileSync(projectPath, 'utf8')
+      overridden.push(`${layer}(${file})`)
+      found++
+    } else if (existsSync(pluginPath)) {
+      filesByLayer[layer] = readFileSync(pluginPath, 'utf8')
+      found++
+    }
+  }
+  if (found === 0) {
+    console.warn(`⚠️ 노드 템플릿 없음(${PROJECT_TEMPLATE_DIR}/ · ${NODE_TEMPLATE_DIR}/) — 내장 기본 템플릿 사용.`)
+    return undefined
+  }
+  if (overridden.length > 0) {
+    console.log(`  노드 템플릿 프로젝트 override: ${overridden.join(', ')} (${PROJECT_TEMPLATE_DIR}/)`)
+  }
+  try {
+    return engine.parseNodeDetailTemplate(filesByLayer)
+  } catch (err) {
+    console.error(`노드 템플릿 파싱 실패: ${err.message}`)
+    console.error('형식(파일당): "## 라벨 {#id}" 섹션 + 그 아래 본문(promptHint).')
+    process.exit(2)
+  }
+}
+
+/** 활성 노드 상세 템플릿 조회 — 계층별 섹션 + override 출처(쓰기 없음). */
+function runTemplates() {
+  const tpl = loadNodeDetailTemplate() ?? engine.DEFAULT_NODE_DETAIL_TEMPLATE
+  console.log(`노드 상세 템플릿 — ${projectRoot}`)
+  console.log(`  프로젝트 override 경로: ${PROJECT_TEMPLATE_DIR}/<계층>.md (있으면 우선)`)
+  console.log(`  플러그인 동봉 경로: ${NODE_TEMPLATE_DIR}/<계층>.md`)
+  console.log('')
+  for (const [layer, file] of Object.entries(NODE_TEMPLATE_FILES)) {
+    const sections = tpl.byLayer[layer]
+    if (!sections) continue
+    console.log(`  [${layer}] (${file})  ${sections.map((s) => `${s.label}{#${s.id}}`).join(' · ')}`)
+  }
+  console.log('')
+  console.log('계층 템플릿을 프로젝트별로 바꾸려면 위 override 경로에 <계층>.md 를 두세요(편집 즉시 반영).')
+}
+
 async function runBundle() {
   const { buildBundles } = engine
   const skeleton = readSkeletonOrExit()
-  const { bundles, paths } = await buildBundles(projectRoot, skeleton)
+  const nodeDetailTemplate = loadNodeDetailTemplate()
+  const { bundles, paths } = await buildBundles(projectRoot, skeleton, { nodeDetailTemplate })
   console.log(`도메인 번들 조립 완료 — ${projectRoot}`)
   console.log(`  도메인 ${bundles.length}개 번들(.spec/map/bundle/):`)
   for (const b of bundles) {

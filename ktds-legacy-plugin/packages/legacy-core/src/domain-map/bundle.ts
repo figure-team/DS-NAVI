@@ -17,6 +17,8 @@ import { z } from 'zod'
 import { specMapDir, stableJson } from './persist.js'
 import { cmp } from '../utils/cmp.js'
 import { DEFAULT_NODE_DETAIL_TEMPLATE, NodeDetailTemplateSchema } from './node-template.js'
+import type { NodeDetailTemplate } from './node-template.js'
+import { FlowLayerSchema } from './types.js'
 import type { SkeletonReport } from './types.js'
 
 /** `.spec/map/bundle/` 하위 디렉터리 이름. */
@@ -64,7 +66,8 @@ export const DomainBundleSchema = z.object({
       stepIds: z.array(z.string()),
     }),
   ),
-  steps: z.array(z.object({ stepId: z.string(), relPath: z.string() })),
+  /** P4: layer = 이 step 의 계층 — 호스트가 nodeDetailTemplate.byLayer[layer] 섹션을 채운다. */
+  steps: z.array(z.object({ stepId: z.string(), relPath: z.string(), layer: FlowLayerSchema.optional() })),
   /** 소스 슬라이스 포함 파일 (도메인 내 유일, relPath 정렬). */
   files: z.array(BundleFileSchema),
   /** charCap 으로 슬라이스가 생략된 파일 (보고 — 조용한 누락 금지). */
@@ -80,6 +83,11 @@ export type DomainBundle = z.infer<typeof DomainBundleSchema>
 export interface BuildBundlesOptions {
   sliceLines?: number
   charCap?: number
+  /**
+   * P4: step 상세 채움 템플릿. 보통 .mjs 가 templates/node-detail-sections.md 를
+   * 읽어 파싱해 주입한다(사람 편집 권위). 미지정이면 내장 기본(DEFAULT)으로 폴백.
+   */
+  nodeDetailTemplate?: NodeDetailTemplate
 }
 
 interface KgFileHint {
@@ -164,6 +172,7 @@ export async function buildBundles(
 ): Promise<{ bundles: DomainBundle[]; paths: string[] }> {
   const sliceLines = options.sliceLines ?? DEFAULT_SLICE_LINES
   const charCap = options.charCap ?? DEFAULT_BUNDLE_CHAR_CAP
+  const nodeDetailTemplate = options.nodeDetailTemplate ?? DEFAULT_NODE_DETAIL_TEMPLATE
   const kgHints = await loadKgHints(projectRoot)
 
   const domains = skeleton.nodes.filter((n) => n.type === 'domain')
@@ -212,7 +221,8 @@ export async function buildBundles(
       for (const stepId of stepIds) {
         const src = sourceByStep.get(stepId)
         if (!src) continue
-        steps.push({ stepId, relPath: src.relPath })
+        const layer = nodeById.get(stepId)?.layer
+        steps.push(layer ? { stepId, relPath: src.relPath, layer } : { stepId, relPath: src.relPath })
         if (!fileAnchors.has(src.relPath)) {
           fileAnchors.set(src.relPath, { line: src.line, className: src.className })
         }
@@ -245,7 +255,7 @@ export async function buildBundles(
       steps,
       files,
       sliceOmitted,
-      nodeDetailTemplate: DEFAULT_NODE_DETAIL_TEMPLATE,
+      nodeDetailTemplate,
     }
     const filePath = join(dir, `${safeKeyFilename(key)}.json`)
     await writeFile(filePath, stableJson(DomainBundleSchema.parse(bundle)), 'utf8')

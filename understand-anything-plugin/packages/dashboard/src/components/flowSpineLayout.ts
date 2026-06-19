@@ -62,6 +62,14 @@ export interface SpineLayout {
   height: number;
   /** Number of steps per column, indexed like {@link SPINE_COLUMNS}. */
   columnCounts: number[];
+  /**
+   * How many lane columns to render, left→right. The 4 backbone lanes
+   * (API/Service/DAO/DB) always render as a stable pipeline frame, even when a
+   * flow skips one. The Other lane (col 4) renders only when populated (e.g. a
+   * disclosed branch), so an empty Other lane never reserves width / gets
+   * clipped. So `colsShown` is 4 normally, 5 once the Other lane has nodes.
+   */
+  colsShown: number;
 }
 
 const COLUMN_INDEX: Record<FlowLayer, number> = {
@@ -127,10 +135,16 @@ export function computeSpineLayout(
     columnCounts[col] += 1;
   }
 
-  const width = COL_W * SPINE_COLUMNS.length + 40;
+  // Always show the 4 backbone lanes (API/Service/DAO/DB) as a stable pipeline
+  // frame — even when a flow skips one. The Other lane (col 4) is the only
+  // conditional one: shown only when it actually has nodes (e.g. a disclosed
+  // branch), so an empty Other lane never reserves width / gets clipped.
+  const lastCol = columnCounts.reduce((acc, c, i) => (c > 0 ? i : acc), -1);
+  const colsShown = Math.max(4, lastCol + 1);
+  const width = COL_W * colsShown + 40;
   const height = Math.max(...colY, HEADER_H + NODE_PAD_Y) + 60;
 
-  return { placements, width, height, columnCounts };
+  return { placements, width, height, columnCounts, colsShown };
 }
 
 // ── Branch folding (progressive disclosure of the Other lane) ────────────────

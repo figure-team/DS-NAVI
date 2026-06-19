@@ -99,12 +99,34 @@ describe("computeSpineLayout — step count preserved + dimensions", () => {
     expect(p.h).toBe(NODE_H);
   });
 
-  it("empty input → zero placements, header-seeded height, full column width", () => {
-    const { placements, columnCounts, width, height } = computeSpineLayout([]);
+  it("empty input → zero placements, header-seeded height, 4 backbone lanes", () => {
+    const { placements, columnCounts, width, height, colsShown } = computeSpineLayout([]);
     expect(placements.size).toBe(0);
     expect(columnCounts).toEqual([0, 0, 0, 0, 0]);
-    expect(width).toBe(COL_W * SPINE_COLUMNS.length + 40);
+    expect(colsShown).toBe(4);
+    expect(width).toBe(COL_W * 4 + 40);
     expect(height).toBe(FIRST_Y + 60);
+  });
+});
+
+describe("computeSpineLayout — colsShown: 4 backbone lanes always, Other on demand", () => {
+  it("always shows the 4 backbone lanes (API/Service/DAO/DB) even when a flow skips some", () => {
+    // api(0) + dao(2) populated; service(1)/db(3) empty → still show all 4 lanes
+    // as the stable pipeline frame. Other(4) stays hidden (empty).
+    const { colsShown, width } = computeSpineLayout([step("a", "api"), step("d", "dao")]);
+    expect(colsShown).toBe(4);
+    expect(width).toBe(COL_W * 4 + 40);
+  });
+
+  it("api-only flow still shows all 4 backbone lanes", () => {
+    const { colsShown } = computeSpineLayout([step("a", "api"), step("a2", "api")]);
+    expect(colsShown).toBe(4);
+  });
+
+  it("the Other lane appears only once it has nodes (col 4 populated → 5 lanes)", () => {
+    const { colsShown, width } = computeSpineLayout([step("a", "api"), step("u", "unknown")]);
+    expect(colsShown).toBe(SPINE_COLUMNS.length);
+    expect(width).toBe(COL_W * SPINE_COLUMNS.length + 40);
   });
 });
 

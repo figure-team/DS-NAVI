@@ -457,7 +457,7 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
       {topbar}
       <div className="flex-1 min-h-0 flex">
       <div className="flex-1 min-w-0 relative">
-      <div className="h-full w-full overflow-auto">
+      <div className="spine-scroll h-full w-full overflow-auto">
         <div
           className="relative"
           style={{ minWidth: layout.width, minHeight: layout.height }}
@@ -465,7 +465,7 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
           {/* Layer rail columns (headers + background). pointer-events disabled
               so step nodes/edges above stay interactive. */}
           <div className="absolute inset-0 flex pointer-events-none">
-            {SPINE_COLUMNS.map((layer, li) => (
+            {SPINE_COLUMNS.slice(0, layout.colsShown).map((layer, li) => (
               <div
                 key={layer}
                 role="group"

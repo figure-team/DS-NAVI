@@ -4,7 +4,8 @@
  * 사용: node understand-onboard.mjs [projectRoot] [--by <handle>] [--skip-docs] [--methodology as-built|si-standard]
  *
  * 신규 투입자용 단일 진입점 — 결정론 ktds 분석 체인을 한 번에 돌린다:
- *   init → map scan(--auto-approve 자동 1차 패스) → map(skeleton) → docs → 커버리지 리포트.
+ *   init → map scan → confirm(--auto-approve) → map(skeleton) → emit(domain-graph.json,
+ *   대시보드 도메인 지도; fill 없이 결정론 라벨 폴백) → docs → 커버리지 리포트.
  * 각 단계는 기존 granular CLI 를 그대로 호출(파워유저용 granular 명령은 유지). UA 네이티브
  * `/understand`(knowledge-graph.json)는 대시보드/dual-load 용 — 온보딩 전/후 별도 실행을
  * 안내한다(ktds 분석은 .spec/map 기반이라 KG 없이도 동작).
@@ -53,19 +54,23 @@ function step(label, script, scriptArgs) {
 }
 
 console.log(`가이드 온보딩 시작 — ${projectRoot}`)
-console.log('(UA 대시보드/dual-load 를 원하면 먼저 /understand 로 knowledge-graph.json 을 생성하세요. ktds 분석은 KG 없이도 진행됩니다.)')
+console.log('(대시보드 도메인 지도는 emit 단계에서 자동 생성됩니다. 구조 그래프 뷰·dual-load 를 원하면 별도로 /understand 로 knowledge-graph.json 을 생성하세요.)')
 
-step('1/4 초기화 (init)', 'understand-init.mjs', [])
-step('2/4 스캔 (map scan)', 'understand-map.mjs', ['scan'])
-step('3/4 도메인 경계 자동 1차 확정 (map confirm --auto-approve)', 'understand-map.mjs', [
+step('1/5 초기화 (init)', 'understand-init.mjs', [])
+step('2/5 스캔 (map scan)', 'understand-map.mjs', ['scan'])
+step('3/5 도메인 경계 자동 1차 확정 (map confirm --auto-approve)', 'understand-map.mjs', [
   'confirm',
   '--auto-approve',
   '--by',
   by,
 ])
-step('3.5/4 도메인 맵 빌드 (map)', 'understand-map.mjs', ['map'])
+step('4/5 도메인 맵 빌드 (map)', 'understand-map.mjs', ['map'])
+// emit: skeleton → domain-graph.json(대시보드 도메인 지도). fill/<key>.json 이 없으면
+// 결정론 라벨 폴백으로 미채움 노드를 채운다(근거·검증 패널은 비어 있음). 근거까지 원하면
+// 후속으로 bundle → fill 작성 → emit 재실행(채워진 도메인만 증분 반영).
+step('5/5 도메인 그래프 emit (대시보드 도메인 지도)', 'understand-map.mjs', ['emit'])
 if (!skipDocs) {
-  step('4/4 산출물 생성 (docs)', 'understand-docs.mjs', [methodology])
+  step('+ 산출물 생성 (docs)', 'understand-docs.mjs', [methodology])
 } else {
   console.log('\n▷ docs 단계 건너뜀(--skip-docs).')
 }
@@ -78,7 +83,10 @@ if (existsSync(covPath)) {
   console.log('\n' + engine.renderCoverageReport(report))
 }
 
-console.log('온보딩 완료. 다음(선택):')
+console.log('온보딩 완료. 대시보드 도메인 지도(.understand-anything/domain-graph.json) 생성됨 — 대시보드에서 도메인 뷰 확인 가능.')
+console.log('다음(선택):')
+console.log('  - 근거·검증 채움: /understand-map bundle → fill/<key>.json 작성 → emit (도메인 카드 근거율·인용 노출)')
 console.log('  - 정밀 도메인 경계: /understand-map plan → confirm (자동 1차 경계 재정련)')
 console.log('  - 변경 영향도/생성예측: /understand-impact')
+console.log('  - 구조 그래프 뷰: /understand (knowledge-graph.json) — 대시보드 구조 뷰·dual-load')
 console.log('  - 증분 재스캔: 코드 변경 후 다시 /understand-onboard (변경 파일만 재도출, 확정 플랜 보존)')

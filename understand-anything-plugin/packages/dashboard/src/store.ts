@@ -14,7 +14,8 @@ export type NavigationLevel = "overview" | "layer-detail";
 export type NodeType = "file" | "function" | "class" | "module" | "concept" | "config" | "document" | "service" | "table" | "endpoint" | "pipeline" | "schema" | "resource" | "domain" | "flow" | "step" | "article" | "entity" | "topic" | "claim" | "source";
 export type Complexity = "simple" | "moderate" | "complex";
 export type EdgeCategory = "structural" | "behavioral" | "data-flow" | "dependencies" | "semantic" | "infrastructure" | "domain" | "knowledge";
-export type ViewMode = "structural" | "domain" | "knowledge";
+// ktds-fork (ADR-004): "wiki" = 코드그래프 위에 세분화 위키를 "문서" 토글로 오버레이.
+export type ViewMode = "structural" | "domain" | "knowledge" | "wiki";
 export type DetailLevel = "file" | "class";
 
 export interface FilterState {
@@ -97,6 +98,13 @@ function buildGraphIndexes(graph: KnowledgeGraph): {
 /** Maximum number of entries in the sidebar navigation history. */
 const MAX_HISTORY = 50;
 
+/** 오버레이 채널 원본 (ktds) — generatedAt(ISO)으로 자동 활성 우선순위 결정. */
+export interface OverlayChannelData {
+  changed: string[];
+  affected: string[];
+  generatedAt: string;
+}
+
 interface DashboardStore {
   graph: KnowledgeGraph | null;
   /** id → node lookup, rebuilt by setGraph. Empty before any graph loads. */
@@ -126,9 +134,15 @@ interface DashboardStore {
 
   persona: Persona;
 
+  // 오버레이 2채널 (ktds): diff=실측(git 변경, /understand-review·understand-diff),
+  // impact=예측(/understand-impact 시드 기반 도달성). diffMode/changedNodeIds/
+  // affectedNodeIds는 "활성 채널"의 뷰 상태 — 모든 뷰가 이것만 읽는다.
   diffMode: boolean;
   changedNodeIds: Set<string>;
   affectedNodeIds: Set<string>;
+  overlaySource: "diff" | "impact" | null;
+  diffOverlayData: OverlayChannelData | null;
+  impactOverlayData: OverlayChannelData | null;
 
   // Focus mode: isolate a node's 1-hop neighborhood
   focusNodeId: string | null;
@@ -172,6 +186,10 @@ interface DashboardStore {
 
   setDiffOverlay: (changed: string[], affected: string[]) => void;
   toggleDiffMode: () => void;
+  /** 채널 원본 적재 + 자동 활성(시드 보유 && 더 최신이거나 유일할 때). */
+  setOverlayData: (source: "diff" | "impact", data: OverlayChannelData) => void;
+  /** 채널 토글 — 활성 채널 재토글=숨김, 비활성 채널=전환 (동시 표시 없음). */
+  toggleOverlay: (source: "diff" | "impact") => void;
   clearDiffOverlay: () => void;
 
   toggleFilterPanel: () => void;
@@ -192,23 +210,44 @@ interface DashboardStore {
   viewMode: ViewMode;
   isKnowledgeGraph: boolean;
   domainGraph: KnowledgeGraph | null;
+  /** ktds-fork (ADR-004): 세분화 위키 그래프(별도 wiki-graph.json). "문서" 토글 소스. */
+  wikiGraph: KnowledgeGraph | null;
   activeDomainId: string | null;
-
+  /** US-002: active flow sub-level within domain viewMode; null = flow list. */
+  activeFlowId: string | null;
   /**
-   * Raw ktds Code Atlas domain-graph (nodes+edges from `@ktds/legacy-core`),
-   * loaded on demand by the ktds tab. Kept separate from `domainGraph`
-   * because the raw file does not satisfy the core KnowledgeGraph schema and
-   * its step nodes carry extra ktds fields (`layer`, etc.). Only consumed for
-   * CodeViewer source resolution of ktds step nodes.
+   * FIX 3: the flow selected inline in FlowListView (screen 2). Lifted to the
+   * store so it survives the fullscreen round-trip (FlowListView unmounts when
+   * `activeFlowId` promotes to the full-screen spine, then remounts on back).
+   * Distinct from `activeFlowId`: this drives the inline spine without
+   * committing the full-screen view. null = no inline selection.
    */
-  ktdsDomainGraph: KnowledgeGraph | null;
-  setKtdsDomainGraph: (graph: KnowledgeGraph | null) => void;
+  selectedFlowId: string | null;
+  setSelectedFlow: (flowId: string | null) => void;
+  /**
+   * 곁가지 접기 (#4): backbone step ids whose folded `unknown`-lane branches
+   * (domain entities) are currently disclosed in the spine. Empty = every
+   * branch folded (the decluttered backbone-only default). Keyed by backbone
+   * step id, which embeds its flow, so entries never collide across flows.
+   */
+  expandedBranchParents: Set<string>;
+  /** Toggle one backbone step's branches between folded and disclosed. */
+  toggleBranchParent: (parentId: string) => void;
+  /** Disclose every listed parent's branches (expand all), or `null` to fold all. */
+  setBranchParentsExpanded: (parentIds: string[] | null) => void;
 
   setDomainGraph: (graph: KnowledgeGraph) => void;
+  setWikiGraph: (graph: KnowledgeGraph) => void; // ktds-fork (ADR-004)
+  /** ktds-fork: "문서" 뷰로 전환하며 해당 위키 노드를 선택(원자적). NodeInfo "관련 문서"용. */
+  openWikiDoc: (nodeId: string) => void;
   setViewMode: (mode: ViewMode) => void;
   setIsKnowledgeGraph: (value: boolean) => void;
   navigateToDomain: (domainId: string) => void;
   clearActiveDomain: () => void;
+  /** US-002: drill into flow spine view within the current domain. */
+  navigateToFlow: (flowId: string) => void;
+  /** US-002: return from flow spine to the flow list; leaves activeDomainId intact. */
+  clearActiveFlow: () => void;
 
   // Container expand/collapse + lazy layout caches
   expandedContainers: Set<string>;
@@ -322,6 +361,9 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   diffMode: false,
   changedNodeIds: new Set<string>(),
   affectedNodeIds: new Set<string>(),
+  overlaySource: null,
+  diffOverlayData: null,
+  impactOverlayData: null,
 
   focusNodeId: null,
   nodeHistory: [],
@@ -394,6 +436,9 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       nodeHistory: [],
       viewMode: keepDomainView ? "domain" as const : "structural" as const,
       activeDomainId: keepDomainView ? activeDomainId : null,
+      activeFlowId: null,
+      selectedFlowId: null,
+      expandedBranchParents: new Set(),
       containerLayoutCache: new Map(),
       expandedContainers: new Set(),
       pendingFocusContainer: null,
@@ -558,14 +603,46 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   expandCodeViewer: () => set({ codeViewerExpanded: true }),
   collapseCodeViewer: () => set({ codeViewerExpanded: false }),
 
+  // 하위호환 별칭 — diff 채널 적재 (generatedAt 미상 = 빈 문자열: 항상 최저 우선)
   setDiffOverlay: (changed, affected) =>
-    set({
-      diffMode: true,
-      changedNodeIds: new Set(changed),
-      affectedNodeIds: new Set(affected),
+    get().setOverlayData("diff", { changed, affected, generatedAt: "" }),
+
+  toggleDiffMode: () => get().toggleOverlay("diff"),
+
+  setOverlayData: (source, data) =>
+    set((state) => {
+      const next: Partial<DashboardStore> =
+        source === "diff" ? { diffOverlayData: data } : { impactOverlayData: data };
+      // 자동 활성: 시드가 있고, (활성 가능한 다른 채널이 없거나 || 이 채널이 더
+      // 최신)일 때. 빈 채널(changed=0 — KG 미조인 발행)은 경쟁자가 아니다(리뷰
+      // minor: 빈 채널의 최신 generatedAt이 유효 채널의 자동 활성을 막는 순서
+      // 의존 제거). 두 채널이 비동기로 도착해도 최종 활성 = 최신 유효 분석.
+      const other = source === "diff" ? state.impactOverlayData : state.diffOverlayData;
+      const newer =
+        other === null || other.changed.length === 0 || data.generatedAt >= other.generatedAt;
+      if (data.changed.length > 0 && newer) {
+        next.overlaySource = source;
+        next.diffMode = true;
+        next.changedNodeIds = new Set(data.changed);
+        next.affectedNodeIds = new Set(data.affected);
+      }
+      return next;
     }),
 
-  toggleDiffMode: () => set((state) => ({ diffMode: !state.diffMode })),
+  toggleOverlay: (source) =>
+    set((state) => {
+      const data = source === "diff" ? state.diffOverlayData : state.impactOverlayData;
+      if (!data || data.changed.length === 0) return {};
+      if (state.overlaySource === source && state.diffMode) {
+        return { diffMode: false }; // 같은 채널 재토글 = 숨김 (채널 기억)
+      }
+      return {
+        overlaySource: source,
+        diffMode: true,
+        changedNodeIds: new Set(data.changed),
+        affectedNodeIds: new Set(data.affected),
+      };
+    }),
 
   clearDiffOverlay: () =>
     set({
@@ -682,16 +759,51 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   viewMode: "structural",
   isKnowledgeGraph: false,
   domainGraph: null,
+  wikiGraph: null, // ktds-fork (ADR-004)
   activeDomainId: null,
+  activeFlowId: null,
+  selectedFlowId: null,
+
+  setSelectedFlow: (flowId) => set({ selectedFlowId: flowId }),
+
+  expandedBranchParents: new Set<string>(),
+  toggleBranchParent: (parentId) =>
+    set((state) => {
+      const next = new Set(state.expandedBranchParents);
+      if (next.has(parentId)) next.delete(parentId);
+      else next.add(parentId);
+      return { expandedBranchParents: next };
+    }),
+  setBranchParentsExpanded: (parentIds) =>
+    set({ expandedBranchParents: new Set(parentIds ?? []) }),
 
   setDomainGraph: (graph) => {
-    set({ domainGraph: graph });
+    // Land on the domain map as the opening view when a domain graph is
+    // available and the user is still on the initial structural view
+    // (spec di-codeatlas-001 success scene ①: "열자마자 도메인 지도 랜딩").
+    // Fires once on load; a deliberate later switch to "코드"/"문서" is preserved.
+    const { viewMode } = get();
+    set({
+      domainGraph: graph,
+      viewMode: viewMode === "structural" ? "domain" : viewMode,
+    });
   },
 
-  ktdsDomainGraph: null,
-  setKtdsDomainGraph: (graph) => {
-    set({ ktdsDomainGraph: graph });
+  setWikiGraph: (graph) => { // ktds-fork (ADR-004)
+    set({ wikiGraph: graph });
   },
+
+  // ktds-fork: setViewMode는 selectedNodeId를 비우므로(뷰 전환+선택을 한 번에 못 함)
+  // navigateToDomain 패턴을 따라 원자적으로 wiki 뷰 전환 + 문서 선택.
+  openWikiDoc: (nodeId) =>
+    set({
+      viewMode: "wiki" as const,
+      selectedNodeId: nodeId,
+      focusNodeId: null,
+      codeViewerOpen: false,
+      codeViewerNodeId: null,
+      codeViewerExpanded: false,
+    }),
 
   setIsKnowledgeGraph: (value) => {
     set({ isKnowledgeGraph: value });
@@ -702,6 +814,9 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       viewMode: mode,
       selectedNodeId: null,
       focusNodeId: null,
+      activeFlowId: null,
+      selectedFlowId: null,
+      expandedBranchParents: new Set(),
       codeViewerOpen: false,
       codeViewerNodeId: null,
       codeViewerExpanded: false,
@@ -716,6 +831,8 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     set({
       viewMode: "domain" as const,
       activeDomainId: domainId,
+      activeFlowId: null,
+      selectedFlowId: null,
       focusNodeId: null,
       nodeHistory: newHistory,
     });
@@ -724,6 +841,35 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   clearActiveDomain: () => {
     set({
       activeDomainId: null,
+      activeFlowId: null,
+      selectedFlowId: null,
+      selectedNodeId: null,
+      focusNodeId: null,
+    });
+  },
+
+  // US-002: flow spine navigation — mirrors navigateToDomain / clearActiveDomain
+  navigateToFlow: (flowId) => {
+    const { selectedNodeId, nodeHistory } = get();
+    const newHistory = selectedNodeId
+      ? [...nodeHistory, selectedNodeId].slice(-MAX_HISTORY)
+      : nodeHistory;
+    set({
+      activeFlowId: flowId,
+      // FIX 3: keep inline + fullscreen selection in agreement so the back
+      // round-trip re-shows the same flow's inline spine.
+      selectedFlowId: flowId,
+      selectedNodeId: null,
+      focusNodeId: null,
+      nodeHistory: newHistory,
+    });
+  },
+
+  clearActiveFlow: () => {
+    // FIX 3: clear the full-screen flow but PRESERVE selectedFlowId so that
+    // returning to the flow list re-shows the inline spine for the last flow.
+    set({
+      activeFlowId: null,
       selectedNodeId: null,
       focusNodeId: null,
     });

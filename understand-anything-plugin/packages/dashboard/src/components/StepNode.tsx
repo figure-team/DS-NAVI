@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
 import { useDashboardStore } from "../store";
+import { useDiffLabels } from "../hooks/useDiffLabels";
 
 export interface StepNodeData extends Record<string, unknown> {
   label: string;
@@ -9,6 +10,9 @@ export interface StepNodeData extends Record<string, unknown> {
   filePath?: string;
   stepId: string;
   order: number;
+  // ktds-fork (ADR-003): step 파일의 diff 상태 배지 + 무관 step 흐림
+  diffStatus?: "changed" | "affected";
+  isDiffFaded?: boolean;
 }
 
 export type StepFlowNode = Node<StepNodeData, "step-node">;
@@ -17,6 +21,16 @@ function StepNode({ data }: NodeProps<StepFlowNode>) {
   const selectNode = useDashboardStore((s) => s.selectNode);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const isSelected = selectedNodeId === data.stepId;
+  // ktds-fork (ADR-003): 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
+  const { lblChanged, lblAffected } = useDiffLabels();
+
+  // ktds-fork (ADR-003): 변경=적, 영향=호박 (구조 뷰 노드 배지와 동일 시각 언어)
+  const diffStyle =
+    data.diffStatus === "changed"
+      ? { borderColor: "var(--color-diff-changed)", boxShadow: "0 0 10px rgba(224, 82, 82, 0.3)" }
+      : data.diffStatus === "affected"
+        ? { borderColor: "var(--color-diff-affected)", boxShadow: "0 0 8px rgba(212, 160, 48, 0.25)" }
+        : undefined;
 
   return (
     <div
@@ -24,7 +38,8 @@ function StepNode({ data }: NodeProps<StepFlowNode>) {
         isSelected
           ? "border-accent bg-accent/10"
           : "border-border-subtle bg-elevated hover:border-accent/40"
-      }`}
+      }${data.isDiffFaded ? " diff-faded" : ""}`}
+      style={diffStyle}
       onClick={() => selectNode(data.stepId)}
     >
       <Handle type="target" position={Position.Left} className="!bg-text-muted/40 !w-1.5 !h-1.5" />
@@ -37,6 +52,17 @@ function StepNode({ data }: NodeProps<StepFlowNode>) {
         <span className="text-[11px] font-medium text-text-primary truncate">
           {data.label}
         </span>
+        {/* ktds-fork (ADR-003): 명시 배지 */}
+        {data.diffStatus === "changed" && (
+          <span className="ml-auto shrink-0 text-[8px] font-semibold px-1 py-px rounded whitespace-nowrap bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)]">
+            {lblChanged}
+          </span>
+        )}
+        {data.diffStatus === "affected" && (
+          <span className="ml-auto shrink-0 text-[8px] font-semibold px-1 py-px rounded whitespace-nowrap bg-[var(--color-diff-affected-dim)] text-[var(--color-diff-affected)]">
+            {lblAffected}
+          </span>
+        )}
       </div>
       <div className="text-[10px] text-text-secondary line-clamp-2">
         {data.summary}

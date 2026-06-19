@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ClaimsContent from "./ClaimsContent"; // ktds-fork (ADR-004): 본문 마크다운 + 근거 배지 카드
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
 import type { NodeType, EdgeType, KnowledgeGraph, GraphNode } from "@understand-anything/core/types";
@@ -123,11 +124,33 @@ function KnowledgeNodeDetails({ node, graph }: { node: GraphNode; graph: Knowled
       {meta?.content && (
         <div>
           <h4 className="text-[10px] uppercase tracking-wider text-text-muted mb-1">{t.common.preview}</h4>
-          <div className="text-[11px] text-text-secondary leading-relaxed bg-elevated rounded-lg p-3 max-h-[300px] overflow-auto whitespace-pre-wrap font-mono">
-            {meta.content.slice(0, 1500)}
-            {meta.content.length > 1500 && (
-              <span className="text-text-muted">... {t.common.truncated}</span>
-            )}
+          {/* ktds-fork (ADR-004 ID9): raw font-mono 미리보기 → 마크다운 렌더 + 전체 본문(1500자 캡 제거).
+              ktds knowledge-graph.json은 knowledgeMeta.content에 노트 전체 본문을 담는다(U-A 파서 text[:3000] 미경유). */}
+          <div className="text-[11px] text-text-secondary leading-relaxed bg-elevated rounded-lg p-3 max-h-[420px] overflow-auto tour-markdown">
+            <ClaimsContent
+              content={meta.content}
+              mdComponents={{
+                h1: ({ children }) => <h1 className="text-[13px] font-semibold text-text-primary mb-1.5">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-[12px] font-semibold text-text-primary mt-2 mb-1">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-[11px] font-semibold text-text-primary mt-1.5 mb-1">{children}</h3>,
+                p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
+                strong: ({ children }) => <strong className="font-semibold text-text-primary">{children}</strong>,
+                // 본문 내 링크는 의도적으로 비활성(span) — 노트 간 이동은 위 위키링크/백링크(related 엣지)
+                // 버튼으로만 한다. 미리보기 패널에서 임의 외부 URL 클릭을 막는다(ktds-fork).
+                a: ({ children }) => <span className="text-accent">{children}</span>,
+                blockquote: ({ children }) => <blockquote className="border-l-2 border-border pl-2 text-text-muted">{children}</blockquote>,
+                code: ({ className, children }) => {
+                  const isBlock = className?.includes("language-");
+                  return isBlock ? (
+                    <code className="block bg-base rounded px-2 py-1.5 mb-1.5 overflow-x-auto text-[11px] leading-relaxed">{children}</code>
+                  ) : (
+                    <code className="bg-base rounded px-1 py-0.5 text-[11px]">{children}</code>
+                  );
+                },
+                ul: ({ children }) => <ul className="list-disc list-inside mb-1.5 space-y-0.5">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-inside mb-1.5 space-y-0.5">{children}</ol>,
+              }}
+            />
           </div>
         </div>
       )}
@@ -256,6 +279,33 @@ function DomainNodeDetails({ node, graph }: { node: GraphNode; graph: KnowledgeG
   return null;
 }
 
+// ktds-fork: 도메인 노드의 세분화 위키 문서로 가는 진입점.
+// 도메인 노드 id == wiki 노드 id(= CanonicalNode.uid)로 직접 매칭(검증됨). 구조(코드)
+// 노드는 U-A ordinal id라 wiki id와 겹치지 않아 코드 뷰에선 자연히 매칭 0 → 미표시.
+function RelatedDocsSection({ node }: { node: GraphNode }) {
+  const wikiGraph = useDashboardStore((s) => s.wikiGraph);
+  const openWikiDoc = useDashboardStore((s) => s.openWikiDoc);
+  const doc = wikiGraph?.nodes.find((n) => n.id === node.id && n.type === "article");
+  if (!doc) return null;
+  return (
+    <div className="mb-4">
+      <h3 className="text-[11px] font-semibold text-accent uppercase tracking-wider mb-2">관련 문서</h3>
+      <button
+        type="button"
+        onClick={() => openWikiDoc(doc.id)}
+        className="block w-full text-left px-3 py-2 rounded-lg bg-elevated border border-border-subtle hover:border-accent/40 hover:bg-accent/5 transition-colors"
+      >
+        <div className="text-[12px] text-text-primary truncate">{doc.name}</div>
+        {doc.filePath && (
+          <div className="text-[10px] font-mono text-text-muted truncate mt-0.5" title={doc.filePath}>
+            {doc.filePath}
+          </div>
+        )}
+      </button>
+    </div>
+  );
+}
+
 export default function NodeInfo() {
   const graph = useDashboardStore((s) => s.graph);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
@@ -271,8 +321,15 @@ export default function NodeInfo() {
   const focusNodeId = useDashboardStore((s) => s.focusNodeId);
   const viewMode = useDashboardStore((s) => s.viewMode);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
+  const wikiGraph = useDashboardStore((s) => s.wikiGraph); // ktds-fork (ADR-004)
 
-  const activeGraph = viewMode === "domain" && domainGraph ? domainGraph : graph;
+  // ktds-fork (ADR-004): "문서" 모드면 위키 그래프에서 노드 조회(본문·위키링크·백링크).
+  const activeGraph =
+    viewMode === "wiki" && wikiGraph
+      ? wikiGraph
+      : viewMode === "domain" && domainGraph
+      ? domainGraph
+      : graph;
   const node = activeGraph?.nodes.find((n) => n.id === selectedNodeId) ?? null;
 
   // Resolve history node names for the breadcrumb trail
@@ -461,6 +518,11 @@ export default function NodeInfo() {
       {/* Domain-specific details */}
       {activeGraph && node && (node.type === "domain" || node.type === "flow" || node.type === "step") && (
         <DomainNodeDetails node={node} graph={activeGraph} />
+      )}
+
+      {/* ktds-fork: 도메인 노드 → 세분화 위키 문서 진입점 ("관련 문서") */}
+      {node && (node.type === "domain" || node.type === "flow" || node.type === "step") && (
+        <RelatedDocsSection node={node} />
       )}
 
       {/* Child classes/functions within this file */}

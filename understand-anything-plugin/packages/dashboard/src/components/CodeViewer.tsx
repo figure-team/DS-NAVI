@@ -64,18 +64,15 @@ export default function CodeViewer({
 }: CodeViewerProps) {
   const graph = useDashboardStore((s) => s.graph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const ktdsDomainGraph = useDashboardStore((s) => s.ktdsDomainGraph);
   const viewMode = useDashboardStore((s) => s.viewMode);
   const codeViewerNodeId = useDashboardStore((s) => s.codeViewerNodeId);
   const closeCodeViewer = useDashboardStore((s) => s.closeCodeViewer);
   const activeGraph = viewMode === "domain" && domainGraph ? domainGraph : graph;
   // Files tab always builds its tree from the structural graph, so a node ID opened from
   // there may not exist in the active (domain) graph — fall back to the structural graph.
-  // ktds step nodes live only in the on-demand ktds domain graph — fall back to it last.
   const node =
     activeGraph?.nodes.find((n) => n.id === codeViewerNodeId) ??
     graph?.nodes.find((n) => n.id === codeViewerNodeId) ??
-    ktdsDomainGraph?.nodes.find((n) => n.id === codeViewerNodeId) ??
     null;
   const [state, setState] = useState<SourceState>({
     status: "idle",

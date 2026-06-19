@@ -14,7 +14,7 @@ import { basename, resolve } from 'node:path'
 import { writeDomainGraph } from './persist.js'
 import { SKELETON_BLANK } from './types.js'
 import type { SkeletonReport, UaGraphEdge, UaGraphNode } from './types.js'
-import type { VerifyReport } from './verify.js'
+import type { VerifyReport, VerifiedItem } from './verify.js'
 
 /** NEEDS_REVIEW 강등 마커 — 검증 실패 항목 텍스트 앞에 붙인다(삭제 금지). */
 export const NEEDS_REVIEW_MARKER = '[확인 필요] '
@@ -158,6 +158,51 @@ export function demoteUnverified(nodes: UaGraphNode[], report: VerifyReport): Ua
       out.summary = mark(node.summary, node.id)
     }
     return out
+  })
+}
+
+/** verify-report 의 1자리 반올림 규칙(verify.ts pct 와 동일) — 도메인 레벨 재집계용. */
+function pct1(num: number, den: number): number {
+  return den === 0 ? 100 : Math.round((num / den) * 1000) / 10
+}
+
+/**
+ * 검증 결과(citation status + claim verdict)를 노드 domainMeta.ktdsClaims 에 임베드한다 —
+ * 대시보드(화면1 도메인 카드)가 domain-graph.json **한 파일**로 근거·검증을 읽게 하는 단일
+ * 소스화. 도메인 노드: 도메인 레벨 주장(summary/entity/businessRule/crossDomain)만 ktdsClaims
+ * 로 붙이고, **그 부분집합 기준** groundedPct/groundedCount/reviewCount 를 domainMeta 에 둔다
+ * (카드가 보여주는 항목과 일치 — flow/step 은 화면2/3 소관이라 카드 근거율에서 제외).
+ * flow/step 노드: 자기 ref 의 검증 항목 1개를 붙인다. demoteUnverified 다음에 적용한다.
+ */
+export function embedVerification(nodes: UaGraphNode[], report: VerifyReport): UaGraphNode[] {
+  const domainResultById = new Map(report.domains.map((d) => [d.domainId, d]))
+  const itemByRef = new Map<string, VerifiedItem>()
+  for (const d of report.domains) for (const it of d.items) itemByRef.set(it.ref, it)
+
+  return nodes.map((node) => {
+    if (node.type === 'domain') {
+      const dr = domainResultById.get(node.id)
+      if (!dr) return node
+      const claims = dr.items.filter((it) => it.kind !== 'flow' && it.kind !== 'step')
+      if (claims.length === 0) return node
+      const grounded = claims.filter((c) => c.verdict === 'GROUNDED').length
+      return {
+        ...node,
+        domainMeta: {
+          ...node.domainMeta,
+          ktdsClaims: claims,
+          groundedPct: pct1(grounded, claims.length),
+          groundedCount: grounded,
+          reviewCount: claims.length - grounded,
+        },
+      }
+    }
+    if (node.type === 'flow' || node.type === 'step') {
+      const it = itemByRef.get(node.id)
+      if (!it) return node
+      return { ...node, domainMeta: { ...node.domainMeta, ktdsClaims: [it] } }
+    }
+    return node
   })
 }
 

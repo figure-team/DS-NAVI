@@ -12,7 +12,12 @@ import { join } from 'node:path'
 import { gitCommitHash, readSkeleton, uaDir, DOMAIN_GRAPH_FILENAME } from './persist.js'
 import { applyFills, readFills, unfilledNodes, type RejectedItem } from './fill.js'
 import { verifyFills, writeVerifyReport, type VerifyReport } from './verify.js'
-import { demoteUnverified, emitFilledDomainGraph, type EmitOptions } from './emit.js'
+import {
+  demoteUnverified,
+  embedVerification,
+  emitFilledDomainGraph,
+  type EmitOptions,
+} from './emit.js'
 
 export interface FillPipelineResult {
   /** fill 파일이 아직 없는 도메인 key. */
@@ -43,9 +48,12 @@ export async function runFillPipeline(
   const report = await verifyFills(projectRoot, fills, skeleton.gitCommit)
   const verifyReportPath = writeVerifyReport(projectRoot, report)
   const demoted = demoteUnverified(nodes, report)
+  // 검증 결과(citation status + verdict + 도메인 근거율)를 노드 domainMeta.ktdsClaims 에
+  // 임베드 — 대시보드가 domain-graph.json 한 파일로 근거·검증을 읽는다(단일 소스).
+  const verified = embedVerification(demoted, report)
   // 강등 후의 빈칸(SKELETON_BLANK) 잔여 노드 — emit 폴백 적용 전 기준으로 보고한다.
-  const unfilled = unfilledNodes(demoted)
-  emitFilledDomainGraph(projectRoot, skeleton, demoted, options)
+  const unfilled = unfilledNodes(verified)
+  emitFilledDomainGraph(projectRoot, skeleton, verified, options)
   const domainGraphPath = join(uaDir(projectRoot), DOMAIN_GRAPH_FILENAME)
   // 검증은 현재 워킹트리 파일과 대조하므로, skeleton 이 옛 commit 산물이면 라인 이동으로
   // 정당한 인용이 강등될 수 있다 — 차단 대신 표면화한다.

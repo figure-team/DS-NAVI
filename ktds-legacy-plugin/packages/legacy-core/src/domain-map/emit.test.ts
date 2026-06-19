@@ -10,9 +10,10 @@ import { buildSlices } from './slices.js'
 import { buildCandidates } from './classify.js'
 import { buildAutoPlan } from './confirm.js'
 import { buildSkeleton } from './skeleton.js'
-import { emitDomainGraph } from './emit.js'
+import { emitDomainGraph, embedVerification } from './emit.js'
 import { loadProjectGraph } from '../orchestrator/index.js'
-import type { SkeletonReport } from './types.js'
+import type { SkeletonReport, UaGraphNode } from './types.js'
+import type { VerifyReport } from './verify.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const shopMini = join(here, '..', '..', 'fixtures', 'chain-recall', 'shop-mini')
@@ -119,5 +120,80 @@ describe('emit — structural domain-graph.json (pre-LLM-fill)', () => {
       await rm(rootA, { recursive: true, force: true })
       await rm(rootB, { recursive: true, force: true })
     }
+  })
+})
+
+describe('embedVerification — 검증결과를 노드 domainMeta 에 단일소스 임베드', () => {
+  const report: VerifyReport = {
+    schemaVersion: 1,
+    gitCommit: 'abc',
+    domains: [
+      {
+        domainId: 'domain:cart',
+        items: [
+          {
+            kind: 'summary',
+            ref: 'domain:cart',
+            text: '장바구니',
+            citations: [{ filePath: 'Cart.java', line: 32, snippet: 'class Cart impl', status: 'ok' }],
+            verdict: 'GROUNDED',
+          },
+          {
+            kind: 'businessRule',
+            ref: 'domain:cart#businessRule[0]',
+            text: '무료배송(환각)',
+            citations: [{ filePath: 'Cart.java', line: 9999, snippet: 'free shipping', status: 'line-out-of-range' }],
+            verdict: 'NEEDS_REVIEW',
+          },
+          {
+            kind: 'flow',
+            ref: 'flow:cart-add',
+            text: '담기',
+            citations: [{ filePath: 'CartActionBean.java', line: 45, snippet: 'addItemToCart()', status: 'ok' }],
+            verdict: 'GROUNDED',
+          },
+        ],
+        citationTotal: 3,
+        citationOk: 2,
+        groundedPct: 66.7,
+      },
+    ],
+    overall: { itemTotal: 3, itemGrounded: 2, citationTotal: 3, citationOk: 2, groundedPct: 66.7 },
+  }
+  const mk = (id: string, type: UaGraphNode['type']): UaGraphNode => ({
+    id,
+    type,
+    name: 'x',
+    summary: 's',
+    tags: ['cart'],
+    complexity: 'simple',
+    domainMeta: {},
+  })
+
+  it('도메인 노드: 도메인 레벨 주장만 ktdsClaims + 그 부분집합 기준 근거율(flow 제외)', () => {
+    const out = embedVerification([mk('domain:cart', 'domain')], report)
+    const meta = out[0].domainMeta as Record<string, unknown>
+    const claims = meta.ktdsClaims as Array<{ kind: string; verdict: string }>
+    // flow 항목은 카드 근거율에서 제외 → summary + businessRule 2개만
+    expect(claims.map((c) => c.kind).sort()).toEqual(['businessRule', 'summary'])
+    expect(claims.find((c) => c.kind === 'businessRule')?.verdict).toBe('NEEDS_REVIEW')
+    expect(meta.groundedPct).toBe(50) // 2개 중 1개 GROUNDED
+    expect(meta.groundedCount).toBe(1)
+    expect(meta.reviewCount).toBe(1)
+  })
+
+  it('flow 노드: 자기 ref 항목 1개를 ktdsClaims 로(citation status 포함)', () => {
+    const out = embedVerification([mk('flow:cart-add', 'flow')], report)
+    const claims = (out[0].domainMeta as Record<string, unknown>).ktdsClaims as Array<{
+      citations: Array<{ status: string }>
+    }>
+    expect(claims).toHaveLength(1)
+    expect(claims[0].citations[0].status).toBe('ok')
+  })
+
+  it('검증항목 없는 노드(미채움)는 변경하지 않는다', () => {
+    const node = mk('domain:account', 'domain')
+    const out = embedVerification([node], report)
+    expect((out[0].domainMeta as Record<string, unknown>).ktdsClaims).toBeUndefined()
   })
 })

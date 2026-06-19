@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Highlight, themes } from "prism-react-renderer";
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
@@ -66,14 +66,22 @@ export default function CodeViewer({
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const viewMode = useDashboardStore((s) => s.viewMode);
   const codeViewerNodeId = useDashboardStore((s) => s.codeViewerNodeId);
+  const codeViewerFilePath = useDashboardStore((s) => s.codeViewerFilePath);
+  const codeViewerLine = useDashboardStore((s) => s.codeViewerLine);
   const closeCodeViewer = useDashboardStore((s) => s.closeCodeViewer);
   const activeGraph = viewMode === "domain" && domainGraph ? domainGraph : graph;
   // Files tab always builds its tree from the structural graph, so a node ID opened from
   // there may not exist in the active (domain) graph — fall back to the structural graph.
-  const node =
-    activeGraph?.nodes.find((n) => n.id === codeViewerNodeId) ??
-    graph?.nodes.find((n) => n.id === codeViewerNodeId) ??
-    null;
+  const node = codeViewerNodeId
+    ? activeGraph?.nodes.find((n) => n.id === codeViewerNodeId) ??
+      graph?.nodes.find((n) => n.id === codeViewerNodeId) ??
+      null
+    : null;
+  // 두 모드: 노드 모드(node.filePath/lineRange) 또는 인용 직접 모드(codeViewerFilePath/Line).
+  const filePath = codeViewerFilePath ?? node?.filePath ?? null;
+  const displayName = codeViewerFilePath
+    ? codeViewerFilePath.split("/").pop() ?? codeViewerFilePath
+    : node?.name ?? "";
   const [state, setState] = useState<SourceState>({
     status: "idle",
     source: null,
@@ -82,7 +90,7 @@ export default function CodeViewer({
   const { t } = useI18n();
 
   useEffect(() => {
-    if (!node?.filePath) {
+    if (!filePath) {
       setState({ status: "error", source: null, error: "This node does not have a file path." });
       return;
     }
@@ -99,7 +107,7 @@ export default function CodeViewer({
     const controller = new AbortController();
     setState({ status: "loading", source: null, error: null });
 
-    fetch(fileContentUrl(node.filePath, accessToken), { signal: controller.signal })
+    fetch(fileContentUrl(filePath, accessToken), { signal: controller.signal })
       .then(async (res) => {
         const data = (await res.json()) as SourceFile | { error?: string };
         if (!res.ok) {
@@ -117,14 +125,25 @@ export default function CodeViewer({
       });
 
     return () => controller.abort();
-  }, [accessToken, node?.filePath]);
+  }, [accessToken, filePath]);
 
   const highlightedRange = useMemo(() => {
-    if (!node?.lineRange) return null;
-    return { start: node.lineRange[0], end: node.lineRange[1] };
-  }, [node?.lineRange]);
+    if (codeViewerFilePath && codeViewerLine != null) {
+      return { start: codeViewerLine, end: codeViewerLine }; // 인용 직접 모드: 단일 라인
+    }
+    if (node?.lineRange) return { start: node.lineRange[0], end: node.lineRange[1] };
+    return null;
+  }, [codeViewerFilePath, codeViewerLine, node?.lineRange]);
 
-  if (!node) {
+  // 하이라이트 라인을 로드 후 화면에 보이게 스크롤(인용 점프 시 해당 라인이 보이도록).
+  const highlightRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (state.status === "loaded" && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ block: "center" });
+    }
+  }, [state.status, highlightedRange?.start]);
+
+  if (!filePath) {
     return (
       <div className="h-full w-full flex items-center justify-center bg-surface">
         <p className="text-text-muted text-sm">{t.codeViewer.noFile}</p>
@@ -133,7 +152,7 @@ export default function CodeViewer({
   }
 
   const source = state.source;
-  const language = source?.language ?? fallbackLanguage(node.filePath);
+  const language = source?.language ?? fallbackLanguage(filePath);
   const lineInfo = highlightedRange
     ? `${t.codeViewer.lines} ${highlightedRange.start}-${highlightedRange.end}`
     : t.codeViewer.fullFile;
@@ -157,12 +176,12 @@ export default function CodeViewer({
             </span>
             <span className="text-[10px] text-text-muted">{lineInfo}</span>
           </div>
-          <div className="text-sm font-heading text-text-primary truncate" title={node.name}>
-            {node.name}
+          <div className="text-sm font-heading text-text-primary truncate" title={displayName}>
+            {displayName}
           </div>
-          {node.filePath && (
-            <div className="text-[11px] font-mono text-text-muted truncate mt-0.5" title={node.filePath}>
-              {node.filePath}
+          {filePath && (
+            <div className="text-[11px] font-mono text-text-muted truncate mt-0.5" title={filePath}>
+              {filePath}
             </div>
           )}
         </div>
@@ -228,11 +247,14 @@ export default function CodeViewer({
                       highlightedRange !== null &&
                       lineNumber >= highlightedRange.start &&
                       lineNumber <= highlightedRange.end;
+                    const isFirstHighlighted =
+                      highlightedRange !== null && lineNumber === highlightedRange.start;
                     const lineProps = getLineProps({ line });
                     return (
                       <div
                         key={lineNumber}
                         {...lineProps}
+                        ref={isFirstHighlighted ? highlightRef : undefined}
                         className={`${lineProps.className} flex ${
                           isHighlighted ? "bg-accent/15" : "hover:bg-elevated/40"
                         }`}

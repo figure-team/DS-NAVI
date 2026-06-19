@@ -126,6 +126,9 @@ interface DashboardStore {
 
   codeViewerOpen: boolean;
   codeViewerNodeId: string | null;
+  /** 노드 없이 임의 (filePath, line)로 열 때 사용 — 인용 칩 점프(근거). nodeId와 배타적. */
+  codeViewerFilePath: string | null;
+  codeViewerLine: number | null;
   codeViewerExpanded: boolean;
 
   tourActive: boolean;
@@ -180,6 +183,8 @@ interface DashboardStore {
   setSearchQuery: (query: string) => void;
   setPersona: (persona: Persona) => void;
   openCodeViewer: (nodeId: string) => void;
+  /** 인용(file:line) 칩 클릭 → 노드 없이 임의 파일의 단일 라인으로 코드뷰어 열기. */
+  openCodeViewerAt: (filePath: string, line: number) => void;
   closeCodeViewer: () => void;
   expandCodeViewer: () => void;
   collapseCodeViewer: () => void;
@@ -350,6 +355,8 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   activeLayerId: null,
   codeViewerOpen: false,
   codeViewerNodeId: null,
+  codeViewerFilePath: null,
+  codeViewerLine: null,
   codeViewerExpanded: false,
 
   tourActive: false,
@@ -597,9 +604,29 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     }),
 
   openCodeViewer: (nodeId) =>
-    set({ codeViewerOpen: true, codeViewerNodeId: nodeId, codeViewerExpanded: false }),
+    set({
+      codeViewerOpen: true,
+      codeViewerNodeId: nodeId,
+      codeViewerFilePath: null,
+      codeViewerLine: null,
+      codeViewerExpanded: false,
+    }),
+  openCodeViewerAt: (filePath, line) =>
+    set({
+      codeViewerOpen: true,
+      codeViewerNodeId: null,
+      codeViewerFilePath: filePath,
+      codeViewerLine: line,
+      codeViewerExpanded: false,
+    }),
   closeCodeViewer: () =>
-    set({ codeViewerOpen: false, codeViewerNodeId: null, codeViewerExpanded: false }),
+    set({
+      codeViewerOpen: false,
+      codeViewerNodeId: null,
+      codeViewerFilePath: null,
+      codeViewerLine: null,
+      codeViewerExpanded: false,
+    }),
   expandCodeViewer: () => set({ codeViewerExpanded: true }),
   collapseCodeViewer: () => set({ codeViewerExpanded: false }),
 

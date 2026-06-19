@@ -3,6 +3,8 @@ import { useMemo } from "react";
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
 import FlowSpineView from "./FlowSpineView";
+import CitationChip from "./CitationChip";
+import VerdictBadge from "./VerdictBadge";
 import {
   buildDomainFlows,
   findDomain,
@@ -190,11 +192,14 @@ export default function FlowListView() {
                     >
                       <div className="flex items-center gap-2">
                         <MethodBadge method={flow.method} />
-                        <span
-                          className="ml-auto shrink-0 text-text-muted"
-                          style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}
-                        >
-                          {t.flowList.stepCount.replace("{count}", String(flow.stepCount))}
+                        <span className="ml-auto flex items-center gap-1.5 shrink-0">
+                          {flow.grounding && <VerdictBadge verdict={flow.grounding.verdict} />}
+                          <span
+                            className="text-text-muted"
+                            style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}
+                          >
+                            {t.flowList.stepCount.replace("{count}", String(flow.stepCount))}
+                          </span>
                         </span>
                       </div>
                       {/* Full endpoint — wraps so every character stays visible. */}
@@ -227,29 +232,46 @@ export default function FlowListView() {
       <div className="flex-1 min-w-0 h-full flex flex-col bg-root">
         {selectedFlow ? (
           <>
-            {/* center header — selected flow context + fullscreen */}
+            {/* center header — selected flow context + grounding + fullscreen */}
             <div
-              className="flex items-center gap-2.5 shrink-0 bg-panel border-b border-border-subtle"
+              className="flex flex-col gap-1.5 shrink-0 bg-panel border-b border-border-subtle"
               style={{ padding: "10px 20px" }}
             >
-              <MethodBadge method={selectedFlow.method} />
-              <span
-                className="text-text-primary whitespace-nowrap"
-                style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}
-              >
-                {selectedFlow.path}
-              </span>
-              <span className="text-text-secondary truncate" style={{ fontSize: 11, minWidth: 0 }}>
-                — {selectedFlow.name}
-              </span>
-              <button
-                type="button"
-                onClick={() => navigateToFlow(selectedFlow.id)}
-                className="flex items-center gap-1.5 shrink-0 ml-auto rounded border border-border-subtle text-text-muted hover:border-border-medium hover:text-accent transition-colors"
-                style={{ padding: "5px 12px", fontSize: 11 }}
-              >
-                {t.flowList.fullscreen}
-              </button>
+              <div className="flex items-center gap-2.5">
+                <MethodBadge method={selectedFlow.method} />
+                <span
+                  className="text-text-primary whitespace-nowrap"
+                  style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}
+                >
+                  {selectedFlow.path}
+                </span>
+                <span className="text-text-secondary truncate" style={{ fontSize: 11, minWidth: 0 }}>
+                  — {selectedFlow.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => navigateToFlow(selectedFlow.id)}
+                  className="flex items-center gap-1.5 shrink-0 ml-auto rounded border border-border-subtle text-text-muted hover:border-border-medium hover:text-accent transition-colors"
+                  style={{ padding: "5px 12px", fontSize: 11 }}
+                >
+                  {t.flowList.fullscreen}
+                </button>
+              </div>
+              {selectedFlow.grounding && (
+                <div className="flex items-center flex-wrap gap-1.5">
+                  <VerdictBadge verdict={selectedFlow.grounding.verdict} />
+                  <span className="uppercase text-text-muted" style={{ fontSize: 10, letterSpacing: "0.08em" }}>
+                    {t.grounding.evidence}
+                  </span>
+                  {selectedFlow.grounding.citations.length > 0 ? (
+                    selectedFlow.grounding.citations.map((c, i) => (
+                      <CitationChip key={`${c.filePath}:${c.line}:${i}`} filePath={c.filePath} line={c.line} status={c.status} />
+                    ))
+                  ) : (
+                    <span className="text-text-muted" style={{ fontSize: 10 }}>{t.grounding.noCitations}</span>
+                  )}
+                </div>
+              )}
             </div>
             {/* code graph */}
             <div className="flex-1 min-h-0 relative">

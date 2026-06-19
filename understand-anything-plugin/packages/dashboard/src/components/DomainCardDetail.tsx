@@ -3,6 +3,7 @@ import { useI18n } from "../contexts/I18nContext";
 import type { DomainCard, DomainClaim } from "../utils/domainData";
 import GroundedBar from "./GroundedBar";
 import CitationChip from "./CitationChip";
+import VerdictBadge from "./VerdictBadge";
 
 /**
  * 도메인 카드 인라인 확장 상세 (설계 §4) — 순수 도메인 개요.
@@ -18,26 +19,12 @@ export interface DomainCardDetailProps {
 
 const MAX_VISIBLE = 5;
 
-function VerdictIcon({ verdict }: { verdict: DomainClaim["verdict"] }) {
-  const { t } = useI18n();
-  const review = verdict === "NEEDS_REVIEW";
-  return (
-    <span
-      className={`shrink-0 text-[11px] leading-5 ${review ? "text-amber-500" : "text-accent"}`}
-      title={review ? t.grounding.needsReview : t.grounding.grounded}
-      aria-hidden
-    >
-      {review ? "⚠" : "✓"}
-    </span>
-  );
-}
-
 function ClaimRow({ claim }: { claim: DomainClaim }) {
   const review = claim.verdict === "NEEDS_REVIEW";
   return (
     <div className={review ? "border-l-2 border-amber-500/50 pl-2" : "pl-[2px]"}>
       <div className="flex items-start gap-1.5">
-        <VerdictIcon verdict={claim.verdict} />
+        <VerdictBadge verdict={claim.verdict} />
         <span className="text-xs text-text-secondary leading-relaxed">{claim.text}</span>
       </div>
       {claim.citations.length > 0 && (

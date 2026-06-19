@@ -30,6 +30,8 @@ export interface DomainFlow {
   stepCount: number;
   /** Raw entryType from domainMeta (http / cron / event / manual / …). */
   entryType: string;
+  /** Flow-level verification (own ref grounding); null when unfilled/unverified. */
+  grounding: FlowGrounding | null;
 }
 
 /** A citation backing a domain-level claim (embedded by emit's embedVerification). */
@@ -82,6 +84,52 @@ export interface DomainCard {
 
 const CLAIM_KINDS = new Set(["summary", "entity", "businessRule", "crossDomain"]);
 
+/** Parse a raw `citations` array (VerifiedCitation[] shape) into DomainClaimCitation[]. */
+function parseCitations(raw: unknown): DomainClaimCitation[] {
+  if (!Array.isArray(raw)) return [];
+  return (raw as unknown[])
+    .map((x): DomainClaimCitation | null => {
+      const ci = x as Record<string, unknown>;
+      if (typeof ci.filePath !== "string" || typeof ci.line !== "number") return null;
+      return {
+        filePath: ci.filePath,
+        line: ci.line,
+        status: typeof ci.status === "string" ? ci.status : undefined,
+      };
+    })
+    .filter((x): x is DomainClaimCitation => x !== null);
+}
+
+/** Read `domainMeta.ktdsClaims` as a raw array (embedded by emit's embedVerification). */
+function readKtdsClaims(node: GraphNode): unknown[] {
+  const meta = node.domainMeta as Record<string, unknown> | undefined;
+  return Array.isArray(meta?.ktdsClaims) ? (meta!.ktdsClaims as unknown[]) : [];
+}
+
+/**
+ * A flow/step node's single verification item — its own ref's grounding, embedded
+ * by emit's embedVerification (`ktdsClaims: [VerifiedItem]` with kind 'flow'|'step').
+ * Powers the screen-2 flow row badge + screen-3 step detail citations.
+ */
+export interface FlowGrounding {
+  verdict: "GROUNDED" | "NEEDS_REVIEW";
+  citations: DomainClaimCitation[];
+}
+
+/**
+ * Parse a flow/step node's verification item from `domainMeta.ktdsClaims[0]`.
+ * Returns null when the node hasn't been LLM-filled/verified (no flow/step claim)
+ * — screens 2/3 then render structural detail only, with no grounding affordance.
+ */
+export function parseFlowStepClaim(node: GraphNode): FlowGrounding | null {
+  const first = readKtdsClaims(node)[0] as Record<string, unknown> | undefined;
+  if (!first || (first.kind !== "flow" && first.kind !== "step")) return null;
+  return {
+    verdict: first.verdict === "NEEDS_REVIEW" ? "NEEDS_REVIEW" : "GROUNDED",
+    citations: parseCitations(first.citations),
+  };
+}
+
 /** Parse domainMeta.ktdsClaims (+ groundedPct/counts) embedded by emit's embedVerification. */
 function parseDomainClaims(node: GraphNode): {
   claims: DomainClaim[];
@@ -91,31 +139,17 @@ function parseDomainClaims(node: GraphNode): {
   reviewCount: number;
 } {
   const meta = node.domainMeta as Record<string, unknown> | undefined;
-  const raw = Array.isArray(meta?.ktdsClaims) ? (meta!.ktdsClaims as unknown[]) : [];
-  const claims: DomainClaim[] = raw
+  const claims: DomainClaim[] = readKtdsClaims(node)
     .map((c): DomainClaim | null => {
       const o = c as Record<string, unknown>;
       const kind = typeof o.kind === "string" && CLAIM_KINDS.has(o.kind) ? o.kind : null;
       const text = typeof o.text === "string" ? o.text : "";
       if (!kind || !text) return null;
-      const citations = Array.isArray(o.citations)
-        ? (o.citations as unknown[])
-            .map((x): DomainClaimCitation | null => {
-              const ci = x as Record<string, unknown>;
-              if (typeof ci.filePath !== "string" || typeof ci.line !== "number") return null;
-              return {
-                filePath: ci.filePath,
-                line: ci.line,
-                status: typeof ci.status === "string" ? ci.status : undefined,
-              };
-            })
-            .filter((x): x is DomainClaimCitation => x !== null)
-        : [];
       return {
         kind: kind as DomainClaim["kind"],
         text,
         verdict: o.verdict === "NEEDS_REVIEW" ? "NEEDS_REVIEW" : "GROUNDED",
-        citations,
+        citations: parseCitations(o.citations),
       };
     })
     .filter((c): c is DomainClaim => c !== null);
@@ -342,6 +376,7 @@ export function buildDomainFlows(graph: KnowledgeGraph, domainId: string): Domai
         desc: node.summary,
         stepCount: flowStepCount.get(node.id) ?? 0,
         entryType: entryType ?? "",
+        grounding: parseFlowStepClaim(node),
       };
     });
 }

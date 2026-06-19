@@ -124,6 +124,8 @@ export const zh = {
     needsReview: "需复核",
     viewSource: "查看代码",
     unverified: "未验证依据",
+    evidence: "依据",
+    noCitations: "无引用",
   },
   flowList: {
     eyebrow: "业务领域",

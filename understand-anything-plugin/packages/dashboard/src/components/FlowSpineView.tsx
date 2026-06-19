@@ -16,9 +16,11 @@ import {
   NODE_H,
 } from "./flowSpineLayout";
 import type { SpinePlacement, SpineStep, SpineCallEdge } from "./flowSpineLayout";
-import { flowBadge } from "../utils/domainData";
+import { flowBadge, parseFlowStepClaim } from "../utils/domainData";
 import type { FlowMethod } from "../utils/domainData";
 import type { GraphNode } from "@understand-anything/core/types";
+import CitationChip from "./CitationChip";
+import VerdictBadge from "./VerdictBadge";
 
 const METHOD_COLOR: Record<FlowMethod, string> = {
   GET: "#38bdf8",
@@ -290,6 +292,8 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
   };
 
   const selectedStep = selectedNodeId ? allSteps.find((s) => s.id === selectedNodeId) ?? null : null;
+  // 스텝 자기 ref 의 검증 항목(emit embedVerification) — 근거 인용 + verdict. 미채움 노드는 null.
+  const stepGrounding = selectedStep ? parseFlowStepClaim(selectedStep.node) : null;
   const flowNode = domainGraph?.nodes.find((n) => n.id === activeFlowId) ?? null;
 
   // Right sidebar: the selected node's detail card. Shown ONLY while a node is
@@ -339,6 +343,23 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
               </p>
               <p className="text-xs text-text-secondary leading-relaxed">{selectedStep.node.summary}</p>
             </>
+          )}
+          {stepGrounding && (
+            <div className="mt-2">
+              <p className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-text-muted">
+                <VerdictBadge verdict={stepGrounding.verdict} />
+                {t.grounding.evidence}
+              </p>
+              {stepGrounding.citations.length > 0 ? (
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {stepGrounding.citations.map((c, i) => (
+                    <CitationChip key={`${c.filePath}:${c.line}:${i}`} filePath={c.filePath} line={c.line} status={c.status} />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[11px] text-text-muted mt-1">{t.grounding.noCitations}</p>
+              )}
+            </div>
           )}
           {selectedStep.node.tags && selectedStep.node.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">

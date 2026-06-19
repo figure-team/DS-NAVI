@@ -124,6 +124,8 @@ export const ko = {
     needsReview: "확인 필요",
     viewSource: "코드 보기",
     unverified: "근거 미검증",
+    evidence: "근거",
+    noCitations: "인용 없음",
   },
   flowList: {
     eyebrow: "업무 도메인",

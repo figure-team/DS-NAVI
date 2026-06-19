@@ -124,6 +124,8 @@ export const zhTW = {
     needsReview: "需複核",
     viewSource: "查看程式碼",
     unverified: "未驗證依據",
+    evidence: "依據",
+    noCitations: "無引用",
   },
   flowList: {
     eyebrow: "業務領域",

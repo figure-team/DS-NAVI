@@ -124,6 +124,8 @@ export const ru = {
     needsReview: "Требует проверки",
     viewSource: "Открыть код",
     unverified: "Непроверенная ссылка",
+    evidence: "Обоснование",
+    noCitations: "Нет ссылок",
   },
   flowList: {
     eyebrow: "Бизнес-домен",

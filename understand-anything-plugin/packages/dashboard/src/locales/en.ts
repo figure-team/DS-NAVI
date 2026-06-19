@@ -124,6 +124,8 @@ export const en = {
     needsReview: "Needs review",
     viewSource: "View source",
     unverified: "Unverified citation",
+    evidence: "Evidence",
+    noCitations: "No citations",
   },
   flowList: {
     eyebrow: "Business domain",

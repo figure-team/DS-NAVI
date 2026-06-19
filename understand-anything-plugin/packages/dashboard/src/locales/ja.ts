@@ -124,6 +124,8 @@ export const ja = {
     needsReview: "要確認",
     viewSource: "コードを表示",
     unverified: "未検証の根拠",
+    evidence: "根拠",
+    noCitations: "引用なし",
   },
   flowList: {
     eyebrow: "業務ドメイン",

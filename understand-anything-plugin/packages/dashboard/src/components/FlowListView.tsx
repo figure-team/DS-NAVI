@@ -119,6 +119,14 @@ export default function FlowListView() {
   const selectedFlow = flows.find((f) => f.id === selectedFlowId) ?? null;
   const singleGroup = groups.length <= 1;
 
+  // 표시 순서(그룹 순회) 기준 1..N 번호 — 펼침 행 배지와 접힘 레일 번호 선택이 동일 매핑을 쓴다.
+  const orderedFlows = useMemo(() => groups.flatMap((g) => g.flows), [groups]);
+  const flowNumber = useMemo(() => {
+    const m = new Map<string, number>();
+    orderedFlows.forEach((f, i) => m.set(f.id, i + 1));
+    return m;
+  }, [orderedFlows]);
+
   return (
     <div className="h-full w-full flex overflow-hidden">
       {/* LEFT: collapsed rail — » expand + vertical domain label. Replaces the
@@ -134,17 +142,35 @@ export default function FlowListView() {
           onClick={() => setListCollapsed(false)}
           title={t.flowList.expandList}
           aria-label={t.flowList.expandList}
-          className="mt-3 flex items-center justify-center rounded-md border border-border-subtle text-text-secondary hover:border-border-medium hover:text-accent transition-colors cursor-pointer"
+          className="shrink-0 mt-3 flex items-center justify-center rounded-md border border-border-subtle text-text-secondary hover:border-border-medium hover:text-accent transition-colors cursor-pointer"
           style={{ width: 28, height: 28, fontSize: 14, lineHeight: 1 }}
         >
           »
         </button>
-        <span
-          className="mt-4 uppercase text-text-muted select-none whitespace-nowrap"
-          style={{ fontSize: 10, letterSpacing: "0.12em", writingMode: "vertical-rl" }}
-        >
-          {domainNode?.name ?? ""} · {flows.length}
-        </span>
+        {/* 접힘 상태 번호 선택 — 펼치지 않고도 번호로 기능 전환(선택 번호 강조). */}
+        <div className="mt-3 flex-1 w-full overflow-y-auto flex flex-col items-center gap-1.5 pb-3">
+          {orderedFlows.map((f, i) => {
+            const isSel = f.id === selectedFlowId;
+            return (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setSelectedFlow(f.id)}
+                title={`${i + 1}. ${f.name}`}
+                aria-label={`${i + 1}. ${f.name}`}
+                aria-current={isSel}
+                className={`shrink-0 flex items-center justify-center rounded-md border font-mono transition-colors cursor-pointer ${
+                  isSel
+                    ? "border-accent text-accent bg-accent/10"
+                    : "border-border-subtle text-text-muted hover:border-border-medium hover:text-accent"
+                }`}
+                style={{ width: 28, height: 26, fontSize: 11 }}
+              >
+                {i + 1}
+              </button>
+            );
+          })}
+        </div>
       </aside>
       ) : (
       /* LEFT sidebar: flow list. Clicking a row selects the flow and renders its
@@ -227,6 +253,13 @@ export default function FlowListView() {
                       }}
                     >
                       <div className="flex items-center gap-2">
+                        {/* 번호 — 접힘 레일 번호와 동일 매핑(번호로 기능 식별·선택). */}
+                        <span
+                          className="shrink-0 inline-flex items-center justify-center rounded border border-border-subtle text-text-muted"
+                          style={{ minWidth: 18, height: 18, fontSize: 10, fontFamily: "var(--font-mono)" }}
+                        >
+                          {flowNumber.get(flow.id)}
+                        </span>
                         <MethodBadge method={flow.method} />
                         <span className="ml-auto flex items-center gap-1.5 shrink-0">
                           {flow.grounding && <VerdictBadge verdict={flow.grounding.verdict} />}

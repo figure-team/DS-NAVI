@@ -95,3 +95,85 @@
 - **결정론**: groundedPct는 정수 1자리(verify.ts pct와 동일 규칙) 재사용.
 - **용어 "흐름→기능"은 표시 라벨만**: 내부 모델(`flow:` id, 노드 type `"flow"`, `contains_flow`, `FlowListView`/`FlowSpineView`/`flowModel`)은 불변 — 스키마·엔진·블루프린트 동기화 전반을 건드리는 대규모 리팩터 회피("표시는 기능, 내부는 flow"). 내부 id까지 통일은 별도 큰 작업으로 분리.
 - 화면 2(기능 목록)·화면 3(스파인) 근거·검증 노출은 본 설계 범위 밖(후속) — 우선 도메인 카드(화면 1)에 집중.
+
+---
+
+## 9. 구현 상태 / 트레이드오프 / 후속 재개점 (세션 핸드오프)
+
+> 화면1 도메인 카드(근거·검증) **5단계 전부 구현·검증·커밋 완료.** 화면2/3은 후속(아래 재개점).
+
+### 9.1 완료 커밋
+| 단계 | 커밋 | 내용 |
+|---|---|---|
+| 1 | `4d3b891` | 백엔드 emit `embedVerification` — verify(status/verdict/groundedPct)를 노드 domainMeta.ktdsClaims 에 임베드(단일소스) |
+| 2 | `ffb2754` | store `openCodeViewerAt(filePath,line)` + CodeViewer 단일라인 하이라이트·scrollIntoView |
+| 3 | `4133248` | `CitationChip`/`GroundedBar` 컴포넌트 + grounding i18n(6종) |
+| 4 | `7e6a9bc` | `DomainCardDetail` + DomainMapView 아코디언 + App.tsx 도메인페이지 코드뷰어 마운트 |
+| 5 | `050e706` | 표시 라벨 "흐름"→"기능" 일괄(6종 locale + emit 결정론 라벨) |
+
+검증 상태: dashboard build ✓ · dashboard 테스트 110 · legacy-core 511 · 코어불변식 0 ·
+헤드리스 E2E(카드 확장→근거율·인용칩·⚠·코드뷰어 점프, 잔존 "흐름" 0).
+
+### 9.2 핵심 트레이드오프 (왜 이렇게 했나)
+- **하이브리드 채움**(결정론 라벨 + LLM fill): 항상 보이는 얕은 라벨 vs 풍부하지만 host(Claude)
+  오케스트레이션 의존·환각 가능. 환각은 S9 인용검증→NEEDS_REVIEW 강등으로 완화(삭제 아님).
+- **단일소스 임베드**(ktdsClaims를 domain-graph 노드에) vs verify-report 별도 fetch: 대시보드가
+  한 파일만 읽음(단순) ↔ domain-graph.json 비대 + emit↔verify 결합. → 임베드 채택.
+- **카드=순수 도메인 개요, 기능은 개수만**: 오버플로 없음·한눈 신뢰도 ↔ 기능별 상세/인용은
+  카드에 없음(화면2로 위임). 도메인 레벨 주장(요약/엔티티/규칙/교차)만 카드.
+- **"표시는 기능, 내부는 flow"**: 스키마·엔진·블루프린트 동기화 대규모 리팩터 회피 ↔ 표시어
+  (기능)와 내부 id(flow:*) 용어 divergence. 엣지타입(contains_flow/flow_step) 라벨은 유지.
+- **인용 칩 항상 클릭 가능**(status ok 아니어도): 사용자가 주장 위치 직접 확인 ↔ 불일치 라인으로
+  점프할 수 있음(amber+툴팁으로 표시). allowlist 미포함은 서버가 "source unavailable" graceful.
+- **컴포넌트 렌더 단위테스트 생략**: testing-library/jsdom 미설치(무거운 dep 회피) ↔ 컴포넌트
+  렌더 회귀는 store 단위테스트 + 헤드리스(playwright)로만 커버. 도입 시 CitationChip/GroundedBar/
+  DomainCardDetail 렌더 테스트 추가 권장.
+
+### 9.3 후속 재개점 — 화면2(기능 목록)·화면3(스파인) 근거·검증 노출
+- **데이터 이미 준비됨**: `embedVerification`(emit.ts)이 **flow/step 노드에도** ktdsClaims(자기 ref의
+  검증항목)를 임베드한다. 즉 FlowListView(화면2)는 flow 노드의, FlowSpineView(화면3)는 step 노드의
+  `domainMeta.ktdsClaims`를 읽으면 됨(백엔드 추가 작업 거의 없음).
+- **재사용 자산**: `CitationChip`·`GroundedBar`·store `openCodeViewerAt`·App 도메인페이지 코드뷰어
+  슬라이드업(이미 마운트)·domainData 파서 패턴(`parseDomainClaims` 동형으로 flow/step용 작성).
+- **작업**: ① flow 노드용 claim 파서(domainData) ② FlowListView 흐름 행/디테일에 CitationChip+배지
+  ③ FlowSpineView step 디테일(노드 클릭 패널)에 인용·근거율 ④ 화면2/3 라벨은 이미 "기능"으로 변경됨.
+- **주의**: 블루프린트 동기화 때 `KtdsNodeDetail`(공유 상세 패널) 제거됨 → 화면2/3 상세는 각
+  컴포넌트 내부 렌더. NodeInfo(사이드바)는 도메인 풀페이지에서 숨김(거기 인용 추가해도 안 보임).
+- **검증 방법**: jpetstore에 `bundle`→합성fill(flows/steps 포함)→`emit` 후 헤드리스로 화면2/3 확인.
+
+### 9.4 외부 참고 (codegraph OSS 평가 → §10 별도 문서/메모)
+
+---
+
+## 10. codegraph OSS 적용성 평가 (github.com/colbymchenry/codegraph)
+
+> codegraph = **AI 에이전트용** 사전 인덱스 코드 지식그래프(SQLite+FTS5, tree-sitter 20+ 언어,
+> 17+ 프레임워크 라우트 인식, 파일워치 증분, MCP 도구 4종). **LLM 미사용**(에이전트를 보조).
+> 우리 = **사람용** 도메인/기능 추상화 + LLM 채움 + file:line 인용검증 + 대시보드/문서. 레이어가 다름.
+
+### 적용 가능 (우선순위 순)
+1. **[높음] 그래프를 MCP 도구로 노출** — codegraph 핵심 가치(에이전트가 파일 스캔 대신 그래프 질의 →
+   토큰 ~16%↓·툴콜 ~58%↓). 우리 knowledge-graph/domain-graph/impact 를 `explore/node/search/callers`
+   류 MCP 도구로 열면 **에이전트向 신규 채널**(현재는 사람向 대시보드/문서뿐). 우리 강점(도메인/기능
+   추상화·인용)을 에이전트가 질의 가능. → 후속 큰 기능 후보.
+2. **[높음] 프레임워크/언어 라우트 추출 확대** — codegraph 17+ 프레임워크(Django/Express/Rails/Gin/
+   Axum…)·20+ 언어 패턴. 우리 `routes/{stripes,nextjs}.ts` 패턴을 동형 확장하면 로드맵 "비-Java
+   결정론 엔진"에 직접 기여. 라우트 DSL/데코레이터 인식 기법 참고.
+3. **[중] SQLite+FTS5 저장/검색** — 대형 레포에서 JSON 재파싱 대비 빠른 심볼 검색·impact 질의.
+   단 우리 결정론(byte-diff=0, stable JSON) 모델과 상충 → 캐시/인덱스 레이어로만(소스는 JSON 유지).
+4. **[중] 파일워치 자동 증분** — 우리 fingerprint 증분(P6 보완 D)은 on-demand. native FS 이벤트
+   디바운스 자동 재인덱싱은 라이브 UX 향상(에이전트/대시보드 자동 최신화).
+5. **[중] 엣지 provenance 태깅 입도** — codegraph는 엣지마다 출처(direct/heuristic: swift-objc-bridge
+   등) 태그. 우리 confidence(CONFIRMED/INFERRED/…)·unresolved 보고와 철학 일치 → 엣지 단위 출처
+   태그 입도 보강 참고.
+
+### 이미 보유 / 비채택
+- **impact radius(전이 의존)**: 우리 impact 엔진(P5: reach/api/persistence/flow)이 이미 보유 +
+  인용검증까지 → 더 정밀. 차용 불필요.
+- **LLM 미사용 철학**: codegraph는 주장 생성을 안 하므로 검증 불요. 우리는 **LLM 의미 채움 + S9
+  인용검증**이 차별점 → 유지(비채택).
+- **번들 런타임/zero-dep 배포**: 우리 vendor-deps.sh(자급 node_modules)로 유사 목표 해결됨.
+
+### 결론
+codegraph와 우리는 **경쟁이 아니라 보완 레이어**(심볼·에이전트 vs 도메인·사람). 가장 가치 있는
+차용은 **①MCP 에이전트 채널 + ②프레임워크/언어 추출 확대**. ③~⑤는 성능/UX 점진 개선 후보.

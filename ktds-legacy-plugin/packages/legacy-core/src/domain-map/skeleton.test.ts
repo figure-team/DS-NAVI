@@ -7,6 +7,7 @@ import { extractEdges } from './edges.js'
 import { buildSlices } from './slices.js'
 import { buildCandidates } from './classify.js'
 import { buildAutoPlan } from './confirm.js'
+import { buildMethodCallGraph } from './method-calls.js'
 import { buildSkeleton, DEFAULT_STEP_CAP } from './skeleton.js'
 import { stableJson } from './persist.js'
 import type { ConfirmedPlan, SkeletonReport } from './types.js'
@@ -177,5 +178,59 @@ describe('skeleton — shop-mini structural (S6, P2 file-level steps)', () => {
     const a = await buildShopMiniSkeleton()
     const b = await buildShopMiniSkeleton()
     expect(stableJson(a.skeleton)).toBe(stableJson(b.skeleton))
+  })
+})
+
+describe('skeleton — calls-edge used-method labels (methodCallGraph)', () => {
+  /** shop-mini 산출물 + 실제 메서드 호출그래프를 인메모리로 만들어 skeleton 을 빌드. */
+  async function buildWithMethods(): Promise<SkeletonReport> {
+    const census = buildCensus(shopMini)
+    const routes = await extractRoutes(shopMini, census)
+    const edges = await extractEdges(shopMini, census)
+    const slices = buildSlices(census, routes, edges)
+    const candidates = buildCandidates(census, routes, slices)
+    const plan = buildAutoPlan(candidates)
+    const methodCallGraph = await buildMethodCallGraph(shopMini, census)
+    return buildSkeleton(shopMini, {
+      census,
+      routes,
+      edges,
+      slices,
+      candidates,
+      plan,
+      methodCallGraph,
+    })
+  }
+
+  it('attaches an ordered "→" method label to the OrderController→OrderService calls edge', async () => {
+    const skeleton = await buildWithMethods()
+    const edge = skeleton.edges.find(
+      (e) =>
+        e.type === 'calls' &&
+        e.source === 'step:POST /orders:src/main/java/com/shop/web/OrderController.java' &&
+        e.target === 'step:POST /orders:src/main/java/com/shop/service/OrderService.java',
+    )
+    expect(edge).toBeDefined()
+    // description = controller 가 service 에서 호출 순서대로 쓰는 메서드(결정론·근거 보유).
+    expect(typeof edge!.description).toBe('string')
+    expect(edge!.description!.length).toBeGreaterThan(0)
+    // 다중 메서드면 " → " 로 연결, 단일이면 구분자 없음 — 어느 쪽이든 비지 않음.
+    for (const m of edge!.description!.split(' → ')) {
+      expect(m.trim().length).toBeGreaterThan(0)
+    }
+  })
+
+  it('leaves the description absent when no method-level call resolves for the pair', async () => {
+    // methodCallGraph 미제공(파일 단위 폴백) 경로는 description 을 절대 만들지 않는다.
+    const { skeleton } = await buildShopMiniSkeleton()
+    const callEdges = skeleton.edges.filter((e) => e.type === 'calls')
+    expect(callEdges.length).toBeGreaterThan(0)
+    for (const e of callEdges) expect(e.description).toBeUndefined()
+  })
+
+  it('determinism: method-labelled skeleton twice byte-identical', async () => {
+    const a = await buildWithMethods()
+    const b = await buildWithMethods()
+    expect(stableJson(a)).toBe(stableJson(b))
   })
 })

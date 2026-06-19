@@ -171,6 +171,19 @@ export async function buildSkeleton(
     set.add(e.target)
   }
 
+  // (callerFile→calleeFile) → 호출 순서(callLine) 유니크 메서드 목록. step→step calls
+  // 엣지에 "이 파일이 상대 파일에서 실제로 쓰는 메서드" 라벨을 붙이는 데 쓴다(결정론·근거
+  // 보유). methodCallGraph.calls 는 (callerFile, callLine, calleeMethod) 정렬이라 배열
+  // 순서대로 dedupe 하면 호출 라인 순서가 보존된다. methodCallGraph 미제공이면 빈 맵.
+  const methodsByFilePair = new Map<string, string[]>()
+  for (const c of methodCallGraph?.calls ?? []) {
+    if (!c.calleeFile) continue
+    const key = `${c.callerFile}\n${c.calleeFile}`
+    let list = methodsByFilePair.get(key)
+    if (!list) methodsByFilePair.set(key, (list = []))
+    if (!list.includes(c.calleeMethod)) list.push(c.calleeMethod)
+  }
+
   const layerSignals: LayerSignals = buildLayerSignals(routes, edges)
 
   // java-facts: step/route 파일의 클래스명 + 선언 라인. census 의 java 파일만 1회 파싱.
@@ -277,11 +290,17 @@ export async function buildSkeleton(
           if (!targets) continue
           for (const fileB of [...targets].sort(cmp)) {
             if (fileB === fileA || !inChain.has(fileB)) continue
+            // 사용 메서드 라벨(결정론): fileA 의 코드가 fileB 에서 호출 순서대로 쓰는
+            // 메서드. 메서드 단위 근거가 있을 때만 부여(없으면 파일 단위 의존 엣지로 유지).
+            const methods = methodsByFilePair.get(`${fileA}\n${fileB}`)
             edgeList.push({
               source: `step:${flowKey}:${fileA}`,
               target: `step:${flowKey}:${fileB}`,
               type: 'calls',
               weight: 1,
+              ...(methods && methods.length > 0
+                ? { description: methods.join(' → ') }
+                : {}),
             })
           }
         }

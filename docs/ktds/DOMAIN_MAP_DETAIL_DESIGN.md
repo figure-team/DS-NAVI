@@ -177,3 +177,22 @@
 ### 결론
 codegraph와 우리는 **경쟁이 아니라 보완 레이어**(심볼·에이전트 vs 도메인·사람). 가장 가치 있는
 차용은 **①MCP 에이전트 채널 + ②프레임워크/언어 추출 확대**. ③~⑤는 성능/UX 점진 개선 후보.
+
+### 10.1 후속 보류 — 변경 영향도(impact)에 codegraph 차용 (실제 레포 검증 2026-06-19)
+실 레포 검증 결과 §10 기술 사실 일치(MIT · SQLite+FTS5 · tree-sitter · MCP 4도구
+explore/node/search/callers + impact/callees/files/status · LLM 미사용 · 16%↓/툴콜 58%↓ ·
+native 파일워치). **impact 한정 판단:**
+- **현재(Java/JVM-웹 레거시) = 비채택.** ⓐ codegraph 효율 레버는 "에이전트 grep/read 루프"를
+  대체하는 것인데 우리 impact 는 결정론 엔진(edges.json BFS, 재스캔 0) → 줄일 에이전트 비용 없음.
+  ⓑ codegraph `impact` = 범용 심볼 전이 ≈ 우리 `reach.ts` 의 부분집합. 우리는 4렌즈(reach/api/
+  persistence/flow)+인용검증+신뢰도등급+생성예측까지 = 상위 분석. ⓒ Java 엣지 정밀도 우위:
+  우리 엣지 `injection`/`ctor-param`(Spring DI)·`mapper-xml`(MyBatis)·servlet/Stripes/JSP 라우트는
+  codegraph 범용 콜그래프가 안 만듦. ⓓ codegraph는 mutable SQLite+파일워치 ↔ 우리 byte-diff=0 결정론 충돌.
+- **트리거: 폴리글랏 확장(Vue/React/Python/FastAPI 추가 예정)** → 그때 **하이브리드 재검토.**
+  레이어 분리: ①전이 reach 그래프(BFS 백본)는 codegraph 엣지를 edges.json 포맷으로 **스냅샷**해
+  입력 차용(JS/TS/Python 콜그래프 0빌드 회피) — codegraph가 React Router/Vue/Nuxt/FastAPI `@app.get`
+  이미 커버. ②의미 렌즈(api 라우트·persistence/ORM·flow)는 우리가 소유 — `routes/{spring,stripes}.ts`
+  패턴을 `routes/{fastapi,react-router,vue}.ts` + ORM 엣지로 확장(codegraph는 기법 참조만).
+  통째 대체 아님, impact 엔진 유지.
+- **도입 전 스파이크 1건(유일 리스크): 결정론** — 같은 commit에서 codegraph 인덱싱→정렬 export 가
+  byte-diff=0 재현되는지(깨끗한 체크아웃 인덱싱이면 가능성 높지만 freshness 지향이라 검증 필수).

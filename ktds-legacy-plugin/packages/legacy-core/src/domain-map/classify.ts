@@ -213,17 +213,22 @@ export function buildCandidates(
     directory.degenerate ? null : (directory.tokenByFile.get(p) ?? null)
 
   // 도메인 시드 = 루트(엔트리 파일). 루트 key 는 루트 파일에서 파생한 자연키:
-  // 디렉토리 토큰이 루트들을 실제로 구별할 때만 디렉토리 토큰을 key 로 쓴다 —
-  // package-by-layer(모든 컨트롤러가 한 디렉토리)에서는 루트 전원이 같은 토큰을
-  // 받아 도메인이 하나로 붕괴하므로 그 경우 파일명 prefix 가 루트 key 다.
-  const rootDirTokens = new Set(
-    slices.slices.map((s) => dirToken(s.root)).filter((t): t is string => t !== null),
-  )
-  const dirDistinguishesRoots = rootDirTokens.size >= 2
+  // 디렉토리 토큰이 그 루트를 '유일하게' 식별할 때만 디렉토리 토큰을 key 로 쓴다.
+  // package-by-layer(모든 컨트롤러가 한 디렉토리: 예 …/web/actions/*ActionBean)에서는
+  // 여러 루트가 같은 디렉토리 토큰(예 'mybatis')을 공유해 도메인이 하나로 붕괴하므로,
+  // 공유 토큰인 루트는 파일명 prefix(Account→account 등)로 분리한다. 전역 boolean 으로
+  // 판정하면 단 하나의 이질 루트(예 WEB-INF/web.xml)가 나머지를 통째로 붕괴시킨다.
+  const rootsByDirToken = new Map<string, number>()
+  for (const slice of slices.slices) {
+    const t = dirToken(slice.root)
+    if (t !== null) rootsByDirToken.set(t, (rootsByDirToken.get(t) ?? 0) + 1)
+  }
   const rootKey = new Map<string, string>()
   for (const slice of slices.slices) {
+    const t = dirToken(slice.root)
+    const tokenUniqueToRoot = t !== null && rootsByDirToken.get(t) === 1
     const key =
-      (dirDistinguishesRoots ? dirToken(slice.root) : null) ??
+      (tokenUniqueToRoot ? t : null) ??
       prefixToken(slice.root) ??
       (slice.root.split('/').pop() ?? slice.root).replace(/\.[^.]+$/, '').toLowerCase()
     rootKey.set(slice.root, key)

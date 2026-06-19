@@ -143,10 +143,13 @@ export function extractStripesRoutes(root: Node, filePath: string): RouteEntry[]
     for (const method of childrenOfType(body, 'method_declaration')) {
       const mMods = child(method, 'modifiers')
       const mModText = mMods ? mMods.text : ''
-      // public 비정적 + Resolution 반환만 이벤트 핸들러.
+      // public 비정적 + Resolution(또는 서브타입) 반환만 이벤트 핸들러.
+      // Stripes Resolution 구현은 전부 "…Resolution" 으로 끝난다(ForwardResolution,
+      // RedirectResolution, StreamingResolution 등). 베이스 `Resolution` 만 매칭하면
+      // ForwardResolution 핸들러(예: CatalogActionBean)를 통째로 놓친다.
       if (!/\bpublic\b/.test(mModText)) continue
       if (/\bstatic\b/.test(mModText)) continue
-      if (!/\bResolution\b/.test(returnTypeText(method))) continue
+      if (!/Resolution\b/.test(returnTypeText(method))) continue
 
       const mName = methodName(method) ?? '<unknown>'
       const mAnnots = annotationsOf(method)

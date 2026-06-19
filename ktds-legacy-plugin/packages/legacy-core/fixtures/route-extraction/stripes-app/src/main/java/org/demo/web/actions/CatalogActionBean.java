@@ -14,4 +14,9 @@ public class CatalogActionBean extends AbstractActionBean {
     public Resolution viewCategory() {
         return new ForwardResolution("/category.jsp");
     }
+
+    // 선언 반환타입이 서브타입(ForwardResolution) — 베이스 Resolution 만 매칭하면 누락된다.
+    public ForwardResolution viewProduct() {
+        return new ForwardResolution("/product.jsp");
+    }
 }

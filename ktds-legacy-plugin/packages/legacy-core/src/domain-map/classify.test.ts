@@ -14,6 +14,7 @@ const fixtures = join(here, '..', '..', 'fixtures')
 const shopMini = join(fixtures, 'chain-recall', 'shop-mini')
 const featureTree = join(fixtures, 'classify', 'feature-tree')
 const flat = join(fixtures, 'classify', 'flat')
+const packageByLayer = join(fixtures, 'classify', 'package-by-layer')
 
 async function candidatesFor(root: string): Promise<CandidatesReport> {
   const census = buildCensus(root)
@@ -98,5 +99,21 @@ describe('classify — flat (directory-degenerate fallback to prefix)', () => {
     const c = await candidatesFor(flat)
     expect(c.directoryDegenerate).toEqual({ reason: 'too-few-clusters' })
     expect(c.candidates.map((x) => x.key)).toEqual(['catalog', 'invoice'])
+  })
+})
+
+describe('classify — package-by-layer (shared directory token must not collapse roots)', () => {
+  // 여러 컨트롤러가 한 패키지(org/shop/*Controller)에 모여 같은 디렉토리 토큰("shop")을
+  // 공유하고, 토큰이 다른 이질 루트(org/admin/AdminController)가 하나 있어 디렉토리 분류는
+  // 전역적으로 degenerate 가 아니다(=null). 과거 버그: 이질 루트 하나로 "디렉토리가 루트를
+  // 구별한다"고 전역 판정해 shop 컨트롤러 3개를 'shop' 한 도메인으로 붕괴시켰다(jpetstore의
+  // mybatis 붕괴와 동형). 공유 토큰 루트는 파일명 prefix 로 분리되어야 한다.
+  it('splits roots sharing a directory token by filename prefix (not collapsed)', async () => {
+    const c = await candidatesFor(packageByLayer)
+    expect(c.directoryDegenerate).toBeNull()
+    // shop 컨트롤러 3개는 account/cart/order 로 분리, 이질 루트 admin 은 유지.
+    expect(c.candidates.map((x) => x.key).sort()).toEqual(['account', 'admin', 'cart', 'order'])
+    // 'shop'(공유 디렉토리 토큰)이 도메인 key 로 남으면 붕괴 회귀.
+    expect(c.candidates.map((x) => x.key)).not.toContain('shop')
   })
 })

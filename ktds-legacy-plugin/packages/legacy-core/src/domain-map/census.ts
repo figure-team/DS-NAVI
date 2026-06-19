@@ -30,7 +30,22 @@ export const SOURCE_LANG_BY_EXT: Record<string, string> = {
 }
 
 /** walk 폴백에서 건너뛸 디렉터리. */
-const WALK_SKIP_DIRS = new Set(['node_modules', '.git', 'dist', '.spec', '.understand-anything'])
+const WALK_SKIP_DIRS = new Set([
+  'node_modules',
+  '.git',
+  'dist',
+  '.spec',
+  '.understand-anything',
+  // 빌드 툴링(소스 아님) — Maven wrapper(.mvn/MavenWrapperDownloader.java 의 main()이
+  // 가짜 배치 진입점/도메인으로 잡히는 것 방지), Maven/Gradle 산출물.
+  '.mvn',
+  'target',
+])
+
+/** relPath 의 경로 세그먼트 중 하나라도 skip 디렉터리면 true(인구조사 제외). */
+function isInSkippedDir(relPath: string): boolean {
+  return relPath.split('/').some((seg) => WALK_SKIP_DIRS.has(seg))
+}
 
 /** 경로 구분자를 forward slash 로 정규화. */
 function toPosix(p: string): string {
@@ -111,6 +126,8 @@ export function buildCensus(projectRoot: string): CensusReport {
   } else {
     files = applyGitignore(projectRoot, walkFiles(projectRoot))
   }
+  // 빌드 툴링 디렉터리는 git ls-files(추적됨)로도 들어오므로 소스와 무관하게 제외한다.
+  files = files.filter((relPath) => !isInSkippedDir(relPath))
 
   // statSync 로 실재 파일만(심볼릭/누락 방어), relPath 정렬.
   const seen = new Set<string>()

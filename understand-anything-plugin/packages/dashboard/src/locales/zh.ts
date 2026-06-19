@@ -117,6 +117,7 @@ export const zh = {
     empty: "暂无领域图。请运行 /understand-domain 生成。",
     breadcrumbRoot: "领域地图",
     viewFeatures: "查看功能",
+    detail: "详情",
   },
   grounding: {
     rate: "依据率",

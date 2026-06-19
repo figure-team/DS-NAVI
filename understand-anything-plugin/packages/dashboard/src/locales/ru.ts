@@ -117,6 +117,7 @@ export const ru = {
     empty: "Граф доменов недоступен. Запустите /understand-domain для генерации.",
     breadcrumbRoot: "Карта доменов",
     viewFeatures: "Показать функции",
+    detail: "Подробнее",
   },
   grounding: {
     rate: "Обоснованность",

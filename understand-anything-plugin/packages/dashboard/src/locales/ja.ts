@@ -117,6 +117,7 @@ export const ja = {
     empty: "ドメイングラフがありません。/understand-domain で生成してください。",
     breadcrumbRoot: "ドメインマップ",
     viewFeatures: "機能を見る",
+    detail: "詳細",
   },
   grounding: {
     rate: "根拠率",

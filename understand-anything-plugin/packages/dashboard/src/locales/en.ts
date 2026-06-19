@@ -117,6 +117,7 @@ export const en = {
     empty: "No domain graph available. Run /understand-domain to generate one.",
     breadcrumbRoot: "Domain map",
     viewFeatures: "View features",
+    detail: "Details",
   },
   grounding: {
     rate: "Grounding",

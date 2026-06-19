@@ -107,11 +107,23 @@ export default function DomainMapView() {
                   }`}
                   style={{ height: 2, background: card.color }}
                 />
-                {/* Header = expand toggle (인라인 확장). 기능별 상세는 '기능 보기'로 화면2. */}
+                {/* 우측 상단 '상세보기' 토글 — 근거 패널 인라인 확장. 본문 클릭과 분리(중첩 버튼 회피
+                    위해 본문 버튼의 형제로 두고 절대배치 + z-10 으로 위에 올린다). */}
                 <button
                   type="button"
                   onClick={() => setExpandedId(isOpen ? null : card.id)}
                   aria-expanded={isOpen}
+                  className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-md border border-border-subtle bg-elevated/80 text-text-muted hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+                  style={{ padding: "4px 9px", fontSize: 11 }}
+                  title={t.domainMap.detail}
+                >
+                  {t.domainMap.detail}
+                  <span style={{ fontSize: 9, lineHeight: 1 }}>{isOpen ? "▴" : "▾"}</span>
+                </button>
+                {/* 본문 = 기능 보기(화면2)로 이동. 근거 상세는 우측 상단 '상세보기' 토글로 분리. */}
+                <button
+                  type="button"
+                  onClick={() => navigateToDomain(card.id)}
                   className="w-full text-left cursor-pointer"
                   style={{ padding: 24 }}
                 >

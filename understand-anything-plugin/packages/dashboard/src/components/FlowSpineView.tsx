@@ -294,6 +294,33 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
   const selectedStep = selectedNodeId ? allSteps.find((s) => s.id === selectedNodeId) ?? null : null;
   // 스텝 자기 ref 의 검증 항목(emit embedVerification) — 근거 인용 + verdict. 미채움 노드는 null.
   const stepGrounding = selectedStep ? parseFlowStepClaim(selectedStep.node) : null;
+
+  // P1 결정론 노출: 선택 노드의 사용 메서드 + 호출관계 in/out. 전부 엔진 `calls`
+  // 엣지에서 직접 계산(LLM 무관) — `methodsByNode` 와 달리 렌더 서브셋이 아니라
+  // 그래프 전체를 훑어 접힌 곁가지가 선택돼도 완전하게 보인다.
+  const selectedDetail = useMemo(() => {
+    if (!domainGraph || !selectedNodeId) return null;
+    const nodesById = new Map(domainGraph.nodes.map((n) => [n.id, n]));
+    const methods: string[] = [];
+    const callsOut: Array<{ id: string; name: string }> = [];
+    const callsIn: Array<{ id: string; name: string }> = [];
+    for (const e of domainGraph.edges) {
+      if (e.type !== "calls") continue;
+      if (e.target === selectedNodeId) {
+        const desc = typeof e.description === "string" ? e.description.trim() : "";
+        for (const m of desc.split("→").map((s) => s.trim()).filter(Boolean)) {
+          if (!methods.includes(m)) methods.push(m);
+        }
+        const src = nodesById.get(e.source);
+        if (src && !callsIn.some((c) => c.id === src.id)) callsIn.push({ id: src.id, name: src.name });
+      }
+      if (e.source === selectedNodeId) {
+        const tgt = nodesById.get(e.target);
+        if (tgt && !callsOut.some((c) => c.id === tgt.id)) callsOut.push({ id: tgt.id, name: tgt.name });
+      }
+    }
+    return { methods, callsOut, callsIn };
+  }, [domainGraph, selectedNodeId]);
   const flowNode = domainGraph?.nodes.find((n) => n.id === activeFlowId) ?? null;
 
   // Right sidebar: the selected node's detail card. Shown ONLY while a node is
@@ -359,6 +386,65 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
               ) : (
                 <p className="text-[11px] text-text-muted mt-1">{t.grounding.noCitations}</p>
               )}
+            </div>
+          )}
+          {selectedDetail && selectedDetail.methods.length > 0 && (
+            <div className="mt-2">
+              <p className="text-[11px] uppercase tracking-wider text-text-muted">
+                {t.flowView.detailMethods}
+              </p>
+              <div className="flex flex-col gap-0.5 mt-1">
+                {selectedDetail.methods.map((m) => (
+                  <span
+                    key={m}
+                    className="text-[11px] text-text-secondary truncate"
+                    style={{ fontFamily: "var(--font-mono)" }}
+                    title={m}
+                  >
+                    {m}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {selectedDetail && selectedDetail.callsOut.length > 0 && (
+            <div className="mt-2">
+              <p className="text-[11px] uppercase tracking-wider text-text-muted">
+                {t.flowView.detailCallsOut}
+              </p>
+              <div className="flex flex-col gap-0.5 mt-1">
+                {selectedDetail.callsOut.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => selectNode(c.id)}
+                    className="text-left text-[11px] text-text-secondary hover:text-accent transition-colors truncate"
+                    title={c.name}
+                  >
+                    → {c.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {selectedDetail && selectedDetail.callsIn.length > 0 && (
+            <div className="mt-2">
+              <p className="text-[11px] uppercase tracking-wider text-text-muted">
+                {t.flowView.detailCallsIn}
+              </p>
+              <div className="flex flex-col gap-0.5 mt-1">
+                {selectedDetail.callsIn.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => selectNode(c.id)}
+                    className="text-left text-[11px] text-text-secondary hover:text-accent transition-colors truncate"
+                    title={c.name}
+                  >
+                    ← {c.name}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           {selectedStep.node.tags && selectedStep.node.tags.length > 0 && (

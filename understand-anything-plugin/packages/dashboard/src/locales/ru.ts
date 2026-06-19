@@ -161,6 +161,9 @@ export const ru = {
     collapseAllBranches: "Свернуть ветви",
     methodsUsed: "методы",
     closeDetail: "Закрыть",
+    detailMethods: "Используемые методы",
+    detailCallsOut: "Вызывает (out)",
+    detailCallsIn: "Вызывается (in)",
   },
   detailLevel: {
     filesTitle: "Только файлы — зависимости архитектурного уровня (быстро)",

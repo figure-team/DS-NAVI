@@ -161,6 +161,9 @@ export const en = {
     collapseAllBranches: "Collapse branches",
     methodsUsed: "methods",
     closeDetail: "Close",
+    detailMethods: "Used methods",
+    detailCallsOut: "Calls (out)",
+    detailCallsIn: "Called by (in)",
   },
   detailLevel: {
     filesTitle: "Files only — architecture-level dependencies (fast)",

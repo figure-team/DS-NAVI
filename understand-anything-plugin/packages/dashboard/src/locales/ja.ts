@@ -161,6 +161,9 @@ export const ja = {
     collapseAllBranches: "枝を折りたたむ",
     methodsUsed: "メソッド",
     closeDetail: "閉じる",
+    detailMethods: "使用メソッド",
+    detailCallsOut: "呼び出し (out)",
+    detailCallsIn: "呼び出し元 (in)",
   },
   detailLevel: {
     filesTitle: "ファイルのみ — アーキテクチャレベルの依存関係（高速）",

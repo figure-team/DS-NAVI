@@ -161,6 +161,9 @@ export const ko = {
     collapseAllBranches: "곁가지 접기",
     methodsUsed: "methods",
     closeDetail: "닫기",
+    detailMethods: "사용 메서드",
+    detailCallsOut: "호출함 (out)",
+    detailCallsIn: "호출됨 (in)",
   },
   detailLevel: {
     filesTitle: "파일만 — 아키텍처 레벨 의존성 (빠름)",

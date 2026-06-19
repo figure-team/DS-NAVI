@@ -161,6 +161,9 @@ export const zh = {
     collapseAllBranches: "折叠分支",
     methodsUsed: "方法",
     closeDetail: "关闭",
+    detailMethods: "使用的方法",
+    detailCallsOut: "调用 (out)",
+    detailCallsIn: "被调用 (in)",
   },
   detailLevel: {
     filesTitle: "仅文件 — 架构级依赖（快速）",

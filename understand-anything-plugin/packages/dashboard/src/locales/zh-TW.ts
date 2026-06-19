@@ -161,6 +161,9 @@ export const zhTW = {
     collapseAllBranches: "摺疊分支",
     methodsUsed: "方法",
     closeDetail: "關閉",
+    detailMethods: "使用的方法",
+    detailCallsOut: "呼叫 (out)",
+    detailCallsIn: "被呼叫 (in)",
   },
   detailLevel: {
     filesTitle: "僅檔案 — 架構級依賴（快速）",

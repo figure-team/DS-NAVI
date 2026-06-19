@@ -166,7 +166,7 @@ export const ja = {
     detailCallsIn: "呼び出し元 (in)",
     detailViewButton: "詳細を見る",
     detailSectionsEmpty: "詳細は未入力です。",
-    detailSections: { role: "役割" } as Record<string, string>,
+    detailSections: { role: "役割", request: "リクエスト処理", businessLogic: "ビジネスロジック", persistence: "永続化", schema: "スキーマ", dataShape: "データ構造" } as Record<string, string>,
     confirmed: "確定",
     editButton: "編集",
     saveButton: "保存（確定）",

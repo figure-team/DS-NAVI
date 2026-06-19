@@ -166,7 +166,7 @@ export const ko = {
     detailCallsIn: "호출됨 (in)",
     detailViewButton: "상세보기",
     detailSectionsEmpty: "채워진 상세가 없습니다.",
-    detailSections: { role: "역할" } as Record<string, string>,
+    detailSections: { role: "역할", request: "요청 처리", businessLogic: "비즈니스 로직", persistence: "영속 처리", schema: "스키마", dataShape: "데이터 구조" } as Record<string, string>,
     confirmed: "확정",
     editButton: "편집",
     saveButton: "저장 (확정)",

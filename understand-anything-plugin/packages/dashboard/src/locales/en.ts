@@ -166,7 +166,7 @@ export const en = {
     detailCallsIn: "Called by (in)",
     detailViewButton: "View detail",
     detailSectionsEmpty: "No detail filled yet.",
-    detailSections: { role: "Role" } as Record<string, string>,
+    detailSections: { role: "Role", request: "Request handling", businessLogic: "Business logic", persistence: "Persistence", schema: "Schema", dataShape: "Data shape" } as Record<string, string>,
     confirmed: "Confirmed",
     editButton: "Edit",
     saveButton: "Save (confirm)",

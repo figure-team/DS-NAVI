@@ -166,7 +166,7 @@ export const ru = {
     detailCallsIn: "Вызывается (in)",
     detailViewButton: "Подробнее",
     detailSectionsEmpty: "Детали ещё не заполнены.",
-    detailSections: { role: "Роль" } as Record<string, string>,
+    detailSections: { role: "Роль", request: "Обработка запроса", businessLogic: "Бизнес-логика", persistence: "Персистентность", schema: "Схема", dataShape: "Структура данных" } as Record<string, string>,
     confirmed: "Подтверждено",
     editButton: "Изменить",
     saveButton: "Сохранить (подтвердить)",

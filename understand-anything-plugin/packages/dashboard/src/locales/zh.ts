@@ -166,7 +166,7 @@ export const zh = {
     detailCallsIn: "被调用 (in)",
     detailViewButton: "查看详情",
     detailSectionsEmpty: "尚未填写详情。",
-    detailSections: { role: "角色" } as Record<string, string>,
+    detailSections: { role: "角色", request: "请求处理", businessLogic: "业务逻辑", persistence: "持久化", schema: "模式", dataShape: "数据结构" } as Record<string, string>,
     confirmed: "已确认",
     editButton: "编辑",
     saveButton: "保存（确认）",

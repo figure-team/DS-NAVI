@@ -166,7 +166,7 @@ export const zhTW = {
     detailCallsIn: "被呼叫 (in)",
     detailViewButton: "查看詳情",
     detailSectionsEmpty: "尚未填寫詳情。",
-    detailSections: { role: "角色" } as Record<string, string>,
+    detailSections: { role: "角色", request: "請求處理", businessLogic: "業務邏輯", persistence: "持久化", schema: "結構描述", dataShape: "資料結構" } as Record<string, string>,
     confirmed: "已確認",
     editButton: "編輯",
     saveButton: "儲存（確認）",

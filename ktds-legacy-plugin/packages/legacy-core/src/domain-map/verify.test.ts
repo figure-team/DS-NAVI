@@ -136,3 +136,92 @@ describe('verify — 기계 인용 검증', () => {
     expect(a).toBe(b)
   })
 })
+
+describe('verify — P2 step 상세 섹션(detail) 인용 검증', () => {
+  /** step.detail 섹션을 가진 fill. summary 와 detail 둘 다 실파일 인용. */
+  function fillWithDetail(detail: DomainFill['steps'][number]['detail']): DomainFill {
+    return {
+      schemaVersion: 1,
+      domainId: 'domain:order',
+      name: '주문',
+      summary: {
+        text: '주문 처리',
+        citations: [{ filePath: 'src/OrderService.java', line: 3, snippet: 'public class OrderService' }],
+      },
+      entities: [],
+      businessRules: [],
+      crossDomainInteractions: [],
+      flows: [],
+      steps: [
+        {
+          stepId: 'step:POST /orders:src/OrderService.java',
+          name: '주문 생성',
+          summary: {
+            text: '주문 생성 서비스',
+            citations: [{ filePath: 'src/OrderService.java', line: 5, snippet: 'public void create(Order order)' }],
+          },
+          detail,
+        },
+      ],
+    }
+  }
+
+  it('detail:role 항목을 kind/ref 규칙대로 생성하고 근거 있으면 GROUNDED', async () => {
+    const report = await verifyFills(
+      root,
+      [
+        fillWithDetail({
+          role: {
+            text: '주문 생성을 담당하는 서비스 계층',
+            citations: [{ filePath: 'src/OrderService.java', line: 5, snippet: 'public void create(Order order)' }],
+          },
+        }),
+      ],
+      'x'.repeat(40),
+    )
+    const items = report.domains[0].items
+    const role = items.find((i) => i.kind === 'detail:role')
+    expect(role).toBeDefined()
+    expect(role!.ref).toBe('step:POST /orders:src/OrderService.java#detail:role')
+    expect(role!.verdict).toBe('GROUNDED')
+    // step summary 항목도 그대로 존재(detail 이 summary 를 대체하지 않음).
+    expect(items.some((i) => i.kind === 'step')).toBe(true)
+  })
+
+  it('근거 없는 detail 은 NEEDS_REVIEW 로 강등(삭제 아님)', async () => {
+    const report = await verifyFills(
+      root,
+      [
+        fillWithDetail({
+          role: {
+            text: '환각 역할',
+            citations: [{ filePath: 'src/Ghost.java', line: 1, snippet: 'nonexistent role' }],
+          },
+        }),
+      ],
+      'x'.repeat(40),
+    )
+    const role = report.domains[0].items.find((i) => i.kind === 'detail:role')
+    expect(role?.verdict).toBe('NEEDS_REVIEW')
+    expect(role?.text).toBe('환각 역할') // 텍스트 보존
+  })
+
+  it('detail 미제공 step 은 detail 항목을 만들지 않는다', async () => {
+    const report = await verifyFills(root, [fillWithDetail(undefined)], 'x'.repeat(40))
+    expect(report.domains[0].items.some((i) => String(i.kind).startsWith('detail:'))).toBe(false)
+  })
+
+  it('결정론: detail 섹션 포함 동일 입력 동일 출력', async () => {
+    const fills = [
+      fillWithDetail({
+        role: {
+          text: '서비스 역할',
+          citations: [{ filePath: 'src/OrderService.java', line: 5, snippet: 'public void create(Order order)' }],
+        },
+      }),
+    ]
+    const a = JSON.stringify(await verifyFills(root, fills, 'x'.repeat(40)))
+    const b = JSON.stringify(await verifyFills(root, fills, 'x'.repeat(40)))
+    expect(a).toBe(b)
+  })
+})

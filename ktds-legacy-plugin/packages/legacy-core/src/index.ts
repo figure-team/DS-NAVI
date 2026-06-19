@@ -50,6 +50,13 @@ export {
 export { extractRoutes, scanRoutes, scanDomainMap, buildMap } from './domain-map/extract.js'
 export { buildSkeleton, DEFAULT_STEP_CAP } from './domain-map/skeleton.js'
 export {
+  DEFAULT_NODE_DETAIL_TEMPLATE,
+  NodeDetailTemplateSchema,
+  NodeDetailSectionSchema,
+  sectionsForLayer,
+} from './domain-map/node-template.js'
+export type { NodeDetailTemplate, NodeDetailSection } from './domain-map/node-template.js'
+export {
   buildMethodCallGraph,
   buildGraphFromFacts,
   reachableFlowFiles,

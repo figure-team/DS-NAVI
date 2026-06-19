@@ -84,11 +84,12 @@ skeleton 이 있어야 한다(없으면 안내 후 종료). 도메인별로 **LL
 
 1. `.spec/map/bundle/<key>.json` 을 읽는다.
 2. 그 안의 소스 슬라이스·구조 신호만 근거로, 도메인/흐름/단계의 `name`·`summary`·`entities`·`businessRules`·`crossDomainInteractions` 을 작성한다.
-3. 결과를 `.spec/map/fill/<key>.json` 에 `DomainFill` 스키마로 쓴다.
+3. **단계 상세(P2):** 번들의 `nodeDetailTemplate.sections` 각 섹션을 그 `promptHint` 지시대로 `steps[].detail[<섹션id>]` 에 채운다. v1 은 `role`(역할) 1개 — 이 흐름에서 그 클래스/파일이 맡는 역할을 한 문단으로, step slice 에서 인용. 메서드·호출관계는 채우지 않는다(결정론 — 엔진이 calls 엣지로 보유).
+4. 결과를 `.spec/map/fill/<key>.json` 에 `DomainFill` 스키마로 쓴다.
 
 **계약(반드시 준수):**
 
-- 모든 **사실 주장**(summary/entities/businessRules/crossDomainInteractions/흐름 summary/단계 summary)에 `citations` 1개 이상 필수. 각 인용은 `{ filePath, line, snippet }` — `filePath` 는 프로젝트 루트 상대 경로, `line` 은 1-based, `snippet` 은 **그 라인의 실제 텍스트(8자 이상, 식별자성 토큰 포함)**.
+- 모든 **사실 주장**(summary/entities/businessRules/crossDomainInteractions/흐름 summary/단계 summary/**단계 detail 섹션**)에 `citations` 1개 이상 필수. 각 인용은 `{ filePath, line, snippet }` — `filePath` 는 프로젝트 루트 상대 경로, `line` 은 1-based, `snippet` 은 **그 라인의 실제 텍스트(8자 이상, 식별자성 토큰 포함)**.
 - `domainId`/`flowId`/`stepId` 는 번들에 있는 id 만 사용한다(모르는 ID·다른 도메인 ID 는 emit 단계에서 항목 단위 기각).
 - 구조 필드(filePath/lineRange/entryPoint 등)는 채우지 않는다(read-only — emit 이 보존).
 - 도메인 표시명(`name`)만 인용 면제(명명이라). 그 외 텍스트는 근거 없으면 쓰지 않는다.

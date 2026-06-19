@@ -16,6 +16,7 @@ import { join } from 'node:path'
 import { z } from 'zod'
 import { specMapDir, stableJson } from './persist.js'
 import { cmp } from '../utils/cmp.js'
+import { DEFAULT_NODE_DETAIL_TEMPLATE, NodeDetailTemplateSchema } from './node-template.js'
 import type { SkeletonReport } from './types.js'
 
 /** `.spec/map/bundle/` 하위 디렉터리 이름. */
@@ -68,6 +69,11 @@ export const DomainBundleSchema = z.object({
   files: z.array(BundleFileSchema),
   /** charCap 으로 슬라이스가 생략된 파일 (보고 — 조용한 누락 금지). */
   sliceOmitted: z.array(z.string()),
+  /**
+   * P2: step 상세 채움 템플릿. 호스트(Claude)가 steps[].detail 의 어떤 섹션을
+   * (promptHint 지시대로) 채울지 안내한다. v1 = role 섹션 1개.
+   */
+  nodeDetailTemplate: NodeDetailTemplateSchema,
 })
 export type DomainBundle = z.infer<typeof DomainBundleSchema>
 
@@ -239,6 +245,7 @@ export async function buildBundles(
       steps,
       files,
       sliceOmitted,
+      nodeDetailTemplate: DEFAULT_NODE_DETAIL_TEMPLATE,
     }
     const filePath = join(dir, `${safeKeyFilename(key)}.json`)
     await writeFile(filePath, stableJson(DomainBundleSchema.parse(bundle)), 'utf8')

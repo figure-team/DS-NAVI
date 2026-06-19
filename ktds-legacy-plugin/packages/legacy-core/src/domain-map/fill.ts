@@ -59,6 +59,12 @@ export const DomainFillSchema = z.object({
       stepId: z.string().regex(/^step:/),
       name: z.string().min(1).max(120),
       summary: ClaimSchema,
+      /**
+       * P2: 템플릿 섹션별 의미 주장(key = NodeDetailTemplate 섹션 id, 예: 'role').
+       * 각 값은 도메인 주장과 동일한 ClaimSchema(text + 인용 ≥1). 선택 — 미채움 섹션은
+       * verify/emit 에서 그냥 빠진다(결정론 폴백 없음 — role 은 LLM 전용).
+       */
+      detail: z.record(z.string(), ClaimSchema).optional(),
     }),
   ),
 })

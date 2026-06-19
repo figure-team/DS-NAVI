@@ -177,7 +177,20 @@ function pct1(num: number, den: number): number {
 export function embedVerification(nodes: UaGraphNode[], report: VerifyReport): UaGraphNode[] {
   const domainResultById = new Map(report.domains.map((d) => [d.domainId, d]))
   const itemByRef = new Map<string, VerifiedItem>()
-  for (const d of report.domains) for (const it of d.items) itemByRef.set(it.ref, it)
+  // P2: step 상세 섹션 검증 항목(kind 'detail:<id>', ref '<stepId>#detail:<id>')을
+  // 소유 stepId 로 묶는다 — verify 가 섹션 id 정렬 순서로 넣어 결정론 보존.
+  const detailByStep = new Map<string, VerifiedItem[]>()
+  for (const d of report.domains)
+    for (const it of d.items) {
+      itemByRef.set(it.ref, it)
+      const sep = it.ref.indexOf('#detail:')
+      if (sep > 0) {
+        const stepId = it.ref.slice(0, sep)
+        let list = detailByStep.get(stepId)
+        if (!list) detailByStep.set(stepId, (list = []))
+        list.push(it)
+      }
+    }
 
   return nodes.map((node) => {
     if (node.type === 'domain') {
@@ -197,10 +210,18 @@ export function embedVerification(nodes: UaGraphNode[], report: VerifyReport): U
         },
       }
     }
-    if (node.type === 'flow' || node.type === 'step') {
+    if (node.type === 'flow') {
       const it = itemByRef.get(node.id)
       if (!it) return node
       return { ...node, domainMeta: { ...node.domainMeta, ktdsClaims: [it] } }
+    }
+    if (node.type === 'step') {
+      const it = itemByRef.get(node.id)
+      const details = detailByStep.get(node.id) ?? []
+      // summary 항목 + 상세 섹션 항목들. 둘 다 없으면 원본 유지.
+      if (!it && details.length === 0) return node
+      const claims = it ? [it, ...details] : details
+      return { ...node, domainMeta: { ...node.domainMeta, ktdsClaims: claims } }
     }
     return node
   })

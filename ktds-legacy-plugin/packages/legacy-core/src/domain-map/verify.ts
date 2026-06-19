@@ -37,8 +37,15 @@ export const VerifiedCitationSchema = z.object({
 export type VerifiedCitation = z.infer<typeof VerifiedCitationSchema>
 
 export const VerifiedItemSchema = z.object({
-  kind: z.enum(['summary', 'entity', 'businessRule', 'crossDomain', 'flow', 'step']),
-  /** 항목 식별자: domainId/flowId/stepId 또는 "<domainId>#<kind>[i]". */
+  /**
+   * 주장 종류. 도메인/흐름/단계 기본 항목 + step 상세 섹션은 'detail:<sectionId>'
+   * (예: 'detail:role') — NodeDetailTemplate 섹션 id 를 접미로 단다.
+   */
+  kind: z.union([
+    z.enum(['summary', 'entity', 'businessRule', 'crossDomain', 'flow', 'step']),
+    z.string().regex(/^detail:/),
+  ]),
+  /** 항목 식별자: domainId/flowId/stepId, "<domainId>#<kind>[i]", "<stepId>#detail:<sectionId>". */
   ref: z.string(),
   text: z.string(),
   citations: z.array(VerifiedCitationSchema),
@@ -181,6 +188,20 @@ export async function verifyFills(
     }
     for (const s of fill.steps) {
       items.push(await verifyClaim(projectRoot, 'step', s.stepId, s.summary, cache))
+      // P2: step 상세 섹션 주장도 동일 인용 검증. 섹션 id 정렬로 결정론(저자 키 순서 무관).
+      if (s.detail) {
+        for (const sectionId of Object.keys(s.detail).sort(cmp)) {
+          items.push(
+            await verifyClaim(
+              projectRoot,
+              `detail:${sectionId}`,
+              `${s.stepId}#detail:${sectionId}`,
+              s.detail[sectionId],
+              cache,
+            ),
+          )
+        }
+      }
     }
 
     const citationTotal = items.reduce((n, i) => n + i.citations.length, 0)

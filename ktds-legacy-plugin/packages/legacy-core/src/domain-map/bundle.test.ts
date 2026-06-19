@@ -97,6 +97,18 @@ describe('bundle — 도메인 LLM 입력 묶음', () => {
     expect(svc.slice!.text).toContain('주문은 회원만 생성할 수 있다')
   })
 
+  it('P2: 모든 번들에 nodeDetailTemplate(v1 role 섹션) 동봉', async () => {
+    const skeleton = await shopSkeleton(root)
+    const { bundles } = await buildBundles(root, skeleton)
+    expect(bundles.length).toBeGreaterThan(0)
+    for (const b of bundles) {
+      expect(b.nodeDetailTemplate.version).toBe(1)
+      const role = b.nodeDetailTemplate.sections.find((s) => s.id === 'role')
+      expect(role).toBeDefined()
+      expect(role!.promptHint.length).toBeGreaterThan(0)
+    }
+  })
+
   it('charCap=0: 모든 슬라이스 생략(null) + sliceOmitted 전건(정렬) 보고', async () => {
     const skeleton = await shopSkeleton(root)
     const { bundles } = await buildBundles(root, skeleton, { charCap: 0 })

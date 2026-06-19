@@ -7,6 +7,7 @@
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
+import { loadConfig } from '../config/index.js'
 import { ConfirmedPlanSchema, SkeletonReportSchema } from './types.js'
 import type {
   CandidatesReport,
@@ -219,11 +220,36 @@ export const DOMAIN_GRAPH_FILENAME = 'domain-graph.json'
  */
 export function writeDomainGraph(
   projectRoot: string,
-  graph: { nodes: UaGraphNode[]; edges: UaGraphEdge[] },
+  graph: { nodes: UaGraphNode[]; edges: UaGraphEdge[]; [key: string]: unknown },
 ): string {
   const dir = uaDir(projectRoot)
   mkdirSync(dir, { recursive: true })
   const filePath = join(dir, DOMAIN_GRAPH_FILENAME)
   writeFileSync(filePath, stableJson(graph), 'utf8')
+  return filePath
+}
+
+/** 대시보드용 config.json 파일명(`.understand-anything/` 하위) — UA 대시보드가 fetch. */
+export const DASHBOARD_CONFIG_FILENAME = 'config.json'
+
+/**
+ * `.understand-anything/config.json` 기록 — UA 대시보드가 fetch 해 UI 언어(outputLanguage)를
+ * 정하는 파일. UA 코어 persistence 의 기본값은 "en"(불변식 영역이라 무수정)이라, ktds 는
+ * 사용자 설정(understanding.config.json, 기본 ko)을 이 경로로 오버레이해 한국어 기본을
+ * 보장한다. understanding.config.json 이 없거나 손상이면 ko 로 폴백한다.
+ * 기록한 파일의 절대 경로를 반환한다.
+ */
+export function writeDashboardConfig(projectRoot: string): string {
+  let outputLanguage = 'ko'
+  try {
+    const cfg = loadConfig(projectRoot)
+    if (cfg?.outputLanguage) outputLanguage = cfg.outputLanguage
+  } catch {
+    // 손상된 understanding.config.json → ko 폴백(대시보드 언어 결정은 비치명적).
+  }
+  const dir = uaDir(projectRoot)
+  mkdirSync(dir, { recursive: true })
+  const filePath = join(dir, DASHBOARD_CONFIG_FILENAME)
+  writeFileSync(filePath, stableJson({ outputLanguage }), 'utf8')
   return filePath
 }

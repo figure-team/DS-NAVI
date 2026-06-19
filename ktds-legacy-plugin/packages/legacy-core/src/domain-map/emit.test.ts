@@ -38,14 +38,29 @@ describe('emit — structural domain-graph.json (pre-LLM-fill)', () => {
     await rm(root, { recursive: true, force: true })
   })
 
-  it('writes .understand-anything/domain-graph.json with { nodes, edges }', async () => {
+  it('writes .understand-anything/domain-graph.json as a full UA KG envelope', async () => {
     const skeleton = await shopMiniSkeleton()
     const out = emitDomainGraph(root, skeleton)
     expect(out.nodes).toBe(skeleton.nodes)
     expect(out.edges).toBe(skeleton.edges)
 
     const raw = await readFile(join(root, '.understand-anything', 'domain-graph.json'), 'utf8')
-    const parsed = JSON.parse(raw) as { nodes: unknown[]; edges: unknown[] }
+    const parsed = JSON.parse(raw) as {
+      version: string
+      project: { name: string; analyzedAt: string; gitCommitHash: string }
+      nodes: unknown[]
+      edges: unknown[]
+      layers: unknown[]
+      tour: unknown[]
+      ktdsMap: { generatedFromCommit: string }
+    }
+    // 대시보드가 standalone 그래프로 검증·렌더하려면 envelope(version/project/layers/tour)가 필수.
+    expect(parsed.version).toBe('1.0.0')
+    expect(typeof parsed.project.name).toBe('string')
+    expect(typeof parsed.project.analyzedAt).toBe('string')
+    expect(Array.isArray(parsed.layers)).toBe(true)
+    expect(Array.isArray(parsed.tour)).toBe(true)
+    expect(parsed.ktdsMap.generatedFromCommit).toBe(skeleton.gitCommit ?? '')
     expect(Array.isArray(parsed.nodes)).toBe(true)
     expect(Array.isArray(parsed.edges)).toBe(true)
     expect(parsed.nodes.length).toBe(skeleton.nodes.length)
@@ -87,9 +102,12 @@ describe('emit — structural domain-graph.json (pre-LLM-fill)', () => {
     const a = await shopMiniSkeleton()
     const rootA = await mkdtemp(join(tmpdir(), 'ktds-emit-a-'))
     const rootB = await mkdtemp(join(tmpdir(), 'ktds-emit-b-'))
+    // projectName/analyzedAt 를 고정해 시각·temp 디렉터리명에 의존하지 않게 한다
+    // (envelope 도입 후에도 동일 입력 -> byte-identical 보장).
+    const fixed = { projectName: 'shop-mini', analyzedAt: '2026-01-01T00:00:00.000Z' }
     try {
-      emitDomainGraph(rootA, a)
-      emitDomainGraph(rootB, await shopMiniSkeleton())
+      emitDomainGraph(rootA, a, fixed)
+      emitDomainGraph(rootB, await shopMiniSkeleton(), fixed)
       const fileA = await readFile(join(rootA, '.understand-anything', 'domain-graph.json'), 'utf8')
       const fileB = await readFile(join(rootB, '.understand-anything', 'domain-graph.json'), 'utf8')
       expect(fileA).toBe(fileB)

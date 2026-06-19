@@ -18,6 +18,7 @@ import {
   readConfirmedPlan,
   writeCandidates,
   writeCensus,
+  writeDashboardConfig,
   writeEdges,
   writeMapArtifact,
   writeMethodCalls,
@@ -257,6 +258,8 @@ export async function buildMap(
   )
   writeSkeleton(projectRoot, skeleton)
   emitDomainGraph(projectRoot, skeleton)
+  // 대시보드 UI 언어를 사용자 설정(기본 ko)으로 오버레이 — UA 코어의 "en" 기본 무력화.
+  writeDashboardConfig(projectRoot)
   return { needsConfirm: false, ...scan, plan, skeleton, methodCallGraph }
 }
 

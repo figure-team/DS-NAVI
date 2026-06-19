@@ -47,7 +47,7 @@ describe('emit — structural domain-graph.json (pre-LLM-fill)', () => {
     expect(out.nodes.length).toBe(skeleton.nodes.length)
     const outDomain = out.nodes.find((n) => n.type === 'domain')
     expect(outDomain?.name).not.toBe('') // SKELETON_BLANK 공란이 라벨로 채워짐
-    expect(outDomain?.summary).toMatch(/흐름/)
+    expect(outDomain?.summary).toMatch(/기능/)
 
     const raw = await readFile(join(root, '.understand-anything', 'domain-graph.json'), 'utf8')
     const parsed = JSON.parse(raw) as {

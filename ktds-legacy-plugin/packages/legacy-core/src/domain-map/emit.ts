@@ -62,7 +62,7 @@ export function applyDeterministicLabels(
       const key = node.id.replace(/^domain:/, '')
       const flows = flowCountByDomainId.get(node.id) ?? 0
       const total = nodeCountByKey.get(key) ?? 1
-      return { ...node, name: titleCaseKey(key), summary: `진입 흐름 ${flows}개 · 노드 ${total}개` }
+      return { ...node, name: titleCaseKey(key), summary: `기능 ${flows}개 · 노드 ${total}개` }
     }
     if (node.type === 'flow') {
       const entry = str(node.domainMeta?.entryPoint) ?? node.id.replace(/^flow:/, '')

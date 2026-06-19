@@ -131,7 +131,7 @@ describe('fill-pipeline — scan→bundle→fill→emit E2E', () => {
     // user 도메인은 pending → 하이브리드 폴백으로 결정론 라벨이 채워진다(빈 이름 아님).
     const userNode = graph.nodes.find((n: { id: string }) => n.id === 'domain:user')
     expect(userNode.name).not.toBe('')
-    expect(userNode.summary).toMatch(/흐름/)
+    expect(userNode.summary).toMatch(/기능/)
     // 단, unfilled 는 채움 전 빈칸 기준으로 user 도메인을 보고한다.
     expect(result.unfilled).toContain('domain:user')
 

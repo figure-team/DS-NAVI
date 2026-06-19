@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
@@ -69,13 +69,13 @@ export default function FlowListView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
   const clearActiveDomain = useDashboardStore((s) => s.clearActiveDomain);
-  const navigateToFlow = useDashboardStore((s) => s.navigateToFlow);
-  // FIX 3: inline selection now lives in the store so it survives the
-  // fullscreen round-trip (this component unmounts while the full-screen spine
-  // is shown, then remounts on back).
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const { t } = useI18n();
+
+  // 좌측 기능 목록 접기/펼치기 — 접으면 인라인 스파인이 폭 전체를 차지(화면3 전체화면 대체).
+  // 기본 펼침: 도메인 재진입 시 FlowListView 가 remount 되며 자동으로 펼친 상태로 복귀.
+  const [listCollapsed, setListCollapsed] = useState(false);
 
   const flows = useMemo<DomainFlow[]>(
     () =>
@@ -121,15 +121,41 @@ export default function FlowListView() {
 
   return (
     <div className="h-full w-full flex overflow-hidden">
-      {/* LEFT sidebar: flow list. Clicking a row selects the flow and renders its
-          code graph in the center pane. */}
+      {/* LEFT: collapsed rail — » expand + vertical domain label. Replaces the
+          old full-screen spine: collapse the list and the inline spine claims
+          the full width. */}
+      {listCollapsed ? (
+      <aside
+        className="shrink-0 h-full flex flex-col items-center border-r border-border-subtle bg-surface/40"
+        style={{ width: 44 }}
+      >
+        <button
+          type="button"
+          onClick={() => setListCollapsed(false)}
+          title={t.flowList.expandList}
+          aria-label={t.flowList.expandList}
+          className="mt-3 flex items-center justify-center rounded-md border border-border-subtle text-text-secondary hover:border-border-medium hover:text-accent transition-colors cursor-pointer"
+          style={{ width: 28, height: 28, fontSize: 14, lineHeight: 1 }}
+        >
+          »
+        </button>
+        <span
+          className="mt-4 uppercase text-text-muted select-none whitespace-nowrap"
+          style={{ fontSize: 10, letterSpacing: "0.12em", writingMode: "vertical-rl" }}
+        >
+          {domainNode?.name ?? ""} · {flows.length}
+        </span>
+      </aside>
+      ) : (
+      /* LEFT sidebar: flow list. Clicking a row selects the flow and renders its
+          code graph in the center pane. */
       <aside
         className="shrink-0 h-full flex flex-col border-r border-border-subtle bg-surface/40"
         style={{ width: 320 }}
       >
-        {/* sidebar header — breadcrumb (navigation) + back button */}
+        {/* sidebar header — breadcrumb (navigation) + back + collapse */}
         <div className="shrink-0 border-b border-border-subtle" style={{ padding: "16px 16px 14px" }}>
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-2">
             <p
               className="uppercase text-text-muted truncate"
               style={{ fontSize: 11, letterSpacing: "0.1em", minWidth: 0 }}
@@ -151,6 +177,16 @@ export default function FlowListView() {
               style={{ padding: "6px 10px", fontSize: 11 }}
             >
               {t.flowList.back}
+            </button>
+            <button
+              type="button"
+              onClick={() => setListCollapsed(true)}
+              title={t.flowList.collapseList}
+              aria-label={t.flowList.collapseList}
+              className="flex items-center justify-center shrink-0 rounded-md border border-border-subtle text-text-muted hover:border-border-medium hover:text-accent transition-colors cursor-pointer"
+              style={{ width: 28, height: 28, fontSize: 14, lineHeight: 1 }}
+            >
+              «
             </button>
           </div>
         </div>
@@ -226,13 +262,14 @@ export default function FlowListView() {
           ))}
         </div>
       </aside>
+      )}
 
       {/* CENTER + RIGHT: selected flow's code graph (FlowSpineView renders its own
           right sidebar, which now appears only when a node is clicked). */}
       <div className="flex-1 min-w-0 h-full flex flex-col bg-root">
         {selectedFlow ? (
           <>
-            {/* center header — selected flow context + grounding + fullscreen */}
+            {/* center header — selected flow context + grounding */}
             <div
               className="flex flex-col gap-1.5 shrink-0 bg-panel border-b border-border-subtle"
               style={{ padding: "10px 20px" }}
@@ -248,14 +285,6 @@ export default function FlowListView() {
                 <span className="text-text-secondary truncate" style={{ fontSize: 11, minWidth: 0 }}>
                   — {selectedFlow.name}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => navigateToFlow(selectedFlow.id)}
-                  className="flex items-center gap-1.5 shrink-0 ml-auto rounded border border-border-subtle text-text-muted hover:border-border-medium hover:text-accent transition-colors"
-                  style={{ padding: "5px 12px", fontSize: 11 }}
-                >
-                  {t.flowList.fullscreen}
-                </button>
               </div>
               {selectedFlow.grounding && (
                 <div className="flex items-center flex-wrap gap-1.5">

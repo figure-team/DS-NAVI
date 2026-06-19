@@ -133,6 +133,8 @@ export const ru = {
     subtitle: "Выберите функцию, чтобы сразу увидеть её межслойный граф ниже.",
     back: "← Карта доменов",
     fullscreen: "⤢ Полный экран",
+    collapseList: "Свернуть список",
+    expandList: "Развернуть список",
     selectPrompt: "Выберите функцию, чтобы увидеть её межслойный граф.",
     stepCount: "{count} steps",
     groupHttp: "HTTP-эндпоинты",

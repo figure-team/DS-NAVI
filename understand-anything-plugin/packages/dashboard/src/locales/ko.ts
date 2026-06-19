@@ -133,6 +133,8 @@ export const ko = {
     subtitle: "기능을 선택하면 아래에서 교차계층 그래프를 바로 확인할 수 있습니다.",
     back: "← 도메인 지도",
     fullscreen: "⤢ 전체화면",
+    collapseList: "목록 접기",
+    expandList: "목록 펼치기",
     selectPrompt: "기능을 선택하면 교차계층 그래프가 표시됩니다.",
     stepCount: "{count} steps",
     groupHttp: "HTTP 엔드포인트",

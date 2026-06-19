@@ -133,6 +133,8 @@ export const zhTW = {
     subtitle: "選擇功能後，可在下方直接檢視其跨層級圖。",
     back: "← 領域地圖",
     fullscreen: "⤢ 全螢幕",
+    collapseList: "收合清單",
+    expandList: "展開清單",
     selectPrompt: "選擇一個功能以檢視其跨層級圖。",
     stepCount: "{count} steps",
     groupHttp: "HTTP 端點",

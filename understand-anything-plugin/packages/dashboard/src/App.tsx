@@ -4,8 +4,8 @@ import type { GraphIssue } from "@understand-anything/core/schema";
 import { useDashboardStore } from "./store";
 import GraphView from "./components/GraphView";
 import DomainMapView from "./components/DomainMapView"; // ktds-fork: 도메인 지도 랜딩 (화면 1)
-import FlowListView from "./components/FlowListView"; // ktds-fork: 흐름 목록 마스터-디테일 (화면 2)
-import FlowSpineView from "./components/FlowSpineView"; // ktds-fork: 도메인 흐름 스파인 뷰 (화면 3)
+import FlowListView from "./components/FlowListView"; // ktds-fork: 기능 목록 + 인라인 스파인 (화면 2)
+// ktds-fork: 화면3(전체화면 스파인) 제거 — 스파인은 화면2 인라인으로만, 목록 접기로 공간 확보.
 import KnowledgeGraphView from "./components/KnowledgeGraphView";
 import WikiReader from "./components/WikiReader"; // ktds-fork (ADR-004): 문서 모드 리더
 import SearchBar from "./components/SearchBar";
@@ -779,9 +779,7 @@ function DashboardContent({
       {/* ktds-fork: 도메인 풀페이지 — 사이드바·코드뷰어 없이 3화면을 전면 노출. */}
       {isDomainPage ? (
         <div className="flex-1 min-h-0 relative">
-          {activeFlowId ? (
-            <FlowSpineView />
-          ) : activeDomainId ? (
+          {activeDomainId ? (
             <FlowListView />
           ) : (
             <DomainMapView />

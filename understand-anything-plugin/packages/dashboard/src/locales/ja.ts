@@ -133,6 +133,8 @@ export const ja = {
     subtitle: "機能を選択すると、下にクロスレイヤーグラフがすぐ表示されます。",
     back: "← ドメインマップ",
     fullscreen: "⤢ 全画面",
+    collapseList: "一覧を畳む",
+    expandList: "一覧を開く",
     selectPrompt: "機能を選択すると、クロスレイヤーグラフが表示されます。",
     stepCount: "{count} steps",
     groupHttp: "HTTP エンドポイント",

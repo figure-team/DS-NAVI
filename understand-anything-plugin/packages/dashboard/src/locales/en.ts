@@ -133,6 +133,8 @@ export const en = {
     subtitle: "Pick a feature to see its cross-layer graph right below.",
     back: "← Domain map",
     fullscreen: "⤢ Fullscreen",
+    collapseList: "Collapse list",
+    expandList: "Expand list",
     selectPrompt: "Select a feature to view its cross-layer graph.",
     stepCount: "{count} steps",
     groupHttp: "HTTP endpoints",

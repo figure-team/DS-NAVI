@@ -133,6 +133,8 @@ export const zh = {
     subtitle: "选择功能后，可在下方直接查看其跨层级图。",
     back: "← 领域地图",
     fullscreen: "⤢ 全屏",
+    collapseList: "收起列表",
+    expandList: "展开列表",
     selectPrompt: "选择一个功能以查看其跨层级图。",
     stepCount: "{count} steps",
     groupHttp: "HTTP 端点",

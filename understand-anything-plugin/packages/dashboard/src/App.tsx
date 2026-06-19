@@ -514,15 +514,9 @@ function DashboardContent({
           <h1 className="font-heading text-base sm:text-lg text-text-primary tracking-wide truncate max-w-[160px] sm:max-w-[220px] lg:max-w-none">
             {graph?.project.name ?? t.common.appName}
           </h1>
-          {/* ktds-fork: PersonaSelector는 구조 전용 — 도메인 풀페이지에서는 숨김. */}
-          {!isDomainPage && (
-            <>
-              <div className="w-px h-5 bg-border-subtle hidden sm:block" />
-              <PersonaSelector />
-            </>
-          )}
-          {/* ktds-fork (ADR-004): 코드/도메인 토글에 "문서"(세분화 위키) 추가. wikiGraph 또는
-              domainGraph가 있을 때 토글 그룹 표시(둘 중 하나만 있어도 코드↔해당 전환). */}
+          {/* ktds-fork: [구조/도메인/문서] 탭을 프로젝트명 바로 뒤(PersonaSelector 앞)에 고정 —
+              모든 메인 페이지에서 탭 위치를 동일하게(도메인 화면 기준). wikiGraph 또는 domainGraph가
+              있을 때 토글 그룹 표시(둘 중 하나만 있어도 코드↔해당 전환). */}
           {graph && !isKnowledgeGraph && (domainGraph || wikiGraph) && (
             <>
               <div className="w-px h-5 bg-border-subtle" />
@@ -568,6 +562,13 @@ function DashboardContent({
                   </button>
                 )}
               </div>
+            </>
+          )}
+          {/* ktds-fork: PersonaSelector는 구조 전용 — 도메인 풀페이지에서는 숨김. 탭 뒤에 배치. */}
+          {!isDomainPage && (
+            <>
+              <div className="w-px h-5 bg-border-subtle hidden sm:block" />
+              <PersonaSelector />
             </>
           )}
         </div>

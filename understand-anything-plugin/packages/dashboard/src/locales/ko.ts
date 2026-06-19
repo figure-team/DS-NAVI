@@ -115,7 +115,7 @@ export const ko = {
     flowCount: "기능 {count}개",
     nodeCount: "노드 {count}개",
     empty: "도메인 그래프가 없습니다. /understand-domain 으로 생성하세요.",
-    breadcrumbRoot: "도메인 지도",
+    breadcrumbRoot: "Domain",
     viewFeatures: "기능 보기",
     detail: "상세보기",
   },

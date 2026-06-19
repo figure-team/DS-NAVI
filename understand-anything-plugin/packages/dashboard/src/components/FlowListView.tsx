@@ -198,14 +198,6 @@ export default function FlowListView() {
             </p>
             <button
               type="button"
-              onClick={() => clearActiveDomain()}
-              className="flex items-center shrink-0 rounded-md border border-border-subtle text-text-secondary hover:border-border-medium hover:text-accent transition-colors"
-              style={{ padding: "6px 10px", fontSize: 11 }}
-            >
-              {t.flowList.back}
-            </button>
-            <button
-              type="button"
               onClick={() => setListCollapsed(true)}
               title={t.flowList.collapseList}
               aria-label={t.flowList.collapseList}

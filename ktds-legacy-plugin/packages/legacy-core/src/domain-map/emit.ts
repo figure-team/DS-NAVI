@@ -12,7 +12,66 @@
  */
 import { basename, resolve } from 'node:path'
 import { writeDomainGraph } from './persist.js'
+import { SKELETON_BLANK } from './types.js'
 import type { SkeletonReport, UaGraphEdge, UaGraphNode } from './types.js'
+
+/** "web-inf" → "Web Inf", "account" → "Account". 도메인 key 표제화(결정론). */
+function titleCaseKey(key: string): string {
+  return key
+    .split(/[-_]/)
+    .filter((w) => w.length > 0)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(' ')
+}
+
+/** 파일 경로 → 확장자 없는 basename. */
+function fileStem(p: string): string {
+  return (p.split('/').pop() ?? p).replace(/\.[^.]+$/, '')
+}
+
+/**
+ * 결정론 라벨 — LLM 채움(S8, bundle/emit-with-fill) 전, 공란(SKELETON_BLANK) 노드에
+ * 구조 신호로 name/summary 를 채운다. 도메인=key 표제화, 흐름=진입점 경로, 단계=파일명.
+ * 이미 채워진(LLM 등) 노드는 건드리지 않으므로, 향후 채움 단계가 이 값을 덮어쓴다.
+ * 순수 함수(skeleton 만 입력) → 동일 입력 byte-identical 보장.
+ */
+export function applyDeterministicLabels(
+  nodes: UaGraphNode[],
+  edges: UaGraphEdge[],
+): UaGraphNode[] {
+  const flowCountByDomainId = new Map<string, number>()
+  for (const e of edges) {
+    if (e.type === 'contains_flow') {
+      flowCountByDomainId.set(e.source, (flowCountByDomainId.get(e.source) ?? 0) + 1)
+    }
+  }
+  const nodeCountByKey = new Map<string, number>()
+  for (const n of nodes) {
+    const key = n.tags[0]
+    if (key) nodeCountByKey.set(key, (nodeCountByKey.get(key) ?? 0) + 1)
+  }
+  const str = (v: unknown): string | null => (typeof v === 'string' && v.length > 0 ? v : null)
+
+  return nodes.map((node) => {
+    if (node.name !== SKELETON_BLANK) return node
+    if (node.type === 'domain') {
+      const key = node.id.replace(/^domain:/, '')
+      const flows = flowCountByDomainId.get(node.id) ?? 0
+      const total = nodeCountByKey.get(key) ?? 1
+      return { ...node, name: titleCaseKey(key), summary: `진입 흐름 ${flows}개 · 노드 ${total}개` }
+    }
+    if (node.type === 'flow') {
+      const entry = str(node.domainMeta?.entryPoint) ?? node.id.replace(/^flow:/, '')
+      const etype = str(node.domainMeta?.entryType)
+      return { ...node, name: entry, summary: etype ? `진입 유형: ${etype}` : node.summary }
+    }
+    if (node.type === 'step') {
+      const name = node.filePath ? fileStem(node.filePath) : node.id.replace(/^step:/, '')
+      return { ...node, name, summary: node.layer ? `레이어: ${node.layer}` : node.summary }
+    }
+    return node
+  })
+}
 
 export interface EmitOptions {
   /** 프로젝트 표시명 — 기본 basename(projectRoot). */
@@ -32,6 +91,8 @@ export function emitDomainGraph(
   skeleton: SkeletonReport,
   options: EmitOptions = {},
 ): { nodes: UaGraphNode[]; edges: UaGraphEdge[] } {
+  // 공란 노드에 결정론 라벨 적용(LLM 채움 전 폴백) — 대시보드가 빈 이름 대신 구조명을 표시.
+  const nodes = applyDeterministicLabels(skeleton.nodes, skeleton.edges)
   const graph = {
     version: '1.0.0',
     project: {
@@ -42,7 +103,7 @@ export function emitDomainGraph(
       analyzedAt: options.analyzedAt ?? new Date().toISOString(),
       gitCommitHash: skeleton.gitCommit ?? '',
     },
-    nodes: skeleton.nodes,
+    nodes,
     edges: skeleton.edges,
     layers: [] as unknown[],
     tour: [] as unknown[],
@@ -52,5 +113,5 @@ export function emitDomainGraph(
     },
   }
   writeDomainGraph(projectRoot, graph)
-  return { nodes: skeleton.nodes, edges: skeleton.edges }
+  return { nodes, edges: skeleton.edges }
 }

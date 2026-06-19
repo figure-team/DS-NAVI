@@ -41,8 +41,12 @@ describe('emit — structural domain-graph.json (pre-LLM-fill)', () => {
   it('writes .understand-anything/domain-graph.json as a full UA KG envelope', async () => {
     const skeleton = await shopMiniSkeleton()
     const out = emitDomainGraph(root, skeleton)
-    expect(out.nodes).toBe(skeleton.nodes)
     expect(out.edges).toBe(skeleton.edges)
+    // 노드는 결정론 라벨이 적용된 사본 — 개수/순서는 보존하되 공란 이름이 채워진다.
+    expect(out.nodes.length).toBe(skeleton.nodes.length)
+    const outDomain = out.nodes.find((n) => n.type === 'domain')
+    expect(outDomain?.name).not.toBe('') // SKELETON_BLANK 공란이 라벨로 채워짐
+    expect(outDomain?.summary).toMatch(/흐름/)
 
     const raw = await readFile(join(root, '.understand-anything', 'domain-graph.json'), 'utf8')
     const parsed = JSON.parse(raw) as {

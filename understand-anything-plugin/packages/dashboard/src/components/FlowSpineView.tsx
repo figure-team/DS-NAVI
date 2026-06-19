@@ -21,6 +21,7 @@ import type { FlowMethod } from "../utils/domainData";
 import type { GraphNode } from "@understand-anything/core/types";
 import CitationChip from "./CitationChip";
 import VerdictBadge from "./VerdictBadge";
+import TrustBadge from "./TrustBadge";
 import NodeDetailModal from "./NodeDetailModal";
 
 const METHOD_COLOR: Record<FlowMethod, string> = {
@@ -126,6 +127,10 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
   const expandedBranchParents = useDashboardStore((s) => s.expandedBranchParents);
   const toggleBranchParent = useDashboardStore((s) => s.toggleBranchParent);
   const setBranchParentsExpanded = useDashboardStore((s) => s.setBranchParentsExpanded);
+  // P3: 선택 노드의 사용자 오버레이(편집/확정) — 사이드바 신뢰 배지 + 요약 덮기.
+  const selectedOverride = useDashboardStore((s) =>
+    selectedNodeId ? s.nodeOverrides[selectedNodeId] : undefined,
+  );
   const { t } = useI18n();
 
   // 상세 모달(P2, 읽기) 열림 상태 — 사이드바 "상세보기"가 토글.
@@ -344,17 +349,24 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
       <div className="p-4">
         <div className="flex flex-col gap-2">
           <div className="flex items-start justify-between gap-2">
-            <span
-              className="self-start uppercase font-semibold rounded px-1.5 py-0.5"
-              style={{
-                fontSize: 9,
-                letterSpacing: "0.08em",
-                color: LAYER_COLOR[selectedStep.layer],
-                background: `${LAYER_COLOR[selectedStep.layer]}1f`,
-              }}
-            >
-              {laneLabels[selectedStep.layer]}
-            </span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span
+                className="self-start uppercase font-semibold rounded px-1.5 py-0.5"
+                style={{
+                  fontSize: 9,
+                  letterSpacing: "0.08em",
+                  color: LAYER_COLOR[selectedStep.layer],
+                  background: `${LAYER_COLOR[selectedStep.layer]}1f`,
+                }}
+              >
+                {laneLabels[selectedStep.layer]}
+              </span>
+              {/* P3 신뢰 배지: 오버레이 있으면 확정(approver), 없으면 자기 ref verdict. */}
+              <TrustBadge
+                confirmedBy={selectedOverride?.approver ?? null}
+                verdict={stepGrounding?.verdict ?? null}
+              />
+            </div>
             <button
               type="button"
               onClick={() => selectNode(null)}
@@ -380,12 +392,14 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
           >
             {t.flowView.detailViewButton}
           </button>
-          {selectedStep.node.summary && (
+          {(selectedOverride?.editedClaims?.summary ?? selectedStep.node.summary) && (
             <>
               <p className="text-[11px] uppercase tracking-wider text-text-muted mt-2">
                 {t.flowView.detailSummary}
               </p>
-              <p className="text-xs text-text-secondary leading-relaxed">{selectedStep.node.summary}</p>
+              <p className="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap">
+                {selectedOverride?.editedClaims?.summary ?? selectedStep.node.summary}
+              </p>
             </>
           )}
           {stepGrounding && (

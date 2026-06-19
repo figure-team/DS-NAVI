@@ -176,6 +176,155 @@ function readSourceFile(url: URL) {
   };
 }
 
+// ── P3: 노드 오버레이(사용자 편집/확정) — 서버 저장 ───────────────────────────
+const MAX_OVERRIDE_BODY_BYTES = 256 * 1024;
+
+/**
+ * 편집 허용 필드 화이트리스트 — **의미 주장만**(summary, detail:<sectionId>). 결정론
+ * 사실(메서드/호출/파일:라인/계층)은 코드 추출이라 편집 거부(재스캔 시 재생성).
+ */
+function isEditableClaimKey(key: string): boolean {
+  return key === "summary" || /^detail:[A-Za-z0-9_-]+$/.test(key);
+}
+
+/**
+ * node-overrides.json 절대 경로 — domain-graph.json 과 동일 `.understand-anything/`
+ * (영속 출력 디렉터리, 재스캔 생존). 프로젝트(=domain-graph) 미발견이면 null.
+ */
+function nodeOverridesFilePath(): string | null {
+  const graphFile = findGraphFile("domain-graph.json");
+  if (!graphFile) return null;
+  return path.join(path.dirname(graphFile), "node-overrides.json");
+}
+
+/** 현재 domain-graph.json 의 노드 id 집합 — POST 시 nodeId 실존 검증용. */
+function domainGraphNodeIds(): Set<string> {
+  const ids = new Set<string>();
+  const graphFile = findGraphFile("domain-graph.json");
+  if (!graphFile) return ids;
+  try {
+    const raw = JSON.parse(fs.readFileSync(graphFile, "utf-8")) as { nodes?: Array<{ id?: unknown }> };
+    for (const n of raw.nodes ?? []) if (typeof n.id === "string") ids.add(n.id);
+  } catch {
+    // 파싱 실패 → 빈 집합(검증에서 모든 nodeId 차단).
+  }
+  return ids;
+}
+
+/** node-overrides.json 읽기 — 없거나 손상이면 {} (조용한 빈 처리는 읽기에서만 허용). */
+function readNodeOverrides(file: string): Record<string, unknown> {
+  try {
+    if (!fs.existsSync(file)) return {};
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8"));
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** POST 바디를 크기 상한 안에서 수집. 초과 시 reject('too-large'). */
+function collectRequestBody(
+  req: import("http").IncomingMessage,
+  limit: number,
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let size = 0;
+    const chunks: Buffer[] = [];
+    req.on("data", (c: Buffer) => {
+      size += c.length;
+      if (size > limit) {
+        reject(new Error("too-large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(c);
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", reject);
+  });
+}
+
+/**
+ * POST /node-overrides — { nodeId, editedClaims, approver } 를 검증 후 병합 기록.
+ * 검증: nodeId 실존 · editedClaims 키 화이트리스트(의미 주장) + 값 문자열 · approver 비어있지 않음.
+ * 레코드 존재 = 그 노드 확정(approver). audit append-only. 응답 = 갱신된 레코드.
+ */
+function handleOverridePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = nodeOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No domain graph found. Run /understand-map first." });
+    return;
+  }
+  collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
+    .then((body) => {
+      let parsed: { nodeId?: unknown; editedClaims?: unknown; approver?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { nodeId, editedClaims, approver } = parsed ?? {};
+      if (typeof nodeId !== "string" || !nodeId) {
+        sendJson(res, 400, { error: "nodeId is required" });
+        return;
+      }
+      if (typeof approver !== "string" || !approver.trim()) {
+        sendJson(res, 400, { error: "approver is required" });
+        return;
+      }
+      if (!editedClaims || typeof editedClaims !== "object" || Array.isArray(editedClaims)) {
+        sendJson(res, 400, { error: "editedClaims object is required" });
+        return;
+      }
+      if (!domainGraphNodeIds().has(nodeId)) {
+        sendJson(res, 400, { error: "nodeId is not in the domain graph" });
+        return;
+      }
+      const clean: Record<string, string> = {};
+      for (const [k, v] of Object.entries(editedClaims as Record<string, unknown>)) {
+        if (!isEditableClaimKey(k)) {
+          sendJson(res, 400, { error: `field is not editable (deterministic fact): ${k}` });
+          return;
+        }
+        if (typeof v !== "string") {
+          sendJson(res, 400, { error: `editedClaims[${k}] must be a string` });
+          return;
+        }
+        clean[k] = v;
+      }
+      if (Object.keys(clean).length === 0) {
+        sendJson(res, 400, { error: "no editable fields provided" });
+        return;
+      }
+      const now = new Date().toISOString();
+      const by = approver.trim();
+      const store = readNodeOverrides(file);
+      const prev = (store[nodeId] as { audit?: unknown } | undefined) ?? {};
+      const audit = Array.isArray(prev.audit) ? prev.audit : [];
+      const record = {
+        editedClaims: clean,
+        approver: by,
+        at: now,
+        audit: [...audit, { event: "CONFIRMED", by, at: now }],
+      };
+      store[nodeId] = record;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write node-overrides:", err);
+        sendJson(res, 500, { error: "Failed to write overrides" });
+        return;
+      }
+      sendJson(res, 200, record);
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
 export default defineConfig({
   test: {
     environment: "node",
@@ -255,7 +404,9 @@ export default defineConfig({
             pathname === "/diff-overlay.json" ||
             pathname === "/meta.json" ||
             pathname === "/config.json" ||
-            pathname === "/file-content.json";
+            pathname === "/file-content.json" ||
+            pathname === "/node-overrides.json" ||
+            pathname === "/node-overrides";
 
           if (!isProtectedEndpoint) {
             next();
@@ -266,6 +417,21 @@ export default defineConfig({
           // Requests without a matching ?token= get a 403.
           if (url.searchParams.get("token") !== ACCESS_TOKEN) {
             sendJson(res, 403, { error: "Forbidden: missing or invalid token" });
+            return;
+          }
+
+          // P3: 노드 오버레이 — 쓰기(POST)는 토큰 게이트 + 화이트리스트, 읽기(GET)는 병합용.
+          if (pathname === "/node-overrides") {
+            if (req.method === "POST") {
+              handleOverridePost(req, res);
+            } else {
+              sendJson(res, 405, { error: "Use POST to write node overrides" });
+            }
+            return;
+          }
+          if (pathname === "/node-overrides.json") {
+            const file = nodeOverridesFilePath();
+            sendJson(res, 200, file ? readNodeOverrides(file) : {});
             return;
           }
 

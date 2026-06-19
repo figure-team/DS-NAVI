@@ -116,6 +116,9 @@ function Dashboard({ accessToken }: { accessToken: string }) {
   const setDomainGraph = useDashboardStore((s) => s.setDomainGraph);
   const setWikiGraph = useDashboardStore((s) => s.setWikiGraph); // ktds-fork (ADR-004)
   const setOverlayData = useDashboardStore((s) => s.setOverlayData);
+  const setNodeOverrides = useDashboardStore((s) => s.setNodeOverrides); // P3
+  const setApproverHandle = useDashboardStore((s) => s.setApproverHandle); // P3
+  const setAccessToken = useDashboardStore((s) => s.setAccessToken); // P3
   const [loadError, setLoadError] = useState<string | null>(null);
   const [graphIssues, setGraphIssues] = useState<GraphIssue[]>([]);
   const [metaTheme, setMetaTheme] = useState<ThemeConfig | null>(null);
@@ -132,9 +135,26 @@ function Dashboard({ accessToken }: { accessToken: string }) {
       .then((r) => (r.ok ? r.json() : null))
       .then((config) => {
         if (config?.outputLanguage) setOutputLanguage(config.outputLanguage);
+        // P3: approver 핸들(config.approver) — 저장 시 기본값. 없으면 대시보드 1회 입력.
+        if (typeof config?.approver === "string" && config.approver.trim()) {
+          setApproverHandle(config.approver.trim());
+        }
       })
       .catch(() => {});
   }, []);
+
+  // P3: 노드 오버레이(사용자 편집/확정) read-time 병합 소스 + 쓰기 토큰을 store 로.
+  useEffect(() => {
+    setAccessToken(accessToken);
+    fetch(dataUrl("node-overrides.json", accessToken))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+          setNodeOverrides(data);
+        }
+      })
+      .catch(() => {});
+  }, [setNodeOverrides, setAccessToken]);
 
   useEffect(() => {
     fetch(dataUrl("knowledge-graph.json", accessToken))

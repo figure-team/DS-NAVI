@@ -117,6 +117,13 @@ export const ja = {
     empty: "ドメイングラフがありません。/understand-domain で生成してください。",
     breadcrumbRoot: "ドメインマップ",
   },
+  grounding: {
+    rate: "根拠率",
+    grounded: "根拠あり",
+    needsReview: "要確認",
+    viewSource: "コードを表示",
+    unverified: "未検証の根拠",
+  },
   flowList: {
     eyebrow: "業務ドメイン",
     subtitle: "フローを選択すると、下にクロスレイヤーグラフがすぐ表示されます。",

@@ -117,6 +117,13 @@ export const ko = {
     empty: "도메인 그래프가 없습니다. /understand-domain 으로 생성하세요.",
     breadcrumbRoot: "도메인 지도",
   },
+  grounding: {
+    rate: "근거율",
+    grounded: "근거 있음",
+    needsReview: "확인 필요",
+    viewSource: "코드 보기",
+    unverified: "근거 미검증",
+  },
   flowList: {
     eyebrow: "업무 도메인",
     subtitle: "흐름을 선택하면 아래에서 교차계층 그래프를 바로 확인할 수 있습니다.",

@@ -117,6 +117,13 @@ export const zhTW = {
     empty: "尚無領域圖。請執行 /understand-domain 產生。",
     breadcrumbRoot: "領域地圖",
   },
+  grounding: {
+    rate: "依據率",
+    grounded: "有依據",
+    needsReview: "需複核",
+    viewSource: "查看程式碼",
+    unverified: "未驗證依據",
+  },
   flowList: {
     eyebrow: "業務領域",
     subtitle: "選擇流程後，可在下方直接檢視其跨層級圖。",

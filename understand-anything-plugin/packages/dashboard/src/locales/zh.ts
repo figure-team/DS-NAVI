@@ -117,6 +117,13 @@ export const zh = {
     empty: "暂无领域图。请运行 /understand-domain 生成。",
     breadcrumbRoot: "领域地图",
   },
+  grounding: {
+    rate: "依据率",
+    grounded: "有依据",
+    needsReview: "需复核",
+    viewSource: "查看代码",
+    unverified: "未验证依据",
+  },
   flowList: {
     eyebrow: "业务领域",
     subtitle: "选择流程后，可在下方直接查看其跨层级图。",

@@ -117,6 +117,13 @@ export const en = {
     empty: "No domain graph available. Run /understand-domain to generate one.",
     breadcrumbRoot: "Domain map",
   },
+  grounding: {
+    rate: "Grounding",
+    grounded: "Grounded",
+    needsReview: "Needs review",
+    viewSource: "View source",
+    unverified: "Unverified citation",
+  },
   flowList: {
     eyebrow: "Business domain",
     subtitle: "Pick a flow to see its cross-layer graph right below.",

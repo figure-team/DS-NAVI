@@ -117,6 +117,13 @@ export const ru = {
     empty: "Граф доменов недоступен. Запустите /understand-domain для генерации.",
     breadcrumbRoot: "Карта доменов",
   },
+  grounding: {
+    rate: "Обоснованность",
+    grounded: "Обосновано",
+    needsReview: "Требует проверки",
+    viewSource: "Открыть код",
+    unverified: "Непроверенная ссылка",
+  },
   flowList: {
     eyebrow: "Бизнес-домен",
     subtitle: "Выберите поток, чтобы сразу увидеть его межслойный граф ниже.",

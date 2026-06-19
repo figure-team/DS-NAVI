@@ -1,7 +1,7 @@
 ---
 name: understand-map
 description: 결정론 도메인 맵 — 전수 census/라우트/콜체인/도달성 스캔 + 도메인 경계 확정 + 요약 (.spec/map/*.json, 동일 commit byte-diff=0)
-argument-hint: ["[projectRoot]", "[scan|plan|confirm|map]"]
+argument-hint: ["[projectRoot]", "[scan|plan|confirm|map|bundle|emit]"]
 ---
 
 # /understand-map
@@ -64,15 +64,62 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> map
 
 산출: `.spec/map/domain-map.json` (동일 commit 재실행 byte-diff=0).
 
+## 5) 번들 (LLM 채움 입력 조립)
+
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> bundle
+```
+
+skeleton 이 있어야 한다(없으면 안내 후 종료). 도메인별로 **LLM 채움 입력 묶음**을 `.spec/map/bundle/<key>.json` 에 조립한다. 각 묶음은:
+
+- **노드 구조**: 도메인의 흐름(flow)·단계(step) id 와 진입점/진입유형, 흐름별 단계 체인.
+- **근거 후보**: 각 단계 대상 파일의 **실제 소스 슬라이스**(앵커 라인 주변, 인용 가능한 텍스트) — charCap 초과분은 `slice=null` + `sliceOmitted` 로 정직하게 보고(조용한 누락 금지).
+- **결정론 신호**: 파일 경로·앵커 라인·클래스명, (KG 존재 시) 파일 노드의 summary/tags 기회 보강.
+
+산출: `.spec/map/bundle/<key>.json` (동일 입력 byte-diff=0).
+
+## 6) 호스트(Claude) 채움 — fill 작성 (인용 의무)
+
+번들과 emit 사이에서 **호스트(Claude)가 도메인당 1회** 채움을 수행한다:
+
+1. `.spec/map/bundle/<key>.json` 을 읽는다.
+2. 그 안의 소스 슬라이스·구조 신호만 근거로, 도메인/흐름/단계의 `name`·`summary`·`entities`·`businessRules`·`crossDomainInteractions` 을 작성한다.
+3. 결과를 `.spec/map/fill/<key>.json` 에 `DomainFill` 스키마로 쓴다.
+
+**계약(반드시 준수):**
+
+- 모든 **사실 주장**(summary/entities/businessRules/crossDomainInteractions/흐름 summary/단계 summary)에 `citations` 1개 이상 필수. 각 인용은 `{ filePath, line, snippet }` — `filePath` 는 프로젝트 루트 상대 경로, `line` 은 1-based, `snippet` 은 **그 라인의 실제 텍스트(8자 이상, 식별자성 토큰 포함)**.
+- `domainId`/`flowId`/`stepId` 는 번들에 있는 id 만 사용한다(모르는 ID·다른 도메인 ID 는 emit 단계에서 항목 단위 기각).
+- 구조 필드(filePath/lineRange/entryPoint 등)는 채우지 않는다(read-only — emit 이 보존).
+- 도메인 표시명(`name`)만 인용 면제(명명이라). 그 외 텍스트는 근거 없으면 쓰지 않는다.
+- 채움은 **도메인 단위 멱등**이다 — 실패/누락 도메인의 `fill/<key>.json` 만 다시 쓰면 그 도메인만 재반영된다.
+
+> 채우지 않은 도메인은 emit 에서 **결정론 라벨 폴백**(도메인=key 표제화, 흐름=진입점, 단계=파일명)으로 빈 이름 대신 구조명을 갖는다(하이브리드: 채움 우선, 미채움은 결정론 라벨).
+
+## 7) Emit (인용 기계검증 + 도메인 그래프 산출)
+
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> emit
+```
+
+채움 파이프라인을 실행한다: `fill/<key>.json` 읽기 → skeleton 에 적용(구조 read-only, 도메인 밖 ID 기각) → **인용 기계검증**(경로 실존 → 라인 범위 → 정규화 스니펫↔실파일 텍스트 일치; path-escape/no-file/line-out-of-range/text-mismatch/trivial-snippet 차단) → NEEDS_REVIEW 강등(ok 인용 0개 항목 텍스트 앞에 `[확인 필요] ` 마커, **삭제 금지**) → emit.
+
+- ok 인용이 1개라도 있으면 항목은 `GROUNDED`, 0개면 `NEEDS_REVIEW`(텍스트 보존 + 마커).
+- 부분 채움 허용 — pending(미작성)/invalid(스키마 실패)/rejected(도메인 밖 ID) 를 보고하고 채워진 도메인만 반영한다.
+- 근거율(`groundedPct`)·인용 ok 율을 한국어로 보고한다(인용 실존율의 측정기).
+
+산출:
+- `.understand-anything/domain-graph.json` — U-A KnowledgeGraph 호환(version/project/nodes/edges/layers/tour + ktdsMap). 대시보드가 fetch 해 도메인 뷰를 그린다.
+- `.spec/map/verify-report.json` — 인용 검증 리포트(도메인별 항목/인용 status/근거율).
+
+동일 입력 재실행 byte-diff=0(NEEDS_REVIEW 마커는 보존).
+
 ## 선행
 
 - `/understand-init` 로 `understanding.config.json` 생성.
 - (선택) U-A `/understand` 로 `.understand-anything/knowledge-graph.json` 생성 → 교차검증/힌트.
 
-## 후속 (로드맵)
-
-- `bundle`/`emit-with-fill` (LLM name/summary 채움 + 인용 검증) — P4.
-
 ## 출력 해석
 
-각 단계 요약을 한국어로 보고하고, `.spec/map/` 산출물 경로를 안내한다. scan→plan→confirm→map 순서로 진행한다.
+각 단계 요약을 한국어로 보고하고, `.spec/map/` 산출물 경로를 안내한다.
+전체 순서: scan → plan → confirm → map → bundle → (호스트 fill 작성) → emit.

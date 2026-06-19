@@ -9,6 +9,8 @@
  *   confirm  도메인 경계 확정. NON-TTY 안전: 플래그 없으면 표 + 안내만 출력하고,
  *            `--auto-approve --by <handle>` 가 있을 때만 확정 플랜을 기록한다.
  *   map      도메인 맵 요약(우선순위 랭킹 + 교차 도메인 엣지, 한국어). 확정 플랜 필요.
+ *   bundle   도메인별 LLM 채움 입력 묶음(.spec/map/bundle/<key>.json) 조립. skeleton 필요.
+ *   emit     채움 파이프라인 — fill/<key>.json 적용 + 인용 기계검증 + domain-graph.json emit.
  *
  * 모든 출력은 결정론·한국어. 동일 commit 재실행 시 산출물 byte-diff=0.
  */
@@ -54,10 +56,15 @@ switch (sub) {
   case 'map':
     await runMap()
     break
+  case 'bundle':
+    await runBundle()
+    break
+  case 'emit':
+    await runEmit()
+    break
   default:
     console.error(
-      `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | map.\n` +
-        '(bundle/emit-with-fill 은 P4 로드맵.)',
+      `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | map | bundle | emit.`,
     )
     process.exit(2)
 }
@@ -152,6 +159,68 @@ async function runMap() {
   }
   console.log('')
   console.log('산출물: .spec/map/domain-map.json (동일 commit 재실행 byte-diff=0)')
+}
+
+async function runBundle() {
+  const { buildBundles } = engine
+  const skeleton = readSkeletonOrExit()
+  const { bundles, paths } = await buildBundles(projectRoot, skeleton)
+  console.log(`도메인 번들 조립 완료 — ${projectRoot}`)
+  console.log(`  도메인 ${bundles.length}개 번들(.spec/map/bundle/):`)
+  for (const b of bundles) {
+    const omitted = b.sliceOmitted.length > 0 ? ` (슬라이스 생략 ${b.sliceOmitted.length}개)` : ''
+    console.log(`    - ${b.key}: 흐름 ${b.flows.length}개 · 단계 ${b.steps.length}개 · 파일 ${b.files.length}개${omitted}`)
+  }
+  console.log('')
+  console.log('산출물 경로:')
+  for (const p of paths) console.log(`  ${p}`)
+  console.log('')
+  console.log('다음 단계: 도메인별 fill/<key>.json 을 작성한 뒤 emit 을 실행하세요.')
+  console.log('계약: 모든 사실 주장(summary/entities/businessRules/흐름/단계)에 file:line + 스니펫 인용 필수.')
+  console.log('  → fill 경로: .spec/map/fill/<key>.json  (스키마: DomainFill — citations min 1, snippet ≥ 8자)')
+  console.log('  → 채움 후: emit (인용 기계검증 + domain-graph.json 산출).')
+}
+
+async function runEmit() {
+  const { runFillPipeline } = engine
+  let result
+  try {
+    result = await runFillPipeline(projectRoot)
+  } catch (err) {
+    console.error(`채움 emit 실패: ${err.message}`)
+    console.error('skeleton 이 없으면 먼저 scan → confirm 을, 번들이 없으면 bundle 을 실행하세요.')
+    process.exit(2)
+  }
+
+  console.log(`도메인 그래프 채움·검증·emit 완료 — ${projectRoot}`)
+  console.log(`  채움 도메인: ${result.report.domains.length}개`)
+  console.log(`  미작성(pending): ${result.pending.length}개${result.pending.length ? ` [${result.pending.join(', ')}]` : ''}`)
+  console.log(`  무효(invalid): ${result.invalid.length}개${result.invalid.length ? ` [${result.invalid.map((i) => i.key).join(', ')}]` : ''}`)
+  console.log(`  기각(rejected): ${result.rejected.length}개`)
+  console.log(`  빈칸 잔여 노드: ${result.unfilled.length}개`)
+  const o = result.report.overall
+  console.log(`  근거율: 항목 ${o.itemGrounded}/${o.itemTotal} GROUNDED (${o.groundedPct}%) · 인용 ${o.citationOk}/${o.citationTotal} ok`)
+  if (result.staleSkeleton) {
+    console.log('  ⚠️ skeleton 이 옛 commit 산물입니다 — 라인 이동으로 정당한 인용이 강등될 수 있습니다(재scan 권장).')
+  }
+  console.log('')
+  console.log('산출물:')
+  console.log(`  ${result.domainGraphPath}  (U-A 호환 도메인 그래프)`)
+  console.log(`  ${result.verifyReportPath}  (인용 검증 리포트)`)
+  console.log('동일 입력 재실행 시 byte-diff=0(NEEDS_REVIEW 항목은 [확인 필요] 마커로 보존).')
+}
+
+/** skeleton.json 을 읽어 반환. 없으면 안내 후 종료(조용한 빈 처리 금지). */
+function readSkeletonOrExit() {
+  const { readSkeleton } = engine
+  const skeleton = readSkeleton(projectRoot)
+  if (!skeleton) {
+    console.error(`skeleton.json 없음 — ${projectRoot}`)
+    console.error('먼저 도메인 경계를 확정하고 skeleton 을 산출하세요:')
+    console.error('  scan → confirm --auto-approve --by <담당자> → (buildMap 으로 skeleton 산출)')
+    process.exit(2)
+  }
+  return skeleton
 }
 
 /** 후보 도메인 경계 표(헤더 + 구분선 + 행)를 출력한다. plan/confirm 공용(동일 출력). */

@@ -14,6 +14,10 @@ import { basename, resolve } from 'node:path'
 import { writeDomainGraph } from './persist.js'
 import { SKELETON_BLANK } from './types.js'
 import type { SkeletonReport, UaGraphEdge, UaGraphNode } from './types.js'
+import type { VerifyReport } from './verify.js'
+
+/** NEEDS_REVIEW 강등 마커 — 검증 실패 항목 텍스트 앞에 붙인다(삭제 금지). */
+export const NEEDS_REVIEW_MARKER = '[확인 필요] '
 
 /** "web-inf" → "Web Inf", "account" → "Account". 도메인 key 표제화(결정론). */
 function titleCaseKey(key: string): string {
@@ -108,6 +112,83 @@ export function emitDomainGraph(
     layers: [] as unknown[],
     tour: [] as unknown[],
     // ktds 확장 (U-A 스키마 passthrough) — freshness 대조용.
+    ktdsMap: {
+      generatedFromCommit: skeleton.gitCommit ?? '',
+    },
+  }
+  writeDomainGraph(projectRoot, graph)
+  return { nodes, edges: skeleton.edges }
+}
+
+/**
+ * 검증 리포트를 노드에 반영: NEEDS_REVIEW 항목 텍스트에 마커 부착(삭제 아님).
+ * applyFills 가 만든 노드 배열을 입력으로 받아 복사·수정한다.
+ * ref 규칙: 도메인 summary=domainId, 배열 항목=`<domainId>#<kind>[i]`,
+ * flow/step summary=flowId/stepId (verify.ts 와 동일한 키 체계).
+ */
+export function demoteUnverified(nodes: UaGraphNode[], report: VerifyReport): UaGraphNode[] {
+  const verdictByRef = new Map<string, 'GROUNDED' | 'NEEDS_REVIEW'>()
+  for (const d of report.domains) {
+    for (const item of d.items) verdictByRef.set(item.ref, item.verdict)
+  }
+  const mark = (text: string, ref: string): string =>
+    verdictByRef.get(ref) === 'NEEDS_REVIEW' && !text.startsWith(NEEDS_REVIEW_MARKER)
+      ? NEEDS_REVIEW_MARKER + text
+      : text
+
+  return nodes.map((node) => {
+    const out: UaGraphNode = { ...node }
+    if (node.type === 'domain') {
+      out.summary = mark(node.summary, node.id)
+      const meta = { ...node.domainMeta }
+      for (const [kind, field] of [
+        ['entity', 'entities'],
+        ['businessRule', 'businessRules'],
+        ['crossDomain', 'crossDomainInteractions'],
+      ] as const) {
+        const arr = meta[field]
+        if (Array.isArray(arr)) {
+          meta[field] = arr.map((text, i) =>
+            typeof text === 'string' ? mark(text, `${node.id}#${kind}[${i}]`) : text,
+          )
+        }
+      }
+      out.domainMeta = meta
+    } else {
+      out.summary = mark(node.summary, node.id)
+    }
+    return out
+  })
+}
+
+/**
+ * 채움(LLM fill) 경로의 domain-graph.json emit. applyFills→demoteUnverified 를 거친
+ * 노드 배열을 받아, **여전히 공란(SKELETON_BLANK)인 노드에는 결정론 라벨 폴백을
+ * 적용**한다(하이브리드: 채움 우선, 미채움은 구조 라벨). envelope(version/project/
+ * layers/tour/ktdsMap)는 구조 emit 과 동일하다.
+ */
+export function emitFilledDomainGraph(
+  projectRoot: string,
+  skeleton: SkeletonReport,
+  filledNodes: UaGraphNode[],
+  options: EmitOptions = {},
+): { nodes: UaGraphNode[]; edges: UaGraphEdge[] } {
+  // 채움이 안 된 노드만 결정론 라벨로 폴백(채워진 노드는 SKELETON_BLANK 가 아니라 보존).
+  const nodes = applyDeterministicLabels(filledNodes, skeleton.edges)
+  const graph = {
+    version: '1.0.0',
+    project: {
+      name: options.projectName ?? basename(resolve(projectRoot)),
+      languages: [] as string[],
+      frameworks: [] as string[],
+      description: 'ktds /understand-map 결정론 도메인 그래프 (skeleton+LLM fill+기계검증)',
+      analyzedAt: options.analyzedAt ?? new Date().toISOString(),
+      gitCommitHash: skeleton.gitCommit ?? '',
+    },
+    nodes,
+    edges: skeleton.edges,
+    layers: [] as unknown[],
+    tour: [] as unknown[],
     ktdsMap: {
       generatedFromCommit: skeleton.gitCommit ?? '',
     },

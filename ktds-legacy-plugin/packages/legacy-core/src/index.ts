@@ -32,6 +32,7 @@ export {
   readConfirmedPlan,
   CONFIRMED_PLAN_FILENAME,
   writeSkeleton,
+  readSkeleton,
   writeMethodCalls,
   writeDomainMapSummary,
   DOMAIN_MAP_SUMMARY_FILENAME,
@@ -59,7 +60,56 @@ export type {
   ReceiverDesc,
   JavaLocalVar,
 } from './domain-map/java-facts.js'
-export { emitDomainGraph } from './domain-map/emit.js'
+export {
+  emitDomainGraph,
+  emitFilledDomainGraph,
+  demoteUnverified,
+  applyDeterministicLabels,
+  NEEDS_REVIEW_MARKER,
+} from './domain-map/emit.js'
+export {
+  buildBundles,
+  safeKeyFilename,
+  bundleDir,
+  BUNDLE_DIR,
+  DEFAULT_SLICE_LINES,
+  DEFAULT_BUNDLE_CHAR_CAP,
+  SourceSliceSchema,
+  BundleFileSchema,
+  DomainBundleSchema,
+} from './domain-map/bundle.js'
+export type { SourceSlice, BundleFile, DomainBundle, BuildBundlesOptions } from './domain-map/bundle.js'
+export {
+  readFills,
+  applyFills,
+  unfilledNodes,
+  fillDir,
+  fillPathFor,
+  FILL_DIR,
+  CitationSchema,
+  ClaimSchema as FillClaimSchema,
+  DomainFillSchema,
+} from './domain-map/fill.js'
+export type { Citation, Claim as FillClaim, DomainFill, RejectedItem } from './domain-map/fill.js'
+export {
+  verifyFills,
+  writeVerifyReport,
+  VERIFY_REPORT_FILENAME,
+  CITATION_STATUS,
+  VerifiedCitationSchema,
+  VerifiedItemSchema,
+  DomainVerifyResultSchema,
+  VerifyReportSchema,
+} from './domain-map/verify.js'
+export type {
+  CitationStatus,
+  VerifiedCitation,
+  VerifiedItem,
+  DomainVerifyResult,
+  VerifyReport,
+} from './domain-map/verify.js'
+export { runFillPipeline } from './domain-map/fill-pipeline.js'
+export type { FillPipelineResult } from './domain-map/fill-pipeline.js'
 export {
   buildCrossDomainGraph,
   scoreDomains,

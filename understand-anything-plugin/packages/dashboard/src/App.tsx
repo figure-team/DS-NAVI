@@ -778,13 +778,21 @@ function DashboardContent({
 
       {/* ktds-fork: 도메인 풀페이지 — 사이드바·코드뷰어 없이 3화면을 전면 노출. */}
       {isDomainPage ? (
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 relative">
           {activeFlowId ? (
             <FlowSpineView />
           ) : activeDomainId ? (
             <FlowListView />
           ) : (
             <DomainMapView />
+          )}
+          {/* ktds-fork: 도메인 화면에서도 인용 칩(근거) 점프가 코드뷰어를 열 수 있게 슬라이드업 마운트. */}
+          {codeViewerOpen && !codeViewerExpanded && (
+            <div className="absolute bottom-0 left-0 right-0 h-[40vh] bg-surface border-t border-border-subtle animate-slide-up z-20 overflow-hidden">
+              <Suspense fallback={null}>
+                <CodeViewer accessToken={accessToken} onExpand={expandCodeViewer} />
+              </Suspense>
+            </div>
           )}
         </div>
       ) : (

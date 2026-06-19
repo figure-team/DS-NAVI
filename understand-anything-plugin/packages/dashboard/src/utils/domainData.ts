@@ -32,6 +32,22 @@ export interface DomainFlow {
   entryType: string;
 }
 
+/** A citation backing a domain-level claim (embedded by emit's embedVerification). */
+export interface DomainClaimCitation {
+  filePath: string;
+  line: number;
+  /** verify.ts CitationStatus ('ok' | 'text-mismatch' | …). undefined → treat as ok. */
+  status?: string;
+}
+
+/** A verified domain-level claim (summary / entity / businessRule / crossDomain). */
+export interface DomainClaim {
+  kind: "summary" | "entity" | "businessRule" | "crossDomain";
+  text: string;
+  verdict: "GROUNDED" | "NEEDS_REVIEW";
+  citations: DomainClaimCitation[];
+}
+
 export interface DomainCard {
   /** Domain node id (= store navigateToDomain target). */
   id: string;
@@ -49,6 +65,74 @@ export interface DomainCard {
   nodeCount: number;
   /** Entity names from domainMeta (may be empty). */
   entities: string[];
+  /**
+   * Verified domain-level claims (from domainMeta.ktdsClaims). Empty when the
+   * domain hasn't been LLM-filled (deterministic-label only) — `filled` is false.
+   */
+  claims: DomainClaim[];
+  /** True when LLM-filled (has ktdsClaims) — drives "채움 전" vs detail rendering. */
+  filled: boolean;
+  /** Grounded ratio (%) over domain-level claims; null when unfilled. */
+  groundedPct: number | null;
+  /** GROUNDED claim count. */
+  groundedCount: number;
+  /** NEEDS_REVIEW claim count. */
+  reviewCount: number;
+}
+
+const CLAIM_KINDS = new Set(["summary", "entity", "businessRule", "crossDomain"]);
+
+/** Parse domainMeta.ktdsClaims (+ groundedPct/counts) embedded by emit's embedVerification. */
+function parseDomainClaims(node: GraphNode): {
+  claims: DomainClaim[];
+  filled: boolean;
+  groundedPct: number | null;
+  groundedCount: number;
+  reviewCount: number;
+} {
+  const meta = node.domainMeta as Record<string, unknown> | undefined;
+  const raw = Array.isArray(meta?.ktdsClaims) ? (meta!.ktdsClaims as unknown[]) : [];
+  const claims: DomainClaim[] = raw
+    .map((c): DomainClaim | null => {
+      const o = c as Record<string, unknown>;
+      const kind = typeof o.kind === "string" && CLAIM_KINDS.has(o.kind) ? o.kind : null;
+      const text = typeof o.text === "string" ? o.text : "";
+      if (!kind || !text) return null;
+      const citations = Array.isArray(o.citations)
+        ? (o.citations as unknown[])
+            .map((x): DomainClaimCitation | null => {
+              const ci = x as Record<string, unknown>;
+              if (typeof ci.filePath !== "string" || typeof ci.line !== "number") return null;
+              return {
+                filePath: ci.filePath,
+                line: ci.line,
+                status: typeof ci.status === "string" ? ci.status : undefined,
+              };
+            })
+            .filter((x): x is DomainClaimCitation => x !== null)
+        : [];
+      return {
+        kind: kind as DomainClaim["kind"],
+        text,
+        verdict: o.verdict === "NEEDS_REVIEW" ? "NEEDS_REVIEW" : "GROUNDED",
+        citations,
+      };
+    })
+    .filter((c): c is DomainClaim => c !== null);
+  const filled = claims.length > 0;
+  return {
+    claims,
+    filled,
+    groundedPct: typeof meta?.groundedPct === "number" ? meta.groundedPct : null,
+    groundedCount:
+      typeof meta?.groundedCount === "number"
+        ? meta.groundedCount
+        : claims.filter((c) => c.verdict === "GROUNDED").length,
+    reviewCount:
+      typeof meta?.reviewCount === "number"
+        ? meta.reviewCount
+        : claims.filter((c) => c.verdict === "NEEDS_REVIEW").length,
+  };
 }
 
 export interface DomainStats {
@@ -199,6 +283,7 @@ export function buildDomainCards(graph: KnowledgeGraph): {
     const entities = Array.isArray(meta?.entities)
       ? (meta!.entities as unknown[]).filter((x): x is string => typeof x === "string")
       : [];
+    const verified = parseDomainClaims(node);
     return {
       id: node.id,
       name: node.name,
@@ -208,6 +293,11 @@ export function buildDomainCards(graph: KnowledgeGraph): {
       flowCount: flowIds.length,
       nodeCount,
       entities,
+      claims: verified.claims,
+      filled: verified.filled,
+      groundedPct: verified.groundedPct,
+      groundedCount: verified.groundedCount,
+      reviewCount: verified.reviewCount,
     };
   });
 

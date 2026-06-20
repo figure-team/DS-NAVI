@@ -43,6 +43,25 @@ function nodeRowConfidence(node: UaGraphNode): { confidence: Confidence; evidenc
     : { confidence: 'INFERRED', evidence: [] }
 }
 
+/**
+ * 도메인 행 근거 — 도메인 노드는 filePath 가 없으므로(추상 묶음) domainMeta.ktdsClaims 의
+ * fill citation(file:line, 기계검증됨)을 행 근거로 승계한다. 인용 보유 → CONFIRMED.
+ * 합성 금지: ktdsClaims 도 없으면 INFERRED.
+ */
+function domainRowConfidence(node: UaGraphNode): { confidence: Confidence; evidence: Evidence[] } {
+  const direct = nodeEvidence(node)
+  if (direct.length > 0) return { confidence: 'CONFIRMED', evidence: direct }
+  const claims = (node.domainMeta?.ktdsClaims as Array<{ citations?: unknown }> | undefined) ?? []
+  for (const c of claims) {
+    const cits = Array.isArray(c?.citations) ? c.citations : []
+    const ev: Evidence[] = cits
+      .filter((x): x is { filePath: string; line?: unknown } => typeof (x as { filePath?: unknown })?.filePath === 'string')
+      .map((x) => ({ file: x.filePath, line: typeof x.line === 'number' ? x.line : null }))
+    if (ev.length > 0) return { confidence: 'CONFIRMED', evidence: ev.slice(0, 3) }
+  }
+  return { confidence: 'INFERRED', evidence: [] }
+}
+
 /** domainMeta 의 단일 문자열 필드(entryPoint 등) — 없으면 `[추정]`. */
 function metaScalar(meta: Record<string, unknown> | undefined, key: string): string {
   const v = meta?.[key]
@@ -75,7 +94,7 @@ function featureId(index: number): string {
 function buildSiFeatureSpec(input: DocInput): GeneratedDoc {
   const domains = nodesOfType(input.nodes, 'domain')
   const rows: TableRow[] = domains.map((n, i): TableRow => {
-    const { confidence, evidence } = nodeRowConfidence(n)
+    const { confidence, evidence } = domainRowConfidence(n)
     const rules = metaList(n.domainMeta, 'businessRules')
     return {
       cells: [

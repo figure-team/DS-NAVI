@@ -205,6 +205,39 @@ describe('builders: confidence + evidence grounding', () => {
 })
 
 // ──────────────────────────────────────────────────────────────────────────
+// grounding 보강: pom 의존성(buildDeps) → tech-stack CONFIRMED, 도메인 fill 인용 → si CONFIRMED.
+// ──────────────────────────────────────────────────────────────────────────
+
+describe('grounding enrichment (buildDeps / domain citations)', () => {
+  it('tech-stack: buildDeps 있으면 프레임워크/라이브러리 CONFIRMED + pom 근거', () => {
+    const doc = buildTechStack({ ...INPUT, buildDeps: [{ name: 'spring-web', file: 'pom.xml', line: 107 }] })
+    const fw = section(doc, '프레임워크 / 주요 라이브러리').claims
+    expect(fw).toHaveLength(1)
+    expect(fw[0].confidence).toBe('CONFIRMED')
+    expect(fw[0].text).toBe('프레임워크/라이브러리: spring-web')
+    expect(fw[0].evidence).toEqual([{ file: 'pom.xml', line: 107 }])
+  })
+
+  it('tech-stack: buildDeps 없으면 project.frameworks 추론(INFERRED) 유지', () => {
+    const fw = section(buildTechStack(INPUT), '프레임워크 / 주요 라이브러리').claims
+    expect(fw.every((c) => c.confidence === 'INFERRED')).toBe(true)
+  })
+
+  it('si-기능명세서: 도메인 filePath 없어도 ktdsClaims 인용을 행 근거로 승계(CONFIRMED)', () => {
+    const dom = node('domain:x', 'domain', {
+      name: 'X',
+      domainMeta: { ktdsClaims: [{ kind: 'summary', citations: [{ filePath: 'a/B.java', line: 5 }] }] },
+    })
+    const si = getMethodology('si-standard')
+      .buildDocSet({ nodes: [dom], edges: [] })
+      .find((d) => d.docId === 'si-기능명세서')!
+    const row = si.sections[0].table!.rows[0]
+    expect(row.confidence).toBe('CONFIRMED')
+    expect(row.evidence).toEqual([{ file: 'a/B.java', line: 5 }])
+  })
+})
+
+// ──────────────────────────────────────────────────────────────────────────
 // grounding: 근거 없는 CONFIRMED 가 산출되지 않는다(사실 날조 금지).
 // ──────────────────────────────────────────────────────────────────────────
 

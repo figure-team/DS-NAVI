@@ -31,6 +31,8 @@ export interface DocInput {
   mybatisModel?: MyBatisModel | null
   /** 메서드 호출그래프(P3) — crud-matrix 가 흐름별 핸들러→매퍼 메서드 정밀 귀속에 사용. */
   methodCallGraph?: MethodCallGraph | null
+  /** 빌드파일 의존성(pom.xml/gradle) — tech-stack 프레임워크/라이브러리 grounding(file:line). */
+  buildDeps?: Array<{ name: string; file: string; line: number }>
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

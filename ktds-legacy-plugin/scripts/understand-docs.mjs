@@ -117,7 +117,51 @@ if (existsSync(mcgPath)) {
   }
 }
 
-const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph }
+// 언어 도출 — 그래프 노드 filePath 확장자에서(emit project.languages 가 비어 있어 보강).
+const EXT_LANG = { java: "Java", kt: "Kotlin", ts: "TypeScript", tsx: "TypeScript", js: "JavaScript", jsx: "JavaScript", py: "Python", go: "Go", rb: "Ruby", cs: "C#", php: "PHP" }
+function deriveLanguages(nodes) {
+  const set = new Set()
+  for (const n of nodes) {
+    const fp = typeof n.filePath === "string" ? n.filePath : ""
+    const ext = fp.includes(".") ? fp.slice(fp.lastIndexOf(".") + 1).toLowerCase() : ""
+    if (EXT_LANG[ext]) set.add(EXT_LANG[ext])
+  }
+  return [...set].sort()
+}
+
+// Maven pom.xml 의존성 추출(file:line) — tech-stack 프레임워크/라이브러리 grounding. test/provided 제외.
+function findBuildDeps(root) {
+  const pom = join(root, "pom.xml")
+  if (!existsSync(pom)) return []
+  let xml
+  try {
+    xml = readFileSync(pom, "utf8")
+  } catch {
+    return []
+  }
+  const out = []
+  const seen = new Set()
+  for (const m of xml.matchAll(/<dependency>([\s\S]*?)<\/dependency>/g)) {
+    if (/<scope>\s*(test|provided)\s*<\/scope>/.test(m[1])) continue
+    const aid = /<artifactId>([^<]+)<\/artifactId>/.exec(m[1])
+    if (!aid) continue
+    const name = aid[1].trim()
+    if (seen.has(name)) continue
+    seen.add(name)
+    const absIdx = (m.index ?? 0) + m[0].indexOf(aid[0])
+    out.push({ name, file: "pom.xml", line: xml.slice(0, absIdx).split("\n").length })
+  }
+  return out.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+}
+
+const langs = deriveLanguages(graph.nodes)
+const project = {
+  ...(graph.project ?? {}),
+  languages: langs.length > 0 ? langs : graph.project?.languages ?? [],
+}
+const buildDeps = findBuildDeps(projectRoot)
+
+const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph, project, buildDeps }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 

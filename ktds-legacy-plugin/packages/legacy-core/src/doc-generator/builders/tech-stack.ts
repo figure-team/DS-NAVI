@@ -8,6 +8,7 @@
  * 앵커가 없으므로 INFERRED(근거 미앵커). 모듈 노드는 filePath 보유 시 CONFIRMED.
  */
 import type { Claim, GeneratedDoc } from '../types.js'
+import { claim } from '../claims.js'
 import {
   type DocInput,
   displayName,
@@ -23,10 +24,17 @@ export function buildTechStack(input: DocInput): GeneratedDoc {
     .slice()
     .sort()
     .map((l): Claim => inferred(`사용 언어: ${l}`))
-  const frameworks = (input.project?.frameworks ?? [])
-    .slice()
-    .sort()
-    .map((f): Claim => inferred(`프레임워크/라이브러리: ${f}`))
+  // 프레임워크/라이브러리 — 빌드파일(pom.xml 등) 의존성이 있으면 file:line 근거로 CONFIRMED,
+  // 없으면 project.frameworks 추론(INFERRED). buildDeps 는 이름 정렬(결정론).
+  const frameworks: Claim[] =
+    input.buildDeps && input.buildDeps.length > 0
+      ? [...input.buildDeps]
+          .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+          .map((d): Claim => claim(`프레임워크/라이브러리: ${d.name}`, 'CONFIRMED', [{ file: d.file, line: d.line }]))
+      : (input.project?.frameworks ?? [])
+          .slice()
+          .sort()
+          .map((f): Claim => inferred(`프레임워크/라이브러리: ${f}`))
   const modules = nodesWithTag(input.nodes, 'module').map((n): Claim =>
     nodeClaim(n, `모듈: ${displayName(n)}${summarySuffix(n)}`),
   )

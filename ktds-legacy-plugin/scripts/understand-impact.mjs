@@ -194,6 +194,10 @@ function runAnalyze() {
   })
   const mdPath = engine.publishChangeImpact(projectRoot, doc, { sourceCommit: result.gitCommit })
 
+  // 대시보드 구조 탭 오버레이(impact-overlay.json) — knowledge-graph 노드 id 로 매핑.
+  // KG 부재면 changed=0 인 비활성 오버레이가 쓰여 토글이 회색(graceful).
+  const { overlay, overlayPath } = engine.emitImpactOverlay(projectRoot, result)
+
   console.log(`영향도 분석 완료 — ${projectRoot}`)
   console.log(`  상류(영향받는 호출자): 파일 ${result.upstream.files.length} · API ${result.upstream.api.length} · 흐름 ${result.upstream.flows.length} · 도메인 ${result.upstream.domains.length}`)
   console.log(`  하류(의존 협력자): 파일 ${result.downstream.files.length}`)
@@ -203,5 +207,10 @@ function runAnalyze() {
     console.log(`  생성예측(${suggestion.strength}): [변경] ${suggestion.change.length} · [생성] ${suggestion.create.length} · [영향] ${suggestion.impact.length}`)
     console.log('  주의: [생성]은 net-new 라 CONFIRMED 불가(최대 [추정]) — 선례 앵커만 실존 근거.')
   }
+  const overlayNote =
+    overlay.changedNodeIds.length > 0
+      ? `구조 탭 영향도 토글 점등(changed ${overlay.changedNodeIds.length}·affected ${overlay.affectedNodeIds.length}${overlay.unresolved.length ? `·미매핑 ${overlay.unresolved.length}` : ''})`
+      : 'KG 미조인 — 영향도 토글 비활성(knowledge-graph.json 생성 후 재실행)'
+  console.log(`  대시보드 오버레이: ${overlayPath} — ${overlayNote}`)
   console.log(`  산출물: .spec/map/impact.json · impact-verify-report.json · ${mdPath}(read-only)`)
 }

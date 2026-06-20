@@ -108,3 +108,13 @@ export type {
   ImpactAggregateInputs,
   BuildChangeImpactOptions,
 } from './doc.js'
+export {
+  IMPACT_OVERLAY_FILENAME,
+  ImpactOverlaySchema,
+  buildKgNodeIndex,
+  buildImpactOverlay,
+  loadKgNodeIndex,
+  writeImpactOverlay,
+  emitImpactOverlay,
+} from './overlay.js'
+export type { ImpactOverlay } from './overlay.js'

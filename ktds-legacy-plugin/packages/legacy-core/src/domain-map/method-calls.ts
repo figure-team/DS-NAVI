@@ -643,3 +643,41 @@ export function reachableFlowFiles(
   }
   return ordered
 }
+
+/**
+ * 핸들러 메서드에서 도달하는 (callee 파일, 메서드) 쌍을 BFS 로 모은다 — reachableFlowFiles 의
+ * 메서드-정밀 버전. CRUD 매트릭스가 흐름별로 **실제 호출하는 매퍼 메서드만** 귀속하도록 쓴다
+ * (파일 단위 사용메서드 라벨의 과다귀속 해소). external/unresolved callee 는 건너뛴다.
+ * 결정론: (file, method) 사전순 정렬 후 반환.
+ */
+export function reachableMethods(
+  graph: MethodCallGraph,
+  rootRelPath: string,
+  handlerMethod: string,
+): Array<{ file: string; method: string }> {
+  const byCaller = indexCallsByCaller(graph)
+  const seen = new Set<string>()
+  const out: Array<{ file: string; method: string }> = []
+  const visited = new Set<string>()
+  let frontier: Array<[string, string]> = [[rootRelPath, handlerMethod]]
+  while (frontier.length > 0) {
+    const next: Array<[string, string]> = []
+    for (const [file, method] of frontier) {
+      const vkey = `${file}\n${method}`
+      if (visited.has(vkey)) continue
+      visited.add(vkey)
+      for (const call of callsOf(byCaller, file, method)) {
+        if (call.calleeFile === null) continue
+        const key = `${call.calleeFile}\n${call.calleeMethod}`
+        if (!seen.has(key)) {
+          seen.add(key)
+          out.push({ file: call.calleeFile, method: call.calleeMethod })
+        }
+        next.push([call.calleeFile, call.calleeMethod])
+      }
+    }
+    frontier = next
+  }
+  out.sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : a.method < b.method ? -1 : a.method > b.method ? 1 : 0))
+  return out
+}

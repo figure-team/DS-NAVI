@@ -8,6 +8,7 @@ import type { UaGraphEdge, UaGraphNode } from '../../domain-map/types.js'
 import type { RoutesReport } from '../../domain-map/types.js'
 import type { JpaModel } from '../../jpa/types.js'
 import type { MyBatisModel } from '../../mybatis/types.js'
+import type { MethodCallGraph } from '../../domain-map/types.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -28,6 +29,8 @@ export interface DocInput {
   jpaModel?: JpaModel | null
   /** MyBatis 모델(Tier B) — crud-matrix(기능×테이블) + si-테이블정의서(테이블/컬럼) grounding. */
   mybatisModel?: MyBatisModel | null
+  /** 메서드 호출그래프(P3) — crud-matrix 가 흐름별 핸들러→매퍼 메서드 정밀 귀속에 사용. */
+  methodCallGraph?: MethodCallGraph | null
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

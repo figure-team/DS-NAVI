@@ -106,7 +106,18 @@ function findMapperXmls(root) {
 }
 const mybatisModel = buildMyBatisModel(findMapperXmls(projectRoot))
 
-const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel }
+// 메서드 호출그래프(P3) — crud-matrix 흐름별 핸들러→매퍼 메서드 정밀 귀속(있으면).
+let methodCallGraph = null
+const mcgPath = join(projectRoot, '.spec', 'map', 'method-calls.json')
+if (existsSync(mcgPath)) {
+  try {
+    methodCallGraph = JSON.parse(readFileSync(mcgPath, 'utf8'))
+  } catch {
+    // 손상 시 null(폴백: 파일 단위 사용메서드).
+  }
+}
+
+const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 

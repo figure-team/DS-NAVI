@@ -11,6 +11,8 @@ import type { GeneratedDoc, Evidence, TableRow } from '../types.js'
 import { type DocInput, nodesOfType } from './shared.js'
 import { namespaceBaseName } from '../../mybatis/index.js'
 import type { MyBatisModel } from '../../mybatis/types.js'
+import { reachableMethods } from '../../domain-map/method-calls.js'
+import type { MethodCallGraph } from '../../domain-map/types.js'
 
 const cmp = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
 
@@ -58,6 +60,16 @@ function doc(columns: string[], rows: TableRow[], prose?: string): GeneratedDoc 
 const TABLE_PROSE =
   'CRUD 는 기능이 도달하는 매퍼가 해당 테이블에 수행하는 SQL 문 종류(select=R/insert=C/update=U/delete=D)에서 판정한다. ' +
   '사용 메서드 라벨이 파일 단위이므로 같은 매퍼를 공유하는 기능들은 그 매퍼의 CRUD 전체가 귀속될 수 있다(핸들러 단위 정밀 추적은 후속). 근거=Mapper XML file:line.'
+
+/** 정밀 경로 prose — methodCallGraph 로 핸들러가 실제 호출하는 매퍼 메서드만 귀속. */
+const PRECISE_PROSE =
+  'CRUD 는 기능 핸들러가 실제 호출하는 매퍼 메서드의 SQL 문 종류(select=R/insert=C/update=U/delete=D)에서 판정한다(메서드 호출그래프 정밀 귀속). 근거=Mapper XML file:line.'
+
+/** 흐름 핸들러 메서드 — entryPoint "Class#method" → "method"(없으면 null). */
+function bareHandler(entryPoint: unknown): string | null {
+  if (typeof entryPoint !== 'string') return null
+  return entryPoint.includes('#') ? entryPoint.slice(entryPoint.lastIndexOf('#') + 1) : null
+}
 
 /** 기능×테이블 (mybatisModel 기반, SQL 문에서 CRUD 판정 → [확정]). */
 function buildByTable(input: DocInput, model: MyBatisModel): GeneratedDoc {
@@ -168,8 +180,66 @@ function buildByDao(input: DocInput): GeneratedDoc {
   return doc(columns, rows)
 }
 
+/** 기능×테이블 (정밀) — 흐름 핸들러에서 methodCallGraph 로 실제 도달하는 매퍼 메서드만 귀속. */
+function buildByTablePrecise(input: DocInput, model: MyBatisModel, graph: MethodCallGraph): GeneratedDoc {
+  const mapperByBase = new Map<string, { stmts: Map<string, { crud: string; tables: string[]; line: number }>; relPath: string }>()
+  for (const m of model.mappers) {
+    mapperByBase.set(namespaceBaseName(m.namespace), {
+      stmts: new Map(m.statements.map((s) => [s.id, { crud: s.crud, tables: s.tables, line: s.line }])),
+      relPath: m.relPath,
+    })
+  }
+  const flows = nodesOfType(input.nodes, 'flow')
+  const tablesSet = new Set<string>()
+  const perFlow = new Map<string, { byTable: Map<string, Set<string>>; ev: Evidence[] }>()
+  for (const flow of flows) {
+    const byTable = new Map<string, Set<string>>()
+    const ev: Evidence[] = []
+    const evSeen = new Set<string>()
+    const handler = bareHandler((flow.domainMeta as Record<string, unknown> | undefined)?.entryPoint)
+    if (handler && typeof flow.filePath === 'string') {
+      for (const { file, method } of reachableMethods(graph, flow.filePath, handler)) {
+        const mapper = mapperByBase.get(baseName(file))
+        if (!mapper) continue
+        const stmt = mapper.stmts.get(method)
+        if (!stmt) continue
+        for (const t of stmt.tables) {
+          tablesSet.add(t)
+          const set = byTable.get(t) ?? new Set<string>()
+          set.add(stmt.crud)
+          byTable.set(t, set)
+        }
+        const key = `${mapper.relPath}:${stmt.line}`
+        if (!evSeen.has(key)) {
+          evSeen.add(key)
+          ev.push({ file: mapper.relPath, line: stmt.line })
+        }
+      }
+    }
+    perFlow.set(flow.id, { byTable, ev })
+  }
+  const tableCols = [...tablesSet].sort(cmp)
+  const columns = ['기능', ...tableCols]
+  const rows: TableRow[] = flows.map((flow): TableRow => {
+    const { byTable, ev } = perFlow.get(flow.id)!
+    const cells = [
+      flow.name.length > 0 ? flow.name : flow.id,
+      ...tableCols.map((t) => (byTable.has(t) ? crudCell(byTable.get(t)!) : '')),
+    ]
+    return ev.length > 0
+      ? { cells, confidence: 'CONFIRMED', evidence: ev }
+      : { cells, confidence: 'INFERRED', evidence: [] }
+  })
+  return doc(columns, rows, PRECISE_PROSE)
+}
+
 export function buildCrudMatrix(input: DocInput): GeneratedDoc {
-  return input.mybatisModel && input.mybatisModel.mappers.length > 0
-    ? buildByTable(input, input.mybatisModel)
-    : buildByDao(input)
+  const model = input.mybatisModel
+  if (model && model.mappers.length > 0) {
+    // 정밀(methodCallGraph): 흐름 핸들러가 실제 호출하는 매퍼 메서드만 귀속(과다귀속 해소).
+    if (input.methodCallGraph) return buildByTablePrecise(input, model, input.methodCallGraph)
+    // 폴백: 파일 단위 사용메서드 라벨(과다귀속 가능, caveat).
+    return buildByTable(input, model)
+  }
+  return buildByDao(input)
 }

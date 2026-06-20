@@ -40,7 +40,7 @@ function node(id: string, type: UaGraphNode['type'], over: Partial<UaGraphNode> 
 const NODES: UaGraphNode[] = [
   node('domain:order', 'domain', { name: '주문', tags: ['order'] }),
   node('domain:catalog', 'domain', { name: '카탈로그', tags: ['catalog'] }),
-  node('flow:place', 'flow', { name: '주문생성', tags: ['order'], filePath: 'src/web/OrderController.java', lineRange: [10, 20] }),
+  node('flow:place', 'flow', { name: '주문생성', tags: ['order'], filePath: 'src/web/OrderController.java', lineRange: [10, 20], domainMeta: { entryPoint: 'OrderController#place' } }),
   node('step:place:svc', 'step', { name: '주문서비스', tags: ['order'], layer: 'service', filePath: 'src/order/OrderService.java', lineRange: [5, 50], summary: '주문 조율' }),
   node('step:place:dao', 'step', { name: '주문매퍼', tags: ['order'], layer: 'dao', filePath: 'src/order/OrderMapper.java', lineRange: [3, 9] }),
   node('step:place:catdao', 'step', { name: '상품매퍼', tags: ['catalog'], layer: 'dao', filePath: 'src/catalog/ProductMapper.java', lineRange: [2, 8] }),
@@ -143,6 +143,28 @@ describe('Tier B — mybatisModel 있으면 기능×테이블 / 테이블+컬럼
 
   it('crud-matrix: mybatisModel 없으면 기능×DAO 폴백', () => {
     expect(buildCrudMatrix(INPUT).sections[0].table!.columns).toEqual(['기능', 'OrderMapper', 'ProductMapper'])
+  })
+
+  it('crud-matrix 정밀: methodCallGraph 로 핸들러가 실제 호출하는 매퍼 메서드만 귀속', () => {
+    // place 핸들러 → OrderService.create → OrderMapper.insertOrder + ProductMapper.getProductList.
+    // getOrder(R)는 호출 안 함 → 파일단위 'CR' 이 아니라 정밀 ORDERS 'C'.
+    const mkCall = (cf: string, cm: string, ef: string, em: string) => ({
+      callerClass: cf.split('/').pop().replace('.java', ''), callerMethod: cm, callerFile: cf, callLine: 1,
+      calleeClass: ef.split('/').pop().replace('.java', ''), calleeMethod: em, calleeFile: ef,
+      receiverKind: 'field', argCount: 0, overloadArity: null,
+    })
+    const methodCallGraph = {
+      schemaVersion: 1, gitCommit: null,
+      calls: [
+        mkCall('src/web/OrderController.java', 'place', 'src/order/OrderService.java', 'create'),
+        mkCall('src/order/OrderService.java', 'create', 'src/order/OrderMapper.java', 'insertOrder'),
+        mkCall('src/order/OrderService.java', 'create', 'src/catalog/ProductMapper.java', 'getProductList'),
+      ],
+    }
+    const doc = buildCrudMatrix({ ...mybInput, methodCallGraph })
+    expect(doc.sections[0].table!.columns).toEqual(['기능', 'ORDERS', 'PRODUCT'])
+    expect(cells(doc)).toEqual([['주문생성', 'C', 'R']]) // 정밀: getOrder 미호출 → ORDERS=C(파일단위면 CR)
+    expect(doc.sections[0].table!.rows[0].confidence).toBe('CONFIRMED')
   })
 
   it('si-테이블정의서: 테이블별 섹션 + INSERT 컬럼([확정])', () => {

@@ -22,7 +22,7 @@ import { buildSlices } from './slices.js'
 import { buildCandidates } from './classify.js'
 import { buildAutoPlan } from './confirm.js'
 import { buildSkeleton } from './skeleton.js'
-import { buildMethodCallGraph, reachableFlowFiles } from './method-calls.js'
+import { buildMethodCallGraph, reachableFlowFiles, reachableMethods } from './method-calls.js'
 import { stableJson } from './persist.js'
 import type { RoutesReport, SkeletonReport } from './types.js'
 
@@ -81,6 +81,21 @@ describe('skeleton — reachableFlowFiles primitive', () => {
     // trace matches on bare callerMethod -> no match -> root only.
     const reached = reachableFlowFiles(methodCallGraph, ORDER_ROOT, 'OrderController#create')
     expect(reached).toEqual([ORDER_ROOT])
+  })
+
+  it('reachableMethods: 핸들러에서 도달하는 (파일, 메서드) 쌍(메서드-정밀)', async () => {
+    const { methodCallGraph } = await buildInputs()
+    const reached = reachableMethods(methodCallGraph, ORDER_ROOT, 'create')
+    // create -> OrderService 의 메서드(들)로 해소(파일+메서드). root 자기 메서드는 제외.
+    expect(reached.some((r) => r.file === ORDER_SERVICE)).toBe(true)
+    expect(reached.every((r) => !(r.file === ORDER_ROOT && r.method === 'create'))).toBe(true)
+    // 결정론: 두 번 호출 동일.
+    expect(reachableMethods(methodCallGraph, ORDER_ROOT, 'create')).toEqual(reached)
+  })
+
+  it('reachableMethods: 미선언 메서드는 빈 결과', async () => {
+    const { methodCallGraph } = await buildInputs()
+    expect(reachableMethods(methodCallGraph, ORDER_ROOT, 'noSuchMethod')).toEqual([])
   })
 })
 

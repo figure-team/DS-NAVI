@@ -156,22 +156,23 @@
 > 우리 = **사람용** 도메인/기능 추상화 + LLM 채움 + file:line 인용검증 + 대시보드/문서. 레이어가 다름.
 
 ### 적용 가능 (우선순위 순)
-1. **[높음] 그래프를 MCP 도구로 노출** — codegraph 핵심 가치(에이전트가 파일 스캔 대신 그래프 질의 →
-   토큰 ~16%↓·툴콜 ~58%↓). 우리 knowledge-graph/domain-graph/impact 를 `explore/node/search/callers`
-   류 MCP 도구로 열면 **에이전트向 신규 채널**(현재는 사람向 대시보드/문서뿐). 우리 강점(도메인/기능
-   추상화·인용)을 에이전트가 질의 가능. → 후속 큰 기능 후보.
-2. **[높음] 프레임워크/언어 라우트 추출 확대** — codegraph 17+ 프레임워크(Django/Express/Rails/Gin/
+1. **[높음] 프레임워크/언어 라우트 추출 확대** — codegraph 17+ 프레임워크(Django/Express/Rails/Gin/
    Axum…)·20+ 언어 패턴. 우리 `routes/{stripes,nextjs}.ts` 패턴을 동형 확장하면 로드맵 "비-Java
    결정론 엔진"에 직접 기여. 라우트 DSL/데코레이터 인식 기법 참고.
-3. **[중] SQLite+FTS5 저장/검색** — 대형 레포에서 JSON 재파싱 대비 빠른 심볼 검색·impact 질의.
+2. **[중] SQLite+FTS5 저장/검색** — 대형 레포에서 JSON 재파싱 대비 빠른 심볼 검색·impact 질의.
    단 우리 결정론(byte-diff=0, stable JSON) 모델과 상충 → 캐시/인덱스 레이어로만(소스는 JSON 유지).
-4. **[중] 파일워치 자동 증분** — 우리 fingerprint 증분(P6 보완 D)은 on-demand. native FS 이벤트
+3. **[중] 파일워치 자동 증분** — 우리 fingerprint 증분(P6 보완 D)은 on-demand. native FS 이벤트
    디바운스 자동 재인덱싱은 라이브 UX 향상(에이전트/대시보드 자동 최신화).
-5. **[중] 엣지 provenance 태깅 입도** — codegraph는 엣지마다 출처(direct/heuristic: swift-objc-bridge
+4. **[중] 엣지 provenance 태깅 입도** — codegraph는 엣지마다 출처(direct/heuristic: swift-objc-bridge
    등) 태그. 우리 confidence(CONFIRMED/INFERRED/…)·unresolved 보고와 철학 일치 → 엣지 단위 출처
    태그 입도 보강 참고.
 
 ### 이미 보유 / 비채택
+- **MCP 도구 노출(그래프를 에이전트 질의 채널로)**: codegraph 핵심 가치(에이전트 파일 스캔 →
+  그래프 질의, 토큰 ~16%↓·툴콜 ~58%↓)이나 그건 **codegraph 기준 중요도**다. 우리 산출물 소비자는
+  **사람**(SI 문서·대시보드)이며 에이전트向 질의 채널은 새 사용자층을 여는 **별개 제품 확장**이지
+  현 범위의 마무리가 아님 → **비채택**(레이어가 다름, line 156). 폴리글랏/에이전트 제품화로 방향이
+  바뀌면 그때 별도 제안으로 재검토.
 - **impact radius(전이 의존)**: 우리 impact 엔진(P5: reach/api/persistence/flow)이 이미 보유 +
   인용검증까지 → 더 정밀. 차용 불필요.
 - **LLM 미사용 철학**: codegraph는 주장 생성을 안 하므로 검증 불요. 우리는 **LLM 의미 채움 + S9
@@ -180,7 +181,8 @@
 
 ### 결론
 codegraph와 우리는 **경쟁이 아니라 보완 레이어**(심볼·에이전트 vs 도메인·사람). 가장 가치 있는
-차용은 **①MCP 에이전트 채널 + ②프레임워크/언어 추출 확대**. ③~⑤는 성능/UX 점진 개선 후보.
+차용은 **프레임워크/언어 추출 확대**(로드맵 비-Java 엔진에 직접 기여). SQLite/파일워치/provenance는
+성능·UX 점진 개선 후보. **MCP 에이전트 채널은 사람向 제품 범위 밖이라 비채택**(위 참조).
 
 ### 10.1 후속 보류 — 변경 영향도(impact)에 codegraph 차용 (실제 레포 검증 2026-06-19)
 실 레포 검증 결과 §10 기술 사실 일치(MIT · SQLite+FTS5 · tree-sitter · MCP 4도구

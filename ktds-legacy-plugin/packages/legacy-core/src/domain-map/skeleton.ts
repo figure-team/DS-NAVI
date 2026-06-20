@@ -225,9 +225,21 @@ export async function buildSkeleton(
             : null
         if (traced && traced.length > 1) {
           ordered = traced
+        } else if (
+          traced &&
+          flow.handlerMethod &&
+          handlerDeclaredIn(javaFacts, root, flow.handlerMethod)
+        ) {
+          // 포워딩 전용 핸들러(예: signonForm/newAccountForm — 다른 프로젝트 파일을
+          // 호출하지 않고 JSP 로 ForwardResolution 만 함). 트레이스 결과가 root 뿐이고
+          // 그 핸들러가 실제로 root 에 선언돼 있으면 [root] 단일 step 이 정직한 정답이다.
+          // 파일 단위 폴백으로 빠지면 같은 빈의 다른 핸들러가 닿는 파일(모델·매퍼)을
+          // 이 흐름의 step 으로 날조하게 된다 — 핸들러 선언이 확인될 때는 폴백 금지.
+          ordered = traced
         } else {
-          // P2 폴백: 슬라이스 도달 파일(파일 단위). root 는 흐름의 닻이라 첫 step
-          // 으로 항상 보존하고, 나머지는 relPath 정렬.
+          // P2 폴백: 슬라이스 도달 파일(파일 단위). 트레이스 불가(람다/외부-heavy/
+          // 메서드 미선언)일 때만. root 는 흐름의 닻이라 첫 step 으로 항상 보존하고,
+          // 나머지는 relPath 정렬.
           const reached = reachedByRoot.get(root) ?? new Set<string>([root])
           const rest = [...reached].filter((f) => f !== root).sort(cmp)
           ordered = [root, ...rest]
@@ -361,6 +373,21 @@ function bareMethod(handler: string | null): string | null {
   if (!handler) return null
   const hash = handler.lastIndexOf('#')
   return hash >= 0 ? handler.slice(hash + 1) : handler
+}
+
+/**
+ * root 파일이 handlerMethod 를 실제로 선언하는가. 메서드 트레이스가 root 하나만
+ * 반환했을 때 '포워딩 전용 핸들러'(선언됨, 호출 없음)와 '트레이스 불가'(람다/외부/
+ * 이름 불일치)를 구별하는 데 쓴다 — 전자는 [root] 단일 step, 후자는 파일 단위 폴백.
+ */
+function handlerDeclaredIn(
+  javaFacts: Map<string, JavaFileFacts>,
+  root: string,
+  method: string,
+): boolean {
+  const facts = javaFacts.get(root)
+  if (!facts) return false
+  return facts.classes.some((c) => c.methods.some((m) => m.name === method))
 }
 
 /** 한 root 가 선언한 라우트/배치 진입을 flow 스펙으로 모은다(flowId 정렬). */

@@ -28,6 +28,7 @@ import type { RoutesReport, SkeletonReport } from './types.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const shopMini = join(here, '..', '..', 'fixtures', 'chain-recall', 'shop-mini')
+const forwardOnly = join(here, '..', '..', 'fixtures', 'forward-only')
 
 const ORDER_ROOT = 'src/main/java/com/shop/web/OrderController.java'
 const ORDER_SERVICE = 'src/main/java/com/shop/service/OrderService.java'
@@ -153,5 +154,53 @@ describe('skeleton — methodCallGraph refinement vs file-level fallback', () =>
       const src = sk.stepSources.find((s) => s.stepId === n.id)
       expect(src).toBeDefined()
     }
+  })
+})
+
+/**
+ * 포워딩 전용 핸들러(선언됨, 호출 없음) 회귀 — jpetstore signonForm 류 버그.
+ * 핸들러가 다른 프로젝트 파일을 호출하지 않으면 트레이스 결과가 [root] 뿐인데,
+ * 예전 가드(`traced.length > 1`)는 이를 '트레이스 실패'로 오판해 같은 빈의 다른
+ * 핸들러가 닿는 파일(서비스·매퍼)을 step 으로 날조했다. handlerDeclaredIn 으로
+ * '선언됨 + 호출 없음'을 구별해 [root] 단일 step 으로 고정한다.
+ */
+describe('skeleton — forward-only handler (declared, no calls) → single step', () => {
+  const PAGE_CTRL = 'src/main/java/com/ex/web/PageController.java'
+  const DATA_SVC = 'src/main/java/com/ex/service/DataService.java'
+
+  async function buildFwd() {
+    const census = buildCensus(forwardOnly)
+    const routes = await extractRoutes(forwardOnly, census)
+    const edges = await extractEdges(forwardOnly, census)
+    const slices = buildSlices(census, routes, edges)
+    const candidates = buildCandidates(census, routes, slices)
+    const plan = buildAutoPlan(candidates)
+    const methodCallGraph = await buildMethodCallGraph(forwardOnly, census)
+    return { census, routes, edges, slices, candidates, plan, methodCallGraph }
+  }
+
+  const stepsOf = (sk: SkeletonReport, flowKey: string): string[] =>
+    sk.nodes
+      .filter((n) => n.type === 'step' && n.id.includes(flowKey))
+      .map((n) => n.filePath!)
+
+  it('forward-only route gets exactly its root step (no sibling service/mapper)', async () => {
+    const sk = await buildSkeleton(forwardOnly, await buildFwd(), {})
+    expect(stepsOf(sk, 'GET /pages/home')).toEqual([PAGE_CTRL])
+  })
+
+  it('genuine route on the same controller still method-traces to the service', async () => {
+    const sk = await buildSkeleton(forwardOnly, await buildFwd(), {})
+    const data = stepsOf(sk, 'GET /pages/data')
+    expect(data.length).toBeGreaterThan(1)
+    expect(data).toContain(DATA_SVC)
+  })
+
+  it('WITHOUT methodCallGraph the forward-only route falls back to the file-level union', async () => {
+    const { methodCallGraph: _omit, ...noGraph } = await buildFwd()
+    const sk = await buildSkeleton(forwardOnly, noGraph, {})
+    // P2 fallback (no method graph) cannot prune — proves the method-graph path is
+    // what removes the spurious sibling steps for forward-only handlers.
+    expect(stepsOf(sk, 'GET /pages/home').length).toBeGreaterThan(1)
   })
 })

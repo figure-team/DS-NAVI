@@ -56,7 +56,14 @@ ERD)는 추출 보강 필요 → D2 이후 점진 확장 후보.
     재-emit(LLM 채움 소실)함. understand-docs 는 디스크 그래프를 읽기만(비파괴). 채움 갱신은
     understand-map `map`→`emit` 으로만.
   - 잔여(refine): si-기능명세서 행 신뢰도가 domain 노드 filePath 부재로 [추정] — domainMeta.ktdsClaims
-    인용을 행 근거로 승계하면 [확정] 승격 가능(Tier B 후속).
+    인용을 행 근거로 승계하면 [확정] 승격 가능(후속).
+- **Tier B — MyBatis 테이블 추출. ✅ 완료(커밋 b4fd99f).** `src/mybatis`(parseMapperXml/
+  buildMyBatisModel, 정규식): 문별 CRUD(문 종류)·테이블(FROM/JOIN/INTO/UPDATE)·컬럼(INSERT/UPDATE).
+  → crud-matrix=**기능×테이블**(CRUD를 SQL 문에서 [확정], 근거=Mapper XML file:line), si-테이블정의서=
+  테이블별 컬럼([확정]). understand-docs 가 매퍼 XML 스캔→모델→input. legacy-core 586.
+  ⚠️ **정밀도 한계**: calls description 의 사용 메서드 라벨이 **파일 단위**(서비스→매퍼 전체 메서드)라,
+  같은 매퍼를 공유하는 흐름들은 그 매퍼의 CRUD 전체가 귀속됨(예: editAccount/newAccount/signon 이
+  ACCOUNT CRU 동일). 핸들러 단위 정밀은 methodCallGraph 메서드-정밀 추적 필요(후속). 문서에 caveat 명시.
 - **D3 — 편집/확정 + 대시보드.** 생성 `.md` 를 대시보드에서 보기/편집 → dev서버 `POST /doc`
   (토큰+화이트리스트, node-overrides 패턴) → `<proj>/.understand-anything/doc-output/<docId>.md`
   저장(생성물과 분리) → 저장=즉시 **확정(approver)** (doc-overrides.json: editedAt+approver+audit).

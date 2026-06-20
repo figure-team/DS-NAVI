@@ -96,7 +96,7 @@ function buildSiFeatureSpec(input: DocInput): GeneratedDoc {
     docId: 'si-기능명세서',
     title: 'SI 기능명세서',
     methodology: 'si-standard',
-    sections: [{ heading: '기능 목록', claims: [], table: { columns: FN_COLUMNS, rows } }],
+    sections: [{ heading: '기능 목록', key: 'feature-list', claims: [], table: { columns: FN_COLUMNS, rows } }],
   }
 }
 
@@ -130,7 +130,7 @@ function buildSiInterfaceSpec(input: DocInput): GeneratedDoc {
     docId: 'si-인터페이스정의서',
     title: 'SI 인터페이스정의서',
     methodology: 'si-standard',
-    sections: [{ heading: 'API 목록', claims: [], table: { columns: API_COLUMNS, rows } }],
+    sections: [{ heading: 'API 목록', key: 'api-list', claims: [], table: { columns: API_COLUMNS, rows } }],
   }
 }
 
@@ -166,6 +166,7 @@ function buildSiTableSpec(input: DocInput): GeneratedDoc {
     }
     return {
       heading: `${displayName(n)} 테이블`,
+      key: 'table-list',
       claims: [],
       table: { columns: TBL_COLUMNS, rows: [row] },
     }
@@ -178,6 +179,9 @@ function buildSiTableSpec(input: DocInput): GeneratedDoc {
     sections,
   }
 }
+
+// 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
+export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec }
 
 /** si-standard 모듈 — SI 정형 3종을 docId 순서로 산출(기능 → 인터페이스 → 테이블). */
 export const siStandardMethodology: MethodologyModule = {

@@ -186,7 +186,17 @@ export {
   buildFeatureSpec,
   buildApiSpec,
   buildDbSpec,
+  buildProgramList,
+  buildCrudMatrix,
+  buildBatchList,
+  buildImpactAnalysis,
   detectCycles,
+  parseDocTemplate,
+  applyDocTemplate,
+  DocTemplateSchema,
+  DocTemplateSectionSchema,
+  DOC_SET,
+  buildDocSet,
   MethodologySchema,
   DocStatusSchema,
   EvidenceSchema,
@@ -214,6 +224,9 @@ export type {
   DocMeta,
   DocInput,
   MethodologyModule,
+  DocTemplate,
+  DocTemplateSection,
+  DocSetEntry,
 } from './doc-generator/index.js'
 export { enforceEvidence, INFERRED_BLOCK_THRESHOLD } from './evidence/index.js'
 export type { EvidenceVerdict, EvidenceViolation } from './evidence/index.js'

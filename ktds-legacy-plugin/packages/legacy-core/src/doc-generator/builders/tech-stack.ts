@@ -36,9 +36,9 @@ export function buildTechStack(input: DocInput): GeneratedDoc {
     title: '기술 스택',
     methodology: 'as-built',
     sections: [
-      { heading: '언어', claims: languages },
-      { heading: '프레임워크 / 주요 라이브러리', claims: frameworks },
-      { heading: '모듈', claims: modules },
+      { heading: '언어', key: 'languages', claims: languages },
+      { heading: '프레임워크 / 주요 라이브러리', key: 'frameworks', claims: frameworks },
+      { heading: '모듈', key: 'modules', claims: modules },
     ],
   }
 }

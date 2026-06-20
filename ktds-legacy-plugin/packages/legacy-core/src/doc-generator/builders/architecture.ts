@@ -78,9 +78,9 @@ export function buildArchitecture(input: DocInput): GeneratedDoc {
     title: '아키텍처',
     methodology: 'as-built',
     sections: [
-      { heading: '레이어', claims: layerClaims },
-      { heading: '의존 방향', claims: depClaims },
-      { heading: '순환 의존 후보', claims: cycleClaims },
+      { heading: '레이어', key: 'layers', claims: layerClaims },
+      { heading: '의존 방향', key: 'dependencies', claims: depClaims },
+      { heading: '순환 의존 후보', key: 'cycles', claims: cycleClaims },
     ],
   }
 }

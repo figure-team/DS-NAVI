@@ -118,23 +118,39 @@ export function parseDocTemplate(md: string): DocTemplate {
  * 템플릿 미적용 경로는 호출자가 빌더 산출을 그대로 쓰면 된다(이 함수 미호출 = 기존 동작).
  */
 export function applyDocTemplate(doc: GeneratedDoc, tpl: DocTemplate): GeneratedDoc {
-  const byKey = new Map<string, Section>()
+  // 같은 key 의 빌더 섹션을 묶는다(테이블별 N 섹션 등 반복 섹션 지원).
+  const byKey = new Map<string, Section[]>()
   for (const s of doc.sections) {
-    if (typeof s.key === 'string') byKey.set(s.key, s)
+    if (typeof s.key !== 'string') continue
+    const list = byKey.get(s.key) ?? []
+    list.push(s)
+    byKey.set(s.key, list)
   }
-  const sections: Section[] = tpl.sections.map((ts): Section => {
-    const data = byKey.get(ts.key)
-    if (!data) {
-      // 빌더가 안 만든 키 → 빈 섹션(헤딩만). 표/목록 여부는 컬럼 유무로.
-      return ts.columns
-        ? { heading: ts.heading, key: ts.key, claims: [], table: { columns: ts.columns, rows: [] } }
-        : { heading: ts.heading, key: ts.key, claims: [] }
-    }
-    const out: Section = { ...data, heading: ts.heading, key: ts.key }
+  // 템플릿 컬럼을 빌더 표에 입힌다(컬럼 수 같을 때만 rename — 매트릭스 동적 컬럼 안전).
+  const withColumns = (data: Section, ts: DocTemplateSection): Section => {
+    const out: Section = { ...data, key: ts.key }
     if (data.table && ts.columns && ts.columns.length === data.table.columns.length) {
       out.table = { columns: ts.columns, rows: data.table.rows }
     }
     return out
-  })
+  }
+  const sections: Section[] = []
+  for (const ts of tpl.sections) {
+    const matches = byKey.get(ts.key) ?? []
+    if (matches.length === 0) {
+      // 빌더가 안 만든 키 → 빈 섹션(헤딩만). 표/목록 여부는 컬럼 유무로.
+      sections.push(
+        ts.columns
+          ? { heading: ts.heading, key: ts.key, claims: [], table: { columns: ts.columns, rows: [] } }
+          : { heading: ts.heading, key: ts.key, claims: [] },
+      )
+    } else if (matches.length === 1) {
+      // 단일 섹션 → 템플릿 헤딩으로 교체.
+      sections.push({ ...withColumns(matches[0], ts), heading: ts.heading })
+    } else {
+      // 반복 섹션(예: 테이블별) → 빌더 헤딩 유지(데이터 기반), 템플릿 컬럼만 입힌다.
+      for (const m of matches) sections.push(withColumns(m, ts))
+    }
+  }
   return { docId: tpl.docId, title: tpl.title, methodology: tpl.methodology, sections }
 }

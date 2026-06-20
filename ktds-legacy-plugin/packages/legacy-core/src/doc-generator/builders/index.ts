@@ -8,6 +8,10 @@ export { buildArchitecture, detectCycles } from './architecture.js'
 export { buildFeatureSpec } from './feature-spec.js'
 export { buildApiSpec } from './api-spec.js'
 export { buildDbSpec } from './db-spec.js'
+export { buildProgramList } from './program-list.js'
+export { buildCrudMatrix } from './crud-matrix.js'
+export { buildBatchList } from './batch-list.js'
+export { buildImpactAnalysis } from './impact-analysis.js'
 export type { DocInput } from './shared.js'
 export {
   sortNodes,

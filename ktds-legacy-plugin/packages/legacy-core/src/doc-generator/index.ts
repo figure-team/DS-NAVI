@@ -36,6 +36,8 @@ export {
   DocTemplateSectionSchema,
 } from './doc-template.js'
 export type { DocTemplate, DocTemplateSection } from './doc-template.js'
+export { DOC_SET, buildDocSet } from './doc-set.js'
+export type { DocSetEntry } from './doc-set.js'
 export {
   renderMarkdown,
   renderSkeleton,
@@ -49,6 +51,10 @@ export {
   buildFeatureSpec,
   buildApiSpec,
   buildDbSpec,
+  buildProgramList,
+  buildCrudMatrix,
+  buildBatchList,
+  buildImpactAnalysis,
   detectCycles,
   sortNodes,
   sortEdges,

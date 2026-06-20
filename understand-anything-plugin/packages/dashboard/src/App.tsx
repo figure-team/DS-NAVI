@@ -599,8 +599,8 @@ function DashboardContent({
               </div>
             </>
           )}
-          {/* ktds-fork: PersonaSelector는 구조 전용 — 도메인 풀페이지에서는 숨김. 탭 뒤에 배치. */}
-          {!isDomainPage && (
+          {/* ktds-fork: PersonaSelector(개요/학습/심층)는 구조 전용 — 도메인·산출물 풀페이지에서는 숨김. */}
+          {!isDomainPage && !isDocsPage && (
             <>
               <div className="w-px h-5 bg-border-subtle hidden sm:block" />
               <PersonaSelector />
@@ -747,7 +747,7 @@ function DashboardContent({
         {/* ktds-fork: 도메인 풀페이지에서는 구조 전용 액션(FilterPanel/ExportMenu/PathFinder)을
             숨기고 ThemePicker + 키보드 도움말만 유지한다. */}
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          {!isDomainPage && (
+          {!isDomainPage && !isDocsPage && (
             <>
               <FilterPanel />
               <ExportMenu />
@@ -797,8 +797,8 @@ function DashboardContent({
       </header>
 
       {/* Search */}
-      {/* ktds-fork: 도메인 풀페이지에서는 SearchBar 숨김. */}
-      {!isDomainPage && <SearchBar />}
+      {/* ktds-fork: 도메인·산출물 풀페이지에서는 SearchBar 숨김. */}
+      {!isDomainPage && !isDocsPage && <SearchBar />}
 
       {/* Validation warning banner */}
       {allIssues.length > 0 && !loadError && (

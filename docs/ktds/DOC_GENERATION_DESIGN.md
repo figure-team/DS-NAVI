@@ -61,9 +61,10 @@ ERD)는 추출 보강 필요 → D2 이후 점진 확장 후보.
   buildMyBatisModel, 정규식): 문별 CRUD(문 종류)·테이블(FROM/JOIN/INTO/UPDATE)·컬럼(INSERT/UPDATE).
   → crud-matrix=**기능×테이블**(CRUD를 SQL 문에서 [확정], 근거=Mapper XML file:line), si-테이블정의서=
   테이블별 컬럼([확정]). understand-docs 가 매퍼 XML 스캔→모델→input. legacy-core 586.
-  ⚠️ **정밀도 한계**: calls description 의 사용 메서드 라벨이 **파일 단위**(서비스→매퍼 전체 메서드)라,
-  같은 매퍼를 공유하는 흐름들은 그 매퍼의 CRUD 전체가 귀속됨(예: editAccount/newAccount/signon 이
-  ACCOUNT CRU 동일). 핸들러 단위 정밀은 methodCallGraph 메서드-정밀 추적 필요(후속). 문서에 caveat 명시.
+- **CRUD 핸들러 정밀화. ✅ 완료(커밋 38706b9).** 파일 단위 사용메서드 라벨의 CRUD 과다귀속 해소:
+  `reachableMethods`(method-calls.ts) 로 흐름 핸들러(entryPoint Class#method)에서 BFS 도달하는 매퍼
+  메서드만 귀속(buildByTablePrecise). understand-docs 가 method-calls.json 전달. graph 없으면 파일단위
+  폴백. 실측: editAccount=ACCOUNT RU, newAccount=CR, signon=R(과거 셋 다 CRU 동일 → 정정). legacy-core 589.
 - **D3 — 편집/확정 + 대시보드.** 생성 `.md` 를 대시보드에서 보기/편집 → dev서버 `POST /doc`
   (토큰+화이트리스트, node-overrides 패턴) → `<proj>/.understand-anything/doc-output/<docId>.md`
   저장(생성물과 분리) → 저장=즉시 **확정(approver)** (doc-overrides.json: editedAt+approver+audit).

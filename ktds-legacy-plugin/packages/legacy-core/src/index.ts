@@ -278,6 +278,7 @@ export {
 export type { ProfileWChangeStory, ProfileWTask, SourceCitation } from './profile-w/index.js'
 export * from './impact/index.js'
 export * from './jpa/index.js'
+export * from './mybatis/index.js'
 export {
   CoverageReportSchema,
   buildCoverageReport,

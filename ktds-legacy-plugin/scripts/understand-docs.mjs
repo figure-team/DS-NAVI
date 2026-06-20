@@ -8,9 +8,9 @@
  * `.understand-anything/doc-output/<docId>.md` 로 쓰며, 사용자가 편집·확정할 수 있다(D3).
  * 모든 표 행/주장은 file:line 근거 + 신뢰도 태그(AC-9). 위키 볼트(.spec/wiki/)도 함께 갱신.
  */
-import { dirname, join } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -34,6 +34,7 @@ const {
   evidenceRate,
   buildWikiVault,
   writeWikiVault,
+  buildMyBatisModel,
 } = engine
 
 const PLUGIN_DOC_DIR = join(here, '..', 'templates', 'doc')
@@ -72,7 +73,40 @@ if (existsSync(routesPath)) {
   }
 }
 
-const input = { nodes: graph.nodes, edges: graph.edges, routes }
+// MyBatis Mapper XML 스캔(Tier B) — 테이블/CRUD grounding. 매퍼 XML 없으면 빈 모델.
+function findMapperXmls(root) {
+  const SKIP = new Set(['node_modules', '.git', 'target', 'build', 'dist', '.understand-anything', '.spec', '.idea'])
+  const out = []
+  const walk = (dir) => {
+    let entries
+    try {
+      entries = readdirSync(dir, { withFileTypes: true })
+    } catch {
+      return
+    }
+    for (const e of entries) {
+      if (e.isDirectory()) {
+        if (!SKIP.has(e.name)) walk(join(dir, e.name))
+      } else if (e.name.endsWith('.xml')) {
+        const p = join(dir, e.name)
+        let content
+        try {
+          content = readFileSync(p, 'utf8')
+        } catch {
+          continue
+        }
+        if (content.includes('<mapper') && content.includes('namespace')) {
+          out.push({ relPath: relative(root, p), content })
+        }
+      }
+    }
+  }
+  walk(root)
+  return out.sort((a, b) => (a.relPath < b.relPath ? -1 : a.relPath > b.relPath ? 1 : 0))
+}
+const mybatisModel = buildMyBatisModel(findMapperXmls(projectRoot))
+
+const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 
@@ -117,7 +151,10 @@ for (const entry of DOC_SET) {
 const vault = buildWikiVault(docs, (doc) => meta.find((m) => m.docId === doc.docId))
 writeWikiVault(projectRoot, vault)
 
-console.log(`understand-docs 완료 — ${projectRoot} (입력: ${graphSource})`)
+const myb = mybatisModel.mappers.length > 0
+  ? ` · MyBatis ${mybatisModel.mappers.length}매퍼/${mybatisModel.tables.length}테이블`
+  : ''
+console.log(`understand-docs 완료 — ${projectRoot} (입력: ${graphSource}${myb})`)
 console.log(`  문서 ${docs.length}종 → .understand-anything/doc-output/:`)
 for (const m of meta) {
   console.log(`    - ${m.docId}: ${m.title} (근거율 ${(m.evidenceRate * 100).toFixed(0)}%)`)

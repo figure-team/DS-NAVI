@@ -147,7 +147,44 @@ const TBL_COLUMNS = ['컬럼', '타입', 'PK', 'FK', 'NULL', '설명']
  * 표기한다(컬럼 단위 enrichment = P6: JPA @Table/@Column·MyBatis Mapper XML SQL
  * 슬라이스 주입). 설명=summary. 행 신뢰도는 노드 근거 보유 여부로 결정(grounding).
  */
+/**
+ * MyBatis 모델 기반 테이블 섹션 — 테이블별 컬럼(INSERT/UPDATE 문에서 추출)을 행으로.
+ * 컬럼 존재는 SQL 근거(Mapper XML file:line) → CONFIRMED. 타입/PK/FK/NULL 은 SQL 에 없어
+ * [추정]. SELECT 전용 테이블은 컬럼 미추출(행 0) — 합성 금지.
+ */
+function buildSiTableSpecFromMyBatis(input: DocInput): GeneratedDoc {
+  const model = input.mybatisModel!
+  // 테이블 → 컬럼 → 근거(첫 출현). C/U 문의 컬럼만 해당 테이블로 귀속(단일 테이블).
+  const byTable = new Map<string, Map<string, Evidence>>()
+  for (const m of model.mappers) {
+    for (const s of m.statements) {
+      if ((s.crud !== 'C' && s.crud !== 'U') || s.tables.length !== 1) continue
+      const table = s.tables[0]
+      const colMap = byTable.get(table) ?? new Map<string, Evidence>()
+      for (const c of s.columns) {
+        if (!colMap.has(c)) colMap.set(c, { file: m.relPath, line: s.line })
+      }
+      byTable.set(table, colMap)
+    }
+  }
+  const sections = model.tables.map((table) => {
+    const colMap = byTable.get(table) ?? new Map<string, Evidence>()
+    const rows: TableRow[] = [...colMap.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)).map(
+      (col): TableRow => ({
+        cells: [col, INFERRED_CELL, INFERRED_CELL, INFERRED_CELL, INFERRED_CELL, EMPTY_CELL],
+        confidence: 'CONFIRMED',
+        evidence: [colMap.get(col)!],
+      }),
+    )
+    return { heading: `${table} 테이블`, key: 'table-list', claims: [], table: { columns: TBL_COLUMNS, rows } }
+  })
+  return { docId: 'si-테이블정의서', title: 'SI 테이블정의서', methodology: 'si-standard', sections }
+}
+
 function buildSiTableSpec(input: DocInput): GeneratedDoc {
+  if (input.mybatisModel && input.mybatisModel.tables.length > 0) {
+    return buildSiTableSpecFromMyBatis(input)
+  }
   const tables = nodesWithTag(input.nodes, 'table', 'schema')
   const sections = tables.map((n) => {
     const { confidence, evidence } = nodeRowConfidence(n)

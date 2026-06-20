@@ -13,6 +13,8 @@ import { readFileSync } from 'node:fs'
 import type { RoutesReport, UaGraphEdge, UaGraphNode } from '../domain-map/types.js'
 import type { DocInput } from './builders/index.js'
 import { buildProgramList, buildCrudMatrix, buildBatchList, buildImpactAnalysis } from './builders/index.js'
+import { buildSiTableSpec } from './methodology/si-standard.js'
+import { buildMyBatisModel } from '../mybatis/index.js'
 import { parseDocTemplate, applyDocTemplate } from './doc-template.js'
 import { DOC_SET } from './doc-set.js'
 import { renderSkeleton } from './render.js'
@@ -113,6 +115,44 @@ describe('buildImpactAnalysis', () => {
     // cross-domain: order → catalog 1건.
     const cross = cells(doc, 1)
     expect(cross).toEqual([['주문', '카탈로그', '1', '1']])
+  })
+})
+
+describe('Tier B — mybatisModel 있으면 기능×테이블 / 테이블+컬럼', () => {
+  const ORDER_XML = `<mapper namespace="com.shop.OrderMapper">
+    <insert id="insertOrder"> INSERT INTO ORDERS (ID, USERID, TOTAL) VALUES (?,?,?) </insert>
+    <select id="getOrder"> SELECT * FROM ORDERS WHERE ID = ? </select>
+  </mapper>`
+  const PRODUCT_XML = `<mapper namespace="com.shop.ProductMapper">
+    <select id="getProductList"> SELECT * FROM PRODUCT WHERE CATEGORY = ? </select>
+  </mapper>`
+  const model = buildMyBatisModel([
+    { relPath: 'OrderMapper.xml', content: ORDER_XML },
+    { relPath: 'ProductMapper.xml', content: PRODUCT_XML },
+  ])
+  const mybInput = { ...INPUT, mybatisModel: model }
+
+  it('crud-matrix: 열=테이블, CRUD 는 SQL 문에서([확정])', () => {
+    const doc = buildCrudMatrix(mybInput)
+    expect(doc.sections[0].table!.columns).toEqual(['기능', 'ORDERS', 'PRODUCT'])
+    // place 흐름: insertOrder(C)+getOrder(R)→ORDERS 'CR', getProductList(R)→PRODUCT 'R'.
+    expect(cells(doc)).toEqual([['주문생성', 'CR', 'R']])
+    expect(doc.sections[0].table!.rows[0].confidence).toBe('CONFIRMED')
+    expect(doc.sections[0].table!.rows[0].evidence.length).toBeGreaterThan(0)
+  })
+
+  it('crud-matrix: mybatisModel 없으면 기능×DAO 폴백', () => {
+    expect(buildCrudMatrix(INPUT).sections[0].table!.columns).toEqual(['기능', 'OrderMapper', 'ProductMapper'])
+  })
+
+  it('si-테이블정의서: 테이블별 섹션 + INSERT 컬럼([확정])', () => {
+    const doc = buildSiTableSpec(mybInput)
+    expect(doc.sections.map((s) => s.heading)).toEqual(['ORDERS 테이블', 'PRODUCT 테이블'])
+    const orders = doc.sections[0].table!
+    expect(orders.rows.map((r) => r.cells[0])).toEqual(['ID', 'TOTAL', 'USERID'])
+    expect(orders.rows[0].confidence).toBe('CONFIRMED')
+    // SELECT 전용 PRODUCT 는 컬럼 미추출(행 0).
+    expect(doc.sections[1].table!.rows).toEqual([])
   })
 })
 

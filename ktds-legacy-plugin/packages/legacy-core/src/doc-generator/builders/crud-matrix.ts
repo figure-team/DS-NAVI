@@ -1,21 +1,21 @@
 /**
- * 07_crud-matrix.md — CRUD 매트릭스 빌더(D2).
+ * 07_crud-matrix.md — CRUD 매트릭스 빌더(D2 + Tier B).
  *
- * 행=기능(flow), 열=기능 + 접근 DAO(매퍼) 파일(동적 생성, matrix 섹션). 셀=C/R/U/D.
- * flow→flow_step→step(layer=dao) 로 접근 DAO 를 도출(접근 자체는 [확정] 사실)하고,
- * 그 DAO 로 들어가는 calls 의 메서드명에서 C/R/U/D 를 추론한다([추정] — 이름 규칙 휴리스틱).
- * 메서드 단서가 없으면 접근표시 '○'. 테이블 단위(기능×테이블)는 MyBatis Mapper XML SQL
- * 테이블 추출 보강 후 확장(현재 그래프에 테이블 노드 없음) — 정직성.
+ * mybatisModel 이 있으면 **기능×테이블**: flow→dao step(매퍼)→사용 메서드→매퍼 문(statement)
+ * 으로 테이블과 CRUD 를 SQL 문 종류에서 직접 판정([확정], 근거=Mapper XML file:line).
+ * 없으면 폴백 **기능×DAO(매퍼)**: 메서드명 접두 규칙으로 CRUD 추론([추정]).
  *
- * 결정론: 열=DAO basename asc, 행=flow id asc. 행 신뢰도=INFERRED(CRUD 추론).
+ * 결정론: 열=테이블/DAO basename asc, 행=flow id asc.
  */
-import type { GeneratedDoc, TableRow } from '../types.js'
+import type { GeneratedDoc, Evidence, TableRow } from '../types.js'
 import { type DocInput, nodesOfType } from './shared.js'
+import { namespaceBaseName } from '../../mybatis/index.js'
+import type { MyBatisModel } from '../../mybatis/types.js'
 
 const cmp = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
 
-/** 메서드명 → CRUD 글자(접두 규칙). 미상이면 null. */
-function crudOf(method: string): 'C' | 'R' | 'U' | 'D' | null {
+/** 메서드명 → CRUD 글자(접두 규칙, 폴백 경로). 미상이면 null. */
+function crudOf(method: string): string | null {
   const m = method.toLowerCase()
   if (/^(insert|save|add|create|regist|new|persist)/.test(m)) return 'C'
   if (/^(update|modify|edit|set|merge|change)/.test(m)) return 'U'
@@ -24,38 +24,116 @@ function crudOf(method: string): 'C' | 'R' | 'U' | 'D' | null {
   return null
 }
 
-/** calls 엣지 description("caller → callee")에서 callee 쪽 식별자들. */
+/**
+ * calls 엣지 description 의 사용 메서드들. description 은 "m1 → m2 → m3 …" 형태로 caller 가
+ * callee(매퍼) 에서 호출 순서대로 쓰는 **메서드 전부**를 나열한다(skeleton P1). 모든 토큰을
+ * 추출한다(매퍼 메서드명 = MyBatis statement id).
+ */
 function calleeMethods(desc: string | undefined): string[] {
   if (!desc) return []
-  const seg = desc.includes('→') ? desc.slice(desc.lastIndexOf('→') + 1) : desc
-  return seg.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []
+  return desc.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []
 }
 
-/** 파일 경로 → basename(확장자 제거) — DAO 열 라벨. */
 function baseName(filePath: string): string {
   return (filePath.split('/').pop() ?? filePath).replace(/\.[^.]+$/, '')
 }
 
-/** CRUD 글자 집합 → 'CRUD' 정준 순서 문자열. 비었으면 접근표시. */
+/** CRUD 글자 집합 → 'CRUD' 정준 순서 문자열. 비었으면 접근표시 '○'. */
 function crudCell(letters: Set<string>): string {
   if (letters.size === 0) return '○'
   return ['C', 'R', 'U', 'D'].filter((l) => letters.has(l)).join('')
 }
 
-export function buildCrudMatrix(input: DocInput): GeneratedDoc {
+function doc(columns: string[], rows: TableRow[], prose?: string): GeneratedDoc {
+  return {
+    docId: '07_crud-matrix',
+    title: 'CRUD 매트릭스',
+    methodology: 'as-built',
+    sections: [{ heading: 'CRUD 매트릭스', key: 'crud-matrix', claims: [], ...(prose ? { prose } : {}), table: { columns, rows } }],
+  }
+}
+
+/** 정밀도 caveat — calls 엣지의 사용 메서드 라벨이 파일 단위라, 같은 매퍼를 쓰는 흐름들은
+ *  그 매퍼의 CRUD 전체가 귀속될 수 있다(기능별 핸들러 정밀 추적은 후속). */
+const TABLE_PROSE =
+  'CRUD 는 기능이 도달하는 매퍼가 해당 테이블에 수행하는 SQL 문 종류(select=R/insert=C/update=U/delete=D)에서 판정한다. ' +
+  '사용 메서드 라벨이 파일 단위이므로 같은 매퍼를 공유하는 기능들은 그 매퍼의 CRUD 전체가 귀속될 수 있다(핸들러 단위 정밀 추적은 후속). 근거=Mapper XML file:line.'
+
+/** 기능×테이블 (mybatisModel 기반, SQL 문에서 CRUD 판정 → [확정]). */
+function buildByTable(input: DocInput, model: MyBatisModel): GeneratedDoc {
   const stepById = new Map(input.nodes.filter((n) => n.type === 'step').map((n) => [n.id, n]))
-  // flow id → (dao 파일 → CRUD 글자 집합).
-  const flowDao = new Map<string, Map<string, Set<string>>>()
-  // dao 스텝 id → 그 스텝으로 들어오는 calls 의 callee 메서드들.
-  const incomingMethods = new Map<string, string[]>()
+  // 매퍼 basename → {namespace 문맵, relPath}.
+  const mapperByBase = new Map<string, { stmts: Map<string, { crud: string; tables: string[]; line: number }>; relPath: string }>()
+  for (const m of model.mappers) {
+    const stmts = new Map(m.statements.map((s) => [s.id, { crud: s.crud, tables: s.tables, line: s.line }]))
+    mapperByBase.set(namespaceBaseName(m.namespace), { stmts, relPath: m.relPath })
+  }
+  // dao 스텝 id → 사용 메서드(들어오는 calls 의 callee).
+  const incoming = new Map<string, string[]>()
   for (const e of input.edges) {
     if (e.type !== 'calls') continue
-    const prev = incomingMethods.get(e.target) ?? []
-    incomingMethods.set(e.target, [...prev, ...calleeMethods(e.description)])
+    incoming.set(e.target, [...(incoming.get(e.target) ?? []), ...calleeMethods(e.description)])
   }
 
   const flows = nodesOfType(input.nodes, 'flow')
-  const daoFilesSet = new Set<string>()
+  const tablesSet = new Set<string>()
+  const perFlow = new Map<string, { byTable: Map<string, Set<string>>; ev: Evidence[] }>()
+  for (const flow of flows) {
+    const byTable = new Map<string, Set<string>>()
+    const ev: Evidence[] = []
+    const evSeen = new Set<string>()
+    for (const e of input.edges) {
+      if (e.type !== 'flow_step' || e.source !== flow.id) continue
+      const step = stepById.get(e.target)
+      if (!step || step.layer !== 'dao' || typeof step.filePath !== 'string') continue
+      const mapper = mapperByBase.get(baseName(step.filePath))
+      if (!mapper) continue
+      for (const method of incoming.get(step.id) ?? []) {
+        const stmt = mapper.stmts.get(method)
+        if (!stmt) continue
+        for (const t of stmt.tables) {
+          tablesSet.add(t)
+          const set = byTable.get(t) ?? new Set<string>()
+          set.add(stmt.crud)
+          byTable.set(t, set)
+        }
+        const key = `${mapper.relPath}:${stmt.line}`
+        if (!evSeen.has(key)) {
+          evSeen.add(key)
+          ev.push({ file: mapper.relPath, line: stmt.line })
+        }
+      }
+    }
+    perFlow.set(flow.id, { byTable, ev })
+  }
+
+  const tableCols = [...tablesSet].sort(cmp)
+  const columns = ['기능', ...tableCols]
+  const rows: TableRow[] = flows.map((flow): TableRow => {
+    const { byTable, ev } = perFlow.get(flow.id)!
+    const cells = [
+      flow.name.length > 0 ? flow.name : flow.id,
+      ...tableCols.map((t) => (byTable.has(t) ? crudCell(byTable.get(t)!) : '')),
+    ]
+    // 테이블 접근(근거 보유)이 있으면 CONFIRMED(SQL 문 근거), 없으면 INFERRED(접근 없음).
+    return ev.length > 0
+      ? { cells, confidence: 'CONFIRMED', evidence: ev }
+      : { cells, confidence: 'INFERRED', evidence: [] }
+  })
+  return doc(columns, rows, TABLE_PROSE)
+}
+
+/** 기능×DAO(매퍼) 폴백 — 메서드명 CRUD 추론([추정]). */
+function buildByDao(input: DocInput): GeneratedDoc {
+  const stepById = new Map(input.nodes.filter((n) => n.type === 'step').map((n) => [n.id, n]))
+  const incoming = new Map<string, string[]>()
+  for (const e of input.edges) {
+    if (e.type !== 'calls') continue
+    incoming.set(e.target, [...(incoming.get(e.target) ?? []), ...calleeMethods(e.description)])
+  }
+  const flows = nodesOfType(input.nodes, 'flow')
+  const daoSet = new Set<string>()
+  const perFlow = new Map<string, Map<string, Set<string>>>()
   for (const flow of flows) {
     const perDao = new Map<string, Set<string>>()
     for (const e of input.edges) {
@@ -63,38 +141,35 @@ export function buildCrudMatrix(input: DocInput): GeneratedDoc {
       const step = stepById.get(e.target)
       if (!step || step.layer !== 'dao' || typeof step.filePath !== 'string') continue
       const dao = baseName(step.filePath)
-      daoFilesSet.add(dao)
+      daoSet.add(dao)
       const letters = perDao.get(dao) ?? new Set<string>()
-      for (const meth of incomingMethods.get(step.id) ?? []) {
+      for (const meth of incoming.get(step.id) ?? []) {
         const c = crudOf(meth)
         if (c) letters.add(c)
       }
       perDao.set(dao, letters)
     }
-    flowDao.set(flow.id, perDao)
+    perFlow.set(flow.id, perDao)
   }
-
-  const daoCols = [...daoFilesSet].sort(cmp)
+  const daoCols = [...daoSet].sort(cmp)
   const columns = ['기능', ...daoCols]
   const rows: TableRow[] = flows.map((flow): TableRow => {
-    const perDao = flowDao.get(flow.id)!
+    const perDao = perFlow.get(flow.id)!
     const cells = [
       flow.name.length > 0 ? flow.name : flow.id,
-      ...daoCols.map((dao) => (perDao.has(dao) ? crudCell(perDao.get(dao)!) : '')),
+      ...daoCols.map((d) => (perDao.has(d) ? crudCell(perDao.get(d)!) : '')),
     ]
     return {
       cells,
       confidence: 'INFERRED',
-      evidence: typeof flow.filePath === 'string'
-        ? [{ file: flow.filePath, line: flow.lineRange ? flow.lineRange[0] : null }]
-        : [],
+      evidence: typeof flow.filePath === 'string' ? [{ file: flow.filePath, line: flow.lineRange ? flow.lineRange[0] : null }] : [],
     }
   })
+  return doc(columns, rows)
+}
 
-  return {
-    docId: '07_crud-matrix',
-    title: 'CRUD 매트릭스',
-    methodology: 'as-built',
-    sections: [{ heading: 'CRUD 매트릭스', key: 'crud-matrix', claims: [], table: { columns, rows } }],
-  }
+export function buildCrudMatrix(input: DocInput): GeneratedDoc {
+  return input.mybatisModel && input.mybatisModel.mappers.length > 0
+    ? buildByTable(input, input.mybatisModel)
+    : buildByDao(input)
 }

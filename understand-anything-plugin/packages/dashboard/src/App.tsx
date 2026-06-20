@@ -31,6 +31,7 @@ import { I18nProvider, useI18n } from "./contexts/I18nContext.tsx";
 // Lazy-load heavy / optional components so they ship in separate chunks.
 const CodeViewer = lazy(() => import("./components/CodeViewer"));
 const LearnPanel = lazy(() => import("./components/LearnPanel"));
+const DocsView = lazy(() => import("./components/DocsView")); // ktds-fork (D3): 산출물 문서 편집/확정
 const PathFinderModal = lazy(() => import("./components/PathFinderModal"));
 const KeyboardShortcutsHelp = lazy(
   () => import("./components/KeyboardShortcutsHelp"),
@@ -325,6 +326,7 @@ function DashboardContent({
   // ktds-fork: 도메인 탭 = 완전 독립 풀페이지. U-A 크롬(사이드바/검색/코드뷰어/범례/토글)을
   // 전부 숨기고 도메인 3화면(지도→흐름목록→흐름스파인)만 헤더 아래 전면 노출한다.
   const isDomainPage = viewMode === "domain" && Boolean(domainGraph);
+  const isDocsPage = viewMode === "docs"; // ktds-fork (D3): 산출물 문서 풀페이지
 
   // 브레드크럼 세그먼트 이름 — 도메인/흐름 노드는 domainGraph에서 id로 조회.
   const activeDomainName = useMemo(() => {
@@ -581,6 +583,19 @@ function DashboardContent({
                     문서
                   </button>
                 )}
+                {/* ktds-fork (D3): 산출물(SI .md) 편집/확정 뷰. */}
+                <button
+                  type="button"
+                  onClick={() => setViewMode("docs")}
+                  title="산출물 문서(편집·확정)"
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === "docs"
+                      ? "bg-accent/20 text-accent"
+                      : "text-text-muted hover:text-text-secondary"
+                  }`}
+                >
+                  산출물
+                </button>
               </div>
             </>
           )}
@@ -639,8 +654,8 @@ function DashboardContent({
           </nav>
         ) : (
         <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
-          {/* ktds-fork (ADR-004): 문서 모드는 이 블록 전체를 숨김(아래 개별 가드 불필요) */}
-          {viewMode !== "wiki" && (
+          {/* ktds-fork (ADR-004 + D3): 문서/산출물 모드는 이 블록 전체를 숨김 */}
+          {viewMode !== "wiki" && viewMode !== "docs" && (
           <div className="flex items-center gap-4 w-max">
             <DiffToggle />
             {/* Detail level: file view (architecture) / class view (code structure) */}
@@ -797,8 +812,12 @@ function DashboardContent({
         </div>
       )}
 
-      {/* ktds-fork: 도메인 풀페이지 — 사이드바·코드뷰어 없이 3화면을 전면 노출. */}
-      {isDomainPage ? (
+      {/* ktds-fork (D3): 산출물 문서 풀페이지 — 목록+본문 편집/확정. */}
+      {isDocsPage ? (
+        <Suspense fallback={<div className="flex-1" />}>
+          <DocsView />
+        </Suspense>
+      ) : isDomainPage ? (
         <div className="flex-1 min-h-0 relative">
           {activeDomainId ? (
             <FlowListView />

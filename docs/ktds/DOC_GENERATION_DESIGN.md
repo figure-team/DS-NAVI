@@ -72,7 +72,8 @@ ERD)는 추출 보강 필요 → D2 이후 점진 확장 후보.
   - DocsView: 좌측 목록(제목+확정 배지)+우측 본문(monospace 뷰/textarea 편집). 저장=즉시 확정 →
     TrustBadge '✓ 확정(approver)' 반영. approver=approverHandle/localStorage/1회 입력. App '산출물' 탭+풀페이지.
   - 헤드리스 QA: 9문서·편집→저장→확정(qa-user) 배지+내용 반영, 콘솔 에러 0. dashboard 129·코어불변식 ∅.
-  - 폴리시 후보: 본문 GFM 표 렌더(현재 monospace, remark-gfm 미설치) · DocsView i18n(현재 ko 리터럴).
+  - 본문 GFM 표 렌더 ✅(커밋 833a59c, react-markdown + remark-gfm, 다크테마 표). DocsView i18n 은
+    ko 리터럴 유지(사용자 확정: ko 충분).
 
 > **기능 완결**: D1(템플릿 9종)·D2(런타임 로드+생성)·Tier B(테이블 추출)·CRUD 정밀화·D3(편집/확정)
 > 전부 완료. 사용자 정의 흐름(템플릿→생성→커스텀→편집/확정→화면 반영) 충족.

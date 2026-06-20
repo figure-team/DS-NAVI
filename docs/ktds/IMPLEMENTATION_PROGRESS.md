@@ -37,5 +37,5 @@
 
 ## 알려진 이월(P5/P6에서 해소)
 - db-spec `reads_from`/`writes_to` 엣지 + JPA/MyBatis 컬럼 메타 → P6 enrich (현재 calls 엣지 기반 [추정]).
-- 대시보드 픽셀(AC-4/AC-5 실제 렌더)은 헤드리스 환경 미검증 → 수동 시각 QA 필요(`pnpm --filter @understand-anything/dashboard dev`).
+- 대시보드 픽셀(AC-4/AC-5 실제 렌더): **헤드리스 시각 QA 완료(2026-06-20, jpetstore-6)** — playwright(chromium)로 화면1(도메인 카드+GroundedBar)·화면2(기능 목록, 행 레이아웃·라우트 URL·✓배지)·화면3(인라인 스파인, 근거 칩·1-step 포워딩 핸들러) 렌더 확인. 단 **헤드리스에 CJK 폰트 부재로 한글이 두부(□)로 렌더** — 레이아웃/테마/요소는 정상, 텍스트 내용은 DOM innerText 로 별도 검증. 완전한 한글 픽셀 QA(CI 포함)는 `fonts-noto-cjk` 설치 필요. diff-overlay.json 404 는 선택 기능 미설정 시 graceful(버그 아님).
 - 신뢰도 단일 소스: `CONFIRMED/CONFIRMED_AI/INFERRED/UNVERIFIED` (블루프린트의 CONFIRMED_HUMAN/NEEDS_REVIEW 대신; 사람확정은 doc-state로).

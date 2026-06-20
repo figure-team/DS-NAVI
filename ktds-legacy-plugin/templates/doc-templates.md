@@ -1,8 +1,10 @@
-# 산출물 문서 기본 템플릿 (Component 5)
+# 산출물 문서 계약 스펙 (Component 5)
 
-> 목적: 산출물 생성 시 **각 문서가 동일한 구조**를 따르도록 하는 기본 템플릿(AC-36).
+> 목적: 산출물 생성 시 **각 문서가 동일한 구조**를 따르도록 하는 공통 계약(AC-36).
 > 적용: doc-generator(`@ktds/legacy-core` doc-generator) + SI표준 방법론 모듈(보완 C).
-> 이 파일은 플러그인에 동봉되어 사람이 편집 가능하며, 렌더러가 런타임에 로드한다(편집 즉시 반영).
+> **이 파일 = 계약/형식 스펙(권위).** 문서별 **기본 템플릿(.md)**은 `templates/doc/` 에 있으며
+> 사람 편집 가능(플러그인 기본 + 프로젝트 override). 런타임 로드·생성 연결은 doc-generator
+> 구현 단계 작업이다(현재 빌더는 아래 §1~§2 구조를 코드로 미러). 템플릿 형식은 `templates/doc/_README.md`.
 > 데이터 모델: `GeneratedDoc{docId,title,methodology,sections[]}` · `Section{heading,prose?,claims[]}` ·
 > `Claim{text,confidence,evidence[],requiresHumanReview}`. confidence 는 `CONFIDENCE_VALUES` 단일 소스와 일치.
 

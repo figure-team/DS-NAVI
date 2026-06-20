@@ -1,0 +1,18 @@
+---
+docId: si-인터페이스정의서
+title: SI 인터페이스정의서
+methodology: si-standard
+---
+
+<!--
+  SI 인터페이스정의서(API) 기본 템플릿. 사람 편집 가능(플러그인 기본).
+  프로젝트 override: <proj>/.understand-anything/doc/interface-spec.md
+  형식·신뢰도 규약: _README.md 참조. 신뢰도·근거 열은 렌더러가 자동 부가.
+-->
+
+## API 목록 {#api-list}
+
+라우트 1건 = 표 1행. 경로/HTTP/핸들러는 라우트 추출 사실 → [확정] + 근거(file:line).
+요청/응답/인증은 그래프에 없어 추론 → [추정]. API_ID=API-001.. (routeId 정렬 순서).
+
+| API_ID | HTTP | 경로 | 컨트롤러·핸들러 | 요청 | 응답 | 인증 |

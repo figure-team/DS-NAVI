@@ -42,13 +42,21 @@ ERD)는 추출 보강 필요 → D2 이후 점진 확장 후보.
   (형식·바인딩키 어휘·신뢰도 규약). `doc-templates.md` 헤더의 잘못된 "런타임 로드" 문구 정정
   (계약 스펙으로 역할 명확화). 기본값(헤딩·컬럼·docId)은 **현재 빌더 출력과 1:1**로 인코딩 →
   D2 연결 시 골든 스냅샷 보존.
-- **D2 — 템플릿 런타임 로드 + 생성 연결.** 엔진에 순수 파서 `parseDocTemplate`(node-template.ts
-  의 parseNodeDetailTemplate 동형: frontmatter + `## 라벨 {#바인딩키}` + 표 컬럼 헤더 1줄).
-  understand-docs.mjs 가 IO(프로젝트 override → 플러그인 폴백, loadNodeDetailTemplate 동형).
-  빌더는 헤딩/제목/컬럼을 **템플릿에서** 가져오고(바인딩키로 매핑), 미정의 시 DEFAULT 상수 폴백.
-  신규 빌더 4종: 06_program-list(file/class), 07_crud-matrix(flow→dao→table + 매퍼 SQL C/R/U/D
-  판정), 08_batch-list(routes.batchEntries), 09_impact-analysis(fan-in/out + impact reach +
-  교차도메인 엣지). 게이트: 골든 스냅샷(기존 5종=현출력) 불변 + 신규 4 doc 스냅샷.
+- **D2 — 템플릿 런타임 로드 + 생성 연결. ✅ 완료(커밋 200c4d3·b5c9f2d·d4fcfa9).**
+  - D2.1 `doc-template.ts`: parseDocTemplate(frontmatter + `## 라벨 {#바인딩키}` + 표 컬럼 헤더 1줄)
+    + applyDocTemplate(제목·헤딩·컬럼·순서 덮어쓰기, 컬럼 수 같을 때만 rename=매트릭스 안전,
+    반복 섹션=테이블별 N섹션 지원). Section 에 binding key(additive). 테스트 +16.
+  - D2.2 신규 빌더 4종 + `doc-set.ts`(DOC_SET: docId↔빌더↔템플릿). 기존 5+SI3 에 key 부여.
+    **현실 제약 반영**: MyBatis 라 table 노드 없음 → 07_crud-matrix 는 **기능×DAO(매퍼)** + 메서드명
+    CRUD 추론([추정], 테이블 단위는 Tier B). 09 는 calls 엣지 fan-in/out + reach + 도메인쌍.
+    테스트 +19(골든 4 + applyDocTemplate 라운드트립=기본 템플릿 byte-identical). legacy-core 574.
+  - D2.3 understand-docs.mjs: 템플릿 로드(override→폴백) + 9종 생성 + `.md` 출력
+    (`.understand-anything/doc-output/<docId>.md`). 입력=**디스크 fill 그래프 + routes.json**.
+    ⚠️ **buildMap 호출 금지**: buildMap→emitDomainGraph 가 domain-graph.json 을 결정론 skeleton 으로
+    재-emit(LLM 채움 소실)함. understand-docs 는 디스크 그래프를 읽기만(비파괴). 채움 갱신은
+    understand-map `map`→`emit` 으로만.
+  - 잔여(refine): si-기능명세서 행 신뢰도가 domain 노드 filePath 부재로 [추정] — domainMeta.ktdsClaims
+    인용을 행 근거로 승계하면 [확정] 승격 가능(Tier B 후속).
 - **D3 — 편집/확정 + 대시보드.** 생성 `.md` 를 대시보드에서 보기/편집 → dev서버 `POST /doc`
   (토큰+화이트리스트, node-overrides 패턴) → `<proj>/.understand-anything/doc-output/<docId>.md`
   저장(생성물과 분리) → 저장=즉시 **확정(approver)** (doc-overrides.json: editedAt+approver+audit).

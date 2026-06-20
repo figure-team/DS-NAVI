@@ -369,6 +369,11 @@ function docTitle(content: string, docId: string): string {
   const m = /\ntitle:\s*(.+?)\s*\n/.exec(content.slice(0, 400));
   return m ? m[1].trim() : docId;
 }
+/** frontmatter 의 methodology(없으면 빈 문자열) — 사이드바 폴더 그룹핑용. */
+function docMethodology(content: string): string {
+  const m = /\nmethodology:\s*(.+?)\s*\n/.exec(content.slice(0, 400));
+  return m ? m[1].trim() : "";
+}
 /** 문서 본문 — 편집 오버레이 우선, 없으면 생성물. 실패 시 null. */
 function readDocContent(docId: string): string | null {
   const ov = readDocOverrides()[docId];
@@ -586,6 +591,7 @@ export default defineConfig({
               return {
                 docId,
                 title: docTitle(content, docId),
+                methodology: docMethodology(content),
                 confirmed: !!o,
                 approver: o?.approver ?? null,
                 at: o?.at ?? null,

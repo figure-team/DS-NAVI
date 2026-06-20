@@ -62,12 +62,22 @@ const MD_COMPONENTS = {
 interface DocListItem {
   docId: string;
   title: string;
+  methodology?: string;
   confirmed: boolean;
   approver: string | null;
   at: string | null;
 }
 
 const APPROVER_LS_KEY = "ktds.approver";
+
+/** 방법론 → 사이드바 폴더 라벨 + 순서. 미분류는 '기타'. */
+const FOLDERS: Array<{ key: string; label: string }> = [
+  { key: "as-built", label: "현행 분석" },
+  { key: "si-standard", label: "SI 표준 산출물" },
+  { key: "_other", label: "기타" },
+];
+const folderKeyOf = (m?: string): string =>
+  m === "as-built" || m === "si-standard" ? m : "_other";
 
 export default function DocsView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
@@ -83,6 +93,7 @@ export default function DocsView() {
   const [draft, setDraft] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   const tokenQ = accessToken ? `?token=${encodeURIComponent(accessToken)}` : "";
   const canWrite = Boolean(accessToken);
@@ -200,31 +211,70 @@ export default function DocsView() {
               <code>understand-docs</code> 를 먼저 실행하세요.
             </p>
           ) : (
-            <div className="flex flex-col gap-1.5">
-              {docs.map((d) => {
-                const isSel = d.docId === selected;
+            <div className="flex flex-col">
+              {FOLDERS.map((folder) => {
+                const items = docs.filter((d) => folderKeyOf(d.methodology) === folder.key);
+                if (items.length === 0) return null;
+                const isOpen = !collapsed.has(folder.key);
                 return (
-                  <button
-                    key={d.docId}
-                    type="button"
-                    onClick={() => setSelected(d.docId)}
-                    className="flex flex-col gap-1 text-left rounded-lg border cursor-pointer transition-colors w-full"
-                    style={{
-                      padding: "9px 11px",
-                      background: isSel ? "rgba(212,165,116,0.07)" : "var(--color-elevated)",
-                      borderColor: isSel ? "var(--color-accent)" : "var(--color-border-subtle)",
-                    }}
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-text-primary" style={{ fontSize: 12.5, lineHeight: 1.35 }}>
-                        {d.title}
+                  <div key={folder.key} className="mb-1">
+                    {/* 폴더 헤더 — 접기/펼치기 */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCollapsed((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(folder.key)) next.delete(folder.key);
+                          else next.add(folder.key);
+                          return next;
+                        })
+                      }
+                      className="flex items-center gap-1.5 w-full text-left rounded-md hover:bg-elevated/60 transition-colors cursor-pointer"
+                      style={{ padding: "5px 6px" }}
+                    >
+                      <span className="text-text-muted" style={{ fontSize: 9, width: 10, display: "inline-block" }}>
+                        {isOpen ? "▾" : "▸"}
                       </span>
-                      {d.confirmed && <TrustBadge confirmedBy={d.approver} className="ml-auto" />}
-                    </div>
-                    <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}>
-                      {d.docId}
-                    </span>
-                  </button>
+                      <span style={{ fontSize: 12 }}>{isOpen ? "📂" : "📁"}</span>
+                      <span className="text-text-secondary" style={{ fontSize: 11.5, fontWeight: 600 }}>
+                        {folder.label}
+                      </span>
+                      <span className="text-text-muted ml-auto" style={{ fontSize: 10, fontFamily: "var(--font-mono)" }}>
+                        {items.length}
+                      </span>
+                    </button>
+                    {/* 폴더 내 문서 — 들여쓰기 + 트리 가이드 라인 */}
+                    {isOpen && (
+                      <div className="flex flex-col" style={{ marginLeft: 10, borderLeft: "1px solid var(--color-border-subtle)", paddingLeft: 6 }}>
+                        {items.map((d) => {
+                          const isSel = d.docId === selected;
+                          return (
+                            <button
+                              key={d.docId}
+                              type="button"
+                              onClick={() => setSelected(d.docId)}
+                              title={d.docId}
+                              className="flex items-center gap-1.5 text-left rounded-md cursor-pointer transition-colors w-full"
+                              style={{
+                                padding: "6px 8px",
+                                background: isSel ? "rgba(212,165,116,0.10)" : "transparent",
+                                color: isSel ? "var(--color-accent)" : undefined,
+                              }}
+                            >
+                              <span style={{ fontSize: 11, opacity: 0.8 }}>📄</span>
+                              <span
+                                className={isSel ? "" : "text-text-secondary"}
+                                style={{ fontSize: 12, lineHeight: 1.3, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                              >
+                                {d.title}
+                              </span>
+                              {d.confirmed && <TrustBadge confirmedBy={d.approver} className="ml-auto shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>

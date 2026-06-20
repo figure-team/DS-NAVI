@@ -1,7 +1,55 @@
 import { useCallback, useEffect, useState } from "react";
+import type { ComponentPropsWithoutRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { useDashboardStore } from "../store";
 import TrustBadge from "./TrustBadge";
+
+/** 표시용 frontmatter(--- ... ---) 제거 — 메타는 헤더/배지로 노출, 본문엔 불필요. */
+function stripFrontmatter(md: string): string {
+  return md.replace(/^﻿?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+}
+
+/** 다크 테마 마크다운 컴포넌트(GFM 표 포함). 인라인 스타일로 테마 변수 사용. */
+const MD_COMPONENTS = {
+  h1: (p: ComponentPropsWithoutRef<"h1">) => (
+    <h1 style={{ fontSize: 19, color: "var(--color-text-primary)", margin: "4px 0 14px", fontFamily: "var(--font-heading)" }} {...p} />
+  ),
+  h2: (p: ComponentPropsWithoutRef<"h2">) => (
+    <h2 style={{ fontSize: 15, color: "var(--color-accent)", margin: "22px 0 10px", paddingBottom: 4, borderBottom: "1px solid var(--color-border-subtle)" }} {...p} />
+  ),
+  h3: (p: ComponentPropsWithoutRef<"h3">) => (
+    <h3 style={{ fontSize: 13, color: "var(--color-text-primary)", margin: "16px 0 8px" }} {...p} />
+  ),
+  p: (p: ComponentPropsWithoutRef<"p">) => (
+    <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.65, margin: "8px 0" }} {...p} />
+  ),
+  ul: (p: ComponentPropsWithoutRef<"ul">) => (
+    <ul style={{ margin: "8px 0", paddingLeft: 20, listStyle: "disc" }} {...p} />
+  ),
+  li: (p: ComponentPropsWithoutRef<"li">) => (
+    <li style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.6, margin: "3px 0" }} {...p} />
+  ),
+  blockquote: (p: ComponentPropsWithoutRef<"blockquote">) => (
+    <blockquote style={{ borderLeft: "3px solid var(--color-border-medium)", margin: "10px 0", padding: "2px 0 2px 12px", color: "var(--color-text-muted)", fontSize: 12.5 }} {...p} />
+  ),
+  code: (p: ComponentPropsWithoutRef<"code">) => (
+    <code style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, background: "var(--color-elevated)", padding: "1px 5px", borderRadius: 4, color: "var(--color-text-primary)" }} {...p} />
+  ),
+  a: (p: ComponentPropsWithoutRef<"a">) => <a style={{ color: "var(--color-accent)" }} {...p} />,
+  table: (p: ComponentPropsWithoutRef<"table">) => (
+    <div style={{ overflowX: "auto", margin: "10px 0" }}>
+      <table style={{ borderCollapse: "collapse", fontSize: 11.5, width: "max-content", minWidth: "100%" }} {...p} />
+    </div>
+  ),
+  th: (p: ComponentPropsWithoutRef<"th">) => (
+    <th style={{ border: "1px solid var(--color-border-subtle)", padding: "5px 9px", background: "var(--color-elevated)", color: "var(--color-text-secondary)", textAlign: "left", whiteSpace: "nowrap", fontWeight: 600 }} {...p} />
+  ),
+  td: (p: ComponentPropsWithoutRef<"td">) => (
+    <td style={{ border: "1px solid var(--color-border-subtle)", padding: "5px 9px", color: "var(--color-text-secondary)", verticalAlign: "top" }} {...p} />
+  ),
+} as const;
 
 /**
  * 산출물 문서 뷰(D3) — 생성된 SI 문서(.md)를 목록·조회·편집·확정한다.
@@ -245,12 +293,11 @@ export default function DocsView() {
                   style={{ fontFamily: "var(--font-mono)", fontSize: 12.5, lineHeight: 1.6, padding: 14, resize: "none" }}
                 />
               ) : (
-                <pre
-                  className="text-text-secondary"
-                  style={{ fontFamily: "var(--font-mono)", fontSize: 12.5, lineHeight: 1.6, whiteSpace: "pre", margin: 0 }}
-                >
-                  {content}
-                </pre>
+                <div style={{ maxWidth: 980 }}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
+                    {stripFrontmatter(content)}
+                  </ReactMarkdown>
+                </div>
               )}
             </div>
           </>

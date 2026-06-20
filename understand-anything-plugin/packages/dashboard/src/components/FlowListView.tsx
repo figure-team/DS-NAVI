@@ -263,21 +263,22 @@ export default function FlowListView() {
                           </span>
                         </span>
                       </div>
-                      {/* Full endpoint — wraps so every character stays visible. */}
+                      {/* Function label ("어떤 기능인지") first — human-readable name
+                          leads, technical entry signature follows below. */}
+                      <span className="text-text-primary" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
+                        {flow.name}
+                      </span>
+                      {/* Full endpoint / entry signature — wraps so every character stays visible. */}
                       <span
-                        className="text-text-primary"
+                        className="text-text-secondary"
                         style={{
                           fontFamily: "var(--font-mono)",
-                          fontSize: 11.5,
+                          fontSize: 11,
                           wordBreak: "break-all",
                           lineHeight: 1.45,
                         }}
                       >
                         {flow.path}
-                      </span>
-                      {/* Function label ("어떤 기능인지") — not the long description. */}
-                      <span className="text-text-secondary" style={{ fontSize: 12, lineHeight: 1.4 }}>
-                        {flow.name}
                       </span>
                     </button>
                   );

@@ -35,8 +35,8 @@
 | 레벨 | 채움 필드 | 개수 특성 | 표시 위치 |
 |---|---|---|---|
 | 도메인 | summary, entities[], businessRules[], crossDomain[] | 도메인당 1묶음(기능 수와 무관, 채움이 큐레이션) | **카드** |
-| 기능(flow) | flow.name, flow.summary + 인용 | 많음(상품추가/삭제/즐겨찾기…) | 화면 2 (후속) |
-| 단계(step) | step.name, step.summary + 인용 | 더 많음 | 화면 3 (후속) |
+| 기능(flow) | flow.name, flow.summary + 인용 | 많음(상품추가/삭제/즐겨찾기…) | 화면 2 ✅ (구현·커밋) |
+| 단계(step) | step.name, step.summary + 인용 | 더 많음 | 화면 3 ✅ (구현·커밋) |
 
 → **기능이 N개여도 카드는 기능을 나열하지 않는다**(개수만). 기능별 상세·기능별 코드 인용은 화면 2/3.
 
@@ -94,13 +94,14 @@
 - **모바일**: 인라인 확장 그리드 리플로우 — 한 번에 하나 확장으로 완화, 코드뷰어는 전체화면 모달 경로.
 - **결정론**: groundedPct는 정수 1자리(verify.ts pct와 동일 규칙) 재사용.
 - **용어 "흐름→기능"은 표시 라벨만**: 내부 모델(`flow:` id, 노드 type `"flow"`, `contains_flow`, `FlowListView`/`FlowSpineView`/`flowModel`)은 불변 — 스키마·엔진·블루프린트 동기화 전반을 건드리는 대규모 리팩터 회피("표시는 기능, 내부는 flow"). 내부 id까지 통일은 별도 큰 작업으로 분리.
-- 화면 2(기능 목록)·화면 3(스파인) 근거·검증 노출은 본 설계 범위 밖(후속) — 우선 도메인 카드(화면 1)에 집중.
+- 화면 2(기능 목록)·화면 3(스파인) 근거·검증 노출은 본 설계의 1차 범위 밖이었으나 후속으로 **구현·커밋 완료**(§9.3) — 우선순위는 도메인 카드(화면 1)였다.
 
 ---
 
-## 9. 구현 상태 / 트레이드오프 / 후속 재개점 (세션 핸드오프)
+## 9. 구현 상태 / 트레이드오프 (세션 핸드오프)
 
-> 화면1 도메인 카드(근거·검증) **5단계 전부 구현·검증·커밋 완료.** 화면2/3은 후속(아래 재개점).
+> 화면1 도메인 카드(근거·검증) **5단계 전부 구현·검증·커밋 완료.** 화면2/3 근거·검증 노출도
+> **후속으로 구현·커밋 완료**(§9.3). 본 설계의 모든 화면 작업이 완결됨.
 
 ### 9.1 완료 커밋
 | 단계 | 커밋 | 내용 |
@@ -129,17 +130,20 @@
   렌더 회귀는 store 단위테스트 + 헤드리스(playwright)로만 커버. 도입 시 CitationChip/GroundedBar/
   DomainCardDetail 렌더 테스트 추가 권장.
 
-### 9.3 후속 재개점 — 화면2(기능 목록)·화면3(스파인) 근거·검증 노출
-- **데이터 이미 준비됨**: `embedVerification`(emit.ts)이 **flow/step 노드에도** ktdsClaims(자기 ref의
-  검증항목)를 임베드한다. 즉 FlowListView(화면2)는 flow 노드의, FlowSpineView(화면3)는 step 노드의
-  `domainMeta.ktdsClaims`를 읽으면 됨(백엔드 추가 작업 거의 없음).
+### 9.3 화면2(기능 목록)·화면3(스파인) 근거·검증 노출 — ✅ 완료·커밋
+- **커밋 `0d25ba1`**: flow/step 노드용 claim 파서(`parseFlowStepClaim`, domainData) + 공유
+  `VerdictBadge`(✓/⚠) + 화면2 FlowListView 행/센터헤더 근거(VerdictBadge+근거라벨+CitationChip) +
+  화면3 FlowSpineView 노드 클릭 사이드바 step 상세 인용 + grounding i18n(7종). 백엔드 추가 0.
+- **데이터 소스**: `embedVerification`(emit.ts)이 flow/step 노드에도 ktdsClaims(자기 ref 검증항목)를
+  임베드 — 화면2는 flow 노드, 화면3는 step 노드의 `domainMeta.ktdsClaims`를 읽음(단일 소스).
 - **재사용 자산**: `CitationChip`·`GroundedBar`·store `openCodeViewerAt`·App 도메인페이지 코드뷰어
-  슬라이드업(이미 마운트)·domainData 파서 패턴(`parseDomainClaims` 동형으로 flow/step용 작성).
-- **작업**: ① flow 노드용 claim 파서(domainData) ② FlowListView 흐름 행/디테일에 CitationChip+배지
-  ③ FlowSpineView step 디테일(노드 클릭 패널)에 인용·근거율 ④ 화면2/3 라벨은 이미 "기능"으로 변경됨.
-- **주의**: 블루프린트 동기화 때 `KtdsNodeDetail`(공유 상세 패널) 제거됨 → 화면2/3 상세는 각
-  컴포넌트 내부 렌더. NodeInfo(사이드바)는 도메인 풀페이지에서 숨김(거기 인용 추가해도 안 보임).
-- **검증 방법**: jpetstore에 `bundle`→합성fill(flows/steps 포함)→`emit` 후 헤드리스로 화면2/3 확인.
+  슬라이드업 + `parseDomainClaims` 동형 파서 패턴.
+- **주의(현행 유지)**: 블루프린트 동기화 때 `KtdsNodeDetail`(공유 상세 패널) 제거됨 → 화면2/3 상세는
+  각 컴포넌트 내부 렌더. NodeInfo(사이드바)는 도메인 풀페이지에서 숨김.
+- **후속 폴리시(2026-06-20 세션)**: 화면2 행 레이아웃(기능명 위/시그니처 아래, `d2171ca`) ·
+  http 흐름 path 를 핸들러 시그니처 대신 라우트 URL 로 표시(`2e35389`) · 포워딩 전용 핸들러에
+  가짜 step 붙던 엔진 버그 수정(`5408c5d`, legacy-core skeleton 메서드 트레이스 권위화).
+- **검증**: dashboard 129 · legacy-core 539 · 코어불변식 ∅ · jpetstore-6 실측(재생성)·헤드리스.
 
 ### 9.4 외부 참고 (codegraph OSS 평가 → §10 별도 문서/메모)
 

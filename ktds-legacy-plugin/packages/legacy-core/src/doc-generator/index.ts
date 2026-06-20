@@ -30,6 +30,13 @@ export type {
 export { claim, claimUnits, confidenceTag, evidenceRate, inferredRatio } from './claims.js'
 export type { ClaimUnit } from './claims.js'
 export {
+  parseDocTemplate,
+  applyDocTemplate,
+  DocTemplateSchema,
+  DocTemplateSectionSchema,
+} from './doc-template.js'
+export type { DocTemplate, DocTemplateSection } from './doc-template.js'
+export {
   renderMarkdown,
   renderSkeleton,
   CLAIMS_FENCE_OPEN,

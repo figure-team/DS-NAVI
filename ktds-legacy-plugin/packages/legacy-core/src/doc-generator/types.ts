@@ -69,6 +69,11 @@ export type Table = z.infer<typeof TableSchema>
  */
 export const SectionSchema = z.object({
   heading: z.string(),
+  /**
+   * 바인딩 키(선택) — 런타임 문서 템플릿(doc-template)이 섹션을 식별해 헤딩/컬럼/순서를
+   * 덮어쓰는 안정 키(렌더에는 안 나옴). 빌더가 부여하며, 템플릿 미적용 시 무시된다.
+   */
+  key: z.string().optional(),
   prose: z.string().optional(),
   claims: z.array(ClaimSchema),
   table: TableSchema.optional(),

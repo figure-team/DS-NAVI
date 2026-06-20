@@ -65,10 +65,17 @@ ERD)는 추출 보강 필요 → D2 이후 점진 확장 후보.
   `reachableMethods`(method-calls.ts) 로 흐름 핸들러(entryPoint Class#method)에서 BFS 도달하는 매퍼
   메서드만 귀속(buildByTablePrecise). understand-docs 가 method-calls.json 전달. graph 없으면 파일단위
   폴백. 실측: editAccount=ACCOUNT RU, newAccount=CR, signon=R(과거 셋 다 CRU 동일 → 정정). legacy-core 589.
-- **D3 — 편집/확정 + 대시보드.** 생성 `.md` 를 대시보드에서 보기/편집 → dev서버 `POST /doc`
-  (토큰+화이트리스트, node-overrides 패턴) → `<proj>/.understand-anything/doc-output/<docId>.md`
-  저장(생성물과 분리) → 저장=즉시 **확정(approver)** (doc-overrides.json: editedAt+approver+audit).
-  대시보드 문서 뷰 + `확정(사용자명)` 배지(TrustBadge 재사용). approver=understanding.config.approver.
+- **D3 — 편집/확정 + 대시보드. ✅ 완료(커밋 fa0b25f 대시보드 + 직전 dev서버).**
+  - dev서버(vite.config): GET /doc-list.json · GET /doc-content.json?docId= · POST /doc(토큰 게이트,
+    docId 실존=traversal 방지·approver 필수). 편집은 `.understand-anything/doc-overrides.json` 오버레이
+    (생성물 doc-output 불변, 재생성 생존). 레코드=확정, audit append-only. content 우선=오버레이.
+  - DocsView: 좌측 목록(제목+확정 배지)+우측 본문(monospace 뷰/textarea 편집). 저장=즉시 확정 →
+    TrustBadge '✓ 확정(approver)' 반영. approver=approverHandle/localStorage/1회 입력. App '산출물' 탭+풀페이지.
+  - 헤드리스 QA: 9문서·편집→저장→확정(qa-user) 배지+내용 반영, 콘솔 에러 0. dashboard 129·코어불변식 ∅.
+  - 폴리시 후보: 본문 GFM 표 렌더(현재 monospace, remark-gfm 미설치) · DocsView i18n(현재 ko 리터럴).
+
+> **기능 완결**: D1(템플릿 9종)·D2(런타임 로드+생성)·Tier B(테이블 추출)·CRUD 정밀화·D3(편집/확정)
+> 전부 완료. 사용자 정의 흐름(템플릿→생성→커스텀→편집/확정→화면 반영) 충족.
 
 ## 4. 핵심 결정 (node-detail 재사용)
 - 템플릿 형식·출처우선순위·편집즉시반영 = node-detail 동형([[code-atlas-template-runtime]]).

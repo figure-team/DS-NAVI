@@ -277,13 +277,38 @@ function readEntryMeta(node: GraphNode): { entryPoint?: string; entryType?: stri
   };
 }
 
+const VERB_RE = /^(GET|POST|PUT|DELETE|PATCH|ANY)\b\s*(.*)$/i;
+
+/** PATCH folds into the PUT badge; ANY and the real verbs pass through. */
+function toMethod(verb: string): FlowMethod {
+  const v = verb.toUpperCase();
+  return (v === "PATCH" ? "PUT" : v) as FlowMethod;
+}
+
+/**
+ * For http flows the real route URL lives in the node id, which the engine emits
+ * as `flow:<METHOD> <path>` (e.g. "flow:ANY /actions/Account.action?signon").
+ * Return that URL so the list shows the endpoint, not the handler signature that
+ * `entryPoint` carries (e.g. "AccountActionBean#signonForm"). Returns null when
+ * the id isn't in that shape — e.g. the bundled demo graph uses slug ids
+ * ("flow:order-create"), where the URL is in entryPoint instead.
+ */
+function httpPathFromId(node: GraphNode): { method: FlowMethod; path: string } | null {
+  const body = node.id.startsWith("flow:") ? node.id.slice("flow:".length) : node.id;
+  // Path must start with "/" — guards against slugs and FQN/servlet patterns.
+  const m = body.match(/^(GET|POST|PUT|DELETE|PATCH|ANY)\s+(\/\S.*)$/i);
+  if (!m) return null;
+  return { method: toMethod(m[1]), path: m[2].trim() };
+}
+
 /**
  * Derive the flow's method badge + display path from its entry metadata.
  *
- * - http entry → HTTP verb parsed from `entryPoint` ("POST /orders" → POST,
- *   "/orders/{id}" path). A leading "ANY" (the engine's token for an entry with
- *   no fixed HTTP verb, e.g. event-dispatched Stripes actions) shows as ANY;
- *   a verb-less http entry also resolves to ANY (never a fabricated GET).
+ * - http entry → prefer the real route URL from the node id; otherwise the HTTP
+ *   verb parsed from `entryPoint` ("POST /orders" → POST, "/orders" path). A
+ *   leading "ANY" (the engine's token for an entry with no fixed HTTP verb, e.g.
+ *   event-dispatched Stripes actions) shows as ANY; a verb-less http entry also
+ *   resolves to ANY (never a fabricated GET).
  * - cron / batch → BATCH, event → EVENT. Non-http entries show their
  *   `entryPoint` (job name) or the flow label as the path.
  */
@@ -294,14 +319,13 @@ function deriveMethodAndPath(
 ): { method: FlowMethod; path: string } {
   const type = (entryType ?? "").toLowerCase();
   if (type === "http") {
+    // The route URL is the meaningful "feature path" for screen 2; entryPoint
+    // often holds the handler signature (Stripes/Spring), so the id wins first.
+    const fromId = httpPathFromId(node);
+    if (fromId) return fromId;
     const raw = (entryPoint ?? "").trim();
-    const m = raw.match(/^(GET|POST|PUT|DELETE|PATCH|ANY)\b\s*(.*)$/i);
-    if (m) {
-      const verb = m[1].toUpperCase();
-      // PATCH folds into the PUT badge; ANY and the real verbs pass through.
-      const method = (verb === "PATCH" ? "PUT" : verb) as FlowMethod;
-      return { method, path: m[2].trim() || node.name };
-    }
+    const m = raw.match(VERB_RE);
+    if (m) return { method: toMethod(m[1]), path: m[2].trim() || node.name };
     // Verb-less http entry → ANY (honest "no fixed HTTP verb"), not a guessed GET.
     return { method: "ANY", path: raw || node.name };
   }

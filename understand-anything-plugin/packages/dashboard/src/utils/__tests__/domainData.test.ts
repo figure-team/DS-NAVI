@@ -53,6 +53,46 @@ describe("flowBadge — method derivation", () => {
   });
 });
 
+describe("flowBadge — http path prefers the route URL from the node id", () => {
+  function httpFlow(id: string, entryPoint: string): GraphNode {
+    return {
+      id,
+      type: "flow",
+      name: "x",
+      summary: "",
+      tags: [],
+      complexity: "simple",
+      domainMeta: { entryPoint, entryType: "http" },
+    } as unknown as GraphNode;
+  }
+
+  it("id URL wins over a handler signature in entryPoint", () => {
+    // jpetstore: entryPoint carries the Stripes handler, the URL is in the id.
+    expect(
+      flowBadge(httpFlow("flow:ANY /actions/Account.action", "AccountActionBean#signonForm")),
+    ).toEqual({ method: "ANY", path: "/actions/Account.action" });
+  });
+
+  it("keeps the event/query suffix from the id", () => {
+    expect(
+      flowBadge(httpFlow("flow:ANY /actions/Account.action?signon", "AccountActionBean#signon")),
+    ).toEqual({ method: "ANY", path: "/actions/Account.action?signon" });
+  });
+
+  it("slug id (bundled demo graph) falls back to the entryPoint URL", () => {
+    expect(flowBadge(httpFlow("flow:order-create", "POST /orders"))).toEqual({
+      method: "POST",
+      path: "/orders",
+    });
+  });
+
+  it("non-URL id (servlet pattern) falls back to entryPoint, never a bad path", () => {
+    const b = flowBadge(httpFlow("flow:ANY *.action", "net.sourceforge.x.DispatcherServlet"));
+    expect(b.method).toBe("ANY");
+    expect(b.path).toContain("DispatcherServlet");
+  });
+});
+
 describe("parseFlowStepClaim — flow/step node grounding (screens 2/3)", () => {
   it("reads the flow node's verification item (kind=flow) with citations", () => {
     const node = nodeWithClaims("flow", [

@@ -223,6 +223,23 @@ describe('grounding enrichment (buildDeps / domain citations)', () => {
     expect(fw.every((c) => c.confidence === 'INFERRED')).toBe(true)
   })
 
+  it('architecture: fileEdges 있으면 의존 방향 CONFIRMED + source file:line 근거', () => {
+    const doc = buildArchitecture({
+      ...INPUT,
+      fileEdges: [{ source: 'a/A.java', target: 'b/B.java', kind: 'import', line: 3 }],
+    })
+    const deps = section(doc, '의존 방향').claims
+    expect(deps).toHaveLength(1)
+    expect(deps[0].confidence).toBe('CONFIRMED')
+    expect(deps[0].text).toBe('의존: a/A.java → b/B.java (import)')
+    expect(deps[0].evidence).toEqual([{ file: 'a/A.java', line: 3 }])
+  })
+
+  it('architecture: fileEdges 없으면 calls 엣지 추론(INFERRED) 폴백', () => {
+    const deps = section(buildArchitecture(INPUT), '의존 방향').claims
+    expect(deps.every((c) => c.confidence === 'INFERRED')).toBe(true)
+  })
+
   it('si-기능명세서: 도메인 filePath 없어도 ktdsClaims 인용을 행 근거로 승계(CONFIRMED)', () => {
     const dom = node('domain:x', 'domain', {
       name: 'X',

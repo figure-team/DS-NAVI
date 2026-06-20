@@ -5,7 +5,7 @@
  * 않는다. filePath+lineRange 가 있는 노드만 CONFIRMED(근거 보유)로 올린다.
  */
 import type { UaGraphEdge, UaGraphNode } from '../../domain-map/types.js'
-import type { RoutesReport } from '../../domain-map/types.js'
+import type { RoutesReport, EdgeRecord } from '../../domain-map/types.js'
 import type { JpaModel } from '../../jpa/types.js'
 import type { MyBatisModel } from '../../mybatis/types.js'
 import type { MethodCallGraph } from '../../domain-map/types.js'
@@ -33,6 +33,8 @@ export interface DocInput {
   methodCallGraph?: MethodCallGraph | null
   /** 빌드파일 의존성(pom.xml/gradle) — tech-stack 프레임워크/라이브러리 grounding(file:line). */
   buildDeps?: Array<{ name: string; file: string; line: number }>
+  /** 파일 의존 엣지(edges.json) — architecture 의존 방향/순환 grounding(source file:line). */
+  fileEdges?: EdgeRecord[]
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

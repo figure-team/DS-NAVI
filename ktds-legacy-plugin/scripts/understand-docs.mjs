@@ -154,6 +154,18 @@ function findBuildDeps(root) {
   return out.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
 }
 
+// 파일 의존 엣지(edges.json) — architecture 의존 방향/순환 grounding(없으면 빈 배열).
+let fileEdges = []
+const edgesPath = join(projectRoot, ".spec", "map", "edges.json")
+if (existsSync(edgesPath)) {
+  try {
+    const er = JSON.parse(readFileSync(edgesPath, "utf8"))
+    if (Array.isArray(er.edges)) fileEdges = er.edges
+  } catch {
+    // 손상 시 빈 배열(architecture 는 calls 폴백).
+  }
+}
+
 const langs = deriveLanguages(graph.nodes)
 const project = {
   ...(graph.project ?? {}),
@@ -161,7 +173,7 @@ const project = {
 }
 const buildDeps = findBuildDeps(projectRoot)
 
-const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph, project, buildDeps }
+const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph, project, buildDeps, fileEdges }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 

@@ -86,5 +86,17 @@ ERD)는 추출 보강 필요 → D2 이후 점진 확장 후보.
 - 결정론·근거 보존: 기본 템플릿=현 빌더 출력 → byte-diff 0. 사람 확정은 confidence 아닌 별도 축.
 
 ## 5. 검증 게이트 (매 단계)
-legacy-core 테스트(현 539) · 골든 스냅샷(doc-generator/methodology) · 코어불변식 `git diff ua-base
+legacy-core 테스트(현 592) · 골든 스냅샷(doc-generator/methodology) · 코어불변식 `git diff ua-base
 -- understand-anything-plugin/packages/core`=∅ · dashboard build/test(D3) · jpetstore-6 실측.
+
+## 6. 근거율 현황 (jpetstore-6 실측) + 0% 진단
+| 문서 | 근거율 | 비고 |
+|---|---|---|
+| si-인터페이스정의서·si-테이블정의서·06_program-list·09_impact-analysis·si-기능명세서 | 100% | file:line [확정] |
+| 01_tech-stack | 92% | pom.xml 의존성 [확정] + 언어 [추정](커밋 db1facd) |
+| 07_crud-matrix | ~50% | DB 접근 흐름만 [확정], 포워딩 전용 흐름은 접근 없음(정상) |
+| 02_architecture | 0% | **구조적 한계**: 의존(depends_on/imports) 엣지가 skeleton 그래프(contains_flow/flow_step/calls)에 없음 → 레이어/의존 [추정]. 해소하려면 edges.json(파일 의존)을 DocInput 에 주입하는 후속 필요. |
+| 08_batch-list | 0% | 정상 — 배치 0개(빈 표). |
+
+**0% 해소 이력:** 01_tech-stack(빈 문서)·si-기능명세서(인용 미승계)는 커밋 db1facd 로 근거화. 남은
+02_architecture 는 edges.json 주입(후속) 필요 — 그 외 전부 근거 있음.

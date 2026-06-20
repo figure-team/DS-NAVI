@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
@@ -20,8 +20,18 @@ export default function DomainMapView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const navigateToDomain = useDashboardStore((s) => s.navigateToDomain);
   const { t } = useI18n();
-  // 카드 인라인 확장(아코디언) — 한 번에 하나만 펼쳐 그리드 점프 최소화(설계 §4).
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  // 카드 상세 — '상세보기' 클릭 시 모달로 띄운다(화면2 노드 상세와 동형). null = 닫힘.
+  const [detailId, setDetailId] = useState<string | null>(null);
+
+  // Escape 로 모달 닫기.
+  useEffect(() => {
+    if (!detailId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDetailId(null);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [detailId]);
 
   const data = useMemo(
     () => (domainGraph ? buildDomainCards(domainGraph) : null),
@@ -37,6 +47,7 @@ export default function DomainMapView() {
   }
 
   const { stats, cards } = data;
+  const detailCard = cards.find((c) => c.id === detailId) ?? null;
 
   return (
     <div className="h-full w-full overflow-auto">
@@ -88,7 +99,7 @@ export default function DomainMapView() {
           }}
         >
           {cards.map((card, i) => {
-            const isOpen = expandedId === card.id;
+            const isOpen = detailId === card.id;
             return (
               <div
                 key={card.id}
@@ -111,14 +122,14 @@ export default function DomainMapView() {
                     위해 본문 버튼의 형제로 두고 절대배치 + z-10 으로 위에 올린다). */}
                 <button
                   type="button"
-                  onClick={() => setExpandedId(isOpen ? null : card.id)}
-                  aria-expanded={isOpen}
+                  onClick={() => setDetailId(card.id)}
+                  aria-haspopup="dialog"
                   className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-md border border-border-subtle bg-elevated/80 text-text-muted hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
                   style={{ padding: "4px 9px", fontSize: 11 }}
                   title={t.domainMap.detail}
                 >
                   {t.domainMap.detail}
-                  <span style={{ fontSize: 9, lineHeight: 1 }}>{isOpen ? "▴" : "▾"}</span>
+                  <span style={{ fontSize: 10, lineHeight: 1 }}>⤢</span>
                 </button>
                 {/* 본문 = 기능 보기(화면2)로 이동. 근거 상세는 우측 상단 '상세보기' 토글로 분리. */}
                 <button
@@ -157,14 +168,63 @@ export default function DomainMapView() {
                     />
                   </div>
                 </button>
-                {isOpen && (
-                  <DomainCardDetail card={card} onViewFeatures={() => navigateToDomain(card.id)} />
-                )}
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* 도메인 카드 상세 — 모달(화면2 노드 상세와 동형). 배경 클릭/Escape 로 닫힘. */}
+      {detailCard && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-root/80 backdrop-blur-sm p-4"
+          onClick={() => setDetailId(null)}
+          role="presentation"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={detailCard.name}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-surface border border-border-medium rounded-xl shadow-2xl flex flex-col overflow-hidden"
+            style={{ width: "min(640px, 100%)", maxHeight: "82vh", ["--card-accent" as string]: detailCard.color }}
+          >
+            <span style={{ height: 2, background: detailCard.color }} />
+            {/* 헤더 — 아이콘 + 도메인명 + 닫기 */}
+            <div className="flex items-center gap-2.5 shrink-0 border-b border-border-subtle" style={{ padding: "14px 18px" }}>
+              <span
+                className="flex items-center justify-center rounded-lg select-none"
+                style={{ width: 30, height: 30, background: `${detailCard.color}22`, fontSize: 15, lineHeight: 1 }}
+                aria-hidden="true"
+              >
+                {detailCard.icon}
+              </span>
+              <span className="font-heading text-text-primary" style={{ fontSize: 17 }}>
+                {detailCard.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => setDetailId(null)}
+                aria-label="닫기"
+                className="ml-auto flex items-center justify-center rounded-md border border-border-subtle text-text-muted hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+                style={{ width: 28, height: 28, fontSize: 15, lineHeight: 1 }}
+              >
+                ✕
+              </button>
+            </div>
+            {/* 본문 — 스크롤. '기능 보기'는 도메인 이동 후 모달 닫기. */}
+            <div className="overflow-y-auto min-h-0">
+              <DomainCardDetail
+                card={detailCard}
+                onViewFeatures={() => {
+                  setDetailId(null);
+                  navigateToDomain(detailCard.id);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

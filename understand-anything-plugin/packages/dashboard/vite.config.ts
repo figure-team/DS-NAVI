@@ -325,6 +325,129 @@ function handleOverridePost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
+// ── D3: 산출물 문서(.md) 편집/확정 — node-overrides 와 동형(편집=즉시 확정). ──────────
+const MAX_DOC_BODY_BYTES = 4 * 1024 * 1024; // 문서는 claim 보다 큼.
+
+/** 생성 문서 디렉터리(.understand-anything/doc-output). 프로젝트 미발견이면 null. */
+function docOutputDir(): string | null {
+  const graphFile = findGraphFile("domain-graph.json");
+  return graphFile ? path.join(path.dirname(graphFile), "doc-output") : null;
+}
+/** 문서 편집 오버레이 경로(.understand-anything/doc-overrides.json). */
+function docOverridesFilePath(): string | null {
+  const graphFile = findGraphFile("domain-graph.json");
+  return graphFile ? path.join(path.dirname(graphFile), "doc-overrides.json") : null;
+}
+type DocOverride = { content: string; approver: string; at: string; audit?: unknown[] };
+/** doc-overrides.json 읽기 — 없거나 손상이면 {}. */
+function readDocOverrides(): Record<string, DocOverride> {
+  const file = docOverridesFilePath();
+  if (!file || !fs.existsSync(file)) return {};
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8"));
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, DocOverride>) : {};
+  } catch {
+    return {};
+  }
+}
+/** doc-output 의 docId 목록(.md 제외, 정렬) — POST docId 실존 검증 + 경로 traversal 방지. */
+function docOutputIds(): string[] {
+  const dir = docOutputDir();
+  if (!dir || !fs.existsSync(dir)) return [];
+  try {
+    return fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(".md"))
+      .map((f) => f.slice(0, -3))
+      .sort();
+  } catch {
+    return [];
+  }
+}
+/** frontmatter 의 title(없으면 docId). */
+function docTitle(content: string, docId: string): string {
+  const m = /\ntitle:\s*(.+?)\s*\n/.exec(content.slice(0, 400));
+  return m ? m[1].trim() : docId;
+}
+/** 문서 본문 — 편집 오버레이 우선, 없으면 생성물. 실패 시 null. */
+function readDocContent(docId: string): string | null {
+  const ov = readDocOverrides()[docId];
+  if (ov && typeof ov.content === "string") return ov.content;
+  const dir = docOutputDir();
+  if (!dir) return null;
+  try {
+    return fs.readFileSync(path.join(dir, `${docId}.md`), "utf-8");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * POST /doc — { docId, content, approver } 저장. 검증: docId 실존(doc-output) · content 문자열 ·
+ * approver 비어있지 않음. 레코드 존재 = 그 문서 확정(approver). audit append-only. 생성물 불변,
+ * 편집은 doc-overrides.json 오버레이(재생성 생존). 응답 = 메타(content 제외).
+ */
+function handleDocPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = docOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No domain graph found. Run /understand-docs first." });
+    return;
+  }
+  collectRequestBody(req, MAX_DOC_BODY_BYTES)
+    .then((body) => {
+      let parsed: { docId?: unknown; content?: unknown; approver?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { docId, content, approver } = parsed ?? {};
+      if (typeof docId !== "string" || !docId) {
+        sendJson(res, 400, { error: "docId is required" });
+        return;
+      }
+      if (typeof content !== "string") {
+        sendJson(res, 400, { error: "content (string) is required" });
+        return;
+      }
+      if (typeof approver !== "string" || !approver.trim()) {
+        sendJson(res, 400, { error: "approver is required" });
+        return;
+      }
+      if (!docOutputIds().includes(docId)) {
+        sendJson(res, 400, { error: "docId is not a generated document" });
+        return;
+      }
+      const now = new Date().toISOString();
+      const by = approver.trim();
+      const store = readDocOverrides();
+      const prev = store[docId];
+      const audit = Array.isArray(prev?.audit) ? prev!.audit : [];
+      const record: DocOverride = {
+        content,
+        approver: by,
+        at: now,
+        audit: [...audit, { event: "CONFIRMED", by, at: now }],
+      };
+      store[docId] = record;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write doc-overrides:", err);
+        sendJson(res, 500, { error: "Failed to write doc overrides" });
+        return;
+      }
+      // content 는 응답에서 제외(클라이언트가 이미 보유) — 메타만.
+      sendJson(res, 200, { docId, approver: by, at: now, confirmed: true });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
 export default defineConfig({
   test: {
     environment: "node",
@@ -406,7 +529,10 @@ export default defineConfig({
             pathname === "/config.json" ||
             pathname === "/file-content.json" ||
             pathname === "/node-overrides.json" ||
-            pathname === "/node-overrides";
+            pathname === "/node-overrides" ||
+            pathname === "/doc-list.json" ||
+            pathname === "/doc-content.json" ||
+            pathname === "/doc";
 
           if (!isProtectedEndpoint) {
             next();
@@ -432,6 +558,51 @@ export default defineConfig({
           if (pathname === "/node-overrides.json") {
             const file = nodeOverridesFilePath();
             sendJson(res, 200, file ? readNodeOverrides(file) : {});
+            return;
+          }
+
+          // D3: 산출물 문서(.md) 목록/내용/저장.
+          if (pathname === "/doc") {
+            if (req.method === "POST") handleDocPost(req, res);
+            else sendJson(res, 405, { error: "Use POST to save a document" });
+            return;
+          }
+          if (pathname === "/doc-list.json") {
+            const dir = docOutputDir();
+            const ov = readDocOverrides();
+            const docs = docOutputIds().map((docId) => {
+              const o = ov[docId];
+              const content = readDocContent(docId) ?? "";
+              return {
+                docId,
+                title: docTitle(content, docId),
+                confirmed: !!o,
+                approver: o?.approver ?? null,
+                at: o?.at ?? null,
+              };
+            });
+            sendJson(res, 200, { docs, hasOutput: !!dir });
+            return;
+          }
+          if (pathname === "/doc-content.json") {
+            const docId = url.searchParams.get("docId");
+            if (!docId || !docOutputIds().includes(docId)) {
+              sendJson(res, 404, { error: "unknown docId" });
+              return;
+            }
+            const content = readDocContent(docId);
+            if (content === null) {
+              sendJson(res, 500, { error: "failed to read document" });
+              return;
+            }
+            const o = readDocOverrides()[docId];
+            sendJson(res, 200, {
+              docId,
+              content,
+              confirmed: !!o,
+              approver: o?.approver ?? null,
+              at: o?.at ?? null,
+            });
             return;
           }
 

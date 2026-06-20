@@ -465,11 +465,21 @@ export default defineConfig({
   },
 
   resolve: {
+    // pnpm symlink layout can resolve react via multiple physical paths,
+    // yielding two React module instances → "Invalid hook call" (dispatcher null).
+    // Force a single copy for hooks to work across react-markdown et al.
+    dedupe: ["react", "react-dom"],
     alias: {
       "@understand-anything/core/schema": path.resolve(__dirname, "../core/dist/schema.js"),
       "@understand-anything/core/search": path.resolve(__dirname, "../core/dist/search.js"),
       "@understand-anything/core/types": path.resolve(__dirname, "../core/dist/types.js"),
     },
+  },
+
+  // Pre-bundle React (and the JSX runtime) so every transitive importer shares
+  // the same optimized instance — prevents the dev-server hook-dispatcher split.
+  optimizeDeps: {
+    include: ["react", "react-dom", "react-dom/client", "react/jsx-runtime"],
   },
 
   build: {

@@ -35,6 +35,8 @@ methodology: as-built | si-standard
 - **표 섹션**: 헤딩 아래 `| 컬럼 | ... |` 헤더 **1줄**로 컬럼을 정의(편집 가능). **신뢰도·근거 열은
   렌더러가 자동 부가**하므로 여기 적지 않는다(도메인 컬럼만).
 - **목록 섹션**: 컬럼 헤더 줄이 없으면 불릿 목록(claim 1개 = 1줄).
+- **매트릭스 섹션**(`#crud-matrix`): 고정 열(`| 기능 |`)만 템플릿에 두고, 나머지 열(테이블)은
+  분석 데이터로 자동 생성. 셀=C/R/U/D.
 - 헤딩 앞 제목(`#`)/주석(`<!-- -->`)/프로즈는 무시(채움 지시·설명용).
 
 ## 신뢰도 태그·근거 규약 (4단계, CONFIDENCE_VALUES 단일 소스)
@@ -50,7 +52,7 @@ methodology: as-built | si-standard
 - **사람 확정은 confidence 가 아니라 문서 단위 `확정(사용자명)` 상태**(approver + 감사 로그)로 기록.
   생성된 `.md` 를 사용자가 편집·저장하면 그 문서는 확정 상태가 된다(node-overrides 패턴 동형).
 
-## 기본 세트 (근거 가능 6종)
+## 기본 세트 (근거 가능 9종)
 
 | 파일 | docId | 문서 | 근거원 |
 |---|---|---|---|
@@ -60,6 +62,9 @@ methodology: as-built | si-standard
 | interface-spec.md | si-인터페이스정의서 | SI 인터페이스정의서 | routes 추출 |
 | table-spec.md | si-테이블정의서 | SI 테이블정의서 | table/schema 노드 · JPA/MyBatis(P6) |
 | program-list.md | 06_program-list | 프로그램 목록 | file/class 노드(census) |
+| crud-matrix.md | 07_crud-matrix | CRUD 매트릭스 | flow→dao→table · 매퍼 SQL/메서드 |
+| batch-list.md | 08_batch-list | 배치 작업 목록 | routes.batchEntries |
+| impact-analysis.md | 09_impact-analysis | 영향도 분석서 | fan-in/out 엣지 · impact reach · 교차도메인 엣지 |
 
 ## 바인딩키 어휘 (생성기가 채우는 값)
 
@@ -75,3 +80,7 @@ methodology: as-built | si-standard
 | `#api-list` | routes(라우트별 행) | 표 |
 | `#table-list` | table/schema 노드(테이블별 섹션) | 표(반복) |
 | `#program-list` | file/class 노드 | 표 |
+| `#crud-matrix` | flow×table CRUD(매퍼 SQL/메서드 판정) | 매트릭스 |
+| `#batch-list` | routes.batchEntries | 표 |
+| `#impact-hotspots` | fan-in/out + impact reach 상위 | 표 |
+| `#cross-domain-deps` | 교차 도메인 의존 엣지 | 표 |

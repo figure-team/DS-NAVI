@@ -214,6 +214,25 @@ export const en = {
     seed: "Will change",
     affected: "Affected",
   },
+  // ktds: structure tab "Impact analysis" button/modal — NL → claude -p /understand-impact
+  impactAnalyze: {
+    button: "Impact analysis",
+    buttonTitle: "Run change impact analysis from natural language",
+    title: "Change Impact Analysis",
+    description:
+      "Describe the change you intend to make in natural language. When the analysis finishes, changed/affected nodes are highlighted on the structure graph.",
+    placeholder: "e.g. I want to add Kakao social login",
+    run: "Run analysis",
+    submitting: "Starting…",
+    cancel: "Cancel",
+    running: "Analyzing impact",
+    runningHint: "Impact analysis in progress — click to view input",
+    alreadyRunning: "An analysis is already running. Try again once it finishes.",
+    errNoServer: "Cannot run analysis: not a writable dev server.",
+    errGeneric: "Failed to start analysis.",
+    toastDone: "Impact analysis complete — results highlighted on the structure graph.",
+    toastFailed: "Impact analysis failed. Check the console/logs.",
+  },
   learnPanel: {
     finish: "Finish",
     next: "Next",

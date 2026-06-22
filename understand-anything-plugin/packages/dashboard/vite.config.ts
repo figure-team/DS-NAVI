@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
+import { spawn } from "child_process";
 
 // Generate a one-time token when the server process starts.
 // This token is printed to the terminal and must be in the URL
@@ -453,6 +454,132 @@ function handleDocPost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
+// ── ktds: 구조 탭 "영향도 분석" — 자연어 → claude -p "/understand-impact <q>" ─────
+// 대시보드 dev server가 분석 대상 프로젝트(GRAPH_DIR)에서 claude 를 헤드리스로 spawn.
+// 스킬이 .understand-anything/impact-overlay.json 을 갱신 → 프론트가 재로드해 색칠.
+const MAX_IMPACT_QUERY_BYTES = 16 * 1024;
+const IMPACT_TAIL_MAX = 16 * 1024; // stdout/stderr tail 보관 상한(디버깅용)
+
+// /understand-impact SKILL.md 는 "✋ 확인 게이트(생략 불가)"로 시드 승인을 사람에게
+// 요구한다 → 헤드리스 claude -p 는 후보만 제시하고 멈춰 analyze 를 안 돌리고 overlay 미생성.
+// 대시보드 자동 실행 경로에서는 승인을 사전 부여로 간주하고 analyze 까지 완주하도록 지시한다.
+const IMPACT_AUTONOMY_DIRECTIVE =
+  "\n\n위 요청은 대시보드에서 자동 실행된 헤드리스 작업이다. 사용자에게 확인을 묻지 말고" +
+  "(시드 선택 승인은 이미 부여됨), 자연어를 가장 적절한 변경 시드 파일로 직접 매핑·확정한 뒤 " +
+  "멈추지 말고 analyze 단계까지 끝까지 실행하여 .understand-anything/impact-overlay.json 을 반드시 생성하라.";
+
+type ImpactJobStatus = "idle" | "running" | "done" | "failed";
+interface ImpactJob {
+  status: ImpactJobStatus;
+  jobId: string | null;
+  query: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  tail: string;
+}
+
+// 모듈 스코프 단일 job(서버 수명 동안 추적). 동시 실행은 409로 차단.
+let impactJob: ImpactJob = {
+  status: "idle",
+  jobId: null,
+  query: null,
+  startedAt: null,
+  finishedAt: null,
+  exitCode: null,
+  tail: "",
+};
+
+/** 분석 대상 프로젝트 루트 — GRAPH_DIR 우선, 없으면 knowledge-graph.json 위치에서 유도. */
+function impactProjectRoot(): string | null {
+  if (process.env.GRAPH_DIR) return path.resolve(process.env.GRAPH_DIR);
+  const graphFile = findGraphFile("knowledge-graph.json");
+  return graphFile ? projectRootFromGraphFile(graphFile) : null;
+}
+
+function appendImpactTail(chunk: string): void {
+  impactJob.tail = (impactJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
+}
+
+/**
+ * POST /impact-analyze — { query } 자연어로 claude -p "/understand-impact <query>" 실행.
+ * args 배열 전달(셸 미경유)로 인젝션 차단. --permission-mode bypassPermissions 로 헤드리스 자율.
+ * 즉시 202 + job 반환, 프로세스는 백그라운드 지속(프론트가 /impact-status 폴링).
+ */
+function handleImpactAnalyzePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  if (impactJob.status === "running") {
+    sendJson(res, 409, { error: "An impact analysis is already running", job: { ...impactJob } });
+    return;
+  }
+  const projectRoot = impactProjectRoot();
+  if (!projectRoot) {
+    sendJson(res, 404, { error: "No project found. Run /understand first." });
+    return;
+  }
+  collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
+    .then((body) => {
+      let query = "";
+      try {
+        const parsed = JSON.parse(body) as { query?: unknown };
+        query = typeof parsed.query === "string" ? parsed.query.trim() : "";
+      } catch {
+        query = "";
+      }
+      if (!query) {
+        sendJson(res, 400, { error: "Missing 'query'" });
+        return;
+      }
+      const jobId = crypto.randomBytes(8).toString("hex");
+      impactJob = {
+        status: "running",
+        jobId,
+        query,
+        startedAt: new Date().toISOString(),
+        finishedAt: null,
+        exitCode: null,
+        tail: "",
+      };
+      let child: ReturnType<typeof spawn>;
+      try {
+        child = spawn(
+          "claude",
+          [
+            "-p",
+            `/understand-impact ${query}${IMPACT_AUTONOMY_DIRECTIVE}`,
+            "--permission-mode",
+            "bypassPermissions",
+          ],
+          { cwd: projectRoot, env: process.env },
+        );
+      } catch (err) {
+        impactJob.status = "failed";
+        impactJob.finishedAt = new Date().toISOString();
+        appendImpactTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
+        sendJson(res, 500, { error: "Failed to launch claude", job: { ...impactJob } });
+        return;
+      }
+      child.stdout?.on("data", (c: Buffer) => appendImpactTail(c.toString("utf8")));
+      child.stderr?.on("data", (c: Buffer) => appendImpactTail(c.toString("utf8")));
+      child.on("error", (err) => {
+        if (impactJob.jobId !== jobId) return; // 다음 job 이 시작됐으면 무시
+        impactJob.status = "failed";
+        impactJob.finishedAt = new Date().toISOString();
+        appendImpactTail(`\n[spawn error] ${err.message}\n`);
+      });
+      child.on("close", (code) => {
+        if (impactJob.jobId !== jobId) return;
+        impactJob.status = code === 0 ? "done" : "failed";
+        impactJob.exitCode = code;
+        impactJob.finishedAt = new Date().toISOString();
+      });
+      sendJson(res, 202, { job: { ...impactJob } });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
 export default defineConfig({
   test: {
     environment: "node",
@@ -548,7 +675,9 @@ export default defineConfig({
             pathname === "/node-overrides" ||
             pathname === "/doc-list.json" ||
             pathname === "/doc-content.json" ||
-            pathname === "/doc";
+            pathname === "/doc" ||
+            pathname === "/impact-analyze" ||
+            pathname === "/impact-status";
 
           if (!isProtectedEndpoint) {
             next();
@@ -620,6 +749,17 @@ export default defineConfig({
               approver: o?.approver ?? null,
               at: o?.at ?? null,
             });
+            return;
+          }
+
+          // ktds: 구조 탭 "영향도 분석" — claude -p "/understand-impact <q>" 실행/상태.
+          if (pathname === "/impact-analyze") {
+            if (req.method === "POST") handleImpactAnalyzePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to start impact analysis" });
+            return;
+          }
+          if (pathname === "/impact-status") {
+            sendJson(res, 200, { job: { ...impactJob } });
             return;
           }
 

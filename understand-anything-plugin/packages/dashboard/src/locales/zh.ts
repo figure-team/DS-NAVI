@@ -214,6 +214,25 @@ export const zh = {
     seed: "待修改",
     affected: "受影响",
   },
+  // ktds: 结构标签页"影响分析"按钮/弹窗 — 自然语言 → claude -p /understand-impact
+  impactAnalyze: {
+    button: "影响分析",
+    buttonTitle: "用自然语言运行变更影响分析",
+    title: "变更影响分析",
+    description:
+      "用自然语言描述你打算做的变更。分析完成后，结构图上会高亮显示变更/受影响的节点。",
+    placeholder: "例如：我想添加 Kakao 社交登录",
+    run: "运行分析",
+    submitting: "正在启动…",
+    cancel: "取消",
+    running: "正在分析影响",
+    runningHint: "影响分析进行中 — 点击查看输入",
+    alreadyRunning: "已有分析正在进行。完成后请重试。",
+    errNoServer: "无法运行分析：不是可写的开发服务器。",
+    errGeneric: "启动分析失败。",
+    toastDone: "影响分析完成 — 结果已在结构图上高亮显示。",
+    toastFailed: "影响分析失败。请查看控制台/日志。",
+  },
   learnPanel: {
     finish: "完成",
     next: "下一步",

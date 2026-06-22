@@ -214,6 +214,25 @@ export const zhTW = {
     seed: "待修改",
     affected: "受影響",
   },
+  // ktds: 結構標籤頁「影響分析」按鈕/彈窗 — 自然語言 → claude -p /understand-impact
+  impactAnalyze: {
+    button: "影響分析",
+    buttonTitle: "用自然語言執行變更影響分析",
+    title: "變更影響分析",
+    description:
+      "用自然語言描述你打算進行的變更。分析完成後，結構圖上會醒目顯示變更/受影響的節點。",
+    placeholder: "例如：我想新增 Kakao 社群登入",
+    run: "執行分析",
+    submitting: "正在啟動…",
+    cancel: "取消",
+    running: "正在分析影響",
+    runningHint: "影響分析進行中 — 點擊查看輸入",
+    alreadyRunning: "已有分析正在進行。完成後請重試。",
+    errNoServer: "無法執行分析：不是可寫入的開發伺服器。",
+    errGeneric: "啟動分析失敗。",
+    toastDone: "影響分析完成 — 結果已在結構圖上醒目顯示。",
+    toastFailed: "影響分析失敗。請查看主控台/日誌。",
+  },
   learnPanel: {
     finish: "完成",
     next: "下一步",

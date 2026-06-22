@@ -105,6 +105,16 @@ export interface OverlayChannelData {
   generatedAt: string;
 }
 
+/** ktds: 구조 탭 "영향도 분석"(claude -p /understand-impact) 실행 상태. */
+export type ImpactJobStatus = "idle" | "running" | "done" | "failed";
+export interface ImpactJobState {
+  status: ImpactJobStatus;
+  jobId: string | null;
+  query: string | null;
+  exitCode: number | null;
+  error: string | null;
+}
+
 /**
  * P3: 노드 사용자 오버레이 레코드(node-overrides.json 의 값). 레코드 존재 = 그 노드
  * 확정(approver). editedClaims 키 = 편집된 의미 주장 필드("summary" | "detail:<id>").
@@ -207,6 +217,18 @@ interface DashboardStore {
   /** 채널 토글 — 활성 채널 재토글=숨김, 비활성 채널=전환 (동시 표시 없음). */
   toggleOverlay: (source: "diff" | "impact") => void;
   clearDiffOverlay: () => void;
+
+  // ktds: 구조 탭 "영향도 분석" — 자연어 입력 모달 + claude -p 실행 job(전역 상태).
+  impactModalOpen: boolean;
+  impactJob: ImpactJobState;
+  openImpactModal: () => void;
+  closeImpactModal: () => void;
+  /** 자연어 query를 POST /impact-analyze로 보내 분석 시작(running). */
+  startImpactAnalysis: (query: string) => Promise<{ ok: boolean; error?: string }>;
+  /** GET /impact-status 폴링 결과로 job 상태 동기화. */
+  pollImpactStatus: () => Promise<void>;
+  /** impact-overlay.json 재fetch → impact 채널 적재 + 명시 활성. */
+  reloadImpactOverlay: () => Promise<void>;
 
   toggleFilterPanel: () => void;
   toggleExportMenu: () => void;
@@ -711,6 +733,108 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       changedNodeIds: new Set<string>(),
       affectedNodeIds: new Set<string>(),
     }),
+
+  // ── ktds: 구조 탭 "영향도 분석" job ────────────────────────────────────────
+  impactModalOpen: false,
+  impactJob: { status: "idle", jobId: null, query: null, exitCode: null, error: null },
+  openImpactModal: () => set({ impactModalOpen: true }),
+  closeImpactModal: () => set({ impactModalOpen: false }),
+
+  startImpactAnalysis: async (query) => {
+    const q = query.trim();
+    if (!q) return { ok: false, error: "empty-query" };
+    const { accessToken } = get();
+    if (!accessToken) return { ok: false, error: "no-write-server" };
+    try {
+      const res = await fetch(`/impact-analyze?token=${encodeURIComponent(accessToken)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q }),
+      });
+      const data = (await res.json().catch(() => null)) as
+        | { job?: { jobId?: string | null; query?: string | null }; error?: string }
+        | null;
+      // 409 = 이미 실행 중 → running 으로 동기화하고 성공 취급(모달 닫힘).
+      if (!res.ok && res.status !== 409) {
+        return { ok: false, error: data?.error ?? `HTTP ${res.status}` };
+      }
+      set({
+        impactJob: {
+          status: "running",
+          jobId: data?.job?.jobId ?? null,
+          query: data?.job?.query ?? q,
+          exitCode: null,
+          error: null,
+        },
+      });
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    }
+  },
+
+  pollImpactStatus: async () => {
+    const { accessToken } = get();
+    if (!accessToken) return;
+    try {
+      const res = await fetch(`/impact-status?token=${encodeURIComponent(accessToken)}`);
+      if (!res.ok) return;
+      const data = (await res.json().catch(() => null)) as
+        | { job?: { status?: ImpactJobStatus; jobId?: string | null; exitCode?: number | null } }
+        | null;
+      const job = data?.job;
+      if (!job?.status) return;
+      set((s) => ({
+        impactJob: {
+          ...s.impactJob,
+          status: job.status as ImpactJobStatus,
+          jobId: job.jobId ?? s.impactJob.jobId,
+          exitCode: job.exitCode ?? null,
+        },
+      }));
+    } catch {
+      // 폴링 실패는 조용히 무시(다음 틱 재시도).
+    }
+  },
+
+  reloadImpactOverlay: async () => {
+    const { accessToken, setOverlayData } = get();
+    try {
+      const url = accessToken
+        ? `/impact-overlay.json?token=${encodeURIComponent(accessToken)}&t=${Date.now()}`
+        : `/impact-overlay.json?t=${Date.now()}`;
+      const res = await fetch(url);
+      if (!res.ok) return;
+      const data = (await res.json().catch(() => null)) as
+        | { changedNodeIds?: unknown; affectedNodeIds?: unknown; generatedAt?: unknown }
+        | null;
+      if (
+        !data ||
+        !Array.isArray(data.changedNodeIds) ||
+        !Array.isArray(data.affectedNodeIds)
+      ) {
+        return;
+      }
+      const changed = data.changedNodeIds as string[];
+      const affected = data.affectedNodeIds as string[];
+      setOverlayData("impact", {
+        changed,
+        affected,
+        generatedAt: typeof data.generatedAt === "string" ? data.generatedAt : "",
+      });
+      // 분석 직후엔 impact 채널을 명시적으로 활성(자동 활성 우선순위와 무관하게 보이도록).
+      if (changed.length > 0) {
+        set({
+          overlaySource: "impact",
+          diffMode: true,
+          changedNodeIds: new Set<string>(changed),
+          affectedNodeIds: new Set<string>(affected),
+        });
+      }
+    } catch {
+      // 무시.
+    }
+  },
 
   toggleFilterPanel: () => set((state) => ({
     filterPanelOpen: !state.filterPanelOpen,

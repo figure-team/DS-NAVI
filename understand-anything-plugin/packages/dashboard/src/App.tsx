@@ -12,6 +12,7 @@ import SearchBar from "./components/SearchBar";
 import NodeInfo from "./components/NodeInfo";
 import LayerLegend from "./components/LayerLegend";
 import DiffToggle from "./components/DiffToggle";
+import ImpactJobIndicator from "./components/ImpactJobIndicator";
 import FilterPanel from "./components/FilterPanel";
 import ExportMenu from "./components/ExportMenu";
 import PersonaSelector from "./components/PersonaSelector";
@@ -33,6 +34,7 @@ const CodeViewer = lazy(() => import("./components/CodeViewer"));
 const LearnPanel = lazy(() => import("./components/LearnPanel"));
 const DocsView = lazy(() => import("./components/DocsView")); // ktds-fork (D3): 산출물 문서 편집/확정
 const PathFinderModal = lazy(() => import("./components/PathFinderModal"));
+const ImpactAnalysisModal = lazy(() => import("./components/ImpactAnalysisModal"));
 const KeyboardShortcutsHelp = lazy(
   () => import("./components/KeyboardShortcutsHelp"),
 );
@@ -159,7 +161,19 @@ function Dashboard({ accessToken }: { accessToken: string }) {
 
   useEffect(() => {
     fetch(dataUrl("knowledge-graph.json", accessToken))
-      .then((res) => res.json())
+      .then((res) => {
+        // res.ok 미검사 시 403/404의 {error} 본문이 그래프로 검증돼 "Missing project
+        // metadata" 로 오인된다. dev server 재시작으로 토큰이 회전하면 흔히 발생 →
+        // 정직한 메시지로 분기(특히 401/403 = 토큰 만료).
+        if (!res.ok) {
+          throw new Error(
+            res.status === 401 || res.status === 403
+              ? `access token rejected (HTTP ${res.status}) — reopen the dashboard with the current ?token= URL printed by the dev server`
+              : `HTTP ${res.status}`,
+          );
+        }
+        return res.json();
+      })
       .then((data: unknown) => {
         const result = validateGraph(data);
         if (result.success && result.data) {
@@ -291,6 +305,8 @@ function DashboardContent({
   const collapseCodeViewer = useDashboardStore((s) => s.collapseCodeViewer);
   const pathFinderOpen = useDashboardStore((s) => s.pathFinderOpen);
   const togglePathFinder = useDashboardStore((s) => s.togglePathFinder);
+  const impactModalOpen = useDashboardStore((s) => s.impactModalOpen);
+  const openImpactModal = useDashboardStore((s) => s.openImpactModal);
   const nodeTypeFilters = useDashboardStore((s) => s.nodeTypeFilters);
   const toggleNodeTypeFilter = useDashboardStore((s) => s.toggleNodeTypeFilter);
   const detailLevel = useDashboardStore((s) => s.detailLevel);
@@ -658,6 +674,25 @@ function DashboardContent({
           {viewMode !== "wiki" && viewMode !== "docs" && (
           <div className="flex items-center gap-4 w-max">
             <DiffToggle />
+            {/* ktds: 구조 뷰에서 자연어 → claude -p /understand-impact 영향도 분석 */}
+            {!isKnowledgeGraph && viewMode !== "domain" && (
+              <button
+                type="button"
+                onClick={openImpactModal}
+                title={t.impactAnalyze.buttonTitle}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors whitespace-nowrap"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+                {t.impactAnalyze.button}
+              </button>
+            )}
             {/* Detail level: file view (architecture) / class view (code structure) */}
             {!isKnowledgeGraph && viewMode !== "domain" && (
               <>
@@ -773,6 +808,8 @@ function DashboardContent({
               </button>
             </>
           )}
+          {/* ktds: 영향도 분석 진행 인디케이터 + 완료 토스트(항상 마운트 — 탭/모달과 무관). */}
+          <ImpactJobIndicator />
           <ThemePicker />
           <button
             onClick={() => setShowKeyboardHelp(true)}
@@ -915,6 +952,13 @@ function DashboardContent({
       {pathFinderOpen && (
         <Suspense fallback={null}>
           <PathFinderModal isOpen={pathFinderOpen} onClose={togglePathFinder} />
+        </Suspense>
+      )}
+
+      {/* ktds: 영향도 분석 자연어 입력 모달 — 열렸을 때만 마운트(lazy 청크). */}
+      {impactModalOpen && (
+        <Suspense fallback={null}>
+          <ImpactAnalysisModal />
         </Suspense>
       )}
 

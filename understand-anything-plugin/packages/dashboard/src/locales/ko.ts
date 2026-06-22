@@ -214,6 +214,25 @@ export const ko = {
     seed: "변경예정",
     affected: "영향받음",
   },
+  // ktds: 구조 탭 "영향도 분석" 버튼/모달 — 자연어 → claude -p /understand-impact
+  impactAnalyze: {
+    button: "영향도 분석",
+    buttonTitle: "자연어로 변경 영향도 분석 실행",
+    title: "변경 영향도 분석",
+    description:
+      "변경하려는 내용을 자연어로 설명하세요. 분석이 끝나면 구조 그래프에 변경/영향 노드가 표시됩니다.",
+    placeholder: "예: 카카오 소셜 로그인을 추가하려고 해",
+    run: "분석 실행",
+    submitting: "시작 중…",
+    cancel: "취소",
+    running: "영향도 분석 중",
+    runningHint: "영향도 분석이 진행 중입니다 — 클릭하여 입력 보기",
+    alreadyRunning: "이미 분석이 진행 중입니다. 완료 후 다시 실행하세요.",
+    errNoServer: "쓰기 가능한 dev server가 아니어서 분석을 실행할 수 없습니다.",
+    errGeneric: "분석 실행에 실패했습니다.",
+    toastDone: "영향도 분석 완료 — 구조 그래프에 결과를 표시했습니다.",
+    toastFailed: "영향도 분석에 실패했습니다. 콘솔/로그를 확인하세요.",
+  },
   learnPanel: {
     finish: "완료",
     next: "다음",

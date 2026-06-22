@@ -214,6 +214,25 @@ export const ja = {
     seed: "変更予定",
     affected: "影響あり",
   },
+  // ktds: 構造タブ「影響分析」ボタン/モーダル — 自然言語 → claude -p /understand-impact
+  impactAnalyze: {
+    button: "影響分析",
+    buttonTitle: "自然言語で変更影響分析を実行",
+    title: "変更影響分析",
+    description:
+      "行おうとしている変更を自然言語で記述してください。分析が完了すると、構造グラフ上に変更/影響ノードがハイライト表示されます。",
+    placeholder: "例：Kakao ソーシャルログインを追加したい",
+    run: "分析を実行",
+    submitting: "開始中…",
+    cancel: "キャンセル",
+    running: "影響を分析中",
+    runningHint: "影響分析が進行中 — クリックして入力を表示",
+    alreadyRunning: "すでに分析が進行中です。完了後に再実行してください。",
+    errNoServer: "分析を実行できません：書き込み可能な開発サーバーではありません。",
+    errGeneric: "分析の開始に失敗しました。",
+    toastDone: "影響分析が完了 — 結果を構造グラフ上にハイライトしました。",
+    toastFailed: "影響分析に失敗しました。コンソール/ログを確認してください。",
+  },
   learnPanel: {
     finish: "完了",
     next: "次へ",

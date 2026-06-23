@@ -677,7 +677,8 @@ export default defineConfig({
             pathname === "/doc-content.json" ||
             pathname === "/doc" ||
             pathname === "/impact-analyze" ||
-            pathname === "/impact-status";
+            pathname === "/impact-status" ||
+            pathname === "/rtm.json";
 
           if (!isProtectedEndpoint) {
             next();
@@ -796,6 +797,8 @@ export default defineConfig({
               ? "meta.json"
               : pathname === "/domain-graph.json"
               ? "domain-graph.json"
+              : pathname === "/rtm.json"
+              ? "rtm.json"
               : "knowledge-graph.json";
 
           const candidates = graphFileCandidates(fileName);

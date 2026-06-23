@@ -33,6 +33,7 @@ import { I18nProvider, useI18n } from "./contexts/I18nContext.tsx";
 const CodeViewer = lazy(() => import("./components/CodeViewer"));
 const LearnPanel = lazy(() => import("./components/LearnPanel"));
 const DocsView = lazy(() => import("./components/DocsView")); // ktds-fork (D3): 산출물 문서 편집/확정
+const RtmView = lazy(() => import("./components/RtmView")); // ktds-fork (R2): 요구사항 추적표(RTM)
 const PathFinderModal = lazy(() => import("./components/PathFinderModal"));
 const ImpactAnalysisModal = lazy(() => import("./components/ImpactAnalysisModal"));
 const KeyboardShortcutsHelp = lazy(
@@ -343,6 +344,7 @@ function DashboardContent({
   // 전부 숨기고 도메인 3화면(지도→흐름목록→흐름스파인)만 헤더 아래 전면 노출한다.
   const isDomainPage = viewMode === "domain" && Boolean(domainGraph);
   const isDocsPage = viewMode === "docs"; // ktds-fork (D3): 산출물 문서 풀페이지
+  const isRtmPage = viewMode === "rtm"; // ktds-fork (R2): 요구사항 추적표 풀페이지
 
   // 브레드크럼 세그먼트 이름 — 도메인/흐름 노드는 domainGraph에서 id로 조회.
   const activeDomainName = useMemo(() => {
@@ -612,11 +614,24 @@ function DashboardContent({
                 >
                   산출물
                 </button>
+                {/* ktds-fork (R2): 요구사항 추적표(RTM) 뷰. */}
+                <button
+                  type="button"
+                  onClick={() => setViewMode("rtm")}
+                  title="요구사항 추적표(RTM)"
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === "rtm"
+                      ? "bg-accent/20 text-accent"
+                      : "text-text-muted hover:text-text-secondary"
+                  }`}
+                >
+                  추적표
+                </button>
               </div>
             </>
           )}
           {/* ktds-fork: PersonaSelector(개요/학습/심층)는 구조 전용 — 도메인·산출물 풀페이지에서는 숨김. */}
-          {!isDomainPage && !isDocsPage && (
+          {!isDomainPage && !isDocsPage && !isRtmPage && (
             <>
               <div className="w-px h-5 bg-border-subtle hidden sm:block" />
               <PersonaSelector />
@@ -782,7 +797,7 @@ function DashboardContent({
         {/* ktds-fork: 도메인 풀페이지에서는 구조 전용 액션(FilterPanel/ExportMenu/PathFinder)을
             숨기고 ThemePicker + 키보드 도움말만 유지한다. */}
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          {!isDomainPage && !isDocsPage && (
+          {!isDomainPage && !isDocsPage && !isRtmPage && (
             <>
               <FilterPanel />
               <ExportMenu />
@@ -835,7 +850,7 @@ function DashboardContent({
 
       {/* Search */}
       {/* ktds-fork: 도메인·산출물 풀페이지에서는 SearchBar 숨김. */}
-      {!isDomainPage && !isDocsPage && <SearchBar />}
+      {!isDomainPage && !isDocsPage && !isRtmPage && <SearchBar />}
 
       {/* Validation warning banner */}
       {allIssues.length > 0 && !loadError && (
@@ -850,7 +865,11 @@ function DashboardContent({
       )}
 
       {/* ktds-fork (D3): 산출물 문서 풀페이지 — 목록+본문 편집/확정. */}
-      {isDocsPage ? (
+      {isRtmPage ? (
+        <Suspense fallback={<div className="flex-1" />}>
+          <RtmView />
+        </Suspense>
+      ) : isDocsPage ? (
         <Suspense fallback={<div className="flex-1" />}>
           <DocsView />
         </Suspense>

@@ -15,7 +15,7 @@ export type NodeType = "file" | "function" | "class" | "module" | "concept" | "c
 export type Complexity = "simple" | "moderate" | "complex";
 export type EdgeCategory = "structural" | "behavioral" | "data-flow" | "dependencies" | "semantic" | "infrastructure" | "domain" | "knowledge";
 // ktds-fork (ADR-004): "wiki" = 코드그래프 위에 세분화 위키를 "문서" 토글로 오버레이.
-export type ViewMode = "structural" | "domain" | "knowledge" | "wiki" | "docs";
+export type ViewMode = "structural" | "domain" | "knowledge" | "wiki" | "docs" | "rtm";
 export type DetailLevel = "file" | "class";
 
 export interface FilterState {

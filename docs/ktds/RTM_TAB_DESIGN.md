@@ -74,8 +74,25 @@ Function {
 이력은 보존(§1 불변규칙이 기능뿐 아니라 규칙 단위에도 적용).
 
 **연산 위치(단일 소스, 순수·테스트됨):** `buildRtm`(AS-IS) → `applyRequirements`(상태/이력/rules/nfrTags
-재계산) → `computeCoverage`(롤업). 인테이크가 `rtm-requirements.json` 에 v2 구조를 쓰면 understand-rtm 이
-적용해 `rtm.json` 에 bake. 시험결과/검수는 인테이크가 채우지 않는다(실측·고객 몫).
+재계산) → `computeCoverage`(롤업) → `computeDiagnostics`(무결성). 인테이크가 `rtm-requirements.json` 에
+v2 구조를 쓰면 understand-rtm 이 적용해 `rtm.json` 에 bake. 시험결과/검수는 인테이크가 채우지 않는다(실측·고객 몫).
+
+### 1b.1 무결성 진단 (critic 리뷰 반영 — 강제 대신 가시화)
+LLM 인테이크는 잘못된 입력을 쓸 수 있고 zod 는 shape 만 검증한다. `computeDiagnostics` 가 교차참조를
+검사해 `model.diagnostics[]`(error/warn)로 표면화한다(조용한 손실 금지 — understand-rtm 콘솔에도 출력):
+- **error**: 드롭(파싱 실패 요구사항), 댕글링 changeset/AC `fnId`, 중복 기능/요구 id, supersede/dependsOn **순환**.
+- **warn**: `AC.fnIds ⊄ changeset`, 동일 fnId 다중 버킷, 댕글링 `nfrScope`/`dependsOn`/`supersedes`, supersede 비대칭.
+- **자연순 id 정렬**(`natCmp`): `REQ-2 < REQ-10` — 현행 head 선택이 순서에 의존하므로 사전순 역전 버그 제거.
+- **NFR 커버리지**: 비기능 요구는 대상 기능 없음을 미구현으로 오인하지 않고 `nfrScope` 로 판정.
+- **검증 축 화해**: 기능 검증 = 기능 `test` 셀 OR 그 기능을 매핑한 AC 의 PASS 테스트(뷰①↔뷰② 일치).
+- **요구사항 진척 롤업**: `coverage.byRequirement[reqId] = {targetsTotal, targetsBuilt, acsTotal, acsPassed}`(뷰② x/y).
+
+### 1b.2 남은 빈틈(인지·후속)
+- **검증/검수 입력 경로**: `rtm-overrides.json` 은 현재 **기능 행만** 편집/확정한다. 사람이 `TestRef.result=PASS`,
+  `signoff.approved`, `lifecycle` 전이를 기록할 경로가 아직 없어 `verified/signedOff` 는 실데이터에서 0에 머문다
+  → **오버레이를 요구사항/AC/시험결과/검수로 확장**(다음 우선순위, 서버+UI 동반).
+- **릴리스 baseline/버전 스냅샷**: `source.targetRelease` 만 있고 "R1 합의분 vs 현행" 동결 스냅샷은 미구현.
+- **AC 단위 구현상태**·**요구사항 lifecycle 자동 도출**: 현재 수동/미도출.
 
 ## 2. UI — 탭 1개 · 뷰 2개 · 상세 패널
 

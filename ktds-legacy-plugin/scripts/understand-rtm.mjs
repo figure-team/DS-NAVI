@@ -133,7 +133,11 @@ const myb = mybatisModel.mappers.length > 0 ? ` · MyBatis ${mybatisModel.mapper
 
 console.log(`understand-rtm 완료 — ${projectRoot}${myb}`)
 console.log(`  RTM → .understand-anything/rtm.json`)
-console.log(`  도메인 ${model.domains.length} · 기능 ${model.functions.length} · 요구사항 ${reqCount} · 추적셀 근거율 ${rate}%`)
+const dropped = reqCount - model.requirements.length
+console.log(
+  `  도메인 ${model.domains.length} · 기능 ${model.functions.length} · 요구사항 ${model.requirements.length}` +
+    `${dropped > 0 ? `(입력 ${reqCount}, 드롭 ${dropped})` : ''} · 추적셀 근거율 ${rate}%`,
+)
 const cov = model.coverage
 if (cov) {
   console.log(
@@ -144,5 +148,14 @@ if (cov) {
   if (cov.gaps.unimplemented.length || cov.gaps.orphanCode.length) {
     console.log(`  갭 — 미구현 요구 ${cov.gaps.unimplemented.length} · 고아 코드 ${cov.gaps.orphanCode.length} · 미검증 기능 ${cov.gaps.unverified.length}`)
   }
+}
+// 무결성 진단(C1/C2/M4/M5) — 조용한 손실 금지: 댕글링 참조·드롭·순환을 표면화한다.
+const diags = model.diagnostics ?? []
+if (diags.length > 0) {
+  const errs = diags.filter((d) => d.level === 'error').length
+  const warns = diags.length - errs
+  console.log(`  ⚠ 무결성 진단 — error ${errs} · warn ${warns} (rtm.json diagnostics[] 참조):`)
+  for (const d of diags.slice(0, 12)) console.log(`    [${d.level}] ${d.code}: ${d.message}`)
+  if (diags.length > 12) console.log(`    … 외 ${diags.length - 12}건`)
 }
 console.log('모든 추적 셀은 file:line 근거 + 신뢰도 태그를 갖는다(grounding 보존). 요구사항/이력/편집·확정은 후속(R3~R5).')

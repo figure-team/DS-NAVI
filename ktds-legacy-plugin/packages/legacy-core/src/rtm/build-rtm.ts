@@ -26,6 +26,7 @@ import type {
   RtmTraceCell,
 } from './types.js'
 import { computeCoverage } from './coverage.js'
+import { computeDiagnostics } from './validate.js'
 
 const cmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0)
 
@@ -258,5 +259,6 @@ export function buildRtm(input: DocInput, gitCommit: string | null = null): RtmM
   }))
 
   const model: RtmModel = { schemaVersion: 2, gitCommit, domains, functions, requirements: [] }
-  return { ...model, coverage: computeCoverage(model) }
+  const withCov: RtmModel = { ...model, coverage: computeCoverage(model) }
+  return { ...withCov, diagnostics: computeDiagnostics(withCov) }
 }

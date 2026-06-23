@@ -255,8 +255,30 @@ export const RtmCoverageSchema = z.object({
     orphanCode: z.array(z.string()),
     unverified: z.array(z.string()),
   }),
+  /** 요구사항 단위 진척 롤업(§9 뷰② 구현 x/y · 검증 x/y) — reqId → 대상/구현/AC/통과 수. */
+  byRequirement: z.record(
+    z.string(),
+    z.object({
+      targetsTotal: z.number().int(),
+      targetsBuilt: z.number().int(),
+      acsTotal: z.number().int(),
+      acsPassed: z.number().int(),
+    }),
+  ),
 })
 export type RtmCoverage = z.infer<typeof RtmCoverageSchema>
+
+/**
+ * 무결성 진단(critic C1/C2/M4/M5) — LLM 인테이크 산출은 잘못될 수 있으므로 참조 무결성을
+ * 강제 대신 **가시화**한다(조용한 손실 금지). error=치명(댕글링/순환/드롭), warn=주의(불일치).
+ */
+export const RtmDiagnosticSchema = z.object({
+  level: z.enum(['error', 'warn']),
+  code: z.string(),
+  message: z.string(),
+  ref: z.string().optional(),
+})
+export type RtmDiagnostic = z.infer<typeof RtmDiagnosticSchema>
 
 /**
  * rtm.json — RTM 구조화 산출물(생성물, 불변). 사람 편집/확정은 rtm-overrides.json 오버레이.
@@ -269,5 +291,6 @@ export const RtmModelSchema = z.object({
   functions: z.array(RtmFunctionRowSchema),
   requirements: z.array(RtmRequirementSchema),
   coverage: RtmCoverageSchema.optional(),
+  diagnostics: z.array(RtmDiagnosticSchema).optional(),
 })
 export type RtmModel = z.infer<typeof RtmModelSchema>

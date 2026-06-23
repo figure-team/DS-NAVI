@@ -14,6 +14,7 @@
 import { RtmRequirementSchema } from './types.js'
 import type { RtmFunctionRow, RtmFunctionRule, RtmModel, RtmRequirement } from './types.js'
 import { computeCoverage } from './coverage.js'
+import { computeDiagnostics, natCmp } from './validate.js'
 
 type Verb = 'added' | 'modified' | 'removed' | 'revived'
 
@@ -49,12 +50,16 @@ export function applyRequirements(
   requirements: RtmRequirement[],
   newFunctions: RtmFunctionRow[] = [],
 ): RtmModel {
-  // 입력 정규화(스키마 default 채움) — 후방호환. 손상 요구사항은 건너뛴다.
-  const sortedReqs: RtmRequirement[] = requirements
-    .map((r) => RtmRequirementSchema.safeParse(r))
-    .filter((s): s is { success: true; data: RtmRequirement } => s.success)
-    .map((s) => s.data)
-    .sort((a, b) => cmp(a.id, b.id))
+  // 입력 정규화(스키마 default 채움) — 후방호환. 손상 요구사항은 드롭하되 **가시화**(C2).
+  const droppedReqIds: string[] = []
+  const sortedReqs: RtmRequirement[] = []
+  for (const r of requirements) {
+    const parsed = RtmRequirementSchema.safeParse(r)
+    if (parsed.success) sortedReqs.push(parsed.data)
+    else droppedReqIds.push(typeof (r as { id?: unknown })?.id === 'string' ? (r as { id: string }).id : '(id 미상)')
+  }
+  // 현행 head(§1) 선택이 순서에 의존하므로 자연순 정렬(REQ-2 < REQ-10, M3).
+  sortedReqs.sort((a, b) => natCmp(a.id, b.id))
 
   const activeReqs = sortedReqs.filter((r) => r.status === 'ACTIVE')
 
@@ -113,5 +118,7 @@ export function applyRequirements(
   }))
 
   const next: RtmModel = { ...model, domains, functions, requirements: sortedReqs }
-  return { ...next, coverage: computeCoverage(next) }
+  const coverage = computeCoverage(next)
+  const withCov: RtmModel = { ...next, coverage }
+  return { ...withCov, diagnostics: computeDiagnostics(withCov, droppedReqIds) }
 }

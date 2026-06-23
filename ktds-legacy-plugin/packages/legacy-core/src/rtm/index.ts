@@ -26,6 +26,7 @@ export {
   SignoffSchema,
   RtmRequirementSchema,
   RtmCoverageSchema,
+  RtmDiagnosticSchema,
   RtmModelSchema,
 } from './types.js'
 export type {
@@ -50,8 +51,10 @@ export type {
   Signoff,
   RtmRequirement,
   RtmCoverage,
+  RtmDiagnostic,
   RtmModel,
 } from './types.js'
 export { buildRtm } from './build-rtm.js'
 export { applyRequirements } from './apply-requirements.js'
 export { computeCoverage } from './coverage.js'
+export { computeDiagnostics, natCmp } from './validate.js'

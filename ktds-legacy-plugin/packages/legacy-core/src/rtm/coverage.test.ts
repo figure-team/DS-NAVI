@@ -60,7 +60,10 @@ describe('RTM v2 — AC(①) · NFR(②) · coverage(⑥)', () => {
     expect(cov.requirements.byLifecycle).toEqual({ DEVELOPING: 1 })
     expect(cov.tests).toEqual({ total: 2, pass: 1, fail: 0, untested: 1 })
     expect(cov.gaps.unimplemented).toEqual(['REQ-001'])
-    expect(cov.gaps.unverified).toContain('f1') // f1=CHANGED 인데 테스트 셀 빔
+    // M2 축 화해: f1 은 AC-1(PASS)이 매핑 → 검증됨 → unverified 에 없음(테스트 셀 빔에도).
+    expect(cov.gaps.unverified).not.toContain('f1')
+    // per-requirement 롤업: 대상 {f1,f2}=2 중 f1 만 구현 / AC 2 중 1 통과.
+    expect(cov.byRequirement['REQ-001']).toEqual({ targetsTotal: 2, targetsBuilt: 1, acsTotal: 2, acsPassed: 1 })
   })
 
   it('signoff 승인 시 검수 집계 + computeCoverage 직접 호출 동등', () => {

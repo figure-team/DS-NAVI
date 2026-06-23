@@ -53,6 +53,30 @@ Function {
 상태/배지 어휘: `+신규` `~변경` `−삭제/폐기` `=부활` · `🚫고아` · `⚠미구현` · `✅구현·검증`
 · `[추정]` ↔ `✓확정(이름)`.
 
+## 1b. 상세 요구사항 모델 (v2) — 9개 빈틈 반영
+
+상세 요구(여러 기능 + 여러 조건/분기/예외)와 SI RTM 실무 요건을 담기 위해 모델을 확장(schemaVersion 2).
+핵심: **요구사항 → 인수조건(AC) → 기능**의 3계층 + 검증 스파인 + 메타/커버리지.
+
+| # | 확장 | 어디에 |
+|---|---|---|
+| ① 인수조건(AC) | 검증 가능한 조건 1개 = AC. `kind`(분기/선행/후행/예외/일반) + `fnIds`(N:M 기능 매핑) | `Requirement.acceptanceCriteria[]` ↔ `Function.rules[]`(현행 AC 역집계) |
+| ② 비기능(NFR) | `type: functional\|nonfunctional` + `nfrCategory` + `nfrScope`(횡단 귀속) | `Requirement` + `Function.nfrTags[]` |
+| ③ 검증 스파인 | 시험결과(PASS/FAIL/NA/UNTESTED) + 결함 + **고객검수(signoff, 내부확정과 별개 2축)** | `AC.tests[]` + `Requirement.signoff` |
+| ④ lifecycle | 접수→분석→설계→개발→시험→완료/보류/반려 | `Requirement.lifecycle` |
+| ⑤ 메타 | 우선순위·요청자·출처문서·요청일·대상 릴리스 | `Requirement.priority` + `source.{requester,doc,section,requestedAt,targetRelease}` |
+| ⑥ 커버리지/갭 | 요구 구현·검증·검수 집계 + 양방향 갭(미구현 요구 ↔ 고아 코드 ↔ 미검증) | `model.coverage`(computeCoverage 파생) |
+| ⑦ 의존성 | 선행 요구 | `Requirement.dependsOn[]` |
+| ⑧ 산출물 연계 | SI 문서(기능명세서 등) 항목 링크 | `Function.deliverableRefs[]`(docId+anchor) |
+| ⑨ 변경관리 | CR번호·사유·승인자·영향공수(영향도 엔진 연계) | `Requirement.changeReq` |
+
+**규칙도 supersede**: `Function.rules` 는 현행(ACTIVE) 요구사항의 AC 만 집계 → 폐기 요구의 규칙은 빠지되
+이력은 보존(§1 불변규칙이 기능뿐 아니라 규칙 단위에도 적용).
+
+**연산 위치(단일 소스, 순수·테스트됨):** `buildRtm`(AS-IS) → `applyRequirements`(상태/이력/rules/nfrTags
+재계산) → `computeCoverage`(롤업). 인테이크가 `rtm-requirements.json` 에 v2 구조를 쓰면 understand-rtm 이
+적용해 `rtm.json` 에 bake. 시험결과/검수는 인테이크가 채우지 않는다(실측·고객 몫).
+
 ## 2. UI — 탭 1개 · 뷰 2개 · 상세 패널
 
 상단 토글로 두 뷰 전환. **같은 데이터의 전치(transpose)** 이며 클릭으로 상호 점프.

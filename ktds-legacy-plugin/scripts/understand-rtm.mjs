@@ -134,4 +134,15 @@ const myb = mybatisModel.mappers.length > 0 ? ` · MyBatis ${mybatisModel.mapper
 console.log(`understand-rtm 완료 — ${projectRoot}${myb}`)
 console.log(`  RTM → .understand-anything/rtm.json`)
 console.log(`  도메인 ${model.domains.length} · 기능 ${model.functions.length} · 요구사항 ${reqCount} · 추적셀 근거율 ${rate}%`)
+const cov = model.coverage
+if (cov) {
+  console.log(
+    `  커버리지 — 요구 구현 ${cov.requirements.implemented}/${cov.requirements.total} · 검증 ${cov.requirements.verified}/${cov.requirements.total}` +
+      ` · 기능 구현 ${cov.functions.implemented} 미구현 ${cov.functions.planned} 고아 ${cov.functions.orphaned}` +
+      ` · 시험 통과 ${cov.tests.pass}/${cov.tests.total}`,
+  )
+  if (cov.gaps.unimplemented.length || cov.gaps.orphanCode.length) {
+    console.log(`  갭 — 미구현 요구 ${cov.gaps.unimplemented.length} · 고아 코드 ${cov.gaps.orphanCode.length} · 미검증 기능 ${cov.gaps.unverified.length}`)
+  }
+}
 console.log('모든 추적 셀은 file:line 근거 + 신뢰도 태그를 갖는다(grounding 보존). 요구사항/이력/편집·확정은 후속(R3~R5).')

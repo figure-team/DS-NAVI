@@ -40,11 +40,27 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. `rtm-r
 
 `.understand-anything/rtm-requirements.json` 이 이미 있으면 읽어 **보존**한다(append, 덮어쓰기 금지).
 
-## 2) 분해 — 요청을 하위 기능들로
+## 2) 분해 — 요청을 하위 기능 + 인수조건(AC)으로
 요청 하나가 기능 1개일 수도, 여러 개일 수도 있다. 기존 기능들의 **입도(granularity)에 맞춰** 분해하라.
 예) "알림 기능" → 알림 추가 / 알림 삭제 / 재알림 / 재고 알림. 과하게 쪼개지 말고 기존 기능 수준으로.
 
-## 3) 매칭 — 기존 수정 vs 신규
+**상세 요구(조건·분기·예외 포함)는 인수조건(AC)으로 쪼갠다.** 검증 가능한 조건 1개 = AC 1개. 각 AC 는
+그것을 구현하는 **기능(fnIds)에 매핑**한다(한 AC 가 여러 기능에 걸칠 수 있다 = N:M). `kind`:
+`branch`(분기) / `precondition`(선행검증) / `postcondition`(후행액션) / `exception`(예외) / `rule`(일반).
+예) "장바구니 추가 시 있으면 +1, 없으면 추가. 재고 없으면 불가, 단 이벤트 상품 예외. 추가되면 알림 발송":
+- AC-1 있으면+1/없으면추가(branch) → [장바구니추가]
+- AC-2 재고없으면 불가(precondition) → [장바구니추가, 재고확인]
+- AC-3 이벤트 상품 예외(exception) → [장바구니추가, 재고확인]
+- AC-4 추가시 알림 발송(postcondition) → [장바구니추가, 알림발송]
+각 AC 에 테스트 슬롯(`tests`)을 둔다 — 케이스 미정이면 비워 둔다(검증 공백 = 할 일).
+
+## 3) 매칭 — 기존 수정 vs 신규 · 기능 vs 비기능
+먼저 요구사항 **유형**을 판정한다(`type`):
+- **기능(functional)** — 특정 기능/코드에 매핑됨(아래 changeset).
+- **비기능(nonfunctional)** — 성능/보안/가용성 등 횡단 요구(예: "3초 이내 응답", "암호화 저장"). `nfrCategory`
+  지정 + `nfrScope` 에 영향 기능/도메인 id(비면 시스템 전체). changeset 은 비울 수 있다.
+
+기능 요구는 각 하위 기능을 인벤토리와 대조해 분류한다(changeset 동사):
 각 하위 기능을 인벤토리와 대조해 분류한다(changeset 동사):
 - **기존 기능 수정** → 그 `functions[].id` 를 `modified` 에. (예: "결제에 무통장입금 추가" → 기존 결제 처리 기능 `modified`)
 - **기존 기능 제거(요구 폐기)** → `removed`. **삭제하지 말고 표시만**(파괴적 삭제 금지).
@@ -68,14 +84,29 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. `rtm-r
   "requirements": [
     {
       "id": "REQ-00N",                      // 기존 최대 + 1 (zero-pad 3자리)
-      "text": "결제는 무통장입금만 가능",      // 요구사항 한 줄 요약
+      "text": "장바구니 추가 규칙",           // 요구사항 한 줄 요약
+      "type": "functional",                  // functional | nonfunctional(②)
+      "nfrCategory": null,                   // 비기능일 때 performance|security|availability|... (②)
+      "nfrScope": [],                        // 비기능 횡단 귀속 기능/도메인 id(비면 시스템 전체) (②)
+      "priority": "HIGH",                    // HIGH|MEDIUM|LOW (⑤)
+      "lifecycle": "RECEIVED",               // RECEIVED|ANALYZING|DESIGNING|DEVELOPING|TESTING|DONE|HOLD|REJECTED (④)
       "status": "ACTIVE",                    // ACTIVE | SUPERSEDED
-      "supersedes": "REQ-005",               // 대체하는 이전 요구사항(없으면 null)
+      "supersedes": null,                    // 대체하는 이전 요구사항(없으면 null)
       "supersededBy": null,
-      "source": { "kind": "customer", "raw": "<고객 원문 그대로>" },
-      "changeset": {
-        "added":    ["to-be:payment/무통장입금-등록"],
-        "modified": ["flow:POST /order/confirm"],
+      "dependsOn": [],                       // 선행 요구사항 id (⑦)
+      "source": { "kind": "customer", "raw": "<고객 원문 그대로>",
+                  "requester": null, "doc": null, "section": null, "requestedAt": null, "targetRelease": null }, // (⑤)
+      "changeReq": null,                     // 변경요청: { crNo, reason, approver, effort } (⑨)
+      "signoff": null,                       // 고객검수: { approved, by, at } — 인테이크는 null(고객 몫) (③)
+      "acceptanceCriteria": [                // 인수조건 ① — 상세 조건을 검증 단위로
+        { "id": "AC-1", "text": "있으면 +1, 없으면 추가", "kind": "branch",
+          "fnIds": ["to-be:cart/장바구니추가"], "confidence": "INFERRED", "tests": [] },
+        { "id": "AC-2", "text": "재고 0이면 추가 불가", "kind": "precondition",
+          "fnIds": ["to-be:cart/장바구니추가", "flow:stock-check"], "confidence": "INFERRED", "tests": [] }
+      ],
+      "changeset": {                         // AC fnIds 와 일치해야 함(±/~/=)
+        "added":    ["to-be:cart/장바구니추가"],
+        "modified": ["flow:stock-check", "flow:noti-send"],
         "removed":  [],
         "revived":  []
       }
@@ -103,6 +134,10 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. `rtm-r
   진입점/구현/데이터 제안은 `INFERRED`(`(제안)` 접두), 테스트는 `UNVERIFIED`. 근거(evidence)는 `[]`.
 - 기존 기능의 셀 값은 **건드리지 않는다**(rtm.json 이 소유). changeset 의 fnId 로만 참조한다.
 - `changeset` 의 모든 fnId 는 rtm.json `functions[].id` 또는 이 파일 `functions[]` 의 신규 id 중 하나여야 한다.
+- **AC.fnIds 는 changeset 에 등장한 기능과 일치**해야 한다(누락/유령 매핑 금지). AC 의 `confidence` 는
+  신규 제안이면 `INFERRED`. **시험결과(`tests[].result`)는 인테이크가 `PASS` 로 적지 않는다** — 실제 시험
+  전이므로 비우거나(`[]`) 케이스만 `UNTESTED` 로. 고객검수(`signoff`)도 인테이크는 건드리지 않는다(사람 몫).
+- `lifecycle` 신규 요청 기본값은 `RECEIVED`(또는 분석까지 했으면 `ANALYZING`). 임의로 `DONE` 금지.
 
 ## 6) 재생성
 기록 후 RTM 을 재생성해 상태/이력을 반영한다:

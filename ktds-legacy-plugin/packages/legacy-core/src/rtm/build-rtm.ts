@@ -25,6 +25,7 @@ import type {
   RtmModel,
   RtmTraceCell,
 } from './types.js'
+import { computeCoverage } from './coverage.js'
 
 const cmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0)
 
@@ -243,6 +244,9 @@ export function buildRtm(input: DocInput, gitCommit: string | null = null): RtmM
         origin: 'AS_IS',
         state: impl.evidence.length > 0 ? 'IMPLEMENTED' : 'PLANNED',
         requirementHistory: [],
+        nfrTags: [],
+        rules: [],
+        deliverableRefs: [],
       })
     }
   }
@@ -253,5 +257,6 @@ export function buildRtm(input: DocInput, gitCommit: string | null = null): RtmM
     functionCount: domainCounts.get(gk) ?? 0,
   }))
 
-  return { schemaVersion: 1, gitCommit, domains, functions, requirements: [] }
+  const model: RtmModel = { schemaVersion: 2, gitCommit, domains, functions, requirements: [] }
+  return { ...model, coverage: computeCoverage(model) }
 }

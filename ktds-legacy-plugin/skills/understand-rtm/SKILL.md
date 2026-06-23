@@ -1,19 +1,35 @@
 ---
-name: understand-rtm-intake
-description: 요구사항 추적표(RTM) 인테이크 — 고객 자연어 요청을 기존 도메인/기능 인벤토리(rtm.json)와 대조해 하위 기능들로 분해·매칭하고, 변경 묶음(changeset)을 rtm-requirements.json 에 기록한 뒤 understand-rtm 으로 재생성한다. 신규는 [추정], 확정은 사람 몫.
-argument-hint: ["<자연어 요청>", "[projectRoot]"]
+name: understand-rtm
+description: 요구사항 추적표(RTM) — 코드에서 AS-IS 추적표(rtm.json)를 생성하고, 고객 자연어 요청을 기존 도메인/기능 인벤토리와 대조해 하위 기능으로 분해·매칭(인테이크)해 변경 묶음(changeset)을 rtm-requirements.json 에 기록한 뒤 재생성한다. 신규는 [추정], 확정은 사람 몫.
+argument-hint: ["[자연어 요청]", "[projectRoot]"]
 ---
 
-# /understand-rtm-intake
+# /understand-rtm
 
 > 🌐 **언어:** 사용자에게 보여주는 모든 설명은 **한국어**로 한다.
 
-고객사의 자연어 요청(예: "알림 기능 만들어줘", "결제에 무통장입금 추가해줘")을 받아 **요구사항 추적표(RTM)**에
-반영한다. 핵심 원칙: **너는 제안만(`[추정]`) 한다. 확정은 사람이 대시보드에서 한다.** 코드를 수정하지 않는다 —
+요구사항 추적표(RTM)의 단일 명령. **두 모드**가 있다(인자로 구분):
+
+- **생성 모드** (자연어 요청 없음) — 코드에서 AS-IS 추적표를 만든다(§A).
+- **인테이크 모드** (자연어 요청 있음) — 고객 요청을 분해·매칭해 요구사항/변경 묶음을 기록한다(§B~).
+
+핵심 원칙: **너는 제안만(`[추정]`) 한다. 확정은 사람이 대시보드에서 한다.** 코드를 수정하지 않는다 —
 요구사항·변경 묶음만 기록한다.
 
-## 0) 전제
-`.understand-anything/rtm.json` 이 있어야 한다(없으면 `understand-rtm` 먼저 안내하고 멈춤). 이 파일이
+## A) 생성 모드 — 자연어 요청이 없을 때
+코드에서 AS-IS 추적표를 결정론으로 생성한다:
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-rtm.mjs <projectRoot>
+```
+도메인 그래프 + 스캔 산출물(routes/MyBatis/method-calls)에서 기능별 4축(진입점/구현/데이터/테스트)을
+file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. `rtm-requirements.json` 이 있으면 적용해
+상태/이력을 재계산한다. 완료 후 도메인·기능 수, 근거율을 한국어로 보고하고 끝낸다.
+
+## B) 인테이크 모드 — 자연어 요청이 있을 때
+고객사의 자연어 요청(예: "알림 기능 만들어줘", "결제에 무통장입금 추가해줘")을 받아 RTM 에 반영한다.
+
+### 0) 전제
+`.understand-anything/rtm.json` 이 있어야 한다(없으면 §A 생성 모드를 먼저 안내하고 멈춤). 이 파일이
 현재 **도메인/기능 인벤토리 + 기존 요구사항**의 단일 소스다.
 
 ## 1) 인벤토리 파악

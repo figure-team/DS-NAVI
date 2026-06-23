@@ -695,7 +695,7 @@ function handleImpactAnalyzePost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
-// ── R5: RTM 인테이크 — 자연어 요청 → claude -p "/understand-rtm-intake <q>" ─────
+// ── R5: RTM 인테이크 — 자연어 요청 → claude -p "/understand-rtm <q>" ─────
 // 스킬이 .understand-anything/rtm-requirements.json 작성 + understand-rtm 재생성 → 프론트가
 // rtm.json 재로드. 영향도 분석 job 과 동형(단일 job, 409 차단, args 배열로 셸 미경유).
 const RTM_INTAKE_DIRECTIVE =
@@ -717,7 +717,7 @@ function appendRtmTail(chunk: string): void {
 }
 
 /**
- * POST /rtm-intake — { query } 자연어로 claude -p "/understand-rtm-intake <query>" 실행.
+ * POST /rtm-intake — { query } 자연어로 claude -p "/understand-rtm <query>" 실행.
  * 즉시 202 + job, 프로세스는 백그라운드 지속(프론트가 /rtm-intake-status 폴링 → done 시 rtm.json 재로드).
  */
 function handleRtmIntakePost(
@@ -752,7 +752,7 @@ function handleRtmIntakePost(
       try {
         child = spawn(
           "claude",
-          ["-p", `/understand-rtm-intake ${query}${RTM_INTAKE_DIRECTIVE}`, "--permission-mode", "bypassPermissions"],
+          ["-p", `/understand-rtm ${query}${RTM_INTAKE_DIRECTIVE}`, "--permission-mode", "bypassPermissions"],
           { cwd: projectRoot, env: process.env },
         );
       } catch (err) {

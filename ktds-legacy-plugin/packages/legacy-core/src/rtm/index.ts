@@ -26,3 +26,4 @@ export type {
   RtmModel,
 } from './types.js'
 export { buildRtm } from './build-rtm.js'
+export { applyRequirements } from './apply-requirements.js'

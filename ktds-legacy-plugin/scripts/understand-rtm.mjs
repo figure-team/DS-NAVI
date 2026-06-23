@@ -25,7 +25,7 @@ if (!existsSync(distEntry)) {
 
 const projectRoot = process.argv[2] || process.cwd()
 const engine = await import(distEntry)
-const { buildRtm, buildMyBatisModel } = engine
+const { buildRtm, applyRequirements, buildMyBatisModel } = engine
 
 // 입력은 디스크의 fill 완료 그래프(비파괴). buildMap 호출 금지(채움 소실).
 const graphPath = join(projectRoot, '.understand-anything', 'domain-graph.json')
@@ -102,7 +102,24 @@ if (existsSync(mcgPath)) {
 }
 
 const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph }
-const model = buildRtm(input, graph.gitCommit ?? null)
+let model = buildRtm(input, graph.gitCommit ?? null)
+
+// 요구사항 오버레이(.understand-anything/rtm-requirements.json) — 있으면 적용해 기능 상태/이력 재계산.
+// { requirements: RtmRequirement[], functions?: RtmFunctionRow[](신규 TO-BE 행) }. 수동 작성(R4) 또는
+// 인테이크(R5, claude -p)가 쓴다. 없으면 AS-IS 그대로.
+let reqCount = 0
+const reqPath = join(projectRoot, '.understand-anything', 'rtm-requirements.json')
+if (existsSync(reqPath)) {
+  try {
+    const overlay = JSON.parse(readFileSync(reqPath, 'utf8'))
+    const requirements = Array.isArray(overlay.requirements) ? overlay.requirements : []
+    const newFunctions = Array.isArray(overlay.functions) ? overlay.functions : []
+    model = applyRequirements(model, requirements, newFunctions)
+    reqCount = requirements.length
+  } catch (err) {
+    console.error(`rtm-requirements.json 파싱 실패(무시): ${err.message}`)
+  }
+}
 
 const OUTPUT_DIR = join(projectRoot, '.understand-anything')
 mkdirSync(OUTPUT_DIR, { recursive: true })
@@ -116,5 +133,5 @@ const myb = mybatisModel.mappers.length > 0 ? ` · MyBatis ${mybatisModel.mapper
 
 console.log(`understand-rtm 완료 — ${projectRoot}${myb}`)
 console.log(`  RTM → .understand-anything/rtm.json`)
-console.log(`  도메인 ${model.domains.length} · 기능 ${model.functions.length} · 추적셀 근거율 ${rate}%`)
+console.log(`  도메인 ${model.domains.length} · 기능 ${model.functions.length} · 요구사항 ${reqCount} · 추적셀 근거율 ${rate}%`)
 console.log('모든 추적 셀은 file:line 근거 + 신뢰도 태그를 갖는다(grounding 보존). 요구사항/이력/편집·확정은 후속(R3~R5).')

@@ -454,6 +454,121 @@ function handleDocPost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
+// ── R3: RTM 행 오버레이(사용자 편집/확정) — node-overrides 와 동형(편집=즉시 확정). ──
+/** rtm-overrides.json 경로(.understand-anything/, rtm.json 형제, 재생성 생존). */
+function rtmOverridesFilePath(): string | null {
+  const graphFile = findGraphFile("domain-graph.json");
+  return graphFile ? path.join(path.dirname(graphFile), "rtm-overrides.json") : null;
+}
+/** rtm.json 의 기능 id 집합 — POST fnId 실존 검증용(없으면 빈 집합 = 전부 차단). */
+function rtmFunctionIds(): Set<string> {
+  const ids = new Set<string>();
+  const file = findGraphFile("rtm.json");
+  if (!file) return ids;
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as { functions?: Array<{ id?: unknown }> };
+    for (const f of raw.functions ?? []) if (typeof f.id === "string") ids.add(f.id);
+  } catch {
+    /* 파싱 실패 → 빈 집합 */
+  }
+  return ids;
+}
+/**
+ * 편집 허용 셀 화이트리스트 — 사람이 교정/확정하는 표시 셀(name + 4 추적축). 스키마 키
+ * (id/featureId/origin/confidence 등 결정론 사실)은 편집 거부.
+ */
+function isEditableRtmCell(key: string): boolean {
+  return key === "name" || key === "entryPoint" || key === "implementation" || key === "data" || key === "test";
+}
+type RtmOverride = { editedCells: Record<string, string>; approver: string; at: string; audit?: unknown[] };
+/** rtm-overrides.json 읽기 — 없거나 손상이면 {}. */
+function readRtmOverrides(): Record<string, RtmOverride> {
+  const file = rtmOverridesFilePath();
+  if (!file || !fs.existsSync(file)) return {};
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8"));
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, RtmOverride>) : {};
+  } catch {
+    return {};
+  }
+}
+/**
+ * POST /rtm-override — { fnId, editedCells, approver } 검증 후 병합 기록.
+ * 검증: fnId 실존(rtm.json) · editedCells 키 화이트리스트 + 값 문자열 · approver 비어있지 않음.
+ * 레코드 존재 = 그 기능 행 확정(approver). audit append-only. 생성물(rtm.json) 불변.
+ */
+function handleRtmOverridePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = rtmOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No domain graph found. Run /understand-rtm first." });
+    return;
+  }
+  collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
+    .then((body) => {
+      let parsed: { fnId?: unknown; editedCells?: unknown; approver?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { fnId, editedCells, approver } = parsed ?? {};
+      if (typeof fnId !== "string" || !fnId) {
+        sendJson(res, 400, { error: "fnId is required" });
+        return;
+      }
+      if (typeof approver !== "string" || !approver.trim()) {
+        sendJson(res, 400, { error: "approver is required" });
+        return;
+      }
+      if (!editedCells || typeof editedCells !== "object" || Array.isArray(editedCells)) {
+        sendJson(res, 400, { error: "editedCells object is required" });
+        return;
+      }
+      if (!rtmFunctionIds().has(fnId)) {
+        sendJson(res, 400, { error: "fnId is not in rtm.json" });
+        return;
+      }
+      const clean: Record<string, string> = {};
+      for (const [k, v] of Object.entries(editedCells as Record<string, unknown>)) {
+        if (!isEditableRtmCell(k)) {
+          sendJson(res, 400, { error: `cell is not editable: ${k}` });
+          return;
+        }
+        if (typeof v !== "string") {
+          sendJson(res, 400, { error: `editedCells[${k}] must be a string` });
+          return;
+        }
+        clean[k] = v;
+      }
+      const now = new Date().toISOString();
+      const by = approver.trim();
+      const store = readRtmOverrides();
+      const prev = store[fnId];
+      const audit = Array.isArray(prev?.audit) ? prev!.audit : [];
+      const record: RtmOverride = {
+        editedCells: clean,
+        approver: by,
+        at: now,
+        audit: [...audit, { event: "CONFIRMED", by, at: now }],
+      };
+      store[fnId] = record;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write rtm-overrides:", err);
+        sendJson(res, 500, { error: "Failed to write rtm overrides" });
+        return;
+      }
+      sendJson(res, 200, { fnId, ...record });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
 // ── ktds: 구조 탭 "영향도 분석" — 자연어 → claude -p "/understand-impact <q>" ─────
 // 대시보드 dev server가 분석 대상 프로젝트(GRAPH_DIR)에서 claude 를 헤드리스로 spawn.
 // 스킬이 .understand-anything/impact-overlay.json 을 갱신 → 프론트가 재로드해 색칠.
@@ -678,7 +793,9 @@ export default defineConfig({
             pathname === "/doc" ||
             pathname === "/impact-analyze" ||
             pathname === "/impact-status" ||
-            pathname === "/rtm.json";
+            pathname === "/rtm.json" ||
+            pathname === "/rtm-overrides.json" ||
+            pathname === "/rtm-override";
 
           if (!isProtectedEndpoint) {
             next();
@@ -704,6 +821,17 @@ export default defineConfig({
           if (pathname === "/node-overrides.json") {
             const file = nodeOverridesFilePath();
             sendJson(res, 200, file ? readNodeOverrides(file) : {});
+            return;
+          }
+
+          // R3: RTM 행 오버레이(편집/확정) — 읽기(GET, 병합용)·쓰기(POST, 토큰+화이트리스트).
+          if (pathname === "/rtm-override") {
+            if (req.method === "POST") handleRtmOverridePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to write rtm overrides" });
+            return;
+          }
+          if (pathname === "/rtm-overrides.json") {
+            sendJson(res, 200, readRtmOverrides());
             return;
           }
 

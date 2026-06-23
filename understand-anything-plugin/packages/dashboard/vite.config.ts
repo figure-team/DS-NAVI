@@ -695,6 +695,92 @@ function handleImpactAnalyzePost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
+// ── R5: RTM 인테이크 — 자연어 요청 → claude -p "/understand-rtm-intake <q>" ─────
+// 스킬이 .understand-anything/rtm-requirements.json 작성 + understand-rtm 재생성 → 프론트가
+// rtm.json 재로드. 영향도 분석 job 과 동형(단일 job, 409 차단, args 배열로 셸 미경유).
+const RTM_INTAKE_DIRECTIVE =
+  "\n\n위 요청은 대시보드 추적표에서 자동 실행된 헤드리스 작업이다. 사용자에게 확인을 묻지 말고 " +
+  "rtm.json 인벤토리와 대조해 요청을 하위 기능으로 분해·매칭하고, rtm-requirements.json 에 제안(전부 [추정])을 " +
+  "기록한 뒤, understand-rtm.mjs 를 실행해 rtm.json 을 재생성하는 단계까지 끝까지 완주하라. 확정은 사람이 대시보드에서 한다.";
+
+let rtmJob: ImpactJob = {
+  status: "idle",
+  jobId: null,
+  query: null,
+  startedAt: null,
+  finishedAt: null,
+  exitCode: null,
+  tail: "",
+};
+function appendRtmTail(chunk: string): void {
+  rtmJob.tail = (rtmJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
+}
+
+/**
+ * POST /rtm-intake — { query } 자연어로 claude -p "/understand-rtm-intake <query>" 실행.
+ * 즉시 202 + job, 프로세스는 백그라운드 지속(프론트가 /rtm-intake-status 폴링 → done 시 rtm.json 재로드).
+ */
+function handleRtmIntakePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  if (rtmJob.status === "running") {
+    sendJson(res, 409, { error: "An RTM intake is already running", job: { ...rtmJob } });
+    return;
+  }
+  const projectRoot = impactProjectRoot();
+  if (!projectRoot) {
+    sendJson(res, 404, { error: "No project found. Run /understand first." });
+    return;
+  }
+  collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
+    .then((body) => {
+      let query = "";
+      try {
+        const parsed = JSON.parse(body) as { query?: unknown };
+        query = typeof parsed.query === "string" ? parsed.query.trim() : "";
+      } catch {
+        query = "";
+      }
+      if (!query) {
+        sendJson(res, 400, { error: "Missing 'query'" });
+        return;
+      }
+      const jobId = crypto.randomBytes(8).toString("hex");
+      rtmJob = { status: "running", jobId, query, startedAt: new Date().toISOString(), finishedAt: null, exitCode: null, tail: "" };
+      let child: ReturnType<typeof spawn>;
+      try {
+        child = spawn(
+          "claude",
+          ["-p", `/understand-rtm-intake ${query}${RTM_INTAKE_DIRECTIVE}`, "--permission-mode", "bypassPermissions"],
+          { cwd: projectRoot, env: process.env },
+        );
+      } catch (err) {
+        rtmJob.status = "failed";
+        rtmJob.finishedAt = new Date().toISOString();
+        appendRtmTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
+        sendJson(res, 500, { error: "Failed to launch claude", job: { ...rtmJob } });
+        return;
+      }
+      child.stdout?.on("data", (c: Buffer) => appendRtmTail(c.toString("utf8")));
+      child.stderr?.on("data", (c: Buffer) => appendRtmTail(c.toString("utf8")));
+      child.on("error", (err) => {
+        if (rtmJob.jobId !== jobId) return;
+        rtmJob.status = "failed";
+        rtmJob.finishedAt = new Date().toISOString();
+        appendRtmTail(`\n[spawn error] ${err.message}\n`);
+      });
+      child.on("close", (code) => {
+        if (rtmJob.jobId !== jobId) return;
+        rtmJob.status = code === 0 ? "done" : "failed";
+        rtmJob.exitCode = code;
+        rtmJob.finishedAt = new Date().toISOString();
+      });
+      sendJson(res, 202, { job: { ...rtmJob } });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
 export default defineConfig({
   test: {
     environment: "node",
@@ -795,7 +881,9 @@ export default defineConfig({
             pathname === "/impact-status" ||
             pathname === "/rtm.json" ||
             pathname === "/rtm-overrides.json" ||
-            pathname === "/rtm-override";
+            pathname === "/rtm-override" ||
+            pathname === "/rtm-intake" ||
+            pathname === "/rtm-intake-status";
 
           if (!isProtectedEndpoint) {
             next();
@@ -889,6 +977,15 @@ export default defineConfig({
           }
           if (pathname === "/impact-status") {
             sendJson(res, 200, { job: { ...impactJob } });
+            return;
+          }
+          if (pathname === "/rtm-intake") {
+            if (req.method === "POST") handleRtmIntakePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to start RTM intake" });
+            return;
+          }
+          if (pathname === "/rtm-intake-status") {
+            sendJson(res, 200, { job: { ...rtmJob } });
             return;
           }
 

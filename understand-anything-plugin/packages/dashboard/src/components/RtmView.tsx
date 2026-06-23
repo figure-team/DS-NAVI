@@ -135,29 +135,90 @@ export default function RtmView() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let alive = true;
+  const loadModel = useCallback(() => {
     setError(null);
     fetch(`/rtm.json${tokenQ}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((data: RtmModel) => {
-        if (!alive) return;
         if (Array.isArray(data?.functions)) setModel(data);
         else setError("rtm.json 형식 오류");
       })
-      .catch((e) => alive && setError(String(e instanceof Error ? e.message : e)));
+      .catch((e) => setError(String(e instanceof Error ? e.message : e)));
     fetch(`/rtm-overrides.json${tokenQ}`)
       .then((r) => (r.ok ? r.json() : {}))
       .then((data: unknown) => {
-        if (alive && data && typeof data === "object" && !Array.isArray(data)) {
-          setOverrides(data as Record<string, RtmOverride>);
-        }
+        if (data && typeof data === "object" && !Array.isArray(data)) setOverrides(data as Record<string, RtmOverride>);
       })
       .catch(() => {});
-    return () => {
-      alive = false;
-    };
   }, [tokenQ]);
+
+  useEffect(() => {
+    loadModel();
+  }, [loadModel]);
+
+  // R5 인테이크 — 자연어 요청 → claude -p job. running 동안 폴링, done 시 rtm.json 재로드.
+  const [intakeOpen, setIntakeOpen] = useState(false);
+  const [intakeQuery, setIntakeQuery] = useState("");
+  const [intakeStatus, setIntakeStatus] = useState<"idle" | "running" | "done" | "failed">("idle");
+  const [intakeError, setIntakeError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ kind: "done" | "failed"; msg: string } | null>(null);
+
+  const startIntake = useCallback(async () => {
+    const q = intakeQuery.trim();
+    if (!q) return;
+    if (!accessToken) {
+      setIntakeError("읽기전용(라이브 서버 없음) — 인테이크는 dev 서버가 필요합니다.");
+      return;
+    }
+    setIntakeError(null);
+    try {
+      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q }),
+      });
+      if (res.status === 202) {
+        setIntakeStatus("running");
+        setIntakeOpen(false);
+        setIntakeQuery("");
+      } else {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
+        setIntakeError(d?.error ?? `HTTP ${res.status}`);
+      }
+    } catch (e) {
+      setIntakeError(String(e));
+    }
+  }, [intakeQuery, accessToken]);
+
+  useEffect(() => {
+    if (intakeStatus !== "running") return;
+    const poll = async () => {
+      try {
+        const r = await fetch(`/rtm-intake-status${tokenQ}`);
+        const data = (await r.json()) as { job?: { status?: string } };
+        const st = data?.job?.status;
+        if (st === "done") {
+          setIntakeStatus("done");
+          setToast({ kind: "done", msg: "요구사항 인테이크 완료 — 추적표를 갱신했습니다." });
+          loadModel();
+          setView("requirement");
+        } else if (st === "failed") {
+          setIntakeStatus("failed");
+          setToast({ kind: "failed", msg: "요구사항 인테이크 실패 — 콘솔/서버 로그를 확인하세요." });
+        }
+      } catch {
+        /* keep polling */
+      }
+    };
+    const id = setInterval(poll, 3000);
+    return () => clearInterval(id);
+  }, [intakeStatus, tokenQ, loadModel]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 6000);
+    return () => clearTimeout(id);
+  }, [toast]);
 
   const resolveApprover = useCallback((): string | null => {
     const fromStore = approverHandle?.trim();
@@ -275,11 +336,32 @@ export default function RtmView() {
           {toggleBtn("function", "기능 기준")}
           {toggleBtn("requirement", "요구사항 기준")}
         </div>
-        {model && (
-          <span className="ml-auto text-text-muted" style={{ fontSize: 11, fontFamily: "var(--font-mono)" }}>
-            도메인 {model.domains.length} · 기능 {model.functions.length} · 요구사항 {model.requirements.length} · 근거율 {evidenceRate}%
-          </span>
-        )}
+        <span className="ml-auto flex items-center gap-3">
+          {intakeStatus === "running" && (
+            <span className="flex items-center gap-1.5 text-amber-400" style={{ fontSize: 11 }} title="요구사항 인테이크 진행 중">
+              <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              분석 중…
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => { setIntakeOpen(true); setIntakeError(null); }}
+            disabled={intakeStatus === "running"}
+            className="rounded-md border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-40"
+            style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600 }}
+            title="자연어로 새 요구사항을 요청 → 분해·매칭(전부 [추정])"
+          >
+            + 요청
+          </button>
+          {model && (
+            <span className="text-text-muted" style={{ fontSize: 11, fontFamily: "var(--font-mono)" }}>
+              도메인 {model.domains.length} · 기능 {model.functions.length} · 요구사항 {model.requirements.length} · 근거율 {evidenceRate}%
+            </span>
+          )}
+        </span>
       </div>
 
       {/* 본문 */}
@@ -496,6 +578,51 @@ export default function RtmView() {
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* R5 인테이크 모달 — 자연어 요청 입력. */}
+      {intakeOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-root/80 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setIntakeOpen(false); }}>
+          <div role="dialog" aria-modal="true" className="glass-heavy rounded-xl shadow-2xl w-full max-w-xl mx-4">
+            <div className="flex items-center justify-between border-b border-border-subtle" style={{ padding: "14px 20px" }}>
+              <h2 className="text-text-primary" style={{ fontSize: 15, fontWeight: 600 }}>요구사항 요청</h2>
+              <button onClick={() => setIntakeOpen(false)} className="text-text-muted hover:text-text-primary transition-colors" style={{ fontSize: 18, lineHeight: 1 }}>×</button>
+            </div>
+            <div style={{ padding: "16px 20px" }}>
+              <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 10 }}>
+                고객 요청을 자연어로 입력하세요. 기존 도메인/기능과 대조해 하위 기능으로 분해·매칭하고 변경 묶음을 제안합니다.
+                <span className="text-text-muted"> 결과는 전부 <code style={{ fontFamily: "var(--font-mono)" }}>[추정]</code> — 추적표에서 검토 후 확정하세요.</span>
+              </p>
+              <textarea
+                value={intakeQuery}
+                onChange={(e) => setIntakeQuery(e.target.value)}
+                onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void startIntake(); }}
+                placeholder="예) 결제에 무통장입금 추가해줘 / 알림 기능 만들어줘"
+                rows={4}
+                autoFocus
+                className="w-full resize-y rounded-lg bg-elevated border border-border-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
+                style={{ fontSize: 13, padding: "8px 11px" }}
+              />
+              {intakeError && <p className="text-red-400" style={{ fontSize: 11.5, marginTop: 8 }}>{intakeError}</p>}
+            </div>
+            <div className="flex items-center justify-end gap-2 border-t border-border-subtle" style={{ padding: "12px 20px" }}>
+              <button onClick={() => setIntakeOpen(false)} className="rounded-lg text-text-secondary hover:text-text-primary transition-colors" style={{ padding: "6px 12px", fontSize: 13 }}>취소</button>
+              <button onClick={() => void startIntake()} disabled={!intakeQuery.trim()} className="rounded-lg font-medium bg-accent/20 text-accent hover:bg-accent/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed" style={{ padding: "6px 16px", fontSize: 13 }}>분석 실행</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 인테이크 완료/실패 토스트. */}
+      {toast && (
+        <div
+          className={`fixed bottom-5 right-5 z-[120] rounded-lg shadow-2xl border max-w-sm ${toast.kind === "done" ? "bg-emerald-900/80 border-emerald-600 text-emerald-100" : "bg-red-900/80 border-red-600 text-red-100"}`}
+          style={{ padding: "12px 16px", fontSize: 13 }}
+          role="status"
+          onClick={() => setToast(null)}
+        >
+          {toast.msg}
         </div>
       )}
     </div>

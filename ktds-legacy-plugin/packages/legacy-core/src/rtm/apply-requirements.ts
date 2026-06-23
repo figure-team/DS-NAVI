@@ -72,12 +72,16 @@ export function applyRequirements(
     .sort((a, b) => cmp(a.domainId, b.domainId) || cmp(a.id, b.id))
 
   // 도메인 functionCount 갱신(신규 기능 반영) + 신규 도메인 합류.
+  // 표시명: 기존 도메인 → 그대로, 신규(TO-BE) 도메인 → 기능 행의 domainName 승계(없으면 id).
   const counts = new Map<string, number>()
-  for (const f of functions) counts.set(f.domainId, (counts.get(f.domainId) ?? 0) + 1)
-  const domainsById = new Map(model.domains.map((d) => [d.id, d]))
+  const nameById = new Map(model.domains.map((d) => [d.id, d.name]))
+  for (const f of functions) {
+    counts.set(f.domainId, (counts.get(f.domainId) ?? 0) + 1)
+    if (!nameById.has(f.domainId) && f.domainName.length > 0) nameById.set(f.domainId, f.domainName)
+  }
   const domains = [...counts.keys()].sort(cmp).map((id) => ({
     id,
-    name: domainsById.get(id)?.name ?? id,
+    name: nameById.get(id) ?? id,
     functionCount: counts.get(id) ?? 0,
   }))
 

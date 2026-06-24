@@ -1,0 +1,1552 @@
+{
+  "schemaVersion": 2,
+  "gitCommit": null,
+  "domains": [
+    {
+      "id": "domain:account",
+      "name": "계정/회원",
+      "functionCount": 7
+    },
+    {
+      "id": "domain:cart",
+      "name": "장바구니",
+      "functionCount": 5
+    },
+    {
+      "id": "domain:catalog",
+      "name": "카탈로그",
+      "functionCount": 5
+    },
+    {
+      "id": "domain:order",
+      "name": "주문",
+      "functionCount": 4
+    },
+    {
+      "id": "domain:web-inf",
+      "name": "웹 배포 설정 (web.xml)",
+      "functionCount": 1
+    },
+    {
+      "id": "to-be:payment",
+      "name": "결제",
+      "functionCount": 3
+    }
+  ],
+  "functions": [
+    {
+      "id": "flow:ANY /actions/Account.action",
+      "featureId": "FN-001",
+      "name": "계정 기본 진입(로그인 폼)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "ANY /actions/Account.action",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 149
+          }
+        ]
+      },
+      "implementation": {
+        "value": "AccountActionBean",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 149
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Account.action?editAccount",
+      "featureId": "FN-002",
+      "name": "계정 수정 처리",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "ANY /actions/Account.action?editAccount",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 137
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Account, AccountActionBean, AccountMapper, AccountService, CatalogService, ProductMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+            "line": 25
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+            "line": 30
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "line": 34
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 137
+          }
+        ]
+      },
+      "data": {
+        "value": "ACCOUNT(RU) · BANNERDATA(R) · PRODUCT(R) · PROFILE(RU) · SIGNON(RU)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 52
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 79
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 102
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 122
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 36
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Account.action?editAccountForm",
+      "featureId": "FN-003",
+      "name": "계정 수정 폼",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "ANY /actions/Account.action?editAccountForm",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 128
+          }
+        ]
+      },
+      "implementation": {
+        "value": "AccountActionBean",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 128
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Account.action?newAccount",
+      "featureId": "FN-004",
+      "name": "신규 계정 등록 처리",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "ANY /actions/Account.action?newAccount",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 115
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Account, AccountActionBean, AccountMapper, AccountService, CatalogService, ProductMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+            "line": 25
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+            "line": 30
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "line": 34
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 115
+          }
+        ]
+      },
+      "data": {
+        "value": "ACCOUNT(CR) · BANNERDATA(R) · PRODUCT(R) · PROFILE(CR) · SIGNON(CR)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 52
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 95
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 114
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 127
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 36
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Account.action?newAccountForm",
+      "featureId": "FN-005",
+      "name": "신규 계정 등록 폼",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "ANY /actions/Account.action?newAccountForm",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 106
+          }
+        ]
+      },
+      "implementation": {
+        "value": "AccountActionBean",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 106
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Account.action?signoff",
+      "featureId": "FN-006",
+      "name": "로그아웃",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "ANY /actions/Account.action?signoff",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 184
+          }
+        ]
+      },
+      "implementation": {
+        "value": "AccountActionBean",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 184
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Account.action?signon",
+      "featureId": "FN-007",
+      "name": "로그인 처리",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "ANY /actions/Account.action?signon",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 159
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Account, AccountActionBean, AccountMapper, AccountService, CatalogService, ProductMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+            "line": 25
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+            "line": 30
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "line": 34
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 159
+          }
+        ]
+      },
+      "data": {
+        "value": "ACCOUNT(R) · BANNERDATA(R) · PRODUCT(R) · PROFILE(R) · SIGNON(R)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 52
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 36
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Cart.action?addItemToCart",
+      "featureId": "FN-008",
+      "name": "장바구니에 품목 담기",
+      "domainId": "domain:cart",
+      "domainName": "장바구니",
+      "entryPoint": {
+        "value": "ANY /actions/Cart.action?addItemToCart",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 68
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Cart, CartActionBean, CartItem, CatalogService, Item, ItemMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+            "line": 32
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+            "line": 26
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "line": 28
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "line": 34
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 68
+          }
+        ]
+      },
+      "data": {
+        "value": "INVENTORY(R) · ITEM(R)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 70
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 47
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Cart.action?checkOut",
+      "featureId": "FN-009",
+      "name": "체크아웃 진입",
+      "domainId": "domain:cart",
+      "domainName": "장바구니",
+      "entryPoint": {
+        "value": "ANY /actions/Cart.action?checkOut",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 141
+          }
+        ]
+      },
+      "implementation": {
+        "value": "CartActionBean",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 141
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Cart.action?removeItemFromCart",
+      "featureId": "FN-010",
+      "name": "장바구니에서 품목 제거",
+      "domainId": "domain:cart",
+      "domainName": "장바구니",
+      "entryPoint": {
+        "value": "ANY /actions/Cart.action?removeItemFromCart",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 94
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Cart, CartActionBean, CartItem",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+            "line": 32
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 94
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Cart.action?updateCartQuantities",
+      "featureId": "FN-011",
+      "name": "장바구니 수량 갱신",
+      "domainId": "domain:cart",
+      "domainName": "장바구니",
+      "entryPoint": {
+        "value": "ANY /actions/Cart.action?updateCartQuantities",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 116
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Cart, CartActionBean, CartItem, Item",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+            "line": 32
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+            "line": 26
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 116
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Cart.action?viewCart",
+      "featureId": "FN-012",
+      "name": "장바구니 조회",
+      "domainId": "domain:cart",
+      "domainName": "장바구니",
+      "entryPoint": {
+        "value": "ANY /actions/Cart.action?viewCart",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 137
+          }
+        ]
+      },
+      "implementation": {
+        "value": "CartActionBean",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 137
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Catalog.action",
+      "featureId": "FN-013",
+      "name": "카탈로그 메인 화면",
+      "domainId": "domain:catalog",
+      "domainName": "카탈로그",
+      "entryPoint": {
+        "value": "ANY /actions/Catalog.action",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 143
+          }
+        ]
+      },
+      "implementation": {
+        "value": "CatalogActionBean",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 143
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Catalog.action?searchProducts",
+      "featureId": "FN-014",
+      "name": "상품 검색",
+      "domainId": "domain:catalog",
+      "domainName": "카탈로그",
+      "entryPoint": {
+        "value": "ANY /actions/Catalog.action?searchProducts",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 190
+          }
+        ]
+      },
+      "implementation": {
+        "value": "CatalogActionBean, CatalogService, ProductMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "line": 34
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 190
+          }
+        ]
+      },
+      "data": {
+        "value": "PRODUCT(R)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 46
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Catalog.action?viewCategory",
+      "featureId": "FN-015",
+      "name": "카테고리 조회",
+      "domainId": "domain:catalog",
+      "domainName": "카탈로그",
+      "entryPoint": {
+        "value": "ANY /actions/Catalog.action?viewCategory",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 153
+          }
+        ]
+      },
+      "implementation": {
+        "value": "CatalogActionBean, CatalogService, CategoryMapper, ProductMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "line": 34
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 153
+          }
+        ]
+      },
+      "data": {
+        "value": "CATEGORY(R) · PRODUCT(R)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 36
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Catalog.action?viewItem",
+      "featureId": "FN-016",
+      "name": "품목 상세 조회",
+      "domainId": "domain:catalog",
+      "domainName": "카탈로그",
+      "entryPoint": {
+        "value": "ANY /actions/Catalog.action?viewItem",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 179
+          }
+        ]
+      },
+      "implementation": {
+        "value": "CatalogActionBean, CatalogService, Item, ItemMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+            "line": 26
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "line": 28
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "line": 34
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 179
+          }
+        ]
+      },
+      "data": {
+        "value": "ITEM(R)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 47
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Catalog.action?viewProduct",
+      "featureId": "FN-017",
+      "name": "상품 상세 조회",
+      "domainId": "domain:catalog",
+      "domainName": "카탈로그",
+      "entryPoint": {
+        "value": "ANY /actions/Catalog.action?viewProduct",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 166
+          }
+        ]
+      },
+      "implementation": {
+        "value": "CatalogActionBean, CatalogService, ItemMapper, ProductMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "line": 28
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "line": 34
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "line": 166
+          }
+        ]
+      },
+      "data": {
+        "value": "ITEM(R) · PRODUCT(R)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 26
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Order.action?listOrders",
+      "featureId": "FN-018",
+      "name": "주문 목록 조회",
+      "domainId": "domain:order",
+      "domainName": "주문",
+      "entryPoint": {
+        "value": "ANY /actions/Order.action?listOrders",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 107
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Account, AccountActionBean, OrderActionBean, OrderMapper, OrderService",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 37
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 42
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 107
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Order.action?newOrder",
+      "featureId": "FN-019",
+      "name": "주문 생성",
+      "domainId": "domain:order",
+      "domainName": "주문",
+      "entryPoint": {
+        "value": "ANY /actions/Order.action?newOrder",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 142
+          }
+        ]
+      },
+      "implementation": {
+        "value": "CartActionBean, ItemMapper, LineItemMapper, Order, OrderActionBean, OrderMapper, OrderService, SequenceMapper",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 30
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "line": 28
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+            "line": 25
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 37
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 37
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 142
+          }
+        ]
+      },
+      "data": {
+        "value": "INVENTORY(U) · LINEITEM(C) · SEQUENCE(RU)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 76
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
+            "line": 37
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/SequenceMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/SequenceMapper.xml",
+            "line": 32
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "CHANGED",
+      "requirementHistory": [
+        "REQ-001"
+      ],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Order.action?newOrderForm",
+      "featureId": "FN-020",
+      "name": "주문 폼 표시",
+      "domainId": "domain:order",
+      "domainName": "주문",
+      "entryPoint": {
+        "value": "ANY /actions/Order.action?newOrderForm",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 119
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Account, AccountActionBean, Cart, CartActionBean, Order, OrderActionBean",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+            "line": 32
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 30
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 42
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 37
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 119
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "CHANGED",
+      "requirementHistory": [
+        "REQ-001"
+      ],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY /actions/Order.action?viewOrder",
+      "featureId": "FN-021",
+      "name": "주문 상세 조회",
+      "domainId": "domain:order",
+      "domainName": "주문",
+      "entryPoint": {
+        "value": "ANY /actions/Order.action?viewOrder",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 171
+          }
+        ]
+      },
+      "implementation": {
+        "value": "Account, AccountActionBean, ItemMapper, LineItemMapper, Order, OrderActionBean, OrderMapper, OrderService",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 30
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "line": 28
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+            "line": 27
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 37
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 42
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 171
+          }
+        ]
+      },
+      "data": {
+        "value": "INVENTORY(R) · ITEM(R) · LINEITEM(R) · ORDERS(R) · ORDERSTATUS(R)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 70
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 47
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/site/xdoc/index.xml",
+            "line": 381
+          }
+        ]
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "flow:ANY *.action",
+      "featureId": "FN-022",
+      "name": "*.action 요청 라우팅 흐름",
+      "domainId": "domain:web-inf",
+      "domainName": "웹 배포 설정 (web.xml)",
+      "entryPoint": {
+        "value": "ANY *.action",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/webapp/WEB-INF/web.xml",
+            "line": 60
+          }
+        ]
+      },
+      "implementation": {
+        "value": "web",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/main/webapp/WEB-INF/web.xml",
+            "line": 60
+          }
+        ]
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "AS_IS",
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "to-be:payment/결제-결과-확인",
+      "featureId": "FN-025",
+      "name": "결제 결과 확인",
+      "domainId": "to-be:payment",
+      "domainName": "결제",
+      "entryPoint": {
+        "value": "(제안) GET /actions/Payment.action?paymentResult",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +PaymentActionBean.paymentResult()",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "(제안) PAYMENT(R)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-001"
+      ],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "to-be:payment/결제-처리",
+      "featureId": "FN-024",
+      "name": "결제 처리(승인)",
+      "domainId": "to-be:payment",
+      "domainName": "결제",
+      "entryPoint": {
+        "value": "(제안) POST /actions/Payment.action?processPayment",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +PaymentService.processPayment()",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "(제안) PAYMENT(C), ORDER(U)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-001"
+      ],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    },
+    {
+      "id": "to-be:payment/결제수단-선택-폼",
+      "featureId": "FN-023",
+      "name": "결제수단 선택 폼",
+      "domainId": "to-be:payment",
+      "domainName": "결제",
+      "entryPoint": {
+        "value": "(제안) GET /actions/Payment.action?paymentForm",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +PaymentActionBean.paymentForm()",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "(제안) PAYMENT(R), ORDER(R)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-001"
+      ],
+      "nfrTags": [],
+      "rules": [],
+      "deliverableRefs": []
+    }
+  ],
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "text": "체크아웃에 결제 기능 추가 — 결제수단 선택·결제 처리(승인)·결제 결과 확인",
+      "type": "functional",
+      "nfrCategory": null,
+      "nfrScope": [],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [],
+      "source": {
+        "kind": "customer",
+        "raw": "결제 기능 추가"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [],
+      "changeset": {
+        "added": [
+          "to-be:payment/결제수단-선택-폼",
+          "to-be:payment/결제-처리",
+          "to-be:payment/결제-결과-확인"
+        ],
+        "modified": [
+          "flow:ANY /actions/Order.action?newOrderForm",
+          "flow:ANY /actions/Order.action?newOrder"
+        ],
+        "removed": [],
+        "revived": []
+      }
+    }
+  ],
+  "coverage": {
+    "requirements": {
+      "total": 1,
+      "implemented": 0,
+      "verified": 0,
+      "signedOff": 0,
+      "byLifecycle": {
+        "RECEIVED": 1
+      }
+    },
+    "functions": {
+      "total": 25,
+      "implemented": 20,
+      "planned": 3,
+      "orphaned": 0,
+      "confirmed": 0
+    },
+    "tests": {
+      "total": 0,
+      "pass": 0,
+      "fail": 0,
+      "untested": 0
+    },
+    "gaps": {
+      "unimplemented": [
+        "REQ-001"
+      ],
+      "orphanCode": [],
+      "unverified": [
+        "flow:ANY *.action",
+        "flow:ANY /actions/Account.action",
+        "flow:ANY /actions/Account.action?editAccount",
+        "flow:ANY /actions/Account.action?editAccountForm",
+        "flow:ANY /actions/Account.action?newAccount",
+        "flow:ANY /actions/Account.action?newAccountForm",
+        "flow:ANY /actions/Account.action?signoff",
+        "flow:ANY /actions/Account.action?signon",
+        "flow:ANY /actions/Cart.action?addItemToCart",
+        "flow:ANY /actions/Cart.action?checkOut",
+        "flow:ANY /actions/Cart.action?removeItemFromCart",
+        "flow:ANY /actions/Cart.action?updateCartQuantities",
+        "flow:ANY /actions/Cart.action?viewCart",
+        "flow:ANY /actions/Catalog.action",
+        "flow:ANY /actions/Catalog.action?searchProducts",
+        "flow:ANY /actions/Catalog.action?viewCategory",
+        "flow:ANY /actions/Catalog.action?viewItem",
+        "flow:ANY /actions/Catalog.action?viewProduct",
+        "flow:ANY /actions/Order.action?listOrders",
+        "flow:ANY /actions/Order.action?newOrder",
+        "flow:ANY /actions/Order.action?newOrderForm",
+        "flow:ANY /actions/Order.action?viewOrder"
+      ]
+    }
+  }
+}

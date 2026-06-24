@@ -1,0 +1,66 @@
+{
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "text": "체크아웃에 결제 기능 추가 — 결제수단 선택·결제 처리(승인)·결제 결과 확인",
+      "type": "functional",
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "source": { "kind": "customer", "raw": "결제 기능 추가" },
+      "changeset": {
+        "added": [
+          "to-be:payment/결제수단-선택-폼",
+          "to-be:payment/결제-처리",
+          "to-be:payment/결제-결과-확인"
+        ],
+        "modified": [
+          "flow:ANY /actions/Order.action?newOrderForm",
+          "flow:ANY /actions/Order.action?newOrder"
+        ],
+        "removed": [],
+        "revived": []
+      }
+    }
+  ],
+  "functions": [
+    {
+      "id": "to-be:payment/결제수단-선택-폼",
+      "featureId": "FN-023",
+      "name": "결제수단 선택 폼",
+      "domainId": "to-be:payment",
+      "domainName": "결제",
+      "entryPoint":     { "value": "(제안) GET /actions/Payment.action?paymentForm", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +PaymentActionBean.paymentForm()", "confidence": "INFERRED", "evidence": [] },
+      "data":           { "value": "(제안) PAYMENT(R), ORDER(R)", "confidence": "INFERRED", "evidence": [] },
+      "test":           { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE", "state": "PLANNED", "requirementHistory": [], "nfrTags": [], "rules": [], "deliverableRefs": []
+    },
+    {
+      "id": "to-be:payment/결제-처리",
+      "featureId": "FN-024",
+      "name": "결제 처리(승인)",
+      "domainId": "to-be:payment",
+      "domainName": "결제",
+      "entryPoint":     { "value": "(제안) POST /actions/Payment.action?processPayment", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +PaymentService.processPayment()", "confidence": "INFERRED", "evidence": [] },
+      "data":           { "value": "(제안) PAYMENT(C), ORDER(U)", "confidence": "INFERRED", "evidence": [] },
+      "test":           { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE", "state": "PLANNED", "requirementHistory": [], "nfrTags": [], "rules": [], "deliverableRefs": []
+    },
+    {
+      "id": "to-be:payment/결제-결과-확인",
+      "featureId": "FN-025",
+      "name": "결제 결과 확인",
+      "domainId": "to-be:payment",
+      "domainName": "결제",
+      "entryPoint":     { "value": "(제안) GET /actions/Payment.action?paymentResult", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +PaymentActionBean.paymentResult()", "confidence": "INFERRED", "evidence": [] },
+      "data":           { "value": "(제안) PAYMENT(R)", "confidence": "INFERRED", "evidence": [] },
+      "test":           { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE", "state": "PLANNED", "requirementHistory": [], "nfrTags": [], "rules": [], "deliverableRefs": []
+    }
+  ]
+}

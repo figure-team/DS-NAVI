@@ -1,0 +1,23 @@
+# Vendored demo fixture (jpetstore-6) — minimal ignores.
+# Build output is regenerable and excluded; everything else, including the
+# committed .understand-anything analysis output and source .properties files,
+# is tracked so the demo works on a fresh clone and the project can be
+# re-analyzed after analysis-logic changes.
+/target
+/build
+.settings
+.classpath
+.project
+.idea
+*.iml
+.env
+
+# OMC/orchestration scratch — not part of the demo
+.omc/
+.understand-anything/.trash-*/
+.understand-anything/tmp/
+.understand-anything/intermediate/
+
+# The repo-root .gitignore ignores .understand-anything globally; re-include the
+# committed analysis output for this vendored fixture.
+!.understand-anything/

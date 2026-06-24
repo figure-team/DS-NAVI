@@ -800,9 +800,10 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   reloadImpactOverlay: async () => {
     const { accessToken, setOverlayData } = get();
     try {
+      const base = import.meta.env.BASE_URL; // "/demo/" (demo) | "/" (라이브 서버)
       const url = accessToken
-        ? `/impact-overlay.json?token=${encodeURIComponent(accessToken)}&t=${Date.now()}`
-        : `/impact-overlay.json?t=${Date.now()}`;
+        ? `${base}impact-overlay.json?token=${encodeURIComponent(accessToken)}&t=${Date.now()}`
+        : `${base}impact-overlay.json?t=${Date.now()}`;
       const res = await fetch(url);
       if (!res.ok) return;
       const data = (await res.json().catch(() => null)) as

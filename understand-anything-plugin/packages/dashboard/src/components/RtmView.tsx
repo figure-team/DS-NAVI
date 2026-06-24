@@ -101,8 +101,11 @@ export default function RtmView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
   const approverHandle = useDashboardStore((s) => s.approverHandle);
   const setApproverHandle = useDashboardStore((s) => s.setApproverHandle);
-  const tokenQ = accessToken ? `?token=${encodeURIComponent(accessToken)}` : "";
-  const canWrite = Boolean(accessToken);
+  // demo 모드: 정적 파일을 base(`/demo/`) 아래에서 읽고, 쓰기(편집·인테이크)는 비활성.
+  const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
+  const dataBase = import.meta.env.BASE_URL; // "/demo/" (demo) | "/" (라이브 서버)
+  const tokenQ = accessToken && !DEMO_MODE ? `?token=${encodeURIComponent(accessToken)}` : "";
+  const canWrite = Boolean(accessToken) && !DEMO_MODE;
 
   const [model, setModel] = useState<RtmModel | null>(null);
   const [fnOv, setFnOv] = useState<Record<string, FnOverride>>({});
@@ -120,11 +123,11 @@ export default function RtmView() {
 
   const loadModel = useCallback(() => {
     setError(null);
-    fetch(`/rtm.json${tokenQ}`)
+    fetch(`${dataBase}rtm.json${tokenQ}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((data: RtmModel) => { if (Array.isArray(data?.functions)) setModel(data); else setError("rtm.json 형식 오류"); })
       .catch((e) => setError(String(e instanceof Error ? e.message : e)));
-    fetch(`/rtm-overrides.json${tokenQ}`)
+    fetch(`${dataBase}rtm-overrides.json${tokenQ}`)
       .then((r) => (r.ok ? r.json() : {}))
       .then((data: unknown) => {
         if (data && typeof data === "object" && !Array.isArray(data)) {
@@ -136,7 +139,7 @@ export default function RtmView() {
         }
       })
       .catch(() => {});
-  }, [tokenQ]);
+  }, [tokenQ, dataBase]);
   useEffect(() => { loadModel(); }, [loadModel]);
 
   // 인테이크 ---------------------------------------------------------------

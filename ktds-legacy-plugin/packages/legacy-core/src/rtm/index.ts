@@ -27,6 +27,10 @@ export {
   RtmRequirementSchema,
   RtmCoverageSchema,
   RtmDiagnosticSchema,
+  RtmAuditEventSchema,
+  RtmFunctionOverrideSchema,
+  RtmTestOverrideSchema,
+  RtmRequirementOverrideSchema,
   RtmModelSchema,
 } from './types.js'
 export type {
@@ -52,9 +56,14 @@ export type {
   RtmRequirement,
   RtmCoverage,
   RtmDiagnostic,
+  RtmAuditEvent,
+  RtmFunctionOverride,
+  RtmTestOverride,
+  RtmRequirementOverride,
   RtmModel,
 } from './types.js'
 export { buildRtm } from './build-rtm.js'
 export { applyRequirements } from './apply-requirements.js'
+export { applyOverlay } from './apply-overlay.js'
 export { computeCoverage } from './coverage.js'
 export { computeDiagnostics, natCmp } from './validate.js'

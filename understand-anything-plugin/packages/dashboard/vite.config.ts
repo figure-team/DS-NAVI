@@ -569,6 +569,103 @@ function handleRtmOverridePost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
+// ── 검증 스파인 입력: 요구사항 오버레이(lifecycle·고객검수·시험결과) — _requirements 아래 기록.
+const RTM_LIFECYCLES = new Set(["RECEIVED", "ANALYZING", "DESIGNING", "DEVELOPING", "TESTING", "DONE", "HOLD", "REJECTED"]);
+const RTM_TEST_RESULTS = new Set(["PASS", "FAIL", "NA", "UNTESTED"]);
+/** rtm.json 의 요구사항 id 집합 — POST reqId 실존 검증용. */
+function rtmRequirementIds(): Set<string> {
+  const ids = new Set<string>();
+  const file = findGraphFile("rtm.json");
+  if (!file) return ids;
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as { requirements?: Array<{ id?: unknown }> };
+    for (const r of raw.requirements ?? []) if (typeof r.id === "string") ids.add(r.id);
+  } catch {
+    /* 빈 집합 */
+  }
+  return ids;
+}
+/**
+ * POST /rtm-req-override — { reqId, lifecycle?, signoff?, tests?, approver } 검증 후 _requirements 기록.
+ * 검증: reqId 실존 · lifecycle 열거 · signoff {approved,...}|null · tests "<acId>::<caseId>"→{result,defectId}.
+ * audit append-only. 생성물(rtm.json) 불변 — 오버레이만 갱신(understand-rtm 재실행이 coverage 에 반영).
+ */
+function handleRtmReqOverridePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = rtmOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No domain graph found. Run /understand-rtm first." });
+    return;
+  }
+  collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
+    .then((body) => {
+      let p: { reqId?: unknown; lifecycle?: unknown; signoff?: unknown; tests?: unknown; approver?: unknown };
+      try {
+        p = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { reqId, lifecycle, signoff, tests, approver } = p ?? {};
+      if (typeof reqId !== "string" || !reqId) return sendJson(res, 400, { error: "reqId is required" });
+      if (typeof approver !== "string" || !approver.trim()) return sendJson(res, 400, { error: "approver is required" });
+      if (!rtmRequirementIds().has(reqId)) return sendJson(res, 400, { error: "reqId is not in rtm.json" });
+
+      const rec: { lifecycle?: string; signoff?: unknown; tests?: Record<string, { result: string; defectId: string | null }> } = {};
+      if (lifecycle !== undefined) {
+        if (typeof lifecycle !== "string" || !RTM_LIFECYCLES.has(lifecycle)) return sendJson(res, 400, { error: `invalid lifecycle: ${String(lifecycle)}` });
+        rec.lifecycle = lifecycle;
+      }
+      if (signoff !== undefined) {
+        if (signoff !== null && (typeof signoff !== "object" || typeof (signoff as { approved?: unknown }).approved !== "boolean"))
+          return sendJson(res, 400, { error: "signoff must be null or { approved:boolean, by?, at? }" });
+        rec.signoff = signoff;
+      }
+      if (tests !== undefined) {
+        if (!tests || typeof tests !== "object" || Array.isArray(tests)) return sendJson(res, 400, { error: "tests must be an object" });
+        const clean: Record<string, { result: string; defectId: string | null }> = {};
+        for (const [k, v] of Object.entries(tests as Record<string, unknown>)) {
+          const result = (v as { result?: unknown })?.result;
+          if (typeof result !== "string" || !RTM_TEST_RESULTS.has(result)) return sendJson(res, 400, { error: `tests[${k}].result invalid` });
+          const defectId = (v as { defectId?: unknown })?.defectId;
+          clean[k] = { result, defectId: typeof defectId === "string" ? defectId : null };
+        }
+        rec.tests = clean;
+      }
+      if (rec.lifecycle === undefined && rec.signoff === undefined && rec.tests === undefined)
+        return sendJson(res, 400, { error: "nothing to update (lifecycle/signoff/tests)" });
+
+      const now = new Date().toISOString();
+      const by = approver.trim();
+      const store = readRtmOverrides() as Record<string, unknown> & { _requirements?: Record<string, { lifecycle?: string; signoff?: unknown; tests?: Record<string, unknown>; approver?: string; at?: string; audit?: unknown[] }> };
+      const reqs = (store._requirements && typeof store._requirements === "object" ? store._requirements : {}) as Record<string, { lifecycle?: string; signoff?: unknown; tests?: Record<string, unknown>; approver?: string; at?: string; audit?: unknown[] }>;
+      const prev = reqs[reqId] ?? {};
+      const audit = Array.isArray(prev.audit) ? prev.audit : [];
+      const event = rec.tests ? "TEST_RECORDED" : rec.signoff !== undefined ? "SIGNED_OFF" : "LIFECYCLE";
+      reqs[reqId] = {
+        ...prev,
+        ...(rec.lifecycle !== undefined ? { lifecycle: rec.lifecycle } : {}),
+        ...(rec.signoff !== undefined ? { signoff: rec.signoff } : {}),
+        tests: { ...(prev.tests ?? {}), ...(rec.tests ?? {}) },
+        approver: by,
+        at: now,
+        audit: [...audit, { event, by, at: now }],
+      };
+      store._requirements = reqs;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write rtm-overrides:", err);
+        return sendJson(res, 500, { error: "Failed to write rtm overrides" });
+      }
+      sendJson(res, 200, { reqId, ...reqs[reqId] });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
 // ── ktds: 구조 탭 "영향도 분석" — 자연어 → claude -p "/understand-impact <q>" ─────
 // 대시보드 dev server가 분석 대상 프로젝트(GRAPH_DIR)에서 claude 를 헤드리스로 spawn.
 // 스킬이 .understand-anything/impact-overlay.json 을 갱신 → 프론트가 재로드해 색칠.
@@ -882,6 +979,7 @@ export default defineConfig({
             pathname === "/rtm.json" ||
             pathname === "/rtm-overrides.json" ||
             pathname === "/rtm-override" ||
+            pathname === "/rtm-req-override" ||
             pathname === "/rtm-intake" ||
             pathname === "/rtm-intake-status";
 
@@ -916,6 +1014,11 @@ export default defineConfig({
           if (pathname === "/rtm-override") {
             if (req.method === "POST") handleRtmOverridePost(req, res);
             else sendJson(res, 405, { error: "Use POST to write rtm overrides" });
+            return;
+          }
+          if (pathname === "/rtm-req-override") {
+            if (req.method === "POST") handleRtmReqOverridePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to write rtm requirement overrides" });
             return;
           }
           if (pathname === "/rtm-overrides.json") {

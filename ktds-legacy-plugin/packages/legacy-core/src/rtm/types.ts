@@ -280,6 +280,41 @@ export const RtmDiagnosticSchema = z.object({
 })
 export type RtmDiagnostic = z.infer<typeof RtmDiagnosticSchema>
 
+// ── 오버레이(사람 편집/확정/검증 입력) — rtm-overrides.json ──────────────────────
+/** 감사 이벤트 — append-only(누가 언제 무엇을). */
+export const RtmAuditEventSchema = z.object({ event: z.string(), by: z.string(), at: z.string() })
+export type RtmAuditEvent = z.infer<typeof RtmAuditEventSchema>
+
+/** 기능 행 오버레이(R3) — 셀 교정 + 확정자. on-disk 에서는 fnId 키로 최상위. */
+export const RtmFunctionOverrideSchema = z.object({
+  editedCells: z.record(z.string(), z.string()).default({}),
+  approver: z.string(),
+  at: z.string(),
+  audit: z.array(RtmAuditEventSchema).default([]),
+})
+export type RtmFunctionOverride = z.infer<typeof RtmFunctionOverrideSchema>
+
+/** 시험결과 오버레이 — AC 테스트의 PASS/FAIL/NA + 결함(사람 실측 입력, critic ⓐ). */
+export const RtmTestOverrideSchema = z.object({
+  result: TestResultSchema,
+  defectId: z.string().nullable().default(null),
+})
+export type RtmTestOverride = z.infer<typeof RtmTestOverrideSchema>
+
+/**
+ * 요구사항 오버레이 — lifecycle 전이·고객검수(signoff)·시험결과 기록(검증 스파인 입력 경로).
+ * tests 키 = "<acId>::<caseId>". on-disk 에서는 `_requirements` 아래 reqId 키.
+ */
+export const RtmRequirementOverrideSchema = z.object({
+  lifecycle: RequirementLifecycleSchema.optional(),
+  signoff: SignoffSchema.optional(),
+  tests: z.record(z.string(), RtmTestOverrideSchema).default({}),
+  approver: z.string(),
+  at: z.string(),
+  audit: z.array(RtmAuditEventSchema).default([]),
+})
+export type RtmRequirementOverride = z.infer<typeof RtmRequirementOverrideSchema>
+
 /**
  * rtm.json — RTM 구조화 산출물(생성물, 불변). 사람 편집/확정은 rtm-overrides.json 오버레이.
  * coverage 는 computeCoverage 결과(파생). 모든 배열은 정렬되어 byte-identical 재실행을 보장한다.

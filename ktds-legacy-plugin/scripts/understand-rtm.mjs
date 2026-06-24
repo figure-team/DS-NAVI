@@ -25,7 +25,7 @@ if (!existsSync(distEntry)) {
 
 const projectRoot = process.argv[2] || process.cwd()
 const engine = await import(distEntry)
-const { buildRtm, applyRequirements, buildMyBatisModel } = engine
+const { buildRtm, applyRequirements, applyOverlay, buildMyBatisModel } = engine
 
 // 입력은 디스크의 fill 완료 그래프(비파괴). buildMap 호출 금지(채움 소실).
 const graphPath = join(projectRoot, '.understand-anything', 'domain-graph.json')
@@ -121,6 +121,22 @@ if (existsSync(reqPath)) {
   }
 }
 
+// 사람 오버레이(.understand-anything/rtm-overrides.json) — 셀 교정·lifecycle·검수·시험결과 입력을
+// 모델에 반영(검증 스파인 입력 경로). 적용 후 coverage 가 실데이터를 반영한다. 없으면 무변경.
+let overlayCount = 0
+const overlayPath = join(projectRoot, '.understand-anything', 'rtm-overrides.json')
+if (existsSync(overlayPath)) {
+  try {
+    const overlay = JSON.parse(readFileSync(overlayPath, 'utf8'))
+    if (overlay && typeof overlay === 'object' && !Array.isArray(overlay)) {
+      model = applyOverlay(model, overlay)
+      overlayCount = Object.keys(overlay).filter((k) => k !== '_requirements').length + Object.keys(overlay._requirements ?? {}).length
+    }
+  } catch (err) {
+    console.error(`rtm-overrides.json 파싱 실패(무시): ${err.message}`)
+  }
+}
+
 const OUTPUT_DIR = join(projectRoot, '.understand-anything')
 mkdirSync(OUTPUT_DIR, { recursive: true })
 writeFileSync(join(OUTPUT_DIR, 'rtm.json'), JSON.stringify(model, null, 2) + '\n', 'utf8')
@@ -136,7 +152,8 @@ console.log(`  RTM → .understand-anything/rtm.json`)
 const dropped = reqCount - model.requirements.length
 console.log(
   `  도메인 ${model.domains.length} · 기능 ${model.functions.length} · 요구사항 ${model.requirements.length}` +
-    `${dropped > 0 ? `(입력 ${reqCount}, 드롭 ${dropped})` : ''} · 추적셀 근거율 ${rate}%`,
+    `${dropped > 0 ? `(입력 ${reqCount}, 드롭 ${dropped})` : ''} · 추적셀 근거율 ${rate}%` +
+    `${overlayCount > 0 ? ` · 사람 오버레이 ${overlayCount} 적용` : ''}`,
 )
 const cov = model.coverage
 if (cov) {

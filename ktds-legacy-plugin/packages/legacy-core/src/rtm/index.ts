@@ -67,3 +67,17 @@ export { applyRequirements } from './apply-requirements.js'
 export { applyOverlay } from './apply-overlay.js'
 export { computeCoverage } from './coverage.js'
 export { computeDiagnostics, natCmp } from './validate.js'
+export {
+  REQUIREMENT_TEMPLATES,
+  requirementTemplateEntry,
+  requirementTemplateFile,
+  resolveRequirementTemplatePath,
+  loadRequirementTemplate,
+} from './requirement-templates.js'
+export type {
+  RequirementDocKind,
+  RequirementTemplateEntry,
+  RequirementTemplateDirs,
+  ResolvedRequirementTemplate,
+  LoadedRequirementTemplate,
+} from './requirement-templates.js'

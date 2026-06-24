@@ -4,117 +4,98 @@ import { useDashboardStore } from "../store";
 import TrustBadge from "./TrustBadge";
 
 /**
- * 요구사항 추적표(RTM) 뷰 — R2(읽기) + R3(행 추정→확정) + R4(뷰② 요구사항·changeset·이력 타임라인).
- * 설계: docs/ktds/RTM_TAB_DESIGN.md.
+ * 요구사항 추적표(RTM) v2 뷰 — 설계: docs/ktds/RTM_TAB_DESIGN.md / 프로토타입: docs/ktds/rtm-proto.html.
  *
- * 두 뷰 토글(같은 데이터의 전치):
- *  ① 기능 기준 — 도메인별 기능 그리드. 행 클릭 → 상세 패널(현행 상태 + 셀 교정/확정 + 요청별 이력).
- *  ② 요구사항 기준 — 요청별 변경 묶음(−삭제/~변경/+신규/=부활). 펼침→기능 클릭 시 ①로 점프.
- * 생성물 rtm.json 불변, 편집/확정은 rtm-overrides.json 오버레이(병합, 오버레이가 이김).
+ * 탭 3개: ① 기능 기준(도메인 그리드) ② 요구사항 기준(AC 매트릭스·supersede 이력·NFR) ③ 현황(커버리지·갭).
+ * 생성물 rtm.json 불변, 사람 입력은 rtm-overrides.json 오버레이(기능=최상위 fnId, 요구=_requirements).
+ * 검증 스파인 입력: 기능 셀 확정(POST /rtm-override) · 요구 시험결과/검수/lifecycle(POST /rtm-req-override).
  */
 type Confidence = "CONFIRMED" | "CONFIRMED_AI" | "INFERRED" | "UNVERIFIED";
+type TestResult = "PASS" | "FAIL" | "NA" | "UNTESTED";
+type AcKind = "branch" | "precondition" | "postcondition" | "exception" | "rule";
 
-interface Evidence {
-  file: string;
-  line: number | null;
-  snippet?: string;
-}
-interface TraceCell {
-  value: string;
-  confidence: Confidence;
-  evidence: Evidence[];
-}
+interface Evidence { file: string; line: number | null }
+interface TraceCell { value: string; confidence: Confidence; evidence: Evidence[] }
+interface TestRef { caseId: string; result: TestResult; defectId: string | null }
+interface AC { id: string; text: string; kind: AcKind; fnIds: string[]; confidence: Confidence; tests: TestRef[] }
+interface FnRule { reqId: string; acId: string; text: string; kind: AcKind; confidence: Confidence }
 interface FunctionRow {
-  id: string;
-  featureId: string;
-  name: string;
-  domainId: string;
-  domainName: string;
-  entryPoint: TraceCell;
-  implementation: TraceCell;
-  data: TraceCell;
-  test: TraceCell;
-  origin: "AS_IS" | "TO_BE";
-  state: "IMPLEMENTED" | "PARTIAL" | "PLANNED" | "CHANGED" | "ORPHANED";
-  requirementHistory: string[];
+  id: string; featureId: string; name: string; domainId: string; domainName: string;
+  entryPoint: TraceCell; implementation: TraceCell; data: TraceCell; test: TraceCell;
+  origin: "AS_IS" | "TO_BE"; state: "IMPLEMENTED" | "PARTIAL" | "PLANNED" | "CHANGED" | "ORPHANED";
+  requirementHistory: string[]; nfrTags: string[]; rules: FnRule[]; deliverableRefs: { docId: string; anchor?: string }[];
 }
-interface DomainGroup {
-  id: string;
-  name: string;
-  functionCount: number;
-}
-interface Changeset {
-  added: string[];
-  modified: string[];
-  removed: string[];
-  revived: string[];
-}
+interface DomainGroup { id: string; name: string; functionCount: number }
+interface Changeset { added: string[]; modified: string[]; removed: string[]; revived: string[] }
+interface Signoff { approved: boolean; by: string | null; at: string | null }
 interface Requirement {
-  id: string;
-  text: string;
-  status: "ACTIVE" | "SUPERSEDED";
-  supersedes: string | null;
-  supersededBy: string | null;
-  source: { kind: string; raw: string } | null;
-  changeset: Changeset;
+  id: string; text: string; type: "functional" | "nonfunctional"; nfrCategory: string | null; nfrScope: string[];
+  priority: "HIGH" | "MEDIUM" | "LOW"; lifecycle: string; status: "ACTIVE" | "SUPERSEDED";
+  supersedes: string | null; supersededBy: string | null; dependsOn: string[];
+  source: { kind: string; raw: string; requester?: string; targetRelease?: string } | null;
+  changeReq: { crNo: string | null; reason: string | null; approver: string | null; effort: string | null } | null;
+  signoff: Signoff | null; acceptanceCriteria: AC[]; changeset: Changeset;
 }
+interface Coverage {
+  requirements: { total: number; implemented: number; verified: number; signedOff: number; byLifecycle: Record<string, number> };
+  functions: { total: number; implemented: number; planned: number; orphaned: number; confirmed: number };
+  tests: { total: number; pass: number; fail: number; untested: number };
+  gaps: { unimplemented: string[]; orphanCode: string[]; unverified: string[] };
+  byRequirement: Record<string, { targetsTotal: number; targetsBuilt: number; acsTotal: number; acsPassed: number }>;
+}
+interface Diagnostic { level: "error" | "warn"; code: string; message: string; ref?: string }
 interface RtmModel {
-  schemaVersion: number;
-  gitCommit: string | null;
-  domains: DomainGroup[];
-  functions: FunctionRow[];
-  requirements: Requirement[];
+  schemaVersion: number; gitCommit: string | null; domains: DomainGroup[]; functions: FunctionRow[];
+  requirements: Requirement[]; coverage?: Coverage; diagnostics?: Diagnostic[];
 }
-interface RtmOverride {
-  editedCells: Record<string, string>;
-  approver: string;
-  at: string;
-}
+interface FnOverride { editedCells: Record<string, string>; approver: string; at: string }
+interface ReqOverride { lifecycle?: string; signoff?: Signoff | null; tests?: Record<string, { result: TestResult; defectId: string | null }>; approver?: string; at?: string }
 
 const APPROVER_LS_KEY = "ktds.approver";
+const GOLD = "var(--color-accent)";
+const OK = "#7fae8a", BAD = "#cf8a86", WARN = "#d8a25e", NFR = "#9fc1d8", FAINT = "#4f4a40", GOLD_DIM = "#9c7a52";
 
 const CONF: Record<Confidence, { label: string; color: string }> = {
   CONFIRMED: { label: "확정", color: "var(--color-text-muted)" },
   CONFIRMED_AI: { label: "확정·AI", color: "var(--color-text-muted)" },
-  INFERRED: { label: "추정", color: "#d4a574" },
-  UNVERIFIED: { label: "확인필요", color: "#c98a8a" },
+  INFERRED: { label: "추정", color: WARN },
+  UNVERIFIED: { label: "확인필요", color: BAD },
 };
-
-const STATE: Record<FunctionRow["state"], string> = {
-  IMPLEMENTED: "✅ 구현",
-  PARTIAL: "🔁 부분",
-  PLANNED: "⚠ 미구현",
-  CHANGED: "~ 변경",
-  ORPHANED: "🚫 고아",
+const STATE_LABEL: Record<FunctionRow["state"], string> = {
+  IMPLEMENTED: "✅ 구현", PARTIAL: "🔁 부분", PLANNED: "⚠ 미구현", CHANGED: "~ 변경", ORPHANED: "🚫 고아",
 };
-
-/** 변경 동사 — changeset 분류. revive>added>modified>removed 우선순위(builder 와 동일). */
+const STATE_COLOR: Record<FunctionRow["state"], string> = {
+  IMPLEMENTED: OK, PARTIAL: WARN, PLANNED: "var(--color-text-muted)", CHANGED: WARN, ORPHANED: BAD,
+};
 const VERB: Record<keyof Changeset, { sym: string; label: string; color: string }> = {
-  revived: { sym: "=", label: "부활", color: "var(--color-accent)" },
-  added: { sym: "+", label: "신규", color: "#7fb88f" },
-  modified: { sym: "~", label: "변경", color: "#d4a574" },
-  removed: { sym: "−", label: "삭제", color: "#c98a8a" },
+  revived: { sym: "=", label: "부활", color: GOLD },
+  added: { sym: "+", label: "신규", color: OK },
+  modified: { sym: "~", label: "변경", color: WARN },
+  removed: { sym: "−", label: "삭제", color: BAD },
 };
-function verbOf(r: Requirement, fnId: string): keyof Changeset | null {
-  if (r.changeset.revived.includes(fnId)) return "revived";
-  if (r.changeset.added.includes(fnId)) return "added";
-  if (r.changeset.modified.includes(fnId)) return "modified";
-  if (r.changeset.removed.includes(fnId)) return "removed";
-  return null;
-}
+const AC_KIND: Record<AcKind, { label: string; color: string }> = {
+  branch: { label: "분기", color: "#c8b76a" }, precondition: { label: "선행", color: NFR },
+  postcondition: { label: "후행", color: OK }, exception: { label: "예외", color: "#d28fb0" }, rule: { label: "규칙", color: "var(--color-text-muted)" },
+};
+const TEST_RES: Record<TestResult, { label: string; color: string }> = {
+  PASS: { label: "PASS", color: OK }, FAIL: { label: "FAIL", color: BAD }, NA: { label: "N/A", color: "var(--color-text-muted)" }, UNTESTED: { label: "미실행", color: "var(--color-text-muted)" },
+};
+const LIFECYCLE_ORDER = ["RECEIVED", "ANALYZING", "DESIGNING", "DEVELOPING", "TESTING", "DONE", "HOLD", "REJECTED"];
+const LIFECYCLE_LABEL: Record<string, string> = { RECEIVED: "접수", ANALYZING: "분석", DESIGNING: "설계", DEVELOPING: "개발중", TESTING: "시험", DONE: "완료", HOLD: "보류", REJECTED: "반려" };
+const PRIORITY: Record<string, { label: string; color: string; bg: string }> = {
+  HIGH: { label: "HIGH", color: "#e0a0a0", bg: "rgba(207,138,134,.13)" }, MEDIUM: { label: "MED", color: WARN, bg: "rgba(216,162,94,.12)" }, LOW: { label: "LOW", color: "var(--color-text-muted)", bg: "var(--color-elevated)" },
+};
+const NFR_CAT: Record<string, string> = { performance: "성능", security: "보안", availability: "가용성", scalability: "확장성", usability: "사용성", maintainability: "유지보수성", compliance: "규정준수", other: "기타" };
 
 type CellKey = "entryPoint" | "implementation" | "data" | "test";
 const COLS: Array<{ key: CellKey; label: string }> = [
-  { key: "entryPoint", label: "진입점" },
-  { key: "implementation", label: "구현" },
-  { key: "data", label: "데이터(CRUD)" },
-  { key: "test", label: "테스트" },
+  { key: "entryPoint", label: "진입점" }, { key: "implementation", label: "구현" }, { key: "data", label: "데이터(CRUD)" }, { key: "test", label: "테스트" },
 ];
+const evidenceTitle = (c: TraceCell) => (c.evidence.length === 0 ? undefined : c.evidence.map((e) => (e.line === null ? e.file : `${e.file}:${e.line}`)).join("\n"));
+const verbOf = (r: Requirement, fnId: string): keyof Changeset | null =>
+  r.changeset.revived.includes(fnId) ? "revived" : r.changeset.added.includes(fnId) ? "added" : r.changeset.modified.includes(fnId) ? "modified" : r.changeset.removed.includes(fnId) ? "removed" : null;
 
-function evidenceTitle(cell: TraceCell): string | undefined {
-  if (cell.evidence.length === 0) return undefined;
-  return cell.evidence.map((e) => (e.line === null ? e.file : `${e.file}:${e.line}`)).join("\n");
-}
+const BORDER = "1px solid var(--color-border-subtle)";
 
 export default function RtmView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
@@ -124,11 +105,13 @@ export default function RtmView() {
   const canWrite = Boolean(accessToken);
 
   const [model, setModel] = useState<RtmModel | null>(null);
-  const [overrides, setOverrides] = useState<Record<string, RtmOverride>>({});
+  const [fnOv, setFnOv] = useState<Record<string, FnOverride>>({});
+  const [reqOv, setReqOv] = useState<Record<string, ReqOverride>>({});
   const [error, setError] = useState<string | null>(null);
 
-  const [view, setView] = useState<"function" | "requirement">("function");
-  const [selected, setSelected] = useState<string | null>(null);
+  const [view, setView] = useState<"function" | "requirement" | "status">("function");
+  const [selFn, setSelFn] = useState<string | null>(null);
+  const [selReq, setSelReq] = useState<string | null>(null);
   const [expandedReqs, setExpandedReqs] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Record<string, string>>({});
@@ -139,24 +122,24 @@ export default function RtmView() {
     setError(null);
     fetch(`/rtm.json${tokenQ}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((data: RtmModel) => {
-        if (Array.isArray(data?.functions)) setModel(data);
-        else setError("rtm.json 형식 오류");
-      })
+      .then((data: RtmModel) => { if (Array.isArray(data?.functions)) setModel(data); else setError("rtm.json 형식 오류"); })
       .catch((e) => setError(String(e instanceof Error ? e.message : e)));
     fetch(`/rtm-overrides.json${tokenQ}`)
       .then((r) => (r.ok ? r.json() : {}))
       .then((data: unknown) => {
-        if (data && typeof data === "object" && !Array.isArray(data)) setOverrides(data as Record<string, RtmOverride>);
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+          const raw = data as Record<string, unknown>;
+          const reqs = (raw._requirements && typeof raw._requirements === "object" ? raw._requirements : {}) as Record<string, ReqOverride>;
+          const fns: Record<string, FnOverride> = {};
+          for (const [k, v] of Object.entries(raw)) if (!k.startsWith("_")) fns[k] = v as FnOverride;
+          setFnOv(fns); setReqOv(reqs);
+        }
       })
       .catch(() => {});
   }, [tokenQ]);
+  useEffect(() => { loadModel(); }, [loadModel]);
 
-  useEffect(() => {
-    loadModel();
-  }, [loadModel]);
-
-  // R5 인테이크 — 자연어 요청 → claude -p job. running 동안 폴링, done 시 rtm.json 재로드.
+  // 인테이크 ---------------------------------------------------------------
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [intakeQuery, setIntakeQuery] = useState("");
   const [intakeStatus, setIntakeStatus] = useState<"idle" | "running" | "done" | "failed">("idle");
@@ -166,28 +149,13 @@ export default function RtmView() {
   const startIntake = useCallback(async () => {
     const q = intakeQuery.trim();
     if (!q) return;
-    if (!accessToken) {
-      setIntakeError("읽기전용(라이브 서버 없음) — 인테이크는 dev 서버가 필요합니다.");
-      return;
-    }
+    if (!accessToken) { setIntakeError("읽기전용(라이브 서버 없음) — 인테이크는 dev 서버가 필요합니다."); return; }
     setIntakeError(null);
     try {
-      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q }),
-      });
-      if (res.status === 202) {
-        setIntakeStatus("running");
-        setIntakeOpen(false);
-        setIntakeQuery("");
-      } else {
-        const d = (await res.json().catch(() => null)) as { error?: string } | null;
-        setIntakeError(d?.error ?? `HTTP ${res.status}`);
-      }
-    } catch (e) {
-      setIntakeError(String(e));
-    }
+      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: q }) });
+      if (res.status === 202) { setIntakeStatus("running"); setIntakeOpen(false); setIntakeQuery(""); }
+      else { const d = (await res.json().catch(() => null)) as { error?: string } | null; setIntakeError(d?.error ?? `HTTP ${res.status}`); }
+    } catch (e) { setIntakeError(String(e)); }
   }, [intakeQuery, accessToken]);
 
   useEffect(() => {
@@ -195,436 +163,494 @@ export default function RtmView() {
     const poll = async () => {
       try {
         const r = await fetch(`/rtm-intake-status${tokenQ}`);
-        const data = (await r.json()) as { job?: { status?: string } };
-        const st = data?.job?.status;
-        if (st === "done") {
-          setIntakeStatus("done");
-          setToast({ kind: "done", msg: "요구사항 인테이크 완료 — 추적표를 갱신했습니다." });
-          loadModel();
-          setView("requirement");
-        } else if (st === "failed") {
-          setIntakeStatus("failed");
-          setToast({ kind: "failed", msg: "요구사항 인테이크 실패 — 콘솔/서버 로그를 확인하세요." });
-        }
-      } catch {
-        /* keep polling */
-      }
+        const st = ((await r.json()) as { job?: { status?: string } })?.job?.status;
+        if (st === "done") { setIntakeStatus("done"); setToast({ kind: "done", msg: "요구사항 인테이크 완료 — 추적표를 갱신했습니다." }); loadModel(); setView("requirement"); }
+        else if (st === "failed") { setIntakeStatus("failed"); setToast({ kind: "failed", msg: "요구사항 인테이크 실패 — 서버 로그를 확인하세요." }); }
+      } catch { /* keep polling */ }
     };
     const id = setInterval(poll, 3000);
     return () => clearInterval(id);
   }, [intakeStatus, tokenQ, loadModel]);
-
-  useEffect(() => {
-    if (!toast) return;
-    const id = setTimeout(() => setToast(null), 6000);
-    return () => clearTimeout(id);
-  }, [toast]);
+  useEffect(() => { if (!toast) return; const id = setTimeout(() => setToast(null), 6000); return () => clearTimeout(id); }, [toast]);
 
   const resolveApprover = useCallback((): string | null => {
     const fromStore = approverHandle?.trim();
     if (fromStore) return fromStore;
     const fromLs = typeof localStorage !== "undefined" ? localStorage.getItem(APPROVER_LS_KEY)?.trim() : undefined;
-    if (fromLs) {
-      setApproverHandle(fromLs);
-      return fromLs;
-    }
+    if (fromLs) { setApproverHandle(fromLs); return fromLs; }
     const entered = typeof window !== "undefined" ? window.prompt("확정자(이름/핸들)를 입력하세요:")?.trim() : "";
-    if (entered) {
-      try {
-        localStorage.setItem(APPROVER_LS_KEY, entered);
-      } catch {
-        /* ignore */
-      }
-      setApproverHandle(entered);
-      return entered;
-    }
+    if (entered) { try { localStorage.setItem(APPROVER_LS_KEY, entered); } catch { /* */ } setApproverHandle(entered); return entered; }
     return null;
   }, [approverHandle, setApproverHandle]);
 
-  const effValue = (f: FunctionRow, key: CellKey | "name"): string => {
-    const edited = overrides[f.id]?.editedCells?.[key];
-    if (typeof edited === "string") return edited;
-    return key === "name" ? f.name : f[key].value;
+  // 병합 helpers -----------------------------------------------------------
+  const effCell = (f: FunctionRow, key: CellKey | "name"): string => {
+    const e = fnOv[f.id]?.editedCells?.[key];
+    return typeof e === "string" ? e : key === "name" ? f.name : f[key].value;
   };
-  const isEdited = (f: FunctionRow, key: string): boolean => typeof overrides[f.id]?.editedCells?.[key] === "string";
-  const isConfirmed = (f: FunctionRow): boolean => Boolean(overrides[f.id]);
+  const isEdited = (f: FunctionRow, key: string) => typeof fnOv[f.id]?.editedCells?.[key] === "string";
+  const isConfirmed = (f: FunctionRow) => Boolean(fnOv[f.id]);
+  const effLifecycle = (r: Requirement) => reqOv[r.id]?.lifecycle ?? r.lifecycle;
+  const effSignoff = (r: Requirement): Signoff | null => (reqOv[r.id] && "signoff" in reqOv[r.id] ? reqOv[r.id].signoff ?? null : r.signoff);
+  const effTest = (r: Requirement, acId: string, t: TestRef): TestResult => reqOv[r.id]?.tests?.[`${acId}::${t.caseId}`]?.result ?? t.result;
+  const fnById = (id: string) => model?.functions.find((f) => f.id === id);
+  const reqById = (id: string) => model?.requirements.find((r) => r.id === id);
+  const selectedFn = model?.functions.find((f) => f.id === selFn) ?? null;
+  const selectedReq = model?.requirements.find((r) => r.id === selReq) ?? null;
 
-  const fnById = (id: string): FunctionRow | undefined => model?.functions.find((f) => f.id === id);
-  const selectedRow = model?.functions.find((f) => f.id === selected) ?? null;
-
-  const openFunction = useCallback((fnId: string) => {
-    setView("function");
-    setSelected(fnId);
-    setEditing(false);
-    setSaveError(null);
-  }, []);
+  const openFunction = useCallback((id: string) => { setView("function"); setSelReq(null); setSelFn(id); setEditing(false); setSaveError(null); }, []);
 
   const beginEdit = useCallback(() => {
-    if (!selectedRow) return;
-    setDraft({
-      name: effValue(selectedRow, "name"),
-      entryPoint: effValue(selectedRow, "entryPoint"),
-      implementation: effValue(selectedRow, "implementation"),
-      data: effValue(selectedRow, "data"),
-      test: effValue(selectedRow, "test"),
-    });
-    setEditing(true);
-    setSaveError(null);
+    if (!selectedFn) return;
+    setDraft({ name: effCell(selectedFn, "name"), entryPoint: effCell(selectedFn, "entryPoint"), implementation: effCell(selectedFn, "implementation"), data: effCell(selectedFn, "data"), test: effCell(selectedFn, "test") });
+    setEditing(true); setSaveError(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRow, overrides]);
+  }, [selectedFn, fnOv]);
 
-  const onConfirm = useCallback(
-    async (fromEdit: boolean) => {
-      if (!selectedRow || !accessToken) return;
-      const approver = resolveApprover();
-      if (!approver) return;
-      const editedCells: Record<string, string> = {};
-      if (fromEdit) {
-        for (const key of ["name", "entryPoint", "implementation", "data", "test"] as const) {
-          const original = key === "name" ? selectedRow.name : selectedRow[key].value;
-          if (draft[key] !== undefined && draft[key] !== original) editedCells[key] = draft[key];
-        }
-      }
-      setSaving(true);
-      setSaveError(null);
-      try {
-        const res = await fetch(`/rtm-override?token=${encodeURIComponent(accessToken)}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fnId: selectedRow.id, editedCells, approver }),
-        });
-        const data = (await res.json().catch(() => null)) as (RtmOverride & { error?: string }) | null;
-        if (!res.ok || !data) {
-          setSaveError(data?.error ?? `HTTP ${res.status}`);
-          return;
-        }
-        setOverrides((prev) => ({ ...prev, [selectedRow.id]: { editedCells: data.editedCells, approver: data.approver, at: data.at } }));
-        setEditing(false);
-      } catch (e) {
-        setSaveError(String(e));
-      } finally {
-        setSaving(false);
-      }
-    },
-    [selectedRow, accessToken, draft, resolveApprover],
+  const onConfirm = useCallback(async (fromEdit: boolean) => {
+    if (!selectedFn || !accessToken) return;
+    const approver = resolveApprover();
+    if (!approver) return;
+    const editedCells: Record<string, string> = {};
+    if (fromEdit) for (const key of ["name", "entryPoint", "implementation", "data", "test"] as const) {
+      const original = key === "name" ? selectedFn.name : selectedFn[key].value;
+      if (draft[key] !== undefined && draft[key] !== original) editedCells[key] = draft[key];
+    }
+    setSaving(true); setSaveError(null);
+    try {
+      const res = await fetch(`/rtm-override?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fnId: selectedFn.id, editedCells, approver }) });
+      const data = (await res.json().catch(() => null)) as (FnOverride & { error?: string }) | null;
+      if (!res.ok || !data) { setSaveError(data?.error ?? `HTTP ${res.status}`); return; }
+      setFnOv((p) => ({ ...p, [selectedFn.id]: { editedCells: data.editedCells, approver: data.approver, at: data.at } }));
+      setEditing(false);
+    } catch (e) { setSaveError(String(e)); } finally { setSaving(false); }
+  }, [selectedFn, accessToken, draft, resolveApprover]);
+
+  // 요구사항 검증 입력 (POST /rtm-req-override) -------------------------------
+  const postReq = useCallback(async (reqId: string, payload: { lifecycle?: string; signoff?: Signoff | null; tests?: Record<string, { result: TestResult; defectId: string | null }> }) => {
+    if (!accessToken) { setToast({ kind: "failed", msg: "읽기전용 — 검증 입력은 dev 서버가 필요합니다." }); return; }
+    const approver = resolveApprover();
+    if (!approver) return;
+    try {
+      const res = await fetch(`/rtm-req-override?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reqId, ...payload, approver }) });
+      const data = (await res.json().catch(() => null)) as (ReqOverride & { error?: string }) | null;
+      if (!res.ok || !data) { setToast({ kind: "failed", msg: `저장 실패: ${data?.error ?? res.status}` }); return; }
+      setReqOv((p) => ({ ...p, [reqId]: { ...p[reqId], ...(payload.lifecycle !== undefined ? { lifecycle: payload.lifecycle } : {}), ...(payload.signoff !== undefined ? { signoff: payload.signoff } : {}), tests: { ...(p[reqId]?.tests ?? {}), ...(payload.tests ?? {}) } } }));
+    } catch (e) { setToast({ kind: "failed", msg: String(e) }); }
+  }, [accessToken, resolveApprover]);
+
+  const cov = model?.coverage;
+  const diags = model?.diagnostics ?? [];
+  const errCount = diags.filter((d) => d.level === "error").length;
+
+  // ── 렌더 조각 ──────────────────────────────────────────────────────────
+  const tabBtn = (k: typeof view, label: string) => (
+    <button type="button" onClick={() => { setView(k); setSelFn(null); setSelReq(null); }}
+      className={`rounded-md transition-colors ${view === k ? "bg-accent/20 text-accent" : "text-text-muted hover:text-text-secondary"}`}
+      style={{ padding: "5px 14px", fontSize: 12, fontWeight: view === k ? 600 : 500 }}>{label}</button>
   );
-
-  const evidenceRate = (() => {
-    if (!model) return 0;
-    const cells = model.functions.flatMap((f) => [f.entryPoint, f.implementation, f.data, f.test]);
-    if (cells.length === 0) return 0;
-    return Math.round((cells.filter((c) => c.confidence === "CONFIRMED").length / cells.length) * 100);
-  })();
-
-  const toggleBtn = (mode: "function" | "requirement", label: string) => (
-    <button
-      type="button"
-      onClick={() => setView(mode)}
-      className={`rounded-md transition-colors ${view === mode ? "bg-accent/20 text-accent" : "text-text-muted hover:text-text-secondary"}`}
-      style={{ padding: "3px 10px", fontSize: 11, fontWeight: view === mode ? 600 : 400 }}
-    >
-      {label}
-    </button>
+  const Tile = ({ lbl, n, d, pct, bar }: { lbl: string; n: number | string; d?: string; pct?: number; bar?: string }) => (
+    <div style={{ flex: 1, background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 13, padding: "13px 15px" }}>
+      <div className="text-text-muted" style={{ fontSize: 10.5, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 7 }}>{lbl}</div>
+      <div style={{ fontFamily: "var(--font-heading)", fontSize: 24, color: "var(--color-text-primary)", lineHeight: 1 }}>{n}{d && <span className="text-text-muted" style={{ fontSize: 13, fontFamily: "var(--font-body)" }}>{d}</span>}</div>
+      {pct !== undefined && <div style={{ height: 5, borderRadius: 3, background: "var(--color-elevated)", overflow: "hidden", marginTop: 9 }}><i style={{ display: "block", height: "100%", width: `${pct}%`, background: bar }} /></div>}
+    </div>
   );
+  const confChip = (label: string, color: string) => <span style={{ marginLeft: 6, fontSize: 9, fontFamily: "var(--font-mono)", color }}>[{label}]</span>;
+
+  // 추적 셀 (그리드)
+  const TraceTd = ({ f, c }: { f: FunctionRow; c: { key: CellKey; label: string } }) => {
+    const cell = f[c.key]; const edited = isEdited(f, c.key);
+    const v = effCell(f, c.key); const proposed = v.startsWith("(제안)") || (f.origin === "TO_BE" && v.length > 0);
+    const chip = edited ? { label: "확정", color: GOLD } : CONF[cell.confidence];
+    return (
+      <td title={evidenceTitle(cell)} style={{ borderBottom: BORDER, padding: "11px 12px", verticalAlign: "top" }}>
+        <span style={{ fontSize: 12.5, color: proposed ? "var(--color-text-muted)" : "var(--color-text-secondary)", fontStyle: proposed ? "italic" : "normal" }}>{v.length > 0 ? v : <span style={{ color: FAINT }}>—</span>}</span>
+        {confChip(chip.label, chip.color)}
+      </td>
+    );
+  };
 
   return (
     <div className="flex-1 min-h-0 flex flex-col bg-root overflow-hidden relative">
-      {/* 헤더 + 뷰 토글 */}
-      <div className="flex items-center gap-3 shrink-0 bg-panel border-b border-border-subtle" style={{ padding: "10px 20px" }}>
-        <span className="text-text-primary" style={{ fontSize: 14 }}>요구사항 추적표 (RTM)</span>
-        <div className="flex items-center gap-1 ml-2">
-          {toggleBtn("function", "기능 기준")}
-          {toggleBtn("requirement", "요구사항 기준")}
+      {/* 헤더 */}
+      <div className="flex items-center gap-4 shrink-0 bg-panel border-b border-border-subtle" style={{ padding: "12px 24px" }}>
+        <span style={{ fontFamily: "var(--font-heading)", fontSize: 19, color: "var(--color-text-primary)" }}>요구사항 추적표</span>
+        <span className="text-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, letterSpacing: ".16em", border: "1px solid var(--color-border-subtle)", borderRadius: 5, padding: "3px 6px" }}>RTM</span>
+        <div className="flex items-center gap-1 ml-1 rounded-lg" style={{ background: "var(--color-panel)", border: BORDER, padding: 3 }}>
+          {tabBtn("function", "기능 기준")}{tabBtn("requirement", "요구사항 기준")}{tabBtn("status", "현황")}
         </div>
         <span className="ml-auto flex items-center gap-3">
           {intakeStatus === "running" && (
             <span className="flex items-center gap-1.5 text-amber-400" style={{ fontSize: 11 }} title="요구사항 인테이크 진행 중">
-              <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              분석 중…
+              <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>분석 중…
             </span>
           )}
-          <button
-            type="button"
-            onClick={() => { setIntakeOpen(true); setIntakeError(null); }}
-            disabled={intakeStatus === "running"}
-            className="rounded-md border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-40"
-            style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600 }}
-            title="자연어로 새 요구사항을 요청 → 분해·매칭(전부 [추정])"
-          >
-            + 요청
-          </button>
-          {model && (
-            <span className="text-text-muted" style={{ fontSize: 11, fontFamily: "var(--font-mono)" }}>
-              도메인 {model.domains.length} · 기능 {model.functions.length} · 요구사항 {model.requirements.length} · 근거율 {evidenceRate}%
-            </span>
-          )}
+          <button type="button" onClick={() => { setIntakeOpen(true); setIntakeError(null); }} disabled={intakeStatus === "running"}
+            className="rounded-lg border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-40" style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600 }}
+            title="자연어로 새 요구사항을 요청 → 분해·매칭(전부 [추정])">＋ 새 요청</button>
         </span>
       </div>
 
+      {/* 진단 배너 (#7) */}
+      {diags.length > 0 && (
+        <button type="button" onClick={() => setView("status")} className="flex items-center gap-3 text-left hover:bg-elevated/30 transition-colors"
+          style={{ margin: "12px 24px 0", padding: "9px 14px", borderRadius: 9, background: errCount > 0 ? "rgba(207,138,134,.08)" : "rgba(216,162,94,.08)", border: `1px solid ${errCount > 0 ? "rgba(207,138,134,.28)" : "rgba(216,162,94,.28)"}` }}>
+          <span style={{ color: errCount > 0 ? BAD : WARN, fontSize: 13 }}>⚠</span>
+          <span className="text-text-secondary" style={{ fontSize: 12 }}><b style={{ color: errCount > 0 ? BAD : WARN }}>무결성 진단 {diags.length}건</b>{errCount > 0 ? ` (error ${errCount})` : ""} — {diags[0].message}{diags.length > 1 ? ` 외 ${diags.length - 1}건` : ""}</span>
+          <span className="text-text-muted ml-auto" style={{ fontSize: 11, fontFamily: "var(--font-mono)" }}>현황 탭에서 보기 ›</span>
+        </button>
+      )}
+
       {/* 본문 */}
-      <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 20, paddingBottom: selectedRow && view === "function" ? "42vh" : 20 }}>
+      <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq) ? "50vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
         {error ? (
-          <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>
-            요구사항 추적표를 불러오지 못했습니다 ({error}).<br />
-            <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>understand-rtm</code> 을 먼저 실행해{" "}
-            <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>.understand-anything/rtm.json</code> 을 생성하세요.
-          </div>
+          <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>요구사항 추적표를 불러오지 못했습니다 ({error}).<br /><code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>understand-rtm</code> 을 먼저 실행하세요.</div>
         ) : !model ? (
           <div className="text-text-muted" style={{ fontSize: 13 }}>불러오는 중…</div>
+        ) : view === "function" ? (
+          <FunctionView />
         ) : view === "requirement" ? (
-          /* ── 뷰② 요구사항 기준 ── */
-          model.requirements.length === 0 ? (
-            <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>
-              등록된 요구사항이 없습니다. 요구사항은 인테이크(R5, 자연어 요청 → 분해)로 추가되거나,{" "}
-              <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>.understand-anything/rtm-requirements.json</code> 로 수동 작성합니다.
-            </div>
-          ) : (
-            model.requirements.map((r) => {
-              const counts = (["removed", "modified", "added", "revived"] as Array<keyof Changeset>).filter((k) => r.changeset[k].length > 0);
-              const open = expandedReqs.has(r.id);
-              const touched = (["removed", "modified", "added", "revived"] as Array<keyof Changeset>).flatMap((k) => r.changeset[k].map((fnId) => ({ fnId, verb: k })));
-              return (
-                <section key={r.id} className="rounded-lg border border-border-subtle" style={{ marginBottom: 14, background: "var(--color-surface)" }}>
-                  <button
-                    type="button"
-                    onClick={() => setExpandedReqs((p) => { const n = new Set(p); n.has(r.id) ? n.delete(r.id) : n.add(r.id); return n; })}
-                    className="flex items-center gap-2 w-full text-left hover:bg-elevated/40 transition-colors"
-                    style={{ padding: "10px 14px" }}
-                  >
-                    <span className="text-text-muted" style={{ fontSize: 9, width: 10 }}>{open ? "▾" : "▸"}</span>
-                    <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{r.id}</span>
-                    <span className="text-text-primary" style={{ fontSize: 13 }}>{r.text}</span>
-                    {r.status === "SUPERSEDED" ? (
-                      <span className="text-text-muted" style={{ fontSize: 10.5 }} title={r.supersededBy ? `${r.supersededBy} 가 대체` : undefined}>폐기{r.supersededBy ? ` ⟶${r.supersededBy}` : ""}</span>
-                    ) : (
-                      <span className="text-accent" style={{ fontSize: 10.5 }}>● 현행</span>
-                    )}
-                    <span className="ml-auto flex items-center gap-2" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>
-                      {counts.map((k) => (
-                        <span key={k} style={{ color: VERB[k].color }}>{VERB[k].sym}{r.changeset[k].length}</span>
-                      ))}
-                    </span>
-                  </button>
-                  {open && (
-                    <div style={{ padding: "2px 14px 12px 34px" }}>
-                      {touched.length === 0 ? (
-                        <div className="text-text-muted" style={{ fontSize: 11.5 }}>영향 기능 없음.</div>
-                      ) : (
-                        touched.map(({ fnId, verb }) => {
-                          const f = fnById(fnId);
-                          return (
-                            <button
-                              key={`${verb}:${fnId}`}
-                              type="button"
-                              onClick={() => openFunction(fnId)}
-                              className="flex items-center gap-2 w-full text-left rounded-md hover:bg-elevated/50 transition-colors"
-                              style={{ padding: "4px 6px" }}
-                            >
-                              <span style={{ color: VERB[verb].color, fontFamily: "var(--font-mono)", fontSize: 12, width: 14 }}>{VERB[verb].sym}</span>
-                              <span className="text-text-muted" style={{ fontSize: 10.5 }}>{VERB[verb].label}</span>
-                              <span className="text-text-secondary" style={{ fontSize: 12 }}>{f ? `${f.featureId} ${effValue(f, "name")}` : fnId}</span>
-                              {f && <span className="text-text-muted ml-auto" style={{ fontSize: 10.5 }}>{STATE[f.state]}</span>}
-                            </button>
-                          );
-                        })
-                      )}
-                    </div>
-                  )}
-                </section>
-              );
-            })
-          )
-        ) : model.functions.length === 0 ? (
-          <div className="text-text-muted" style={{ fontSize: 13 }}>기능이 없습니다.</div>
+          <RequirementView />
         ) : (
-          /* ── 뷰① 기능 기준 ── */
-          model.domains.map((domain) => {
-            const rows = model.functions.filter((f) => f.domainId === domain.id);
-            if (rows.length === 0) return null;
-            const confirmedCount = rows.filter(isConfirmed).length;
-            return (
-              <section key={domain.id} style={{ marginBottom: 26 }}>
-                <div className="flex items-center gap-2" style={{ marginBottom: 8 }}>
-                  <span className="text-accent" style={{ fontSize: 13, fontWeight: 600 }}>{domain.name}</span>
-                  <span className="text-text-muted" style={{ fontSize: 11, fontFamily: "var(--font-mono)" }}>기능 {domain.functionCount} · 확정 {confirmedCount}/{rows.length}</span>
-                </div>
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ borderCollapse: "collapse", fontSize: 12, width: "max-content", minWidth: "100%" }}>
-                    <thead>
-                      <tr>
-                        {["기능", ...COLS.map((c) => c.label), "상태"].map((h) => (
-                          <th key={h} style={{ border: "1px solid var(--color-border-subtle)", padding: "6px 9px", background: "var(--color-elevated)", color: "var(--color-text-secondary)", textAlign: "left", whiteSpace: "nowrap", fontWeight: 600 }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((f) => {
-                        const sel = f.id === selected;
-                        return (
-                          <tr key={f.id} onClick={() => openFunction(f.id)} style={{ cursor: "pointer", background: sel ? "rgba(212,165,116,0.08)" : undefined }}>
-                            <td style={{ border: "1px solid var(--color-border-subtle)", padding: "6px 9px", whiteSpace: "nowrap", verticalAlign: "top" }}>
-                              <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{f.featureId}</span>{" "}
-                              <span className="text-text-primary" style={{ fontSize: 12 }}>{effValue(f, "name")}</span>
-                              {f.requirementHistory.length > 0 && (
-                                <span className="text-text-muted" style={{ fontSize: 10, marginLeft: 6, fontFamily: "var(--font-mono)" }} title={`현행 요구: ${f.requirementHistory[f.requirementHistory.length - 1]}`}>
-                                  ◷{f.requirementHistory[f.requirementHistory.length - 1]}
-                                </span>
-                              )}
-                            </td>
-                            {COLS.map((c) => {
-                              const cell = f[c.key];
-                              const edited = isEdited(f, c.key);
-                              const chip = edited ? { label: "확정", color: "var(--color-accent)" } : CONF[cell.confidence];
-                              return (
-                                <td key={c.key} title={evidenceTitle(cell)} style={{ border: "1px solid var(--color-border-subtle)", padding: "6px 9px", verticalAlign: "top" }}>
-                                  <span className="text-text-secondary" style={{ fontSize: 12 }}>
-                                    {effValue(f, c.key).length > 0 ? effValue(f, c.key) : <span className="text-text-muted">—</span>}
-                                  </span>
-                                  <span style={{ marginLeft: 6, fontSize: 9.5, color: chip.color, whiteSpace: "nowrap", fontFamily: "var(--font-mono)" }}>[{chip.label}]</span>
-                                </td>
-                              );
-                            })}
-                            <td style={{ border: "1px solid var(--color-border-subtle)", padding: "6px 9px", whiteSpace: "nowrap", verticalAlign: "top" }}>
-                              {isConfirmed(f) ? <TrustBadge confirmedBy={overrides[f.id].approver} /> : <span className="text-text-secondary" style={{ fontSize: 11.5 }}>{STATE[f.state]}</span>}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            );
-          })
+          <StatusView />
         )}
       </div>
 
-      {/* 상세 패널 — 뷰①에서 행 클릭 시 하단 슬라이드업(현행 상태 + 편집/확정 + 요청별 이력). */}
-      {selectedRow && view === "function" && model && (
-        <div className="absolute bottom-0 left-0 right-0 bg-surface border-t border-border-subtle animate-slide-up z-20 overflow-auto" style={{ height: "40vh" }}>
-          <div className="flex items-center gap-3 sticky top-0 bg-panel border-b border-border-subtle" style={{ padding: "10px 20px" }}>
-            <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{selectedRow.featureId}</span>
-            <span className="text-text-primary" style={{ fontSize: 14 }}>{effValue(selectedRow, "name")}</span>
-            {isConfirmed(selectedRow) ? <TrustBadge confirmedBy={overrides[selectedRow.id].approver} /> : <span className="text-text-secondary" style={{ fontSize: 11.5 }}>{STATE[selectedRow.state]}</span>}
-            <span className="ml-auto flex items-center gap-2">
-              {saveError && <span className="text-amber-400" style={{ fontSize: 11 }}>저장 실패: {saveError}</span>}
-              {!canWrite ? (
-                <span className="text-text-muted" style={{ fontSize: 11 }}>읽기전용(라이브 서버 없음)</span>
-              ) : editing ? (
-                <>
-                  <button type="button" onClick={() => setEditing(false)} className="rounded-md border border-border-subtle text-text-secondary hover:text-text-primary transition-colors" style={{ padding: "4px 12px", fontSize: 12 }}>취소</button>
-                  <button type="button" onClick={() => onConfirm(true)} disabled={saving} className="rounded-md border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-50" style={{ padding: "4px 12px", fontSize: 12 }}>{saving ? "저장 중…" : "저장 + 확정"}</button>
-                </>
-              ) : (
-                <>
-                  {!isConfirmed(selectedRow) && <button type="button" onClick={() => onConfirm(false)} disabled={saving} className="rounded-md border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-50" style={{ padding: "4px 12px", fontSize: 12 }}>{saving ? "확정 중…" : "확정"}</button>}
-                  <button type="button" onClick={beginEdit} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent transition-colors" style={{ padding: "4px 12px", fontSize: 12 }}>편집</button>
-                </>
-              )}
-              <button type="button" onClick={() => { setSelected(null); setEditing(false); }} className="text-text-muted hover:text-text-primary transition-colors" style={{ fontSize: 16, lineHeight: 1, padding: "0 4px" }} title="닫기">×</button>
-            </span>
-          </div>
-          <div style={{ padding: 20 }}>
-            <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 12 }}>
-              <tbody>
-                {([{ key: "name" as const, label: "기능명" }, ...COLS] as Array<{ key: CellKey | "name"; label: string }>).map(({ key, label }) => {
-                  const cell = key === "name" ? null : selectedRow[key];
-                  return (
-                    <tr key={key}>
-                      <td style={{ padding: "8px 12px 8px 0", color: "var(--color-text-muted)", whiteSpace: "nowrap", verticalAlign: "top", width: 96 }}>{label}</td>
-                      <td style={{ padding: "8px 0", verticalAlign: "top" }}>
-                        {editing ? (
-                          <input value={draft[key] ?? ""} onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))} className="w-full bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent transition-colors" style={{ fontSize: 12.5, padding: "5px 9px" }} />
-                        ) : (
-                          <span className="text-text-secondary" style={{ fontSize: 12.5 }}>
-                            {effValue(selectedRow, key).length > 0 ? effValue(selectedRow, key) : <span className="text-text-muted">—</span>}
-                            {cell && <span style={{ marginLeft: 8, fontSize: 10, color: isEdited(selectedRow, key) ? "var(--color-accent)" : CONF[cell.confidence].color, fontFamily: "var(--font-mono)" }}>[{isEdited(selectedRow, key) ? "확정" : CONF[cell.confidence].label}]</span>}
-                          </span>
-                        )}
-                        {!editing && cell && cell.evidence.length > 0 && (
-                          <div className="text-text-muted" style={{ fontSize: 10.5, fontFamily: "var(--font-mono)", marginTop: 3 }}>근거: {cell.evidence.map((e) => (e.line === null ? e.file : `${e.file}:${e.line}`)).join(", ")}</div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      {selectedFn && view === "function" && model && <FunctionDrawer />}
+      {selectedReq && view === "requirement" && model && <RequirementDrawer />}
 
-            {/* 요청별 이력 — 이 기능을 건드린 요구사항만(설계 §2.1). 코드 diff 는 데이터 없음(접힘 동등). */}
-            <div style={{ marginTop: 18 }}>
-              <div className="text-text-muted uppercase" style={{ fontSize: 10.5, letterSpacing: "0.08em", marginBottom: 8 }}>📜 요청별 이력</div>
-              {selectedRow.requirementHistory.length === 0 ? (
-                <div className="text-text-muted" style={{ fontSize: 11.5 }}>관련 요구사항 없음 (AS-IS).</div>
-              ) : (
-                [...selectedRow.requirementHistory].reverse().map((reqId, i) => {
-                  const r = model.requirements.find((rr) => rr.id === reqId);
-                  if (!r) return null;
-                  const verb = verbOf(r, selectedRow.id);
-                  const isHead = i === 0;
-                  return (
-                    <button key={reqId} type="button" onClick={() => { setView("requirement"); setExpandedReqs((p) => new Set(p).add(reqId)); }} className="flex items-start gap-2 w-full text-left rounded-md hover:bg-elevated/50 transition-colors" style={{ padding: "5px 6px" }}>
-                      <span style={{ color: isHead ? "var(--color-accent)" : "var(--color-text-muted)", fontSize: 11 }}>{isHead ? "●" : "│"}</span>
-                      <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{r.id}</span>
-                      {verb && <span style={{ color: VERB[verb].color, fontSize: 11 }}>{VERB[verb].sym} {VERB[verb].label}</span>}
-                      <span className="text-text-secondary" style={{ fontSize: 12 }}>{r.text}</span>
-                      <span className="ml-auto text-text-muted" style={{ fontSize: 10.5 }}>{isHead ? "현행" : r.status === "SUPERSEDED" ? "폐기" : ""}</span>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* R5 인테이크 모달 — 자연어 요청 입력. */}
+      {/* 인테이크 모달 */}
       {intakeOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-root/80 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setIntakeOpen(false); }}>
           <div role="dialog" aria-modal="true" className="glass-heavy rounded-xl shadow-2xl w-full max-w-xl mx-4">
             <div className="flex items-center justify-between border-b border-border-subtle" style={{ padding: "14px 20px" }}>
               <h2 className="text-text-primary" style={{ fontSize: 15, fontWeight: 600 }}>요구사항 요청</h2>
-              <button onClick={() => setIntakeOpen(false)} className="text-text-muted hover:text-text-primary transition-colors" style={{ fontSize: 18, lineHeight: 1 }}>×</button>
+              <button onClick={() => setIntakeOpen(false)} className="text-text-muted hover:text-text-primary" style={{ fontSize: 18, lineHeight: 1 }}>×</button>
             </div>
             <div style={{ padding: "16px 20px" }}>
-              <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 10 }}>
-                고객 요청을 자연어로 입력하세요. 기존 도메인/기능과 대조해 하위 기능으로 분해·매칭하고 변경 묶음을 제안합니다.
-                <span className="text-text-muted"> 결과는 전부 <code style={{ fontFamily: "var(--font-mono)" }}>[추정]</code> — 추적표에서 검토 후 확정하세요.</span>
-              </p>
-              <textarea
-                value={intakeQuery}
-                onChange={(e) => setIntakeQuery(e.target.value)}
-                onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void startIntake(); }}
-                placeholder="예) 결제에 무통장입금 추가해줘 / 알림 기능 만들어줘"
-                rows={4}
-                autoFocus
-                className="w-full resize-y rounded-lg bg-elevated border border-border-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent"
-                style={{ fontSize: 13, padding: "8px 11px" }}
-              />
+              <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 10 }}>고객 요청을 자연어로 입력하세요. 기존 도메인/기능과 대조해 하위 기능·인수조건으로 분해·매칭합니다.<span className="text-text-muted"> 결과는 전부 <code style={{ fontFamily: "var(--font-mono)" }}>[추정]</code> — 검토 후 확정하세요.</span></p>
+              <textarea value={intakeQuery} onChange={(e) => setIntakeQuery(e.target.value)} onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void startIntake(); }} placeholder="예) 장바구니 추가 시 있으면 +1, 없으면 추가. 재고 없으면 불가, 단 이벤트 상품 예외. 추가되면 알림 발송." rows={4} autoFocus className="w-full resize-y rounded-lg bg-elevated border border-border-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" style={{ fontSize: 13, padding: "8px 11px" }} />
               {intakeError && <p className="text-red-400" style={{ fontSize: 11.5, marginTop: 8 }}>{intakeError}</p>}
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-border-subtle" style={{ padding: "12px 20px" }}>
-              <button onClick={() => setIntakeOpen(false)} className="rounded-lg text-text-secondary hover:text-text-primary transition-colors" style={{ padding: "6px 12px", fontSize: 13 }}>취소</button>
-              <button onClick={() => void startIntake()} disabled={!intakeQuery.trim()} className="rounded-lg font-medium bg-accent/20 text-accent hover:bg-accent/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed" style={{ padding: "6px 16px", fontSize: 13 }}>분석 실행</button>
+              <button onClick={() => setIntakeOpen(false)} className="rounded-lg text-text-secondary hover:text-text-primary" style={{ padding: "6px 12px", fontSize: 13 }}>취소</button>
+              <button onClick={() => void startIntake()} disabled={!intakeQuery.trim()} className="rounded-lg font-medium bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-40" style={{ padding: "6px 16px", fontSize: 13 }}>분석 실행</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 인테이크 완료/실패 토스트. */}
       {toast && (
-        <div
-          className={`fixed bottom-5 right-5 z-[120] rounded-lg shadow-2xl border max-w-sm ${toast.kind === "done" ? "bg-emerald-900/80 border-emerald-600 text-emerald-100" : "bg-red-900/80 border-red-600 text-red-100"}`}
-          style={{ padding: "12px 16px", fontSize: 13 }}
-          role="status"
-          onClick={() => setToast(null)}
-        >
-          {toast.msg}
-        </div>
+        <div className={`fixed bottom-5 right-5 z-[120] rounded-lg shadow-2xl border max-w-sm ${toast.kind === "done" ? "bg-emerald-900/80 border-emerald-600 text-emerald-100" : "bg-red-900/80 border-red-600 text-red-100"}`} style={{ padding: "12px 16px", fontSize: 13 }} role="status" onClick={() => setToast(null)}>{toast.msg}</div>
       )}
     </div>
   );
+
+  // ── 뷰① 기능 기준 ──
+  function FunctionView() {
+    if (!model) return null;
+    return (
+      <>
+        {cov && (
+          <div className="flex gap-2.5" style={{ marginBottom: 22 }}>
+            <Tile lbl="요구사항 구현" n={cov.requirements.implemented} d={`/${cov.requirements.total}`} pct={pct(cov.requirements.implemented, cov.requirements.total)} bar={`linear-gradient(90deg,${GOLD_DIM},${GOLD})`} />
+            <Tile lbl="요구사항 검증" n={cov.requirements.verified} d={`/${cov.requirements.total}`} pct={pct(cov.requirements.verified, cov.requirements.total)} bar={`linear-gradient(90deg,#5f8a6c,${OK})`} />
+            <Tile lbl="고객 검수" n={cov.requirements.signedOff} d={`/${cov.requirements.total}`} pct={pct(cov.requirements.signedOff, cov.requirements.total)} bar={`linear-gradient(90deg,${GOLD_DIM},${GOLD})`} />
+            <Tile lbl="검증 공백" n={cov.gaps.unverified.length} d=" 기능" pct={cov.functions.total ? pct(cov.gaps.unverified.length, cov.functions.total) : 0} bar={`linear-gradient(90deg,#9c6360,${BAD})`} />
+          </div>
+        )}
+        {model.functions.length === 0 ? <div className="text-text-muted" style={{ fontSize: 13 }}>기능이 없습니다.</div> : model.domains.map((domain) => {
+          const rows = model.functions.filter((f) => f.domainId === domain.id);
+          if (rows.length === 0) return null;
+          const confirmedN = rows.filter(isConfirmed).length;
+          const isNew = domain.id.startsWith("to-be:");
+          return (
+            <section key={domain.id} style={{ marginBottom: 26 }}>
+              <div className="flex items-center gap-3" style={{ padding: "0 4px 11px" }}>
+                <span style={{ color: isNew ? OK : GOLD, fontSize: 11 }}>{isNew ? "✦" : "◆"}</span>
+                <span style={{ fontFamily: "var(--font-heading)", fontSize: 17, color: "var(--color-text-primary)" }}>{domain.name}</span>
+                <span className="text-faint" style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: FAINT }}>{domain.id.replace(/^(domain:|to-be:)/, "")}{isNew ? " · 신규" : ""}</span>
+                <span className="text-text-muted ml-auto" style={{ fontSize: 11.5 }}>기능 {domain.functionCount} · 확정 {confirmedN}/{rows.length}</span>
+              </div>
+              <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 14, overflow: "hidden" }}>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 880 }}>
+                    <thead><tr>{["기능", ...COLS.map((c) => c.label), "상태"].map((h) => <th key={h} style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>{h}</th>)}</tr></thead>
+                    <tbody>{rows.map((f) => (
+                      <tr key={f.id} onClick={() => openFunction(f.id)} style={{ cursor: "pointer", background: f.id === selFn ? "rgba(212,165,116,0.08)" : undefined, boxShadow: isConfirmed(f) ? `inset 2px 0 0 ${GOLD}` : undefined }} className="hover:bg-accent/[0.045]">
+                        <td style={{ borderBottom: BORDER, padding: "11px 12px", whiteSpace: "nowrap", verticalAlign: "top" }}>
+                          <div><span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}>{f.featureId}</span>{f.requirementHistory.length > 0 && <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: GOLD_DIM, marginLeft: 6 }}>◷{f.requirementHistory[f.requirementHistory.length - 1]}{f.rules.length > 0 ? ` · 규칙 ${f.rules.length}` : ""}</span>}</div>
+                          <div style={{ marginTop: 3 }}><span style={{ fontSize: 13, color: "var(--color-text-primary)", fontWeight: 500 }}>{effCell(f, "name")}</span>
+                            {f.nfrTags.map((t) => <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 8.5, fontFamily: "var(--font-mono)", color: NFR, background: "rgba(120,160,190,.12)", border: "1px solid rgba(120,160,190,.25)", borderRadius: 4, padding: "1px 5px", marginLeft: 6 }}>⚡{t}</span>)}</div>
+                        </td>
+                        {COLS.map((c) => <TraceTd key={c.key} f={f} c={c} />)}
+                        <td style={{ borderBottom: BORDER, padding: "11px 12px", whiteSpace: "nowrap", verticalAlign: "top" }}>{isConfirmed(f) ? <TrustBadge confirmedBy={fnOv[f.id].approver} /> : <Pill label={STATE_LABEL[f.state]} color={STATE_COLOR[f.state]} />}</td>
+                      </tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          );
+        })}
+      </>
+    );
+  }
+
+  // ── 뷰② 요구사항 기준 ──
+  function RequirementView() {
+    if (!model) return null;
+    if (model.requirements.length === 0) return <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 560 }}>등록된 요구사항이 없습니다. <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>＋ 새 요청</code> 으로 자연어 요청을 분해·매칭하거나 rtm-requirements.json 으로 작성합니다.</div>;
+    const active = model.requirements.filter((r) => effLifecycle(r) && r.status === "ACTIVE");
+    const dead = model.requirements.filter((r) => r.status === "SUPERSEDED");
+    return (
+      <>
+        {active.map((r) => <ReqCard key={r.id} r={r} />)}
+        {dead.length > 0 && (
+          <>
+            <div className="flex items-center gap-2.5" style={{ margin: "20px 4px 10px" }}><span className="text-text-muted" style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase" }}>폐기 이력 (감사 보존)</span><span style={{ flex: 1, height: 1, background: "var(--color-border-subtle)" }} /></div>
+            {dead.map((r) => <ReqCard key={r.id} r={r} dead />)}
+          </>
+        )}
+      </>
+    );
+  }
+
+  function ReqCard({ r, dead }: { r: Requirement; dead?: boolean }) {
+    if (!model) return null;
+    const open = expandedReqs.has(r.id);
+    const counts = (["removed", "modified", "added", "revived"] as Array<keyof Changeset>).filter((k) => r.changeset[k].length > 0);
+    const targets = [...new Set([...r.changeset.added, ...r.changeset.modified, ...r.changeset.revived, ...r.changeset.removed])];
+    const so = effSignoff(r);
+    return (
+      <section style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 14, marginBottom: 14, overflow: "hidden", opacity: dead ? 0.68 : 1 }}>
+        <div className="flex items-center gap-3" style={{ padding: "14px 20px", cursor: "pointer" }} onClick={() => setExpandedReqs((p) => { const n = new Set(p); n.has(r.id) ? n.delete(r.id) : n.add(r.id); return n; })}>
+          <span style={{ width: 11, height: 11, borderRadius: "50%", flex: "none", background: dead ? "none" : r.type === "nonfunctional" ? NFR : GOLD, border: dead ? `1.5px solid ${FAINT}` : "none", boxShadow: dead ? "none" : `0 0 0 4px ${r.type === "nonfunctional" ? "rgba(120,160,190,.14)" : "rgba(212,165,116,.14)"}` }} />
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-muted)", textDecoration: dead ? "line-through" : "none" }}>{r.id}</span>
+          <span style={{ fontSize: 15, color: dead ? "var(--color-text-secondary)" : "var(--color-text-primary)", fontWeight: 500 }}>{r.text}</span>
+          {dead ? <Pill label="폐기" color="var(--color-text-muted)" bg="rgba(255,255,255,.04)" />
+            : r.type === "nonfunctional" ? <Pill label={`⚡ 비기능 · ${NFR_CAT[r.nfrCategory ?? "other"] ?? "기타"}`} color={NFR} bg="rgba(120,160,190,.12)" />
+              : <><Pill label="● 현행" color={GOLD} bg="rgba(212,165,116,.12)" />{r.priority && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, color: PRIORITY[r.priority].color, background: PRIORITY[r.priority].bg }}>{PRIORITY[r.priority].label}</span>}</>}
+          {r.supersedes && <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: GOLD_DIM }}>⟵ {r.supersedes} 대체</span>}
+          {dead && r.supersededBy && <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: GOLD_DIM }}>⟶ {r.supersededBy} 이 대체</span>}
+          <span className="ml-auto flex items-center gap-2">
+            {!dead && r.type === "functional" && <span className="flex gap-2 text-text-muted" style={{ fontSize: 10.5, fontFamily: "var(--font-mono)" }}>
+              {r.source?.requester && <span style={{ background: "var(--color-elevated)", border: BORDER, borderRadius: 5, padding: "2px 7px" }}>👤 {r.source.requester}</span>}
+              {r.changeReq?.crNo && <span style={{ background: "var(--color-elevated)", border: BORDER, borderRadius: 5, padding: "2px 7px" }}>{r.changeReq.crNo}{r.changeReq.effort ? ` · ${r.changeReq.effort}` : ""}</span>}
+              <span style={{ background: "var(--color-elevated)", border: BORDER, borderRadius: 5, padding: "2px 7px" }}>{LIFECYCLE_LABEL[effLifecycle(r)] ?? effLifecycle(r)}</span>
+              {so?.approved && <span style={{ color: GOLD }}>✓검수</span>}
+            </span>}
+            {r.type === "nonfunctional" && r.nfrScope.length > 0 && <span className="text-text-muted" style={{ fontSize: 10.5, fontFamily: "var(--font-mono)" }}>횡단: {r.nfrScope.map((id) => fnById(id)?.name ?? id).join(" · ")}</span>}
+            <span className="flex gap-2" style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 500 }}>{counts.map((k) => <span key={k} style={{ color: VERB[k].color }}>{VERB[k].sym}{r.changeset[k].length}</span>)}</span>
+            {!dead && <button type="button" onClick={(e) => { e.stopPropagation(); setSelFn(null); setSelReq(r.id); }} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent transition-colors" style={{ padding: "3px 10px", fontSize: 11 }}>검증</button>}
+          </span>
+        </div>
+        {open && (
+          <div style={{ padding: "4px 20px 16px", borderTop: BORDER }}>
+            {r.source?.raw && <div className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.6, margin: "8px 0 6px" }}>본문: {r.source.raw}</div>}
+            {r.acceptanceCriteria.length > 0 ? <AcMatrix r={r} targets={r.changeset.added.concat(r.changeset.modified, r.changeset.revived)} /> : (
+              <div style={{ marginTop: 6 }}>{targets.length === 0 ? <div className="text-text-muted" style={{ fontSize: 11.5 }}>영향 기능 없음.</div> : targets.map((id) => {
+                const v = verbOf(r, id); const f = fnById(id);
+                return <button key={id} type="button" onClick={() => openFunction(id)} className="flex items-center gap-2.5 w-full text-left rounded-md hover:bg-elevated/50 transition-colors" style={{ padding: "6px 8px" }}>
+                  {v && <><span style={{ color: VERB[v].color, fontFamily: "var(--font-mono)", fontSize: 13, width: 15, textAlign: "center", fontWeight: 600 }}>{VERB[v].sym}</span><span className="text-text-muted" style={{ fontSize: 11, width: 34 }}>{VERB[v].label}</span></>}
+                  <span className="text-text-secondary" style={{ fontSize: 12.5 }}>{f ? <><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginRight: 6 }}>{f.featureId}</span>{effCell(f, "name")}</> : id}</span>
+                  {f && <span className="ml-auto text-text-muted" style={{ fontSize: 10.5 }}>{STATE_LABEL[f.state]}</span>}
+                </button>;
+              })}</div>
+            )}
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  function AcMatrix({ r, targets }: { r: Requirement; targets: string[] }) {
+    const cols = [...new Set(targets)];
+    return (
+      <div style={{ marginTop: 10, border: BORDER, borderRadius: 11, overflow: "hidden" }}>
+        <div style={{ display: "grid", gridTemplateColumns: `2.6fr .8fr ${cols.map(() => "1fr").join(" ")} .9fr`, background: "var(--color-elevated)", padding: "9px 14px", alignItems: "center" }}>
+          {["인수조건 (AC)", "유형", ...cols.map((id) => fnById(id)?.name ?? id), "시험"].map((h, i) => <span key={i} className="text-text-muted" style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 600, textAlign: i === 0 ? "left" : "center" }}>{h}</span>)}
+        </div>
+        {r.acceptanceCriteria.map((ac) => {
+          const t0 = ac.tests[0]; const res = t0 ? effTest(r, ac.id, t0) : "UNTESTED";
+          return (
+            <div key={ac.id} style={{ display: "grid", gridTemplateColumns: `2.6fr .8fr ${cols.map(() => "1fr").join(" ")} .9fr`, padding: "10px 14px", borderTop: BORDER, alignItems: "center" }}>
+              <span style={{ fontSize: 12.5, color: "var(--color-text-secondary)" }}><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginRight: 6 }}>{ac.id}</span>{ac.text}</span>
+              <span style={{ justifySelf: "center", fontSize: 9.5, fontFamily: "var(--font-mono)", padding: "2px 7px", borderRadius: 5, color: AC_KIND[ac.kind].color, background: "color-mix(in srgb,currentColor 14%,transparent)" }}>{AC_KIND[ac.kind].label}</span>
+              {cols.map((id) => <span key={id} style={{ justifySelf: "center", color: ac.fnIds.includes(id) ? GOLD : FAINT, fontSize: ac.fnIds.includes(id) ? 13 : 11 }}>{ac.fnIds.includes(id) ? "●" : "·"}</span>)}
+              <span style={{ justifySelf: "center", fontSize: 10, fontFamily: "var(--font-mono)", padding: "2px 7px", borderRadius: 5, color: TEST_RES[res].color, background: res === "PASS" ? "rgba(127,174,138,.14)" : "var(--color-elevated)" }}>{TEST_RES[res].label}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // ── 뷰③ 현황 ──
+  function StatusView() {
+    if (!model) return null;
+    if (!cov) return <div className="text-text-muted" style={{ fontSize: 13 }}>커버리지 데이터가 없습니다(rtm.json v2 재생성 필요).</div>;
+    const Gap = ({ title, color, ids, render }: { title: string; color: string; ids: string[]; render: (id: string) => React.ReactNode }) => (
+      <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 13, overflow: "hidden" }}>
+        <h3 className="flex items-center gap-2" style={{ fontSize: 12, padding: "12px 16px", borderBottom: BORDER, color }}>{title}<span className="ml-auto" style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>{ids.length}</span></h3>
+        {ids.length === 0 ? <div className="text-text-muted" style={{ padding: "12px 16px", fontSize: 12 }}>없음 ✓</div> : ids.map((id) => <div key={id} style={{ padding: "9px 16px", borderBottom: BORDER, fontSize: 12.5, color: "var(--color-text-secondary)" }}>{render(id)}</div>)}
+      </div>
+    );
+    return (
+      <>
+        <div className="text-accent" style={{ fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 12 }}>커버리지</div>
+        <div className="flex gap-2.5" style={{ marginBottom: 14 }}>
+          <Tile lbl="요구사항" n={cov.requirements.total} />
+          <Tile lbl="구현" n={cov.requirements.implemented} d={`/${cov.requirements.total}`} pct={pct(cov.requirements.implemented, cov.requirements.total)} bar={`linear-gradient(90deg,${GOLD_DIM},${GOLD})`} />
+          <Tile lbl="검증" n={cov.requirements.verified} d={`/${cov.requirements.total}`} pct={pct(cov.requirements.verified, cov.requirements.total)} bar={`linear-gradient(90deg,#5f8a6c,${OK})`} />
+          <Tile lbl="검수" n={cov.requirements.signedOff} d={`/${cov.requirements.total}`} pct={pct(cov.requirements.signedOff, cov.requirements.total)} bar={`linear-gradient(90deg,${GOLD_DIM},${GOLD})`} />
+          <Tile lbl="시험 통과" n={cov.tests.pass} d={`/${cov.tests.total}`} pct={pct(cov.tests.pass, cov.tests.total)} bar={`linear-gradient(90deg,#5f8a6c,${OK})`} />
+        </div>
+        <div style={{ color: BAD, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 12 }}>갭 리포트 — 빈칸 = 위험</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+          <Gap title="🚫 고아 코드" color={BAD} ids={cov.gaps.orphanCode} render={(id) => { const f = fnById(id); return <><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginRight: 6 }}>{f?.featureId ?? id}</span>{f?.name ?? id} — 현행 요구 없음</>; }} />
+          <Gap title="⚠ 미구현 요구" color={WARN} ids={cov.gaps.unimplemented} render={(id) => { const r = reqById(id); return <><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginRight: 6 }}>{id}</span>{r?.text ?? id}{r?.type === "nonfunctional" ? "(성능)" : ""}</>; }} />
+          <Gap title="◔ 미검증 기능" color="var(--color-text-muted)" ids={cov.gaps.unverified} render={(id) => { const f = fnById(id); return <><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginRight: 6 }}>{f?.featureId ?? id}</span>{f?.name ?? id}</>; }} />
+        </div>
+        {diags.length > 0 && (
+          <>
+            <div style={{ color: errCount > 0 ? BAD : WARN, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", margin: "24px 0 12px" }}>무결성 진단</div>
+            <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 13, overflow: "hidden" }}>
+              {diags.map((d, i) => <div key={i} className="flex items-center gap-3" style={{ padding: "9px 16px", borderBottom: i < diags.length - 1 ? BORDER : "none", fontSize: 12 }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: d.level === "error" ? BAD : WARN, border: `1px solid ${d.level === "error" ? "rgba(207,138,134,.3)" : "rgba(216,162,94,.3)"}`, borderRadius: 4, padding: "1px 6px" }}>{d.level}</span>
+                <span className="text-text-secondary">{d.message}</span>{d.ref && <span className="text-text-muted ml-auto" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}>{d.ref}</span>}
+              </div>)}
+            </div>
+          </>
+        )}
+      </>
+    );
+  }
+
+  // ── 기능 드로어 ──
+  function FunctionDrawer() {
+    const f = selectedFn!;
+    return (
+      <div className="absolute bottom-0 left-0 right-0 bg-surface border-t z-20 overflow-auto animate-slide-up" style={{ height: "48vh", borderTopColor: "rgba(212,165,116,.22)" }}>
+        <div className="flex items-center gap-3 sticky top-0 bg-panel border-b border-border-subtle" style={{ padding: "12px 24px" }}>
+          <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{f.featureId}</span>
+          <span style={{ fontFamily: "var(--font-heading)", fontSize: 18, color: "var(--color-text-primary)" }}>{effCell(f, "name")}</span>
+          {isConfirmed(f) ? <TrustBadge confirmedBy={fnOv[f.id].approver} /> : <Pill label={STATE_LABEL[f.state]} color={STATE_COLOR[f.state]} />}
+          <span className="ml-auto flex items-center gap-2">
+            {saveError && <span className="text-amber-400" style={{ fontSize: 11 }}>저장 실패: {saveError}</span>}
+            {!canWrite ? <span className="text-text-muted" style={{ fontSize: 11 }}>읽기전용</span> : editing ? (
+              <><button type="button" onClick={() => setEditing(false)} className="rounded-md border border-border-subtle text-text-secondary" style={{ padding: "5px 13px", fontSize: 12 }}>취소</button>
+                <button type="button" onClick={() => onConfirm(true)} disabled={saving} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>{saving ? "저장 중…" : "저장 + 확정"}</button></>
+            ) : (
+              <>{!isConfirmed(f) && <button type="button" onClick={() => onConfirm(false)} disabled={saving} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>✓ 확정</button>}
+                <button type="button" onClick={beginEdit} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent" style={{ padding: "5px 13px", fontSize: 12 }}>편집</button></>
+            )}
+            <button type="button" onClick={() => { setSelFn(null); setEditing(false); }} className="text-text-muted hover:text-text-primary" style={{ fontSize: 16, padding: "0 4px" }}>×</button>
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr" }}>
+          <div style={{ padding: "18px 24px", borderRight: BORDER }}>
+            <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 12 }}><tbody>
+              {([{ key: "name" as const, label: "기능명" }, ...COLS] as Array<{ key: CellKey | "name"; label: string }>).map(({ key, label }) => {
+                const cell = key === "name" ? null : f[key];
+                return <tr key={key}><td style={{ padding: "9px 12px 9px 0", color: "var(--color-text-muted)", whiteSpace: "nowrap", verticalAlign: "top", width: 88, fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase" }}>{label}</td>
+                  <td style={{ padding: "9px 0", verticalAlign: "top" }}>
+                    {editing ? <input value={draft[key] ?? ""} onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))} className="w-full bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent" style={{ fontSize: 12.5, padding: "5px 9px" }} /> : (
+                      <span className="text-text-secondary" style={{ fontSize: 12.5 }}>{effCell(f, key).length > 0 ? effCell(f, key) : <span style={{ color: FAINT }}>—</span>}{cell && confChip(isEdited(f, key) ? "확정" : CONF[cell.confidence].label, isEdited(f, key) ? GOLD : CONF[cell.confidence].color)}</span>
+                    )}
+                    {!editing && cell && cell.evidence.length > 0 && <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginTop: 3 }}>근거: {cell.evidence.map((e) => (e.line === null ? e.file : `${e.file}:${e.line}`)).join(", ")}</div>}
+                  </td></tr>;
+              })}
+            </tbody></table>
+          </div>
+          <div style={{ padding: "18px 24px", overflow: "auto" }}>
+            <div style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: 12 }}>📋 업무 규칙 — 이 기능이 충족할 조건</div>
+            {f.rules.length === 0 ? <div className="text-text-muted" style={{ fontSize: 11.5, marginBottom: 16 }}>관련 업무규칙 없음.</div> : f.rules.map((r, i) => (
+              <div key={i} className="flex items-start gap-2.5" style={{ padding: "7px 0", borderBottom: BORDER }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: GOLD_DIM, whiteSpace: "nowrap" }}>{r.reqId}·{r.acId}</span>
+                <span style={{ fontSize: 12.5, color: "var(--color-text-secondary)" }}><span style={{ fontSize: 9.5, fontFamily: "var(--font-mono)", padding: "1px 6px", borderRadius: 5, color: AC_KIND[r.kind].color, background: "color-mix(in srgb,currentColor 14%,transparent)", marginRight: 6 }}>{AC_KIND[r.kind].label}</span>{r.text}</span>
+              </div>
+            ))}
+            <div style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: GOLD_DIM, margin: "18px 0 10px" }}>📜 요청별 이력</div>
+            {f.requirementHistory.length === 0 ? <div className="text-text-muted" style={{ fontSize: 11.5 }}>관련 요구사항 없음 (AS-IS).</div> : [...f.requirementHistory].reverse().map((reqId, i) => {
+              const r = reqById(reqId); if (!r) return null; const v = verbOf(r, f.id); const head = i === 0;
+              return <button key={reqId} type="button" onClick={() => { setView("requirement"); setSelFn(null); setExpandedReqs((p) => new Set(p).add(reqId)); }} className="flex items-center gap-2 w-full text-left rounded-md hover:bg-elevated/50" style={{ padding: "5px 6px" }}>
+                <span style={{ color: head ? GOLD : "var(--color-text-muted)", fontSize: 11 }}>{head ? "●" : "│"}</span>
+                <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}>{r.id}</span>
+                {v && <span style={{ color: VERB[v].color, fontSize: 11 }}>{VERB[v].sym} {VERB[v].label}</span>}
+                <span className="text-text-secondary" style={{ fontSize: 12 }}>{r.text}</span>
+                <span className="ml-auto text-text-muted" style={{ fontSize: 10.5 }}>{head ? "현행" : r.status === "SUPERSEDED" ? "폐기" : ""}</span>
+              </button>;
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── 요구사항 검증 드로어 ──
+  function RequirementDrawer() {
+    const r = selectedReq!;
+    const so = effSignoff(r);
+    const lc = effLifecycle(r);
+    return (
+      <div className="absolute bottom-0 left-0 right-0 bg-surface border-t z-20 overflow-auto animate-slide-up" style={{ height: "50vh", borderTopColor: "rgba(212,165,116,.22)" }}>
+        <div className="flex items-center gap-3 sticky top-0 bg-panel border-b border-border-subtle" style={{ padding: "12px 24px" }}>
+          <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{r.id}</span>
+          <span style={{ fontFamily: "var(--font-heading)", fontSize: 18, color: "var(--color-text-primary)" }}>{r.text}</span>
+          <Pill label="● 현행" color={GOLD} bg="rgba(212,165,116,.12)" />
+          {r.priority && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, color: PRIORITY[r.priority].color, background: PRIORITY[r.priority].bg }}>{PRIORITY[r.priority].label}</span>}
+          {!canWrite && <span className="text-text-muted" style={{ fontSize: 11 }}>읽기전용</span>}
+          <button type="button" onClick={() => setSelReq(null)} className="ml-auto text-text-muted hover:text-text-primary" style={{ fontSize: 16, padding: "0 4px" }}>×</button>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr" }}>
+          <div style={{ padding: "18px 24px", borderRight: BORDER }}>
+            <div style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: 12 }}>🧪 인수조건 시험 결과 — 사람 기록</div>
+            {r.acceptanceCriteria.length === 0 ? <div className="text-text-muted" style={{ fontSize: 11.5 }}>인수조건이 없습니다.</div> : r.acceptanceCriteria.map((ac) => {
+              const t0 = ac.tests[0];
+              const res = t0 ? effTest(r, ac.id, t0) : "UNTESTED";
+              return <div key={ac.id} className="flex items-center gap-2.5" style={{ padding: "9px 0", borderBottom: BORDER }}>
+                <span className="flex-1 text-text-secondary" style={{ fontSize: 12 }}><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginRight: 5 }}>{ac.id}</span>{ac.text}{!t0 && <span className="text-text-muted" style={{ fontSize: 10, marginLeft: 6 }}>(케이스 미정)</span>}</span>
+                {t0 && <div className="flex rounded-lg overflow-hidden" style={{ border: BORDER }}>
+                  {(["PASS", "FAIL", "NA"] as TestResult[]).map((rr) => <button key={rr} type="button" disabled={!canWrite} onClick={() => postReq(r.id, { tests: { [`${ac.id}::${t0.caseId}`]: { result: rr, defectId: null } } })}
+                    style={{ fontSize: 10.5, fontFamily: "var(--font-mono)", padding: "4px 9px", border: "none", borderRight: BORDER, cursor: canWrite ? "pointer" : "default", background: res === rr ? (rr === "PASS" ? "rgba(127,174,138,.16)" : rr === "FAIL" ? "rgba(207,138,134,.16)" : "var(--color-elevated)") : "transparent", color: res === rr ? (rr === "PASS" ? OK : rr === "FAIL" ? BAD : "var(--color-text-secondary)") : "var(--color-text-muted)" }}>{rr === "NA" ? "N/A" : rr}</button>)}
+                </div>}
+              </div>;
+            })}
+          </div>
+          <div style={{ padding: "18px 24px" }}>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 6 }}>진행 상태 (lifecycle)</div>
+              <select value={lc} disabled={!canWrite} onChange={(e) => postReq(r.id, { lifecycle: e.target.value })} className="w-full bg-elevated text-text-primary rounded-lg border border-border-subtle outline-none focus:border-accent" style={{ fontSize: 12.5, padding: "8px 11px" }}>
+                {LIFECYCLE_ORDER.map((l) => <option key={l} value={l}>{LIFECYCLE_LABEL[l]}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 6 }}>고객 검수 (signoff)</div>
+              <div className="flex items-center gap-2.5" style={{ background: "rgba(212,165,116,.08)", border: "1px solid rgba(212,165,116,.25)", borderRadius: 10, padding: "11px 14px" }}>
+                <span style={{ color: so?.approved ? GOLD : "var(--color-text-muted)", fontSize: 12 }}>{so?.approved ? `✓ 검수 완료${so.by ? ` (${so.by})` : ""}` : "아직 검수 전"}</span>
+                {canWrite && <button type="button" onClick={() => postReq(r.id, { signoff: so?.approved ? null : { approved: true, by: resolveApprover(), at: new Date().toISOString() } })} className="ml-auto rounded-lg" style={{ fontSize: 11.5, fontWeight: 600, color: GOLD, border: "1px solid rgba(212,165,116,.4)", background: "rgba(212,165,116,.1)", padding: "6px 13px" }}>{so?.approved ? "검수 취소" : "고객 검수 승인"}</button>}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 6 }}>메타</div>
+              <div className="flex flex-wrap gap-3" style={{ background: "var(--color-elevated)", border: BORDER, borderRadius: 8, padding: "9px 12px", fontSize: 12 }}>
+                <span className="text-text-muted">우선순위 <b style={{ color: PRIORITY[r.priority]?.color }}>{PRIORITY[r.priority]?.label}</b></span>
+                {r.source?.requester && <span className="text-text-muted">요청자 <b className="text-text-secondary">{r.source.requester}</b></span>}
+                {r.changeReq?.crNo && <span className="text-text-muted">변경 <b className="text-text-secondary">{r.changeReq.crNo}</b></span>}
+                {r.source?.targetRelease && <span className="text-text-muted">릴리스 <b className="text-text-secondary">{r.source.targetRelease}</b></span>}
+                {r.dependsOn.length > 0 && <span className="text-text-muted">선행 <b className="text-text-secondary">{r.dependsOn.join(", ")}</b></span>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+function pct(n: number, d: number): number { return d > 0 ? Math.round((n / d) * 100) : 0; }
+function Pill({ label, color, bg }: { label: string; color: string; bg?: string }) {
+  return <span style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", width: "max-content", color, background: bg ?? "color-mix(in srgb,currentColor 10%,transparent)", boxShadow: `inset 0 0 0 1px color-mix(in srgb,${color} 22%,transparent)` }}>{label}</span>;
 }

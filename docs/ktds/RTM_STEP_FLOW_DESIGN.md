@@ -312,7 +312,7 @@ claude -p "/understand-rtm --change --target-req <REQ> --kind withdraw --reason 
 | P | 범위 | 검증 |
 |---|---|---|
 | **P1** ✅ | vendoring(**빈 템플릿 3종만**, examples 제외) + 로더 | 로드 단위테스트(9) — 완료 |
-| **P2** | SKILL.md 단계화(절차 A) + `identified.json` 2계층 스키마 + ②③④ 생성 | jpetstore 수동 1회전(①~④) |
+| **P2** ✅ | SKILL.md 단계화(절차 A) + `identified.json` 2계층 스키마 + 검증 CLI | 스키마 테스트(8)·CLI 스모크 — 완료 (LLM ②③④ 채움 e2e 는 P3 배선 후) |
 | **P3** | 서버 job 단계화 + 신규 엔드포인트 | 순차 spawn·게이트·409 테스트 |
 | **P4** | RtmView stepper + 모달 + 미리보기/컨펌/편집 | 시각 QA(headless playwright) |
 | **P5** | ⑤ rtm.json 통합(§9 선택안) + 회귀(targetStep=5 원샷 동등) | 기존 인테이크 결과 diff |

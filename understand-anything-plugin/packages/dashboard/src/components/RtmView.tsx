@@ -771,16 +771,19 @@ export default function RtmView() {
         {open && (
           <div style={{ padding: "4px 20px 16px", borderTop: BORDER }}>
             {r.source?.raw && <div className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.6, margin: "8px 0 6px" }}>본문: {r.source.raw}</div>}
-            {r.acceptanceCriteria.length > 0 ? <AcMatrix r={r} targets={r.changeset.added.concat(r.changeset.modified, r.changeset.revived)} /> : (
-              <div style={{ marginTop: 6 }}>{targets.length === 0 ? <div className="text-text-muted" style={{ fontSize: 11.5 }}>영향 기능 없음.</div> : targets.map((id) => {
+            {r.acceptanceCriteria.length > 0 && <AcMatrix r={r} targets={r.changeset.added.concat(r.changeset.modified, r.changeset.revived)} />}
+            {/* AC 유무와 무관하게 영향 기능을 항상 클릭 목록으로(정방향 연결 가시화). */}
+            <div style={{ marginTop: r.acceptanceCriteria.length > 0 ? 12 : 6 }}>
+              <div className="text-text-muted" style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", fontWeight: 600, margin: "0 0 4px 2px" }}>영향 기능{targets.length > 0 ? ` (${targets.length})` : ""}</div>
+              {targets.length === 0 ? <div className="text-text-muted" style={{ fontSize: 11.5 }}>연결된 기능 없음.</div> : targets.map((id) => {
                 const v = verbOf(r, id); const f = fnById(id);
                 return <button key={id} type="button" onClick={() => openFunction(id)} className="flex items-center gap-2.5 w-full text-left rounded-md hover:bg-elevated/50 transition-colors" style={{ padding: "6px 8px" }}>
                   {v && <><span style={{ color: VERB[v].color, fontFamily: "var(--font-mono)", fontSize: 13, width: 15, textAlign: "center", fontWeight: 600 }}>{VERB[v].sym}</span><span className="text-text-muted" style={{ fontSize: 11, width: 34 }}>{VERB[v].label}</span></>}
                   <span className="text-text-secondary" style={{ fontSize: 12.5 }}>{f ? <><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginRight: 6 }}>{f.featureId}</span>{effCell(f, "name")}</> : id}</span>
                   {f && <span className="ml-auto text-text-muted" style={{ fontSize: 10.5 }}>{STATE_LABEL[f.state]}</span>}
                 </button>;
-              })}</div>
-            )}
+              })}
+            </div>
           </div>
         )}
       </section>

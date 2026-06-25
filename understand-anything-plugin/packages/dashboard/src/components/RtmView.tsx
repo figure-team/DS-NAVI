@@ -184,6 +184,7 @@ export default function RtmView() {
   const [session, setSession] = useState<RtmSession | null>(null);
   const [sessionDocs, setSessionDocs] = useState<SessionDoc[]>([]);
   const [stepBusy, setStepBusy] = useState(false);
+  const [viewStep, setViewStep] = useState<number | null>(null); // null = 산출 최전선(producedStep) 따라감
   // 미리보기/편집
   const [previewName, setPreviewName] = useState<string | null>(null);
   const [previewMd, setPreviewMd] = useState<string>("");
@@ -245,6 +246,23 @@ export default function RtmView() {
     setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); setIntakeStatus("idle");
   }, [sid, accessToken]);
 
+  // 마운트 시 진행 중 세션 복구 — 새로고침/다른 탭에서도 단계 진행을 이어 본다.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const r = await fetch(`/rtm-intake-status${tokenQ}`);
+        const data = (await r.json()) as { job?: { status?: string; sid?: string | null }; session?: RtmSession | null; docs?: SessionDoc[] };
+        if (cancelled || !data.session || data.session.discarded) return;
+        setSid(data.session.sid);
+        setSession(data.session);
+        setSessionDocs(data.docs ?? []);
+        if (data.job?.status === "running" && data.job?.sid === data.session.sid) setIntakeStatus("running");
+      } catch { /* 복구 실패 무시 */ }
+    })();
+    return () => { cancelled = true; };
+  }, [tokenQ]);
+
   // 폴링 — 실행 중이면 세션·문서 갱신. done 이면 멈추고, ⑤ 산출이면 추적표 재로드.
   useEffect(() => {
     if (intakeStatus !== "running" || !sid) return;
@@ -290,17 +308,19 @@ export default function RtmView() {
     } catch { /* */ }
   }, [sid, tokenQ]);
 
-  // producedStep 변동 시 해당 단계 산출물 자동 미리보기.
+  // 표시 단계(viewStep 우선, 없으면 산출 최전선) 산출물 자동 미리보기.
   useEffect(() => {
     if (!session || intakeStatus === "running") return;
-    const ps = session.producedStep;
+    const ps = viewStep ?? session.producedStep;
     if (ps === 1) { void loadIdentified(); setPreviewName(null); }
     else if (ps >= 2 && ps <= 4) {
       const kind = STEP_DOC_KIND[ps];
       const doc = sessionDocs.find((d) => d.kind === kind);
       if (doc && doc.name !== previewName) void loadPreview(doc.name);
     }
-  }, [session?.producedStep, intakeStatus, sessionDocs]);
+  }, [session?.producedStep, viewStep, intakeStatus, sessionDocs]);
+  // 새 단계가 산출되면 표시를 최전선으로 되돌린다.
+  useEffect(() => { setViewStep(null); }, [session?.producedStep]);
   useEffect(() => { if (!toast) return; const id = setTimeout(() => setToast(null), 6000); return () => clearTimeout(id); }, [toast]);
 
   const resolveApprover = useCallback((): string | null => {
@@ -508,16 +528,18 @@ export default function RtmView() {
           const st = session.steps[String(s.n)]?.status ?? "pending";
           const isRunningStep = running && s.n === session.producedStep + 1;
           const color = st === "confirmed" ? GOLD : st === "produced" ? OK : st === "failed" ? BAD : isRunningStep ? WARN : FAINT;
-          const clickable = st !== "pending" || isRunningStep;
+          const clickable = st !== "pending";
+          const active = (viewStep ?? session.producedStep) === s.n;
           return (
             <span key={s.n} className="flex items-center">
               {i > 0 && <span style={{ width: 14, height: 1, background: "var(--color-border-subtle)", margin: "0 2px" }} />}
-              <span className="flex items-center gap-1.5 rounded-md" style={{ padding: "3px 8px", border: `1px solid ${color}40`, background: `${color}14`, opacity: clickable ? 1 : 0.55 }}>
+              <button type="button" disabled={!clickable} onClick={() => setViewStep(s.n)} className="flex items-center gap-1.5 rounded-md transition-colors" title={clickable ? `${s.label} 보기` : undefined}
+                style={{ padding: "3px 8px", border: `1px solid ${active ? color : `${color}40`}`, background: active ? `${color}26` : `${color}14`, opacity: clickable || isRunningStep ? 1 : 0.5, cursor: clickable ? "pointer" : "default" }}>
                 <span style={{ color, fontSize: 12 }}>{CIRCLED[i]}</span>
                 <span style={{ fontSize: 11, color: st === "pending" ? FAINT : "var(--color-text-secondary)" }}>{s.label}</span>
                 {st === "confirmed" && <span style={{ color: GOLD, fontSize: 10 }}>✓</span>}
                 {isRunningStep && <span className="animate-pulse" style={{ color: WARN, fontSize: 11 }}>…</span>}
-              </span>
+              </button>
             </span>
           );
         })}
@@ -529,25 +551,28 @@ export default function RtmView() {
   // ── P4: 단계 산출 미리보기/컨펌 패널(하단 드로어) ──
   function IntakeStepPanel() {
     if (!session) return null;
-    const ps = session.producedStep;
-    if (ps < 1) return null;
+    const frontier = session.producedStep;
+    if (frontier < 1) return null;
+    const ps = viewStep ?? frontier; // 표시 단계(스테퍼에서 고른 단계)
+    const isFrontier = ps === frontier;
     const confirmed = session.confirmedStep >= ps;
-    const canAdvance = confirmed && ps < 5;
+    const canAdvance = isFrontier && session.confirmedStep >= frontier && frontier < 5;
     const isDoc = ps >= 2 && ps <= 4;
     return (
       <div className="fixed left-0 right-0 bottom-0 z-[90] bg-panel border-t border-border-medium shadow-2xl" style={{ height: "52vh", display: "flex", flexDirection: "column" }}>
         <div className="flex items-center gap-3 shrink-0 border-b border-border-subtle" style={{ padding: "10px 22px" }}>
           <span style={{ fontFamily: "var(--font-heading)", fontSize: 14, color: "var(--color-text-primary)" }}>{CIRCLED[ps - 1]} {STEP_DEFS[ps - 1].label}</span>
           {confirmed ? <span style={{ fontSize: 11, color: GOLD }}>✓ 컨펌됨</span> : <span style={{ fontSize: 11, color: WARN }}>검토 필요</span>}
+          {!isFrontier && <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>· 이전 단계 보기</span>}
           <span className="ml-auto flex items-center gap-2">
             {isDoc && previewName && !editingDoc && <button type="button" onClick={() => { setDraftDoc(previewMd); setEditingDoc(true); }} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent" style={{ padding: "5px 12px", fontSize: 12 }}>편집</button>}
             {isDoc && editingDoc && <>
               <button type="button" onClick={() => setEditingDoc(false)} className="rounded-md border border-border-subtle text-text-secondary" style={{ padding: "5px 12px", fontSize: 12 }}>취소</button>
               <button type="button" onClick={() => void saveDoc()} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 12px", fontSize: 12 }}>{stepBusy ? "저장 중…" : "저장"}</button>
             </>}
-            {!confirmed && !editingDoc && <button type="button" onClick={() => void confirmStep(ps)} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12, fontWeight: 600 }}>✓ 컨펌</button>}
-            {canAdvance && <button type="button" onClick={() => void advance(ps + 1)} disabled={stepBusy} className="rounded-md bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>다음 단계 ▸</button>}
-            {canAdvance && ps < 4 && <button type="button" onClick={() => void advance(5)} disabled={stepBusy} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent disabled:opacity-50" style={{ padding: "5px 11px", fontSize: 12 }}>⑤까지 ▸</button>}
+            {isFrontier && !confirmed && !editingDoc && <button type="button" onClick={() => void confirmStep(frontier)} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12, fontWeight: 600 }}>✓ 컨펌</button>}
+            {canAdvance && <button type="button" onClick={() => void advance(frontier + 1)} disabled={stepBusy} className="rounded-md bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>다음 단계 ▸</button>}
+            {canAdvance && frontier < 4 && <button type="button" onClick={() => void advance(5)} disabled={stepBusy} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent disabled:opacity-50" style={{ padding: "5px 11px", fontSize: 12 }}>⑤까지 ▸</button>}
           </span>
         </div>
         <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "14px 22px" }}>

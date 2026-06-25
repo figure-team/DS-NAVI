@@ -891,6 +891,23 @@ function writeRtmSession(s: RtmSession): void {
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "session.json"), JSON.stringify(s, null, 2) + "\n", "utf8");
 }
+/** 로드 시 복구용 — 가장 최근 생성된 비폐기 세션(createdAt 최대). 없으면 null. */
+function latestRtmSession(): RtmSession | null {
+  const base = rtmIntakeBaseDir();
+  if (!base || !fs.existsSync(base)) return null;
+  let best: RtmSession | null = null;
+  try {
+    for (const name of fs.readdirSync(base)) {
+      if (!isValidSid(name)) continue;
+      const s = readRtmSession(name);
+      if (!s || s.discarded) continue;
+      if (!best || (s.createdAt ?? "") > (best.createdAt ?? "")) best = s;
+    }
+  } catch {
+    /* 디렉터리 읽기 실패 → null */
+  }
+  return best;
+}
 /** 세션 디렉터리의 산출 문서 목록(.md) + 종류. identified.json 존재 여부도 함께. */
 function listRtmSessionDocs(sid: string): { name: string; kind: string }[] {
   const dir = rtmSessionDir(sid);
@@ -1422,8 +1439,11 @@ export default defineConfig({
             return;
           }
           if (pathname === "/rtm-intake-status") {
-            const sid = url.searchParams.get("sid") ?? rtmJob.sid;
-            const session = sid ? readRtmSession(sid) : null;
+            const qSid = url.searchParams.get("sid");
+            const sid = qSid ?? rtmJob.sid;
+            let session = sid ? readRtmSession(sid) : null;
+            // 명시 sid 없이 조회(로드 시) + 인메모리 job 도 없으면 디스크에서 최근 활성 세션 복구.
+            if (!session && !qSid) session = latestRtmSession();
             sendJson(res, 200, {
               job: { ...rtmJob },
               session,

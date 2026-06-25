@@ -99,3 +99,8 @@ export type {
   IntakeRequirement,
   IdentifiedIntake,
 } from './intake-types.js'
+export {
+  intakeReqToRtmRequirement,
+  intakeFnStub,
+  fnDomainKey,
+} from './project-intake.js'

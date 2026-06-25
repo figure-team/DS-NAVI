@@ -81,3 +81,21 @@ export type {
   ResolvedRequirementTemplate,
   LoadedRequirementTemplate,
 } from './requirement-templates.js'
+export {
+  RequirementCategorySchema,
+  IntakeReqStatusSchema,
+  IntakeRequestSchema,
+  IntakeSpecSchema,
+  IntakeRequirementSchema,
+  IdentifiedIntakeSchema,
+  parseIdentifiedIntake,
+  diagnoseIntake,
+} from './intake-types.js'
+export type {
+  RequirementCategory,
+  IntakeReqStatus,
+  IntakeRequest,
+  IntakeSpec,
+  IntakeRequirement,
+  IdentifiedIntake,
+} from './intake-types.js'

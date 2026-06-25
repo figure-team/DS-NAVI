@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import type { ComponentPropsWithoutRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { useDashboardStore } from "../store";
 import TrustBadge from "./TrustBadge";
@@ -97,6 +100,37 @@ const verbOf = (r: Requirement, fnId: string): keyof Changeset | null =>
 
 const BORDER = "1px solid var(--color-border-subtle)";
 
+// ── P4: 단계 인테이크(가이드 5단계) ───────────────────────────────────────────
+interface RtmSession {
+  sid: string; request: string; producedStep: number; confirmedStep: number;
+  targetStep: number; discarded: boolean; steps: Record<string, { status: string }>;
+}
+interface SessionDoc { name: string; kind: string }
+const STEP_DEFS: { n: number; label: string }[] = [
+  { n: 1, label: "식별" }, { n: 2, label: "목록표" }, { n: 3, label: "정의서" }, { n: 4, label: "명세서" }, { n: 5, label: "RTM" },
+];
+const CIRCLED = ["①", "②", "③", "④", "⑤"];
+/** 표시용 frontmatter 제거(메타는 배지로, 본문엔 불필요). */
+const stripFrontmatter = (md: string) => md.replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+/** 다크 테마 마크다운 컴포넌트(GFM 표 포함) — DocsView 와 동일 패턴(태그별 타이핑). */
+const MD = {
+  h1: (p: ComponentPropsWithoutRef<"h1">) => <h1 style={{ fontSize: 17, color: "var(--color-text-primary)", margin: "2px 0 12px", fontFamily: "var(--font-heading)" }} {...p} />,
+  h2: (p: ComponentPropsWithoutRef<"h2">) => <h2 style={{ fontSize: 14, color: "var(--color-accent)", margin: "18px 0 9px", paddingBottom: 4, borderBottom: "1px solid var(--color-border-subtle)" }} {...p} />,
+  h3: (p: ComponentPropsWithoutRef<"h3">) => <h3 style={{ fontSize: 12.5, color: "var(--color-text-primary)", margin: "13px 0 7px" }} {...p} />,
+  h4: (p: ComponentPropsWithoutRef<"h4">) => <h4 style={{ fontSize: 12, color: "var(--color-text-primary)", margin: "11px 0 6px" }} {...p} />,
+  p: (p: ComponentPropsWithoutRef<"p">) => <p style={{ fontSize: 12.5, color: "var(--color-text-secondary)", lineHeight: 1.6, margin: "7px 0" }} {...p} />,
+  ul: (p: ComponentPropsWithoutRef<"ul">) => <ul style={{ margin: "7px 0", paddingLeft: 18, listStyle: "disc" }} {...p} />,
+  ol: (p: ComponentPropsWithoutRef<"ol">) => <ol style={{ margin: "7px 0", paddingLeft: 18, listStyle: "decimal" }} {...p} />,
+  li: (p: ComponentPropsWithoutRef<"li">) => <li style={{ fontSize: 12.5, color: "var(--color-text-secondary)", lineHeight: 1.55, margin: "2px 0" }} {...p} />,
+  table: (p: ComponentPropsWithoutRef<"table">) => <div style={{ overflowX: "auto", margin: "8px 0" }}><table style={{ borderCollapse: "collapse", fontSize: 11.5, width: "100%" }} {...p} /></div>,
+  th: (p: ComponentPropsWithoutRef<"th">) => <th style={{ border: BORDER, padding: "5px 9px", background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap" }} {...p} />,
+  td: (p: ComponentPropsWithoutRef<"td">) => <td style={{ border: BORDER, padding: "5px 9px", color: "var(--color-text-secondary)", verticalAlign: "top" }} {...p} />,
+  code: (p: ComponentPropsWithoutRef<"code">) => <code style={{ fontFamily: "var(--font-mono)", fontSize: 11, background: "var(--color-elevated)", padding: "1px 4px", borderRadius: 4 }} {...p} />,
+  blockquote: (p: ComponentPropsWithoutRef<"blockquote">) => <blockquote style={{ borderLeft: `2px solid ${WARN}`, margin: "8px 0", padding: "2px 0 2px 11px", color: "var(--color-text-muted)", fontSize: 12 }} {...p} />,
+  a: (p: ComponentPropsWithoutRef<"a">) => <a style={{ color: "var(--color-accent)" }} {...p} />,
+};
+const STEP_DOC_KIND: Record<number, string> = { 2: "list", 3: "definition", 4: "spec" };
+
 export default function RtmView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
   const approverHandle = useDashboardStore((s) => s.approverHandle);
@@ -139,12 +173,23 @@ export default function RtmView() {
   }, [tokenQ]);
   useEffect(() => { loadModel(); }, [loadModel]);
 
-  // 인테이크 ---------------------------------------------------------------
+  // 단계 인테이크(P4) ------------------------------------------------------
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [intakeQuery, setIntakeQuery] = useState("");
+  const [targetStep, setTargetStep] = useState(5);
   const [intakeStatus, setIntakeStatus] = useState<"idle" | "running" | "done" | "failed">("idle");
   const [intakeError, setIntakeError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ kind: "done" | "failed"; msg: string } | null>(null);
+  const [sid, setSid] = useState<string | null>(null);
+  const [session, setSession] = useState<RtmSession | null>(null);
+  const [sessionDocs, setSessionDocs] = useState<SessionDoc[]>([]);
+  const [stepBusy, setStepBusy] = useState(false);
+  // 미리보기/편집
+  const [previewName, setPreviewName] = useState<string | null>(null);
+  const [previewMd, setPreviewMd] = useState<string>("");
+  const [identified, setIdentified] = useState<{ requirements?: { id: string; category: string; name: string; priority?: string; derivedFrom?: string | null }[]; questions?: string[]; request?: { id: string; name: string } } | null>(null);
+  const [editingDoc, setEditingDoc] = useState(false);
+  const [draftDoc, setDraftDoc] = useState("");
 
   const startIntake = useCallback(async () => {
     const q = intakeQuery.trim();
@@ -152,25 +197,110 @@ export default function RtmView() {
     if (!accessToken) { setIntakeError("읽기전용(라이브 서버 없음) — 인테이크는 dev 서버가 필요합니다."); return; }
     setIntakeError(null);
     try {
-      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: q }) });
-      if (res.status === 202) { setIntakeStatus("running"); setIntakeOpen(false); setIntakeQuery(""); }
-      else { const d = (await res.json().catch(() => null)) as { error?: string } | null; setIntakeError(d?.error ?? `HTTP ${res.status}`); }
+      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ request: q, targetStep }) });
+      const d = (await res.json().catch(() => null)) as { job?: { sid?: string }; session?: RtmSession; error?: string } | null;
+      if (res.status === 202 && d?.session) {
+        setSid(d.session.sid); setSession(d.session); setIntakeStatus("running");
+        setIntakeOpen(false); setIntakeQuery(""); setPreviewName(null); setIdentified(null);
+      } else { setIntakeError(d?.error ?? `HTTP ${res.status}`); }
     } catch (e) { setIntakeError(String(e)); }
-  }, [intakeQuery, accessToken]);
+  }, [intakeQuery, targetStep, accessToken]);
 
+  // start..target 진행(다음 단계 / ⑤까지). 컨펌 게이트 미통과면 409 토스트.
+  const advance = useCallback(async (toStep: number) => {
+    if (!sid || !accessToken) return;
+    setStepBusy(true);
+    try {
+      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid, targetStep: toStep }) });
+      const d = (await res.json().catch(() => null)) as { session?: RtmSession; error?: string } | null;
+      if (res.status === 202 && d?.session) { setSession(d.session); setIntakeStatus("running"); setPreviewName(null); }
+      else setToast({ kind: "failed", msg: d?.error ?? `진행 실패: HTTP ${res.status}` });
+    } catch (e) { setToast({ kind: "failed", msg: String(e) }); } finally { setStepBusy(false); }
+  }, [sid, accessToken]);
+
+  const confirmStep = useCallback(async (step: number) => {
+    if (!sid || !accessToken) return;
+    setStepBusy(true);
+    try {
+      const res = await fetch(`/rtm-intake-confirm?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid, step }) });
+      const d = (await res.json().catch(() => null)) as { session?: RtmSession; error?: string } | null;
+      if (res.ok && d?.session) setSession(d.session);
+      else setToast({ kind: "failed", msg: d?.error ?? `컨펌 실패: HTTP ${res.status}` });
+    } catch (e) { setToast({ kind: "failed", msg: String(e) }); } finally { setStepBusy(false); }
+  }, [sid, accessToken]);
+
+  const saveDoc = useCallback(async () => {
+    if (!sid || !previewName || !accessToken) return;
+    setStepBusy(true);
+    try {
+      const res = await fetch(`/rtm-intake-doc?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid, name: previewName, content: draftDoc }) });
+      if (res.ok) { setPreviewMd(draftDoc); setEditingDoc(false); }
+      else { const d = (await res.json().catch(() => null)) as { error?: string } | null; setToast({ kind: "failed", msg: d?.error ?? `저장 실패: HTTP ${res.status}` }); }
+    } catch (e) { setToast({ kind: "failed", msg: String(e) }); } finally { setStepBusy(false); }
+  }, [sid, previewName, draftDoc, accessToken]);
+
+  const discardSession = useCallback(async () => {
+    if (!sid || !accessToken) { setSession(null); setSid(null); return; }
+    try { await fetch(`/rtm-intake-discard?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid }) }); } catch { /* */ }
+    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); setIntakeStatus("idle");
+  }, [sid, accessToken]);
+
+  // 폴링 — 실행 중이면 세션·문서 갱신. done 이면 멈추고, ⑤ 산출이면 추적표 재로드.
   useEffect(() => {
-    if (intakeStatus !== "running") return;
+    if (intakeStatus !== "running" || !sid) return;
     const poll = async () => {
       try {
-        const r = await fetch(`/rtm-intake-status${tokenQ}`);
-        const st = ((await r.json()) as { job?: { status?: string } })?.job?.status;
-        if (st === "done") { setIntakeStatus("done"); setToast({ kind: "done", msg: "요구사항 인테이크 완료 — 추적표를 갱신했습니다." }); loadModel(); setView("requirement"); }
-        else if (st === "failed") { setIntakeStatus("failed"); setToast({ kind: "failed", msg: "요구사항 인테이크 실패 — 서버 로그를 확인하세요." }); }
+        const r = await fetch(`/rtm-intake-status${tokenQ}&sid=${encodeURIComponent(sid)}`);
+        const data = (await r.json()) as { job?: { status?: string }; session?: RtmSession | null; docs?: SessionDoc[] };
+        if (data.session) setSession(data.session);
+        if (data.docs) setSessionDocs(data.docs);
+        const st = data.job?.status;
+        if (st === "done") {
+          setIntakeStatus("done");
+          const ps = data.session?.producedStep ?? 0;
+          if (ps >= 5) { setToast({ kind: "done", msg: "⑤ RTM 반영 완료 — 추적표를 갱신했습니다." }); loadModel(); }
+          else setToast({ kind: "done", msg: `${CIRCLED[ps - 1] ?? ""} 단계 산출 완료 — 검토 후 컨펌하세요.` });
+        } else if (st === "failed") {
+          setIntakeStatus("failed"); setToast({ kind: "failed", msg: "단계 실행 실패 — 서버 로그를 확인하세요." });
+        }
       } catch { /* keep polling */ }
     };
+    void poll();
     const id = setInterval(poll, 3000);
     return () => clearInterval(id);
-  }, [intakeStatus, tokenQ, loadModel]);
+  }, [intakeStatus, sid, tokenQ, loadModel]);
+
+  // 미리보기 로더 — 현재 산출 단계(producedStep)의 문서/식별결과를 불러온다.
+  const loadPreview = useCallback(async (name: string) => {
+    if (!sid) return;
+    setEditingDoc(false);
+    try {
+      const r = await fetch(`/rtm-intake-doc${tokenQ}&sid=${encodeURIComponent(sid)}&name=${encodeURIComponent(name)}`);
+      const d = (await r.json().catch(() => null)) as { content?: string } | null;
+      setPreviewName(name); setPreviewMd(d?.content ?? "");
+    } catch { /* */ }
+  }, [sid, tokenQ]);
+
+  const loadIdentified = useCallback(async () => {
+    if (!sid) return;
+    try {
+      const r = await fetch(`/rtm-intake-doc${tokenQ}&sid=${encodeURIComponent(sid)}&name=identified.json`);
+      const d = (await r.json().catch(() => null)) as { content?: string } | null;
+      if (d?.content) { try { setIdentified(JSON.parse(d.content)); } catch { setIdentified(null); } }
+    } catch { /* */ }
+  }, [sid, tokenQ]);
+
+  // producedStep 변동 시 해당 단계 산출물 자동 미리보기.
+  useEffect(() => {
+    if (!session || intakeStatus === "running") return;
+    const ps = session.producedStep;
+    if (ps === 1) { void loadIdentified(); setPreviewName(null); }
+    else if (ps >= 2 && ps <= 4) {
+      const kind = STEP_DOC_KIND[ps];
+      const doc = sessionDocs.find((d) => d.kind === kind);
+      if (doc && doc.name !== previewName) void loadPreview(doc.name);
+    }
+  }, [session?.producedStep, intakeStatus, sessionDocs]);
   useEffect(() => { if (!toast) return; const id = setTimeout(() => setToast(null), 6000); return () => clearTimeout(id); }, [toast]);
 
   const resolveApprover = useCallback((): string | null => {
@@ -204,7 +334,6 @@ export default function RtmView() {
     if (!selectedFn) return;
     setDraft({ name: effCell(selectedFn, "name"), entryPoint: effCell(selectedFn, "entryPoint"), implementation: effCell(selectedFn, "implementation"), data: effCell(selectedFn, "data"), test: effCell(selectedFn, "test") });
     setEditing(true); setSaveError(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFn, fnOv]);
 
   const onConfirm = useCallback(async (fromEdit: boolean) => {
@@ -242,6 +371,7 @@ export default function RtmView() {
   const cov = model?.coverage;
   const diags = model?.diagnostics ?? [];
   const errCount = diags.filter((d) => d.level === "error").length;
+  const intakePanelOpen = !!session && !session.discarded && intakeStatus !== "running" && session.producedStep >= 1;
 
   // ── 렌더 조각 ──────────────────────────────────────────────────────────
   const tabBtn = (k: typeof view, label: string) => (
@@ -282,15 +412,19 @@ export default function RtmView() {
         </div>
         <span className="ml-auto flex items-center gap-3">
           {intakeStatus === "running" && (
-            <span className="flex items-center gap-1.5 text-amber-400" style={{ fontSize: 11 }} title="요구사항 인테이크 진행 중">
-              <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>분석 중…
+            <span className="flex items-center gap-1.5 text-amber-400" style={{ fontSize: 11 }} title="요구사항 단계 생성 진행 중">
+              <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              {CIRCLED[Math.min(session?.producedStep ?? 0, 4)]} 단계 생성 중…
             </span>
           )}
-          <button type="button" onClick={() => { setIntakeOpen(true); setIntakeError(null); }} disabled={intakeStatus === "running"}
+          <button type="button" onClick={() => { setIntakeOpen(true); setIntakeError(null); setTargetStep(5); }} disabled={intakeStatus === "running"}
             className="rounded-lg border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-40" style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600 }}
-            title="자연어로 새 요구사항을 요청 → 분해·매칭(전부 [추정])">＋ 새 요청</button>
+            title="자연어로 새 요구사항을 요청 → 가이드 5단계로 분해·문서화(전부 [추정])">＋ 새 요청</button>
         </span>
       </div>
+
+      {/* P4: 단계 진행 스테퍼 */}
+      <IntakeStepper />
 
       {/* 진단 배너 (#7) */}
       {diags.length > 0 && (
@@ -303,7 +437,7 @@ export default function RtmView() {
       )}
 
       {/* 본문 */}
-      <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq) ? "50vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
+      <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq) ? "50vh" : intakePanelOpen ? "55vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
         {error ? (
           <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>요구사항 추적표를 불러오지 못했습니다 ({error}).<br /><code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>understand-rtm</code> 을 먼저 실행하세요.</div>
         ) : !model ? (
@@ -320,6 +454,9 @@ export default function RtmView() {
       {selectedFn && view === "function" && model && <FunctionDrawer />}
       {selectedReq && view === "requirement" && model && <RequirementDrawer />}
 
+      {/* P4: 단계 산출 미리보기/컨펌 패널 */}
+      {intakePanelOpen && <IntakeStepPanel />}
+
       {/* 인테이크 모달 */}
       {intakeOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-root/80 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setIntakeOpen(false); }}>
@@ -329,13 +466,26 @@ export default function RtmView() {
               <button onClick={() => setIntakeOpen(false)} className="text-text-muted hover:text-text-primary" style={{ fontSize: 18, lineHeight: 1 }}>×</button>
             </div>
             <div style={{ padding: "16px 20px" }}>
-              <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 10 }}>고객 요청을 자연어로 입력하세요. 기존 도메인/기능과 대조해 하위 기능·인수조건으로 분해·매칭합니다.<span className="text-text-muted"> 결과는 전부 <code style={{ fontFamily: "var(--font-mono)" }}>[추정]</code> — 검토 후 확정하세요.</span></p>
-              <textarea value={intakeQuery} onChange={(e) => setIntakeQuery(e.target.value)} onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void startIntake(); }} placeholder="예) 장바구니 추가 시 있으면 +1, 없으면 추가. 재고 없으면 불가, 단 이벤트 상품 예외. 추가되면 알림 발송." rows={4} autoFocus className="w-full resize-y rounded-lg bg-elevated border border-border-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" style={{ fontSize: 13, padding: "8px 11px" }} />
+              <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 10 }}>고객 요청을 자연어로 입력하세요. 요청(REQ)을 요구사항(SFR/SIR/DAR/SER…)으로 분해해 가이드 5단계로 문서화합니다.<span className="text-text-muted"> 결과는 전부 <code style={{ fontFamily: "var(--font-mono)" }}>[추정]</code> — 단계마다 검토·컨펌하세요.</span></p>
+              <textarea value={intakeQuery} onChange={(e) => setIntakeQuery(e.target.value)} onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void startIntake(); }} placeholder="예) 네이버 로그인 추가해주세요." rows={3} autoFocus className="w-full resize-y rounded-lg bg-elevated border border-border-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" style={{ fontSize: 13, padding: "8px 11px" }} />
+              <div style={{ marginTop: 14 }}>
+                <div className="text-text-muted" style={{ fontSize: 11, marginBottom: 7 }}>어디까지 진행할까요? <span style={{ color: "var(--color-text-secondary)" }}>(선택 단계까지 한 번에 생성 후 멈춤)</span></div>
+                <div className="flex items-center gap-1.5">
+                  {STEP_DEFS.map((s, i) => (
+                    <button key={s.n} type="button" onClick={() => setTargetStep(s.n)}
+                      className="flex-1 rounded-lg transition-colors" style={{ padding: "7px 4px", border: targetStep === s.n ? `1px solid ${GOLD}` : BORDER, background: targetStep === s.n ? "rgba(212,165,116,0.12)" : "transparent" }}>
+                      <div style={{ fontSize: 13, color: targetStep === s.n ? GOLD : "var(--color-text-secondary)" }}>{CIRCLED[i]}</div>
+                      <div style={{ fontSize: 10, color: targetStep === s.n ? GOLD : "var(--color-text-muted)", marginTop: 2 }}>{s.label}</div>
+                    </button>
+                  ))}
+                </div>
+                <div className="text-text-muted" style={{ fontSize: 10.5, marginTop: 6 }}>{targetStep === 5 ? "⑤ RTM까지 — 추적표에 바로 반영(한 방에 완료)." : `${CIRCLED[targetStep - 1]} ${STEP_DEFS[targetStep - 1].label}까지 생성 후 검토 대기.`}</div>
+              </div>
               {intakeError && <p className="text-red-400" style={{ fontSize: 11.5, marginTop: 8 }}>{intakeError}</p>}
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-border-subtle" style={{ padding: "12px 20px" }}>
               <button onClick={() => setIntakeOpen(false)} className="rounded-lg text-text-secondary hover:text-text-primary" style={{ padding: "6px 12px", fontSize: 13 }}>취소</button>
-              <button onClick={() => void startIntake()} disabled={!intakeQuery.trim()} className="rounded-lg font-medium bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-40" style={{ padding: "6px 16px", fontSize: 13 }}>분석 실행</button>
+              <button onClick={() => void startIntake()} disabled={!intakeQuery.trim()} className="rounded-lg font-medium bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-40" style={{ padding: "6px 16px", fontSize: 13 }}>실행 ▸</button>
             </div>
           </div>
         </div>
@@ -346,6 +496,115 @@ export default function RtmView() {
       )}
     </div>
   );
+
+  // ── P4: 단계 진행 스테퍼 ──
+  function IntakeStepper() {
+    if (!session || session.discarded) return null;
+    const running = intakeStatus === "running";
+    return (
+      <div className="flex items-center gap-1 shrink-0 bg-panel/60 border-b border-border-subtle" style={{ padding: "8px 24px" }}>
+        <span style={{ fontSize: 11, color: "var(--color-text-muted)", marginRight: 6 }}>요청 분해</span>
+        {STEP_DEFS.map((s, i) => {
+          const st = session.steps[String(s.n)]?.status ?? "pending";
+          const isRunningStep = running && s.n === session.producedStep + 1;
+          const color = st === "confirmed" ? GOLD : st === "produced" ? OK : st === "failed" ? BAD : isRunningStep ? WARN : FAINT;
+          const clickable = st !== "pending" || isRunningStep;
+          return (
+            <span key={s.n} className="flex items-center">
+              {i > 0 && <span style={{ width: 14, height: 1, background: "var(--color-border-subtle)", margin: "0 2px" }} />}
+              <span className="flex items-center gap-1.5 rounded-md" style={{ padding: "3px 8px", border: `1px solid ${color}40`, background: `${color}14`, opacity: clickable ? 1 : 0.55 }}>
+                <span style={{ color, fontSize: 12 }}>{CIRCLED[i]}</span>
+                <span style={{ fontSize: 11, color: st === "pending" ? FAINT : "var(--color-text-secondary)" }}>{s.label}</span>
+                {st === "confirmed" && <span style={{ color: GOLD, fontSize: 10 }}>✓</span>}
+                {isRunningStep && <span className="animate-pulse" style={{ color: WARN, fontSize: 11 }}>…</span>}
+              </span>
+            </span>
+          );
+        })}
+        <button type="button" onClick={() => void discardSession()} disabled={running} className="ml-auto text-text-muted hover:text-text-primary disabled:opacity-40" style={{ fontSize: 11 }} title="이 세션 닫기">닫기 ×</button>
+      </div>
+    );
+  }
+
+  // ── P4: 단계 산출 미리보기/컨펌 패널(하단 드로어) ──
+  function IntakeStepPanel() {
+    if (!session) return null;
+    const ps = session.producedStep;
+    if (ps < 1) return null;
+    const confirmed = session.confirmedStep >= ps;
+    const canAdvance = confirmed && ps < 5;
+    const isDoc = ps >= 2 && ps <= 4;
+    return (
+      <div className="fixed left-0 right-0 bottom-0 z-[90] bg-panel border-t border-border-medium shadow-2xl" style={{ height: "52vh", display: "flex", flexDirection: "column" }}>
+        <div className="flex items-center gap-3 shrink-0 border-b border-border-subtle" style={{ padding: "10px 22px" }}>
+          <span style={{ fontFamily: "var(--font-heading)", fontSize: 14, color: "var(--color-text-primary)" }}>{CIRCLED[ps - 1]} {STEP_DEFS[ps - 1].label}</span>
+          {confirmed ? <span style={{ fontSize: 11, color: GOLD }}>✓ 컨펌됨</span> : <span style={{ fontSize: 11, color: WARN }}>검토 필요</span>}
+          <span className="ml-auto flex items-center gap-2">
+            {isDoc && previewName && !editingDoc && <button type="button" onClick={() => { setDraftDoc(previewMd); setEditingDoc(true); }} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent" style={{ padding: "5px 12px", fontSize: 12 }}>편집</button>}
+            {isDoc && editingDoc && <>
+              <button type="button" onClick={() => setEditingDoc(false)} className="rounded-md border border-border-subtle text-text-secondary" style={{ padding: "5px 12px", fontSize: 12 }}>취소</button>
+              <button type="button" onClick={() => void saveDoc()} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 12px", fontSize: 12 }}>{stepBusy ? "저장 중…" : "저장"}</button>
+            </>}
+            {!confirmed && !editingDoc && <button type="button" onClick={() => void confirmStep(ps)} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12, fontWeight: 600 }}>✓ 컨펌</button>}
+            {canAdvance && <button type="button" onClick={() => void advance(ps + 1)} disabled={stepBusy} className="rounded-md bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>다음 단계 ▸</button>}
+            {canAdvance && ps < 4 && <button type="button" onClick={() => void advance(5)} disabled={stepBusy} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent disabled:opacity-50" style={{ padding: "5px 11px", fontSize: 12 }}>⑤까지 ▸</button>}
+          </span>
+        </div>
+        <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "14px 22px" }}>
+          {ps === 1 ? <IdentifiedView />
+            : ps === 5 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑤ RTM 반영 완료 — <b style={{ color: "var(--color-text-primary)" }}>요구사항 기준</b> 탭에서 분해된 요구사항과 추적 결과를 확인하세요. <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
+            : editingDoc ? <textarea value={draftDoc} onChange={(e) => setDraftDoc(e.target.value)} spellCheck={false} className="w-full h-full resize-none rounded-lg bg-elevated border border-border-medium text-text-primary focus:outline-none focus:border-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.55, padding: "10px 12px" }} />
+            : ps === 4 ? <SpecTabs />
+            : <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD}>{stripFrontmatter(previewMd)}</ReactMarkdown>}
+        </div>
+      </div>
+    );
+  }
+
+  function SpecTabs() {
+    const specs = sessionDocs.filter((d) => d.kind === "spec");
+    if (specs.length === 0) return <div className="text-text-muted" style={{ fontSize: 12 }}>명세서를 불러오는 중…</div>;
+    return (
+      <>
+        <div className="flex flex-wrap gap-1.5" style={{ marginBottom: 12 }}>
+          {specs.map((d) => (
+            <button key={d.name} type="button" onClick={() => void loadPreview(d.name)} className="rounded-md transition-colors" style={{ padding: "3px 10px", fontSize: 11, fontFamily: "var(--font-mono)", border: previewName === d.name ? `1px solid ${GOLD}` : BORDER, color: previewName === d.name ? GOLD : "var(--color-text-secondary)", background: previewName === d.name ? "rgba(212,165,116,0.1)" : "transparent" }}>
+              {d.name.replace(/^요구사항명세서_/, "").replace(/\.md$/, "")}
+            </button>
+          ))}
+        </div>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD}>{stripFrontmatter(previewMd)}</ReactMarkdown>
+      </>
+    );
+  }
+
+  function IdentifiedView() {
+    if (!identified) return <div className="text-text-muted" style={{ fontSize: 12 }}>식별 결과를 불러오는 중…</div>;
+    const reqs = identified.requirements ?? [];
+    const qs = identified.questions ?? [];
+    return (
+      <div>
+        <div style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginBottom: 12 }}>요청 <b style={{ color: GOLD, fontFamily: "var(--font-mono)" }}>{identified.request?.id}</b> {identified.request?.name} → 요구사항 <b style={{ color: "var(--color-text-primary)" }}>{reqs.length}</b>건으로 분해</div>
+        <div className="flex flex-col gap-1.5">
+          {reqs.map((r) => (
+            <div key={r.id} className="flex items-center gap-2.5 rounded-md" style={{ padding: "7px 11px", background: "var(--color-elevated)" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: GOLD }}>{r.id}</span>
+              <span style={{ fontSize: 9, color: "var(--color-text-muted)", border: BORDER, borderRadius: 4, padding: "1px 5px" }}>{r.category}</span>
+              <span style={{ fontSize: 12.5, color: "var(--color-text-primary)" }}>{r.name}</span>
+              {r.derivedFrom && <span style={{ fontSize: 10, color: "var(--color-text-muted)", fontFamily: "var(--font-mono)" }}>←{r.derivedFrom}</span>}
+              {r.priority && <span className="ml-auto" style={{ fontSize: 10, color: PRIORITY[r.priority]?.color ?? WARN }}>{PRIORITY[r.priority]?.label ?? r.priority}</span>}
+            </div>
+          ))}
+        </div>
+        {qs.length > 0 && (
+          <div style={{ marginTop: 16, borderTop: BORDER, paddingTop: 12 }}>
+            <div style={{ fontSize: 11.5, color: BAD, marginBottom: 6, fontWeight: 600 }}>[확인필요] — 다음 단계 전에 검토하세요</div>
+            {qs.map((q, i) => <div key={i} style={{ fontSize: 12, color: "var(--color-text-secondary)", padding: "2px 0", lineHeight: 1.5 }}>· {q}</div>)}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // ── 뷰① 기능 기준 ──
   function FunctionView() {

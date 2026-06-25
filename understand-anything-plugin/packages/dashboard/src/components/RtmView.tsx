@@ -9,7 +9,7 @@ import TrustBadge from "./TrustBadge";
 /**
  * 요구사항 추적표(RTM) v2 뷰 — 설계: docs/ktds/RTM_TAB_DESIGN.md / 프로토타입: docs/ktds/rtm-proto.html.
  *
- * 탭 3개: ① 기능 기준(도메인 그리드) ② 요구사항 기준(AC 매트릭스·supersede 이력·NFR) ③ 현황(커버리지·갭).
+ * 탭 3개: ① 기능 기준(도메인 그리드) ② 요청 기준(요청 REQ → 요구사항 → AC, supersede·NFR) ③ 현황(커버리지·갭).
  * 생성물 rtm.json 불변, 사람 입력은 rtm-overrides.json 오버레이(기능=최상위 fnId, 요구=_requirements).
  * 검증 스파인 입력: 기능 셀 확정(POST /rtm-override) · 요구 시험결과/검수/lifecycle(POST /rtm-req-override).
  */
@@ -35,7 +35,7 @@ interface Requirement {
   id: string; text: string; type: "functional" | "nonfunctional"; nfrCategory: string | null; nfrScope: string[];
   priority: "HIGH" | "MEDIUM" | "LOW"; lifecycle: string; status: "ACTIVE" | "SUPERSEDED";
   supersedes: string | null; supersededBy: string | null; dependsOn: string[];
-  source: { kind: string; raw: string; requester?: string; targetRelease?: string } | null;
+  source: { kind: string; raw: string; requester?: string; targetRelease?: string; section?: string; doc?: string; requestedAt?: string } | null;
   changeReq: { crNo: string | null; reason: string | null; approver: string | null; effort: string | null } | null;
   signoff: Signoff | null; acceptanceCriteria: AC[]; changeset: Changeset;
 }
@@ -100,6 +100,16 @@ const verbOf = (r: Requirement, fnId: string): keyof Changeset | null =>
 
 const BORDER = "1px solid var(--color-border-subtle)";
 
+const REQ_RE = /^REQ-\d+/;
+/** 요구사항이 속한 요청(REQ)ID 도출 — source.section(REQ-) → 자기 id 가 REQ- → 그 외 미분류. */
+const requestIdOf = (r: Requirement): string => {
+  const sec = r.source?.section;
+  if (sec && REQ_RE.test(sec)) return sec;
+  if (REQ_RE.test(r.id)) return r.id;
+  return "(미분류)";
+};
+const UNGROUPED = "(미분류)";
+
 // ── P4: 단계 인테이크(가이드 5단계) ───────────────────────────────────────────
 interface RtmSession {
   sid: string; request: string; producedStep: number; confirmedStep: number;
@@ -147,6 +157,7 @@ export default function RtmView() {
   const [selFn, setSelFn] = useState<string | null>(null);
   const [selReq, setSelReq] = useState<string | null>(null);
   const [expandedReqs, setExpandedReqs] = useState<Set<string>>(new Set());
+  const [expandedRequests, setExpandedRequests] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
@@ -428,7 +439,7 @@ export default function RtmView() {
         <span style={{ fontFamily: "var(--font-heading)", fontSize: 19, color: "var(--color-text-primary)" }}>요구사항 추적표</span>
         <span className="text-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, letterSpacing: ".16em", border: "1px solid var(--color-border-subtle)", borderRadius: 5, padding: "3px 6px" }}>RTM</span>
         <div className="flex items-center gap-1 ml-1 rounded-lg" style={{ background: "var(--color-panel)", border: BORDER, padding: 3 }}>
-          {tabBtn("function", "기능 기준")}{tabBtn("requirement", "요구사항 기준")}{tabBtn("status", "현황")}
+          {tabBtn("function", "기능 기준")}{tabBtn("requirement", "요청 기준")}{tabBtn("status", "현황")}
         </div>
         <span className="ml-auto flex items-center gap-3">
           {intakeStatus === "running" && (
@@ -577,7 +588,7 @@ export default function RtmView() {
         </div>
         <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "14px 22px" }}>
           {ps === 1 ? <IdentifiedView />
-            : ps === 5 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑤ RTM 반영 완료 — <b style={{ color: "var(--color-text-primary)" }}>요구사항 기준</b> 탭에서 분해된 요구사항과 추적 결과를 확인하세요. <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
+            : ps === 5 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑤ RTM 반영 완료 — <b style={{ color: "var(--color-text-primary)" }}>요청 기준</b> 탭에서 분해된 요청·요구사항과 추적 결과를 확인하세요. <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
             : editingDoc ? <textarea value={draftDoc} onChange={(e) => setDraftDoc(e.target.value)} spellCheck={false} className="w-full h-full resize-none rounded-lg bg-elevated border border-border-medium text-text-primary focus:outline-none focus:border-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.55, padding: "10px 12px" }} />
             : ps === 4 ? <SpecTabs />
             : <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD}>{stripFrontmatter(previewMd)}</ReactMarkdown>}
@@ -682,34 +693,61 @@ export default function RtmView() {
     );
   }
 
-  // ── 뷰② 요구사항 기준 ──
+  // ── 뷰② 요청 기준 (요청 REQ → 요구사항 SFR… → AC) ──
   function RequirementView() {
     if (!model) return null;
-    if (model.requirements.length === 0) return <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 560 }}>등록된 요구사항이 없습니다. <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>＋ 새 요청</code> 으로 자연어 요청을 분해·매칭하거나 rtm-requirements.json 으로 작성합니다.</div>;
-    const active = model.requirements.filter((r) => effLifecycle(r) && r.status === "ACTIVE");
-    const dead = model.requirements.filter((r) => r.status === "SUPERSEDED");
+    if (model.requirements.length === 0) return <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 560 }}>등록된 요청이 없습니다. <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>＋ 새 요청</code> 으로 자연어 요청을 분해·문서화하거나 rtm-requirements.json 으로 작성합니다.</div>;
+    // 요청(REQ)별 그룹핑 — 한 요청이 여러 요구사항으로 분해된다.
+    const groups = new Map<string, Requirement[]>();
+    for (const r of model.requirements) {
+      const rid = requestIdOf(r);
+      if (!groups.has(rid)) groups.set(rid, []);
+      groups.get(rid)!.push(r);
+    }
+    const reqIds = [...groups.keys()].sort((a, b) =>
+      a === UNGROUPED ? 1 : b === UNGROUPED ? -1 : a.localeCompare(b, undefined, { numeric: true }),
+    );
+    return <>{reqIds.map((rid) => <RequestCard key={rid} reqId={rid} members={groups.get(rid)!} />)}</>;
+  }
+
+  function RequestCard({ reqId, members }: { reqId: string; members: Requirement[] }) {
+    const open = expandedRequests.has(reqId);
+    const ungrouped = reqId === UNGROUPED;
+    const selfReq = members.find((m) => m.id === reqId); // 요청-레벨 단일 요구사항(레거시 REQ-001 류)
+    const title = ungrouped ? "분류되지 않은 요구사항" : selfReq ? selfReq.text : members.find((m) => m.source?.raw)?.source?.raw ?? "";
+    const live = members.filter((m) => m.status === "ACTIVE");
+    const deadN = members.length - live.length;
+    const allDead = live.length === 0;
+    const ordered = [...live, ...members.filter((m) => m.status === "SUPERSEDED")];
+    const catCount = live.reduce((acc, r) => { const c = r.id.match(/^[A-Z]+/)?.[0] ?? "?"; acc[c] = (acc[c] ?? 0) + 1; return acc; }, {} as Record<string, number>);
     return (
-      <>
-        {active.map((r) => <ReqCard key={r.id} r={r} />)}
-        {dead.length > 0 && (
-          <>
-            <div className="flex items-center gap-2.5" style={{ margin: "20px 4px 10px" }}><span className="text-text-muted" style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase" }}>폐기 이력 (감사 보존)</span><span style={{ flex: 1, height: 1, background: "var(--color-border-subtle)" }} /></div>
-            {dead.map((r) => <ReqCard key={r.id} r={r} dead />)}
-          </>
-        )}
-      </>
+      <section style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 14, marginBottom: 14, overflow: "hidden", opacity: allDead ? 0.7 : 1 }}>
+        <div className="flex items-center gap-3" style={{ padding: "15px 20px", cursor: "pointer" }} onClick={() => setExpandedRequests((p) => { const n = new Set(p); if (n.has(reqId)) n.delete(reqId); else n.add(reqId); return n; })}>
+          <span style={{ color: "var(--color-text-muted)", fontSize: 10, width: 11, display: "inline-block", transition: "transform .15s", transform: open ? "rotate(90deg)" : "none" }}>▶</span>
+          {ungrouped ? <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: FAINT }}>{UNGROUPED}</span>
+            : <span style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, color: allDead ? FAINT : GOLD, border: `1px solid ${allDead ? FAINT : GOLD}55`, borderRadius: 5, padding: "2px 8px", textDecoration: allDead ? "line-through" : "none" }}>{reqId}</span>}
+          <span style={{ fontSize: 14.5, color: allDead ? "var(--color-text-secondary)" : "var(--color-text-primary)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 600 }}>{title}</span>
+          <span className="ml-auto flex items-center gap-3 text-text-muted" style={{ fontSize: 11.5 }}>
+            <span style={{ fontFamily: "var(--font-mono)" }}>{Object.entries(catCount).map(([c, n]) => `${c} ${n}`).join(" · ") || "—"}</span>
+            <span>요구사항 {members.length}{deadN ? ` · 폐기 ${deadN}` : ""}</span>
+          </span>
+        </div>
+        {open && <div style={{ padding: "2px 14px 12px", borderTop: BORDER }}>
+          {ordered.map((m) => <ReqCard key={m.id} r={m} dead={m.status === "SUPERSEDED"} nested />)}
+        </div>}
+      </section>
     );
   }
 
-  function ReqCard({ r, dead }: { r: Requirement; dead?: boolean }) {
+  function ReqCard({ r, dead, nested }: { r: Requirement; dead?: boolean; nested?: boolean }) {
     if (!model) return null;
     const open = expandedReqs.has(r.id);
     const counts = (["removed", "modified", "added", "revived"] as Array<keyof Changeset>).filter((k) => r.changeset[k].length > 0);
     const targets = [...new Set([...r.changeset.added, ...r.changeset.modified, ...r.changeset.revived, ...r.changeset.removed])];
     const so = effSignoff(r);
     return (
-      <section style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 14, marginBottom: 14, overflow: "hidden", opacity: dead ? 0.68 : 1 }}>
-        <div className="flex items-center gap-3" style={{ padding: "14px 20px", cursor: "pointer" }} onClick={() => setExpandedReqs((p) => { const n = new Set(p); n.has(r.id) ? n.delete(r.id) : n.add(r.id); return n; })}>
+      <section style={{ background: nested ? "var(--color-surface)" : "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: nested ? 11 : 14, marginTop: nested ? 10 : 0, marginBottom: nested ? 0 : 14, overflow: "hidden", opacity: dead ? 0.68 : 1 }}>
+        <div className="flex items-center gap-3" style={{ padding: "14px 20px", cursor: "pointer" }} onClick={() => setExpandedReqs((p) => { const n = new Set(p); if (n.has(r.id)) n.delete(r.id); else n.add(r.id); return n; })}>
           <span style={{ width: 11, height: 11, borderRadius: "50%", flex: "none", background: dead ? "none" : r.type === "nonfunctional" ? NFR : GOLD, border: dead ? `1.5px solid ${FAINT}` : "none", boxShadow: dead ? "none" : `0 0 0 4px ${r.type === "nonfunctional" ? "rgba(120,160,190,.14)" : "rgba(212,165,116,.14)"}` }} />
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-muted)", textDecoration: dead ? "line-through" : "none" }}>{r.id}</span>
           <span style={{ fontSize: 15, color: dead ? "var(--color-text-secondary)" : "var(--color-text-primary)", fontWeight: 500 }}>{r.text}</span>

@@ -100,11 +100,19 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
 3. 생성한 파일 목록을 보고하고 멈춘다.
 
 ### --step 5 RTM (추적표 반영)
-`identified.json`(완전 보강본)을 정식 `rtm-requirements.json` 으로 투영해 추적표에 반영한다.
-> ⚠️ **P5 구현 예정 단계.** 현재는 §5 투영 규약(요구사항→기능 changeset, AC.fnIds 일치, lifecycle=RECEIVED)에 따라
-> `rtm-requirements.json` 에 append 병합 후 `node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-rtm.mjs <projectRoot>` 로
-> 재생성한다. 통합 정책은 **옵션 B(단계적 브릿지)** — 문서는 2계층, rtm.json 은 현 스키마 유지하며 투영. 상세는
-> `docs/ktds/RTM_STEP_FLOW_DESIGN.md` §9.
+`identified.json`(완전 보강본)을 정식 `rtm-requirements.json` 으로 투영해 추적표에 반영한다(옵션 B 단계적 브릿지).
+**두 명령을 순서대로 실행한다:**
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs project <projectRoot> <sid>
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-rtm.mjs <projectRoot>
+```
+- 1번(`project`): `identified.json` 의 요구사항(SFR…)을 **현 스키마 1급 requirement** 로, 각 `changeset.added` 를
+  **TO-BE 기능 스텁**으로 투영해 `rtm-requirements.json` 에 **기존 보존하며 id 병합**한다. 요청(REQ)은 `source.section`,
+  파생은 `dependsOn`(SIR-002 ← SFR-010)으로 연결. featureId·도메인은 rtm.json 인벤토리에서 결정론으로 이어 붙인다.
+- 2번(`understand-rtm`): `rtm-requirements.json` 을 적용해 `rtm.json` 을 재생성(기능 상태·이력·커버리지 재계산).
+- 보고: 투영된 요구사항 수 / 신규 기능 수 / 병합 후 집계. **"추적표(요구사항 기준)에서 결과를 확인하세요"** 로 마무리.
+> 문서는 2계층(요청 REQ → 요구사항 SFR…) 그대로, rtm.json 은 현 스키마를 유지하며 투영한다(2계층 1급화는 후속).
+> 상세: `docs/ktds/RTM_STEP_FLOW_DESIGN.md` §9.
 
 ---
 

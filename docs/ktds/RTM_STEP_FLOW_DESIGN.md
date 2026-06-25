@@ -315,7 +315,7 @@ claude -p "/understand-rtm --change --target-req <REQ> --kind withdraw --reason 
 | **P2** ✅ | SKILL.md 단계화(절차 A) + `identified.json` 2계층 스키마 + 검증 CLI | 스키마 테스트(8)·CLI 스모크 — 완료 (LLM ②③④ 채움 e2e 는 P3 배선 후) |
 | **P3** ✅ | 서버 job 단계화(targetStep 순차 spawn) + confirm/discard/doc 엔드포인트 + 세션 영속 | 통합테스트 12/12(게이트·doc·traversal·토큰) — 완료. 실 claude ①~④ e2e 는 P4 와 함께 |
 | **P4** ✅ | RtmView stepper + 모달 목표단계선택 + 미리보기(md)/컨펌/편집/진행 | tsc -b·빌드 통과, 추가분 lint-clean — 완료. 실 claude ①~④ 시각 e2e 는 데모로 후속 |
-| **P5** | ⑤ rtm.json 통합(§9 선택안) + 회귀(targetStep=5 원샷 동등) | 기존 인테이크 결과 diff |
+| **P5** ✅ | ⑤ 투영(옵션 B): project-intake 코어 + `rtm-intake.mjs project` 병합 + SKILL 배선 | 코어 테스트(5)·jpetstore 실투영(요구4·기능3, 기존보존 9/9, dependsOn·source.section) — 완료 |
 | **P6** | 변경관리(절차 B) 모드 + CR/영향분석서 | 철회 시나리오(REQ 단위) |
 
 각 Phase 끝 사용자 컨펌 후 다음(메모리 stop-per-phase 관례).

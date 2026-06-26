@@ -1226,6 +1226,156 @@ function handleRtmDocPost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
+// ── P6: RTM 변경관리(절차 B) — 요청(REQ) 철회 ────────────────────────────────
+// 인테이크(다단계)와 달리 단일 파이프라인: claude -p 1회가 SKILL §C(번호→영향분석→문서04·05→
+// 폐기표시·재bake→폐기배너)를 끝까지 수행한다. 결정론 부분은 rtm-intake.mjs CLI 가, 문서 작성은 LLM 이.
+// 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §8.
+const RTM_CHANGE_KINDS = ["withdraw"] as const;
+type RtmChangeKind = (typeof RTM_CHANGE_KINDS)[number];
+function rtmChangeDirective(targetReq: string, kind: RtmChangeKind): string {
+  return (
+    `\n\n위 작업은 대시보드 추적표에서 자동 실행된 변경관리(${kind === "withdraw" ? "철회" : kind})다. ` +
+    `대상 요청은 ${targetReq} 이다. 사용자에게 확인을 묻지 말고 SKILL.md §C 절차를 끝까지 수행한 뒤 ` +
+    `보고하고 멈춰라. **삭제 금지·이력 보존**(상태를 폐기로만), CR 문서(과업내용변경요청서·변경영향분석서)를 ` +
+    `생성하고 추적표를 재생성한다. 확정·후속조치 수행은 사람이 한다.`
+  );
+}
+
+interface RtmChangeJob {
+  status: "idle" | "running" | "done" | "failed";
+  jobId: string | null;
+  targetReq: string | null;
+  kind: RtmChangeKind | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  tail: string;
+}
+const RTM_CHANGE_JOB_IDLE: RtmChangeJob = {
+  status: "idle",
+  jobId: null,
+  targetReq: null,
+  kind: null,
+  startedAt: null,
+  finishedAt: null,
+  exitCode: null,
+  tail: "",
+};
+let rtmChangeJob: RtmChangeJob = { ...RTM_CHANGE_JOB_IDLE };
+function appendRtmChangeTail(chunk: string): void {
+  rtmChangeJob.tail = (rtmChangeJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
+}
+
+/** rtm.json 의 요청(REQ) id 집합 — requirements[].source.section 에서 수집(POST 대상 실존 검증용). */
+function rtmRequestIds(): Set<string> {
+  const ids = new Set<string>();
+  const file = findGraphFile("rtm.json");
+  if (!file) return ids;
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as {
+      requirements?: Array<{ source?: { section?: unknown } | null }>;
+    };
+    for (const r of raw.requirements ?? []) {
+      const section = r.source?.section;
+      if (typeof section === "string" && /^REQ-\d+$/.test(section)) ids.add(section);
+    }
+  } catch {
+    /* 빈 집합 */
+  }
+  return ids;
+}
+
+/** 변경관리 단일 실행기 — claude -p "/understand-rtm --change ..." 1회. jobId 교체 시 중단. */
+function runRtmChange(
+  jobId: string,
+  projectRoot: string,
+  targetReq: string,
+  kind: RtmChangeKind,
+): void {
+  const prompt = `/understand-rtm --change --target-req ${targetReq} --kind ${kind}${rtmChangeDirective(targetReq, kind)}`;
+  let child: ReturnType<typeof spawn>;
+  try {
+    child = spawn("claude", ["-p", prompt, "--permission-mode", "bypassPermissions"], {
+      cwd: projectRoot,
+      env: process.env,
+    });
+  } catch (err) {
+    if (rtmChangeJob.jobId !== jobId) return;
+    rtmChangeJob.status = "failed";
+    rtmChangeJob.finishedAt = new Date().toISOString();
+    appendRtmChangeTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
+    return;
+  }
+  child.stdout?.on("data", (c: Buffer) => appendRtmChangeTail(c.toString("utf8")));
+  child.stderr?.on("data", (c: Buffer) => appendRtmChangeTail(c.toString("utf8")));
+  child.on("error", (err) => {
+    if (rtmChangeJob.jobId !== jobId) return;
+    rtmChangeJob.status = "failed";
+    rtmChangeJob.finishedAt = new Date().toISOString();
+    appendRtmChangeTail(`\n[spawn error] ${err.message}\n`);
+  });
+  child.on("close", (code) => {
+    if (rtmChangeJob.jobId !== jobId) return;
+    rtmChangeJob.status = code === 0 ? "done" : "failed";
+    rtmChangeJob.exitCode = code;
+    rtmChangeJob.finishedAt = new Date().toISOString();
+  });
+}
+
+/**
+ * POST /rtm-change — { targetReq, kind } 요청 철회 시작. 즉시 202 + job. 대상 REQ 는 rtm.json 에 실존해야 한다.
+ * 한 번에 하나만(409). 결과는 GET /rtm-change-status 로 폴링하고, 완료 후 추적표·문서를 다시 읽는다.
+ */
+function handleRtmChangePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  if (rtmChangeJob.status === "running") {
+    sendJson(res, 409, { error: "A change request is already running", job: { ...rtmChangeJob } });
+    return;
+  }
+  const projectRoot = impactProjectRoot();
+  if (!projectRoot) {
+    sendJson(res, 404, { error: "No project found. Run /understand first." });
+    return;
+  }
+  collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
+    .then((body) => {
+      let parsed: { targetReq?: unknown; kind?: unknown } = {};
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const targetReq = typeof parsed.targetReq === "string" ? parsed.targetReq.trim() : "";
+      if (!/^REQ-\d+$/.test(targetReq)) {
+        sendJson(res, 400, { error: "targetReq (REQ-00N) 형식이 필요합니다." });
+        return;
+      }
+      const kind: RtmChangeKind =
+        typeof parsed.kind === "string" && (RTM_CHANGE_KINDS as readonly string[]).includes(parsed.kind)
+          ? (parsed.kind as RtmChangeKind)
+          : "withdraw";
+      if (!rtmRequestIds().has(targetReq)) {
+        sendJson(res, 400, { error: `요청 ${targetReq} 에 귀속된 요구사항이 추적표에 없습니다.` });
+        return;
+      }
+      const jobId = crypto.randomBytes(8).toString("hex");
+      rtmChangeJob = {
+        ...RTM_CHANGE_JOB_IDLE,
+        status: "running",
+        jobId,
+        targetReq,
+        kind,
+        startedAt: new Date().toISOString(),
+      };
+      runRtmChange(jobId, projectRoot, targetReq, kind);
+      sendJson(res, 202, { job: { ...rtmChangeJob } });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
 export default defineConfig({
   test: {
     environment: "node",
@@ -1332,7 +1482,9 @@ export default defineConfig({
             pathname === "/rtm-intake-status" ||
             pathname === "/rtm-intake-confirm" ||
             pathname === "/rtm-intake-discard" ||
-            pathname === "/rtm-intake-doc";
+            pathname === "/rtm-intake-doc" ||
+            pathname === "/rtm-change" ||
+            pathname === "/rtm-change-status";
 
           if (!isProtectedEndpoint) {
             next();
@@ -1449,6 +1601,15 @@ export default defineConfig({
               session,
               docs: session ? listRtmSessionDocs(session.sid) : [],
             });
+            return;
+          }
+          if (pathname === "/rtm-change") {
+            if (req.method === "POST") handleRtmChangePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to start a change request" });
+            return;
+          }
+          if (pathname === "/rtm-change-status") {
+            sendJson(res, 200, { job: { ...rtmChangeJob } });
             return;
           }
           if (pathname === "/rtm-intake-confirm") {

@@ -38,7 +38,8 @@ export function intakeReqToRtmRequirement(
     nfrScope: req.type === 'nonfunctional' ? Array.from(new Set(changesetIds)) : [],
     priority: req.priority,
     lifecycle: 'RECEIVED',
-    status: req.status === 'WITHDRAWN' ? 'SUPERSEDED' : 'ACTIVE',
+    // 절차 B: 인테이크 폐기는 rtm.json 에서도 WITHDRAWN(대체 요구 없는 철회). SUPERSEDED 와 구분.
+    status: req.status === 'WITHDRAWN' ? 'WITHDRAWN' : 'ACTIVE',
     supersedes: null,
     supersededBy: null,
     dependsOn: req.derivedFrom ? [req.derivedFrom] : [],

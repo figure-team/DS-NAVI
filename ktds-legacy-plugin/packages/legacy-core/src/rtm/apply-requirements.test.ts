@@ -28,7 +28,7 @@ function model(fns: RtmFunctionRow[]): RtmModel {
   return { schemaVersion: 1, gitCommit: null, domains: [{ id: 'd1', name: '결제', functionCount: fns.length }], functions: fns, requirements: [] }
 }
 
-function req(id: string, status: 'ACTIVE' | 'SUPERSEDED', changeset: Partial<RtmRequirement['changeset']>): RtmRequirement {
+function req(id: string, status: 'ACTIVE' | 'SUPERSEDED' | 'WITHDRAWN', changeset: Partial<RtmRequirement['changeset']>): RtmRequirement {
   return {
     id,
     text: id,
@@ -69,6 +69,20 @@ describe('applyRequirements (R4, §1 불변규칙)', () => {
     const out = applyRequirements(model([fn('f1')]), reqs)
     expect(out.functions[0].requirementHistory).toEqual(['REQ-001', 'REQ-002', 'REQ-003'])
     expect(out.functions[0].state).toBe('IMPLEMENTED')
+  })
+
+  it('철회(WITHDRAWN) → 현행 head 에서 제외, 기능 원복 + 이력은 감사용 보존', () => {
+    // REQ-001(modified f1) 만 있는데 폐기 → head 없음 → 기능은 base(IMPLEMENTED)로 원복(CHANGED 아님).
+    const out = applyRequirements(model([fn('f1')]), [req('REQ-001', 'WITHDRAWN', { modified: ['f1'] })])
+    expect(out.functions[0].state).toBe('IMPLEMENTED')
+    expect(out.functions[0].requirementHistory).toEqual(['REQ-001']) // 이력 보존
+  })
+
+  it('철회는 현행 head 에서만 빠짐 — 유효 후속이 있으면 그 동사가 head', () => {
+    const reqs = [req('REQ-001', 'WITHDRAWN', { added: ['f1'] }), req('REQ-002', 'ACTIVE', { modified: ['f1'] })]
+    const out = applyRequirements(model([fn('f1')]), reqs)
+    expect(out.functions[0].state).toBe('CHANGED')
+    expect(out.functions[0].requirementHistory).toEqual(['REQ-001', 'REQ-002'])
   })
 
   it('added + 구현 없음 → 신규 미구현(PLANNED, origin=TO_BE)', () => {

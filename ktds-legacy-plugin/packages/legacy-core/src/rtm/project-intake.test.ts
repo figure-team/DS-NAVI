@@ -41,9 +41,9 @@ describe('intakeReqToRtmRequirement', () => {
     expect(r.nfrScope).toContain('to-be:account/재설정-요청')
   })
 
-  it('WITHDRAWN 상태는 SUPERSEDED 로 투영(폐기 보존)', () => {
+  it('WITHDRAWN 상태는 WITHDRAWN 으로 투영(절차 B — 대체 없는 철회, SUPERSEDED 와 구분)', () => {
     const wreq = { ...INTAKE.requirements[0], status: 'WITHDRAWN' as const }
-    expect(intakeReqToRtmRequirement(wreq, INTAKE.request).status).toBe('SUPERSEDED')
+    expect(intakeReqToRtmRequirement(wreq, INTAKE.request).status).toBe('WITHDRAWN')
   })
 })
 

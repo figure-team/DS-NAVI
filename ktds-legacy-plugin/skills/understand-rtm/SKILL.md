@@ -1,7 +1,7 @@
 ---
 name: understand-rtm
 description: 요구사항 추적표(RTM) — ①코드에서 AS-IS 추적표(rtm.json)를 생성하고, ②고객 자연어 요청을 가이드 5단계(식별→목록표→정의서→명세서→RTM)로 분해·문서화한다. 단계마다 멈춰 사용자 컨펌을 받고, 신규는 전부 [추정]·확정은 사람 몫.
-argument-hint: ["[자연어 요청]", "[--intake --session <sid> --step <k>]", "[projectRoot]"]
+argument-hint: ["[자연어 요청]", "[--intake --session <sid> --step <k>]", "[--change --target-req <REQ> --kind withdraw]", "[projectRoot]"]
 ---
 
 # /understand-rtm
@@ -119,11 +119,61 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-rtm.mjs <projectRoot>
 
 ---
 
-## C) 변경관리 모드 — `--change --target-req <REQ> --kind withdraw`
+## C) 변경관리 모드 — `--change --target-req <REQ> --kind withdraw [--cr <CR>]`
 
-기존 요청(REQ)을 철회/변경한다(절차 B). **삭제 금지** — 상태를 `폐기(CR-xxx)`로 바꾸고 이력 보존.
-과업내용변경요청서·변경영향분석서를 생성하고 RTM 역추적으로 영향(설계/코드/DB/시험)과 후속조치(데이터 파기·회귀시험)를 식별한다.
-> ⚠️ **P6 구현 예정 모드.** 상세는 `docs/ktds/RTM_STEP_FLOW_DESIGN.md` §8.
+기존 요청(REQ)을 철회한다(절차 B). 신규 5단계(§B)와 **별개 트리거**다. 핵심 불변:
+**삭제 금지** — 요구사항 행·문서는 지우지 않고 상태를 `폐기(CR-xxx)`로 바꿔 이력을 보존한다. **확정은 사람.**
+
+철회는 **요청(REQ) 단위**다. REQ-001 폐기 → 그 요청에서 분해된 하위 요구사항(SFR/SIR/DAR/SER…)이
+**동반 폐기**된다(source.section 으로 귀속). 모든 결정론 작업은 아래 CLI 가 수행하고, 너는 문서를 채운다.
+
+### 0) 전제
+- `.understand-anything/rtm.json` + `rtm-requirements.json` 이 있어야 한다(없으면 §A·§B 를 먼저 안내하고 멈춤).
+- 대상 `<REQ>` 에 귀속된 요구사항이 있어야 한다(없으면 오타·없는 요청 — 보고하고 멈춤).
+
+### 1) CR 번호 부여(결정론)
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs next-cr <projectRoot>
+```
+충돌 없는 다음 `CR-00N` 을 받는다. `--cr` 가 명시되면 그대로 쓴다. (CR 번호도 changeReq 메타에만 있으므로
+요구사항 id 만 보고 매기면 충돌한다 — 반드시 이 명령으로 받는다.)
+
+### 2) 영향 분석(RTM 역추적)
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs impact <projectRoot> <REQ> --out <projectRoot>/.understand-anything/change/<CR>/impact.json
+```
+영향분석 JSON 을 받는다(결정론): 영향 기능 분류(**회귀**=구현 존재→회귀시험 / **계획취소**=미착수 TO-BE /
+**타요구유지**=다른 유효 요구가 사용), **다운스트림 의존 끊김**, **인수조건/시험**, **산출물**, **후속조치 체크리스트**.
+이 JSON 이 변경영향분석서의 데이터 소스다(추측 금지 — 여기 있는 값만 쓴다).
+
+### 3) 변경관리 문서 생성(템플릿 04·05)
+템플릿 로드: 프로젝트 override `.understand-anything/templates/requirements/0X_*.md` → 없으면 플러그인 동봉
+`${CLAUDE_PLUGIN_ROOT}/templates/requirements/0X_*.md`. **빈 칸 금지·추적 칸 비우지 않기.** 산출 위치는
+`<projectRoot>/.understand-anything/change/<CR>/`.
+1. `04_과업내용변경요청서.md` → `과업내용변경요청서_<CR>.md`. 대상 REQ·하위 요구사항·사유·**영향 요약**(impact 의 기능 수·산출물·후속조치)을 채운다.
+2. `05_변경영향분석서.md` → `변경영향분석서_<CR>.md`. impact JSON 을 표로 옮긴다(영향기능·의존·AC·산출물·후속조치 그대로).
+
+### 4) 폐기 표시(원장 반영) + 재bake
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs withdraw <projectRoot> <REQ> <CR> "<사유>"
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-rtm.mjs <projectRoot>
+```
+- 1번(`withdraw`): `rtm-requirements.json` 의 귀속 요구사항을 `WITHDRAWN` + `changeReq{crNo,reason}` 로 표시(삭제 없음·멱등).
+- 2번(`understand-rtm`): `rtm.json` 을 재생성. 현행 head 에서 폐기 요구가 빠져 기능 상태가 **원복**된다(미착수 TO-BE 는 계획취소, 변경했던 AS-IS 기능은 직전 동사로 복귀). 이력(requirementHistory)은 감사용으로 보존.
+
+### 5) 기존 문서 폐기 배너(있을 때만, 삭제 금지)
+대상 요구사항의 기존 산출 문서가 세션/프로젝트에 있으면 **지우지 말고** 표시만 바꾼다:
+- 목록표: 해당 행 상태 `폐기(<CR>)`(§2 요청 행 + §4 요구사항 행).
+- 정의서·명세서: 상단 폐기 배너 + `상태: 폐기(<CR>, <일자>)` + 사유. 본문은 취소선 권장.
+- 모든 변경 문서에 **개정 이력** 새 버전 행을 추가한다.
+
+### 6) 보고(한국어)
+- 폐기된 요청/요구사항 목록(REQ → 하위 요구사항ID).
+- 영향 기능 분류 요약(회귀 n / 계획취소 n / 타요구유지 n) + 다운스트림 의존 끊김.
+- 후속조치 체크리스트(데이터 파기·회귀시험·문서개정·의존 재검토).
+- 생성한 변경관리 문서 경로. **여기서 멈춘다.** 후속조치 수행·확정은 사람 몫.
+
+> 상세 설계: `docs/ktds/RTM_STEP_FLOW_DESIGN.md` §8. 불변 규칙(삭제 금지·이력 보존·요청 단위 동반 폐기)은 절대 깨지 않는다.
 
 ---
 

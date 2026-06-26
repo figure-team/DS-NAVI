@@ -23,7 +23,15 @@ if (!existsSync(distEntry)) {
   process.exit(2)
 }
 const engine = await import(distEntry)
-const { parseIdentifiedIntake, diagnoseIntake, intakeReqToRtmRequirement, intakeFnStub, fnDomainKey } = engine
+const {
+  parseIdentifiedIntake,
+  diagnoseIntake,
+  intakeReqToRtmRequirement,
+  intakeFnStub,
+  fnDomainKey,
+  withdrawRequest,
+  computeChangeImpact,
+} = engine
 
 const [, , cmd, ...rest] = process.argv
 
@@ -208,10 +216,89 @@ if (cmd === 'project') {
   process.exit(0)
 }
 
+// ── withdraw(절차 B): 요청(REQ) 단위 철회 → rtm-requirements.json 폐기 표시 ──────
+// source.section===REQ 인 요구사항을 WITHDRAWN + changeReq 로 표시(파괴적 삭제 없음).
+// 이후 SKILL 이 understand-rtm.mjs 로 rtm.json 을 재bake 하면 현행 head 에서 폐기분이 빠져 기능이 원복된다.
+if (cmd === 'withdraw') {
+  const projectRoot = rest[0]
+  const reqId = rest[1]
+  const crNo = rest[2]
+  const reason = rest[3] ?? null
+  if (!projectRoot || !reqId || !crNo) {
+    console.error('사용법: node rtm-intake.mjs withdraw <projectRoot> <REQ-00N> <CR-00N> [사유]')
+    process.exit(2)
+  }
+  const uaDir = join(projectRoot, '.understand-anything')
+  const reqPath = join(uaDir, 'rtm-requirements.json')
+  if (!existsSync(reqPath)) {
+    console.error(`rtm-requirements.json 이 없습니다(인테이크된 요구사항 필요): ${reqPath}`)
+    process.exit(2)
+  }
+  let doc
+  try {
+    doc = readJson(reqPath)
+  } catch (err) {
+    console.error(`rtm-requirements.json 파싱 실패: ${err.message}`)
+    process.exit(1)
+  }
+  const requirements = Array.isArray(doc.requirements) ? doc.requirements : []
+  const result = withdrawRequest(requirements, reqId, { crNo, reason })
+  if (result.notFound) {
+    console.error(`요청 ${reqId} 에 속한 요구사항이 없습니다(source.section 불일치). 철회 대상 없음.`)
+    process.exit(1)
+  }
+  const merged = { ...doc, requirements: result.requirements }
+  writeFileSync(reqPath, JSON.stringify(merged, null, 2) + '\n', 'utf8')
+  console.log(`철회 완료(절차 B) — ${reqPath}`)
+  console.log(`  요청 ${reqId} → ${crNo} 로 폐기: ${result.withdrawn.length}건${result.alreadyWithdrawn.length ? ` (이미 폐기 ${result.alreadyWithdrawn.length}건)` : ''}`)
+  for (const id of result.withdrawn) console.log(`    − ${id} WITHDRAWN`)
+  console.log('다음: understand-rtm.mjs 로 rtm.json 을 재생성(폐기 반영·기능 원복)하세요.')
+  process.exit(0)
+}
+
+// ── impact(절차 B): 요청(REQ) 철회 영향분석(RTM 역추적) → JSON ────────────────────
+// rtm.json 모델에서 영향 기능 분류·다운스트림 의존·AC·산출물·후속조치를 결정론으로 산정해 출력한다.
+// 변경영향분석서(05) 작성의 데이터 소스. --out <path> 면 파일로도 쓴다.
+if (cmd === 'impact') {
+  const projectRoot = rest[0]
+  const reqId = rest[1]
+  if (!projectRoot || !reqId) {
+    console.error('사용법: node rtm-intake.mjs impact <projectRoot> <REQ-00N> [--out <경로>]')
+    process.exit(2)
+  }
+  const uaDir = join(projectRoot, '.understand-anything')
+  const rtmPath = join(uaDir, 'rtm.json')
+  if (!existsSync(rtmPath)) {
+    console.error(`rtm.json 이 없습니다(먼저 추적표 생성): ${rtmPath}`)
+    process.exit(2)
+  }
+  let model
+  try {
+    model = readJson(rtmPath)
+  } catch (err) {
+    console.error(`rtm.json 파싱 실패: ${err.message}`)
+    process.exit(1)
+  }
+  const report = computeChangeImpact(model, reqId)
+  const json = JSON.stringify(report, null, 2)
+  const outIdx = rest.indexOf('--out')
+  if (outIdx >= 0 && rest[outIdx + 1]) {
+    writeFileSync(rest[outIdx + 1], json + '\n', 'utf8')
+    console.error(`영향분석 JSON 기록: ${rest[outIdx + 1]}`)
+  }
+  if (report.requirements.length === 0) {
+    console.error(`경고: 요청 ${reqId} 에 귀속된 요구사항이 rtm.json 에 없습니다(영향 비어 있음).`)
+  }
+  console.log(json)
+  process.exit(0)
+}
+
 console.error(
   '사용법:\n' +
     '  node rtm-intake.mjs validate <identified.json 경로>\n' +
     '  node rtm-intake.mjs next-req <projectRoot>\n' +
-    '  node rtm-intake.mjs project  <projectRoot> <sid>',
+    '  node rtm-intake.mjs project  <projectRoot> <sid>\n' +
+    '  node rtm-intake.mjs withdraw <projectRoot> <REQ> <CR> [사유]\n' +
+    '  node rtm-intake.mjs impact   <projectRoot> <REQ> [--out <경로>]',
 )
 process.exit(2)

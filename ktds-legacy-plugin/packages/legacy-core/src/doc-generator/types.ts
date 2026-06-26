@@ -9,8 +9,8 @@
 import { z } from 'zod'
 import { CONFIDENCE_VALUES } from '../types.js'
 
-/** 방법론 모듈 — as-built(현행 추출) / si-standard(SI 제출 서식). */
-export const MethodologySchema = z.enum(['as-built', 'si-standard'])
+/** 방법론 모듈 — as-built(현행 추출) / si-standard(SI 제출 서식) / policy(정책서). */
+export const MethodologySchema = z.enum(['as-built', 'si-standard', 'policy'])
 export type Methodology = z.infer<typeof MethodologySchema>
 
 /** 문서 상태(doc-state) — 사람 확정은 confidence 가 아니라 이 status 로 기록(§0). */

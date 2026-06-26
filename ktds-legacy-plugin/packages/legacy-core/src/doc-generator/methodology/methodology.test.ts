@@ -93,8 +93,17 @@ function tableOf(section: Section) {
 // ──────────────────────────────────────────────────────────────────────────
 
 describe('AC-23: methodology swap yields different doc sets', () => {
-  it('registry: as-built 기본 + si-standard 등록(정렬)', () => {
-    expect(listMethodologies()).toEqual(['as-built', 'si-standard'])
+  it('registry: as-built 기본 + si-standard + policy 등록(정렬)', () => {
+    expect(listMethodologies()).toEqual(['as-built', 'policy', 'si-standard'])
+  })
+
+  it('policy -> 정책서 PoC 4종(glossary/data/validation/authz)', () => {
+    const docs = getMethodology('policy').buildDocSet(INPUT)
+    expect(docs.map((d) => d.docId)).toEqual(['policy-glossary', 'policy-data', 'policy-validation', 'policy-authz'])
+    expect(docs.every((d) => d.methodology === 'policy')).toBe(true)
+    // 신호 미주입(INPUT 에 policySignals 없음) → 빈 표 + 안내 claim(누락 보고).
+    expect(docs.every((d) => d.sections[0].table?.rows.length === 0)).toBe(true)
+    expect(docs.every((d) => d.sections[0].claims.length === 1)).toBe(true)
   })
 
   it('as-built -> 현행 5종(01..05)', () => {

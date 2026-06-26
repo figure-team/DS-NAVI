@@ -35,6 +35,8 @@ const {
   writeDbSchema,
   scanPolicySignals,
   writePolicySignals,
+  scanPolicyReconcile,
+  writePolicyReconcile,
   getMethodology,
   parseDocTemplate,
   applyDocTemplate,
@@ -54,6 +56,10 @@ writeDbSchema(projectRoot, dbSchema)
 // 3) policy-signals — 코드(java-facts) + DB 신호 병합(앵커).
 const signals = await scanPolicySignals(projectRoot, census, dbSchema)
 writePolicySignals(projectRoot, signals)
+
+// 3b) 기존 정책서 대조(있을 때) — .understand-anything/policy-input/*.md → 준수/미정의/문서에만.
+const reconcile = scanPolicyReconcile(projectRoot, signals.signals)
+writePolicyReconcile(projectRoot, reconcile)
 
 // 4) policy 방법론 — 신호를 카테고리별 정책서로(빌더는 policySignals 만 소비).
 const input = { nodes: [], edges: [], policySignals: signals }
@@ -108,5 +114,14 @@ for (const m of meta) {
 }
 if (overridden.length > 0) {
   console.log(`  템플릿 프로젝트 override: ${overridden.join(', ')} (${PROJECT_DOC_DIR}/policy/)`)
+}
+// 기존 정책서가 있었을 때만 대조 요약(준수/문서에만 = 문서 항목 존재).
+const s = reconcile.summary
+if (s.준수 + s.문서에만 > 0) {
+  console.log(`  기존 정책서 대조 → .spec/map/policy-reconcile.json:`)
+  console.log(`    준수 ${s.준수} · 문서에만(미구현 후보) ${s.문서에만} · 미정의(코드에만) ${s.미정의}`)
+  console.log(`    (위반=값 모순은 SKILL 보강에서 앵커 소스 대조로 판정)`)
+} else if (reconcile.unresolved.length > 0) {
+  console.log(`  policy-input 일부 미처리: ${reconcile.unresolved.map((u) => u.ref).join(', ')}`)
 }
 console.log('앵커(file:line)는 결정론 [확정]. 규범 진술·값은 SKILL 보강에서 [추정]로 채운다(합성 금지).')

@@ -74,10 +74,11 @@ const APPROVER_LS_KEY = "ktds.approver";
 const FOLDERS: Array<{ key: string; label: string }> = [
   { key: "as-built", label: "현행 분석" },
   { key: "si-standard", label: "SI 표준 산출물" },
+  { key: "policy", label: "정책서" },
   { key: "_other", label: "기타" },
 ];
 const folderKeyOf = (m?: string): string =>
-  m === "as-built" || m === "si-standard" ? m : "_other";
+  m === "as-built" || m === "si-standard" || m === "policy" ? m : "_other";
 
 export default function DocsView() {
   const accessToken = useDashboardStore((s) => s.accessToken);

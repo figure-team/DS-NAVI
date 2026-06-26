@@ -85,6 +85,32 @@ function loadDocTemplate(docId) {
   }
 }
 
+/** 대조 상태 표시 라벨. */
+const STATUS_LABEL = {
+  준수: '✅ 준수',
+  위반: '⚠️ 위반',
+  미정의: '➕ 미정의(코드에만)',
+  문서에만: '❓ 문서에만(미구현 후보)',
+}
+
+/**
+ * 한 정책서(docId=policy-<category>)에 대한 "## 대조" 마크다운 섹션.
+ * 기존 문서 항목(준수/문서에만)이 있을 때만 렌더(없으면 빈 문자열 — 신규 생성 경로는 깨끗).
+ * DocsView 가 GFM 표로 그대로 렌더하므로 서버/배지 플럼빙이 필요 없다.
+ */
+function reconcileSection(docId) {
+  const category = docId.replace(/^policy-/, '')
+  const es = reconcile.entries.filter((e) => e.category === category)
+  if (!es.some((e) => e.status === '준수' || e.status === '문서에만')) return ''
+  const rows = es
+    .map((e) => {
+      const anchor = e.anchor ? `\`${e.anchor.file}:${e.anchor.line}\`` : '—'
+      return `| ${e.subject} | ${STATUS_LABEL[e.status] ?? e.status} | ${anchor} |`
+    })
+    .join('\n')
+  return `\n## 대조 (기존 정책서)\n\n> \`.understand-anything/policy-input/${category}.md\` 와 코드/DB 신호 대조. 위반(값 모순)은 LLM 보강에서 판정.\n\n| 항목 | 상태 | 코드/DB 근거 |\n| --- | --- | --- |\n${rows}\n`
+}
+
 mkdirSync(OUTPUT_DIR, { recursive: true })
 const overridden = []
 const meta = []
@@ -100,7 +126,7 @@ for (const built of getMethodology('policy').buildDocSet(input)) {
     sourceCommit,
     evidenceRate: evidenceRate(doc),
   }
-  writeFileSync(join(OUTPUT_DIR, `${doc.docId}.md`), renderMarkdown(doc, m), 'utf8')
+  writeFileSync(join(OUTPUT_DIR, `${doc.docId}.md`), renderMarkdown(doc, m) + reconcileSection(doc.docId), 'utf8')
   meta.push(m)
 }
 

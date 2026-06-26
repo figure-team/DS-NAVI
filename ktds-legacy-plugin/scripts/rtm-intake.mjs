@@ -66,6 +66,39 @@ if (cmd === 'validate') {
   process.exit(0)
 }
 
+// ── next-req(①): 충돌 없는 다음 요청ID 산출 ──────────────────────────────────
+// 요청ID(REQ-)는 요구사항 id 로 존재하지 않고 source.section 에만 있을 수 있다. 둘 다(및 원장)를
+// 스캔해 최댓값+1 을 돌려준다(요구사항 id 만 보면 section 으로 쓰인 번호와 충돌한다).
+if (cmd === 'next-req') {
+  const projectRoot = rest[0]
+  if (!projectRoot) {
+    console.error('사용법: node rtm-intake.mjs next-req <projectRoot>')
+    process.exit(2)
+  }
+  const uaDir = join(projectRoot, '.understand-anything')
+  let maxN = 0
+  const scan = (obj) => {
+    for (const r of obj.requirements ?? []) {
+      for (const v of [r.id, r.source && r.source.section]) {
+        const m = /^REQ-(\d+)$/.exec(String(v ?? ''))
+        if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
+      }
+    }
+  }
+  for (const name of ['rtm.json', 'rtm-requirements.json']) {
+    const path = join(uaDir, name)
+    if (existsSync(path)) {
+      try {
+        scan(readJson(path))
+      } catch {
+        /* 손상 무시 */
+      }
+    }
+  }
+  console.log(`REQ-${String(maxN + 1).padStart(3, '0')}`)
+  process.exit(0)
+}
+
 // ── project(⑤) ───────────────────────────────────────────────────────────────
 if (cmd === 'project') {
   const projectRoot = rest[0]
@@ -175,5 +208,10 @@ if (cmd === 'project') {
   process.exit(0)
 }
 
-console.error('사용법:\n  node rtm-intake.mjs validate <identified.json 경로>\n  node rtm-intake.mjs project  <projectRoot> <sid>')
+console.error(
+  '사용법:\n' +
+    '  node rtm-intake.mjs validate <identified.json 경로>\n' +
+    '  node rtm-intake.mjs next-req <projectRoot>\n' +
+    '  node rtm-intake.mjs project  <projectRoot> <sid>',
+)
 process.exit(2)

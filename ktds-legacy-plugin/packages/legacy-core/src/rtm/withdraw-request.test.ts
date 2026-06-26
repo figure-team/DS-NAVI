@@ -64,4 +64,13 @@ describe('withdrawRequest (절차 B)', () => {
     expect(out.withdrawn).toEqual([])
     expect(out.requirements.every((r) => r.status === 'ACTIVE')).toBe(true)
   })
+
+  it('레거시 단일 요청 — 요구사항 id 자체가 REQ-(section 없음)도 철회 대상(jpetstore 스타일)', () => {
+    // source.section 이 비어도 id 가 REQ- 면 그 요청으로 인정(RtmView.requestIdOf 규약).
+    const legacy: RtmRequirement = { ...req('REQ-001', 'REQ-001'), source: { kind: 'customer', raw: '요청', section: undefined } }
+    const out = withdrawRequest([legacy], 'REQ-001', { crNo: 'CR-001' })
+    expect(out.notFound).toBe(false)
+    expect(out.withdrawn).toEqual(['REQ-001'])
+    expect(out.requirements[0].status).toBe('WITHDRAWN')
+  })
 })

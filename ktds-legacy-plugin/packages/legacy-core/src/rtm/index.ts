@@ -67,3 +67,50 @@ export { applyRequirements } from './apply-requirements.js'
 export { applyOverlay } from './apply-overlay.js'
 export { computeCoverage } from './coverage.js'
 export { computeDiagnostics, natCmp } from './validate.js'
+export {
+  REQUIREMENT_TEMPLATES,
+  CHANGE_TEMPLATES,
+  requirementTemplateEntry,
+  changeTemplateEntry,
+  requirementTemplateFile,
+  changeTemplateFile,
+  resolveRequirementTemplatePath,
+  loadRequirementTemplate,
+  loadChangeTemplate,
+} from './requirement-templates.js'
+export type {
+  RequirementDocKind,
+  ChangeDocKind,
+  RequirementTemplateEntry,
+  ChangeTemplateEntry,
+  RequirementTemplateDirs,
+  ResolvedRequirementTemplate,
+  LoadedRequirementTemplate,
+} from './requirement-templates.js'
+export {
+  RequirementCategorySchema,
+  IntakeReqStatusSchema,
+  IntakeRequestSchema,
+  IntakeSpecSchema,
+  IntakeRequirementSchema,
+  IdentifiedIntakeSchema,
+  parseIdentifiedIntake,
+  diagnoseIntake,
+} from './intake-types.js'
+export type {
+  RequirementCategory,
+  IntakeReqStatus,
+  IntakeRequest,
+  IntakeSpec,
+  IntakeRequirement,
+  IdentifiedIntake,
+} from './intake-types.js'
+export {
+  intakeReqToRtmRequirement,
+  intakeFnStub,
+  fnDomainKey,
+} from './project-intake.js'
+export { withdrawRequest, requestIdOf } from './withdraw-request.js'
+export type { WithdrawOptions, WithdrawResult } from './withdraw-request.js'
+export { computeChangeImpact } from './change-impact.js'
+export type { ChangeImpactReport, ChangeImpactFunction, ChangeImpactClass } from './change-impact.js'

@@ -792,30 +792,242 @@ function handleImpactAnalyzePost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
-// ── R5: RTM 인테이크 — 자연어 요청 → claude -p "/understand-rtm <q>" ─────
-// 스킬이 .understand-anything/rtm-requirements.json 작성 + understand-rtm 재생성 → 프론트가
-// rtm.json 재로드. 영향도 분석 job 과 동형(단일 job, 409 차단, args 배열로 셸 미경유).
-const RTM_INTAKE_DIRECTIVE =
-  "\n\n위 요청은 대시보드 추적표에서 자동 실행된 헤드리스 작업이다. 사용자에게 확인을 묻지 말고 " +
-  "rtm.json 인벤토리와 대조해 요청을 하위 기능으로 분해·매칭하고, rtm-requirements.json 에 제안(전부 [추정])을 " +
-  "기록한 뒤, understand-rtm.mjs 를 실행해 rtm.json 을 재생성하는 단계까지 끝까지 완주하라. 확정은 사람이 대시보드에서 한다.";
+// ── P3: RTM 단계 인테이크 — 가이드 5단계를 단계당 claude -p 1회로 ─────
+// 한 POST 가 start..target 단계를 순차 spawn(중간 컨펌 없이 자동진행), target 에서 멈춤. 단계마다
+// claude -p "/understand-rtm --intake --session <sid> --step <k>". 세션 상태는 디스크(session.json)에
+// 영속, 인메모리 rtmJob 은 실행 추적(409 차단). 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §5.
+const RTM_STEP_MIN = 1;
+const RTM_STEP_MAX = 5;
+function rtmStepDirective(step: number): string {
+  return (
+    `\n\n위 작업은 대시보드 추적표에서 자동 실행된 헤드리스 단계 ${step} 이다. 사용자에게 확인을 묻지 말고 ` +
+    `SKILL.md §B 의 --step ${step} 지침만 끝까지 수행한 뒤 보고하고 멈춰라. 다음 단계는 사용자 컨펌 후 별도로 ` +
+    `진행된다. 신규는 전부 [추정]이며 확정은 사람이 대시보드에서 한다.`
+  );
+}
 
-let rtmJob: ImpactJob = {
+interface RtmStepJob {
+  status: "idle" | "running" | "done" | "failed";
+  jobId: string | null;
+  sid: string | null;
+  step: number | null; // 현재 실행 중/마지막 단계
+  targetStep: number | null;
+  request: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  tail: string;
+}
+const RTM_JOB_IDLE: RtmStepJob = {
   status: "idle",
   jobId: null,
-  query: null,
+  sid: null,
+  step: null,
+  targetStep: null,
+  request: null,
   startedAt: null,
   finishedAt: null,
   exitCode: null,
   tail: "",
 };
+let rtmJob: RtmStepJob = { ...RTM_JOB_IDLE };
 function appendRtmTail(chunk: string): void {
   rtmJob.tail = (rtmJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
 }
 
+// ── 세션 영속(.understand-anything/rtm-intake/<sid>/) ────────────────────────
+type RtmStepStatus = "pending" | "running" | "produced" | "confirmed" | "failed";
+interface RtmSession {
+  sid: string;
+  request: string;
+  createdAt: string;
+  producedStep: number; // 산출물이 존재하는 최고 단계(0=없음)
+  confirmedStep: number; // 사용자가 컨펌한 최고 단계
+  targetStep: number;
+  discarded: boolean;
+  steps: Record<string, { status: RtmStepStatus }>;
+}
+/** 인테이크 세션 베이스 디렉터리(.understand-anything/rtm-intake). 프로젝트 미발견이면 null. */
+function rtmIntakeBaseDir(): string | null {
+  const graphFile = findGraphFile("domain-graph.json") ?? findGraphFile("rtm.json");
+  return graphFile ? path.join(path.dirname(graphFile), "rtm-intake") : null;
+}
+/** sid 형식 검증(경로 traversal 방지) — 16진 8~32자. */
+function isValidSid(sid: string): boolean {
+  return /^[a-f0-9]{8,32}$/.test(sid);
+}
+function rtmSessionDir(sid: string): string | null {
+  const base = rtmIntakeBaseDir();
+  if (!base || !isValidSid(sid)) return null;
+  return path.join(base, sid);
+}
+function newRtmSession(sid: string, request: string, targetStep: number): RtmSession {
+  const steps: Record<string, { status: RtmStepStatus }> = {};
+  for (let k = RTM_STEP_MIN; k <= RTM_STEP_MAX; k++) steps[String(k)] = { status: "pending" };
+  return {
+    sid,
+    request,
+    createdAt: new Date().toISOString(),
+    producedStep: 0,
+    confirmedStep: 0,
+    targetStep,
+    discarded: false,
+    steps,
+  };
+}
+function readRtmSession(sid: string): RtmSession | null {
+  const dir = rtmSessionDir(sid);
+  if (!dir) return null;
+  try {
+    const raw = JSON.parse(fs.readFileSync(path.join(dir, "session.json"), "utf-8"));
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as RtmSession) : null;
+  } catch {
+    return null;
+  }
+}
+function writeRtmSession(s: RtmSession): void {
+  const dir = rtmSessionDir(s.sid);
+  if (!dir) return;
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, "session.json"), JSON.stringify(s, null, 2) + "\n", "utf8");
+}
+/** 로드 시 복구용 — 가장 최근 생성된 비폐기 세션(createdAt 최대). 없으면 null. */
+function latestRtmSession(): RtmSession | null {
+  const base = rtmIntakeBaseDir();
+  if (!base || !fs.existsSync(base)) return null;
+  let best: RtmSession | null = null;
+  try {
+    for (const name of fs.readdirSync(base)) {
+      if (!isValidSid(name)) continue;
+      const s = readRtmSession(name);
+      if (!s || s.discarded) continue;
+      if (!best || (s.createdAt ?? "") > (best.createdAt ?? "")) best = s;
+    }
+  } catch {
+    /* 디렉터리 읽기 실패 → null */
+  }
+  return best;
+}
+/** 세션 디렉터리의 산출 문서 목록(.md) + 종류. identified.json 존재 여부도 함께. */
+function listRtmSessionDocs(sid: string): { name: string; kind: string }[] {
+  const dir = rtmSessionDir(sid);
+  if (!dir || !fs.existsSync(dir)) return [];
+  try {
+    return fs
+      .readdirSync(dir)
+      .filter((f) => f.endsWith(".md"))
+      .sort()
+      .map((name) => {
+        const kind = name.startsWith("요구사항목록표")
+          ? "list"
+          : name.startsWith("요구사항정의서")
+          ? "definition"
+          : name.startsWith("요구사항명세서")
+          ? "spec"
+          : "other";
+        return { name, kind };
+      });
+  } catch {
+    return [];
+  }
+}
+/** 세션 파일 이름 검증 — basename 만, .md 또는 identified.json. traversal 차단. */
+function isValidSessionFileName(name: string): boolean {
+  if (name.includes("/") || name.includes("\\") || name.includes("..")) return false;
+  return name.endsWith(".md") || name === "identified.json";
+}
+/** 세션 파일 절대경로(검증 통과 + 디렉터리 이탈 방지). 실패 시 null. */
+function rtmSessionFilePath(sid: string, name: string): string | null {
+  const dir = rtmSessionDir(sid);
+  if (!dir || !isValidSessionFileName(name)) return null;
+  const full = path.join(dir, name);
+  if (!full.startsWith(dir + path.sep)) return null;
+  return full;
+}
+
 /**
- * POST /rtm-intake — { query } 자연어로 claude -p "/understand-rtm <query>" 실행.
- * 즉시 202 + job, 프로세스는 백그라운드 지속(프론트가 /rtm-intake-status 폴링 → done 시 rtm.json 재로드).
+ * 단계 순차 실행기 — jobId 유효한 동안 step=start..target 을 하나씩 spawn(이전 종료 후 다음).
+ * 각 단계 성공 시 session.producedStep 갱신, target 도달 또는 실패 시 정지. jobId 가 교체되면 중단.
+ */
+function runRtmSteps(
+  jobId: string,
+  sid: string,
+  projectRoot: string,
+  request: string,
+  start: number,
+  target: number,
+): void {
+  const reqArg = request.replace(/[\r\n]+/g, " ").replace(/"/g, "'").trim();
+  const runOne = (k: number): void => {
+    if (rtmJob.jobId !== jobId) return; // 후속 job 으로 교체됨
+    rtmJob.step = k;
+    const s0 = readRtmSession(sid);
+    if (s0) {
+      s0.steps[String(k)] = { status: "running" };
+      writeRtmSession(s0);
+    }
+    const requestArg = k === RTM_STEP_MIN ? ` --request "${reqArg}"` : "";
+    const prompt = `/understand-rtm --intake --session ${sid} --step ${k}${requestArg}${rtmStepDirective(k)}`;
+    let child: ReturnType<typeof spawn>;
+    try {
+      child = spawn("claude", ["-p", prompt, "--permission-mode", "bypassPermissions"], {
+        cwd: projectRoot,
+        env: process.env,
+      });
+    } catch (err) {
+      if (rtmJob.jobId !== jobId) return;
+      rtmJob.status = "failed";
+      rtmJob.finishedAt = new Date().toISOString();
+      appendRtmTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
+      const s = readRtmSession(sid);
+      if (s) {
+        s.steps[String(k)] = { status: "failed" };
+        writeRtmSession(s);
+      }
+      return;
+    }
+    child.stdout?.on("data", (c: Buffer) => appendRtmTail(c.toString("utf8")));
+    child.stderr?.on("data", (c: Buffer) => appendRtmTail(c.toString("utf8")));
+    child.on("error", (err) => {
+      if (rtmJob.jobId !== jobId) return;
+      rtmJob.status = "failed";
+      rtmJob.finishedAt = new Date().toISOString();
+      appendRtmTail(`\n[spawn error] ${err.message}\n`);
+    });
+    child.on("close", (code) => {
+      if (rtmJob.jobId !== jobId) return;
+      const s = readRtmSession(sid);
+      if (code !== 0) {
+        rtmJob.status = "failed";
+        rtmJob.exitCode = code;
+        rtmJob.finishedAt = new Date().toISOString();
+        if (s) {
+          s.steps[String(k)] = { status: "failed" };
+          writeRtmSession(s);
+        }
+        return;
+      }
+      if (s) {
+        s.steps[String(k)] = { status: "produced" };
+        s.producedStep = Math.max(s.producedStep, k);
+        writeRtmSession(s);
+      }
+      if (k >= target) {
+        rtmJob.status = "done";
+        rtmJob.exitCode = 0;
+        rtmJob.finishedAt = new Date().toISOString();
+        return;
+      }
+      runOne(k + 1); // 다음 단계 자동진행(같은 호출의 N까지 구간)
+    });
+  };
+  runOne(start);
+}
+
+/**
+ * POST /rtm-intake — { request?, sid?, targetStep } 단계 인테이크 시작/진행.
+ * 신규(sid 없음)면 새 세션 발급 후 step 1 부터, 기존이면 producedStep+1 부터 targetStep 까지 순차 실행.
+ * 미컨펌 산출(produced>confirmed)을 건너뛰고 진행하려 하면 409(컨펌 게이트). 즉시 202 + job + session.
  */
 function handleRtmIntakePost(
   req: import("http").IncomingMessage,
@@ -830,50 +1042,340 @@ function handleRtmIntakePost(
     sendJson(res, 404, { error: "No project found. Run /understand first." });
     return;
   }
+  if (!rtmIntakeBaseDir()) {
+    sendJson(res, 404, { error: "No RTM found. Run /understand-rtm first." });
+    return;
+  }
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
-      let query = "";
+      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown } = {};
       try {
-        const parsed = JSON.parse(body) as { query?: unknown };
-        query = typeof parsed.query === "string" ? parsed.query.trim() : "";
+        parsed = JSON.parse(body);
       } catch {
-        query = "";
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
       }
-      if (!query) {
-        sendJson(res, 400, { error: "Missing 'query'" });
+      const wantTarget =
+        typeof parsed.targetStep === "number" ? Math.floor(parsed.targetStep) : RTM_STEP_MAX;
+
+      let session: RtmSession;
+      let startStep: number;
+      let request: string;
+      if (typeof parsed.sid === "string" && parsed.sid) {
+        const existing = readRtmSession(parsed.sid);
+        if (!existing) {
+          sendJson(res, 404, { error: "Unknown session" });
+          return;
+        }
+        // 컨펌 게이트 — 미컨펌 산출이 있으면 더 진행 불가(같은 호출 자동진행은 예외, 여기선 새 호출).
+        if (existing.producedStep > existing.confirmedStep) {
+          sendJson(res, 409, {
+            error: `단계 ${existing.producedStep} 을(를) 먼저 컨펌하세요.`,
+            session: existing,
+          });
+          return;
+        }
+        session = existing;
+        startStep = existing.producedStep + 1;
+        request = existing.request;
+      } else {
+        request = typeof parsed.request === "string" ? parsed.request.trim() : "";
+        if (!request) {
+          sendJson(res, 400, { error: "Missing 'request'" });
+          return;
+        }
+        const sid = crypto.randomBytes(8).toString("hex");
+        session = newRtmSession(sid, request, wantTarget);
+        startStep = RTM_STEP_MIN;
+      }
+
+      if (startStep > RTM_STEP_MAX) {
+        sendJson(res, 400, { error: "이미 모든 단계(⑤)가 산출되었습니다.", session });
+        return;
+      }
+      const target = Math.min(Math.max(wantTarget, startStep), RTM_STEP_MAX);
+      session.targetStep = target;
+      writeRtmSession(session);
+
+      const jobId = crypto.randomBytes(8).toString("hex");
+      rtmJob = {
+        ...RTM_JOB_IDLE,
+        status: "running",
+        jobId,
+        sid: session.sid,
+        step: startStep,
+        targetStep: target,
+        request,
+        startedAt: new Date().toISOString(),
+      };
+      runRtmSteps(jobId, session.sid, projectRoot, request, startStep, target);
+      sendJson(res, 202, { job: { ...rtmJob }, session });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+/**
+ * POST /rtm-intake-confirm — { sid, step } 단계 컨펌. confirmedStep 을 갱신해 다음 단계 게이트를 연다.
+ * step 은 producedStep 이하만 허용(산출되지 않은 단계 컨펌 금지).
+ */
+function handleRtmConfirmPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
+    .then((body) => {
+      let parsed: { sid?: unknown; step?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const sid = typeof parsed.sid === "string" ? parsed.sid : "";
+      const step = typeof parsed.step === "number" ? Math.floor(parsed.step) : NaN;
+      const session = sid ? readRtmSession(sid) : null;
+      if (!session) {
+        sendJson(res, 404, { error: "Unknown session" });
+        return;
+      }
+      if (!(step >= RTM_STEP_MIN && step <= session.producedStep)) {
+        sendJson(res, 400, { error: "산출된 단계만 컨펌할 수 있습니다." });
+        return;
+      }
+      session.confirmedStep = Math.min(Math.max(session.confirmedStep, step), session.producedStep);
+      for (let j = RTM_STEP_MIN; j <= session.confirmedStep; j++) {
+        session.steps[String(j)] = { status: "confirmed" };
+      }
+      writeRtmSession(session);
+      sendJson(res, 200, { session });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+/** POST /rtm-intake-discard — { sid } 활성 세션 폐기(파일은 이력 보존, discarded 플래그만). */
+function handleRtmDiscardPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  if (rtmJob.status === "running") {
+    sendJson(res, 409, { error: "실행 중에는 폐기할 수 없습니다.", job: { ...rtmJob } });
+    return;
+  }
+  collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
+    .then((body) => {
+      let parsed: { sid?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const sid = typeof parsed.sid === "string" ? parsed.sid : "";
+      const session = sid ? readRtmSession(sid) : null;
+      if (!session) {
+        sendJson(res, 404, { error: "Unknown session" });
+        return;
+      }
+      session.discarded = true;
+      writeRtmSession(session);
+      sendJson(res, 200, { session });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+/** POST /rtm-intake-doc — { sid, name, content } 세션 문서(.md) 인라인 편집 저장(직접 덮어쓰기). */
+function handleRtmDocPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  collectRequestBody(req, MAX_DOC_BODY_BYTES)
+    .then((body) => {
+      let parsed: { sid?: unknown; name?: unknown; content?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const sid = typeof parsed.sid === "string" ? parsed.sid : "";
+      const name = typeof parsed.name === "string" ? parsed.name : "";
+      const content = parsed.content;
+      if (typeof content !== "string") {
+        sendJson(res, 400, { error: "content (string) is required" });
+        return;
+      }
+      // 명세서 등 .md 만 편집 허용(identified.json 직접편집 금지).
+      if (!name.endsWith(".md")) {
+        sendJson(res, 400, { error: "편집 가능한 문서(.md)만 저장할 수 있습니다." });
+        return;
+      }
+      const file = rtmSessionFilePath(sid, name);
+      if (!file || !fs.existsSync(file)) {
+        sendJson(res, 404, { error: "Unknown session document" });
+        return;
+      }
+      try {
+        fs.writeFileSync(file, content, "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write rtm-intake doc:", err);
+        sendJson(res, 500, { error: "Failed to write document" });
+        return;
+      }
+      sendJson(res, 200, { sid, name, saved: true });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+// ── P6: RTM 변경관리(절차 B) — 요청(REQ) 철회 ────────────────────────────────
+// 인테이크(다단계)와 달리 단일 파이프라인: claude -p 1회가 SKILL §C(번호→영향분석→문서04·05→
+// 폐기표시·재bake→폐기배너)를 끝까지 수행한다. 결정론 부분은 rtm-intake.mjs CLI 가, 문서 작성은 LLM 이.
+// 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §8.
+const RTM_CHANGE_KINDS = ["withdraw"] as const;
+type RtmChangeKind = (typeof RTM_CHANGE_KINDS)[number];
+function rtmChangeDirective(targetReq: string, kind: RtmChangeKind): string {
+  return (
+    `\n\n위 작업은 대시보드 추적표에서 자동 실행된 변경관리(${kind === "withdraw" ? "철회" : kind})다. ` +
+    `대상 요청은 ${targetReq} 이다. 사용자에게 확인을 묻지 말고 SKILL.md §C 절차를 끝까지 수행한 뒤 ` +
+    `보고하고 멈춰라. **삭제 금지·이력 보존**(상태를 폐기로만), CR 문서(과업내용변경요청서·변경영향분석서)를 ` +
+    `생성하고 추적표를 재생성한다. 확정·후속조치 수행은 사람이 한다.`
+  );
+}
+
+interface RtmChangeJob {
+  status: "idle" | "running" | "done" | "failed";
+  jobId: string | null;
+  targetReq: string | null;
+  kind: RtmChangeKind | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  tail: string;
+}
+const RTM_CHANGE_JOB_IDLE: RtmChangeJob = {
+  status: "idle",
+  jobId: null,
+  targetReq: null,
+  kind: null,
+  startedAt: null,
+  finishedAt: null,
+  exitCode: null,
+  tail: "",
+};
+let rtmChangeJob: RtmChangeJob = { ...RTM_CHANGE_JOB_IDLE };
+function appendRtmChangeTail(chunk: string): void {
+  rtmChangeJob.tail = (rtmChangeJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
+}
+
+/**
+ * rtm.json 의 요청(REQ) id 집합 — RtmView.requestIdOf 규약: source.section 이 REQ- 면 그것,
+ * 아니면 요구사항 id 가 REQ- 면 그것(레거시 단일 요청). 두 스타일 모두 변경요청 대상으로 인정.
+ */
+function rtmRequestIds(): Set<string> {
+  const ids = new Set<string>();
+  const file = findGraphFile("rtm.json");
+  if (!file) return ids;
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as {
+      requirements?: Array<{ id?: unknown; source?: { section?: unknown } | null }>;
+    };
+    for (const r of raw.requirements ?? []) {
+      const section = r.source?.section;
+      if (typeof section === "string" && /^REQ-\d+/.test(section)) ids.add(section);
+      else if (typeof r.id === "string" && /^REQ-\d+/.test(r.id)) ids.add(r.id);
+    }
+  } catch {
+    /* 빈 집합 */
+  }
+  return ids;
+}
+
+/** 변경관리 단일 실행기 — claude -p "/understand-rtm --change ..." 1회. jobId 교체 시 중단. */
+function runRtmChange(
+  jobId: string,
+  projectRoot: string,
+  targetReq: string,
+  kind: RtmChangeKind,
+): void {
+  const prompt = `/understand-rtm --change --target-req ${targetReq} --kind ${kind}${rtmChangeDirective(targetReq, kind)}`;
+  let child: ReturnType<typeof spawn>;
+  try {
+    child = spawn("claude", ["-p", prompt, "--permission-mode", "bypassPermissions"], {
+      cwd: projectRoot,
+      env: process.env,
+    });
+  } catch (err) {
+    if (rtmChangeJob.jobId !== jobId) return;
+    rtmChangeJob.status = "failed";
+    rtmChangeJob.finishedAt = new Date().toISOString();
+    appendRtmChangeTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
+    return;
+  }
+  child.stdout?.on("data", (c: Buffer) => appendRtmChangeTail(c.toString("utf8")));
+  child.stderr?.on("data", (c: Buffer) => appendRtmChangeTail(c.toString("utf8")));
+  child.on("error", (err) => {
+    if (rtmChangeJob.jobId !== jobId) return;
+    rtmChangeJob.status = "failed";
+    rtmChangeJob.finishedAt = new Date().toISOString();
+    appendRtmChangeTail(`\n[spawn error] ${err.message}\n`);
+  });
+  child.on("close", (code) => {
+    if (rtmChangeJob.jobId !== jobId) return;
+    rtmChangeJob.status = code === 0 ? "done" : "failed";
+    rtmChangeJob.exitCode = code;
+    rtmChangeJob.finishedAt = new Date().toISOString();
+  });
+}
+
+/**
+ * POST /rtm-change — { targetReq, kind } 요청 철회 시작. 즉시 202 + job. 대상 REQ 는 rtm.json 에 실존해야 한다.
+ * 한 번에 하나만(409). 결과는 GET /rtm-change-status 로 폴링하고, 완료 후 추적표·문서를 다시 읽는다.
+ */
+function handleRtmChangePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  if (rtmChangeJob.status === "running") {
+    sendJson(res, 409, { error: "A change request is already running", job: { ...rtmChangeJob } });
+    return;
+  }
+  const projectRoot = impactProjectRoot();
+  if (!projectRoot) {
+    sendJson(res, 404, { error: "No project found. Run /understand first." });
+    return;
+  }
+  collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
+    .then((body) => {
+      let parsed: { targetReq?: unknown; kind?: unknown } = {};
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const targetReq = typeof parsed.targetReq === "string" ? parsed.targetReq.trim() : "";
+      if (!/^REQ-\d+$/.test(targetReq)) {
+        sendJson(res, 400, { error: "targetReq (REQ-00N) 형식이 필요합니다." });
+        return;
+      }
+      const kind: RtmChangeKind =
+        typeof parsed.kind === "string" && (RTM_CHANGE_KINDS as readonly string[]).includes(parsed.kind)
+          ? (parsed.kind as RtmChangeKind)
+          : "withdraw";
+      if (!rtmRequestIds().has(targetReq)) {
+        sendJson(res, 400, { error: `요청 ${targetReq} 에 귀속된 요구사항이 추적표에 없습니다.` });
         return;
       }
       const jobId = crypto.randomBytes(8).toString("hex");
-      rtmJob = { status: "running", jobId, query, startedAt: new Date().toISOString(), finishedAt: null, exitCode: null, tail: "" };
-      let child: ReturnType<typeof spawn>;
-      try {
-        child = spawn(
-          "claude",
-          ["-p", `/understand-rtm ${query}${RTM_INTAKE_DIRECTIVE}`, "--permission-mode", "bypassPermissions"],
-          { cwd: projectRoot, env: process.env },
-        );
-      } catch (err) {
-        rtmJob.status = "failed";
-        rtmJob.finishedAt = new Date().toISOString();
-        appendRtmTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
-        sendJson(res, 500, { error: "Failed to launch claude", job: { ...rtmJob } });
-        return;
-      }
-      child.stdout?.on("data", (c: Buffer) => appendRtmTail(c.toString("utf8")));
-      child.stderr?.on("data", (c: Buffer) => appendRtmTail(c.toString("utf8")));
-      child.on("error", (err) => {
-        if (rtmJob.jobId !== jobId) return;
-        rtmJob.status = "failed";
-        rtmJob.finishedAt = new Date().toISOString();
-        appendRtmTail(`\n[spawn error] ${err.message}\n`);
-      });
-      child.on("close", (code) => {
-        if (rtmJob.jobId !== jobId) return;
-        rtmJob.status = code === 0 ? "done" : "failed";
-        rtmJob.exitCode = code;
-        rtmJob.finishedAt = new Date().toISOString();
-      });
-      sendJson(res, 202, { job: { ...rtmJob } });
+      rtmChangeJob = {
+        ...RTM_CHANGE_JOB_IDLE,
+        status: "running",
+        jobId,
+        targetReq,
+        kind,
+        startedAt: new Date().toISOString(),
+      };
+      runRtmChange(jobId, projectRoot, targetReq, kind);
+      sendJson(res, 202, { job: { ...rtmChangeJob } });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
@@ -981,7 +1483,12 @@ export default defineConfig({
             pathname === "/rtm-override" ||
             pathname === "/rtm-req-override" ||
             pathname === "/rtm-intake" ||
-            pathname === "/rtm-intake-status";
+            pathname === "/rtm-intake-status" ||
+            pathname === "/rtm-intake-confirm" ||
+            pathname === "/rtm-intake-discard" ||
+            pathname === "/rtm-intake-doc" ||
+            pathname === "/rtm-change" ||
+            pathname === "/rtm-change-status";
 
           if (!isProtectedEndpoint) {
             next();
@@ -1088,7 +1595,54 @@ export default defineConfig({
             return;
           }
           if (pathname === "/rtm-intake-status") {
-            sendJson(res, 200, { job: { ...rtmJob } });
+            const qSid = url.searchParams.get("sid");
+            const sid = qSid ?? rtmJob.sid;
+            let session = sid ? readRtmSession(sid) : null;
+            // 명시 sid 없이 조회(로드 시) + 인메모리 job 도 없으면 디스크에서 최근 활성 세션 복구.
+            if (!session && !qSid) session = latestRtmSession();
+            sendJson(res, 200, {
+              job: { ...rtmJob },
+              session,
+              docs: session ? listRtmSessionDocs(session.sid) : [],
+            });
+            return;
+          }
+          if (pathname === "/rtm-change") {
+            if (req.method === "POST") handleRtmChangePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to start a change request" });
+            return;
+          }
+          if (pathname === "/rtm-change-status") {
+            sendJson(res, 200, { job: { ...rtmChangeJob } });
+            return;
+          }
+          if (pathname === "/rtm-intake-confirm") {
+            if (req.method === "POST") handleRtmConfirmPost(req, res);
+            else sendJson(res, 405, { error: "Use POST to confirm a step" });
+            return;
+          }
+          if (pathname === "/rtm-intake-discard") {
+            if (req.method === "POST") handleRtmDiscardPost(req, res);
+            else sendJson(res, 405, { error: "Use POST to discard a session" });
+            return;
+          }
+          if (pathname === "/rtm-intake-doc") {
+            if (req.method === "POST") {
+              handleRtmDocPost(req, res);
+              return;
+            }
+            const sid = url.searchParams.get("sid") ?? "";
+            const name = url.searchParams.get("name") ?? "";
+            const file = rtmSessionFilePath(sid, name);
+            if (!file || !fs.existsSync(file)) {
+              sendJson(res, 404, { error: "Unknown session document" });
+              return;
+            }
+            try {
+              sendJson(res, 200, { sid, name, content: fs.readFileSync(file, "utf-8") });
+            } catch {
+              sendJson(res, 500, { error: "Failed to read document" });
+            }
             return;
           }
 

@@ -34,9 +34,25 @@ export interface WithdrawResult {
   notFound: boolean
 }
 
-/** REQ 에 속한 요구사항 = source.section === reqId(project-intake 가 그렇게 귀속). */
+const REQ_RE = /^REQ-\d+/
+
+/**
+ * 요구사항이 속한 요청(REQ)ID — RtmView.requestIdOf 와 **동일 규약**:
+ *   1) source.section 이 REQ- 면 그것(2계층 인테이크 스타일: SFR-010 ← REQ-001).
+ *   2) 아니면 자기 id 가 REQ- 면 그것(레거시 단일 요청: 요구사항 id 자체가 REQ-001).
+ *   3) 그 외 null(미분류).
+ * 두 스타일을 모두 철회 대상으로 잡아야 실제 원장(jpetstore: id=REQ-NNN)에서도 동작한다.
+ */
+export function requestIdOf(r: RtmRequirement): string | null {
+  const sec = r.source?.section
+  if (sec && REQ_RE.test(sec)) return sec
+  if (REQ_RE.test(r.id)) return r.id
+  return null
+}
+
+/** REQ 에 속한 요구사항 = requestIdOf(r) === reqId(section 우선, 없으면 자기 id). */
 function belongsToRequest(r: RtmRequirement, reqId: string): boolean {
-  return r.source?.section === reqId
+  return requestIdOf(r) === reqId
 }
 
 /**

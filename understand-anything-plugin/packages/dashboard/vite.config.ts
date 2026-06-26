@@ -1266,18 +1266,22 @@ function appendRtmChangeTail(chunk: string): void {
   rtmChangeJob.tail = (rtmChangeJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
 }
 
-/** rtm.json 의 요청(REQ) id 집합 — requirements[].source.section 에서 수집(POST 대상 실존 검증용). */
+/**
+ * rtm.json 의 요청(REQ) id 집합 — RtmView.requestIdOf 규약: source.section 이 REQ- 면 그것,
+ * 아니면 요구사항 id 가 REQ- 면 그것(레거시 단일 요청). 두 스타일 모두 변경요청 대상으로 인정.
+ */
 function rtmRequestIds(): Set<string> {
   const ids = new Set<string>();
   const file = findGraphFile("rtm.json");
   if (!file) return ids;
   try {
     const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as {
-      requirements?: Array<{ source?: { section?: unknown } | null }>;
+      requirements?: Array<{ id?: unknown; source?: { section?: unknown } | null }>;
     };
     for (const r of raw.requirements ?? []) {
       const section = r.source?.section;
-      if (typeof section === "string" && /^REQ-\d+$/.test(section)) ids.add(section);
+      if (typeof section === "string" && /^REQ-\d+/.test(section)) ids.add(section);
+      else if (typeof r.id === "string" && /^REQ-\d+/.test(r.id)) ids.add(r.id);
     }
   } catch {
     /* 빈 집합 */

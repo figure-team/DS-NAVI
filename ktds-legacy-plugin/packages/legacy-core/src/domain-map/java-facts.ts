@@ -76,6 +76,8 @@ export interface MethodFact {
   returnType: string | null
   /** 1-based 선언 라인. */
   line: number
+  /** 메서드/생성자 선언 어노테이션(이름만, 예 `PreAuthorize`). 정책 신호(권한) 입력. */
+  annotations: string[]
   /** 메서드 본문 지역변수 선언(선언 순서). */
   locals: JavaLocalVar[]
   /** 메서드 본문 내 호출 지점(소스 순서). */
@@ -447,6 +449,7 @@ function collectMethods(body: Node): MethodFact[] {
       paramsText: fps ? fps.text : '()',
       returnType: m.type === 'constructor_declaration' ? null : returnTypeName(m),
       line: startLine(m),
+      annotations: annotationNames(child(m, 'modifiers')),
       locals,
       calls,
     })

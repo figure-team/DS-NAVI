@@ -69,14 +69,20 @@ export { computeCoverage } from './coverage.js'
 export { computeDiagnostics, natCmp } from './validate.js'
 export {
   REQUIREMENT_TEMPLATES,
+  CHANGE_TEMPLATES,
   requirementTemplateEntry,
+  changeTemplateEntry,
   requirementTemplateFile,
+  changeTemplateFile,
   resolveRequirementTemplatePath,
   loadRequirementTemplate,
+  loadChangeTemplate,
 } from './requirement-templates.js'
 export type {
   RequirementDocKind,
+  ChangeDocKind,
   RequirementTemplateEntry,
+  ChangeTemplateEntry,
   RequirementTemplateDirs,
   ResolvedRequirementTemplate,
   LoadedRequirementTemplate,

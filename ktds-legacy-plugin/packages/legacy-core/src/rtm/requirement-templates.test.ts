@@ -7,11 +7,16 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   REQUIREMENT_TEMPLATES,
+  CHANGE_TEMPLATES,
   requirementTemplateFile,
   requirementTemplateEntry,
+  changeTemplateEntry,
+  changeTemplateFile,
   resolveRequirementTemplatePath,
   loadRequirementTemplate,
+  loadChangeTemplate,
   type RequirementDocKind,
+  type ChangeDocKind,
 } from './requirement-templates.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -53,6 +58,34 @@ describe('vendored 템플릿 로드(plugin)', () => {
       }
     })
   }
+})
+
+describe('변경관리(절차 B) 템플릿', () => {
+  it('2종(change-request/change-impact)을 04/05 파일로 노출한다', () => {
+    expect(CHANGE_TEMPLATES.map((e) => e.kind)).toEqual(['change-request', 'change-impact'])
+    expect(changeTemplateFile('change-request')).toBe('04_과업내용변경요청서.md')
+    expect(changeTemplateFile('change-impact')).toBe('05_변경영향분석서.md')
+  })
+
+  it('알 수 없는 변경관리 종류는 throw', () => {
+    expect(() => changeTemplateEntry('xxx' as ChangeDocKind)).toThrow()
+  })
+
+  it('plugin 에서 로드하고 구조 표식을 갖는다', () => {
+    const cr = loadChangeTemplate('change-request', { pluginDir: PLUGIN_DIR })
+    expect(cr.source).toBe('plugin')
+    expect(cr.text).toContain('변경요청ID')
+    expect(cr.text).toContain('대상 요청ID')
+    const ia = loadChangeTemplate('change-impact', { pluginDir: PLUGIN_DIR })
+    expect(ia.text).toContain('## 3. 영향 기능')
+    expect(ia.text).toContain('## 7. 후속조치 체크리스트')
+  })
+
+  it('plugin 에도 없으면 load 는 throw', () => {
+    expect(() =>
+      loadChangeTemplate('change-request', { pluginDir: join(here, '__nope__') }),
+    ).toThrow(/변경관리 템플릿을 찾지 못했습니다/)
+  })
 })
 
 describe('override→plugin 우선순위', () => {

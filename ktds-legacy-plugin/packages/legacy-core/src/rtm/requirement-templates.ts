@@ -14,6 +14,9 @@ import { join } from 'node:path'
 /** ②③④ 각 단계가 생성하는 문서 종류. */
 export type RequirementDocKind = 'list' | 'definition' | 'spec'
 
+/** 변경관리(절차 B) 문서 종류 — 과업내용변경요청서·변경영향분석서. */
+export type ChangeDocKind = 'change-request' | 'change-impact'
+
 /** 한 문서 종류의 메타 — 템플릿 파일명 + 표시 제목 + 산출 단계. */
 export interface RequirementTemplateEntry {
   kind: RequirementDocKind
@@ -24,11 +27,24 @@ export interface RequirementTemplateEntry {
   step: 2 | 3 | 4
 }
 
+/** 변경관리 문서 메타(단계 없음 — 별개 트리거 절차 B). */
+export interface ChangeTemplateEntry {
+  kind: ChangeDocKind
+  file: string
+  title: string
+}
+
 /** 요구사항 문서 템플릿 레지스트리(단계 순서). */
 export const REQUIREMENT_TEMPLATES: readonly RequirementTemplateEntry[] = [
   { kind: 'list', file: '01_요구사항목록표.md', title: '요구사항 목록표', step: 2 },
   { kind: 'definition', file: '02_요구사항정의서.md', title: '요구사항정의서', step: 3 },
   { kind: 'spec', file: '03_요구사항명세서.md', title: '요구사항명세서', step: 4 },
+] as const
+
+/** 변경관리 문서 템플릿 레지스트리(절차 B). */
+export const CHANGE_TEMPLATES: readonly ChangeTemplateEntry[] = [
+  { kind: 'change-request', file: '04_과업내용변경요청서.md', title: '과업내용변경요청서' },
+  { kind: 'change-impact', file: '05_변경영향분석서.md', title: '변경영향분석서' },
 ] as const
 
 /** kind → 레지스트리 항목(없으면 throw). */
@@ -38,9 +54,21 @@ export function requirementTemplateEntry(kind: RequirementDocKind): RequirementT
   return entry
 }
 
+/** kind → 변경관리 레지스트리 항목(없으면 throw). */
+export function changeTemplateEntry(kind: ChangeDocKind): ChangeTemplateEntry {
+  const entry = CHANGE_TEMPLATES.find((e) => e.kind === kind)
+  if (!entry) throw new Error(`알 수 없는 변경관리 문서 종류: ${kind}`)
+  return entry
+}
+
 /** kind → 템플릿 파일명(예: '01_요구사항목록표.md'). */
 export function requirementTemplateFile(kind: RequirementDocKind): string {
   return requirementTemplateEntry(kind).file
+}
+
+/** kind → 변경관리 템플릿 파일명(예: '04_과업내용변경요청서.md'). */
+export function changeTemplateFile(kind: ChangeDocKind): string {
+  return changeTemplateEntry(kind).file
 }
 
 export interface RequirementTemplateDirs {
@@ -55,14 +83,11 @@ export interface ResolvedRequirementTemplate {
   source: 'project' | 'plugin'
 }
 
-/**
- * 템플릿 경로 해석 — 프로젝트 override 우선, 없으면 플러그인 동봉. 둘 다 없으면 null.
- */
-export function resolveRequirementTemplatePath(
-  kind: RequirementDocKind,
+/** 파일명 기준 경로 해석(override→plugin). 요구사항·변경관리 템플릿 공통 토대. */
+function resolveTemplateFilePath(
+  file: string,
   dirs: RequirementTemplateDirs,
 ): ResolvedRequirementTemplate | null {
-  const file = requirementTemplateFile(kind)
   if (dirs.projectDir) {
     const p = join(dirs.projectDir, file)
     if (existsSync(p)) return { path: p, source: 'project' }
@@ -72,8 +97,34 @@ export function resolveRequirementTemplatePath(
   return null
 }
 
+/**
+ * 템플릿 경로 해석 — 프로젝트 override 우선, 없으면 플러그인 동봉. 둘 다 없으면 null.
+ */
+export function resolveRequirementTemplatePath(
+  kind: RequirementDocKind,
+  dirs: RequirementTemplateDirs,
+): ResolvedRequirementTemplate | null {
+  return resolveTemplateFilePath(requirementTemplateFile(kind), dirs)
+}
+
 export interface LoadedRequirementTemplate extends ResolvedRequirementTemplate {
   text: string
+}
+
+/** 파일명 기준 본문 로드(override→plugin). 못 찾으면 throw(조용한 빈 산출 방지). */
+function loadTemplateFile(
+  file: string,
+  dirs: RequirementTemplateDirs,
+  label: string,
+): LoadedRequirementTemplate {
+  const resolved = resolveTemplateFilePath(file, dirs)
+  if (!resolved) {
+    throw new Error(
+      `${label} 템플릿을 찾지 못했습니다(${file}). ` +
+        `plugin=${dirs.pluginDir}${dirs.projectDir ? `, project=${dirs.projectDir}` : ''}`,
+    )
+  }
+  return { ...resolved, text: readFileSync(resolved.path, 'utf8') }
 }
 
 /**
@@ -83,13 +134,15 @@ export function loadRequirementTemplate(
   kind: RequirementDocKind,
   dirs: RequirementTemplateDirs,
 ): LoadedRequirementTemplate {
-  const resolved = resolveRequirementTemplatePath(kind, dirs)
-  if (!resolved) {
-    const file = requirementTemplateFile(kind)
-    throw new Error(
-      `요구사항 템플릿을 찾지 못했습니다(${file}). ` +
-        `plugin=${dirs.pluginDir}${dirs.projectDir ? `, project=${dirs.projectDir}` : ''}`,
-    )
-  }
-  return { ...resolved, text: readFileSync(resolved.path, 'utf8') }
+  return loadTemplateFile(requirementTemplateFile(kind), dirs, '요구사항')
+}
+
+/**
+ * 변경관리(절차 B) 템플릿 본문 로드(override→plugin). 찾지 못하면 throw.
+ */
+export function loadChangeTemplate(
+  kind: ChangeDocKind,
+  dirs: RequirementTemplateDirs,
+): LoadedRequirementTemplate {
+  return loadTemplateFile(changeTemplateFile(kind), dirs, '변경관리')
 }

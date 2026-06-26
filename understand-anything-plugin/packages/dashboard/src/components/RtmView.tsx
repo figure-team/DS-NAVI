@@ -33,7 +33,7 @@ interface Changeset { added: string[]; modified: string[]; removed: string[]; re
 interface Signoff { approved: boolean; by: string | null; at: string | null }
 interface Requirement {
   id: string; text: string; type: "functional" | "nonfunctional"; nfrCategory: string | null; nfrScope: string[];
-  priority: "HIGH" | "MEDIUM" | "LOW"; lifecycle: string; status: "ACTIVE" | "SUPERSEDED";
+  priority: "HIGH" | "MEDIUM" | "LOW"; lifecycle: string; status: "ACTIVE" | "SUPERSEDED" | "WITHDRAWN";
   supersedes: string | null; supersededBy: string | null; dependsOn: string[];
   source: { kind: string; raw: string; requester?: string; targetRelease?: string; section?: string; doc?: string; requestedAt?: string } | null;
   changeReq: { crNo: string | null; reason: string | null; approver: string | null; effort: string | null } | null;
@@ -203,6 +203,10 @@ export default function RtmView() {
   const [editingDoc, setEditingDoc] = useState(false);
   const [draftDoc, setDraftDoc] = useState("");
 
+  // ── P6: 변경관리(절차 B) — 요청(REQ) 철회 ──
+  const [changeReqId, setChangeReqId] = useState<string | null>(null); // 진행 중 대상 REQ
+  const [changeRunning, setChangeRunning] = useState(false);
+
   const startIntake = useCallback(async () => {
     const q = intakeQuery.trim();
     if (!q) return;
@@ -298,6 +302,53 @@ export default function RtmView() {
     const id = setInterval(poll, 3000);
     return () => clearInterval(id);
   }, [intakeStatus, sid, tokenQ, loadModel]);
+
+  // 변경관리(절차 B) — 요청(REQ) 철회 시작. claude -p §C 가 CR 문서 생성·폐기표시·재bake 까지 수행한다.
+  const startChange = useCallback(async (reqId: string) => {
+    if (!accessToken) { setToast({ kind: "failed", msg: "읽기전용(라이브 서버 없음) — 변경요청은 dev 서버가 필요합니다." }); return; }
+    if (changeRunning) return;
+    const ok = window.confirm(
+      `요청 ${reqId} 을(를) 철회합니다.\n\n· 하위 요구사항이 동반 폐기(상태=폐기)됩니다.\n· 변경관리 문서(과업내용변경요청서·변경영향분석서)가 생성됩니다.\n· 삭제가 아니라 이력 보존입니다 — 추적표가 재생성됩니다.\n\n진행할까요?`,
+    );
+    if (!ok) return;
+    try {
+      const res = await fetch(`/rtm-change?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetReq: reqId, kind: "withdraw" }) });
+      const d = (await res.json().catch(() => null)) as { job?: unknown; error?: string } | null;
+      if (res.status === 202) { setChangeReqId(reqId); setChangeRunning(true); setToast({ kind: "done", msg: `${reqId} 철회 진행 중 — CR 문서 생성·추적표 재생성 중입니다.` }); }
+      else setToast({ kind: "failed", msg: d?.error ?? `변경요청 실패: HTTP ${res.status}` });
+    } catch (e) { setToast({ kind: "failed", msg: String(e) }); }
+  }, [accessToken, changeRunning]);
+
+  // 마운트 시 진행 중 변경관리 job 복구(새로고침 후에도 진행 상태를 잇는다).
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const r = await fetch(`/rtm-change-status${tokenQ}`);
+        const data = (await r.json()) as { job?: { status?: string; targetReq?: string | null } };
+        if (cancelled) return;
+        if (data.job?.status === "running") { setChangeReqId(data.job.targetReq ?? null); setChangeRunning(true); }
+      } catch { /* 복구 실패 무시 */ }
+    })();
+    return () => { cancelled = true; };
+  }, [tokenQ]);
+
+  // 변경관리 폴링 — 완료되면 추적표 재로드(폐기 반영·기능 원복), 실패면 토스트.
+  useEffect(() => {
+    if (!changeRunning) return;
+    const poll = async () => {
+      try {
+        const r = await fetch(`/rtm-change-status${tokenQ}`);
+        const data = (await r.json()) as { job?: { status?: string } };
+        const st = data.job?.status;
+        if (st === "done") { setChangeRunning(false); setToast({ kind: "done", msg: `${changeReqId ?? "요청"} 철회 완료 — 추적표·CR 문서를 갱신했습니다.` }); loadModel(); }
+        else if (st === "failed") { setChangeRunning(false); setToast({ kind: "failed", msg: "변경요청 실패 — 서버 로그를 확인하세요." }); }
+      } catch { /* keep polling */ }
+    };
+    void poll();
+    const id = setInterval(poll, 3000);
+    return () => clearInterval(id);
+  }, [changeRunning, tokenQ, changeReqId, loadModel]);
 
   // 미리보기 로더 — 현재 산출 단계(producedStep)의 문서/식별결과를 불러온다.
   const loadPreview = useCallback(async (name: string) => {
@@ -718,7 +769,9 @@ export default function RtmView() {
     const live = members.filter((m) => m.status === "ACTIVE");
     const deadN = members.length - live.length;
     const allDead = live.length === 0;
-    const ordered = [...live, ...members.filter((m) => m.status === "SUPERSEDED")];
+    const ordered = [...live, ...members.filter((m) => m.status !== "ACTIVE")];
+    const running = changeRunning && changeReqId === reqId;
+    const canWithdraw = !ungrouped && live.length > 0; // 유효 요구가 남은 정식 요청만 철회 가능
     const catCount = live.reduce((acc, r) => { const c = r.id.match(/^[A-Z]+/)?.[0] ?? "?"; acc[c] = (acc[c] ?? 0) + 1; return acc; }, {} as Record<string, number>);
     return (
       <section style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 14, marginBottom: 14, overflow: "hidden", opacity: allDead ? 0.7 : 1 }}>
@@ -730,10 +783,15 @@ export default function RtmView() {
           <span className="ml-auto flex items-center gap-3 text-text-muted" style={{ fontSize: 11.5 }}>
             <span style={{ fontFamily: "var(--font-mono)" }}>{Object.entries(catCount).map(([c, n]) => `${c} ${n}`).join(" · ") || "—"}</span>
             <span>요구사항 {members.length}{deadN ? ` · 폐기 ${deadN}` : ""}</span>
+            {canWithdraw && <button type="button" onClick={(e) => { e.stopPropagation(); void startChange(reqId); }} disabled={running}
+              className="rounded-md border transition-colors disabled:opacity-60"
+              style={{ padding: "3px 10px", fontSize: 11, borderColor: running ? FAINT : `${BAD}66`, color: running ? "var(--color-text-muted)" : BAD }}
+              title="이 요청을 철회 — 하위 요구사항 동반 폐기 + 변경관리 문서(CR) 생성(삭제 아님, 이력 보존)">
+              {running ? "철회 중…" : "변경요청"}</button>}
           </span>
         </div>
         {open && <div style={{ padding: "2px 14px 12px", borderTop: BORDER }}>
-          {ordered.map((m) => <ReqCard key={m.id} r={m} dead={m.status === "SUPERSEDED"} nested />)}
+          {ordered.map((m) => <ReqCard key={m.id} r={m} dead={m.status !== "ACTIVE"} nested />)}
         </div>}
       </section>
     );
@@ -751,7 +809,7 @@ export default function RtmView() {
           <span style={{ width: 11, height: 11, borderRadius: "50%", flex: "none", background: dead ? "none" : r.type === "nonfunctional" ? NFR : GOLD, border: dead ? `1.5px solid ${FAINT}` : "none", boxShadow: dead ? "none" : `0 0 0 4px ${r.type === "nonfunctional" ? "rgba(120,160,190,.14)" : "rgba(212,165,116,.14)"}` }} />
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-muted)", textDecoration: dead ? "line-through" : "none" }}>{r.id}</span>
           <span style={{ fontSize: 15, color: dead ? "var(--color-text-secondary)" : "var(--color-text-primary)", fontWeight: 500 }}>{r.text}</span>
-          {dead ? <Pill label="폐기" color="var(--color-text-muted)" bg="rgba(255,255,255,.04)" />
+          {dead ? <Pill label={r.status === "WITHDRAWN" ? (r.changeReq?.crNo ? `폐기 ${r.changeReq.crNo}` : "폐기(철회)") : "폐기"} color="var(--color-text-muted)" bg="rgba(255,255,255,.04)" />
             : r.type === "nonfunctional" ? <Pill label={`⚡ 비기능 · ${NFR_CAT[r.nfrCategory ?? "other"] ?? "기타"}`} color={NFR} bg="rgba(120,160,190,.12)" />
               : <><Pill label="● 현행" color={GOLD} bg="rgba(212,165,116,.12)" />{r.priority && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, color: PRIORITY[r.priority].color, background: PRIORITY[r.priority].bg }}>{PRIORITY[r.priority].label}</span>}</>}
           {r.supersedes && <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: GOLD_DIM }}>⟵ {r.supersedes} 대체</span>}
@@ -905,7 +963,7 @@ export default function RtmView() {
                 <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}>{r.id}</span>
                 {v && <span style={{ color: VERB[v].color, fontSize: 11 }}>{VERB[v].sym} {VERB[v].label}</span>}
                 <span className="text-text-secondary" style={{ fontSize: 12 }}>{r.text}</span>
-                <span className="ml-auto text-text-muted" style={{ fontSize: 10.5 }}>{head ? "현행" : r.status === "SUPERSEDED" ? "폐기" : ""}</span>
+                <span className="ml-auto text-text-muted" style={{ fontSize: 10.5 }}>{r.status !== "ACTIVE" ? "폐기" : head ? "현행" : ""}</span>
               </button>;
             })}
           </div>

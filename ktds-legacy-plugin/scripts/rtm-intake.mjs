@@ -107,6 +107,37 @@ if (cmd === 'next-req') {
   process.exit(0)
 }
 
+// ── next-cr(절차 B): 충돌 없는 다음 변경요청ID(CR-00N) ────────────────────────
+// changeReq.crNo 는 요구사항 id 가 아니라 메타에만 존재한다. rtm-requirements.json·rtm.json 의
+// 모든 changeReq.crNo 를 스캔해 최댓값+1 을 돌려준다(next-req 와 동일한 충돌 방지 규약).
+if (cmd === 'next-cr') {
+  const projectRoot = rest[0]
+  if (!projectRoot) {
+    console.error('사용법: node rtm-intake.mjs next-cr <projectRoot>')
+    process.exit(2)
+  }
+  const uaDir = join(projectRoot, '.understand-anything')
+  let maxN = 0
+  const scan = (obj) => {
+    for (const r of obj.requirements ?? []) {
+      const m = /^CR-(\d+)$/.exec(String(r.changeReq?.crNo ?? ''))
+      if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
+    }
+  }
+  for (const name of ['rtm.json', 'rtm-requirements.json']) {
+    const path = join(uaDir, name)
+    if (existsSync(path)) {
+      try {
+        scan(readJson(path))
+      } catch {
+        /* 손상 무시 */
+      }
+    }
+  }
+  console.log(`CR-${String(maxN + 1).padStart(3, '0')}`)
+  process.exit(0)
+}
+
 // ── project(⑤) ───────────────────────────────────────────────────────────────
 if (cmd === 'project') {
   const projectRoot = rest[0]
@@ -297,6 +328,7 @@ console.error(
   '사용법:\n' +
     '  node rtm-intake.mjs validate <identified.json 경로>\n' +
     '  node rtm-intake.mjs next-req <projectRoot>\n' +
+    '  node rtm-intake.mjs next-cr  <projectRoot>\n' +
     '  node rtm-intake.mjs project  <projectRoot> <sid>\n' +
     '  node rtm-intake.mjs withdraw <projectRoot> <REQ> <CR> [사유]\n' +
     '  node rtm-intake.mjs impact   <projectRoot> <REQ> [--out <경로>]',

@@ -15,6 +15,7 @@ import { EvidenceSchema } from '../doc-generator/types.js'
 
 /** `.spec/map/` 정규 산출물 파일명. */
 export const POLICY_SIGNALS_FILENAME = 'policy-signals.json'
+export const POLICY_RECONCILE_FILENAME = 'policy-reconcile.json'
 
 /** 정책 카테고리(사용자 정의 9종). PoC: glossary/data/validation/authz. */
 export const PolicyCategorySchema = z.enum([
@@ -53,3 +54,56 @@ export const PolicySignalSetSchema = z.object({
   unresolved: z.array(z.object({ ref: z.string(), reason: z.string() })),
 })
 export type PolicySignalSet = z.infer<typeof PolicySignalSetSchema>
+
+// ── ingest·대조(P4) — "기존 문서가 있을 때" 경로 ──────────────────────────────
+
+/**
+ * 대조 상태(policyStatus).
+ *  - 준수: 문서 정책 ↔ 코드/DB 신호 모두 존재(주제 매칭).
+ *  - 위반: 문서가 코드/DB 와 모순(값 비교). 신호에 인자값이 없어 결정론 비교 불가 →
+ *          LLM 보강(SKILL)이 앵커 소스를 읽어 판정한다(결정론 reconcile 은 부여하지 않음).
+ *  - 미정의: 코드/DB 엔 있으나 문서에 없음(코드에만 — 문서 누락).
+ *  - 문서에만: 문서엔 있으나 코드/DB 신호 없음(미구현 후보).
+ */
+export const PolicyStatusSchema = z.enum(['준수', '위반', '미정의', '문서에만'])
+export type PolicyStatus = z.infer<typeof PolicyStatusSchema>
+
+/** 기존 정책서에서 파싱한 정책 항목 1건(정규화). */
+export const PolicyItemSchema = z.object({
+  category: PolicyCategorySchema,
+  subject: z.string(),
+  statement: z.string(),
+  /** 입력 문서 내 라인(1-기반, 미상이면 null). */
+  sourceLine: z.number().int().nullable(),
+})
+export type PolicyItem = z.infer<typeof PolicyItemSchema>
+
+/** 대조 결과 1건 — 문서 항목과 코드/DB 신호의 매칭 판정. */
+export const ReconcileEntrySchema = z.object({
+  category: PolicyCategorySchema,
+  subject: z.string(),
+  status: PolicyStatusSchema,
+  /** 문서 측 진술(문서에 없으면 null = 미정의). */
+  docStatement: z.string().nullable(),
+  /** 코드/DB 신호 detail(신호 없으면 null = 문서에만). */
+  signalDetail: z.string().nullable(),
+  /** 매칭 신호 앵커(없으면 null). */
+  anchor: EvidenceSchema.nullable(),
+  note: z.string(),
+})
+export type ReconcileEntry = z.infer<typeof ReconcileEntrySchema>
+
+/** 대조 결과 — .spec/map/policy-reconcile.json 의 단일 소스. */
+export const ReconcileResultSchema = z.object({
+  schemaVersion: z.literal(1),
+  gitCommit: z.string().nullable(),
+  entries: z.array(ReconcileEntrySchema),
+  summary: z.object({
+    준수: z.number().int().nonnegative(),
+    위반: z.number().int().nonnegative(),
+    미정의: z.number().int().nonnegative(),
+    문서에만: z.number().int().nonnegative(),
+  }),
+  unresolved: z.array(z.object({ ref: z.string(), reason: z.string() })),
+})
+export type ReconcileResult = z.infer<typeof ReconcileResultSchema>

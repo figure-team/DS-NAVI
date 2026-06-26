@@ -55,8 +55,17 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot>
 
 ## 기존 정책서 대조 (있을 때)
 
-`.understand-anything/policy-input/<category>.md` 에 기존 정책서가 있으면, 항목 단위로 정규화해
-코드/DB 신호와 대조한다(P4): **준수 / 위반 / 미정의(코드에만) / 문서에만(미구현)**. (후속 단계)
+`.understand-anything/policy-input/<category>.md`(예: `glossary.md`, `authz.md`)에 기존 정책서가
+있으면 1단계 스크립트가 자동으로 ingest·대조해 `.spec/map/policy-reconcile.json` 을 만든다:
+
+- **준수**: 문서 항목 ↔ 코드/DB 신호 모두 존재(category+subject 매칭).
+- **미정의**: 코드/DB 엔 있으나 문서에 없음(문서 누락).
+- **문서에만**: 문서엔 있으나 코드/DB 신호 없음(미구현 후보).
+- **위반**(값 모순): 결정론으로는 부여하지 않는다 — 신호에 인자값이 없기 때문. **이 스킬의 보강
+  단계에서** `문서에만`/`준수` 항목의 앵커 소스를 열어 문서가 명시한 값과 코드 값을 비교해
+  `위반`을 판정한다(예: 문서 "최소 6자" vs 코드 `@Size(min=8)`). 근거 동반 필수.
+
+대조 결과를 정책서에 "대조" 섹션으로 덧붙이거나 항목별 상태 배지로 표기한다.
 
 ## 산출물 / 출력 해석
 

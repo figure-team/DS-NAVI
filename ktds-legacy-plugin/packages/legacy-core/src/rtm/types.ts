@@ -212,7 +212,9 @@ export const RtmRequirementSchema = z.object({
   nfrScope: z.array(z.string()).default([]),
   priority: PrioritySchema.default('MEDIUM'),
   lifecycle: RequirementLifecycleSchema.default('RECEIVED'),
-  status: z.enum(['ACTIVE', 'SUPERSEDED']),
+  // 유효성 상태(절차 B) — ACTIVE(유효) / SUPERSEDED(신규 요구로 대체) / WITHDRAWN(CR 철회·폐기).
+  // WITHDRAWN 은 SUPERSEDED 와 달리 대체 요구가 없다(요청 자체 취소). 파괴적 삭제 금지(이력 보존).
+  status: z.enum(['ACTIVE', 'SUPERSEDED', 'WITHDRAWN']),
   supersedes: z.string().nullable(),
   supersededBy: z.string().nullable(),
   dependsOn: z.array(z.string()).default([]),

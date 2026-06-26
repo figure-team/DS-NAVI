@@ -104,3 +104,7 @@ export {
   intakeFnStub,
   fnDomainKey,
 } from './project-intake.js'
+export { withdrawRequest } from './withdraw-request.js'
+export type { WithdrawOptions, WithdrawResult } from './withdraw-request.js'
+export { computeChangeImpact } from './change-impact.js'
+export type { ChangeImpactReport, ChangeImpactFunction, ChangeImpactClass } from './change-impact.js'

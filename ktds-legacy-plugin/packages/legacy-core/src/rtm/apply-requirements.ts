@@ -84,13 +84,16 @@ export function applyRequirements(
   }
 
   const recompute = (f: RtmFunctionRow): RtmFunctionRow => {
+    // 이력(history)은 감사용 — 폐기(WITHDRAWN) 요구까지 포함해 "건드린 적 있음"을 보존(§1 파괴적 삭제 금지).
     const history = sortedReqs.filter((r) => verbOf(r, f.id) !== null).map((r) => r.id)
     let state = f.state
     let origin = f.origin
-    if (history.length > 0) {
-      let head: RtmRequirement | null = null
-      for (const r of sortedReqs) if (verbOf(r, f.id)) head = r
-      const verb = verbOf(head!, f.id)!
+    // 현행 head 는 **폐기되지 않은** 가장 나중 요구사항(절차 B). 모든 toucher 가 폐기면 head 없음 →
+    // 기능은 폐기 직전이 아니라 **요구사항 적용 전 기준 상태**로 되돌아간다(철회=원복).
+    let head: RtmRequirement | null = null
+    for (const r of sortedReqs) if (r.status !== 'WITHDRAWN' && verbOf(r, f.id)) head = r
+    if (head) {
+      const verb = verbOf(head, f.id)!
       const hasImpl = f.implementation.evidence.length > 0
       state = stateFor(verb, hasImpl)
       origin = verb === 'added' && !hasImpl ? 'TO_BE' : f.origin

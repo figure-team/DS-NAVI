@@ -77,6 +77,7 @@ export function computeDiagnostics(model: RtmModel, droppedReqIds: string[] = []
   const fnIds = new Set(model.functions.map((f) => f.id))
   const domainIds = new Set(model.domains.map((d) => d.id))
   const reqIds = new Set(model.requirements.map((r) => r.id))
+  const statusById = new Map(model.requirements.map((r) => [r.id, r.status]))
 
   for (const id of droppedReqIds) add('error', 'req-dropped', `요구사항 파싱 실패로 누락됨: ${id}`, id)
 
@@ -115,6 +116,9 @@ export function computeDiagnostics(model: RtmModel, droppedReqIds: string[] = []
     }
     for (const id of r.dependsOn) {
       if (!reqIds.has(id)) add('warn', 'dangling-depends-on', `요구 ${r.id} dependsOn 의 요구 id 없음: ${id}`, r.id)
+      else if (r.status === 'ACTIVE' && statusById.get(id) === 'WITHDRAWN') {
+        add('warn', 'depends-on-withdrawn', `유효 요구 ${r.id} 가 폐기된 요구 ${id} 에 의존(의존 끊김 — 재검토 필요)`, r.id)
+      }
     }
     depEdges.set(r.id, r.dependsOn)
     if (r.supersedes !== null) {

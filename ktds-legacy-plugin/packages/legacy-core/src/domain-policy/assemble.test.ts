@@ -33,7 +33,7 @@ const domainGraph: DomainGraphLite = {
 }
 
 const branchesByKey = new Map<string, BranchSignal[]>([
-  ['order', [{ relPath: 'web/OrderActionBean.java', line: 125, className: 'OrderActionBean', methodName: 'newOrderForm', kind: 'if', condition: '!auth' }]],
+  ['order', [{ relPath: 'web/OrderActionBean.java', line: 125, className: 'OrderActionBean', methodName: 'newOrderForm', kind: 'if', condition: '!auth', then: 'return "deny";' }]],
 ])
 
 describe('도메인 정책 입력 조립 (PD3)', () => {

@@ -281,6 +281,7 @@ export * from './jpa/index.js'
 export * from './mybatis/index.js'
 export * from './db-schema/index.js'
 export * from './policy/index.js'
+export * from './domain-policy/index.js'
 export * from './rtm/index.js'
 export {
   CoverageReportSchema,

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { buildDomainPolicyInputs, type DomainGraphLite } from './assemble.js'
+import { buildDomainPolicyInputs, deriveStatusCodes, deriveTerms, type DomainGraphLite } from './assemble.js'
 import type { CandidatesReport } from '../domain-map/types.js'
+import type { DbSchemaModel } from '../db-schema/types.js'
 import type { BranchSignal } from './types.js'
 
 const candidates: CandidatesReport = {
@@ -53,5 +54,63 @@ describe('도메인 정책 입력 조립 (PD3)', () => {
     expect(order.name).toBe('order')
     expect(order.flows).toEqual([])
     expect(order.branches).toEqual([])
+    expect(order.terms).toEqual([])
+    expect(order.statusCodes).toEqual([])
+  })
+})
+
+const DB_SCHEMA: DbSchemaModel = {
+  schemaVersion: 1,
+  gitCommit: null,
+  tier: 'ddl+data',
+  sqlFileCount: 1,
+  liveDbSignals: [],
+  unresolved: [],
+  tables: [
+    {
+      name: 'CATEGORY',
+      relPath: 'db/data.sql',
+      line: 1,
+      comment: '상품 분류',
+      columns: [
+        { name: 'catid', type: 'varchar', nullable: false, primaryKey: true, unique: false, default: null, comment: '분류 코드', line: 2 },
+        { name: 'name', type: 'varchar', nullable: true, primaryKey: false, unique: false, default: null, comment: null, line: 3 },
+        { name: 'descn', type: 'varchar', nullable: true, primaryKey: false, unique: false, default: null, comment: null, line: 4 },
+      ],
+      primaryKey: ['catid'],
+      uniques: [],
+      foreignKeys: [],
+      checks: [],
+      indexes: [],
+      isCodeTable: true,
+      rows: [
+        { values: { catid: 'FISH', name: 'Fish', descn: '물고기' }, line: 10 },
+        { values: { catid: 'DOGS', name: 'Dogs', descn: '개' }, line: 11 },
+      ],
+      rowCount: 2,
+    },
+  ],
+}
+
+describe('§3 상태값 / §2 용어 자동 채움 (db-schema)', () => {
+  it('참조되는 코드 테이블의 dataload 행 → 상태값(코드/명칭/설명 + 행 근거)', () => {
+    const codes = deriveStatusCodes(DB_SCHEMA, 'catalogService.getProductListByCategory(id)')
+    expect(codes.map((c) => c.code)).toEqual(['FISH', 'DOGS'])
+    expect(codes[0]).toEqual({ group: 'CATEGORY', code: 'FISH', name: 'Fish', desc: '물고기', evidence: { file: 'db/data.sql', line: 10 } })
+  })
+
+  it('참조 안 되는 테이블은 제외(내용 참조 scoping)', () => {
+    expect(deriveStatusCodes(DB_SCHEMA, 'orderService.insertOrder(o)')).toEqual([])
+  })
+
+  it('DB 주석 → 용어(테이블/컬럼 주석, 근거 동반)', () => {
+    const terms = deriveTerms(DB_SCHEMA, 'getCategory()')
+    expect(terms).toContainEqual({ term: 'CATEGORY', definition: '상품 분류', note: 'DB 테이블 주석', evidence: { file: 'db/data.sql', line: 1 } })
+    expect(terms).toContainEqual({ term: 'CATEGORY.catid', definition: '분류 코드', note: 'DB 컬럼 주석', evidence: { file: 'db/data.sql', line: 2 } })
+  })
+
+  it('db-schema 없으면 빈 배열', () => {
+    expect(deriveStatusCodes(null, 'x')).toEqual([])
+    expect(deriveTerms(null, 'x')).toEqual([])
   })
 })

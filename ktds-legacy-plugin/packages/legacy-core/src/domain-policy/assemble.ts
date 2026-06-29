@@ -37,22 +37,33 @@ function referencedIn(text: string, tableName: string): boolean {
   return tableName.length >= 4 && text.toLowerCase().includes(tableName.toLowerCase())
 }
 
+/** 셀 값 정리 — HTML 태그 제거·공백 1칸·트림(dataload 에 UI 마크업이 섞이는 경우 대비). */
+function cleanVal(v: string | undefined): string {
+  return (v ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
 /**
  * §3 상태값 — 도메인이 참조하는 코드/룩업 테이블의 dataload 행을 코드값으로(결정론).
  * group=테이블 · code=첫 컬럼값 · 명칭=둘째 · 설명=셋째. 근거=행 file:line.
+ * (group,code) 중복 제거(여러 .sql 의 동일 INSERT 대비), 값은 HTML 제거.
  */
 export function deriveStatusCodes(dbSchema: DbSchemaModel | null, text: string): StatusCode[] {
   if (!dbSchema) return []
   const out: StatusCode[] = []
+  const seen = new Set<string>()
   for (const t of dbSchema.tables) {
     if (!t.isCodeTable || t.rows.length === 0 || !referencedIn(text, t.name)) continue
     const cols = t.columns.map((c) => c.name)
     for (const r of t.rows) {
+      const code = cleanVal(r.values[cols[0]])
+      const dedup = `${t.name}::${code}`
+      if (seen.has(dedup)) continue
+      seen.add(dedup)
       out.push({
         group: t.name,
-        code: r.values[cols[0]] ?? '',
-        name: cols[1] ? (r.values[cols[1]] ?? '') : '',
-        desc: cols[2] ? (r.values[cols[2]] ?? '') : '',
+        code,
+        name: cols[1] ? cleanVal(r.values[cols[1]]) : '',
+        desc: cols[2] ? cleanVal(r.values[cols[2]]) : '',
         evidence: { file: t.relPath, line: r.line },
       })
     }

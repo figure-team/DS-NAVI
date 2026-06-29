@@ -84,19 +84,20 @@ const DB_SCHEMA: DbSchemaModel = {
       indexes: [],
       isCodeTable: true,
       rows: [
-        { values: { catid: 'FISH', name: 'Fish', descn: '물고기' }, line: 10 },
+        { values: { catid: 'FISH', name: 'Fish', descn: '<font size="5">물고기</font>' }, line: 10 },
         { values: { catid: 'DOGS', name: 'Dogs', descn: '개' }, line: 11 },
+        { values: { catid: 'FISH', name: 'Fish', descn: '<font size="5">물고기</font>' }, line: 99 }, // 다른 .sql 중복 INSERT
       ],
-      rowCount: 2,
+      rowCount: 3,
     },
   ],
 }
 
 describe('§3 상태값 / §2 용어 자동 채움 (db-schema)', () => {
-  it('참조되는 코드 테이블의 dataload 행 → 상태값(코드/명칭/설명 + 행 근거)', () => {
+  it('참조되는 코드 테이블의 dataload 행 → 상태값(중복 제거·HTML 정리·행 근거)', () => {
     const codes = deriveStatusCodes(DB_SCHEMA, 'catalogService.getProductListByCategory(id)')
-    expect(codes.map((c) => c.code)).toEqual(['FISH', 'DOGS'])
-    expect(codes[0]).toEqual({ group: 'CATEGORY', code: 'FISH', name: 'Fish', desc: '물고기', evidence: { file: 'db/data.sql', line: 10 } })
+    expect(codes.map((c) => c.code)).toEqual(['FISH', 'DOGS']) // 중복 FISH 제거
+    expect(codes[0]).toEqual({ group: 'CATEGORY', code: 'FISH', name: 'Fish', desc: '물고기', evidence: { file: 'db/data.sql', line: 10 } }) // HTML 제거
   })
 
   it('참조 안 되는 테이블은 제외(내용 참조 scoping)', () => {

@@ -28,6 +28,24 @@ export const BranchSignalSchema = z.object({
 })
 export type BranchSignal = z.infer<typeof BranchSignalSchema>
 
+/**
+ * 도메인 정책서 1개의 조립 입력(PD2/PD3) — PD3 가 confirmed-plan + skeleton + 분기신호로
+ * 채우고, domain-policy 방법론(PD2)이 GeneratedDoc 으로 렌더한다. 영속 산출이 아니라
+ * 메모리 계약이라 zod 대신 interface(분기는 이미 BranchSignal 로 검증됨).
+ */
+export interface DomainPolicyInput {
+  /** 도메인 키(불변, 파일명 닻 — docId=policy-domain-<key>). */
+  key: string
+  /** 표시명(confirmed-plan.name). */
+  name: string
+  /** §1 구성 — 도메인 멤버 클래스(파일 근거). */
+  classes: Array<{ className: string; relPath: string }>
+  /** §2 흐름 — skeleton flow 노드(진입점 file:line, 없으면 null). */
+  flows: Array<{ name: string; entry: { file: string; line: number } | null }>
+  /** §3 분기/조건 — 도메인 경계 안 결정 지점(PD1 분기 스캐너 산출, 경계로 필터). */
+  branches: BranchSignal[]
+}
+
 /** branch-signals.json — 분기 신호 산출물(결정론: relPath/line/kind/condition 정렬). */
 export const BranchSignalSetSchema = z.object({
   schemaVersion: z.literal(1),

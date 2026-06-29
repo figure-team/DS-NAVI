@@ -13,6 +13,8 @@ import type { DocInput } from '../builders/index.js'
 import { renderSkeleton } from '../render.js'
 import type { GeneratedDoc, Section } from '../types.js'
 import { getMethodology, listMethodologies } from './registry.js'
+import { buildSiTableSpec } from './si-standard.js'
+import type { DbSchemaModel } from '../../db-schema/types.js'
 
 // ──────────────────────────────────────────────────────────────────────────
 // 결정론 픽스처 — doc-generator.test.ts 와 동일 형태(근거 보유/미보유 혼합).
@@ -187,6 +189,51 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
     expect(row.confidence).toBe('CONFIRMED')
     expect(row.evidence).toEqual([{ file: 'schema/orders.sql', line: 1 }])
     expect(row.cells[5]).toBe('주문 테이블') // 설명=summary
+  })
+
+  it('si-테이블정의서(PA3): dbSchema 있으면 컬럼/타입/PK/FK/NULL 을 DDL 근거로 확정', () => {
+    const dbSchema: DbSchemaModel = {
+      schemaVersion: 1,
+      gitCommit: null,
+      tier: 'ddl+data',
+      sqlFileCount: 1,
+      tables: [
+        {
+          name: 'member',
+          relPath: 'db/ddl.sql',
+          line: 1,
+          comment: '회원',
+          columns: [
+            { name: 'member_id', type: 'BIGINT', nullable: false, primaryKey: true, unique: false, default: null, comment: 'PK', line: 2 },
+            { name: 'status_cd', type: 'VARCHAR(10)', nullable: false, primaryKey: false, unique: false, default: "'ACTIVE'", comment: null, line: 3 },
+          ],
+          primaryKey: ['member_id'],
+          uniques: [],
+          foreignKeys: [{ columns: ['status_cd'], refTable: 'common_code', refColumns: ['code'], line: 4 }],
+          checks: [],
+          indexes: [],
+          isCodeTable: false,
+          rows: [],
+          rowCount: 0,
+        },
+      ],
+      liveDbSignals: [],
+      unresolved: [],
+    }
+    const doc = buildSiTableSpec({ ...INPUT, dbSchema })
+    expect(doc.sections.map((s) => s.heading)).toEqual(['member 테이블 — 회원'])
+    const t = doc.sections[0].table!
+    expect(t.columns).toEqual(['컬럼', '타입', 'PK', 'FK', 'NULL', '설명'])
+    const pk = t.rows.find((r) => r.cells[0] === 'member_id')!
+    expect(pk.confidence).toBe('CONFIRMED')
+    expect(pk.evidence).toEqual([{ file: 'db/ddl.sql', line: 2 }])
+    expect(pk.cells[1]).toBe('BIGINT')
+    expect(pk.cells[2]).toBe('PK')
+    expect(pk.cells[4]).toBe('NOT NULL')
+    expect(pk.cells[5]).toBe('PK') // 설명=컬럼 주석
+    const fk = t.rows.find((r) => r.cells[0] === 'status_cd')!
+    expect(fk.cells[3]).toBe('→ common_code(code)')
+    expect(fk.cells[4]).toBe('NOT NULL')
   })
 
   it('grounding 불변: 모든 CONFIRMED 행은 근거≥1, 날조 없음', () => {

@@ -26,6 +26,7 @@ import {
   renderSkeleton,
 } from './render.js'
 import type { Claim, DocMeta, GeneratedDoc } from './types.js'
+import type { DbSchemaModel } from '../db-schema/types.js'
 
 // ──────────────────────────────────────────────────────────────────────────
 // 결정론 픽스처 — 근거(filePath+lineRange) 보유/미보유를 섞어 신뢰도 분기를 검증.
@@ -201,6 +202,54 @@ describe('builders: confidence + evidence grounding', () => {
     expect(access.length).toBe(1)
     expect(access[0].confidence).toBe('INFERRED')
     expect(access[0].text).toBe('데이터 접근: flow:place →접근→ tbl:orders')
+  })
+
+  it('db-spec(PA3): dbSchema 있으면 DDL 컬럼/PK/FK/CHECK 섹션 + .sql file:line 근거(CONFIRMED)', () => {
+    const dbSchema: DbSchemaModel = {
+      schemaVersion: 1,
+      gitCommit: null,
+      tier: 'ddl+data',
+      sqlFileCount: 1,
+      tables: [
+        {
+          name: 'member',
+          relPath: 'db/ddl.sql',
+          line: 1,
+          comment: '회원',
+          columns: [
+            { name: 'member_id', type: 'BIGINT', nullable: false, primaryKey: true, unique: false, default: null, comment: 'PK', line: 2 },
+            { name: 'status_cd', type: 'VARCHAR(10)', nullable: false, primaryKey: false, unique: false, default: "'ACTIVE'", comment: null, line: 3 },
+          ],
+          primaryKey: ['member_id'],
+          uniques: [],
+          foreignKeys: [{ columns: ['status_cd'], refTable: 'common_code', refColumns: ['code'], line: 4 }],
+          checks: [{ expression: 'balance >= 0', line: 5 }],
+          indexes: [],
+          isCodeTable: false,
+          rows: [],
+          rowCount: 0,
+        },
+      ],
+      liveDbSignals: [],
+      unresolved: [],
+    }
+    const doc = buildDbSpec({ ...INPUT, dbSchema })
+    const headings = doc.sections.map((s) => s.heading)
+    // 순서: 노드 기반 테이블/스키마 → DDL 섹션들 → 데이터 접근.
+    expect(headings).toEqual([
+      '테이블 / 스키마',
+      'DB 스키마 — 테이블 (DDL, tier=ddl+data)',
+      'DB 스키마 — 컬럼 (DDL)',
+      'DB 스키마 — 제약 (FK/CHECK)',
+      '데이터 접근',
+    ])
+    const cols = section(doc, 'DB 스키마 — 컬럼 (DDL)').claims
+    expect(cols.every((c) => c.confidence === 'CONFIRMED')).toBe(true)
+    expect(cols[0].evidence).toEqual([{ file: 'db/ddl.sql', line: 2 }])
+    expect(cols[0].text).toContain('member.member_id BIGINT [PK] [NOT NULL]')
+    const cons = section(doc, 'DB 스키마 — 제약 (FK/CHECK)').claims
+    expect(cons.some((c) => c.text === 'FK: member(status_cd) → common_code(code)')).toBe(true)
+    expect(cons.some((c) => c.text === 'CHECK: member — balance >= 0')).toBe(true)
   })
 })
 

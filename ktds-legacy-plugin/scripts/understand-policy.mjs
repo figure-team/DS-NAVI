@@ -43,11 +43,47 @@ const {
   applyDocTemplate,
   renderMarkdown,
   evidenceRate,
+  assembleDomainPolicies,
 } = engine
 
 const PLUGIN_DOC_DIR = join(here, '..', 'templates', 'doc')
 const PROJECT_DOC_DIR = join(projectRoot, '.understand-anything', 'doc')
 const OUTPUT_DIR = join(projectRoot, '.understand-anything', 'doc-output')
+
+// ── 도메인 정책서 모드(PD3): `understand-policy <root> domain` ──────────────
+// confirm/emit 이후 산출물(candidates + domain-graph)에서 도메인별 정책서를 만든다.
+// 분기(if/switch/삼항)는 도메인 경계 안에서만 스캔 → 위치·조건식 [확정], 업무분류는 PD4 보강.
+if (process.argv[3] === 'domain') {
+  let inputs
+  try {
+    inputs = await assembleDomainPolicies(projectRoot)
+  } catch (err) {
+    console.error(`도메인 정책서 조립 실패: ${err.message}`)
+    process.exit(2)
+  }
+  mkdirSync(OUTPUT_DIR, { recursive: true })
+  const meta = []
+  for (const doc of getMethodology('domain-policy').buildDocSet({ nodes: [], edges: [], domainPolicies: inputs })) {
+    const m = {
+      docId: doc.docId,
+      title: doc.title,
+      methodology: doc.methodology,
+      status: 'DRAFT',
+      sourceCommit: null,
+      evidenceRate: evidenceRate(doc),
+    }
+    writeFileSync(join(OUTPUT_DIR, `${doc.docId}.md`), renderMarkdown(doc, m), 'utf8')
+    meta.push(m)
+  }
+  console.log(`understand-policy(도메인) 완료 — ${projectRoot}`)
+  console.log(`  도메인 정책서 ${meta.length}종 → .understand-anything/doc-output/:`)
+  for (let i = 0; i < inputs.length; i++) {
+    const d = inputs[i]
+    console.log(`    - policy-domain-${d.key}: ${d.name} (클래스 ${d.classes.length}·흐름 ${d.flows.length}·분기 ${d.branches.length})`)
+  }
+  console.log('분기 위치·조건식 = 결정론 [확정]. 업무분류(권한/상태/계산)·의미 = SKILL 보강에서 [추정](합성 금지).')
+  process.exit(0)
+}
 
 // 1) census — 파일 인구조사(.sql/.java 발견).
 const census = buildCensus(projectRoot)

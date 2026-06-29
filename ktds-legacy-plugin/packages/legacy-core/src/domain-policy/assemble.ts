@@ -14,13 +14,64 @@ import { join } from 'node:path'
 import { specMapDir } from '../domain-map/persist.js'
 import { CandidatesReportSchema } from '../domain-map/types.js'
 import type { CandidatesReport, UaGraphEdge, UaGraphNode } from '../domain-map/types.js'
-import { scanBranches } from './branch-scanner.js'
+import { extractBranches } from './branch-scanner.js'
+import { readDbSchema } from '../db-schema/index.js'
+import type { DbSchemaModel } from '../db-schema/index.js'
 import type { BranchSignal, DomainPolicyInput } from './types.js'
+
+type Term = NonNullable<DomainPolicyInput['terms']>[number]
+type StatusCode = NonNullable<DomainPolicyInput['statusCodes']>[number]
 
 /** emit 된 도메인 그래프(부분) — 흐름/도메인 표시명 출처. */
 export interface DomainGraphLite {
   nodes: UaGraphNode[]
   edges: UaGraphEdge[]
+}
+
+function cmp(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0
+}
+
+/** 테이블이 도메인 소스에서 참조되는가 — 테이블명이 도메인 파일 텍스트에 등장(내용 참조 scoping). */
+function referencedIn(text: string, tableName: string): boolean {
+  return tableName.length >= 4 && text.toLowerCase().includes(tableName.toLowerCase())
+}
+
+/**
+ * §3 상태값 — 도메인이 참조하는 코드/룩업 테이블의 dataload 행을 코드값으로(결정론).
+ * group=테이블 · code=첫 컬럼값 · 명칭=둘째 · 설명=셋째. 근거=행 file:line.
+ */
+export function deriveStatusCodes(dbSchema: DbSchemaModel | null, text: string): StatusCode[] {
+  if (!dbSchema) return []
+  const out: StatusCode[] = []
+  for (const t of dbSchema.tables) {
+    if (!t.isCodeTable || t.rows.length === 0 || !referencedIn(text, t.name)) continue
+    const cols = t.columns.map((c) => c.name)
+    for (const r of t.rows) {
+      out.push({
+        group: t.name,
+        code: r.values[cols[0]] ?? '',
+        name: cols[1] ? (r.values[cols[1]] ?? '') : '',
+        desc: cols[2] ? (r.values[cols[2]] ?? '') : '',
+        evidence: { file: t.relPath, line: r.line },
+      })
+    }
+  }
+  return out
+}
+
+/** §2 용어 — 도메인이 참조하는 테이블/컬럼의 DB 주석(있을 때). 합성 아님 — 주석 원문. */
+export function deriveTerms(dbSchema: DbSchemaModel | null, text: string): Term[] {
+  if (!dbSchema) return []
+  const out: Term[] = []
+  for (const t of dbSchema.tables) {
+    if (!referencedIn(text, t.name)) continue
+    if (t.comment) out.push({ term: t.name, definition: t.comment, note: 'DB 테이블 주석', evidence: { file: t.relPath, line: t.line } })
+    for (const c of t.columns) {
+      if (c.comment) out.push({ term: `${t.name}.${c.name}`, definition: c.comment, note: 'DB 컬럼 주석', evidence: { file: t.relPath, line: c.line } })
+    }
+  }
+  return out
 }
 
 /** relPath → 클래스명(파일 basename, 확장자 제거). */
@@ -43,6 +94,8 @@ export function buildDomainPolicyInputs(
   candidates: CandidatesReport,
   domainGraph: DomainGraphLite | null,
   branchesByKey: Map<string, BranchSignal[]>,
+  termsByKey: Map<string, Term[]> = new Map(),
+  statusByKey: Map<string, StatusCode[]> = new Map(),
 ): DomainPolicyInput[] {
   // domain:<key> 노드 표시명 + contains_flow 흐름 인덱스.
   const nameByKey = new Map<string, string>()
@@ -78,6 +131,8 @@ export function buildDomainPolicyInputs(
       .map((f) => ({ className: classNameOf(f.relPath), relPath: f.relPath })),
     flows: flowsByKey.get(c.key) ?? [],
     branches: branchesByKey.get(c.key) ?? [],
+    terms: termsByKey.get(c.key) ?? [],
+    statusCodes: statusByKey.get(c.key) ?? [],
   }))
 }
 
@@ -132,15 +187,35 @@ export async function assembleDomainPolicies(projectRoot: string): Promise<Domai
     }
   }
 
+  const dbSchema = readDbSchema(projectRoot)
   const branchesByKey = new Map<string, BranchSignal[]>()
+  const termsByKey = new Map<string, Term[]>()
+  const statusByKey = new Map<string, StatusCode[]>()
   for (const c of candidates.candidates) {
     // 후보 멤버 .java ∪ flow 진입점 .java (둘 다 운영 소스만). 도메인 경계 한정.
     const files = new Set(c.files.filter((f) => isPolicyJava(f.relPath)).map((f) => f.relPath))
     for (const ef of entryFilesByKey.get(c.key) ?? []) {
       if (isPolicyJava(ef)) files.add(ef)
     }
-    const set = await scanBranches(projectRoot, [...files])
-    branchesByKey.set(c.key, set.signals)
+    // 파일 1회 읽어 분기 추출 + 텍스트 누적(테이블 참조 scoping 용).
+    const signals: BranchSignal[] = []
+    let domainText = ''
+    for (const rel of [...files].sort(cmp)) {
+      let src: string
+      try {
+        src = readFileSync(join(projectRoot, rel), 'utf8')
+      } catch {
+        continue
+      }
+      domainText += `\n${src}`
+      signals.push(...(await extractBranches(rel, src)))
+    }
+    signals.sort(
+      (a, b) => cmp(a.relPath, b.relPath) || a.line - b.line || cmp(a.kind, b.kind) || cmp(a.condition, b.condition),
+    )
+    branchesByKey.set(c.key, signals)
+    termsByKey.set(c.key, deriveTerms(dbSchema, domainText))
+    statusByKey.set(c.key, deriveStatusCodes(dbSchema, domainText))
   }
-  return buildDomainPolicyInputs(candidates, domainGraph, branchesByKey)
+  return buildDomainPolicyInputs(candidates, domainGraph, branchesByKey, termsByKey, statusByKey)
 }

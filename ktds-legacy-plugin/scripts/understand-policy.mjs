@@ -61,9 +61,28 @@ if (process.argv[3] === 'domain') {
     console.error(`도메인 정책서 조립 실패: ${err.message}`)
     process.exit(2)
   }
+  // 템플릿 — 전 도메인 공용 1개(domain-policy/domain.md). 프로젝트 override → 플러그인 동봉.
+  // 헤딩/열이름/섹션순서를 제어하되 docId/title 은 도메인별이므로 적용 후 복원한다.
+  const domTplRel = join('domain-policy', 'domain.md')
+  const domTplProject = join(PROJECT_DOC_DIR, domTplRel)
+  const domTplPlugin = join(PLUGIN_DOC_DIR, domTplRel)
+  const domTplPath = existsSync(domTplProject) ? domTplProject : existsSync(domTplPlugin) ? domTplPlugin : null
+  let domTpl = null
+  if (domTplPath) {
+    try {
+      domTpl = parseDocTemplate(readFileSync(domTplPath, 'utf8'))
+    } catch (err) {
+      console.error(`도메인 정책 템플릿 파싱 실패(${domTplRel}): ${err.message}`)
+      process.exit(2)
+    }
+  }
+  const domTplOverridden = domTplPath === domTplProject
+
   mkdirSync(OUTPUT_DIR, { recursive: true })
   const meta = []
-  for (const doc of getMethodology('domain-policy').buildDocSet({ nodes: [], edges: [], domainPolicies: inputs })) {
+  for (const built of getMethodology('domain-policy').buildDocSet({ nodes: [], edges: [], domainPolicies: inputs })) {
+    // 템플릿 적용 시 docId/title 이 자리표시로 덮이므로 빌더 값으로 복원(도메인별 식별 유지).
+    const doc = domTpl ? { ...applyDocTemplate(built, domTpl), docId: built.docId, title: built.title } : built
     const m = {
       docId: doc.docId,
       title: doc.title,
@@ -80,6 +99,11 @@ if (process.argv[3] === 'domain') {
   for (let i = 0; i < inputs.length; i++) {
     const d = inputs[i]
     console.log(`    - policy-domain-${d.key}: ${d.name} (클래스 ${d.classes.length}·흐름 ${d.flows.length}·분기 ${d.branches.length})`)
+  }
+  if (domTplOverridden) {
+    console.log(`  템플릿 프로젝트 override: domain-policy/domain.md (${PROJECT_DOC_DIR}/domain-policy/)`)
+  } else if (!domTpl) {
+    console.log('  템플릿 없음 — 빌더 기본 구조로 렌더(domain-policy/domain.md 두면 헤딩/열 override 가능).')
   }
   console.log('분기 위치·조건식 = 결정론 [확정]. 업무분류(권한/상태/계산)·의미 = SKILL 보강에서 [추정](합성 금지).')
   process.exit(0)

@@ -15,6 +15,8 @@ export {
 } from './types.js'
 export type { BranchKind, BranchSignal, BranchSignalSet, DomainPolicyInput } from './types.js'
 export { extractBranches, scanBranches } from './branch-scanner.js'
+export { buildDomainPolicyInputs, assembleDomainPolicies } from './assemble.js'
+export type { DomainGraphLite } from './assemble.js'
 
 /** branch-signals.json 기록(`.spec/map/` mkdir -p 선행). */
 export function writeBranchSignals(projectRoot: string, model: BranchSignalSet): void {

@@ -165,6 +165,70 @@ export function buildDomainPolicyInputs(
   }))
 }
 
+/**
+ * 정책 토픽 자동 분리 — 한 도메인을 그 도메인의 **상태값 그룹을 참조하는 분기**별 토픽으로 쪼갠다.
+ * (실무: 도메인 1개 ≠ 정책 1개. 정책 토픽은 보통 상태값 코드그룹 단위.)
+ *
+ * 한 분기가 어떤 그룹에 속하는가: 조건/처리 텍스트에 그 그룹의 **코드값**(≥3자)이나
+ * **그룹명**(≥4자)이 등장하면 그 그룹 토픽. 어디에도 안 걸리면 잔여(처리 정책) 토픽.
+ * **그룹에 걸리는 분기가 하나도 없으면 분리하지 않는다**(단일 유지 — 보수적, 오분리 방지).
+ */
+export function splitByTopic(d: DomainPolicyInput): DomainPolicyInput[] {
+  const groups = [...new Set((d.statusCodes ?? []).map((s) => s.group))]
+  if (groups.length === 0 || d.branches.length === 0) return [d]
+
+  const codesByGroup = new Map<string, string[]>()
+  for (const s of d.statusCodes ?? []) {
+    const list = codesByGroup.get(s.group) ?? []
+    if (s.code.length >= 3) list.push(s.code.toLowerCase())
+    codesByGroup.set(s.group, list)
+  }
+  const tieOf = (b: BranchSignal): string | null => {
+    const text = `${b.condition} ${b.then}`.toLowerCase()
+    for (const g of [...groups].sort(cmp)) {
+      if (g.length >= 4 && text.includes(g.toLowerCase())) return g
+      if ((codesByGroup.get(g) ?? []).some((c) => text.includes(c))) return g
+    }
+    return null
+  }
+
+  const byTopic = new Map<string | null, BranchSignal[]>()
+  for (const b of d.branches) {
+    const g = tieOf(b)
+    const list = byTopic.get(g) ?? []
+    list.push(b)
+    byTopic.set(g, list)
+  }
+  const tiedGroups = [...byTopic.keys()].filter((k): k is string => k !== null).sort(cmp)
+  if (tiedGroups.length === 0) return [d] // 강한 근거 없음 → 단일 유지
+
+  const out: DomainPolicyInput[] = []
+  for (const g of tiedGroups) {
+    out.push({
+      key: `${d.key}-${g.toLowerCase()}`,
+      name: `${d.name} — ${g} 정책`,
+      classes: d.classes,
+      flows: d.flows,
+      branches: byTopic.get(g) ?? [],
+      terms: d.terms,
+      statusCodes: (d.statusCodes ?? []).filter((s) => s.group === g),
+    })
+  }
+  const residual = byTopic.get(null) ?? []
+  if (residual.length > 0) {
+    out.push({
+      key: d.key,
+      name: `${d.name} 처리 정책`,
+      classes: d.classes,
+      flows: d.flows,
+      branches: residual,
+      terms: d.terms,
+      statusCodes: (d.statusCodes ?? []).filter((s) => !tiedGroups.includes(s.group)),
+    })
+  }
+  return out
+}
+
 /** .spec/map/candidates.json 로드(zod 검증). 없으면 null. */
 function readCandidates(projectRoot: string): CandidatesReport | null {
   const path = join(specMapDir(projectRoot), 'candidates.json')
@@ -249,5 +313,6 @@ export async function assembleDomainPolicies(projectRoot: string): Promise<Domai
     termsByKey.set(c.key, [...deriveTerms(dbSchema, domainText), ...enumTerms(enums)])
     statusByKey.set(c.key, [...deriveStatusCodes(dbSchema, domainText), ...enumStatusCodes(enums)])
   }
-  return buildDomainPolicyInputs(candidates, domainGraph, branchesByKey, termsByKey, statusByKey)
+  // 도메인 입력 → 정책 토픽 단위로 분리(상태값 그룹 참조 분기가 있을 때만; 없으면 도메인=단일 토픽).
+  return buildDomainPolicyInputs(candidates, domainGraph, branchesByKey, termsByKey, statusByKey).flatMap(splitByTopic)
 }

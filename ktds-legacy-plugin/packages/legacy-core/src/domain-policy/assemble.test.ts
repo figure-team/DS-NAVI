@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { buildDomainPolicyInputs, deriveStatusCodes, deriveTerms, type DomainGraphLite } from './assemble.js'
+import { buildDomainPolicyInputs, deriveStatusCodes, deriveTerms, splitByTopic, type DomainGraphLite } from './assemble.js'
 import type { CandidatesReport } from '../domain-map/types.js'
 import type { DbSchemaModel } from '../db-schema/types.js'
-import type { BranchSignal } from './types.js'
+import type { BranchSignal, DomainPolicyInput } from './types.js'
 
 const candidates: CandidatesReport = {
   schemaVersion: 1,
@@ -113,5 +113,49 @@ describe('§3 상태값 / §2 용어 자동 채움 (db-schema)', () => {
   it('db-schema 없으면 빈 배열', () => {
     expect(deriveStatusCodes(null, 'x')).toEqual([])
     expect(deriveTerms(null, 'x')).toEqual([])
+  })
+})
+
+describe('정책 토픽 자동 분리 (splitByTopic)', () => {
+  const br = (line: number, condition: string, then = ''): BranchSignal => ({
+    relPath: 'web/OrderBean.java', line, className: 'OrderBean', methodName: 'm', kind: 'if', condition, then,
+  })
+  const base: DomainPolicyInput = {
+    key: 'order',
+    name: '주문',
+    classes: [],
+    flows: [],
+    statusCodes: [
+      { group: 'SHIP_TYPE', code: '01', name: '무료', desc: '', evidence: null },
+      { group: 'SHIP_TYPE', code: '02', name: '유료', desc: '', evidence: null },
+    ],
+    terms: [],
+    branches: [
+      br(10, 'shipType == SHIP_TYPE_FREE'), // 그룹명 SHIP_TYPE 참조 → 토픽
+      br(20, 'cart.isEmpty()'), // 미참조 → 잔여
+    ],
+  }
+
+  it('상태값 그룹 참조 분기 → 그룹 토픽 + 잔여 토픽 분리', () => {
+    const out = splitByTopic(base)
+    expect(out.map((d) => d.key)).toEqual(['order-ship_type', 'order'])
+    const topic = out.find((d) => d.key === 'order-ship_type')!
+    expect(topic.name).toBe('주문 — SHIP_TYPE 정책')
+    expect(topic.branches.map((b) => b.line)).toEqual([10])
+    expect(topic.statusCodes!.every((s) => s.group === 'SHIP_TYPE')).toBe(true)
+    const residual = out.find((d) => d.key === 'order')!
+    expect(residual.name).toBe('주문 처리 정책')
+    expect(residual.branches.map((b) => b.line)).toEqual([20])
+  })
+
+  it('그룹 참조 분기 없으면 단일 유지(보수적, 오분리 방지)', () => {
+    const out = splitByTopic({ ...base, branches: [br(20, 'cart.isEmpty()')] })
+    expect(out.length).toBe(1)
+    expect(out[0].key).toBe('order')
+  })
+
+  it('상태값 없으면 단일 유지', () => {
+    const out = splitByTopic({ ...base, statusCodes: [] })
+    expect(out.length).toBe(1)
   })
 })

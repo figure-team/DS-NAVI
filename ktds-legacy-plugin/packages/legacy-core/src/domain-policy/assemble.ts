@@ -14,7 +14,8 @@ import { join } from 'node:path'
 import { specMapDir } from '../domain-map/persist.js'
 import { CandidatesReportSchema } from '../domain-map/types.js'
 import type { CandidatesReport, UaGraphEdge, UaGraphNode } from '../domain-map/types.js'
-import { extractBranches } from './branch-scanner.js'
+import { extractBranches, extractEnums } from './branch-scanner.js'
+import type { EnumFact } from './branch-scanner.js'
 import { readDbSchema } from '../db-schema/index.js'
 import type { DbSchemaModel } from '../db-schema/index.js'
 import type { BranchSignal, DomainPolicyInput } from './types.js'
@@ -69,6 +70,23 @@ export function deriveStatusCodes(dbSchema: DbSchemaModel | null, text: string):
     }
   }
   return out
+}
+
+/** Java enum → §3 상태값(그룹=enum 이름, 코드=상수). 도메인 파일의 enum 은 가장 깨끗한 상태값 소스. */
+function enumStatusCodes(enums: EnumFact[]): StatusCode[] {
+  return enums.flatMap((e) =>
+    e.constants.map((code) => ({ group: e.enumName, code, name: '', desc: '', evidence: { file: e.relPath, line: e.line } })),
+  )
+}
+
+/** Java enum → §2 용어(이름=용어, 상수 목록=정의). */
+function enumTerms(enums: EnumFact[]): Term[] {
+  return enums.map((e) => ({
+    term: e.enumName,
+    definition: `enum 상수: ${e.constants.join(', ')}`,
+    note: 'Java enum',
+    evidence: { file: e.relPath, line: e.line },
+  }))
 }
 
 /** §2 용어 — 도메인이 참조하는 테이블/컬럼의 DB 주석(있을 때). 합성 아님 — 주석 원문. */
@@ -208,8 +226,9 @@ export async function assembleDomainPolicies(projectRoot: string): Promise<Domai
     for (const ef of entryFilesByKey.get(c.key) ?? []) {
       if (isPolicyJava(ef)) files.add(ef)
     }
-    // 파일 1회 읽어 분기 추출 + 텍스트 누적(테이블 참조 scoping 용).
+    // 파일 1회 읽어 분기 + enum 추출 + 텍스트 누적(테이블 참조 scoping 용).
     const signals: BranchSignal[] = []
+    const enums: EnumFact[] = []
     let domainText = ''
     for (const rel of [...files].sort(cmp)) {
       let src: string
@@ -220,13 +239,15 @@ export async function assembleDomainPolicies(projectRoot: string): Promise<Domai
       }
       domainText += `\n${src}`
       signals.push(...(await extractBranches(rel, src)))
+      enums.push(...(await extractEnums(rel, src)))
     }
     signals.sort(
       (a, b) => cmp(a.relPath, b.relPath) || a.line - b.line || cmp(a.kind, b.kind) || cmp(a.condition, b.condition),
     )
     branchesByKey.set(c.key, signals)
-    termsByKey.set(c.key, deriveTerms(dbSchema, domainText))
-    statusByKey.set(c.key, deriveStatusCodes(dbSchema, domainText))
+    // 상태값/용어 = DB(코드 테이블·주석) + Java enum 병합.
+    termsByKey.set(c.key, [...deriveTerms(dbSchema, domainText), ...enumTerms(enums)])
+    statusByKey.set(c.key, [...deriveStatusCodes(dbSchema, domainText), ...enumStatusCodes(enums)])
   }
   return buildDomainPolicyInputs(candidates, domainGraph, branchesByKey, termsByKey, statusByKey)
 }

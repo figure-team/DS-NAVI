@@ -285,55 +285,81 @@ describe('determinism: SI golden skeleton + double-run', () => {
 })
 
 // ──────────────────────────────────────────────────────────────────────────
-// domain-policy(PD2) — 도메인당 1문서: §1 구성 · §2 흐름 · §3 조건 분기.
+// domain-policy — 정책 정의서 §0~§8 양식(문서정보/개요/용어/상태값/의사결정테이블/예외/흐름/검증/미결).
 // ──────────────────────────────────────────────────────────────────────────
 
 const ORDER_DOMAIN: DomainPolicyInput = {
   key: 'order',
-  name: '주문',
+  name: '주문 체크아웃',
   classes: [{ className: 'OrderActionBean', relPath: 'web/OrderActionBean.java' }],
   flows: [{ name: 'checkout', entry: { file: 'web/OrderActionBean.java', line: 142 } }],
   branches: [
-    { relPath: 'web/OrderActionBean.java', line: 125, className: 'OrderActionBean', methodName: 'newOrderForm', kind: 'if', condition: '!acc.isAuthenticated()' },
-    { relPath: 'web/OrderActionBean.java', line: 145, className: 'OrderActionBean', methodName: 'newOrder', kind: 'switch', condition: 'state' },
+    { relPath: 'web/OrderActionBean.java', line: 125, className: 'OrderActionBean', methodName: 'newOrderForm', kind: 'if', condition: '!acc.isAuthenticated()', then: 'return BLOCK;' },
+    { relPath: 'web/OrderActionBean.java', line: 150, className: 'OrderActionBean', methodName: 'newOrder', kind: 'if', condition: 'getOrder() != null', then: 'insertOrder(order); return VIEW;' },
   ],
 }
 
-describe('domain-policy 방법론 (PD2)', () => {
-  it('도메인당 1문서(docId/title) + §1구성/§2흐름/§3분기 섹션', () => {
+describe('domain-policy 방법론 — 정책 정의서 §0~§8', () => {
+  it('docId/title + §0~§8 섹션 골격', () => {
     const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
     expect(doc.docId).toBe('policy-domain-order')
-    expect(doc.title).toBe('도메인 정책 — 주문')
+    expect(doc.title).toBe('주문 체크아웃 정책 정의서')
     expect(doc.methodology).toBe('domain-policy')
     expect(doc.sections.map((s) => s.heading)).toEqual([
-      '도메인 구성',
-      '업무 흐름',
-      '조건 분기 (위치·조건식 = 확정 · 업무분류 = PD4 보강)',
+      '문서 정보',
+      '개정 이력',
+      '개요',
+      '용어 정의',
+      '상태값 정의',
+      '정책 규칙 — 의사결정 테이블',
+      '예외 및 엣지 케이스',
+      '처리 흐름 (의사코드)',
+      '검증 시나리오',
+      '미결 사항',
     ])
   })
 
-  it('§3 분기 — 조건식·종류 + file:line 근거(CONFIRMED)', () => {
+  it('§4 의사결정 테이블 — 분기→PL-ID·IF·THEN + file:line 근거(CONFIRMED)', () => {
     const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
-    const br = doc.sections.find((s) => s.key === 'domain-branches')!.table!
-    expect(br.columns).toEqual(['메서드', '조건식', '분기 종류'])
-    const row = br.rows.find((r) => r.cells[0] === 'newOrderForm')!
-    expect(row.cells[1]).toBe('!acc.isAuthenticated()')
-    expect(row.confidence).toBe('CONFIRMED')
-    expect(row.evidence).toEqual([{ file: 'web/OrderActionBean.java', line: 125 }])
+    const dt = doc.sections.find((s) => s.key === 'decision-table')!.table!
+    expect(dt.columns).toEqual(['정책 ID', '정책명', '적용 조건 (IF)', '처리 내용 (THEN)', '우선순위', '예외/비고'])
+    const r0 = dt.rows[0]
+    expect(r0.cells[0]).toBe('PL-001')
+    expect(r0.cells[2]).toBe('!acc.isAuthenticated()') // IF
+    expect(r0.cells[3]).toBe('return BLOCK;') // THEN
+    expect(r0.confidence).toBe('CONFIRMED')
+    expect(r0.evidence).toEqual([{ file: 'web/OrderActionBean.java', line: 125 }])
+    const r1 = dt.rows[1]
+    expect(r1.cells[3]).toBe('insertOrder(order); return VIEW;') // THEN 본문 시드
   })
 
-  it('분기 0이면 "조건 없음" 단정(빈 표 + 안내 claim)', () => {
+  it('§6 처리 흐름 — 메서드: IF→THEN claim(CONFIRMED)', () => {
+    const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
+    const flow = doc.sections.find((s) => s.key === 'process-flow')!
+    expect(flow.claims.some((c) => c.text.includes('IF !acc.isAuthenticated() →'))).toBe(true)
+    expect(flow.claims.every((c) => c.confidence === 'CONFIRMED')).toBe(true)
+  })
+
+  it('§3 상태값 미발견 → 안내 + §8 미결 자동 시드', () => {
+    const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
+    const status = doc.sections.find((s) => s.key === 'status-codes')!
+    expect(status.table!.rows.length).toBe(0)
+    expect(status.claims[0].text).toContain('상태값 코드')
+    const issues = doc.sections.find((s) => s.key === 'open-issues')!.table!
+    expect(issues.rows.some((r) => r.cells[1].includes('상태값 코드'))).toBe(true)
+  })
+
+  it('분기 0이면 §4 "조건 분기 없음" 단정(빈 표 + 안내 claim)', () => {
     const doc = buildDomainPolicyDoc({ ...ORDER_DOMAIN, branches: [] })
-    const sec = doc.sections.find((s) => s.key === 'domain-branches')!
+    const sec = doc.sections.find((s) => s.key === 'decision-table')!
     expect(sec.table!.rows.length).toBe(0)
-    expect(sec.claims[0].text).toContain('조건부 정책 부재')
+    expect(sec.claims[0].text).toContain('무조건 처리')
   })
 
   it('방법론 buildDocSet: domainPolicies → 도메인당 1문서(동적)', () => {
     const docs = getMethodology('domain-policy').buildDocSet({ ...INPUT, domainPolicies: [ORDER_DOMAIN] })
     expect(docs.length).toBe(1)
     expect(docs[0].docId).toBe('policy-domain-order')
-    // domainPolicies 없으면 0문서(우아한 빈).
     expect(getMethodology('domain-policy').buildDocSet(INPUT).length).toBe(0)
   })
 })

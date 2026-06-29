@@ -14,7 +14,8 @@ export {
   BranchSignalSetSchema,
 } from './types.js'
 export type { BranchKind, BranchSignal, BranchSignalSet, DomainPolicyInput } from './types.js'
-export { extractBranches, scanBranches } from './branch-scanner.js'
+export { extractBranches, scanBranches, extractEnums } from './branch-scanner.js'
+export type { EnumFact } from './branch-scanner.js'
 export { buildDomainPolicyInputs, assembleDomainPolicies } from './assemble.js'
 export type { DomainGraphLite } from './assemble.js'
 

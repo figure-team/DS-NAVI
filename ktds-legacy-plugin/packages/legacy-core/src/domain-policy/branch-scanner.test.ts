@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { readFileSync } from 'node:fs'
-import { extractBranches, scanBranches } from './branch-scanner.js'
+import { extractBranches, scanBranches, extractEnums } from './branch-scanner.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const fixtureDir = join(here, '..', '..', 'fixtures', 'domain-policy')
@@ -58,5 +58,26 @@ describe('분기 스캐너 (PD1)', () => {
   it('읽기 실패 파일은 건너뜀(누락 방어)', async () => {
     const set = await scanBranches(fixtureDir, ['nope.java', rel])
     expect(set.fileCount).toBe(1) // 존재하는 1개만
+  })
+})
+
+describe('enum 추출 (§3 상태값 시드)', () => {
+  const enumSrc = `package com.example;
+public enum MemberStatus {
+  ACTIVE,
+  DORMANT,
+  WITHDRAWN
+}`
+
+  it('enum 이름 + 상수 목록 + file:line', async () => {
+    const enums = await extractEnums('domain/MemberStatus.java', enumSrc)
+    expect(enums.length).toBe(1)
+    expect(enums[0].enumName).toBe('MemberStatus')
+    expect(enums[0].constants).toEqual(['ACTIVE', 'DORMANT', 'WITHDRAWN'])
+    expect(enums[0].line).toBeGreaterThan(0)
+  })
+
+  it('enum 없는 파일 → 빈 배열', async () => {
+    expect(await extractEnums('x.java', 'package p; class C {}')).toEqual([])
   })
 })

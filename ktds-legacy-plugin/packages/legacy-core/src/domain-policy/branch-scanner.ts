@@ -115,6 +115,39 @@ function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
 }
 
+/** Java enum 1개 — 상태값(코드) 후보. 이름=코드 그룹, 상수=코드값. */
+export interface EnumFact {
+  enumName: string
+  constants: string[]
+  relPath: string
+  line: number
+}
+
+/** 한 Java 파일의 enum 선언을 추출한다(이름 + 상수 목록). §3 상태값·§2 용어 시드. */
+export async function extractEnums(relPath: string, src: string): Promise<EnumFact[]> {
+  const root = await parseSource('java', src)
+  const out: EnumFact[] = []
+  const walk = (node: Node): void => {
+    if (node.type === 'enum_declaration') {
+      const name = node.childForFieldName('name')?.text ?? ''
+      const body = node.namedChildren.find((c): c is Node => c != null && c.type === 'enum_body')
+      const constants: string[] = []
+      if (body) {
+        for (const c of body.namedChildren) {
+          if (c && c.type === 'enum_constant') {
+            const cn = c.childForFieldName('name')?.text ?? c.namedChildren.find((x): x is Node => x != null && x.type === 'identifier')?.text
+            if (cn) constants.push(cn)
+          }
+        }
+      }
+      if (name) out.push({ enumName: name, constants, relPath, line: startLine(node) })
+    }
+    for (const c of node.namedChildren) if (c) walk(c)
+  }
+  walk(root)
+  return out
+}
+
 /**
  * 여러 Java 파일(relPaths)을 스캔해 분기 신호 집합을 만든다(IO).
  * 호출자가 대상 파일을 한정(PD3: 도메인 경계 = skeleton.stepSources 의 클래스 파일).

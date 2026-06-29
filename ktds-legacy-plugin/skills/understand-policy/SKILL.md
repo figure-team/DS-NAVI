@@ -1,7 +1,7 @@
 ---
 name: understand-policy
-description: 정책서(.md) 생성 — 코드/DB 신호에서 정책 앵커 추출 후 LLM 보강. PoC 4종(용어/데이터/검증/권한), 모든 행 file:line 근거
-argument-hint: ["[projectRoot]"]
+description: 정책서(.md) 생성 — 코드/DB 신호에서 정책 앵커 추출 후 LLM 보강. 카테고리 4종(용어/데이터/검증/권한) + 도메인별 정책서(흐름·조건 분기), 모든 행 file:line 근거
+argument-hint: ["[projectRoot]", "[domain]"]
 ---
 
 # /understand-policy
@@ -15,7 +15,10 @@ argument-hint: ["[projectRoot]"]
 1. **결정론 추출(스크립트)** — 정책의 **앵커(file:line)** 만 표로 싣는다. 합성 금지.
 2. **LLM 보강(이 스킬)** — 앵커 소스를 읽어 규범 진술·값을 채우고 `[추정]` 표기한다.
 
-PoC 카테고리 4종: **용어/도메인 사전 · 데이터 정책 · 업무규칙(Validation) · 권한 정책**.
+두 갈래의 정책서를 만든다:
+
+- **카테고리 정책서** — 코드/DB 신호를 종류별로: 용어/도메인 사전 · 데이터 정책 · 업무규칙(Validation) · 권한 정책.
+- **도메인 정책서**(`domain` 모드) — 한 업무 도메인의 **흐름**과 그 안의 **조건 분기**(권한/상태/계산)를 정리. 아래 "도메인 정책서" 절 참조.
 
 ## 1단계 — 결정론 추출(스크립트 실행)
 
@@ -28,6 +31,8 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot>
   - `.understand-anything/doc-output/policy-{glossary,data,validation,authz}.md` — 앵커 표(신뢰도/근거 열 포함).
   - `.spec/map/db-schema.json`, `.spec/map/policy-signals.json` — 중간 신호(재사용).
 - DB 자산 게이팅: `tier=ddl+data`(상태/요율 행까지) / `ddl`(구조만) / `code-only`(.sql 없음 → 코드역추론 폴백).
+- **db-schema 소스**: `/understand-map scan` 이 산출한 `.spec/map/db-schema.json` 을 있으면 로드(맵 미실행 시만 자체 생성). DDL 의 컬럼/PK/FK/CHECK 는 DB 명세서(`si-테이블정의서`/`05_db-spec`)에도 함께 쓰인다.
+- **라이브 DB 게이트(PA-gate)**: 빌드/설정에서 **외부** 라이브 DB(JDBC 드라이버·datasource URL)가 감지되면(내장형 h2/hsqldb 제외) — `.sql` 유무와 무관하게 사용자에게 **"권위 스키마를 .sql 로 덤프해 넣기"를 권장**한다(라이브 직접 연결은 미지원). 기존 `.sql` 로 진행해도 무방.
 
 ## 2단계 — LLM 보강
 
@@ -52,6 +57,44 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot>
 - **합성 금지**: 소스에 없는 정책을 지어내지 않는다. 불명은 `[추정]`/`[확인 필요]`로 남긴다.
 - **앵커 보존**: 스크립트가 만든 표의 행·근거를 지우지 않는다(보강은 덧붙이기).
 - 재실행 시 1단계는 앵커를 갱신(보강분 덮어씀)하므로, 보강은 1단계 후 다시 적용한다.
+
+## 도메인 정책서 (`domain` 모드)
+
+카테고리 정책서와 별개로, **한 업무 도메인**(주문/계정/카탈로그…)의 흐름과 그 안의 **조건 분기**를
+정리한다. "주문 흐름 안에서 상품 종류·사용자 권한에 따라 처리가 달라지는가?" 같은 질문에 답한다.
+
+> 전제: `/understand-map` 의 `scan`(+ 가능하면 `confirm`→`emit`)이 끝나 있어야 한다
+> (`candidates.json` 필요, 흐름·표시명은 emit 된 `domain-graph.json` 에서).
+
+### 1단계 — 결정론 추출
+
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot> domain
+```
+
+- 도메인별 1문서: `.understand-anything/doc-output/policy-domain-<key>.md`.
+- 각 문서: **§1 도메인 구성**(멤버 클래스) · **§2 업무 흐름**(진입점 file:line) · **§3 조건 분기**.
+- §3 분기표: `메서드 | 조건식 | 분기 종류(if/switch/삼항) | 신뢰도 | 근거`. **위치·조건식·종류는 결정론 `[확정]`**.
+  분기는 도메인 경계 안(후보 멤버 + 흐름 진입점 .java)에서만 스캔하고 운영 소스만 본다(테스트 제외).
+- **분기 0이면** "조건 없음 — 무조건 흐름(조건부 정책 부재)"을 코드 근거로 단정한다(이것도 가치 있는 발견).
+
+### 2단계 — LLM 보강 (분기 → 업무 정책)
+
+각 `policy-domain-*.md` §3 의 모든 행에 대해 **앵커(`file:line`)를 직접 열어** 그 분기가 무엇인지 분류·명문화한다.
+분기 **종류(if/switch/삼항)는 구조일 뿐** — 업무적 의미는 소스를 읽어야 안다.
+
+각 분기를 다음 중 하나로 분류하고 `[추정]` 으로 의미를 적는다(분기 존재·조건식 자체는 `[확정]` 유지):
+
+- **권한(authz)**: 조건이 인증/역할/소유권 가드(예 `!isAuthenticated()` → "미인증 차단", `username.equals(order.username)` → "본인 주문만").
+- **상태(state)**: 조건이 흐름 단계/상태 머신(예 `shippingAddressRequired`, `!isConfirmed()` → "배송지 입력/주문 확인 단계 분기").
+- **계산(calc)**: 조건이 값/금액/수량에 따라 **계산·산출을 다르게** 함(특히 삼항 `amount > 100000 ? 0 : 2500` → "10만원 초과 시 배송비 면제"). 상품 종류·등급별 차등 단가도 여기.
+- **검증(validation)**: 조건이 입력값 적합성 검사(범위·형식·필수).
+
+**계산 조건부 판정(핵심)**: "상품 종류/권한에 따라 계산이 달라지는가?"는 §3 에 **계산 분기가 있으면** 그 조건을 명문화하고,
+**없으면** "조건부 계산 없음 — 전 건 동일 규칙"을 계산식 위치(예 `Cart.getSubTotal` 단순 합산) 근거로 단정한다(합성 금지).
+데이터 주도 정책(요율 테이블 등 `if` 없는 분기)은 코드만으론 안 드러날 수 있어 `[확인 필요]` 로 남긴다.
+
+§1/§2 도 앵커를 읽어 각 클래스 역할·흐름 한 줄 요약을 덧붙일 수 있다(근거 보유 클래스는 `[확정]`).
 
 ## 기존 정책서 대조 (있을 때)
 

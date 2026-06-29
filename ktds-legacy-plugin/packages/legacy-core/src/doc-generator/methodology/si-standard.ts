@@ -200,7 +200,45 @@ function buildSiTableSpecFromMyBatis(input: DocInput): GeneratedDoc {
   return { docId: 'si-테이블정의서', title: 'SI 테이블정의서', methodology: 'si-standard', sections }
 }
 
+/**
+ * db-schema(DDL) 기반 테이블 섹션 — PA3. 권위 소스(.sql DDL)로 컬럼/타입/PK/FK/NULL/설명을
+ * 모두 채운다. 모든 행은 컬럼 선언 file:line 근거(CONFIRMED). MyBatis(컬럼만, 나머지 추정)나
+ * 노드(단일 추정 행)보다 정밀하므로 dbSchema 가 있으면 최우선.
+ */
+function buildSiTableSpecFromDbSchema(input: DocInput): GeneratedDoc {
+  const m = input.dbSchema!
+  const sections = m.tables.map((t) => {
+    const pkSet = new Set(t.primaryKey)
+    // col → "refTable(refCol)" (복합 FK 는 컬럼 위치 매칭).
+    const fkByCol = new Map<string, string>()
+    for (const fk of t.foreignKeys) {
+      fk.columns.forEach((c, i) => fkByCol.set(c, `${fk.refTable}(${fk.refColumns[i] ?? fk.refColumns[0] ?? ''})`))
+    }
+    const rows: TableRow[] = t.columns.map(
+      (c): TableRow => ({
+        cells: [
+          c.name,
+          c.type,
+          pkSet.has(c.name) || c.primaryKey ? 'PK' : EMPTY_CELL,
+          fkByCol.has(c.name) ? `→ ${fkByCol.get(c.name)}` : EMPTY_CELL,
+          c.nullable ? 'NULL' : 'NOT NULL',
+          c.comment ?? EMPTY_CELL,
+        ],
+        confidence: 'CONFIRMED',
+        evidence: [{ file: t.relPath, line: c.line }],
+      }),
+    )
+    const heading = `${t.name} 테이블${t.comment ? ` — ${t.comment}` : ''}`
+    return { heading, key: 'table-list', claims: [], table: { columns: TBL_COLUMNS, rows } }
+  })
+  return { docId: 'si-테이블정의서', title: 'SI 테이블정의서', methodology: 'si-standard', sections }
+}
+
 function buildSiTableSpec(input: DocInput): GeneratedDoc {
+  // 우선순위: db-schema(DDL, 권위·전 컬럼 확정) > MyBatis(컬럼만) > 노드(단일 추정).
+  if (input.dbSchema && input.dbSchema.tables.length > 0) {
+    return buildSiTableSpecFromDbSchema(input)
+  }
   if (input.mybatisModel && input.mybatisModel.tables.length > 0) {
     return buildSiTableSpecFromMyBatis(input)
   }

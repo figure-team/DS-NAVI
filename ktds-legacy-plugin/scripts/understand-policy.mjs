@@ -33,6 +33,7 @@ const {
   buildCensus,
   extractDbSchema,
   writeDbSchema,
+  readDbSchema,
   scanPolicySignals,
   writePolicySignals,
   scanPolicyReconcile,
@@ -48,10 +49,16 @@ const PLUGIN_DOC_DIR = join(here, '..', 'templates', 'doc')
 const PROJECT_DOC_DIR = join(projectRoot, '.understand-anything', 'doc')
 const OUTPUT_DIR = join(projectRoot, '.understand-anything', 'doc-output')
 
-// 1) census — 파일 인구조사(.sql/.java 발견). 2) db-schema — 정적 .sql(3-Tier degrade).
+// 1) census — 파일 인구조사(.sql/.java 발견).
 const census = buildCensus(projectRoot)
-const dbSchema = extractDbSchema(projectRoot, census)
-writeDbSchema(projectRoot, dbSchema)
+// 2) db-schema — PA2: map(scan)이 .spec/map/db-schema.json 을 산출하면 그대로 로드(재스캔 0).
+//    맵 미실행(policy 단독 실행) 시에만 자체 생성(단독성 보존). 동일 입력 → byte-identical.
+let dbSchema = readDbSchema(projectRoot)
+const dbSchemaFromMap = dbSchema !== null
+if (!dbSchema) {
+  dbSchema = extractDbSchema(projectRoot, census)
+  writeDbSchema(projectRoot, dbSchema)
+}
 
 // 3) policy-signals — 코드(java-facts) + DB 신호 병합(앵커).
 const signals = await scanPolicySignals(projectRoot, census, dbSchema)
@@ -132,7 +139,20 @@ for (const built of getMethodology('policy').buildDocSet(input)) {
 
 const tierKo = { 'ddl+data': 'DDL+데이터', ddl: 'DDL만', 'code-only': '코드만(폴백)' }
 console.log(`understand-policy 완료 — ${projectRoot}`)
-console.log(`  DB 분석: tier=${tierKo[dbSchema.tier] ?? dbSchema.tier} (.sql ${dbSchema.sqlFileCount}개, 테이블 ${dbSchema.tables.length})`)
+console.log(
+  `  DB 분석: tier=${tierKo[dbSchema.tier] ?? dbSchema.tier} (.sql ${dbSchema.sqlFileCount}개, 테이블 ${dbSchema.tables.length}) ` +
+    `[${dbSchemaFromMap ? 'map 산출 재사용' : '자체 생성(맵 미실행)'}]`,
+)
+// PA-gate: 외부 라이브 DB 감지 시 .sql 덤프 권장(내장형/신호없음은 조용히 진행).
+const live = dbSchema.liveDbSignals ?? []
+if (live.length > 0) {
+  const vendors = [...new Set(live.map((x) => x.vendor))].join(', ')
+  const external = live.filter((x) => !x.embedded)
+  console.log(`  라이브 DB 신호: ${live.length}건 (벤더 ${vendors})${external.length === 0 ? ' — 내장형(.sql 로딩)' : ''}`)
+  if (external.length > 0) {
+    console.log('  ⚠️ 외부 라이브 DB 감지 — 권위 스키마를 .sql 로 덤프해 넣으면 반영됩니다(권장). 라이브 연결은 추후.')
+  }
+}
 console.log(`  정책 신호: ${signals.signals.length}건 → .spec/map/policy-signals.json`)
 console.log(`  정책서 ${meta.length}종 → .understand-anything/doc-output/:`)
 for (const m of meta) {

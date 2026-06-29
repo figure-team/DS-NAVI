@@ -25,6 +25,12 @@ export const BranchSignalSchema = z.object({
   kind: BranchKindSchema,
   /** 조건식 원문(공백 정규화, 바깥 괄호 제거). 합성 아님 — 소스 그대로. */
   condition: z.string(),
+  /**
+   * 처리 본문 요약(THEN) — if 의 consequence 블록 / 삼항의 "결과 : 대안" (공백 정규화·중괄호
+   * 제거·길이 캡). switch 는 케이스별이라 공란. 의사결정 테이블 THEN 의 결정론 시드(원문 [확정],
+   * 업무 의미는 LLM 보강 [추정]). 합성 아님.
+   */
+  then: z.string(),
 })
 export type BranchSignal = z.infer<typeof BranchSignalSchema>
 

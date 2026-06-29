@@ -20,6 +20,16 @@ describe('분기 스캐너 (PD1)', () => {
     expect(conds).toContain('ternary:amount > 100000')
   })
 
+  it('THEN(처리 본문) 추출 — if consequence / 삼항 결과:대안', async () => {
+    const branches = await extractBranches(rel, src)
+    const authIf = branches.find((b) => b.condition.startsWith('acc == null'))!
+    expect(authIf.then).toContain('return "deny"') // consequence 블록 요약
+    const feeTernary = branches.find((b) => b.condition === 'amount > 100000')!
+    expect(feeTernary.then).toBe('0 : 2500') // 결과 : 대안
+    const switchBr = branches.find((b) => b.kind === 'switch')!
+    expect(switchBr.then).toBe('') // switch 는 케이스별 → 공란
+  })
+
   it('소속 클래스/메서드 + file:line 귀속', async () => {
     const branches = await extractBranches(rel, src)
     for (const b of branches) {

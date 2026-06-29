@@ -56,6 +56,28 @@ function ternaryCond(node: Node): string {
   return condText(first ?? null)
 }
 
+/** 본문 텍스트 요약 — 공백 1칸·바깥 중괄호 제거·길이 캡(THEN 시드). */
+const THEN_CAP = 140
+function summarizeBody(node: Node | null): string {
+  if (!node) return ''
+  let t = node.text.replace(/\s+/g, ' ').trim()
+  if (t.startsWith('{') && t.endsWith('}')) t = t.slice(1, -1).trim()
+  return t.length > THEN_CAP ? `${t.slice(0, THEN_CAP - 1).trimEnd()}…` : t
+}
+
+/** 처리 본문(THEN) — if=consequence 블록 / 삼항="결과 : 대안" / switch=공란(케이스별). */
+function thenText(node: Node): string {
+  if (node.type === 'if_statement') {
+    return summarizeBody(node.childForFieldName('consequence'))
+  }
+  if (node.type === 'ternary_expression') {
+    const c = node.childForFieldName('consequence')
+    const a = node.childForFieldName('alternative')
+    return [c, a].filter((n): n is Node => n != null).map((n) => summarizeBody(n)).join(' : ')
+  }
+  return ''
+}
+
 /**
  * 한 Java 파일에서 분기 신호를 추출한다(순수, 파싱 포함). 소스 순서 보존.
  */
@@ -73,11 +95,11 @@ export async function extractBranches(relPath: string, src: string): Promise<Bra
     }
 
     if (node.type === 'if_statement') {
-      out.push({ relPath, line: startLine(node), className: cls, methodName: mth, kind: 'if', condition: parenCond(node) })
+      out.push({ relPath, line: startLine(node), className: cls, methodName: mth, kind: 'if', condition: parenCond(node), then: thenText(node) })
     } else if (node.type === 'switch_expression') {
-      out.push({ relPath, line: startLine(node), className: cls, methodName: mth, kind: 'switch', condition: parenCond(node) })
+      out.push({ relPath, line: startLine(node), className: cls, methodName: mth, kind: 'switch', condition: parenCond(node), then: thenText(node) })
     } else if (node.type === 'ternary_expression') {
-      out.push({ relPath, line: startLine(node), className: cls, methodName: mth, kind: 'ternary', condition: ternaryCond(node) })
+      out.push({ relPath, line: startLine(node), className: cls, methodName: mth, kind: 'ternary', condition: ternaryCond(node), then: thenText(node) })
     }
 
     for (const c of node.namedChildren) {

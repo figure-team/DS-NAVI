@@ -1,87 +1,224 @@
 /**
- * domain-policy 방법론(PD2) — 한 업무 도메인의 흐름과 그 안의 조건 분기를 정책서로 묶는다.
+ * domain-policy 방법론 — 도메인(정책 토픽)당 1문서를 **SI 정책 정의서 양식(§0~§8)**으로 산출.
  *
- * 카테고리별 정책서(policy: 용어/데이터/검증/권한)와 달리, 도메인당 1문서를 동적으로 산출한다
- * (buildDocSet 이 input.domainPolicies 를 매핑). 각 문서 구조:
- *   §1 도메인 구성(멤버 클래스) · §2 업무 흐름 · §3 조건 분기(위치·조건식=확정)
- * 분기의 **위치·조건식은 결정론 [확정]**, 그게 권한/상태/계산 중 무엇인지·업무 의미는
- * PD4 LLM 보강에서 [추정]으로 판정한다(여기선 분류·합성하지 않는다). 분기 0이면 "조건 없음"을
- * 근거와 함께 단정(가치 있는 발견).
+ * 결정론 시드(코드/DB)를 양식의 올바른 칸에 채우고(`[확정]`=file:line 근거), 규범 부분은
+ * 스캐폴드(`《 》`)·`[추정]`·`[확인 필요]`로 남겨 LLM·사람이 채운다. 합성 금지.
+ *
+ * 강한 섹션(코드에서 직접): §4 의사결정 테이블(분기 IF/THEN) · §6 처리 흐름(의사코드).
+ * 보강 섹션(있으면 채움): §2 용어 · §3 상태값.  스캐폴드: §0 문서정보 · §1 개요 · §5 예외 · §7 검증 · §8 미결.
+ *
+ * buildDocSet 이 input.domainPolicies 를 매핑해 도메인당 1문서를 동적 산출한다.
  */
 import type { DocInput } from '../builders/index.js'
 import { inferred } from '../builders/shared.js'
-import type { GeneratedDoc, Section, TableRow } from '../types.js'
+import { claim } from '../claims.js'
+import type { Claim, Evidence, GeneratedDoc, Section, TableRow } from '../types.js'
 import type { MethodologyModule } from './types.js'
-import type { DomainPolicyInput } from '../../domain-policy/types.js'
+import type { BranchSignal, DomainPolicyInput } from '../../domain-policy/types.js'
 
-const BRANCH_KIND_KO: Record<string, string> = {
-  if: 'if 조건',
-  switch: 'switch 분기',
-  ternary: '삼항(조건부 값/계산)',
+/** 사람이 채울 자리. */
+const S = '《 》'
+
+/** evidence 헬퍼 — null 이면 빈 배열(스캐폴드). */
+function ev(e: { file: string; line: number } | null): Evidence[] {
+  return e ? [{ file: e.file, line: e.line }] : []
 }
 
-/** §1 도메인 구성 — 멤버 클래스(파일 근거). */
-function compositionSection(d: DomainPolicyInput): Section {
-  const rows: TableRow[] = d.classes.map((c) => ({
-    cells: [c.className, c.relPath],
-    confidence: 'CONFIRMED',
-    evidence: [{ file: c.relPath, line: null }],
+/** 스캐폴드 행(근거 없음 → INFERRED, 채움 유도). */
+function scaffoldRow(cells: string[]): TableRow {
+  return { cells, confidence: 'INFERRED', evidence: [] }
+}
+
+// ── §0 문서 정보 ─────────────────────────────────────────────────────────────
+function docControlSections(d: DomainPolicyInput): Section[] {
+  const artifacts = d.classes.map((c) => c.relPath).slice(0, 8).join(', ') || S
+  const info: TableRow[] = [
+    { cells: ['문서명', `${d.name} 정책 정의서`], confidence: 'INFERRED', evidence: [] },
+    scaffoldRow(['문서 버전', `${S} (자동 초안 v0.1)`]),
+    scaffoldRow(['작성일', S]),
+    scaffoldRow(['작성자 / 검토자 / 승인자', S]),
+    {
+      cells: ['관련 산출물', artifacts],
+      confidence: d.classes.length > 0 ? 'CONFIRMED' : 'INFERRED',
+      evidence: d.classes.slice(0, 8).map((c) => ({ file: c.relPath, line: null })),
+    },
+  ]
+  const revision: TableRow[] = [scaffoldRow(['v0.1', S, '최초 자동 초안(코드 추출)', '자동', S])]
+  return [
+    { heading: '문서 정보', key: 'doc-control', claims: [], table: { columns: ['항목', '내용'], rows: info } },
+    {
+      heading: '개정 이력',
+      key: 'revision-history',
+      claims: [],
+      table: { columns: ['버전', '일자', '변경 내용', '작성자', '승인자'], rows: revision },
+    },
+  ]
+}
+
+// ── §1 개요 ─────────────────────────────────────────────────────────────────
+function overviewSection(d: DomainPolicyInput): Section {
+  const scope = d.classes.map((c) => c.className).slice(0, 8).join(', ') || S
+  const rows: TableRow[] = [
+    scaffoldRow(['목적', `${S} [추정] — 서비스 방향·전략과 연결`]),
+    {
+      cells: ['적용 범위', scope],
+      confidence: d.classes.length > 0 ? 'CONFIRMED' : 'INFERRED',
+      evidence: d.classes.slice(0, 8).map((c) => ({ file: c.relPath, line: null })),
+    },
+    scaffoldRow(['적용 제외', S]),
+    scaffoldRow(['정책 소유 부서', S]),
+  ]
+  return { heading: '개요', key: 'overview', claims: [], table: { columns: ['항목', '내용'], rows } }
+}
+
+// ── §2 용어 정의 ─────────────────────────────────────────────────────────────
+function glossarySection(d: DomainPolicyInput): Section {
+  const rows: TableRow[] = (d.terms ?? []).map((t) => ({
+    cells: [t.term, t.definition, t.note],
+    confidence: t.evidence ? 'CONFIRMED' : 'INFERRED',
+    evidence: ev(t.evidence),
   }))
   return {
-    heading: '도메인 구성',
-    key: 'domain-composition',
-    claims: rows.length === 0 ? [inferred('도메인 멤버 클래스가 확인되지 않았습니다(경계 확정 필요).')] : [],
-    table: { columns: ['클래스', '파일'], rows },
+    heading: '용어 정의',
+    key: 'glossary',
+    claims: rows.length === 0 ? [inferred('도메인 용어가 추출되지 않음(DB 주석/enum 부재) — 보강 대상.')] : [],
+    table: { columns: ['용어', '정의', '비고'], rows },
   }
 }
 
-/** §2 업무 흐름 — skeleton flow 진입점. */
-function flowSection(d: DomainPolicyInput): Section {
-  const rows: TableRow[] = d.flows.map((f) => ({
-    cells: [f.name, f.entry ? `${f.entry.file}:${f.entry.line}` : '—'],
-    confidence: f.entry ? 'CONFIRMED' : 'INFERRED',
-    evidence: f.entry ? [{ file: f.entry.file, line: f.entry.line }] : [],
+// ── §3 상태값 정의 ───────────────────────────────────────────────────────────
+function statusSection(d: DomainPolicyInput): Section {
+  const rows: TableRow[] = (d.statusCodes ?? []).map((s) => ({
+    cells: [s.group, s.code, s.name, s.desc],
+    confidence: s.evidence ? 'CONFIRMED' : 'INFERRED',
+    evidence: ev(s.evidence),
   }))
   return {
-    heading: '업무 흐름',
-    key: 'domain-flows',
-    claims: rows.length === 0 ? [inferred('확정된 흐름이 없습니다(skeleton 미생성 또는 단순 도메인).')] : [],
-    table: { columns: ['흐름', '진입점'], rows },
+    heading: '상태값 정의',
+    key: 'status-codes',
+    claims:
+      rows.length === 0
+        ? [inferred('상태값 코드 그룹/enum 미발견 [확인 필요] — 분기 조건의 상태값을 코드로 명문화 필요.')]
+        : [],
+    table: { columns: ['코드 그룹', '코드값', '명칭', '설명'], rows },
   }
 }
 
-/**
- * §3 조건 분기 — 도메인 경계 안 결정 지점. 위치·조건식·종류(if/switch/삼항)는 [확정],
- * 업무 분류(권한/상태/계산)·의미는 PD4 보강 [추정]. 분기 0이면 "조건 없음" 단정.
- */
-function branchSection(d: DomainPolicyInput): Section {
-  const rows: TableRow[] = d.branches.map((b) => ({
-    cells: [b.methodName ?? '—', b.condition, BRANCH_KIND_KO[b.kind] ?? b.kind],
-    confidence: 'CONFIRMED',
+// ── §4 정책 규칙 — 의사결정 테이블 ★핵심★ ────────────────────────────────────
+function pid(i: number): string {
+  return `PL-${String(i + 1).padStart(3, '0')}`
+}
+function decisionTableSection(d: DomainPolicyInput): Section {
+  const rows: TableRow[] = d.branches.map((b, i) => ({
+    // 정책 ID·IF·THEN·근거 = 결정론. 정책명·우선순위(시드=순서)·예외/비고 = 보강.
+    cells: [
+      pid(i),
+      S, // 정책명 [추정]
+      b.condition,
+      b.then.length > 0 ? b.then : S,
+      String(i + 1), // 우선순위 시드(if/else-if 순서) [추정]
+      b.methodName ? `${b.methodName}() · ${b.kind}` : b.kind,
+    ],
+    confidence: 'CONFIRMED', // 행 존재 근거 = 분기(file:line)
     evidence: [{ file: b.relPath, line: b.line }],
   }))
   return {
-    heading: '조건 분기 (위치·조건식 = 확정 · 업무분류 = PD4 보강)',
-    key: 'domain-branches',
+    heading: '정책 규칙 — 의사결정 테이블',
+    key: 'decision-table',
     claims:
       rows.length === 0
-        ? [inferred('조건 분기가 발견되지 않음 — 이 도메인은 무조건 흐름(조건부 정책 부재). 분기 없음을 코드 근거로 단정.')]
-        : [],
-    table: { columns: ['메서드', '조건식', '분기 종류'], rows },
+        ? [inferred('조건 분기 없음 — 무조건 처리(조건부 정책 부재). 분기 없음을 코드 근거로 단정.')]
+        : [inferred('정책명·우선순위·예외/비고는 [추정](보강). 적용 조건(IF)·처리(THEN)·근거는 [확정].')],
+    table: {
+      columns: ['정책 ID', '정책명', '적용 조건 (IF)', '처리 내용 (THEN)', '우선순위', '예외/비고'],
+      rows,
+    },
   }
 }
 
-/** 한 도메인의 정책서를 조립한다(docId=policy-domain-<key>). */
+// ── §5 예외 및 엣지 케이스 ───────────────────────────────────────────────────
+function exceptionsSection(): Section {
+  return {
+    heading: '예외 및 엣지 케이스',
+    key: 'exceptions',
+    claims: [],
+    table: { columns: ['No', '상황', '처리 방침', '담당'], rows: [scaffoldRow(['1', S, S, S])] },
+  }
+}
+
+// ── §6 처리 흐름 (의사코드) ──────────────────────────────────────────────────
+function processFlowSection(d: DomainPolicyInput): Section {
+  // 메서드별로 IF 조건 → THEN 한 줄. 결정론(분기 순서). 근거 동반.
+  const byMethod = new Map<string, BranchSignal[]>()
+  for (const b of d.branches) {
+    const k = b.methodName ?? '(unknown)'
+    const list = byMethod.get(k) ?? []
+    list.push(b)
+    byMethod.set(k, list)
+  }
+  const claims: Claim[] = []
+  for (const [method, brs] of byMethod) {
+    for (const b of brs) {
+      const then = b.then.length > 0 ? b.then : '…'
+      claims.push(claim(`${method}(): IF ${b.condition} → ${then}`, 'CONFIRMED', [{ file: b.relPath, line: b.line }]))
+    }
+  }
+  return {
+    heading: '처리 흐름 (의사코드)',
+    key: 'process-flow',
+    claims: claims.length > 0 ? claims : [inferred('흐름 내 결정 지점이 없습니다(단순 흐름).')],
+  }
+}
+
+// ── §7 검증 시나리오 ─────────────────────────────────────────────────────────
+function validationSection(d: DomainPolicyInput): Section {
+  // 분기가 있으면 PL-ID 참조 스캐폴드 행을, 없으면 빈 스캐폴드.
+  const rows: TableRow[] = d.branches.slice(0, 3).map((_, i) => scaffoldRow([`TC-${String(i + 1).padStart(2, '0')}`, S, S, pid(i)]))
+  return {
+    heading: '검증 시나리오',
+    key: 'validation',
+    claims: [],
+    table: { columns: ['TC ID', '입력 조건', '기대 결과', '적용 정책'], rows: rows.length > 0 ? rows : [scaffoldRow(['TC-01', S, S, S])] },
+  }
+}
+
+// ── §8 미결 사항 ─────────────────────────────────────────────────────────────
+function openIssuesSection(d: DomainPolicyInput): Section {
+  const rows: TableRow[] = []
+  // 정직한 갭을 미결로 자동 시드.
+  if ((d.statusCodes ?? []).length === 0) {
+    rows.push(scaffoldRow(['1', '상태값 코드 그룹/enum 미정의(분기 조건의 상태값)', '미정', S]))
+  }
+  rows.push(scaffoldRow([String(rows.length + 1), S, S, S]))
+  return {
+    heading: '미결 사항',
+    key: 'open-issues',
+    claims: [],
+    table: { columns: ['No', '이슈', '상태', '결정 필요일'], rows },
+  }
+}
+
+/** 한 도메인(정책 토픽)의 정책 정의서를 §0~§8 양식으로 조립한다. */
 export function buildDomainPolicyDoc(d: DomainPolicyInput): GeneratedDoc {
   return {
     docId: `policy-domain-${d.key}`,
-    title: `도메인 정책 — ${d.name}`,
+    title: `${d.name} 정책 정의서`,
     methodology: 'domain-policy',
-    sections: [compositionSection(d), flowSection(d), branchSection(d)],
+    sections: [
+      ...docControlSections(d),
+      overviewSection(d),
+      glossarySection(d),
+      statusSection(d),
+      decisionTableSection(d),
+      exceptionsSection(),
+      processFlowSection(d),
+      validationSection(d),
+      openIssuesSection(d),
+    ],
   }
 }
 
-/** domain-policy 모듈 — 도메인당 1문서를 동적 산출(결정론: 입력 순서 = PD3 가 키 정렬). */
+/** domain-policy 모듈 — 도메인(토픽)당 1문서를 동적 산출. */
 export const domainPolicyMethodology: MethodologyModule = {
   id: 'domain-policy',
   title: '도메인 정책서(domain-policy)',

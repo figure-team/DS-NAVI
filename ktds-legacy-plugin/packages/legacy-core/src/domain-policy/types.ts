@@ -44,12 +44,22 @@ export interface DomainPolicyInput {
   key: string
   /** 표시명(confirmed-plan.name). */
   name: string
-  /** §1 구성 — 도메인 멤버 클래스(파일 근거). */
+  /** 멤버 클래스(파일 근거) — §0 관련 산출물·§1 적용 범위. */
   classes: Array<{ className: string; relPath: string }>
-  /** §2 흐름 — skeleton flow 노드(진입점 file:line, 없으면 null). */
+  /** 업무 흐름(진입점 file:line) — §1 적용 범위 보강. */
   flows: Array<{ name: string; entry: { file: string; line: number } | null }>
-  /** §3 분기/조건 — 도메인 경계 안 결정 지점(PD1 분기 스캐너 산출, 경계로 필터). */
+  /** 결정 지점(PD1, 경계 한정) — §4 의사결정 테이블 IF/THEN + §6 처리 흐름의 시드. */
   branches: BranchSignal[]
+  /** §2 용어 — DB 주석/enum(없으면 빈 → 스캐폴드). */
+  terms?: Array<{ term: string; definition: string; note: string; evidence: { file: string; line: number } | null }>
+  /** §3 상태값 — 코드 테이블 행/enum(없으면 빈 → 스캐폴드·미결). */
+  statusCodes?: Array<{
+    group: string
+    code: string
+    name: string
+    desc: string
+    evidence: { file: string; line: number } | null
+  }>
 }
 
 /** branch-signals.json — 분기 신호 산출물(결정론: relPath/line/kind/condition 정렬). */

@@ -14,7 +14,9 @@ import { renderSkeleton } from '../render.js'
 import type { GeneratedDoc, Section } from '../types.js'
 import { getMethodology, listMethodologies } from './registry.js'
 import { buildSiTableSpec } from './si-standard.js'
+import { buildDomainPolicyDoc } from './domain-policy.js'
 import type { DbSchemaModel } from '../../db-schema/types.js'
+import type { DomainPolicyInput } from '../../domain-policy/types.js'
 
 // ──────────────────────────────────────────────────────────────────────────
 // 결정론 픽스처 — doc-generator.test.ts 와 동일 형태(근거 보유/미보유 혼합).
@@ -95,8 +97,8 @@ function tableOf(section: Section) {
 // ──────────────────────────────────────────────────────────────────────────
 
 describe('AC-23: methodology swap yields different doc sets', () => {
-  it('registry: as-built 기본 + si-standard + policy 등록(정렬)', () => {
-    expect(listMethodologies()).toEqual(['as-built', 'policy', 'si-standard'])
+  it('registry: as-built 기본 + si-standard + policy + domain-policy 등록(정렬)', () => {
+    expect(listMethodologies()).toEqual(['as-built', 'domain-policy', 'policy', 'si-standard'])
   })
 
   it('policy -> 정책서 PoC 4종(glossary/data/validation/authz)', () => {
@@ -279,5 +281,59 @@ describe('determinism: SI golden skeleton + double-run', () => {
     for (let i = 0; i < a.length; i++) {
       expect(renderSkeleton(a[i])).toBe(renderSkeleton(b[i]))
     }
+  })
+})
+
+// ──────────────────────────────────────────────────────────────────────────
+// domain-policy(PD2) — 도메인당 1문서: §1 구성 · §2 흐름 · §3 조건 분기.
+// ──────────────────────────────────────────────────────────────────────────
+
+const ORDER_DOMAIN: DomainPolicyInput = {
+  key: 'order',
+  name: '주문',
+  classes: [{ className: 'OrderActionBean', relPath: 'web/OrderActionBean.java' }],
+  flows: [{ name: 'checkout', entry: { file: 'web/OrderActionBean.java', line: 142 } }],
+  branches: [
+    { relPath: 'web/OrderActionBean.java', line: 125, className: 'OrderActionBean', methodName: 'newOrderForm', kind: 'if', condition: '!acc.isAuthenticated()' },
+    { relPath: 'web/OrderActionBean.java', line: 145, className: 'OrderActionBean', methodName: 'newOrder', kind: 'switch', condition: 'state' },
+  ],
+}
+
+describe('domain-policy 방법론 (PD2)', () => {
+  it('도메인당 1문서(docId/title) + §1구성/§2흐름/§3분기 섹션', () => {
+    const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
+    expect(doc.docId).toBe('policy-domain-order')
+    expect(doc.title).toBe('도메인 정책 — 주문')
+    expect(doc.methodology).toBe('domain-policy')
+    expect(doc.sections.map((s) => s.heading)).toEqual([
+      '도메인 구성',
+      '업무 흐름',
+      '조건 분기 (위치·조건식 = 확정 · 업무분류 = PD4 보강)',
+    ])
+  })
+
+  it('§3 분기 — 조건식·종류 + file:line 근거(CONFIRMED)', () => {
+    const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
+    const br = doc.sections.find((s) => s.key === 'domain-branches')!.table!
+    expect(br.columns).toEqual(['메서드', '조건식', '분기 종류'])
+    const row = br.rows.find((r) => r.cells[0] === 'newOrderForm')!
+    expect(row.cells[1]).toBe('!acc.isAuthenticated()')
+    expect(row.confidence).toBe('CONFIRMED')
+    expect(row.evidence).toEqual([{ file: 'web/OrderActionBean.java', line: 125 }])
+  })
+
+  it('분기 0이면 "조건 없음" 단정(빈 표 + 안내 claim)', () => {
+    const doc = buildDomainPolicyDoc({ ...ORDER_DOMAIN, branches: [] })
+    const sec = doc.sections.find((s) => s.key === 'domain-branches')!
+    expect(sec.table!.rows.length).toBe(0)
+    expect(sec.claims[0].text).toContain('조건부 정책 부재')
+  })
+
+  it('방법론 buildDocSet: domainPolicies → 도메인당 1문서(동적)', () => {
+    const docs = getMethodology('domain-policy').buildDocSet({ ...INPUT, domainPolicies: [ORDER_DOMAIN] })
+    expect(docs.length).toBe(1)
+    expect(docs[0].docId).toBe('policy-domain-order')
+    // domainPolicies 없으면 0문서(우아한 빈).
+    expect(getMethodology('domain-policy').buildDocSet(INPUT).length).toBe(0)
   })
 })

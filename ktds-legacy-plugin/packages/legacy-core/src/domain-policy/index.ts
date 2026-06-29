@@ -13,7 +13,7 @@ export {
   BranchSignalSchema,
   BranchSignalSetSchema,
 } from './types.js'
-export type { BranchKind, BranchSignal, BranchSignalSet } from './types.js'
+export type { BranchKind, BranchSignal, BranchSignalSet, DomainPolicyInput } from './types.js'
 export { extractBranches, scanBranches } from './branch-scanner.js'
 
 /** branch-signals.json 기록(`.spec/map/` mkdir -p 선행). */

@@ -11,6 +11,7 @@ import type { MyBatisModel } from '../../mybatis/types.js'
 import type { MethodCallGraph } from '../../domain-map/types.js'
 import type { PolicySignalSet } from '../../policy/types.js'
 import type { DbSchemaModel } from '../../db-schema/types.js'
+import type { DomainPolicyInput } from '../../domain-policy/types.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -41,6 +42,8 @@ export interface DocInput {
   policySignals?: PolicySignalSet | null
   /** db-schema(PA3) — DB 명세서(db-spec)가 DDL 의 실제 컬럼/PK/FK/CHECK 를 grounding 으로 추가. */
   dbSchema?: DbSchemaModel | null
+  /** 도메인 정책서 입력(PD2) — domain-policy 방법론이 도메인당 1문서를 동적 산출. */
+  domainPolicies?: DomainPolicyInput[]
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

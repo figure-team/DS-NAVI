@@ -28,6 +28,8 @@ import {
 } from './persist.js'
 import { extractJpaModel } from '../jpa/extract.js'
 import { JPA_MODEL_FILENAME } from '../jpa/types.js'
+import { extractDbSchema, writeDbSchema } from '../db-schema/index.js'
+import type { DbSchemaModel } from '../db-schema/index.js'
 import { buildCoverageReport } from '../coverage-report/index.js'
 import { computeFileFingerprints } from '../incremental/index.js'
 import { readSkeleton } from './persist.js'
@@ -170,6 +172,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   edges: EdgesReport
   slices: SlicesReport
   candidates: CandidatesReport
+  dbSchema: DbSchemaModel
 }> {
   const census = buildCensus(projectRoot)
   const routes = await extractRoutes(projectRoot, census)
@@ -185,6 +188,10 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   // (JPA 신호 없는 프로젝트는 entities/repositories 빈 배열. MyBatis 와 공존, AC-16b.)
   const jpaModel = await extractJpaModel(projectRoot, census)
   writeMapArtifact(projectRoot, JPA_MODEL_FILENAME, jpaModel)
+  // PA1: db-schema(정적 .sql DDL/dataload + 라이브 신호 정적 탐지) — map 이 단독 소유.
+  // jpa-model 과 동형(census 파생·scan 시점·.spec/map/ 기록). 소비자(docs/policy)는 로드만.
+  const dbSchema = extractDbSchema(projectRoot, census)
+  writeDbSchema(projectRoot, dbSchema)
   // 보완 D-c/D-b: 통합 커버리지 리포트 + 파일 fingerprint 스냅샷(증분 재스캔 기준).
   const coverage = buildCoverageReport({
     census,
@@ -196,7 +203,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   })
   writeMapArtifact(projectRoot, COVERAGE_FILENAME, coverage)
   writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, computeFileFingerprints(projectRoot, census))
-  return { census, routes, edges, slices, candidates }
+  return { census, routes, edges, slices, candidates, dbSchema }
 }
 
 /**

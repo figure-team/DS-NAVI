@@ -86,15 +86,35 @@ switch (sub) {
 
 async function runScan() {
   const { scanDomainMap } = engine
-  const { census, routes, edges, slices, candidates } = await scanDomainMap(projectRoot)
+  const { census, routes, edges, slices, candidates, dbSchema } = await scanDomainMap(projectRoot)
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
   console.log(`  routes: 라우트 ${routes.routes.length}개 / 배치 ${routes.batchEntries.length}개`)
   console.log(`  edges: 엣지 ${edges.edges.length}개 / 미해소 ${edges.unresolved.length}개`)
   console.log(`  slices: 슬라이스 ${slices.slices.length}개`)
   console.log(`  candidates: 도메인 후보 ${candidates.candidates.length}개`)
-  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates}.json (동일 commit 재실행 byte-diff=0)')
+  reportDbSchema(dbSchema)
+  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema}.json (동일 commit 재실행 byte-diff=0)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
+}
+
+/** db-schema tier + 라이브 DB 신호(정적 탐지) 보고 + .sql 덤프 권장 게이트(PA-gate). */
+function reportDbSchema(dbSchema) {
+  const tierKo = { 'ddl+data': 'DDL+데이터', ddl: 'DDL만', 'code-only': '코드만(폴백)' }
+  console.log(
+    `  db-schema: tier=${tierKo[dbSchema.tier] ?? dbSchema.tier} (.sql ${dbSchema.sqlFileCount}개, 테이블 ${dbSchema.tables.length})`,
+  )
+  const live = dbSchema.liveDbSignals ?? []
+  if (live.length === 0) return
+  const vendors = [...new Set(live.map((s) => s.vendor))].join(', ')
+  const external = live.filter((s) => !s.embedded)
+  console.log(
+    `  라이브 DB 신호: ${live.length}건 (벤더 ${vendors})${external.length === 0 ? ' — 내장형(.sql 로딩, 외부 아님)' : ''}`,
+  )
+  if (external.length > 0) {
+    console.log('  ⚠️ 외부 라이브 DB 감지 — 권위 스키마는 .sql 로 덤프해 넣으면 분석에 반영됩니다(권장).')
+    console.log('     라이브 직접 연결은 추후 지원. 기존 .sql 을 그대로 쓰려면 그대로 진행하세요.')
+  }
 }
 
 async function runPlan() {

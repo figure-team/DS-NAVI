@@ -14,6 +14,7 @@ import { gitCommitHash } from '../domain-map/persist.js'
 import type { CensusReport } from '../domain-map/types.js'
 import { extractDdlFromSource } from './ddl-scan.js'
 import { extractDataloadFromSource } from './dataload-scan.js'
+import { discoverLiveDbSignals } from './discover.js'
 import { DbSchemaModelSchema, DATALOAD_ROW_CAP } from './types.js'
 import type { DbSchemaModel, DbTable, DbSchemaTier } from './types.js'
 
@@ -144,12 +145,16 @@ export function extractDbSchema(projectRoot: string, census: CensusReport): DbSc
   const hasData = tables.some((t) => t.rowCount > 0)
   const tier: DbSchemaTier = tables.length === 0 ? 'code-only' : hasData ? 'ddl+data' : 'ddl'
 
+  // 라이브 DB 연결 신호(정적 탐지, 무연결) — .sql 유무와 별개로 항상 수집.
+  const liveDbSignals = discoverLiveDbSignals(projectRoot, census)
+
   return DbSchemaModelSchema.parse({
     schemaVersion: 1,
     gitCommit: gitCommitHash(projectRoot),
     tier,
     sqlFileCount,
     tables,
+    liveDbSignals,
     unresolved,
   })
 }

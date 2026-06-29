@@ -67,6 +67,11 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot>
 > 전제: `/understand-map scan`(+ 가능하면 `confirm`→`emit`) 완료(`candidates.json` 필요,
 > 흐름·표시명은 emit 된 `domain-graph.json`).
 
+**표기 규약(스캐폴드):**
+- `《 》` = 순수 빈칸(도구가 제안할 근거 없음 → 사람 입력). `《YYYY-MM-DD》` 처럼 형식만 안내하기도.
+- **제안값**(도구/LLM 해석)은 `《 》` 없이 일반 텍스트 + 신뢰도 `[추정]` 로 쓴다(빈칸과 섞지 말 것).
+- `[확정]` = file:line 근거 동반. 보강 시 코드 원문은 IF/THEN 이 아니라 **근거 칸**에 둔다.
+
 ### 1단계 — 결정론 추출
 
 ```

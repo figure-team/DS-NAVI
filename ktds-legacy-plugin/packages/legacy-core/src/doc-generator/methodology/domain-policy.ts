@@ -16,8 +16,18 @@ import type { Claim, Evidence, GeneratedDoc, Section, TableRow } from '../types.
 import type { MethodologyModule } from './types.js'
 import type { BranchSignal, DomainPolicyInput } from '../../domain-policy/types.js'
 
-/** 사람이 채울 자리. */
+/**
+ * 스캐폴드 표기 규약:
+ *  - S(`《 》`)        = 순수 빈칸(도구가 제안할 근거 없음 → 사람 입력).
+ *  - DATE             = 형식만 안내하는 빈칸(사람이 날짜 입력).
+ *  - 제안값           = `《 》` 없이 일반 텍스트 + 신뢰도 [추정](도구/LLM 제안).
+ *  - HINT(text)       = 형식/내용 안내가 필요한 빈칸(`《 …》`).
+ */
 const S = '《 》'
+const DATE = '《YYYY-MM-DD》'
+function hint(text: string): string {
+  return `《${text}》`
+}
 
 /** evidence 헬퍼 — null 이면 빈 배열(스캐폴드). */
 function ev(e: { file: string; line: number } | null): Evidence[] {
@@ -33,17 +43,17 @@ function scaffoldRow(cells: string[]): TableRow {
 function docControlSections(d: DomainPolicyInput): Section[] {
   const artifacts = d.classes.map((c) => c.relPath).slice(0, 8).join(', ') || S
   const info: TableRow[] = [
-    { cells: ['문서명', `${d.name} 정책 정의서`], confidence: 'INFERRED', evidence: [] },
-    scaffoldRow(['문서 버전', `${S} (자동 초안 v0.1)`]),
-    scaffoldRow(['작성일', S]),
-    scaffoldRow(['작성자 / 검토자 / 승인자', S]),
+    { cells: ['문서명', `${d.name} 정책 정의서`], confidence: 'INFERRED', evidence: [] }, // 제안값(파생)
+    scaffoldRow(['문서 버전', 'v0.1 (자동 초안)']), // 제안값
+    scaffoldRow(['작성일', DATE]), // 형식 안내 빈칸
+    scaffoldRow(['작성자 / 검토자 / 승인자', S]), // 순수 빈칸
     {
       cells: ['관련 산출물', artifacts],
       confidence: d.classes.length > 0 ? 'CONFIRMED' : 'INFERRED',
       evidence: d.classes.slice(0, 8).map((c) => ({ file: c.relPath, line: null })),
     },
   ]
-  const revision: TableRow[] = [scaffoldRow(['v0.1', S, '최초 자동 초안(코드 추출)', '자동', S])]
+  const revision: TableRow[] = [scaffoldRow(['v0.1', DATE, '최초 자동 초안(코드 추출)', '자동', S])]
   return [
     { heading: '문서 정보', key: 'doc-control', claims: [], table: { columns: ['항목', '내용'], rows: info } },
     {
@@ -59,7 +69,7 @@ function docControlSections(d: DomainPolicyInput): Section[] {
 function overviewSection(d: DomainPolicyInput): Section {
   const scope = d.classes.map((c) => c.className).slice(0, 8).join(', ') || S
   const rows: TableRow[] = [
-    scaffoldRow(['목적', `${S} [추정] — 서비스 방향·전략과 연결`]),
+    scaffoldRow(['목적', hint('서비스 전략과 연결된 목적 기술')]),
     {
       cells: ['적용 범위', scope],
       confidence: d.classes.length > 0 ? 'CONFIRMED' : 'INFERRED',

@@ -88,6 +88,28 @@ export const DbTableSchema = z.object({
 })
 export type DbTable = z.infer<typeof DbTableSchema>
 
+/**
+ * 라이브 DB "연결 신호" — 정적 탐지 결과(연결하지 않음, PA1).
+ * pom/gradle 의 JDBC 드라이버 의존성 또는 application.{yml,properties}/xml 의 jdbc: URL.
+ * SKILL(PA-gate)이 이 신호로 사용자에게 .sql 덤프를 권장한다(라이브 연결은 추후).
+ */
+export const LiveDbSignalSchema = z.object({
+  /** 벤더(mysql/oracle/postgresql/sqlserver/mariadb/db2/h2/hsqldb/sqlite/derby/unknown). */
+  vendor: z.string(),
+  /** 내장형(h2/hsqldb/sqlite/derby) — 보통 .sql 로딩형이라 외부 라이브 DB 아님(게이트가 약하게 취급). */
+  embedded: z.boolean(),
+  /** 신호 종류. */
+  kind: z.enum(['driver', 'datasource-url']),
+  /** 근거 토큰(드라이버 좌표 / jdbc URL 스킴) — 합성 아님, 소스 원문. */
+  detail: z.string(),
+  relPath: z.string(),
+  line: z.number().int().positive(),
+})
+export type LiveDbSignal = z.infer<typeof LiveDbSignalSchema>
+
+/** 내장형 DB 벤더(외부 라이브 연결 아님 — .sql 로딩형). */
+export const EMBEDDED_DB_VENDORS = new Set(['h2', 'hsqldb', 'sqlite', 'derby'])
+
 /** DB 스키마 모델 — .spec/map/db-schema.json 의 단일 소스. */
 export const DbSchemaModelSchema = z.object({
   schemaVersion: z.literal(1),
@@ -97,6 +119,8 @@ export const DbSchemaModelSchema = z.object({
   /** 파싱한 .sql 파일 수(0 이면 tier=code-only). */
   sqlFileCount: z.number().int().nonnegative(),
   tables: z.array(DbTableSchema),
+  /** 라이브 DB 연결 신호(정적 탐지, 무연결). 비어있지 않으면 SKILL 이 .sql 덤프를 권장. */
+  liveDbSignals: z.array(LiveDbSignalSchema),
   /** 파싱 못한 신호(보고, 누락 금지). */
   unresolved: z.array(z.object({ ref: z.string(), reason: z.string() })),
 })

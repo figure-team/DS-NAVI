@@ -10,6 +10,7 @@ import type { DbSchemaModel } from './types.js'
 export {
   DB_SCHEMA_FILENAME,
   DATALOAD_ROW_CAP,
+  EMBEDDED_DB_VENDORS,
   DbSchemaModelSchema,
   DbTableSchema,
   DbColumnSchema,
@@ -18,6 +19,7 @@ export {
   DbIndexSchema,
   DbRowSchema,
   DbSchemaTierSchema,
+  LiveDbSignalSchema,
 } from './types.js'
 export type {
   DbSchemaModel,
@@ -28,8 +30,10 @@ export type {
   DbIndex,
   DbRow,
   DbSchemaTier,
+  LiveDbSignal,
 } from './types.js'
 export { extractDbSchema } from './extract.js'
+export { discoverLiveDbSignals } from './discover.js'
 export { extractDdlFromSource } from './ddl-scan.js'
 export type { DdlScanResult, CommentOn } from './ddl-scan.js'
 export { extractDataloadFromSource } from './dataload-scan.js'

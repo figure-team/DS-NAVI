@@ -5,7 +5,7 @@
     {
       "id": "domain:account",
       "name": "계정/회원",
-      "functionCount": 7
+      "functionCount": 13
     },
     {
       "id": "domain:cart",
@@ -26,11 +26,6 @@
       "id": "domain:web-inf",
       "name": "웹 배포 설정 (web.xml)",
       "functionCount": 1
-    },
-    {
-      "id": "to-be:payment",
-      "name": "결제",
-      "functionCount": 3
     }
   ],
   "functions": [
@@ -41,7 +36,7 @@
       "domainId": "domain:account",
       "domainName": "계정/회원",
       "entryPoint": {
-        "value": "ANY /actions/Account.action",
+        "value": "AccountActionBean#signonForm",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -71,10 +66,28 @@
         "evidence": []
       },
       "origin": "AS_IS",
-      "state": "IMPLEMENTED",
-      "requirementHistory": [],
+      "state": "CHANGED",
+      "requirementHistory": [
+        "REQ-001",
+        "REQ-002"
+      ],
       "nfrTags": [],
-      "rules": [],
+      "rules": [
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-1",
+          "text": "로그인 폼에 '카카오로 로그인' 버튼/링크를 노출한다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-1",
+          "text": "로그인 폼에 '네이버로 로그인' 버튼/링크를 노출한다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
       "deliverableRefs": []
     },
     {
@@ -84,7 +97,7 @@
       "domainId": "domain:account",
       "domainName": "계정/회원",
       "entryPoint": {
-        "value": "ANY /actions/Account.action?editAccount",
+        "value": "AccountActionBean#editAccount",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -124,7 +137,7 @@
         ]
       },
       "data": {
-        "value": "ACCOUNT(RU) · BANNERDATA(R) · PRODUCT(R) · PROFILE(RU) · SIGNON(RU)",
+        "value": "ACCOUNT(CRU) · BANNERDATA(R) · PRODUCT(R) · PROFILE(CRU) · SIGNON(CRU)",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -134,6 +147,18 @@
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
             "line": 52
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 95
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 114
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 127
           },
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
@@ -149,7 +174,15 @@
           },
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
             "line": 36
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 46
           }
         ]
       },
@@ -172,7 +205,7 @@
       "domainId": "domain:account",
       "domainName": "계정/회원",
       "entryPoint": {
-        "value": "ANY /actions/Account.action?editAccountForm",
+        "value": "AccountActionBean#editAccountForm",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -215,7 +248,7 @@
       "domainId": "domain:account",
       "domainName": "계정/회원",
       "entryPoint": {
-        "value": "ANY /actions/Account.action?newAccount",
+        "value": "AccountActionBean#newAccount",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -255,7 +288,7 @@
         ]
       },
       "data": {
-        "value": "ACCOUNT(CR) · BANNERDATA(R) · PRODUCT(R) · PROFILE(CR) · SIGNON(CR)",
+        "value": "ACCOUNT(CRU) · BANNERDATA(R) · PRODUCT(R) · PROFILE(CRU) · SIGNON(CRU)",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -279,8 +312,28 @@
             "line": 127
           },
           {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 79
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 102
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 122
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 26
+          },
+          {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
             "line": 36
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 46
           }
         ]
       },
@@ -290,10 +343,28 @@
         "evidence": []
       },
       "origin": "AS_IS",
-      "state": "IMPLEMENTED",
-      "requirementHistory": [],
+      "state": "CHANGED",
+      "requirementHistory": [
+        "REQ-001",
+        "REQ-002"
+      ],
       "nfrTags": [],
-      "rules": [],
+      "rules": [
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-6",
+          "text": "연동된 계정이 없으면 카카오 프로필로 신규 계정을 자동 생성한 뒤 로그인한다",
+          "kind": "branch",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-6",
+          "text": "연동된 계정이 없으면 네이버 프로필로 신규 계정을 자동 생성한 뒤 로그인한다",
+          "kind": "branch",
+          "confidence": "INFERRED"
+        }
+      ],
       "deliverableRefs": []
     },
     {
@@ -303,7 +374,7 @@
       "domainId": "domain:account",
       "domainName": "계정/회원",
       "entryPoint": {
-        "value": "ANY /actions/Account.action?newAccountForm",
+        "value": "AccountActionBean#newAccountForm",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -346,7 +417,7 @@
       "domainId": "domain:account",
       "domainName": "계정/회원",
       "entryPoint": {
-        "value": "ANY /actions/Account.action?signoff",
+        "value": "AccountActionBean#signoff",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -389,7 +460,7 @@
       "domainId": "domain:account",
       "domainName": "계정/회원",
       "entryPoint": {
-        "value": "ANY /actions/Account.action?signon",
+        "value": "AccountActionBean#signon",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -429,7 +500,7 @@
         ]
       },
       "data": {
-        "value": "ACCOUNT(R) · BANNERDATA(R) · PRODUCT(R) · PROFILE(R) · SIGNON(R)",
+        "value": "ACCOUNT(CRU) · BANNERDATA(R) · PRODUCT(R) · PROFILE(CRU) · SIGNON(CRU)",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -441,8 +512,40 @@
             "line": 52
           },
           {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 95
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 114
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 127
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 79
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 102
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 122
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 26
+          },
+          {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
             "line": 36
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 46
           }
         ]
       },
@@ -452,11 +555,323 @@
         "evidence": []
       },
       "origin": "AS_IS",
-      "state": "IMPLEMENTED",
-      "requirementHistory": [],
+      "state": "CHANGED",
+      "requirementHistory": [
+        "REQ-001",
+        "REQ-002"
+      ],
       "nfrTags": [],
-      "rules": [],
+      "rules": [
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-5",
+          "text": "카카오 식별자에 연동된 계정이 있으면 해당 계정으로 세션 로그인한다",
+          "kind": "branch",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-5",
+          "text": "네이버 식별자에 연동된 계정이 있으면 해당 계정으로 세션 로그인한다",
+          "kind": "branch",
+          "confidence": "INFERRED"
+        }
+      ],
       "deliverableRefs": []
+    },
+    {
+      "id": "to-be:account/네이버-계정연동-자동가입",
+      "featureId": "FN-028",
+      "name": "네이버 계정 연동/자동가입",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "(제안) AccountActionBean#naverCallback 내부 분기",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +AccountService#linkOrCreateByNaver · AccountMapper · SignonMapper",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "(제안) OAUTH_ACCOUNT(C) · ACCOUNT(CR) · SIGNON(CR)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-002"
+      ],
+      "rules": [
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-5",
+          "text": "네이버 식별자에 연동된 계정이 있으면 해당 계정으로 세션 로그인한다",
+          "kind": "branch",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-6",
+          "text": "연동된 계정이 없으면 네이버 프로필로 신규 계정을 자동 생성한 뒤 로그인한다",
+          "kind": "branch",
+          "confidence": "INFERRED"
+        }
+      ],
+      "nfrTags": []
+    },
+    {
+      "id": "to-be:account/네이버-로그인-진입",
+      "featureId": "FN-026",
+      "name": "네이버 로그인 진입(인가요청 리다이렉트)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "(제안) GET /actions/Account.action?naverLogin",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +AccountActionBean#naverLogin · +NaverOAuthService",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-002"
+      ],
+      "rules": [
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-1",
+          "text": "로그인 폼에 '네이버로 로그인' 버튼/링크를 노출한다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-2",
+          "text": "'네이버로 로그인' 클릭 시 state 파라미터를 발급해 네이버 인가(authorize) 엔드포인트로 리다이렉트한다",
+          "kind": "postcondition",
+          "confidence": "INFERRED"
+        }
+      ],
+      "nfrTags": []
+    },
+    {
+      "id": "to-be:account/네이버-콜백-처리",
+      "featureId": "FN-027",
+      "name": "네이버 OAuth 콜백 처리(토큰교환·프로필조회)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "(제안) GET /actions/Account.action?naverCallback",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +AccountActionBean#naverCallback · +NaverOAuthService(token/userinfo)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "(제안) — (네이버 토큰·사용자 외부 API)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-002"
+      ],
+      "rules": [
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-3",
+          "text": "콜백에서 인가코드로 액세스 토큰을 교환하고 네이버 사용자 정보를 조회한다",
+          "kind": "postcondition",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-002",
+          "acId": "AC-4",
+          "text": "state 불일치 또는 토큰 교환 실패 시 로그인을 거부하고 에러를 처리한다",
+          "kind": "exception",
+          "confidence": "INFERRED"
+        }
+      ],
+      "nfrTags": []
+    },
+    {
+      "id": "to-be:account/카카오-계정연동-자동가입",
+      "featureId": "FN-025",
+      "name": "카카오 계정 연동/자동가입",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "(제안) AccountActionBean#kakaoCallback 내부 분기",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +AccountService#linkOrCreateByKakao · AccountMapper · SignonMapper",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "(제안) OAUTH_ACCOUNT(C) · ACCOUNT(CR) · SIGNON(CR)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-001"
+      ],
+      "rules": [
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-5",
+          "text": "카카오 식별자에 연동된 계정이 있으면 해당 계정으로 세션 로그인한다",
+          "kind": "branch",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-6",
+          "text": "연동된 계정이 없으면 카카오 프로필로 신규 계정을 자동 생성한 뒤 로그인한다",
+          "kind": "branch",
+          "confidence": "INFERRED"
+        }
+      ],
+      "nfrTags": []
+    },
+    {
+      "id": "to-be:account/카카오-로그인-진입",
+      "featureId": "FN-023",
+      "name": "카카오 로그인 진입(인가요청 리다이렉트)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "(제안) GET /actions/Account.action?kakaoLogin",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +AccountActionBean#kakaoLogin · +KakaoOAuthService",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-001"
+      ],
+      "rules": [
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-1",
+          "text": "로그인 폼에 '카카오로 로그인' 버튼/링크를 노출한다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-2",
+          "text": "'카카오로 로그인' 클릭 시 state 파라미터를 발급해 카카오 인가(authorize) 엔드포인트로 리다이렉트한다",
+          "kind": "postcondition",
+          "confidence": "INFERRED"
+        }
+      ],
+      "nfrTags": []
+    },
+    {
+      "id": "to-be:account/카카오-콜백-처리",
+      "featureId": "FN-024",
+      "name": "카카오 OAuth 콜백 처리(토큰교환·프로필조회)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": {
+        "value": "(제안) GET /actions/Account.action?kakaoCallback",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "(제안) +AccountActionBean#kakaoCallback · +KakaoOAuthService(token/userinfo)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "data": {
+        "value": "(제안) — (카카오 토큰·사용자 외부 API)",
+        "confidence": "INFERRED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "REQ-001"
+      ],
+      "rules": [
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-3",
+          "text": "콜백에서 인가코드로 액세스 토큰을 교환하고 카카오 사용자 정보를 조회한다",
+          "kind": "postcondition",
+          "confidence": "INFERRED"
+        },
+        {
+          "reqId": "REQ-001",
+          "acId": "AC-4",
+          "text": "state 불일치 또는 토큰 교환 실패 시 로그인을 거부하고 에러를 처리한다",
+          "kind": "exception",
+          "confidence": "INFERRED"
+        }
+      ],
+      "nfrTags": []
     },
     {
       "id": "flow:ANY /actions/Cart.action?addItemToCart",
@@ -465,7 +880,7 @@
       "domainId": "domain:cart",
       "domainName": "장바구니",
       "entryPoint": {
-        "value": "ANY /actions/Cart.action?addItemToCart",
+        "value": "CartActionBean#addItemToCart",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -510,11 +925,15 @@
         "evidence": [
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
-            "line": 70
+            "line": 26
           },
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
             "line": 47
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 70
           }
         ]
       },
@@ -537,7 +956,7 @@
       "domainId": "domain:cart",
       "domainName": "장바구니",
       "entryPoint": {
-        "value": "ANY /actions/Cart.action?checkOut",
+        "value": "CartActionBean#checkOut",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -580,7 +999,7 @@
       "domainId": "domain:cart",
       "domainName": "장바구니",
       "entryPoint": {
-        "value": "ANY /actions/Cart.action?removeItemFromCart",
+        "value": "CartActionBean#removeItemFromCart",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -631,7 +1050,7 @@
       "domainId": "domain:cart",
       "domainName": "장바구니",
       "entryPoint": {
-        "value": "ANY /actions/Cart.action?updateCartQuantities",
+        "value": "CartActionBean#updateCartQuantities",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -686,7 +1105,7 @@
       "domainId": "domain:cart",
       "domainName": "장바구니",
       "entryPoint": {
-        "value": "ANY /actions/Cart.action?viewCart",
+        "value": "CartActionBean#viewCart",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -729,7 +1148,7 @@
       "domainId": "domain:catalog",
       "domainName": "카탈로그",
       "entryPoint": {
-        "value": "ANY /actions/Catalog.action",
+        "value": "CatalogActionBean#viewMain",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -772,7 +1191,7 @@
       "domainId": "domain:catalog",
       "domainName": "카탈로그",
       "entryPoint": {
-        "value": "ANY /actions/Catalog.action?searchProducts",
+        "value": "CatalogActionBean#searchProducts",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -805,6 +1224,14 @@
         "evidence": [
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 36
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
             "line": 46
           }
         ]
@@ -828,7 +1255,7 @@
       "domainId": "domain:catalog",
       "domainName": "카탈로그",
       "entryPoint": {
-        "value": "ANY /actions/Catalog.action?viewCategory",
+        "value": "CatalogActionBean#viewCategory",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -864,12 +1291,24 @@
         "confidence": "CONFIRMED",
         "evidence": [
           {
-            "file": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
             "line": 26
           },
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
             "line": 36
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 46
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+            "line": 35
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+            "line": 26
           }
         ]
       },
@@ -892,7 +1331,7 @@
       "domainId": "domain:catalog",
       "domainName": "카탈로그",
       "entryPoint": {
-        "value": "ANY /actions/Catalog.action?viewItem",
+        "value": "CatalogActionBean#viewItem",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -924,12 +1363,20 @@
         ]
       },
       "data": {
-        "value": "ITEM(R)",
+        "value": "INVENTORY(R) · ITEM(R)",
         "confidence": "CONFIRMED",
         "evidence": [
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
             "line": 47
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 70
           }
         ]
       },
@@ -952,7 +1399,7 @@
       "domainId": "domain:catalog",
       "domainName": "카탈로그",
       "entryPoint": {
-        "value": "ANY /actions/Catalog.action?viewProduct",
+        "value": "CatalogActionBean#viewProduct",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -984,7 +1431,7 @@
         ]
       },
       "data": {
-        "value": "ITEM(R) · PRODUCT(R)",
+        "value": "INVENTORY(R) · ITEM(R) · PRODUCT(R)",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -992,8 +1439,24 @@
             "line": 26
           },
           {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 47
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 70
+          },
+          {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
             "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 36
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+            "line": 46
           }
         ]
       },
@@ -1016,7 +1479,7 @@
       "domainId": "domain:order",
       "domainName": "주문",
       "entryPoint": {
-        "value": "ANY /actions/Order.action?listOrders",
+        "value": "OrderActionBean#listOrders",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -1052,9 +1515,14 @@
         ]
       },
       "data": {
-        "value": "",
-        "confidence": "INFERRED",
-        "evidence": []
+        "value": "ORDERS(R) · ORDERSTATUS(R)",
+        "confidence": "CONFIRMED",
+        "evidence": [
+          {
+            "file": "src/site/xdoc/index.xml",
+            "line": 381
+          }
+        ]
       },
       "test": {
         "value": "",
@@ -1075,7 +1543,7 @@
       "domainId": "domain:order",
       "domainName": "주문",
       "entryPoint": {
-        "value": "ANY /actions/Order.action?newOrder",
+        "value": "OrderActionBean#newOrder",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -1123,7 +1591,7 @@
         ]
       },
       "data": {
-        "value": "INVENTORY(U) · LINEITEM(C) · SEQUENCE(RU)",
+        "value": "INVENTORY(RU) · ITEM(R) · LINEITEM(CR) · ORDERS(R) · ORDERSTATUS(R) · SEQUENCE(RU)",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -1131,8 +1599,24 @@
             "line": 76
           },
           {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 47
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 70
+          },
+          {
+            "file": "src/site/xdoc/index.xml",
+            "line": 381
+          },
+          {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
             "line": 37
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
+            "line": 26
           },
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/SequenceMapper.xml",
@@ -1150,10 +1634,8 @@
         "evidence": []
       },
       "origin": "AS_IS",
-      "state": "CHANGED",
-      "requirementHistory": [
-        "REQ-001"
-      ],
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
       "nfrTags": [],
       "rules": [],
       "deliverableRefs": []
@@ -1165,7 +1647,7 @@
       "domainId": "domain:order",
       "domainName": "주문",
       "entryPoint": {
-        "value": "ANY /actions/Order.action?newOrderForm",
+        "value": "OrderActionBean#newOrderForm",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -1215,10 +1697,8 @@
         "evidence": []
       },
       "origin": "AS_IS",
-      "state": "CHANGED",
-      "requirementHistory": [
-        "REQ-001"
-      ],
+      "state": "IMPLEMENTED",
+      "requirementHistory": [],
       "nfrTags": [],
       "rules": [],
       "deliverableRefs": []
@@ -1230,7 +1710,7 @@
       "domainId": "domain:order",
       "domainName": "주문",
       "entryPoint": {
-        "value": "ANY /actions/Order.action?viewOrder",
+        "value": "OrderActionBean#viewOrder",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -1278,24 +1758,32 @@
         ]
       },
       "data": {
-        "value": "INVENTORY(R) · ITEM(R) · LINEITEM(R) · ORDERS(R) · ORDERSTATUS(R)",
+        "value": "INVENTORY(RU) · ITEM(R) · LINEITEM(CR) · ORDERS(R) · ORDERSTATUS(R)",
         "confidence": "CONFIRMED",
         "evidence": [
           {
-            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
-            "line": 70
+            "file": "src/site/xdoc/index.xml",
+            "line": 381
           },
           {
-            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
-            "line": 47
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
+            "line": 37
           },
           {
             "file": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
             "line": 26
           },
           {
-            "file": "src/site/xdoc/index.xml",
-            "line": 381
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 76
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 47
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+            "line": 70
           }
         ]
       },
@@ -1318,7 +1806,7 @@
       "domainId": "domain:web-inf",
       "domainName": "웹 배포 설정 (web.xml)",
       "entryPoint": {
-        "value": "ANY *.action",
+        "value": "net.sourceforge.stripes.controller.DispatcherServlet",
         "confidence": "CONFIRMED",
         "evidence": [
           {
@@ -1353,117 +1841,12 @@
       "nfrTags": [],
       "rules": [],
       "deliverableRefs": []
-    },
-    {
-      "id": "to-be:payment/결제-결과-확인",
-      "featureId": "FN-025",
-      "name": "결제 결과 확인",
-      "domainId": "to-be:payment",
-      "domainName": "결제",
-      "entryPoint": {
-        "value": "(제안) GET /actions/Payment.action?paymentResult",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "implementation": {
-        "value": "(제안) +PaymentActionBean.paymentResult()",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "data": {
-        "value": "(제안) PAYMENT(R)",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "test": {
-        "value": "",
-        "confidence": "UNVERIFIED",
-        "evidence": []
-      },
-      "origin": "TO_BE",
-      "state": "PLANNED",
-      "requirementHistory": [
-        "REQ-001"
-      ],
-      "nfrTags": [],
-      "rules": [],
-      "deliverableRefs": []
-    },
-    {
-      "id": "to-be:payment/결제-처리",
-      "featureId": "FN-024",
-      "name": "결제 처리(승인)",
-      "domainId": "to-be:payment",
-      "domainName": "결제",
-      "entryPoint": {
-        "value": "(제안) POST /actions/Payment.action?processPayment",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "implementation": {
-        "value": "(제안) +PaymentService.processPayment()",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "data": {
-        "value": "(제안) PAYMENT(C), ORDER(U)",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "test": {
-        "value": "",
-        "confidence": "UNVERIFIED",
-        "evidence": []
-      },
-      "origin": "TO_BE",
-      "state": "PLANNED",
-      "requirementHistory": [
-        "REQ-001"
-      ],
-      "nfrTags": [],
-      "rules": [],
-      "deliverableRefs": []
-    },
-    {
-      "id": "to-be:payment/결제수단-선택-폼",
-      "featureId": "FN-023",
-      "name": "결제수단 선택 폼",
-      "domainId": "to-be:payment",
-      "domainName": "결제",
-      "entryPoint": {
-        "value": "(제안) GET /actions/Payment.action?paymentForm",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "implementation": {
-        "value": "(제안) +PaymentActionBean.paymentForm()",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "data": {
-        "value": "(제안) PAYMENT(R), ORDER(R)",
-        "confidence": "INFERRED",
-        "evidence": []
-      },
-      "test": {
-        "value": "",
-        "confidence": "UNVERIFIED",
-        "evidence": []
-      },
-      "origin": "TO_BE",
-      "state": "PLANNED",
-      "requirementHistory": [
-        "REQ-001"
-      ],
-      "nfrTags": [],
-      "rules": [],
-      "deliverableRefs": []
     }
   ],
   "requirements": [
     {
       "id": "REQ-001",
-      "text": "체크아웃에 결제 기능 추가 — 결제수단 선택·결제 처리(승인)·결제 결과 확인",
+      "text": "카카오 OAuth 소셜 로그인 추가 — 카카오 계정으로 로그인/자동가입",
       "type": "functional",
       "nfrCategory": null,
       "nfrScope": [],
@@ -1475,20 +1858,183 @@
       "dependsOn": [],
       "source": {
         "kind": "customer",
-        "raw": "결제 기능 추가"
+        "raw": "카카오 로그인 기능 추가"
       },
       "changeReq": null,
       "signoff": null,
-      "acceptanceCriteria": [],
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "로그인 폼에 '카카오로 로그인' 버튼/링크를 노출한다",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action",
+            "to-be:account/카카오-로그인-진입"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "'카카오로 로그인' 클릭 시 state 파라미터를 발급해 카카오 인가(authorize) 엔드포인트로 리다이렉트한다",
+          "kind": "postcondition",
+          "fnIds": [
+            "to-be:account/카카오-로그인-진입"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-3",
+          "text": "콜백에서 인가코드로 액세스 토큰을 교환하고 카카오 사용자 정보를 조회한다",
+          "kind": "postcondition",
+          "fnIds": [
+            "to-be:account/카카오-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-4",
+          "text": "state 불일치 또는 토큰 교환 실패 시 로그인을 거부하고 에러를 처리한다",
+          "kind": "exception",
+          "fnIds": [
+            "to-be:account/카카오-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-5",
+          "text": "카카오 식별자에 연동된 계정이 있으면 해당 계정으로 세션 로그인한다",
+          "kind": "branch",
+          "fnIds": [
+            "to-be:account/카카오-계정연동-자동가입",
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-6",
+          "text": "연동된 계정이 없으면 카카오 프로필로 신규 계정을 자동 생성한 뒤 로그인한다",
+          "kind": "branch",
+          "fnIds": [
+            "to-be:account/카카오-계정연동-자동가입",
+            "flow:ANY /actions/Account.action?newAccount"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
       "changeset": {
         "added": [
-          "to-be:payment/결제수단-선택-폼",
-          "to-be:payment/결제-처리",
-          "to-be:payment/결제-결과-확인"
+          "to-be:account/카카오-로그인-진입",
+          "to-be:account/카카오-콜백-처리",
+          "to-be:account/카카오-계정연동-자동가입"
         ],
         "modified": [
-          "flow:ANY /actions/Order.action?newOrderForm",
-          "flow:ANY /actions/Order.action?newOrder"
+          "flow:ANY /actions/Account.action",
+          "flow:ANY /actions/Account.action?signon",
+          "flow:ANY /actions/Account.action?newAccount"
+        ],
+        "removed": [],
+        "revived": []
+      }
+    },
+    {
+      "id": "REQ-002",
+      "text": "네이버 OAuth 소셜 로그인 추가 — 네이버 계정으로 로그인/자동가입",
+      "type": "functional",
+      "nfrCategory": null,
+      "nfrScope": [],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [],
+      "source": {
+        "kind": "customer",
+        "raw": "네이버 로그인 추가"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "로그인 폼에 '네이버로 로그인' 버튼/링크를 노출한다",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action",
+            "to-be:account/네이버-로그인-진입"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "'네이버로 로그인' 클릭 시 state 파라미터를 발급해 네이버 인가(authorize) 엔드포인트로 리다이렉트한다",
+          "kind": "postcondition",
+          "fnIds": [
+            "to-be:account/네이버-로그인-진입"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-3",
+          "text": "콜백에서 인가코드로 액세스 토큰을 교환하고 네이버 사용자 정보를 조회한다",
+          "kind": "postcondition",
+          "fnIds": [
+            "to-be:account/네이버-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-4",
+          "text": "state 불일치 또는 토큰 교환 실패 시 로그인을 거부하고 에러를 처리한다",
+          "kind": "exception",
+          "fnIds": [
+            "to-be:account/네이버-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-5",
+          "text": "네이버 식별자에 연동된 계정이 있으면 해당 계정으로 세션 로그인한다",
+          "kind": "branch",
+          "fnIds": [
+            "to-be:account/네이버-계정연동-자동가입",
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-6",
+          "text": "연동된 계정이 없으면 네이버 프로필로 신규 계정을 자동 생성한 뒤 로그인한다",
+          "kind": "branch",
+          "fnIds": [
+            "to-be:account/네이버-계정연동-자동가입",
+            "flow:ANY /actions/Account.action?newAccount"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/네이버-로그인-진입",
+          "to-be:account/네이버-콜백-처리",
+          "to-be:account/네이버-계정연동-자동가입"
+        ],
+        "modified": [
+          "flow:ANY /actions/Account.action",
+          "flow:ANY /actions/Account.action?signon",
+          "flow:ANY /actions/Account.action?newAccount"
         ],
         "removed": [],
         "revived": []
@@ -1497,18 +2043,18 @@
   ],
   "coverage": {
     "requirements": {
-      "total": 1,
+      "total": 2,
       "implemented": 0,
       "verified": 0,
       "signedOff": 0,
       "byLifecycle": {
-        "RECEIVED": 1
+        "RECEIVED": 2
       }
     },
     "functions": {
-      "total": 25,
-      "implemented": 20,
-      "planned": 3,
+      "total": 28,
+      "implemented": 19,
+      "planned": 6,
       "orphaned": 0,
       "confirmed": 0
     },
@@ -1520,7 +2066,8 @@
     },
     "gaps": {
       "unimplemented": [
-        "REQ-001"
+        "REQ-001",
+        "REQ-002"
       ],
       "orphanCode": [],
       "unverified": [
@@ -1547,6 +2094,21 @@
         "flow:ANY /actions/Order.action?newOrderForm",
         "flow:ANY /actions/Order.action?viewOrder"
       ]
+    },
+    "byRequirement": {
+      "REQ-001": {
+        "targetsTotal": 6,
+        "targetsBuilt": 3,
+        "acsTotal": 6,
+        "acsPassed": 0
+      },
+      "REQ-002": {
+        "targetsTotal": 6,
+        "targetsBuilt": 3,
+        "acsTotal": 6,
+        "acsPassed": 0
+      }
     }
-  }
+  },
+  "diagnostics": []
 }

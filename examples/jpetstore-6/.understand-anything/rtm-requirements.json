@@ -2,23 +2,165 @@
   "requirements": [
     {
       "id": "REQ-001",
-      "text": "체크아웃에 결제 기능 추가 — 결제수단 선택·결제 처리(승인)·결제 결과 확인",
+      "text": "카카오 OAuth 소셜 로그인 추가 — 카카오 계정으로 로그인/자동가입",
       "type": "functional",
+      "nfrCategory": null,
+      "nfrScope": [],
       "priority": "HIGH",
       "lifecycle": "RECEIVED",
       "status": "ACTIVE",
       "supersedes": null,
       "supersededBy": null,
-      "source": { "kind": "customer", "raw": "결제 기능 추가" },
+      "dependsOn": [],
+      "source": {
+        "kind": "customer",
+        "raw": "카카오 로그인 기능 추가"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "로그인 폼에 '카카오로 로그인' 버튼/링크를 노출한다",
+          "kind": "rule",
+          "fnIds": ["flow:ANY /actions/Account.action", "to-be:account/카카오-로그인-진입"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "'카카오로 로그인' 클릭 시 state 파라미터를 발급해 카카오 인가(authorize) 엔드포인트로 리다이렉트한다",
+          "kind": "postcondition",
+          "fnIds": ["to-be:account/카카오-로그인-진입"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-3",
+          "text": "콜백에서 인가코드로 액세스 토큰을 교환하고 카카오 사용자 정보를 조회한다",
+          "kind": "postcondition",
+          "fnIds": ["to-be:account/카카오-콜백-처리"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-4",
+          "text": "state 불일치 또는 토큰 교환 실패 시 로그인을 거부하고 에러를 처리한다",
+          "kind": "exception",
+          "fnIds": ["to-be:account/카카오-콜백-처리"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-5",
+          "text": "카카오 식별자에 연동된 계정이 있으면 해당 계정으로 세션 로그인한다",
+          "kind": "branch",
+          "fnIds": ["to-be:account/카카오-계정연동-자동가입", "flow:ANY /actions/Account.action?signon"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-6",
+          "text": "연동된 계정이 없으면 카카오 프로필로 신규 계정을 자동 생성한 뒤 로그인한다",
+          "kind": "branch",
+          "fnIds": ["to-be:account/카카오-계정연동-자동가입", "flow:ANY /actions/Account.action?newAccount"],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
       "changeset": {
         "added": [
-          "to-be:payment/결제수단-선택-폼",
-          "to-be:payment/결제-처리",
-          "to-be:payment/결제-결과-확인"
+          "to-be:account/카카오-로그인-진입",
+          "to-be:account/카카오-콜백-처리",
+          "to-be:account/카카오-계정연동-자동가입"
         ],
         "modified": [
-          "flow:ANY /actions/Order.action?newOrderForm",
-          "flow:ANY /actions/Order.action?newOrder"
+          "flow:ANY /actions/Account.action",
+          "flow:ANY /actions/Account.action?signon",
+          "flow:ANY /actions/Account.action?newAccount"
+        ],
+        "removed": [],
+        "revived": []
+      }
+    },
+    {
+      "id": "REQ-002",
+      "text": "네이버 OAuth 소셜 로그인 추가 — 네이버 계정으로 로그인/자동가입",
+      "type": "functional",
+      "nfrCategory": null,
+      "nfrScope": [],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [],
+      "source": {
+        "kind": "customer",
+        "raw": "네이버 로그인 추가"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "로그인 폼에 '네이버로 로그인' 버튼/링크를 노출한다",
+          "kind": "rule",
+          "fnIds": ["flow:ANY /actions/Account.action", "to-be:account/네이버-로그인-진입"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "'네이버로 로그인' 클릭 시 state 파라미터를 발급해 네이버 인가(authorize) 엔드포인트로 리다이렉트한다",
+          "kind": "postcondition",
+          "fnIds": ["to-be:account/네이버-로그인-진입"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-3",
+          "text": "콜백에서 인가코드로 액세스 토큰을 교환하고 네이버 사용자 정보를 조회한다",
+          "kind": "postcondition",
+          "fnIds": ["to-be:account/네이버-콜백-처리"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-4",
+          "text": "state 불일치 또는 토큰 교환 실패 시 로그인을 거부하고 에러를 처리한다",
+          "kind": "exception",
+          "fnIds": ["to-be:account/네이버-콜백-처리"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-5",
+          "text": "네이버 식별자에 연동된 계정이 있으면 해당 계정으로 세션 로그인한다",
+          "kind": "branch",
+          "fnIds": ["to-be:account/네이버-계정연동-자동가입", "flow:ANY /actions/Account.action?signon"],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-6",
+          "text": "연동된 계정이 없으면 네이버 프로필로 신규 계정을 자동 생성한 뒤 로그인한다",
+          "kind": "branch",
+          "fnIds": ["to-be:account/네이버-계정연동-자동가입", "flow:ANY /actions/Account.action?newAccount"],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/네이버-로그인-진입",
+          "to-be:account/네이버-콜백-처리",
+          "to-be:account/네이버-계정연동-자동가입"
+        ],
+        "modified": [
+          "flow:ANY /actions/Account.action",
+          "flow:ANY /actions/Account.action?signon",
+          "flow:ANY /actions/Account.action?newAccount"
         ],
         "removed": [],
         "revived": []
@@ -27,40 +169,88 @@
   ],
   "functions": [
     {
-      "id": "to-be:payment/결제수단-선택-폼",
+      "id": "to-be:account/카카오-로그인-진입",
       "featureId": "FN-023",
-      "name": "결제수단 선택 폼",
-      "domainId": "to-be:payment",
-      "domainName": "결제",
-      "entryPoint":     { "value": "(제안) GET /actions/Payment.action?paymentForm", "confidence": "INFERRED", "evidence": [] },
-      "implementation": { "value": "(제안) +PaymentActionBean.paymentForm()", "confidence": "INFERRED", "evidence": [] },
-      "data":           { "value": "(제안) PAYMENT(R), ORDER(R)", "confidence": "INFERRED", "evidence": [] },
-      "test":           { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
-      "origin": "TO_BE", "state": "PLANNED", "requirementHistory": [], "nfrTags": [], "rules": [], "deliverableRefs": []
+      "name": "카카오 로그인 진입(인가요청 리다이렉트)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": { "value": "(제안) GET /actions/Account.action?kakaoLogin", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +AccountActionBean#kakaoLogin · +KakaoOAuthService", "confidence": "INFERRED", "evidence": [] },
+      "data": { "value": "", "confidence": "INFERRED", "evidence": [] },
+      "test": { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": []
     },
     {
-      "id": "to-be:payment/결제-처리",
+      "id": "to-be:account/카카오-콜백-처리",
       "featureId": "FN-024",
-      "name": "결제 처리(승인)",
-      "domainId": "to-be:payment",
-      "domainName": "결제",
-      "entryPoint":     { "value": "(제안) POST /actions/Payment.action?processPayment", "confidence": "INFERRED", "evidence": [] },
-      "implementation": { "value": "(제안) +PaymentService.processPayment()", "confidence": "INFERRED", "evidence": [] },
-      "data":           { "value": "(제안) PAYMENT(C), ORDER(U)", "confidence": "INFERRED", "evidence": [] },
-      "test":           { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
-      "origin": "TO_BE", "state": "PLANNED", "requirementHistory": [], "nfrTags": [], "rules": [], "deliverableRefs": []
+      "name": "카카오 OAuth 콜백 처리(토큰교환·프로필조회)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": { "value": "(제안) GET /actions/Account.action?kakaoCallback", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +AccountActionBean#kakaoCallback · +KakaoOAuthService(token/userinfo)", "confidence": "INFERRED", "evidence": [] },
+      "data": { "value": "(제안) — (카카오 토큰·사용자 외부 API)", "confidence": "INFERRED", "evidence": [] },
+      "test": { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": []
     },
     {
-      "id": "to-be:payment/결제-결과-확인",
+      "id": "to-be:account/카카오-계정연동-자동가입",
       "featureId": "FN-025",
-      "name": "결제 결과 확인",
-      "domainId": "to-be:payment",
-      "domainName": "결제",
-      "entryPoint":     { "value": "(제안) GET /actions/Payment.action?paymentResult", "confidence": "INFERRED", "evidence": [] },
-      "implementation": { "value": "(제안) +PaymentActionBean.paymentResult()", "confidence": "INFERRED", "evidence": [] },
-      "data":           { "value": "(제안) PAYMENT(R)", "confidence": "INFERRED", "evidence": [] },
-      "test":           { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
-      "origin": "TO_BE", "state": "PLANNED", "requirementHistory": [], "nfrTags": [], "rules": [], "deliverableRefs": []
+      "name": "카카오 계정 연동/자동가입",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": { "value": "(제안) AccountActionBean#kakaoCallback 내부 분기", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +AccountService#linkOrCreateByKakao · AccountMapper · SignonMapper", "confidence": "INFERRED", "evidence": [] },
+      "data": { "value": "(제안) OAUTH_ACCOUNT(C) · ACCOUNT(CR) · SIGNON(CR)", "confidence": "INFERRED", "evidence": [] },
+      "test": { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": []
+    },
+    {
+      "id": "to-be:account/네이버-로그인-진입",
+      "featureId": "FN-026",
+      "name": "네이버 로그인 진입(인가요청 리다이렉트)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": { "value": "(제안) GET /actions/Account.action?naverLogin", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +AccountActionBean#naverLogin · +NaverOAuthService", "confidence": "INFERRED", "evidence": [] },
+      "data": { "value": "", "confidence": "INFERRED", "evidence": [] },
+      "test": { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": []
+    },
+    {
+      "id": "to-be:account/네이버-콜백-처리",
+      "featureId": "FN-027",
+      "name": "네이버 OAuth 콜백 처리(토큰교환·프로필조회)",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": { "value": "(제안) GET /actions/Account.action?naverCallback", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +AccountActionBean#naverCallback · +NaverOAuthService(token/userinfo)", "confidence": "INFERRED", "evidence": [] },
+      "data": { "value": "(제안) — (네이버 토큰·사용자 외부 API)", "confidence": "INFERRED", "evidence": [] },
+      "test": { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": []
+    },
+    {
+      "id": "to-be:account/네이버-계정연동-자동가입",
+      "featureId": "FN-028",
+      "name": "네이버 계정 연동/자동가입",
+      "domainId": "domain:account",
+      "domainName": "계정/회원",
+      "entryPoint": { "value": "(제안) AccountActionBean#naverCallback 내부 분기", "confidence": "INFERRED", "evidence": [] },
+      "implementation": { "value": "(제안) +AccountService#linkOrCreateByNaver · AccountMapper · SignonMapper", "confidence": "INFERRED", "evidence": [] },
+      "data": { "value": "(제안) OAUTH_ACCOUNT(C) · ACCOUNT(CR) · SIGNON(CR)", "confidence": "INFERRED", "evidence": [] },
+      "test": { "value": "", "confidence": "UNVERIFIED", "evidence": [] },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": []
     }
   ]
 }

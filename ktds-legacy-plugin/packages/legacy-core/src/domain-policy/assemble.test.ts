@@ -140,11 +140,11 @@ describe('정책 토픽 자동 분리 (splitByTopic)', () => {
     const out = splitByTopic(base)
     expect(out.map((d) => d.key)).toEqual(['order-ship_type', 'order'])
     const topic = out.find((d) => d.key === 'order-ship_type')!
-    expect(topic.name).toBe('주문 — SHIP_TYPE 정책')
+    expect(topic.name).toBe('주문 — SHIP_TYPE') // 빌더가 " 정책 정의서" 부착 → "주문 — SHIP_TYPE 정책 정의서"
     expect(topic.branches.map((b) => b.line)).toEqual([10])
     expect(topic.statusCodes!.every((s) => s.group === 'SHIP_TYPE')).toBe(true)
     const residual = out.find((d) => d.key === 'order')!
-    expect(residual.name).toBe('주문 처리 정책')
+    expect(residual.name).toBe('주문 처리')
     expect(residual.branches.map((b) => b.line)).toEqual([20])
   })
 

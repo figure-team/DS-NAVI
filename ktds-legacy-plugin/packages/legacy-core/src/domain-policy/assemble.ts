@@ -202,11 +202,12 @@ export function splitByTopic(d: DomainPolicyInput): DomainPolicyInput[] {
   const tiedGroups = [...byTopic.keys()].filter((k): k is string => k !== null).sort(cmp)
   if (tiedGroups.length === 0) return [d] // 강한 근거 없음 → 단일 유지
 
+  // 이름은 "정책"을 붙이지 않는다(빌더 title 이 "<name> 정책 정의서" 로 부착 — 중복 방지).
   const out: DomainPolicyInput[] = []
   for (const g of tiedGroups) {
     out.push({
       key: `${d.key}-${g.toLowerCase()}`,
-      name: `${d.name} — ${g} 정책`,
+      name: `${d.name} — ${g}`,
       classes: d.classes,
       flows: d.flows,
       branches: byTopic.get(g) ?? [],
@@ -218,7 +219,7 @@ export function splitByTopic(d: DomainPolicyInput): DomainPolicyInput[] {
   if (residual.length > 0) {
     out.push({
       key: d.key,
-      name: `${d.name} 처리 정책`,
+      name: `${d.name} 처리`,
       classes: d.classes,
       flows: d.flows,
       branches: residual,

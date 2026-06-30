@@ -35,6 +35,7 @@ const {
   buildWikiVault,
   writeWikiVault,
   buildMyBatisModel,
+  readDbSchema,
 } = engine
 
 const PLUGIN_DOC_DIR = join(here, '..', 'templates', 'doc')
@@ -173,7 +174,10 @@ const project = {
 }
 const buildDeps = findBuildDeps(projectRoot)
 
-const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph, project, buildDeps, fileEdges }
+// PA3: db-spec 가 DDL 의 실제 컬럼/PK/FK/CHECK 를 grounding 으로 싣도록 map(scan) 산출을 로드.
+// 없으면(맵 미실행/code-only) null → db-spec 은 기존 노드 기반 목록만(우아한 degrade).
+const dbSchema = readDbSchema(projectRoot)
+const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 

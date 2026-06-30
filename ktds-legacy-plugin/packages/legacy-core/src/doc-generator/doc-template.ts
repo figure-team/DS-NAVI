@@ -24,6 +24,11 @@ export const DocTemplateSectionSchema = z.object({
    * 여기 포함하지 않는다(도메인 컬럼만). 매트릭스 섹션은 고정 선두 컬럼만 둔다.
    */
   columns: z.array(z.string()).optional(),
+  /**
+   * 섹션 본문(헤딩 아래 표 앞 산문, 선택). 템플릿에 적으면 출력에 그대로 렌더된다
+   * (사람 편집 안내·규범 진술 등). 표/claim 데이터는 빌더가 채우고, prose 는 그 위 안내문.
+   */
+  prose: z.string().optional(),
 })
 export type DocTemplateSection = z.infer<typeof DocTemplateSectionSchema>
 
@@ -37,7 +42,7 @@ export type DocTemplate = z.infer<typeof DocTemplateSchema>
 
 /** frontmatter(--- ... ---) 의 key: value 를 평탄 맵으로. 없으면 throw(정직성). */
 function parseFrontmatter(md: string): Record<string, string> {
-  const m = /^﻿?---\r?\n([\s\S]*?)\r?\n---/.exec(md)
+  const m = /^\uFEFF?---\r?\n([\s\S]*?)\r?\n---/.exec(md)
   if (!m) throw new Error('문서 템플릿에 frontmatter(--- ... ---)가 없습니다')
   const out: Record<string, string> = {}
   for (const line of m[1].split(/\r?\n/)) {
@@ -72,10 +77,18 @@ function isSeparatorRow(line: string): boolean {
 export function parseDocTemplate(md: string): DocTemplate {
   const fm = parseFrontmatter(md)
   const sections: DocTemplateSection[] = []
-  let cur: { key: string; heading: string; columns?: string[] } | null = null
+  let cur: { key: string; heading: string; columns?: string[]; prose: string[]; sawTable: boolean } | null = null
 
   const flush = () => {
-    if (cur) sections.push({ key: cur.key, heading: cur.heading, ...(cur.columns ? { columns: cur.columns } : {}) })
+    if (cur) {
+      const prose = cur.prose.join('\n').trim()
+      sections.push({
+        key: cur.key,
+        heading: cur.heading,
+        ...(cur.columns ? { columns: cur.columns } : {}),
+        ...(prose.length > 0 ? { prose } : {}),
+      })
+    }
     cur = null
   }
 
@@ -87,13 +100,23 @@ export function parseDocTemplate(md: string): DocTemplate {
       if (!m) {
         throw new Error(`섹션 헤딩에 바인딩키가 없습니다: '## ${h[1]}' — '## 라벨 {#키}' 형식 필요`)
       }
-      cur = { key: m[2], heading: m[1].trim() }
+      cur = { key: m[2], heading: m[1].trim(), prose: [], sawTable: false }
       continue
     }
+    if (!cur) continue
+    const isTableRow = line.trim().startsWith('|')
     // 현재 섹션의 첫 표 헤더 줄을 컬럼으로 채택(구분선/이미 채택됨은 건너뜀).
-    if (cur && !cur.columns && line.trim().startsWith('|') && !isSeparatorRow(line)) {
-      const cols = parseColumnRow(line)
-      if (cols.length > 0) cur.columns = cols
+    if (isTableRow) {
+      cur.sawTable = true
+      if (!cur.columns && !isSeparatorRow(line)) {
+        const cols = parseColumnRow(line)
+        if (cols.length > 0) cur.columns = cols
+      }
+      continue
+    }
+    // 표 앞 산문만 본문으로(표 시작 후 줄·HTML 주석 제외). 사람 편집 안내문이 출력에 실린다.
+    if (!cur.sawTable && !line.trim().startsWith('<!--')) {
+      cur.prose.push(line)
     }
   }
   flush()
@@ -137,16 +160,17 @@ export function applyDocTemplate(doc: GeneratedDoc, tpl: DocTemplate): Generated
   const sections: Section[] = []
   for (const ts of tpl.sections) {
     const matches = byKey.get(ts.key) ?? []
+    const prosePatch = ts.prose ? { prose: ts.prose } : {}
     if (matches.length === 0) {
-      // 빌더가 안 만든 키 → 빈 섹션(헤딩만). 표/목록 여부는 컬럼 유무로.
+      // 빌더가 안 만든 키 → 빈 섹션(헤딩 + 템플릿 본문). 표/목록 여부는 컬럼 유무로.
       sections.push(
         ts.columns
-          ? { heading: ts.heading, key: ts.key, claims: [], table: { columns: ts.columns, rows: [] } }
-          : { heading: ts.heading, key: ts.key, claims: [] },
+          ? { heading: ts.heading, key: ts.key, claims: [], table: { columns: ts.columns, rows: [] }, ...prosePatch }
+          : { heading: ts.heading, key: ts.key, claims: [], ...prosePatch },
       )
     } else if (matches.length === 1) {
-      // 단일 섹션 → 템플릿 헤딩으로 교체.
-      sections.push({ ...withColumns(matches[0], ts), heading: ts.heading })
+      // 단일 섹션 → 템플릿 헤딩·본문으로 교체.
+      sections.push({ ...withColumns(matches[0], ts), heading: ts.heading, ...prosePatch })
     } else {
       // 반복 섹션(예: 테이블별) → 빌더 헤딩 유지(데이터 기반), 템플릿 컬럼만 입힌다.
       for (const m of matches) sections.push(withColumns(m, ts))

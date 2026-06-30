@@ -13,6 +13,10 @@ import type { DocInput } from '../builders/index.js'
 import { renderSkeleton } from '../render.js'
 import type { GeneratedDoc, Section } from '../types.js'
 import { getMethodology, listMethodologies } from './registry.js'
+import { buildSiTableSpec } from './si-standard.js'
+import { buildDomainPolicyDoc } from './domain-policy.js'
+import type { DbSchemaModel } from '../../db-schema/types.js'
+import type { DomainPolicyInput } from '../../domain-policy/types.js'
 
 // ──────────────────────────────────────────────────────────────────────────
 // 결정론 픽스처 — doc-generator.test.ts 와 동일 형태(근거 보유/미보유 혼합).
@@ -93,8 +97,17 @@ function tableOf(section: Section) {
 // ──────────────────────────────────────────────────────────────────────────
 
 describe('AC-23: methodology swap yields different doc sets', () => {
-  it('registry: as-built 기본 + si-standard 등록(정렬)', () => {
-    expect(listMethodologies()).toEqual(['as-built', 'si-standard'])
+  it('registry: as-built 기본 + si-standard + policy + domain-policy 등록(정렬)', () => {
+    expect(listMethodologies()).toEqual(['as-built', 'domain-policy', 'policy', 'si-standard'])
+  })
+
+  it('policy -> 정책서 PoC 4종(glossary/data/validation/authz)', () => {
+    const docs = getMethodology('policy').buildDocSet(INPUT)
+    expect(docs.map((d) => d.docId)).toEqual(['policy-glossary', 'policy-data', 'policy-validation', 'policy-authz'])
+    expect(docs.every((d) => d.methodology === 'policy')).toBe(true)
+    // 신호 미주입(INPUT 에 policySignals 없음) → 빈 표 + 안내 claim(누락 보고).
+    expect(docs.every((d) => d.sections[0].table?.rows.length === 0)).toBe(true)
+    expect(docs.every((d) => d.sections[0].claims.length === 1)).toBe(true)
   })
 
   it('as-built -> 현행 5종(01..05)', () => {
@@ -180,6 +193,51 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
     expect(row.cells[5]).toBe('주문 테이블') // 설명=summary
   })
 
+  it('si-테이블정의서(PA3): dbSchema 있으면 컬럼/타입/PK/FK/NULL 을 DDL 근거로 확정', () => {
+    const dbSchema: DbSchemaModel = {
+      schemaVersion: 1,
+      gitCommit: null,
+      tier: 'ddl+data',
+      sqlFileCount: 1,
+      tables: [
+        {
+          name: 'member',
+          relPath: 'db/ddl.sql',
+          line: 1,
+          comment: '회원',
+          columns: [
+            { name: 'member_id', type: 'BIGINT', nullable: false, primaryKey: true, unique: false, default: null, comment: 'PK', line: 2 },
+            { name: 'status_cd', type: 'VARCHAR(10)', nullable: false, primaryKey: false, unique: false, default: "'ACTIVE'", comment: null, line: 3 },
+          ],
+          primaryKey: ['member_id'],
+          uniques: [],
+          foreignKeys: [{ columns: ['status_cd'], refTable: 'common_code', refColumns: ['code'], line: 4 }],
+          checks: [],
+          indexes: [],
+          isCodeTable: false,
+          rows: [],
+          rowCount: 0,
+        },
+      ],
+      liveDbSignals: [],
+      unresolved: [],
+    }
+    const doc = buildSiTableSpec({ ...INPUT, dbSchema })
+    expect(doc.sections.map((s) => s.heading)).toEqual(['member 테이블 — 회원'])
+    const t = doc.sections[0].table!
+    expect(t.columns).toEqual(['컬럼', '타입', 'PK', 'FK', 'NULL', '설명'])
+    const pk = t.rows.find((r) => r.cells[0] === 'member_id')!
+    expect(pk.confidence).toBe('CONFIRMED')
+    expect(pk.evidence).toEqual([{ file: 'db/ddl.sql', line: 2 }])
+    expect(pk.cells[1]).toBe('BIGINT')
+    expect(pk.cells[2]).toBe('PK')
+    expect(pk.cells[4]).toBe('NOT NULL')
+    expect(pk.cells[5]).toBe('PK') // 설명=컬럼 주석
+    const fk = t.rows.find((r) => r.cells[0] === 'status_cd')!
+    expect(fk.cells[3]).toBe('→ common_code(code)')
+    expect(fk.cells[4]).toBe('NOT NULL')
+  })
+
   it('grounding 불변: 모든 CONFIRMED 행은 근거≥1, 날조 없음', () => {
     for (const doc of si) {
       for (const s of doc.sections) {
@@ -223,5 +281,85 @@ describe('determinism: SI golden skeleton + double-run', () => {
     for (let i = 0; i < a.length; i++) {
       expect(renderSkeleton(a[i])).toBe(renderSkeleton(b[i]))
     }
+  })
+})
+
+// ──────────────────────────────────────────────────────────────────────────
+// domain-policy — 정책 정의서 §0~§8 양식(문서정보/개요/용어/상태값/의사결정테이블/예외/흐름/검증/미결).
+// ──────────────────────────────────────────────────────────────────────────
+
+const ORDER_DOMAIN: DomainPolicyInput = {
+  key: 'order',
+  name: '주문 체크아웃',
+  classes: [{ className: 'OrderActionBean', relPath: 'web/OrderActionBean.java' }],
+  flows: [{ name: 'checkout', entry: { file: 'web/OrderActionBean.java', line: 142 } }],
+  branches: [
+    { relPath: 'web/OrderActionBean.java', line: 125, className: 'OrderActionBean', methodName: 'newOrderForm', kind: 'if', condition: '!acc.isAuthenticated()', then: 'return BLOCK;' },
+    { relPath: 'web/OrderActionBean.java', line: 150, className: 'OrderActionBean', methodName: 'newOrder', kind: 'if', condition: 'getOrder() != null', then: 'insertOrder(order); return VIEW;' },
+  ],
+}
+
+describe('domain-policy 방법론 — 정책 정의서 §0~§8', () => {
+  it('docId/title + §0~§8 섹션 골격', () => {
+    const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
+    expect(doc.docId).toBe('policy-domain-order')
+    expect(doc.title).toBe('주문 체크아웃 정책 정의서')
+    expect(doc.methodology).toBe('domain-policy')
+    expect(doc.sections.map((s) => s.heading)).toEqual([
+      '문서 정보',
+      '개정 이력',
+      '개요',
+      '용어 정의',
+      '상태값 정의',
+      '정책 규칙 — 의사결정 테이블',
+      '예외 및 엣지 케이스',
+      '처리 흐름 (의사코드)',
+      '검증 시나리오',
+      '미결 사항',
+    ])
+  })
+
+  it('§4 의사결정 테이블 — 분기→PL-ID·IF·THEN + file:line 근거(CONFIRMED)', () => {
+    const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
+    const dt = doc.sections.find((s) => s.key === 'decision-table')!.table!
+    expect(dt.columns).toEqual(['정책 ID', '정책명', '적용 조건 (IF)', '처리 내용 (THEN)', '우선순위', '예외/비고'])
+    const r0 = dt.rows[0]
+    expect(r0.cells[0]).toBe('PL-001')
+    expect(r0.cells[2]).toBe('!acc.isAuthenticated()') // IF
+    expect(r0.cells[3]).toBe('return BLOCK;') // THEN
+    expect(r0.confidence).toBe('CONFIRMED')
+    expect(r0.evidence).toEqual([{ file: 'web/OrderActionBean.java', line: 125 }])
+    const r1 = dt.rows[1]
+    expect(r1.cells[3]).toBe('insertOrder(order); return VIEW;') // THEN 본문 시드
+  })
+
+  it('§6 처리 흐름 — 메서드: IF→THEN claim(CONFIRMED)', () => {
+    const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
+    const flow = doc.sections.find((s) => s.key === 'process-flow')!
+    expect(flow.claims.some((c) => c.text.includes('IF !acc.isAuthenticated() →'))).toBe(true)
+    expect(flow.claims.every((c) => c.confidence === 'CONFIRMED')).toBe(true)
+  })
+
+  it('§3 상태값 미발견 → 안내 + §8 미결 자동 시드', () => {
+    const doc = buildDomainPolicyDoc(ORDER_DOMAIN)
+    const status = doc.sections.find((s) => s.key === 'status-codes')!
+    expect(status.table!.rows.length).toBe(0)
+    expect(status.claims[0].text).toContain('상태값 코드')
+    const issues = doc.sections.find((s) => s.key === 'open-issues')!.table!
+    expect(issues.rows.some((r) => r.cells[1].includes('상태값 코드'))).toBe(true)
+  })
+
+  it('분기 0이면 §4 "조건 분기 없음" 단정(빈 표 + 안내 claim)', () => {
+    const doc = buildDomainPolicyDoc({ ...ORDER_DOMAIN, branches: [] })
+    const sec = doc.sections.find((s) => s.key === 'decision-table')!
+    expect(sec.table!.rows.length).toBe(0)
+    expect(sec.claims[0].text).toContain('무조건 처리')
+  })
+
+  it('방법론 buildDocSet: domainPolicies → 도메인당 1문서(동적)', () => {
+    const docs = getMethodology('domain-policy').buildDocSet({ ...INPUT, domainPolicies: [ORDER_DOMAIN] })
+    expect(docs.length).toBe(1)
+    expect(docs[0].docId).toBe('policy-domain-order')
+    expect(getMethodology('domain-policy').buildDocSet(INPUT).length).toBe(0)
   })
 })

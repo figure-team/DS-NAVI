@@ -7,6 +7,8 @@
  */
 import { asBuiltMethodology } from './as-built.js'
 import { siStandardMethodology } from './si-standard.js'
+import { policyMethodology } from './policy.js'
+import { domainPolicyMethodology } from './domain-policy.js'
 import type { MethodologyModule } from './types.js'
 
 /** 기본 방법론 id — 현행 5종(as-built). */
@@ -16,6 +18,8 @@ export const DEFAULT_METHODOLOGY = 'as-built'
 const REGISTRY: Record<string, MethodologyModule> = {
   [asBuiltMethodology.id]: asBuiltMethodology,
   [siStandardMethodology.id]: siStandardMethodology,
+  [policyMethodology.id]: policyMethodology,
+  [domainPolicyMethodology.id]: domainPolicyMethodology,
 }
 
 /** id 로 방법론 모듈을 조회. 미등록이면 throw(fail-closed). */

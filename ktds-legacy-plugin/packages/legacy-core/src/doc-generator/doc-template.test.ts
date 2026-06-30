@@ -103,3 +103,32 @@ describe('applyDocTemplate — 헤딩/컬럼/순서 덮어쓰기', () => {
     expect(applyDocTemplate(tableDoc, fewer).sections[0].table?.columns).toEqual(['A', 'B'])
   })
 })
+
+describe('템플릿 본문(prose) — 헤딩 아래 표 앞 산문 캡처·전파', () => {
+  const FM = '---\ndocId: d\ntitle: D\nmethodology: as-built\n---\n'
+
+  it('표 앞 산문을 prose 로 캡처(표 뒤·주석 제외)', () => {
+    const tpl = parseDocTemplate(`${FM}## 개요 {#ov}\n안내 문장 첫째.\n둘째 줄.\n\n| A | B |\n| --- | --- |\n표뒤줄`)
+    expect(tpl.sections[0].prose).toBe('안내 문장 첫째.\n둘째 줄.')
+    expect(tpl.sections[0].columns).toEqual(['A', 'B'])
+  })
+
+  it('산문이 없으면 prose 미설정', () => {
+    const tpl = parseDocTemplate(`${FM}## 표 {#t}\n| A |`)
+    expect(tpl.sections[0].prose).toBeUndefined()
+  })
+
+  it('applyDocTemplate 가 prose 를 섹션에 전파(빌더 데이터 위 안내문)', () => {
+    const doc: GeneratedDoc = { docId: 'd', title: 'D', methodology: 'as-built', sections: [{ heading: 'X', key: 'ov', claims: [] }] }
+    const tpl = parseDocTemplate(`${FM}## 개요 {#ov}\n사람 편집 안내.`)
+    expect(applyDocTemplate(doc, tpl).sections[0].prose).toBe('사람 편집 안내.')
+  })
+
+  it('빌더가 안 만든 키도 헤딩 + prose 로 빈 섹션 생성', () => {
+    const doc: GeneratedDoc = { docId: 'd', title: 'D', methodology: 'as-built', sections: [] }
+    const tpl = parseDocTemplate(`${FM}## 신규 {#new}\n안내만.`)
+    const out = applyDocTemplate(doc, tpl).sections[0]
+    expect(out.heading).toBe('신규')
+    expect(out.prose).toBe('안내만.')
+  })
+})

@@ -16,8 +16,14 @@ export const NODE_WIDTH = 280;
 export const NODE_HEIGHT = 120;
 export const LAYER_CLUSTER_WIDTH = 320;
 export const LAYER_CLUSTER_HEIGHT = 180;
-export const PORTAL_NODE_WIDTH = 240;
-export const PORTAL_NODE_HEIGHT = 80;
+export const PORTAL_NODE_WIDTH = 220;
+export const PORTAL_NODE_HEIGHT = 72;
+// Footprint ELK should route the detail view against — matches the actually
+// rendered card (CustomNode is `max-w-[220px]`; height is content-driven, ~90px
+// typical). Feeding ELK near-real sizes keeps its orthogonal tracks aligned
+// with each card's centre so edges leave/enter straight (see ElkEdge snap).
+export const DETAIL_NODE_WIDTH = 220;
+export const DETAIL_NODE_HEIGHT = 96;
 
 /**
  * Synchronous dagre layout — used for small graphs.
@@ -195,12 +201,51 @@ export function applyForceLayout(
 export const ELK_DEFAULT_LAYOUT_OPTIONS: Record<string, string> = {
   algorithm: "layered",
   "elk.direction": "DOWN",
-  "elk.layered.spacing.nodeNodeBetweenLayers": "80",
-  "elk.spacing.nodeNode": "60",
+  "elk.layered.spacing.nodeNodeBetweenLayers": "100",
+  "elk.spacing.nodeNode": "80",
   "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+  // Brandes-Köpf balanced placement keeps a mostly-linear chain on a single
+  // straight axis instead of the diagonal cascade that NETWORK_SIMPLEX +
+  // LEFT post-compaction produced (uneven horizontal offsets per rank).
+  "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
+  "elk.layered.nodePlacement.favorStraightEdges": "true",
   "elk.edgeRouting": "ORTHOGONAL",
-  "elk.layered.compaction.postCompaction.strategy": "LEFT",
+  // Give parallel/overlapping edges their own orthogonal tracks so two edges
+  // running between the same ranks don't collapse onto one line — the routing
+  // points ELK returns are rendered verbatim by the `elk` custom edge, so a
+  // reader can tell which node connects to which.
+  "elk.spacing.edgeEdge": "24",
+  "elk.layered.spacing.edgeEdgeBetweenLayers": "24",
+  "elk.layered.spacing.edgeNodeBetweenLayers": "32",
   "elk.padding": "[top=40,left=20,right=20,bottom=20]",
+};
+
+/**
+ * Overview-only options (layer-cluster graph). On top of the shared defaults
+ * we disable connected-component separation so the handful of dependency-free
+ * layers (build, docs, config) tuck into the top rank as a tidy row instead of
+ * being tiled off to one side — which, combined with the straight Brandes-Köpf
+ * spine, gives the architecture overview a clean stacked-rows look.
+ *
+ * NOT used for the per-layer detail / per-container stages: a container can hold
+ * many unconnected files, and with separation off ELK would splay them into one
+ * very wide single rank instead of a compact packing.
+ */
+export const ELK_OVERVIEW_LAYOUT_OPTIONS: Record<string, string> = {
+  ...ELK_DEFAULT_LAYOUT_OPTIONS,
+  "elk.separateConnectedComponents": "false",
+};
+
+/**
+ * Layer-detail options. `hierarchyHandling: INCLUDE_CHILDREN` lets a single
+ * ELK pass lay out expanded containers (as parent nodes holding their file
+ * children) AND route the edges that cross between containers — so file→file
+ * connections get their own orthogonal track instead of all collapsing onto a
+ * shared centre channel. Container padding leaves room for the header chrome.
+ */
+export const ELK_DETAIL_LAYOUT_OPTIONS: Record<string, string> = {
+  ...ELK_DEFAULT_LAYOUT_OPTIONS,
+  "elk.hierarchyHandling": "INCLUDE_CHILDREN",
 };
 
 export function nodesToElkInput(

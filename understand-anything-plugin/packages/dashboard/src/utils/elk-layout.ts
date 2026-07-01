@@ -19,11 +19,93 @@ export interface ElkEdge {
   targets: string[];
 }
 
+export interface ElkPoint {
+  x: number;
+  y: number;
+}
+
+/** ELK edge routing geometry, present on edges in ELK's *output* graph. */
+interface ElkEdgeSection {
+  startPoint: ElkPoint;
+  endPoint: ElkPoint;
+  bendPoints?: ElkPoint[];
+}
+
+/**
+ * Pull the orthogonal routing polyline ELK computed for each edge out of a
+ * positioned graph, keyed by edge id. Points are in the same absolute
+ * coordinate frame as the (top-level) node positions, so they map directly to
+ * React Flow flow coordinates. Edges without routing (or nested under a parent)
+ * are simply omitted — the custom edge falls back to a smooth-step path.
+ */
+export function elkEdgePointMap(positioned: ElkInput): Map<string, ElkPoint[]> {
+  const out = new Map<string, ElkPoint[]>();
+  const edges =
+    (positioned as { edges?: Array<{ id: string; sections?: ElkEdgeSection[] }> })
+      .edges ?? [];
+  for (const e of edges) {
+    const section = e.sections?.[0];
+    if (!section) continue;
+    out.set(e.id, [
+      section.startPoint,
+      ...(section.bendPoints ?? []),
+      section.endPoint,
+    ]);
+  }
+  return out;
+}
+
 export interface ElkInput {
   id: string;
   children: ElkChild[];
   edges: ElkEdge[];
   layoutOptions?: Record<string, string>;
+}
+
+interface ElkOutputNode {
+  id: string;
+  x?: number;
+  y?: number;
+  children?: ElkOutputNode[];
+  edges?: Array<{
+    id: string;
+    sources?: string[];
+    targets?: string[];
+    sections?: ElkEdgeSection[];
+  }>;
+}
+
+/**
+ * Like {@link elkEdgePointMap} but for a *hierarchical* layout
+ * (`elk.hierarchyHandling: INCLUDE_CHILDREN`): walks the whole node tree and
+ * keys each edge's routing polyline by `"<source>|<target>"`. ELK reports edge
+ * geometry relative to the edge's containing node, so points are offset by that
+ * container's absolute position to land in the flat React Flow flow frame.
+ *
+ * Keying by endpoint pair (not edge id) lets the renderer attach routing to
+ * edges it rebuilds with its own ids — the (source, target) pair is the stable
+ * join key between the ELK graph and the rendered edges.
+ */
+export function elkEdgePointMapByEndpoint(
+  positioned: ElkInput,
+): Map<string, ElkPoint[]> {
+  const out = new Map<string, ElkPoint[]>();
+  const walk = (node: ElkOutputNode, originX: number, originY: number): void => {
+    for (const e of node.edges ?? []) {
+      const section = e.sections?.[0];
+      const src = e.sources?.[0];
+      const tgt = e.targets?.[0];
+      if (!section || !src || !tgt) continue;
+      const pts = [section.startPoint, ...(section.bendPoints ?? []), section.endPoint]
+        .map((p) => ({ x: p.x + originX, y: p.y + originY }));
+      out.set(`${src}|${tgt}`, pts);
+    }
+    for (const child of node.children ?? []) {
+      walk(child, originX + (child.x ?? 0), originY + (child.y ?? 0));
+    }
+  };
+  walk(positioned as unknown as ElkOutputNode, 0, 0);
+  return out;
 }
 
 // Keep ELK fallback dimensions in lockstep with the dagre/force NODE
@@ -65,7 +147,11 @@ export function repairElkInput(
   const fillDims = (children: ElkChild[]): ElkChild[] =>
     children.map((c) => {
       const next: ElkChild = { ...c };
-      if (next.width == null || next.height == null) {
+      // Only leaf nodes get default dimensions. A node with children is a
+      // compound/parent node whose size ELK computes from its contents — forcing
+      // a fixed size there would break hierarchical (INCLUDE_CHILDREN) layout.
+      const hasChildren = !!next.children && next.children.length > 0;
+      if (!hasChildren && (next.width == null || next.height == null)) {
         next.width = next.width ?? DEFAULT_NODE_WIDTH;
         next.height = next.height ?? DEFAULT_NODE_HEIGHT;
         dimsAdded++;

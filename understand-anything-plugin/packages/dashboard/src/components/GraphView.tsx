@@ -38,12 +38,20 @@ import {
   LAYER_CLUSTER_HEIGHT,
   PORTAL_NODE_WIDTH,
   PORTAL_NODE_HEIGHT,
-  ELK_DEFAULT_LAYOUT_OPTIONS,
+  DETAIL_NODE_WIDTH,
+  DETAIL_NODE_HEIGHT,
+  ELK_OVERVIEW_LAYOUT_OPTIONS,
+  ELK_DETAIL_LAYOUT_OPTIONS,
   nodesToElkInput,
   mergeElkPositions,
 } from "../utils/layout";
-import { applyElkLayout } from "../utils/elk-layout";
-import type { ElkChild, ElkEdge, ElkInput } from "../utils/elk-layout";
+import {
+  applyElkLayout,
+  elkEdgePointMap,
+  elkEdgePointMapByEndpoint,
+} from "../utils/elk-layout";
+import type { ElkChild, ElkEdge, ElkInput, ElkPoint } from "../utils/elk-layout";
+import ElkEdgeComponent from "./ElkEdge";
 import {
   aggregateContainerEdges,
   aggregateLayerEdges,
@@ -61,6 +69,12 @@ const nodeTypes = {
   "layer-cluster": LayerClusterNode,
   portal: PortalNode,
   container: ContainerNode,
+};
+
+// `elk` edges draw ELK's own orthogonal routing (separate track per edge);
+// edges without routing points fall back to a smooth-step path.
+const edgeTypes = {
+  elk: ElkEdgeComponent,
 };
 
 import type { NodeCategory } from "../store";
@@ -317,7 +331,12 @@ function useOverviewGraph() {
     let cancelled = false;
     const { clusterNodes, flowEdges, dims } = built;
     const baseNodes = clusterNodes as unknown as Node[];
-    const elkInput = nodesToElkInput(baseNodes, flowEdges, dims);
+    const elkInput = nodesToElkInput(
+      baseNodes,
+      flowEdges,
+      dims,
+      ELK_OVERVIEW_LAYOUT_OPTIONS,
+    );
     setLayoutStatus("computing");
     applyElkLayout(elkInput, { strict: import.meta.env.DEV })
       .then(({ positioned, issues }) => {
@@ -328,7 +347,13 @@ function useOverviewGraph() {
           useDashboardStore.getState().appendLayoutIssues(issues);
         }
         const positionedNodes = mergeElkPositions(baseNodes, positioned);
-        setOverview({ nodes: positionedNodes, edges: flowEdges });
+        const pointMap = elkEdgePointMap(positioned);
+        const routedEdges = flowEdges.map((e) => ({
+          ...e,
+          type: "elk",
+          data: { ...e.data, points: pointMap.get(e.id) },
+        }));
+        setOverview({ nodes: positionedNodes, edges: routedEdges });
         setLayoutStatus("ready");
       })
       .catch((err) => {
@@ -356,6 +381,8 @@ interface LayerDetailTopology {
   containers: DerivedContainer[];
   nodeToContainer: Map<string, string>;
   intraContainer: GraphEdge[];
+  /** ELK orthogonal routing keyed by `"<source>|<target>"` (final endpoints). */
+  edgePoints: Map<string, ElkPoint[]>;
 }
 
 const EMPTY_TOPOLOGY: LayerDetailTopology = {
@@ -368,6 +395,7 @@ const EMPTY_TOPOLOGY: LayerDetailTopology = {
   containers: [],
   nodeToContainer: new Map(),
   intraContainer: [],
+  edgePoints: new Map(),
 };
 
 /**
@@ -670,15 +698,20 @@ function useLayerDetailTopology(): LayerDetailTopology & {
     handleContainerToggle,
   ]);
 
-  // ── Async ELK Stage 1 layout ────────────────────────────────────────────
-  // `stage1Tick` is bumped by the Stage 2 effect when an actual container
-  // size deviates >20% from the Stage 1 estimate — it forces this effect
-  // to re-run with the now-cached actual size in containerSizeMemory so
-  // surrounding atoms reflow into the correct positions.
-  const stage1Tick = useDashboardStore((s) => s.stage1Tick);
   const [topology, setTopology] = useState<LayerDetailTopology>(EMPTY_TOPOLOGY);
   const [layoutStatus, setLayoutStatus] = useState<"computing" | "ready">("ready");
 
+  const expandedContainers = useDashboardStore((s) => s.expandedContainers);
+  const setContainerLayout = useDashboardStore((s) => s.setContainerLayout);
+
+  // ── Single hierarchical ELK pass ────────────────────────────────────────
+  // Expanded containers become ELK parent nodes holding their file children;
+  // collapsed containers, ungrouped files and portals are leaf nodes. Running
+  // the whole layer through ONE `INCLUDE_CHILDREN` layout lets ELK route the
+  // edges that cross between containers on their own orthogonal tracks — a file
+  // in one folder → a file in another no longer collapses onto a shared centre
+  // line. Re-runs when the structure OR the expansion set changes (the latter
+  // because expanding a container shifts every sibling's position).
   useEffect(() => {
     if (!built) {
       setTopology(EMPTY_TOPOLOGY);
@@ -699,55 +732,81 @@ function useLayerDetailTopology(): LayerDetailTopology & {
       portalEdges,
     } = built;
 
-    // Build Stage 1 ELK input: containers as opaque atoms + ungrouped files
-    // + portals, all at the top level.
-    //
-    // Read containerSizeMemory at effect-run time so that a Stage 2-driven
-    // re-layout (via `stage1Tick`) picks up the freshly measured actual
-    // size and routes around the now-correctly-sized atom. The structural
-    // memo intentionally does NOT depend on `stage1Tick` (avoids rebuilding
-    // the entire layer's structural state), so we override widths from
-    // size memory here.
-    const sizeMemoryAtRun = useDashboardStore.getState().containerSizeMemory;
-    const stage1Children: ElkChild[] = [
-      ...containerFlowNodes.map((cn) => {
-        const memo = sizeMemoryAtRun.get(cn.id);
-        return {
+    const visibleNodeIds = new Set(filteredGraphNodes.map((n) => n.id));
+    const containerById = new Map(containers.map((c) => [c.id, c]));
+
+    // Hierarchical children: expanded container → parent holding file children
+    // (size computed by ELK); collapsed container / ungrouped file / portal →
+    // leaf with a fixed size.
+    const elkChildren: ElkChild[] = [];
+    for (const cn of containerFlowNodes) {
+      const c = containerById.get(cn.id);
+      const childIds = c ? c.nodeIds.filter((id) => visibleNodeIds.has(id)) : [];
+      if (expandedContainers.has(cn.id) && childIds.length > 0) {
+        elkChildren.push({
           id: cn.id,
-          width: memo?.width ?? cn.width ?? NODE_WIDTH,
-          height: memo?.height ?? cn.height ?? NODE_HEIGHT,
-        };
-      }),
-      ...ungroupedFlowNodes.map((un) => ({
+          children: childIds.map((id) => ({
+            id,
+            width: DETAIL_NODE_WIDTH,
+            height: DETAIL_NODE_HEIGHT,
+          })),
+        });
+      } else {
+        elkChildren.push({
+          id: cn.id,
+          width: cn.width ?? NODE_WIDTH,
+          height: cn.height ?? NODE_HEIGHT,
+        });
+      }
+    }
+    for (const un of ungroupedFlowNodes) {
+      elkChildren.push({
         id: un.id,
-        width: NODE_WIDTH,
-        height: NODE_HEIGHT,
-      })),
-      ...portalNodes.map((pn) => ({
+        width: DETAIL_NODE_WIDTH,
+        height: DETAIL_NODE_HEIGHT,
+      });
+    }
+    for (const pn of portalNodes) {
+      elkChildren.push({
         id: pn.id,
         width: PORTAL_NODE_WIDTH,
         height: PORTAL_NODE_HEIGHT,
-      })),
-    ];
+      });
+    }
 
-    const stage1Edges: ElkEdge[] = [
-      ...aggEdges.map((e) => ({
-        id: e.id,
-        sources: [String(e.source)],
-        targets: [String(e.target)],
-      })),
-      ...portalEdges.map((e) => ({
-        id: e.id,
-        sources: [String(e.source)],
-        targets: [String(e.target)],
-      })),
-    ];
+    // Resolve each file→file edge to the endpoints actually rendered: the file
+    // id when its container is expanded (or it is ungrouped), else the collapsed
+    // container atom. This keeps the ELK edge set identical to the edges React
+    // Flow draws, so routing joins back by `"source|target"`.
+    const resolveEndpoint = (fileId: string): string => {
+      const cid = nodeToContainer.get(fileId);
+      if (!cid || cid === fileId) return fileId;
+      return expandedContainers.has(cid) ? fileId : cid;
+    };
+    const seenEdge = new Set<string>();
+    const elkEdges: ElkEdge[] = [];
+    for (const fe of filteredGraphEdges) {
+      const s = resolveEndpoint(fe.source);
+      const t = resolveEndpoint(fe.target);
+      if (s === t) continue;
+      const key = `${s}|${t}`;
+      if (seenEdge.has(key)) continue;
+      seenEdge.add(key);
+      elkEdges.push({ id: `de-${elkEdges.length}`, sources: [s], targets: [t] });
+    }
+    for (const pe of portalEdges) {
+      elkEdges.push({
+        id: `pe-${elkEdges.length}`,
+        sources: [String(pe.source)],
+        targets: [String(pe.target)],
+      });
+    }
 
     const elkInput: ElkInput = {
       id: "layer",
-      layoutOptions: ELK_DEFAULT_LAYOUT_OPTIONS,
-      children: stage1Children,
-      edges: stage1Edges,
+      layoutOptions: ELK_DETAIL_LAYOUT_OPTIONS,
+      children: elkChildren,
+      edges: elkEdges,
     };
 
     setLayoutStatus("computing");
@@ -755,164 +814,82 @@ function useLayerDetailTopology(): LayerDetailTopology & {
       .then(({ positioned, issues }) => {
         if (cancelled) return;
         if (issues.length > 0) {
-          // Funnel into store so WarningBanner surfaces them.
           useDashboardStore.getState().appendLayoutIssues(issues);
         }
-        const allBaseNodes: Node[] = [
-          ...(containerFlowNodes as unknown as Node[]),
-          ...(ungroupedFlowNodes as unknown as Node[]),
-          ...(portalNodes as unknown as Node[]),
-        ];
-        const positionedNodes = mergeElkPositions(allBaseNodes, positioned);
+        const topLevel = positioned.children ?? [];
+        const posById = new Map(topLevel.map((c) => [c.id, c]));
+
+        // Position container atoms (size from ELK when expanded), ungrouped
+        // files and portals.
+        const containerNodes = containerFlowNodes.map((cn) => {
+          const p = posById.get(cn.id);
+          return {
+            ...cn,
+            position: { x: p?.x ?? 0, y: p?.y ?? 0 },
+            width: p?.width ?? cn.width,
+            height: p?.height ?? cn.height,
+          };
+        });
+        const ungroupedPositioned = ungroupedFlowNodes.map((un) => {
+          const p = posById.get(un.id);
+          return { ...un, position: { x: p?.x ?? 0, y: p?.y ?? 0 } };
+        });
+        const portalPositioned = portalNodes.map((pn) => {
+          const p = posById.get(pn.id);
+          return { ...pn, position: { x: p?.x ?? 0, y: p?.y ?? 0 } };
+        });
+
+        // Publish child positions (relative to their container parent) so the
+        // expanded-children memo can render them via parentId + extent.
+        for (const cn of containerFlowNodes) {
+          if (!expandedContainers.has(cn.id)) continue;
+          const parent = posById.get(cn.id);
+          if (!parent?.children) continue;
+          const childPositions = new Map<string, { x: number; y: number }>();
+          for (const ch of parent.children) {
+            childPositions.set(ch.id, { x: ch.x ?? 0, y: ch.y ?? 0 });
+          }
+          setContainerLayout(cn.id, childPositions, {
+            width: parent.width ?? NODE_WIDTH,
+            height: parent.height ?? NODE_HEIGHT,
+          });
+        }
+
+        const edgePoints = elkEdgePointMapByEndpoint(positioned);
+        const attach = (e: Edge): Edge => ({
+          ...e,
+          type: "elk",
+          data: { ...e.data, points: edgePoints.get(`${e.source}|${e.target}`) },
+        });
+
         setTopology({
-          nodes: positionedNodes,
-          edges: aggEdges,
-          portalNodes,
-          portalEdges,
+          nodes: [
+            ...(containerNodes as unknown as Node[]),
+            ...(ungroupedPositioned as unknown as Node[]),
+            ...(portalPositioned as unknown as Node[]),
+          ],
+          edges: aggEdges.map(attach),
+          portalNodes: portalPositioned,
+          portalEdges: portalEdges.map(attach),
           filteredEdges: filteredGraphEdges,
           filteredNodes: filteredGraphNodes,
           containers,
           nodeToContainer,
           intraContainer,
+          edgePoints,
         });
         setLayoutStatus("ready");
       })
       .catch((err) => {
         if (cancelled) return;
-        console.error("[layer-detail Stage 1 ELK] layout failed:", err);
+        console.error("[layer-detail hierarchical ELK] layout failed:", err);
         setLayoutStatus("ready");
       });
 
     return () => {
       cancelled = true;
     };
-  }, [built, stage1Tick]);
-
-  // ── Stage 2: lazy per-container layout on expand ───────────────────────
-  // Watches expandedContainers and computes ELK on each newly-expanded
-  // container's children (without a cache entry). Critically does NOT
-  // depend on `built` — expanding a container must not trigger Stage 1
-  // relayout of the surrounding atoms.
-  const expandedContainers = useDashboardStore((s) => s.expandedContainers);
-  const containerLayoutCache = useDashboardStore((s) => s.containerLayoutCache);
-  const setContainerLayout = useDashboardStore((s) => s.setContainerLayout);
-  const bumpStage1Tick = useDashboardStore((s) => s.bumpStage1Tick);
-
-  const stage2Containers = topology.containers;
-  const stage2Intra = topology.intraContainer;
-
-  useEffect(() => {
-    if (stage2Containers.length === 0) return;
-    const toCompute = [...expandedContainers].filter(
-      (id) => !containerLayoutCache.has(id),
-    );
-    if (toCompute.length === 0) return;
-
-    let cancelled = false;
-    // Capture sizeMemory BEFORE any setContainerLayout writes so the
-    // deviation check below compares against the size Stage 1 actually
-    // used. (setContainerLayout overwrites containerSizeMemory with the
-    // new actualSize.)
-    const sizeMemoryBefore = useDashboardStore.getState().containerSizeMemory;
-    Promise.all(
-      toCompute.map(async (containerId) => {
-        const c = stage2Containers.find((cc) => cc.id === containerId);
-        if (!c) return null;
-        const childIds = new Set(c.nodeIds);
-        const childEdges = stage2Intra.filter(
-          (e) => childIds.has(e.source) && childIds.has(e.target),
-        );
-        const stage2Children: ElkChild[] = c.nodeIds.map((id) => ({
-          id,
-          width: NODE_WIDTH,
-          height: NODE_HEIGHT,
-        }));
-        const stage2Edges: ElkEdge[] = childEdges.map((e, i) => ({
-          id: `${containerId}-e${i}`,
-          sources: [e.source],
-          targets: [e.target],
-        }));
-        const stage2Input: ElkInput = {
-          id: containerId,
-          layoutOptions: ELK_DEFAULT_LAYOUT_OPTIONS,
-          children: stage2Children,
-          edges: stage2Edges,
-        };
-        try {
-          const { positioned, issues } = await applyElkLayout(stage2Input, {
-            strict: import.meta.env.DEV,
-          });
-          if (issues.length > 0) {
-            // Funnel into store so WarningBanner surfaces them.
-            useDashboardStore.getState().appendLayoutIssues(issues);
-          }
-          const childPositions = new Map<string, { x: number; y: number }>();
-          let maxX = 0;
-          let maxY = 0;
-          for (const ch of positioned.children ?? []) {
-            const x = ch.x ?? 0;
-            const y = ch.y ?? 0;
-            const w = ch.width ?? NODE_WIDTH;
-            const h = ch.height ?? NODE_HEIGHT;
-            childPositions.set(ch.id, { x, y });
-            if (x + w > maxX) maxX = x + w;
-            if (y + h > maxY) maxY = y + h;
-          }
-          // Pad for container chrome (header + border)
-          const actualSize = { width: maxX + 40, height: maxY + 60 };
-
-          // Recompute the Stage 1 estimate for this container using the
-          // SAME formula `built` used so we know what Stage 1 actually
-          // routed against. (Memo if present, else sqrt-clamped estimate.)
-          const memo = sizeMemoryBefore.get(containerId);
-          const STAGE1_MAX_W = 800;
-          const STAGE1_MAX_H = 600;
-          const stage1Width = memo?.width
-            ?? Math.min(
-              STAGE1_MAX_W,
-              Math.max(NODE_WIDTH, Math.sqrt(c.nodeIds.length) * NODE_WIDTH * 1.2),
-            );
-          const stage1Height = memo?.height
-            ?? Math.min(
-              STAGE1_MAX_H,
-              Math.max(NODE_HEIGHT, Math.sqrt(c.nodeIds.length) * NODE_HEIGHT * 1.2),
-            );
-          const dw = Math.abs(actualSize.width - stage1Width) / stage1Width;
-          const dh = Math.abs(actualSize.height - stage1Height) / stage1Height;
-          const deviated = dw > 0.2 || dh > 0.2;
-          return { containerId, childPositions, actualSize, deviated };
-        } catch (err) {
-          console.error(`[Stage 2 ${containerId}] layout failed:`, err);
-          return null;
-        }
-      }),
-    ).then((results) => {
-      if (cancelled) return;
-      let anyDeviated = false;
-      for (const r of results) {
-        if (!r) continue;
-        setContainerLayout(r.containerId, r.childPositions, r.actualSize);
-        if (r.deviated) anyDeviated = true;
-      }
-      // Only bump if at least one container's actual size differed >20%
-      // from its Stage 1 estimate. Bumping unconditionally would loop:
-      // Stage 1 → Stage 2 → bump → Stage 1 → ... With the >20% gate,
-      // after the re-layout containerSizeMemory holds the actual size, so
-      // the next Stage 2 sees a 0% deviation and the loop terminates.
-      if (anyDeviated) bumpStage1Tick();
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    expandedContainers,
-    stage2Containers,
-    stage2Intra,
-    containerLayoutCache,
-    setContainerLayout,
-    bumpStage1Tick,
-  ]);
+  }, [built, expandedContainers, setContainerLayout]);
 
   return { ...topology, layoutStatus };
 }
@@ -1239,9 +1216,11 @@ function useLayerDetailGraph() {
           id: `inflated-${key}`,
           source: realSrc,
           target: realTgt,
+          type: "elk",
           label: m.type,
           style: { stroke: "rgba(212,165,116,0.5)", strokeWidth: 1.5 },
           labelStyle: { fill: "#a39787", fontSize: 10 },
+          data: { points: topo.edgePoints.get(`${realSrc}|${realTgt}`) },
         });
       }
     }
@@ -1257,9 +1236,11 @@ function useLayerDetailGraph() {
         id: key,
         source: e.source,
         target: e.target,
+        type: "elk",
         label: e.type,
         style: { stroke: "rgba(212,165,116,0.5)", strokeWidth: 1.5 },
         labelStyle: { fill: "#a39787", fontSize: 10 },
+        data: { points: topo.edgePoints.get(`${e.source}|${e.target}`) },
       });
     }
     return out;
@@ -1268,6 +1249,7 @@ function useLayerDetailGraph() {
     topo.filteredEdges,
     topo.intraContainer,
     topo.nodeToContainer,
+    topo.edgePoints,
     expandedContainers,
   ]);
 
@@ -1341,6 +1323,52 @@ function GraphViewInner() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Hover-to-trace: pointing at a node lights up every edge incident to it (or
+  // to its children, when it's a container) and dims the rest — so even where
+  // routed edges run close together you can see exactly what connects to what.
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
+  const onNodeMouseEnter = useCallback(
+    (_: unknown, node: Node) => setHoveredNodeId(node.id),
+    [],
+  );
+  const onNodeMouseLeave = useCallback(() => setHoveredNodeId(null), []);
+
+  const isIncidentEndpoint = useCallback(
+    (endpoint: string | undefined, hoveredId: string) => {
+      if (!endpoint) return false;
+      if (endpoint === hoveredId) return true;
+      // Hovering a container highlights edges incident to its files.
+      return nodeToContainer?.get(endpoint) === hoveredId;
+    },
+    [nodeToContainer],
+  );
+
+  const displayEdges = useMemo(() => {
+    if (!hoveredNodeId) return edges;
+    return edges.map((edge) => {
+      const incident =
+        isIncidentEndpoint(edge.source, hoveredNodeId) ||
+        isIncidentEndpoint(edge.target, hoveredNodeId);
+      const style = (edge.style ?? {}) as Record<string, unknown>;
+      const labelStyle = (edge.labelStyle ?? {}) as Record<string, unknown>;
+      if (incident) {
+        return {
+          ...edge,
+          animated: true,
+          zIndex: 1000,
+          style: { ...style, stroke: "#d4a574", strokeWidth: 2.5, strokeOpacity: 1 },
+          labelStyle: { ...labelStyle, fill: "#d4a574", fontWeight: 600 },
+        };
+      }
+      return {
+        ...edge,
+        animated: false,
+        style: { ...style, strokeOpacity: 0.06 },
+        labelStyle: { ...labelStyle, opacity: 0.1 },
+      };
+    });
+  }, [edges, hoveredNodeId, isIncidentEndpoint]);
 
   const { fitView, getViewport, setCenter } = useReactFlow();
 
@@ -1534,14 +1562,21 @@ function GraphViewInner() {
       )}
       <ReactFlow
         nodes={nodes}
-        edges={edges}
+        edges={displayEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
+        onNodeMouseEnter={onNodeMouseEnter}
+        onNodeMouseLeave={onNodeMouseLeave}
         onPaneClick={onPaneClick}
         onMove={navigationLevel === "layer-detail" ? onMove : undefined}
         onInit={setReactFlowInstance}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        // `elk` edges render ELK's orthogonal routing — straight segments, each
+        // edge on its own track so overlapping connections stay distinguishable.
+        // Edges with no routing points fall back to a smooth-step path.
+        defaultEdgeOptions={{ type: "elk" }}
         nodesDraggable={false}
         nodesConnectable={false}
         edgesFocusable={false}

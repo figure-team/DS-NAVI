@@ -46,7 +46,13 @@ import louvain from 'graphology-communities-louvain';
  * classes, exported consts). Per-file errors are swallowed into [] with a
  * visible warning so a single bad file does not abort batching.
  *
- * Returns Map<path, string[]>.
+ * In the same global pass, extracts the per-file call graph
+ * (`{ caller, callee, lineNumber }[]`) so Phase 3.5 (resolve-call-edges.mjs)
+ * can deterministically resolve method-level `calls` edges instead of relying
+ * on the LLM's batch-local view. Call-graph extraction failures are swallowed
+ * per file (non-fatal) — a missing call graph only degrades `calls` coverage.
+ *
+ * Returns { exportsByPath: Map<path, string[]>, callGraphByPath: Map<path, entry[]> }.
  */
 async function extractExports(projectRoot, codeFiles) {
   let registry;
@@ -62,10 +68,14 @@ async function extractExports(projectRoot, codeFiles) {
       `Warning: compute-batches: tree-sitter init failed (${err.message}) ` +
       `— all symbols=[] in neighborMap — cross-batch edges limited to file-level\n`,
     );
-    return new Map(codeFiles.map(f => [f.path, []]));
+    return {
+      exportsByPath: new Map(codeFiles.map(f => [f.path, []])),
+      callGraphByPath: new Map(),
+    };
   }
 
   const exportsByPath = new Map();
+  const callGraphByPath = new Map();
 
   // I/O is parallelised in bounded chunks (libuv worker threads handle the
   // disk reads concurrently) while the actual tree-sitter parse stays on
@@ -115,9 +125,27 @@ async function extractExports(projectRoot, codeFiles) {
         );
         exportsByPath.set(file.path, []);
       }
+
+      // Global call-graph pass: extract per-file caller→callee entries for
+      // deterministic Tier-1 resolution downstream (resolve-call-edges.mjs).
+      // Non-fatal per file — a parse failure just drops that file's calls.
+      if (file.fileCategory === 'code' || file.fileCategory === 'script') {
+        try {
+          const cg = registry.extractCallGraph(file.path, content);
+          if (cg && cg.length > 0) {
+            callGraphByPath.set(file.path, cg.map(entry => ({
+              caller: entry.caller,
+              callee: entry.callee,
+              lineNumber: entry.lineNumber,
+            })));
+          }
+        } catch {
+          // Call graph extraction failed — non-fatal, skip this file.
+        }
+      }
     }
   }
-  return exportsByPath;
+  return { exportsByPath, callGraphByPath };
 }
 
 /**
@@ -375,7 +403,21 @@ async function main() {
 
   process.stderr.write(`Loaded ${files.length} files (${codeFiles.length} code).\n`);
 
-  const exportsByPath = await extractExports(projectRoot, codeFiles);
+  const { exportsByPath, callGraphByPath } = await extractExports(projectRoot, codeFiles);
+
+  // Persist the global call graph for Phase 3.5 (resolve-call-edges.mjs).
+  // Keyed by relative file path; only files with a non-empty call graph are
+  // included. This runs on the full file set (not per-batch), so downstream
+  // resolution is immune to the batch-locality that collapses LLM-emitted
+  // `calls` coverage at scale.
+  const callGraphOut = Object.fromEntries(callGraphByPath);
+  const callGraphPath = join(projectRoot, '.understand-anything', 'intermediate', 'call-graph.json');
+  writeFileSync(callGraphPath, JSON.stringify(callGraphOut, null, 2), 'utf-8');
+  const cgFileCount = callGraphByPath.size;
+  const cgEntryCount = [...callGraphByPath.values()].reduce((n, arr) => n + arr.length, 0);
+  process.stderr.write(
+    `Wrote call graph for ${cgFileCount} files (${cgEntryCount} call entries) to ${callGraphPath}\n`,
+  );
 
   let algorithm = 'louvain';
   let perFileCommunity;

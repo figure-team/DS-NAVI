@@ -998,7 +998,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   setDomainGraph: (graph) => {
     // Land on the domain map as the opening view when a domain graph is
     // available and the user is still on the initial structural view
-    // (spec di-codeatlas-001 success scene ①: "열자마자 도메인 지도 랜딩").
+    // (spec di-ds-navi-001 success scene ①: "열자마자 도메인 지도 랜딩").
     // Fires once on load; a deliberate later switch to "코드"/"문서" is preserved.
     const { viewMode } = get();
     set({

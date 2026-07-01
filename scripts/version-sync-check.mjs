@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ktds Code Atlas — 5-manifest 2-scheme version-sync gate (P0.3 / P0 exit gate b).
+ * ktds DS-NAVI — 5-manifest 2-scheme version-sync gate (P0.3 / P0 exit gate b).
  *
  * Scheme A (UA base-tracking, `<base>-ktds.N`): 3 platform plugin.json + UA plugin.json + UA package.json.
  * Scheme B (ktds semver, `X.Y.Z`): legacy plugin.json + legacy-core package.json.

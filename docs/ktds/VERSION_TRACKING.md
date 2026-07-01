@@ -1,4 +1,4 @@
-# ktds Code Atlas — 버전 base-tracking 스킴
+# ktds DS-NAVI — 버전 base-tracking 스킴
 
 > P0.3 산출물. fork(`understand-anything`) + ktds 확장 레이어의 버전 동기 규칙.
 > 검증: `node scripts/version-sync-check.mjs` (P0 exit 게이트 b).

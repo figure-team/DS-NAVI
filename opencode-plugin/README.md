@@ -1,4 +1,4 @@
-# opencode-plugin — ktds Code Atlas + Understand-Anything opencode 어댑터
+# opencode-plugin — ktds DS-NAVI + Understand-Anything opencode 어댑터
 
 Claude Code 플러그인(`ktds-legacy-plugin` + `understand-anything-plugin`)을 **opencode CLI**에서
 동일 기능으로 동작시키는 어댑터. **엔진/스크립트/대시보드 코드는 한 줄도 고치지 않는다** — opencode가

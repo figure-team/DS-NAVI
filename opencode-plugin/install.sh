@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ktds Code Atlas — opencode 어댑터 설치기.
+# ktds DS-NAVI — opencode 어댑터 설치기.
 #
 # Claude 플러그인(ktds-legacy-plugin)의 스크립트/엔진/템플릿을 그대로 재사용하고,
 # opencode 가 발견·실행할 수 있도록 글로벌 설정 디렉터리에 어댑터(플러그인+커맨드)를

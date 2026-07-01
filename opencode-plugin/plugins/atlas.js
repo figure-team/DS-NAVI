@@ -1,4 +1,4 @@
-// ktds Code Atlas — opencode adapter plugin
+// ktds DS-NAVI — opencode adapter plugin
 //
 // Claude Code 플러그인은 스킬 본문에서 `${CLAUDE_PLUGIN_ROOT}/scripts/*.mjs` 로
 // 번들 스크립트를 호출한다. opencode 에는 그 변수가 없다. 이 플러그인은 `shell.env`

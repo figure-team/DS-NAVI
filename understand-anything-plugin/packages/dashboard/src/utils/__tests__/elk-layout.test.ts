@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { applyElkLayout, repairElkInput, type ElkInput } from "../elk-layout";
+import {
+  applyElkLayout,
+  elkEdgePointMap,
+  elkEdgePointMapByEndpoint,
+  repairElkInput,
+  type ElkInput,
+} from "../elk-layout";
 
 describe("repairElkInput", () => {
   it("ensures node dimensions when missing", () => {
@@ -88,6 +94,67 @@ describe("applyElkLayout", () => {
       expect(typeof c.x).toBe("number");
       expect(typeof c.y).toBe("number");
     }
+  });
+
+  it("exposes per-edge orthogonal routing points via elkEdgePointMap", async () => {
+    const { positioned } = await applyElkLayout({
+      id: "root",
+      children: [
+        { id: "a", width: 100, height: 50 },
+        { id: "b", width: 100, height: 50 },
+      ],
+      edges: [{ id: "e1", sources: ["a"], targets: ["b"] }],
+      layoutOptions: {
+        algorithm: "layered",
+        "elk.direction": "DOWN",
+        "elk.edgeRouting": "ORTHOGONAL",
+      },
+    });
+    const map = elkEdgePointMap(positioned);
+    const pts = map.get("e1");
+    expect(pts).toBeDefined();
+    // start + end at minimum; every point is a finite {x,y}
+    expect(pts!.length).toBeGreaterThanOrEqual(2);
+    for (const p of pts!) {
+      expect(Number.isFinite(p.x)).toBe(true);
+      expect(Number.isFinite(p.y)).toBe(true);
+    }
+  });
+
+  it("routes hierarchical (INCLUDE_CHILDREN) edges keyed by endpoint", async () => {
+    const { positioned } = await applyElkLayout({
+      id: "root",
+      layoutOptions: {
+        algorithm: "layered",
+        "elk.direction": "DOWN",
+        "elk.hierarchyHandling": "INCLUDE_CHILDREN",
+        "elk.edgeRouting": "ORTHOGONAL",
+      },
+      // Two parent containers (no explicit size → ELK fits to children) each
+      // with one child file; one cross-container edge between the children.
+      children: [
+        { id: "c1", children: [{ id: "f1", width: 100, height: 40 }] },
+        { id: "c2", children: [{ id: "f2", width: 100, height: 40 }] },
+      ] as ElkInput["children"],
+      edges: [{ id: "e1", sources: ["f1"], targets: ["f2"] }],
+    });
+    const map = elkEdgePointMapByEndpoint(positioned);
+    const pts = map.get("f1|f2");
+    expect(pts).toBeDefined();
+    expect(pts!.length).toBeGreaterThanOrEqual(2);
+    // Parent containers must NOT be forced to default dims — they grow to fit.
+    const c1 = positioned.children!.find((c) => c.id === "c1");
+    expect((c1!.width ?? 0)).toBeGreaterThan(100);
+  });
+
+  it("elkEdgePointMap omits edges without routing sections", () => {
+    // A plain (un-laid-out) graph has no edge sections.
+    const map = elkEdgePointMap({
+      id: "root",
+      children: [{ id: "a", width: 1, height: 1 }],
+      edges: [{ id: "e1", sources: ["a"], targets: ["a"] }],
+    });
+    expect(map.size).toBe(0);
   });
 
   it("returns fatal issue when ELK rejects (without throwing in non-strict)", async () => {

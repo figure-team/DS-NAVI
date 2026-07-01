@@ -161,7 +161,10 @@ describe("orderFlowSteps — raw weight asc, tie-broken by id, NaN last", () => 
 
 // ── Fixture-scoped gates (AC-4 + R5) ────────────────────────────────────────
 
-const fixturePath = resolve(dirname(fileURLToPath(import.meta.url)), "../../../public/domain-graph.json");
+// Dedicated, self-contained fixture (synthetic 100-step `flow:order-detail-big`).
+// Decoupled from public/domain-graph.json, which is now generated demo data
+// (the vendored jpetstore-6 project) and no longer carries this flow.
+const fixturePath = resolve(dirname(fileURLToPath(import.meta.url)), "fixtures/domain-graph.bigflow.json");
 const fixture = JSON.parse(readFileSync(fixturePath, "utf8")) as KnowledgeGraph;
 const BIG_FLOW = "flow:order-detail-big";
 

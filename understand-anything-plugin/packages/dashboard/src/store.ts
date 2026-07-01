@@ -800,9 +800,10 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   reloadImpactOverlay: async () => {
     const { accessToken, setOverlayData } = get();
     try {
+      const base = import.meta.env.BASE_URL; // "/demo/" (demo) | "/" (라이브 서버)
       const url = accessToken
-        ? `/impact-overlay.json?token=${encodeURIComponent(accessToken)}&t=${Date.now()}`
-        : `/impact-overlay.json?t=${Date.now()}`;
+        ? `${base}impact-overlay.json?token=${encodeURIComponent(accessToken)}&t=${Date.now()}`
+        : `${base}impact-overlay.json?t=${Date.now()}`;
       const res = await fetch(url);
       if (!res.ok) return;
       const data = (await res.json().catch(() => null)) as
@@ -997,7 +998,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   setDomainGraph: (graph) => {
     // Land on the domain map as the opening view when a domain graph is
     // available and the user is still on the initial structural view
-    // (spec di-codeatlas-001 success scene ①: "열자마자 도메인 지도 랜딩").
+    // (spec di-ds-navi-001 success scene ①: "열자마자 도메인 지도 랜딩").
     // Fires once on load; a deliberate later switch to "코드"/"문서" is preserved.
     const { viewMode } = get();
     set({

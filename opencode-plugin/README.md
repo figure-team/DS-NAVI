@@ -15,13 +15,17 @@ Claude Code 플러그인(`ktds-legacy-plugin` + `understand-anything-plugin`)을
 ```
 opencode-plugin/
   plugins/atlas.js          # shell.env 훅: 셸에 ATLAS_PLUGIN_ROOT(ktds) + CLAUDE_PLUGIN_ROOT/UA_PLUGIN_ROOT(U-A) 주입
-  command/*.md              # 14개 슬래시 커맨드 (ktds 7 + U-A 7)
-  install.sh                # ~/.config/opencode/ 에 설치 (dev=심링크 / vendor=자급복사)
+  scripts/gen-commands.mjs  # SKILL.md → opencode 커맨드 생성기(설치 시점 실행 — 단일 소스)
+  install.sh / uninstall.sh # 프로젝트 스코프 설치/제거 (dev=심링크 / vendor=자급복사)
   README.md
 ```
 
-설치 시 `~/.config/opencode/` 에 깔리는 것:
-- `command/*.md` — `/understand`, `/understand-map`, `/understand-rtm` … (슬래시 커맨드)
+**커맨드는 저장소에 두지 않는다 — SKILL.md 가 단일 소스.** 커맨드 `.md` 는 `install.sh` 가
+`gen-commands.mjs` 로 **설치 시점에 SKILL.md 에서 생성**한다. 그래서 스킬을 고치거나 새로
+추가하면 재설치만으로 Claude·opencode 양쪽에 반영된다(복사본 드리프트 없음).
+
+설치 시 대상 `.opencode/` 에 깔리는 것:
+- `command/*.md` — SKILL.md 에서 생성된 14개 슬래시 커맨드(`/understand`, `/understand-map` …)
 - `plugins/atlas.js` — 환경변수 주입 플러그인
 - `agents/*.md` — U-A 서브에이전트 9종 (`/understand` 파이프라인 디스패치용)
 - `bundle` → `ktds-legacy-plugin`, `bundle-ua` → `understand-anything-plugin` (dev=심링크)
@@ -33,6 +37,16 @@ opencode-plugin/
 | understand-init, understand-map, understand-onboard*, understand-impact, understand-docs, understand-policy, understand-rtm | understand, understand-dashboard, understand-domain, understand-explain, understand-diff, understand-chat, understand-knowledge |
 
 \* `understand-onboard` 는 ktds(가이드 1-명령 온보딩)가 U-A 동명 스킬을 대체한다(이름 충돌 회피).
+
+## 기능 개발 시 — 양쪽 반영 규칙
+
+| 무엇을 고치나 | opencode 반영 방법 |
+| --- | --- |
+| **엔진/로직** (`legacy-core` TS, `scripts/*.mjs`, `templates/`, 대시보드) | `pnpm build` 만 — dev 모드는 번들을 심링크하므로 Claude·opencode 가 **동일 dist 공유**. 자동. |
+| **스킬 지시문**(`skills/*/SKILL.md`) 수정·**새 스킬 추가** | `install.sh` 재실행 — 커맨드는 SKILL.md 에서 **매번 생성**되므로 자동 반영. (새 ktds 스킬이면 `gen-commands.mjs` 의 `KTDS`/`UA` 배열에 이름 1줄 추가) |
+| **환경변수 주입/훅** (`plugins/atlas.js`) | `install.sh` 재실행. |
+
+요약: 엔진은 빌드만, 스킬은 재설치만. 별도 수기 동기화(복사본 갱신)는 없다.
 
 ## 설치 / 사용
 

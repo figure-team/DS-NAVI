@@ -20,12 +20,12 @@ done
 
 echo "→ opencode-plugin 제거  (target: $TARGET)"
 
-# 우리 커맨드(command/*.md) — opencode-plugin/command 의 파일명만 제거
-if [[ -d "$REPO_PLUGIN_DIR/command" ]]; then
-  for f in "$REPO_PLUGIN_DIR/command/"*.md; do
-    name="$(basename "$f")"
-    rm -f "$TARGET/command/$name" && echo "   - command/$name"
-  done
+# 우리 커맨드 — 생성기가 아는 이름 목록(--list)만 제거(사용자 다른 커맨드는 보존)
+if [[ -f "$REPO_PLUGIN_DIR/scripts/gen-commands.mjs" ]]; then
+  while IFS= read -r name; do
+    [[ -z "$name" ]] && continue
+    rm -f "$TARGET/command/$name.md" && echo "   - command/$name.md"
+  done < <(node "$REPO_PLUGIN_DIR/scripts/gen-commands.mjs" --list)
 fi
 
 # 우리 플러그인(plugins/*.js)

@@ -48,9 +48,11 @@ mkdir -p "$TARGET/plugins" "$TARGET/command" "$TARGET/agents"
 cp "$REPO_PLUGIN_DIR/plugins/"*.js "$TARGET/plugins/"
 echo "   ✓ plugins/*.js → $TARGET/plugins/"
 
-# 2) 커맨드(/understand-*) — SKILL 본문 포팅본
-cp "$REPO_PLUGIN_DIR/command/"*.md "$TARGET/command/"
-echo "   ✓ command/*.md → $TARGET/command/"
+# 2) 커맨드(/understand-*) — SKILL.md(단일 소스)에서 설치 시점 생성
+#    스킬을 고치거나 새로 추가하면 재설치만으로 opencode 에 자동 반영된다(복사본 드리프트 없음).
+node "$REPO_PLUGIN_DIR/scripts/gen-commands.mjs" \
+  --ktds "$KTDS_LEGACY/skills" --ua "$UA_PLUGIN/skills" --out "$TARGET/command" \
+  | sed 's/^/   /'
 
 # 3) 엔진 dist 보장 — 없으면 자동 빌드(일회성, 받는 쪽이 신경 안 쓰게)
 if [[ ! -f "$KTDS_LEGACY/packages/legacy-core/dist/index.js" ]]; then

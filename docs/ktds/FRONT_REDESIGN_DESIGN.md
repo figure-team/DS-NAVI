@@ -1,7 +1,7 @@
 # U-A 대시보드 프론트 전면 재구축 설계 (FRONT_REDESIGN)
 
 > 워크트리: `front` / 브랜치: worktree-front (demo/jpetstore-6 기반)
-> 상태: **P0 승인 완료(2026-07-02) → P1 구현 완료 — 사용자 확인 대기**
+> 상태: **P0~P6 전 단계 완료(2026-07-03) — 기능 완결.** 후속 잔여는 §8.10 참조
 > 결정사항(2026-07-02 확정): 프론트 전면 재구축 · react-router 경로 라우팅 · IA 신설계 · **좌측 NavRail · 홈 신설 · 모바일 반응형 통합 · 라이트 테마 + KT 레드**(레퍼런스: KT DS **DS-APM** 제품 화면, 팔레트 추출 완료 — §6)
 > 시안: `docs/ktds/front-redesign/mockup-shell-home.html` (+.png)
 
@@ -267,6 +267,14 @@ src/
 - **버그 픽스**: `?flow=` 딥링크가 StrictMode 이중 setGraph에 지워짐(P3의 selectedNodeId와 동일 패턴) → setGraph가 domainGraph 존재 시 activeFlowId/selectedFlowId도 보존(도메인 상태는 domainGraph 소관).
 - **검증**: 스파인 딥링크(라이트 레이어 색+인용 칩)·온보딩·구조 class 레벨 스크린샷, build·lint·테스트 green.
 - 잔여(P6 또는 후속): RTM/산출물/위키 하위 라우트, MobileLayout 반응형 통합, 데모 정적 빌드 검증, 비주요 로케일 온보딩 카피.
+
+## 8.10 P6 구현 기록 (2026-07-03) — 마감 QA
+
+- **데모 정적 빌드 검증(§9 리스크 해소)**: `build:demo`(base /demo/, VITE_DEMO_MODE) green, `vite preview`에서 `/demo/structure` `/demo/domains/domain:account` `/demo/rtm` 딥 라우트 전부 200 + 렌더 확인 — BrowserRouter+basename이 SPA fallback 하에서 정상. **조건**: 실제 호스팅도 404→index.html fallback을 지원해야 함(미지원 정적 호스트면 HashRouter 전환 필요).
+- **다크 모드 회귀**: `?theme=<presetId>` 1회 강제 어포던스 신설(저장 안 함, metaTheme보다 우선) → `dark-gold`로 구조 화면 스팟체크 — MODE_EXTRAS 다크 값(노드·레이어·diff·상태·메서드) 정상.
+- **문서 갱신**: CLAUDE.md Dashboard 섹션을 재구축 후 구조(라이트 기본·라우트 맵·셸·QA 어포던스)로 교체.
+- **전체 회귀**: build·lint(0 errors)·테스트 297+132 green.
+- **후속 잔여**(기능 완결과 별개, 필요 시 착수): ① RTM 인테이크(:sid)·산출물(:docId)·위키(/wiki/*) 하위 라우트 ② MobileLayout 반응형 통합(현재 별도 트리 유지, 동작함) ③ 데모 실호스팅의 404 fallback 확인. ~~ja/zh/ru 온보딩 카피~~(사용자 결정: 불필요).
 
 ## 9. 리스크·미결
 

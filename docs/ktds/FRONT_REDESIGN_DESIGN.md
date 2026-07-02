@@ -257,6 +257,17 @@ src/
 - **검증**: 홈·도메인 지도·흐름 목록·구조(중립 엣지 확인)·RTM 라이트 스크린샷, 시안(mockup-shell-home) 대비 구조 일치. build·lint·테스트(297+132) green.
 - 잔여(P5): 내부 화면의 다크 전제 하드코딩 폴리시 — FlowListView METHOD 배지 팔레트, RTM 상태색, ExportMenu SVG 스냅샷(다크 고정), 온보딩 카피. 노드/차트 카테고리 팔레트의 dataviz `validate_palette.js` 검증도 P5 폴리시에서.
 
+## 8.9 P5 구현 기록 (2026-07-03)
+
+- **브랜딩 피드백 반영**: NavRail의 `kt ds` 로고 마크 제거(DS-NAVI 단독), 프리셋 `ktds-light`→`ds-navi-light`·"KT DS Light"→"DS-NAVI Light", 스와치명 "KT Red"→"Red", `--color-kt-red` 삭제. 팔레트 값 자체(§6)는 불변.
+- **시맨틱 토큰 2계열 신설**(모드별 MODE_EXTRAS + @theme 라이트 기본값): `--color-status-{ok,warn,error,info}`(§6의 상태·액센트 분리 원칙 구현), `--color-method-{get,post,put,delete,any,batch,event,flow}`(HTTP 메서드 카테고리).
+- **하드코딩 → 토큰 배선**: RtmView 상태 상수(OK/BAD/WARN/NFR/FAINT/GOLD_DIM), FlowListView·FlowSpineView 메서드 배지(bg는 15% color-mix), CodeViewer prism 테마 모드 스위치(vsDark↔github), ExportMenu SVG는 내보내기 시점 테마 계산값을 굽는 방식(단독 파일은 CSS 변수 해석 불가).
+- **온보딩 카피 재작성**(ko·en): 업스트림 범용 카피(지식그래프/Overview/Learn) → 새 IA 5단계(홈 여정·URL 딥링크·도메인 지도→스파인·구조 그래프·부가 기능). ja/zh/zh-TW/ru는 구 카피 잔존(후속).
+- **노드 팔레트 dataviz 검증**: 라이트 13색을 `validate_palette.js`로 검증 — 채도 미달 5색·대비 미달 1색 교정 후 **전 항목 통과**(CVD 9.8은 노드 라벨=보조 인코딩으로 합법). ds-navi-light 프리셋·@theme 기본값에 반영.
+- **버그 픽스**: `?flow=` 딥링크가 StrictMode 이중 setGraph에 지워짐(P3의 selectedNodeId와 동일 패턴) → setGraph가 domainGraph 존재 시 activeFlowId/selectedFlowId도 보존(도메인 상태는 domainGraph 소관).
+- **검증**: 스파인 딥링크(라이트 레이어 색+인용 칩)·온보딩·구조 class 레벨 스크린샷, build·lint·테스트 green.
+- 잔여(P6 또는 후속): RTM/산출물/위키 하위 라우트, MobileLayout 반응형 통합, 데모 정적 빌드 검증, 비주요 로케일 온보딩 카피.
+
 ## 9. 리스크·미결
 
 - ~~KT DS 팔레트 미확보~~ → **해소**: DS-APM 스크린샷에서 추출 완료(§6). 단 공식 브랜드 가이드 대비 검증은 미실시 — 실 가이드 입수 시 1층 토큰만 교체.

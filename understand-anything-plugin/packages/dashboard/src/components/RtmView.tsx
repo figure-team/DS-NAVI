@@ -56,7 +56,9 @@ interface ReqOverride { lifecycle?: string; signoff?: Signoff | null; tests?: Re
 
 const APPROVER_LS_KEY = "ktds.approver";
 const GOLD = "var(--color-accent)";
-const OK = "#7fae8a", BAD = "#cf8a86", WARN = "#d8a25e", NFR = "#9fc1d8", FAINT = "#4f4a40", GOLD_DIM = "#9c7a52";
+// P5: 시맨틱 상태 토큰(모드별 값은 테마 엔진 MODE_EXTRAS).
+const OK = "var(--color-status-ok)", BAD = "var(--color-status-error)", WARN = "var(--color-status-warn)",
+  NFR = "var(--color-status-info)", FAINT = "var(--color-border-medium)", GOLD_DIM = "var(--color-accent-dim)";
 
 const CONF: Record<Confidence, { label: string; color: string }> = {
   CONFIRMED: { label: "확정", color: "var(--color-text-muted)" },
@@ -809,7 +811,7 @@ export default function RtmView() {
     return (
       <section style={{ background: nested ? "var(--color-surface)" : "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: nested ? 11 : 14, marginTop: nested ? 10 : 0, marginBottom: nested ? 0 : 14, overflow: "hidden", opacity: dead ? 0.68 : 1 }}>
         <div className="flex items-center gap-3" style={{ padding: "14px 20px", cursor: "pointer" }} onClick={() => setExpandedReqs((p) => { const n = new Set(p); if (n.has(r.id)) n.delete(r.id); else n.add(r.id); return n; })}>
-          <span style={{ width: 11, height: 11, borderRadius: "50%", flex: "none", background: dead ? "none" : r.type === "nonfunctional" ? NFR : GOLD, border: dead ? `1.5px solid ${FAINT}` : "none", boxShadow: dead ? "none" : `0 0 0 4px ${r.type === "nonfunctional" ? "rgba(120,160,190,.14)" : "color-mix(in srgb, var(--color-accent) 14%, transparent)"}` }} />
+          <span style={{ width: 11, height: 11, borderRadius: "50%", flex: "none", background: dead ? "none" : r.type === "nonfunctional" ? NFR : GOLD, border: dead ? `1.5px solid ${FAINT}` : "none", boxShadow: dead ? "none" : `0 0 0 4px ${r.type === "nonfunctional" ? "color-mix(in srgb, var(--color-status-info) 14%, transparent)" : "color-mix(in srgb, var(--color-accent) 14%, transparent)"}` }} />
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-muted)", textDecoration: dead ? "line-through" : "none" }}>{r.id}</span>
           <span style={{ fontSize: 15, color: dead ? "var(--color-text-secondary)" : "var(--color-text-primary)", fontWeight: 500 }}>{r.text}</span>
           {dead ? <Pill label={r.status === "WITHDRAWN" ? (r.changeReq?.crNo ? `폐기 ${r.changeReq.crNo}` : "폐기(철회)") : "폐기"} color="var(--color-text-muted)" bg="rgba(255,255,255,.04)" />

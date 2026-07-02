@@ -12,7 +12,7 @@ import { DEFAULT_THEME_CONFIG } from "./types.ts";
 import { getPreset } from "./presets.ts";
 import { applyTheme } from "./theme-engine.ts";
 
-// P4: KT DS 라이트 리브랜딩 — 키 버전 업으로 기존 저장값을 1회 무효화(새 기본값 적용).
+// P4: DS-NAVI 라이트 리브랜딩 — 키 버전 업으로 기존 저장값을 1회 무효화(새 기본값 적용).
 const STORAGE_KEY = "ua-theme-v2";
 
 interface ThemeContextValue {

@@ -22,20 +22,20 @@ const LIGHT_ACCENT_SWATCHES: AccentSwatch[] = [
   { id: "slate", name: "Slate", accent: "#5a6570", accentDim: "#4e5860", accentBright: "#6e7a85" },
 ];
 
-// FRONT_REDESIGN P4: KT DS 브랜드 액센트(§6 팔레트, DS-APM 추출) + 라이트 대안 스와치.
-const KTDS_ACCENT_SWATCHES: AccentSwatch[] = [
-  { id: "ktred", name: "KT Red", accent: "#d81b2c", accentDim: "#b91525", accentBright: "#e8404f" },
+// FRONT_REDESIGN P4: DS-NAVI 브랜드 액센트(§6 팔레트, DS-APM 추출) + 라이트 대안 스와치.
+const DSNAVI_ACCENT_SWATCHES: AccentSwatch[] = [
+  { id: "ktred", name: "Red", accent: "#d81b2c", accentDim: "#b91525", accentBright: "#e8404f" },
   ...LIGHT_ACCENT_SWATCHES,
 ];
 
 export const PRESETS: ThemePreset[] = [
-  // 기본 프리셋(배열 첫 항목 = getPreset 폴백) — KT DS 라이트, DS-APM 디자인 언어.
+  // 기본 프리셋(배열 첫 항목 = getPreset 폴백) — DS-NAVI 라이트, DS-APM 디자인 언어.
   {
-    id: "ktds-light",
-    name: "KT DS Light",
+    id: "ds-navi-light",
+    name: "DS-NAVI Light",
     isDark: false,
     defaultAccentId: "ktred",
-    accentSwatches: KTDS_ACCENT_SWATCHES,
+    accentSwatches: DSNAVI_ACCENT_SWATCHES,
     colors: {
       root: "#f4f5f7",
       surface: "#fcfcfd",
@@ -51,18 +51,18 @@ export const PRESETS: ThemePreset[] = [
       edge: "rgba(26, 27, 31, 0.28)",
       "edge-dim": "rgba(26, 27, 31, 0.08)",
       "edge-dot": "rgba(26, 27, 31, 0.14)",
-      "node-file": "#3a6a87",
-      "node-function": "#488a5b",
-      "node-class": "#755d99",
-      "node-module": "#a88a56",
-      "node-concept": "#966674",
+      "node-file": "#1f6fab",
+      "node-function": "#3f9142",
+      "node-class": "#7a4fc9",
+      "node-module": "#b07818",
+      "node-concept": "#b04a72",
       "node-config": "#0d9488",
       "node-document": "#0284c7",
       "node-service": "#7c3aed",
       "node-table": "#059669",
       "node-endpoint": "#ea580c",
       "node-pipeline": "#e11d48",
-      "node-schema": "#ca8a04",
+      "node-schema": "#a16207",
       "node-resource": "#4f46e5",
     },
   },

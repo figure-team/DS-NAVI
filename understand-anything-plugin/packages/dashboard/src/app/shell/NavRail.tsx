@@ -34,8 +34,7 @@ export default function NavRail() {
   return (
     <nav className="w-[200px] shrink-0 h-full flex flex-col bg-surface border-r border-border-subtle px-2.5 py-3.5">
       <div className="flex items-baseline gap-1.5 px-2.5 pb-4">
-        <span className="font-extrabold text-lg tracking-tight" style={{ color: "var(--color-kt-red)" }}>kt ds</span>
-        <span className="font-heading font-bold text-[15px] text-text-primary tracking-wide">DS-NAVI</span>
+        <span className="font-heading font-bold text-base text-text-primary tracking-wide">DS-NAVI</span>
       </div>
       {items.map((item) => (
         <NavLink

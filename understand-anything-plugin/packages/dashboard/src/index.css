@@ -3,16 +3,13 @@
 @source "../index.html";
 
 @theme {
-  /* FRONT_REDESIGN P4: 첫 페인트 기본값 = KT DS 라이트(ktds-light 프리셋과 동일).
+  /* FRONT_REDESIGN P4: 첫 페인트 기본값 = DS-NAVI 라이트(ds-navi-light 프리셋과 동일).
      런타임 값은 theme-engine(applyTheme)이 CSS 변수로 덮어쓴다. */
   /* Base */
   --color-root: #f4f5f7;
   --color-surface: #fcfcfd;
   --color-elevated: #eff0f3;
   --color-panel: #ffffff;
-
-  /* Brand (모드 불변) */
-  --color-kt-red: #e60012;
 
   /* Accent */
   --color-accent: #d81b2c;
@@ -29,18 +26,18 @@
   --color-border-medium: #d5d8de;
 
   /* Node types */
-  --color-node-file: #3a6a87;
-  --color-node-function: #488a5b;
-  --color-node-class: #755d99;
-  --color-node-module: #a88a56;
-  --color-node-concept: #966674;
+  --color-node-file: #1f6fab;
+  --color-node-function: #3f9142;
+  --color-node-class: #7a4fc9;
+  --color-node-module: #b07818;
+  --color-node-concept: #b04a72;
   --color-node-config: #0d9488;
   --color-node-document: #0284c7;
   --color-node-service: #7c3aed;
   --color-node-table: #059669;
   --color-node-endpoint: #ea580c;
   --color-node-pipeline: #e11d48;
-  --color-node-schema: #ca8a04;
+  --color-node-schema: #a16207;
   --color-node-resource: #4f46e5;
 
   /* Knowledge node types */
@@ -82,6 +79,22 @@
 
   /* Kbd */
   --kbd-bg: rgba(216, 27, 44, 0.1);
+
+  /* Status (시맨틱 상태 — §6: 색+라벨 동반, 액센트와 분리) */
+  --color-status-ok: #1a7f37;
+  --color-status-warn: #b45309;
+  --color-status-error: #c11322;
+  --color-status-info: #175cd3;
+
+  /* HTTP method badges (categorical) */
+  --color-method-get: #0369a1;
+  --color-method-post: #047857;
+  --color-method-put: #a16207;
+  --color-method-delete: #b91c1c;
+  --color-method-any: #475569;
+  --color-method-batch: #6d28d9;
+  --color-method-event: #b45309;
+  --color-method-flow: #64748b;
 
   /* Layer colors (flow spine view) */
   --color-layer-api: #b45309;

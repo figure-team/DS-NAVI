@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Highlight, themes } from "prism-react-renderer";
+import { useTheme } from "../themes/index.ts";
 import { useDashboardStore } from "../store";
 import { useViewMode } from "../hooks/useViewMode";
 import { useI18n } from "../contexts/I18nContext";
@@ -66,6 +67,7 @@ export default function CodeViewer({
   const graph = useDashboardStore((s) => s.graph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const viewMode = useViewMode();
+  const isDarkTheme = useTheme().preset.isDark; // P5: prism 테마 모드 스위치
   const codeViewerNodeId = useDashboardStore((s) => s.codeViewerNodeId);
   const codeViewerFilePath = useDashboardStore((s) => s.codeViewerFilePath);
   const codeViewerLine = useDashboardStore((s) => s.codeViewerLine);
@@ -234,7 +236,7 @@ export default function CodeViewer({
               <span>{source.lineCount} {t.codeViewer.linesLabel}</span>
               <span>{formatBytes(source.sizeBytes)}</span>
             </div>
-            <Highlight code={source.content} language={language} theme={themes.vsDark}>
+            <Highlight code={source.content} language={language} theme={isDarkTheme ? themes.vsDark : themes.github}>
               {({ className, style, tokens, getLineProps, getTokenProps }) => (
                 <pre
                   className={`${className} min-w-max p-0 m-0 ${

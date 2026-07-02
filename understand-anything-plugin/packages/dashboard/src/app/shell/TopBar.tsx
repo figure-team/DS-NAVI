@@ -1,21 +1,21 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 import { useViewMode } from "../../hooks/useViewMode";
 import ImpactJobIndicator from "../../components/ImpactJobIndicator";
+import Omnibox from "./Omnibox";
 
 interface Props {
+  accessToken: string;
   onShowKeyboardHelp: () => void;
 }
 
 /**
- * 상단 TopBar (FRONT_REDESIGN §4) — 프로젝트명 + 브레드크럼 + 전역 액션.
- * 도메인 섹션에서는 지도→흐름목록→스파인 브레드크럼을 렌더한다(구 레거시 헤더에서 승격).
- * 옴니박스(Cmd+K)는 P3에서 합류.
+ * 상단 TopBar (FRONT_REDESIGN §4, 시안 mockup-shell-home 정합) —
+ * 좌측 홈 아이콘 + 섹션 브레드크럼, 우측 옴니박스(⌘K) + 전역 액션.
  */
-export default function TopBar({ onShowKeyboardHelp }: Props) {
-  const graph = useDashboardStore((s) => s.graph);
+export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
   const { t } = useI18n();
   const mode = useViewMode();
 
@@ -26,26 +26,30 @@ export default function TopBar({ onShowKeyboardHelp }: Props) {
     : mode === "docs" ? "산출물"
     : mode === "rtm" ? "추적표"
     : mode === "knowledge" ? "지식그래프"
-    : "홈"; // P3: "/"(홈)과 그 외 미매핑 경로(전부 홈으로 리다이렉트)
+    : "홈"; // "/"(홈)과 그 외 미매핑 경로(전부 홈으로 리다이렉트)
 
   return (
     <header className="h-14 shrink-0 flex items-center gap-3 px-4 bg-surface border-b border-border-subtle">
-      <h1 className="font-heading text-base text-text-primary tracking-wide truncate max-w-[280px]">
-        {graph?.project.name ?? t.common.appName}
-      </h1>
+      {/* 좌측 — 시안: 홈 아이콘 + 섹션명 */}
+      <Link
+        to="/"
+        title="홈"
+        className="shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+          <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
+        </svg>
+      </Link>
       {mode === "domain" ? (
         <DomainBreadcrumb />
       ) : (
-        sectionLabel && (
-          <>
-            <span className="text-text-muted/50 select-none text-sm">›</span>
-            <span className="text-sm font-medium text-text-secondary whitespace-nowrap">
-              {sectionLabel}
-            </span>
-          </>
-        )
+        <span className="text-sm font-semibold text-text-primary whitespace-nowrap">
+          {sectionLabel}
+        </span>
       )}
-      <div className="flex-1" />
+      <div className="flex-1 min-w-0" />
+      {/* 옴니박스 — ⌘K 전역 검색 (시안) */}
+      <Omnibox accessToken={accessToken} />
       {/* 영향도 분석 진행 인디케이터 + 완료 토스트 — 전역 레이어(항상 마운트). */}
       <ImpactJobIndicator />
       <button
@@ -89,12 +93,11 @@ function DomainBreadcrumb() {
       className="min-w-0 overflow-x-auto scrollbar-hide flex items-center gap-1.5 text-sm font-medium"
       aria-label="breadcrumb"
     >
-      <span className="text-text-muted/50 select-none">›</span>
       <button
         type="button"
         onClick={() => navigate("/domains")}
-        className={`whitespace-nowrap transition-colors ${
-          activeDomainId ? "text-text-muted hover:text-text-secondary" : "text-accent"
+        className={`whitespace-nowrap font-semibold transition-colors ${
+          activeDomainId ? "text-text-muted hover:text-text-secondary" : "text-text-primary"
         }`}
       >
         {t.domainMap.breadcrumbRoot}
@@ -106,7 +109,7 @@ function DomainBreadcrumb() {
             type="button"
             onClick={() => clearActiveFlow()}
             className={`whitespace-nowrap transition-colors truncate max-w-[200px] ${
-              activeFlowId ? "text-text-muted hover:text-text-secondary" : "text-accent"
+              activeFlowId ? "text-text-muted hover:text-text-secondary" : "text-text-primary font-semibold"
             }`}
           >
             {activeDomainName}

@@ -227,7 +227,7 @@ export default function ShellLayout(ctx: ShellContext) {
     <div className="h-screen w-screen flex bg-root text-text-primary noise-overlay">
       <NavRail onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        <TopBar onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />
+        <TopBar accessToken={accessToken} onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />
 
         {/* Validation warning banner */}
         {allIssues.length > 0 && !loadError && <WarningBanner issues={allIssues} />}

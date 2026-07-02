@@ -281,7 +281,7 @@ src/
 - **폰트**: `--font-sans` 폴백 강화 — Inter에는 한글 글리프가 없어 Pretendard CDN 실패 시 맑은고딕으로 붕괴하던 문제. 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic' 폴백 삽입.
 - **홈 화면을 승인 시안과 1:1 정합**: 헤더(제목 22px bold + 분석 메타 라인[lastAnalyzedAt·commit·언어] + 우측 "지식그래프 내보내기" = 실제 JSON 다운로드; 설명은 2줄 클램프로 아래), 여정 카드에 액센트 아이콘, 구조 카드 푸터 = 레이어별 노드 수 상위 4, 추적표 카드 푸터 = 구현/변경 + 미구현 warn 배지(rtm state 실측), 요구사항 스탯 타일 포맷(값=요구, sub=추적 기능), **최근 활동 패널 신설**(실데이터만: 문서 확정 at·오버레이 generatedAt·분석 실행 lastAnalyzedAt, 상대시간), 풀폭 레이아웃(중앙 max-width 제거), 시안 수치(값 26px/타이틀 15px/본문 13px/패널 радиус 10px).
 - 시안의 "재분석 실행" 버튼은 대시보드에 실행 수단이 없어 의도적으로 제외(가짜 버튼 금지).
-- **시안 잔여 요소(미구현)**: TopBar 옴니박스(⌘K 전역 검색) — 전역 검색 배선이 필요한 별도 작업.
+- ~~시안 잔여 요소: TopBar 옴니박스~~ → **구현 완료(시안 정합 3차)**: `shell/Omnibox.tsx` — ⌘K/Ctrl+K 커맨드 팔레트. 소스 4종(구조 노드=SearchEngine 퍼지·도메인/흐름=domain-graph·산출물=doc-list·추적표=rtm 기능/요구, 오픈 시 1회 캐시), 결과 선택 시에만 이동(자동 라우팅 금지 — structure-scale 원칙), 크로스섹션 점프는 markPreserveTransientOnce로 선택 보존(노드→/structure?node=, 흐름→/domains/:id?flow=). TopBar 좌측도 시안대로 홈 아이콘+섹션명(프로젝트명 제거). playwright-core e2e로 오픈→검색→노드/흐름 점프 검증.
 
 ## 9. 리스크·미결
 

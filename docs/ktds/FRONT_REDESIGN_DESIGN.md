@@ -1,8 +1,9 @@
 # U-A 대시보드 프론트 전면 재구축 설계 (FRONT_REDESIGN)
 
-> 워크트리: `front` / 브랜치: demo/jpetstore-6 파생 작업
-> 상태: **설계 초안 — 사용자 리뷰 대기**
-> 결정사항(2026-07-02 확정): 프론트 전면 재구축 · react-router 경로 라우팅 · IA 신설계 · 새 디자인 시스템(KT DS 브랜드 컬러 반영, 팔레트 입력 대기)
+> 워크트리: `front` / 브랜치: worktree-front (demo/jpetstore-6 기반)
+> 상태: **P0 진행 — 셸·홈 시안 제작 완료, 사용자 승인 대기**
+> 결정사항(2026-07-02 확정): 프론트 전면 재구축 · react-router 경로 라우팅 · IA 신설계 · **좌측 NavRail · 홈 신설 · 모바일 반응형 통합 · 라이트 테마 + KT 레드**(레퍼런스: KT DS **DS-APM** 제품 화면, 팔레트 추출 완료 — §6)
+> 시안: `docs/ktds/front-redesign/mockup-shell-home.html` (+.png)
 
 ---
 
@@ -140,19 +141,34 @@
 
 ## 6. 디자인 시스템
 
-### 토큰 구조 (3층)
+### 방향 확정 (2026-07-02): 다크 럭셔리 → **라이트 테마 + KT 레드**
+
+레퍼런스는 KT DS의 **DS-APM** 제품 화면(`/home/jk/projects/ktds/apm-project/image.png`) — 좌측 NavRail + 라이트 배경 + KT 레드 액센트. DS-NAVI가 같은 제품군으로 보이도록 이 디자인 언어를 따른다. 다크는 P4 이후 테마 엔진 프리셋으로 선택 지원(차단 요소 아님).
+
+### 토큰 구조 (3층) — 팔레트 확정값 (DS-APM 스크린샷 추출)
 
 ```
-1층 brand   : --brand-primary, --brand-secondary, ... ← KT DS 팔레트 (입력 대기 — 시안/가이드 필요)
-2층 semantic: --bg-root/surface/elevated, --text-primary/secondary/muted,
-              --border-subtle/medium, --accent, --status-{ok,warn,error,info}
-3층 component: 노드 타입 색(--color-node-*), 레이어 색 등 도메인 특화
+1층 brand
+  --kt-red:          #e60012   로고 전용
+  --brand-primary:   #d81b2c   UI 액센트(내비 활성 인디케이터, 버튼, 링크)
+  --brand-tint:      #fcedee   액센트 연한 배경(알림 패널 등)
+  --brand-emphasis:  #c0461e   수치 강조(러스트) — DS-APM 핵심지표 계열
+
+2층 semantic (라이트)
+  --bg-root: #f4f5f7  --bg-surface: #fcfcfd  --bg-card: #ffffff  --bg-hover: #eff0f3
+  --text-primary: #1a1b1f  --text-secondary: #43474e  --text-muted: #6b727b
+  --border-subtle: #e6e8ec  --border-medium: #d5d8de
+  --accent: var(--brand-primary)
+  --status-ok: #1a7f37  --status-warn: #b45309  --status-error: #c11322  --status-info: #175cd3
+
+3층 component: 노드 타입 색(--color-node-*), 레이어 색 등 도메인 특화 — P4에서 라이트 배경 기준 재도출
 ```
 
-- 현행 테마 엔진(`themes/`, CSS 변수 주입)은 구조가 건전하므로 **엔진은 유지, 토큰 스키마와 프리셋만 신설**. 다크 우선 + 라이트 대응 가능한 시맨틱 층.
-- KT DS 컬러는 1층에만 들어가고 화면 코드는 2·3층만 참조 → 팔레트가 늦게 확정돼도 병행 진행 가능.
-- 타이포: DM Serif(장식용 헤딩) 재검토 — 엔터프라이즈 도구 성격에 맞는 산세리프 체계(예: Pretendard + 모노) 제안, 시안 단계에서 비교.
-- 스탯/차트류는 dataviz 스킬 기준(접근성 대비, 시맨틱 상태색)을 따른다.
+- 현행 테마 엔진(`themes/`, CSS 변수 주입)은 구조가 건전하므로 **엔진은 유지, 토큰 스키마와 프리셋만 신설**.
+- KT DS 컬러는 1층에만, 화면 코드는 2·3층만 참조.
+- **레드의 역할 분리**: 브랜드 레드(#d81b2c)는 인터랙션 액센트 전용, 상태 오류는 별도 `--status-error`(#c11322) + 아이콘/라벨 동반 — 색만으로 오류를 표현하지 않는다.
+- 타이포: DM Serif 폐기 → **Pretendard**(본문·헤딩) + 모노(코드·로그). 수치는 산세리프 세미볼드(스탯 타일 규격).
+- 스탯/차트류는 dataviz 스킬 기준을 따르고, P4에서 그래프 노드·차트 카테고리 팔레트는 `validate_palette.js`로 검증 후 확정.
 
 ### shared/ui 프리미티브
 
@@ -203,7 +219,8 @@ src/
 
 ## 9. 리스크·미결
 
-- **KT DS 팔레트 미확보** — P0 입력 필요(브랜드 가이드 또는 대표 색상값). 토큰 3층 구조로 지연 흡수 가능.
+- ~~KT DS 팔레트 미확보~~ → **해소**: DS-APM 스크린샷에서 추출 완료(§6). 단 공식 브랜드 가이드 대비 검증은 미실시 — 실 가이드 입수 시 1층 토큰만 교체.
+- **라이트 전환 파급** — 그래프 노드/레이어/엣지 색(3층)이 전부 다크 배경 기준 → P4에서 라이트 기준 재도출 필요(구조·도메인 뷰 시각 QA 필수).
 - **데모 정적 빌드 × BrowserRouter** — BASE_URL 하위 배포 + 404 fallback 검증 필요. 실패 시 데모 한정 HashRouter(P1에서 결정).
 - **MobileLayout 통합** — 별도 트리 폐기가 P2 범위를 키움. 필요 시 P2에서는 현행 유지 후 P5로 이연 가능.
 - **store 대수술** — RTM/도메인 뷰가 store 액션에 깊게 결합(예: `clearActiveFlow`). P2에서 액션→navigate 어댑터를 두고 점진 치환.

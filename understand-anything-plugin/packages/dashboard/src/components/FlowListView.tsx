@@ -42,7 +42,7 @@ const METHOD_STYLE: Record<FlowMethod, { bg: string; color: string }> = {
   ANY: { bg: "rgba(203,213,225,0.18)", color: "#cbd5e1" },
   BATCH: { bg: "rgba(167,139,250,0.2)", color: "#a78bfa" },
   EVENT: { bg: "rgba(56,189,248,0.2)", color: "#38bdf8" },
-  FLOW: { bg: "rgba(212,165,116,0.18)", color: "#d4a574" },
+  FLOW: { bg: "color-mix(in srgb, var(--color-accent) 18%, transparent)", color: "var(--color-accent)" },
 };
 
 const GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
@@ -235,13 +235,13 @@ export default function FlowListView() {
                       style={{
                         padding: "10px 12px",
                         background: isSelected
-                          ? "rgba(212,165,116,0.07)"
+                          ? "color-mix(in srgb, var(--color-accent) 7%, transparent)"
                           : "var(--color-elevated)",
                         borderColor: isSelected
                           ? "var(--color-accent)"
                           : "var(--color-border-subtle)",
                         boxShadow: isSelected
-                          ? "0 0 0 1px rgba(212,165,116,0.18) inset"
+                          ? "0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent) inset"
                           : undefined,
                       }}
                     >

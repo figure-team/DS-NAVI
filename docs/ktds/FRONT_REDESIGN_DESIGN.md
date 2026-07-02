@@ -246,6 +246,17 @@ src/
 - **검증**: 홈·/domains/domain:account·/structure?node=(Category.java NodeInfo 렌더) 스크린샷 확인, 빌드+lint+테스트 green.
 - 미이관 잔여(의도): RTM 인테이크(/rtm/intake/:sid)·산출물(:docId)·위키(/wiki/*) 하위 라우트 — 해당 뷰 내부 배선이 커서 P5 화면 리디자인과 함께. 옴니박스는 P4~P5.
 
+## 8.8 P4 구현 기록 (2026-07-03)
+
+- **기본 테마 = `ktds-light`**(프리셋 배열 첫 항목·DEFAULT_THEME_CONFIG): §6 팔레트 그대로 — 배경 #f4f5f7/#fcfcfd/#fff/#eff0f3, 텍스트 3단, 중립 보더(#e6e8ec/#d5d8de, 액센트 파생 오버라이드), KT Red 액센트 스와치(#d81b2c/#b91525/#e8404f) + 라이트 대안 스와치. 다크 4종·light-minimal은 프리셋으로 존치(ThemePicker 선택 가능).
+- **테마 엔진 확장**: 적용 순서 재정렬(모드 extras → 액센트 → 파생 → 프리셋 colors 최후승) — 프리셋이 파생값(보더·엣지)을 오버라이드 가능. `MODE_EXTRAS`로 3층 토큰(지식 노드·레이어·diff 색)을 다크/라이트 모드별 스위치 — 프리셋 전환 시 잔류값 방지.
+- **첫 페인트(FOUC) 기준도 라이트**: index.css @theme 기본값을 ktds-light와 동일하게 교체. `--color-kt-red`(#e60012, 로고 전용) 신설, NavRail에 kt ds 로고 마크.
+- **타이포**: 기본 산세리프 = Pretendard Variable(jsdelivr CDN, dynamic subset). DM Serif는 헤딩 폰트 옵션으로 존치(엔진 기본 serif→sans).
+- **골드 하드코딩 스윕**: `#d4a574`/`rgba(212,165,116,α)` 잔재 7파일(GraphView·RtmView·FlowListView·FlowSpineView·ContainerNode·DocsView·domainData) → `var(--color-accent)`/`color-mix(액센트 α%)`/레이어 토큰. 단 GraphView **기본 엣지**는 액센트가 아닌 중립 `--color-edge` 토큰으로 교정(레드 엣지는 diff 오버레이로 오독됨) — 강조(선택 0.8·경로 0.5) 엣지만 액센트.
+- **스토리지 키 v2**(`ua-theme-v2`): 리브랜딩 기본값 1회 적용(기존 저장 테마 무효화).
+- **검증**: 홈·도메인 지도·흐름 목록·구조(중립 엣지 확인)·RTM 라이트 스크린샷, 시안(mockup-shell-home) 대비 구조 일치. build·lint·테스트(297+132) green.
+- 잔여(P5): 내부 화면의 다크 전제 하드코딩 폴리시 — FlowListView METHOD 배지 팔레트, RTM 상태색, ExportMenu SVG 스냅샷(다크 고정), 온보딩 카피. 노드/차트 카테고리 팔레트의 dataviz `validate_palette.js` 검증도 P5 폴리시에서.
+
 ## 9. 리스크·미결
 
 - ~~KT DS 팔레트 미확보~~ → **해소**: DS-APM 스크린샷에서 추출 완료(§6). 단 공식 브랜드 가이드 대비 검증은 미실시 — 실 가이드 입수 시 1층 토큰만 교체.

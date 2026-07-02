@@ -221,7 +221,7 @@ export interface DomainStats {
  * matching DomainClusterNode's intent of a stable color per domain.
  */
 const DOMAIN_PALETTE = [
-  "#d4a574", // gold (api lane)
+  "var(--color-layer-api)", // api lane
   "#38bdf8", // cyan (service lane)
   "#a78bfa", // violet (dao lane)
   "#f87171", // red (db lane)

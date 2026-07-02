@@ -258,7 +258,7 @@ export default function DocsView() {
                               className="flex items-center gap-1.5 text-left rounded-md cursor-pointer transition-colors w-full"
                               style={{
                                 padding: "6px 8px",
-                                background: isSel ? "rgba(212,165,116,0.10)" : "transparent",
+                                background: isSel ? "color-mix(in srgb, var(--color-accent) 10%, transparent)" : "transparent",
                                 color: isSel ? "var(--color-accent)" : undefined,
                               }}
                             >

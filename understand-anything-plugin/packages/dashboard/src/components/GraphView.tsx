@@ -301,7 +301,7 @@ function useOverviewGraph() {
       target: agg.targetLayerId,
       label: `${agg.count}`,
       style: {
-        stroke: "rgba(212,165,116,0.4)",
+        stroke: "var(--color-edge)",
         strokeWidth: Math.min(1 + Math.log2(agg.count + 1), 5),
       },
       labelStyle: { fill: "#a39787", fontSize: 11, fontWeight: 600 },
@@ -610,9 +610,9 @@ function useLayerDetailTopology(): LayerDetailTopology & {
     // container, so just fade everything in diff mode at this stage).
     const aggEdges: Edge[] = interContainerAggregated.map((agg, i) => {
       const baseStyle = diffMode
-        ? { stroke: "rgba(212,165,116,0.08)", strokeWidth: 1 }
+        ? { stroke: "var(--color-edge-dim)", strokeWidth: 1 }
         : {
-            stroke: "rgba(212,165,116,0.4)",
+            stroke: "var(--color-edge)",
             strokeWidth: Math.min(1 + Math.log2(agg.count + 1), 5),
           };
       return {
@@ -662,7 +662,7 @@ function useLayerDetailTopology(): LayerDetailTopology & {
           id: `e-${portalEdgeIdx++}`,
           source: atomId,
           target: `portal:${portal.layerId}`,
-          style: { stroke: "rgba(212,165,116,0.2)", strokeWidth: 1, strokeDasharray: "4 4" },
+          style: { stroke: "var(--color-edge-dot)", strokeWidth: 1, strokeDasharray: "4 4" },
           animated: false,
         });
       }
@@ -1218,7 +1218,7 @@ function useLayerDetailGraph() {
           target: realTgt,
           type: "elk",
           label: m.type,
-          style: { stroke: "rgba(212,165,116,0.5)", strokeWidth: 1.5 },
+          style: { stroke: "color-mix(in srgb, var(--color-accent) 50%, transparent)", strokeWidth: 1.5 },
           labelStyle: { fill: "#a39787", fontSize: 10 },
           data: { points: topo.edgePoints.get(`${realSrc}|${realTgt}`) },
         });
@@ -1238,7 +1238,7 @@ function useLayerDetailGraph() {
         target: e.target,
         type: "elk",
         label: e.type,
-        style: { stroke: "rgba(212,165,116,0.5)", strokeWidth: 1.5 },
+        style: { stroke: "color-mix(in srgb, var(--color-accent) 50%, transparent)", strokeWidth: 1.5 },
         labelStyle: { fill: "#a39787", fontSize: 10 },
         data: { points: topo.edgePoints.get(`${e.source}|${e.target}`) },
       });
@@ -1266,10 +1266,10 @@ function useLayerDetailGraph() {
       if ((edge.style as Record<string, unknown>)?.strokeDasharray) return edge;
 
       if (isSelectedEdge) {
-        return { ...edge, animated: true, style: { stroke: "rgba(212,165,116,0.8)", strokeWidth: 2.5 }, labelStyle: { fill: "#d4a574", fontSize: 11, fontWeight: 600 } };
+        return { ...edge, animated: true, style: { stroke: "color-mix(in srgb, var(--color-accent) 80%, transparent)", strokeWidth: 2.5 }, labelStyle: { fill: "var(--color-accent)", fontSize: 11, fontWeight: 600 } };
       }
       // Fade unrelated edges
-      return { ...edge, animated: false, style: { stroke: "rgba(212,165,116,0.08)", strokeWidth: 1 }, labelStyle: { fill: "rgba(163,151,135,0.2)", fontSize: 10 } };
+      return { ...edge, animated: false, style: { stroke: "var(--color-edge-dim)", strokeWidth: 1 }, labelStyle: { fill: "rgba(163,151,135,0.2)", fontSize: 10 } };
     });
   }, [expandedEdges, topo.portalEdges, selectedNodeId]);
 
@@ -1357,8 +1357,8 @@ function GraphViewInner() {
           ...edge,
           animated: true,
           zIndex: 1000,
-          style: { ...style, stroke: "#d4a574", strokeWidth: 2.5, strokeOpacity: 1 },
-          labelStyle: { ...labelStyle, fill: "#d4a574", fontWeight: 600 },
+          style: { ...style, stroke: "var(--color-accent)", strokeWidth: 2.5, strokeOpacity: 1 },
+          labelStyle: { ...labelStyle, fill: "var(--color-accent)", fontWeight: 600 },
         };
       }
       return {
@@ -1611,7 +1611,7 @@ function GraphViewInner() {
             zIndex: 10,
           }}
         >
-          <span style={{ color: "#d4a574", fontSize: 14 }}>
+          <span style={{ color: "var(--color-accent)", fontSize: 14 }}>
             {tourFitPending ? "Locating tour highlight…" : "Computing layout…"}
           </span>
         </div>

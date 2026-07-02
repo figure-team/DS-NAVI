@@ -558,7 +558,7 @@ export default function RtmView() {
                 <div className="flex items-center gap-1.5">
                   {STEP_DEFS.map((s, i) => (
                     <button key={s.n} type="button" onClick={() => setTargetStep(s.n)}
-                      className="flex-1 rounded-lg transition-colors" style={{ padding: "7px 4px", border: targetStep === s.n ? `1px solid ${GOLD}` : BORDER, background: targetStep === s.n ? "rgba(212,165,116,0.12)" : "transparent" }}>
+                      className="flex-1 rounded-lg transition-colors" style={{ padding: "7px 4px", border: targetStep === s.n ? `1px solid ${GOLD}` : BORDER, background: targetStep === s.n ? "color-mix(in srgb, var(--color-accent) 12%, transparent)" : "transparent" }}>
                       <div style={{ fontSize: 13, color: targetStep === s.n ? GOLD : "var(--color-text-secondary)" }}>{CIRCLED[i]}</div>
                       <div style={{ fontSize: 10, color: targetStep === s.n ? GOLD : "var(--color-text-muted)", marginTop: 2 }}>{s.label}</div>
                     </button>
@@ -658,7 +658,7 @@ export default function RtmView() {
       <>
         <div className="flex flex-wrap gap-1.5" style={{ marginBottom: 12 }}>
           {specs.map((d) => (
-            <button key={d.name} type="button" onClick={() => void loadPreview(d.name)} className="rounded-md transition-colors" style={{ padding: "3px 10px", fontSize: 11, fontFamily: "var(--font-mono)", border: previewName === d.name ? `1px solid ${GOLD}` : BORDER, color: previewName === d.name ? GOLD : "var(--color-text-secondary)", background: previewName === d.name ? "rgba(212,165,116,0.1)" : "transparent" }}>
+            <button key={d.name} type="button" onClick={() => void loadPreview(d.name)} className="rounded-md transition-colors" style={{ padding: "3px 10px", fontSize: 11, fontFamily: "var(--font-mono)", border: previewName === d.name ? `1px solid ${GOLD}` : BORDER, color: previewName === d.name ? GOLD : "var(--color-text-secondary)", background: previewName === d.name ? "color-mix(in srgb, var(--color-accent) 10%, transparent)" : "transparent" }}>
               {d.name.replace(/^요구사항명세서_/, "").replace(/\.md$/, "")}
             </button>
           ))}
@@ -727,7 +727,7 @@ export default function RtmView() {
                   <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 880 }}>
                     <thead><tr>{["기능", ...COLS.map((c) => c.label), "상태"].map((h) => <th key={h} style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>{h}</th>)}</tr></thead>
                     <tbody>{rows.map((f) => (
-                      <tr key={f.id} onClick={() => openFunction(f.id)} style={{ cursor: "pointer", background: f.id === selFn ? "rgba(212,165,116,0.08)" : undefined, boxShadow: isConfirmed(f) ? `inset 2px 0 0 ${GOLD}` : undefined }} className="hover:bg-accent/[0.045]">
+                      <tr key={f.id} onClick={() => openFunction(f.id)} style={{ cursor: "pointer", background: f.id === selFn ? "color-mix(in srgb, var(--color-accent) 8%, transparent)" : undefined, boxShadow: isConfirmed(f) ? `inset 2px 0 0 ${GOLD}` : undefined }} className="hover:bg-accent/[0.045]">
                         <td style={{ borderBottom: BORDER, padding: "11px 12px", whiteSpace: "nowrap", verticalAlign: "top" }}>
                           <div><span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}>{f.featureId}</span>{f.requirementHistory.length > 0 && <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: GOLD_DIM, marginLeft: 6 }}>◷{f.requirementHistory[f.requirementHistory.length - 1]}{f.rules.length > 0 ? ` · 규칙 ${f.rules.length}` : ""}</span>}</div>
                           <div style={{ marginTop: 3 }}><span style={{ fontSize: 13, color: "var(--color-text-primary)", fontWeight: 500 }}>{effCell(f, "name")}</span>
@@ -809,12 +809,12 @@ export default function RtmView() {
     return (
       <section style={{ background: nested ? "var(--color-surface)" : "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: nested ? 11 : 14, marginTop: nested ? 10 : 0, marginBottom: nested ? 0 : 14, overflow: "hidden", opacity: dead ? 0.68 : 1 }}>
         <div className="flex items-center gap-3" style={{ padding: "14px 20px", cursor: "pointer" }} onClick={() => setExpandedReqs((p) => { const n = new Set(p); if (n.has(r.id)) n.delete(r.id); else n.add(r.id); return n; })}>
-          <span style={{ width: 11, height: 11, borderRadius: "50%", flex: "none", background: dead ? "none" : r.type === "nonfunctional" ? NFR : GOLD, border: dead ? `1.5px solid ${FAINT}` : "none", boxShadow: dead ? "none" : `0 0 0 4px ${r.type === "nonfunctional" ? "rgba(120,160,190,.14)" : "rgba(212,165,116,.14)"}` }} />
+          <span style={{ width: 11, height: 11, borderRadius: "50%", flex: "none", background: dead ? "none" : r.type === "nonfunctional" ? NFR : GOLD, border: dead ? `1.5px solid ${FAINT}` : "none", boxShadow: dead ? "none" : `0 0 0 4px ${r.type === "nonfunctional" ? "rgba(120,160,190,.14)" : "color-mix(in srgb, var(--color-accent) 14%, transparent)"}` }} />
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-muted)", textDecoration: dead ? "line-through" : "none" }}>{r.id}</span>
           <span style={{ fontSize: 15, color: dead ? "var(--color-text-secondary)" : "var(--color-text-primary)", fontWeight: 500 }}>{r.text}</span>
           {dead ? <Pill label={r.status === "WITHDRAWN" ? (r.changeReq?.crNo ? `폐기 ${r.changeReq.crNo}` : "폐기(철회)") : "폐기"} color="var(--color-text-muted)" bg="rgba(255,255,255,.04)" />
             : r.type === "nonfunctional" ? <Pill label={`⚡ 비기능 · ${NFR_CAT[r.nfrCategory ?? "other"] ?? "기타"}`} color={NFR} bg="rgba(120,160,190,.12)" />
-              : <><Pill label="● 현행" color={GOLD} bg="rgba(212,165,116,.12)" />{r.priority && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, color: PRIORITY[r.priority].color, background: PRIORITY[r.priority].bg }}>{PRIORITY[r.priority].label}</span>}</>}
+              : <><Pill label="● 현행" color={GOLD} bg="color-mix(in srgb, var(--color-accent) 12%, transparent)" />{r.priority && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, color: PRIORITY[r.priority].color, background: PRIORITY[r.priority].bg }}>{PRIORITY[r.priority].label}</span>}</>}
           {r.supersedes && <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: GOLD_DIM }}>⟵ {r.supersedes} 대체</span>}
           {dead && r.supersededBy && <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: GOLD_DIM }}>⟶ {r.supersededBy} 이 대체</span>}
           <span className="ml-auto flex items-center gap-2">
@@ -918,7 +918,7 @@ export default function RtmView() {
   function FunctionDrawer() {
     const f = selectedFn!;
     return (
-      <div className="absolute bottom-0 left-0 right-0 bg-surface border-t z-20 overflow-auto animate-slide-up" style={{ height: "48vh", borderTopColor: "rgba(212,165,116,.22)" }}>
+      <div className="absolute bottom-0 left-0 right-0 bg-surface border-t z-20 overflow-auto animate-slide-up" style={{ height: "48vh", borderTopColor: "color-mix(in srgb, var(--color-accent) 22%, transparent)" }}>
         <div className="flex items-center gap-3 sticky top-0 bg-panel border-b border-border-subtle" style={{ padding: "12px 24px" }}>
           <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{f.featureId}</span>
           <span style={{ fontFamily: "var(--font-heading)", fontSize: 18, color: "var(--color-text-primary)" }}>{effCell(f, "name")}</span>
@@ -981,11 +981,11 @@ export default function RtmView() {
     const so = effSignoff(r);
     const lc = effLifecycle(r);
     return (
-      <div className="absolute bottom-0 left-0 right-0 bg-surface border-t z-20 overflow-auto animate-slide-up" style={{ height: "50vh", borderTopColor: "rgba(212,165,116,.22)" }}>
+      <div className="absolute bottom-0 left-0 right-0 bg-surface border-t z-20 overflow-auto animate-slide-up" style={{ height: "50vh", borderTopColor: "color-mix(in srgb, var(--color-accent) 22%, transparent)" }}>
         <div className="flex items-center gap-3 sticky top-0 bg-panel border-b border-border-subtle" style={{ padding: "12px 24px" }}>
           <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{r.id}</span>
           <span style={{ fontFamily: "var(--font-heading)", fontSize: 18, color: "var(--color-text-primary)" }}>{r.text}</span>
-          <Pill label="● 현행" color={GOLD} bg="rgba(212,165,116,.12)" />
+          <Pill label="● 현행" color={GOLD} bg="color-mix(in srgb, var(--color-accent) 12%, transparent)" />
           {r.priority && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 5, color: PRIORITY[r.priority].color, background: PRIORITY[r.priority].bg }}>{PRIORITY[r.priority].label}</span>}
           {!canWrite && <span className="text-text-muted" style={{ fontSize: 11 }}>읽기전용</span>}
           <button type="button" onClick={() => setSelReq(null)} className="ml-auto text-text-muted hover:text-text-primary" style={{ fontSize: 16, padding: "0 4px" }}>×</button>
@@ -1014,9 +1014,9 @@ export default function RtmView() {
             </div>
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: 6 }}>고객 검수 (signoff)</div>
-              <div className="flex items-center gap-2.5" style={{ background: "rgba(212,165,116,.08)", border: "1px solid rgba(212,165,116,.25)", borderRadius: 10, padding: "11px 14px" }}>
+              <div className="flex items-center gap-2.5" style={{ background: "color-mix(in srgb, var(--color-accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--color-accent) 25%, transparent)", borderRadius: 10, padding: "11px 14px" }}>
                 <span style={{ color: so?.approved ? GOLD : "var(--color-text-muted)", fontSize: 12 }}>{so?.approved ? `✓ 검수 완료${so.by ? ` (${so.by})` : ""}` : "아직 검수 전"}</span>
-                {canWrite && <button type="button" onClick={() => postReq(r.id, { signoff: so?.approved ? null : { approved: true, by: resolveApprover(), at: new Date().toISOString() } })} className="ml-auto rounded-lg" style={{ fontSize: 11.5, fontWeight: 600, color: GOLD, border: "1px solid rgba(212,165,116,.4)", background: "rgba(212,165,116,.1)", padding: "6px 13px" }}>{so?.approved ? "검수 취소" : "고객 검수 승인"}</button>}
+                {canWrite && <button type="button" onClick={() => postReq(r.id, { signoff: so?.approved ? null : { approved: true, by: resolveApprover(), at: new Date().toISOString() } })} className="ml-auto rounded-lg" style={{ fontSize: 11.5, fontWeight: 600, color: GOLD, border: "1px solid color-mix(in srgb, var(--color-accent) 40%, transparent)", background: "color-mix(in srgb, var(--color-accent) 10%, transparent)", padding: "6px 13px" }}>{so?.approved ? "검수 취소" : "고객 검수 승인"}</button>}
               </div>
             </div>
             <div>

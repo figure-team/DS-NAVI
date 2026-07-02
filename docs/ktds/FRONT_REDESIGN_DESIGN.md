@@ -274,7 +274,7 @@ src/
 - **다크 모드 회귀**: `?theme=<presetId>` 1회 강제 어포던스 신설(저장 안 함, metaTheme보다 우선) → `dark-gold`로 구조 화면 스팟체크 — MODE_EXTRAS 다크 값(노드·레이어·diff·상태·메서드) 정상.
 - **문서 갱신**: CLAUDE.md Dashboard 섹션을 재구축 후 구조(라이트 기본·라우트 맵·셸·QA 어포던스)로 교체.
 - **전체 회귀**: build·lint(0 errors)·테스트 297+132 green.
-- **후속 잔여**(기능 완결과 별개, 필요 시 착수): ① RTM 인테이크(:sid)·산출물(:docId)·위키(/wiki/*) 하위 라우트 ② MobileLayout 반응형 통합(현재 별도 트리 유지, 동작함) ③ 데모 실호스팅의 404 fallback 확인. ~~ja/zh/ru 온보딩 카피~~(사용자 결정: 불필요).
+- **후속 잔여**: ~~① 하위 라우트~~ ~~② 모바일 통합~~ → **§8.12에서 해소**. ③ 데모 실호스팅의 404 fallback 확인(배포 시). ~~ja/zh/ru 온보딩 카피~~(사용자 결정: 불필요).
 
 ## 8.11 시안 정합 패스 (2026-07-03, 사용자 피드백)
 
@@ -282,6 +282,14 @@ src/
 - **홈 화면을 승인 시안과 1:1 정합**: 헤더(제목 22px bold + 분석 메타 라인[lastAnalyzedAt·commit·언어] + 우측 "지식그래프 내보내기" = 실제 JSON 다운로드; 설명은 2줄 클램프로 아래), 여정 카드에 액센트 아이콘, 구조 카드 푸터 = 레이어별 노드 수 상위 4, 추적표 카드 푸터 = 구현/변경 + 미구현 warn 배지(rtm state 실측), 요구사항 스탯 타일 포맷(값=요구, sub=추적 기능), **최근 활동 패널 신설**(실데이터만: 문서 확정 at·오버레이 generatedAt·분석 실행 lastAnalyzedAt, 상대시간), 풀폭 레이아웃(중앙 max-width 제거), 시안 수치(값 26px/타이틀 15px/본문 13px/패널 радиус 10px).
 - 시안의 "재분석 실행" 버튼은 대시보드에 실행 수단이 없어 의도적으로 제외(가짜 버튼 금지).
 - ~~시안 잔여 요소: TopBar 옴니박스~~ → **구현 완료(시안 정합 3차)**: `shell/Omnibox.tsx` — ⌘K/Ctrl+K 커맨드 팔레트. 소스 4종(구조 노드=SearchEngine 퍼지·도메인/흐름=domain-graph·산출물=doc-list·추적표=rtm 기능/요구, 오픈 시 1회 캐시), 결과 선택 시에만 이동(자동 라우팅 금지 — structure-scale 원칙), 크로스섹션 점프는 markPreserveTransientOnce로 선택 보존(노드→/structure?node=, 흐름→/domains/:id?flow=). TopBar 좌측도 시안대로 홈 아이콘+섹션명(프로젝트명 제거). playwright-core e2e로 오픈→검색→노드/흐름 점프 검증.
+
+## 8.12 후속 잔여 해소 (2026-07-03) — 하위 라우트 + 모바일 반응형 통합
+
+- **산출물 `/deliverables/:docId?`**(옵셔널 세그먼트 — 목록↔문서 전환 시 리마운트 방지): DocsView 선택을 URL로 승격 — 클릭 → navigate, 딥링크/새로고침 복원.
+- **위키 `/wiki?doc=<노드 id>`**: 선택 문서 딥링크(위키 그래프 로드 후 1회 적용 + replace 미러). 설계의 `/wiki/*` 경로 대신 쿼리 — 위키 노드 id는 파일 경로가 아니라 CanonicalNode uid라 경로 세그먼트 매핑이 부자연.
+- **RTM `?sid=`(인테이크 세션)·`?req=`(요구 상세)**: 설계의 `/rtm/intake/:sid`·`/rtm/requests/:reqId` 라우트 대신 **쿼리** — 패널 상태라 별도 라우트면 RtmView가 리마운트되어 뷰 상태가 소실됨(이 재구축의 `?flow=`/`?node=` 패턴과 일관). 마운트 복구가 URL sid를 우선 조회, 세션 시작/요구 선택이 URL에 미러(replace), 뒤로가기로 ?req 닫힘.
+- **모바일 반응형 통합(§4 설계 이행)**: MobileLayout·MobileBottomNav·MobileDrawer **삭제**. 단일 셸 — 모바일에서 NavRail 대신 하단 섹션 탭바(`shell/MobileTabBar`), TopBar는 옴니박스 아이콘 트리거, GraphWorkbench는 그래프/정보/파일 콘텐츠 탭(비활성 패널 invisible 유지로 ReactFlow 치수 보존 — 구 MobileLayout 기법 계승). 순개선: 구 모바일에서 접근 불가였던 RTM·산출물·홈이 모바일에서 열림.
+- **검증**: playwright e2e — 산출물 클릭→URL 승격→딥링크 복원, /rtm?req=REQ-002 패널 오픈+닫기 시 ?req 제거, 모바일(390px) 탭바·콘텐츠 탭 스크린샷. build·lint·테스트 green. RTM ?sid 실복원은 라이브 claude 인테이크 필요(기존 수동 e2e 잔여와 동일 범주).
 
 ## 9. 리스크·미결
 

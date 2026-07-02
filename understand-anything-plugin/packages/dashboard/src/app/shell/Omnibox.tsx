@@ -285,6 +285,19 @@ export default function Omnibox({ accessToken }: { accessToken: string }) {
         </kbd>
       </button>
 
+      {/* 모바일 트리거 — 아이콘만 */}
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        title="검색"
+        className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg text-text-muted hover:text-text-primary hover:bg-elevated transition-colors"
+      >
+        <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+      </button>
+
       {/* 팔레트 */}
       {open && (
         <div

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -153,6 +154,8 @@ export default function RtmView() {
   const tokenQ = accessToken && !DEMO_MODE ? `?token=${encodeURIComponent(accessToken)}` : "";
   const canWrite = Boolean(accessToken) && !DEMO_MODE;
 
+  // P5 잔여 해소: 인테이크 세션(?sid=)·요구 상세(?req=)를 URL로 — 새로고침·딥링크 복원.
+  const [searchParams, setSearchParams] = useSearchParams();
   const [model, setModel] = useState<RtmModel | null>(null);
   const [fnOv, setFnOv] = useState<Record<string, FnOverride>>({});
   const [reqOv, setReqOv] = useState<Record<string, ReqOverride>>({});
@@ -266,12 +269,45 @@ export default function RtmView() {
     setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); setIntakeStatus("idle");
   }, [sid, accessToken]);
 
+  // URL(?req=) → 요구 상세 패널 — 딥링크·뒤로가기 복원.
+  useEffect(() => {
+    const req = searchParams.get("req");
+    if (req && req !== selReq) {
+      setView("requirement");
+      setSelFn(null);
+      setSelReq(req);
+    } else if (!req && selReq) {
+      setSelReq(null);
+    }
+    // selReq는 미러 effect가 관리 — 여기서는 URL 변화에만 반응한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // 상태(selReq·sid) → URL 미러(replace, 히스토리 오염 없음).
+  useEffect(() => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (selReq) next.set("req", selReq);
+        else next.delete("req");
+        if (sid) next.set("sid", sid);
+        else next.delete("sid");
+        return next;
+      },
+      { replace: true },
+    );
+  }, [selReq, sid, setSearchParams]);
+
   // 마운트 시 진행 중 세션 복구 — 새로고침/다른 탭에서도 단계 진행을 이어 본다.
   useEffect(() => {
     let cancelled = false;
     void (async () => {
       try {
-        const r = await fetch(`/rtm-intake-status${tokenQ}`);
+        // URL의 ?sid=가 있으면 그 세션을 명시 복원(딥링크), 없으면 서버의 현재 세션.
+        const urlSid = new URLSearchParams(window.location.search).get("sid");
+        const r = await fetch(
+          `/rtm-intake-status${tokenQ}${urlSid ? `&sid=${encodeURIComponent(urlSid)}` : ""}`,
+        );
         const data = (await r.json()) as { job?: { status?: string; sid?: string | null }; session?: RtmSession | null; docs?: SessionDoc[] };
         if (cancelled || !data.session || data.session.discarded) return;
         setSid(data.session.sid);

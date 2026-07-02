@@ -24,7 +24,7 @@ export const router = createBrowserRouter(
         { path: "domains", element: <DomainsPage /> },
         { path: "domains/:domainId", element: <DomainsPage /> },
         { path: "wiki", element: <WikiPage /> },
-        { path: "deliverables", element: <DeliverablesPage /> },
+        { path: "deliverables/:docId?", element: <DeliverablesPage /> },
         { path: "rtm", element: <RtmPage /> },
         { path: "knowledge", element: <KnowledgePage /> },
         { path: "*", element: <Navigate to="/" replace /> },

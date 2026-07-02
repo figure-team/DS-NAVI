@@ -3,8 +3,8 @@ import { Outlet } from "react-router";
 import { useDashboardStore } from "../../store";
 import NavRail from "./NavRail";
 import TopBar from "./TopBar";
+import MobileTabBar from "./MobileTabBar";
 import WarningBanner from "../../components/WarningBanner";
-import MobileLayout from "../../components/MobileLayout";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useViewMode } from "../../hooks/useViewMode";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
@@ -34,7 +34,7 @@ function shouldShowOnboarding(): boolean {
 /**
  * 셸 골격 (FRONT_REDESIGN §4, P2) — NavRail + TopBar + Outlet에 더해
  * 전역 레이어(코드뷰어, 단축키+도움말, 온보딩, 경로찾기/영향도 모달, 검증 배너)를
- * 1회 마운트한다. 모바일은 MobileLayout이 화면을 소유.
+ * 1회 마운트한다. 모바일은 NavRail 대신 하단 섹션 탭바(MobileTabBar) — 반응형 통합.
  */
 export default function ShellLayout(ctx: ShellContext) {
   const { accessToken, loadError, graphIssues } = ctx;
@@ -210,22 +210,9 @@ export default function ShellLayout(ctx: ShellContext) {
   // Register keyboard shortcuts
   useKeyboardShortcuts(shortcuts);
 
-  if (isMobile) {
-    return (
-      <MobileLayout
-        accessToken={accessToken}
-        showKeyboardHelp={showKeyboardHelp}
-        setShowKeyboardHelp={setShowKeyboardHelp}
-        loadError={loadError}
-        allIssues={allIssues}
-        shortcuts={shortcuts}
-      />
-    );
-  }
-
   return (
     <div className="h-screen w-screen flex bg-root text-text-primary noise-overlay">
-      <NavRail onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />
+      {!isMobile && <NavRail onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         <TopBar accessToken={accessToken} onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />
 
@@ -251,6 +238,9 @@ export default function ShellLayout(ctx: ShellContext) {
             </div>
           )}
         </div>
+
+        {/* 모바일 — NavRail 대신 하단 섹션 탭바(반응형 통합, 구 MobileLayout 폐기) */}
+        {isMobile && <MobileTabBar />}
       </div>
 
       {/* Expanded code viewer modal */}

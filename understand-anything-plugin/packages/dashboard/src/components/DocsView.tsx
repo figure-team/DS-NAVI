@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -85,8 +86,11 @@ export default function DocsView() {
   const approverHandle = useDashboardStore((s) => s.approverHandle);
   const setApproverHandle = useDashboardStore((s) => s.setApproverHandle);
 
+  // P5 잔여 해소: 선택 문서는 URL(:docId)이 진실 — 딥링크·공유 가능.
+  const { docId: routeDocId } = useParams();
+  const navigate = useNavigate();
   const [docs, setDocs] = useState<DocListItem[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(routeDocId ?? null);
   const [content, setContent] = useState<string>("");
   const [confirmedBy, setConfirmedBy] = useState<string | null>(null);
   const [listError, setListError] = useState<string | null>(null);
@@ -98,6 +102,11 @@ export default function DocsView() {
 
   const tokenQ = accessToken ? `?token=${encodeURIComponent(accessToken)}` : "";
   const canWrite = Boolean(accessToken);
+
+  // URL(:docId) → 선택 동기화(뒤로가기/딥링크).
+  useEffect(() => {
+    if (routeDocId) setSelected(routeDocId);
+  }, [routeDocId]);
 
   // 문서 목록 로드.
   useEffect(() => {
@@ -253,7 +262,7 @@ export default function DocsView() {
                             <button
                               key={d.docId}
                               type="button"
-                              onClick={() => setSelected(d.docId)}
+                              onClick={() => navigate(`/deliverables/${encodeURIComponent(d.docId)}`)}
                               title={d.docId}
                               className="flex items-center gap-1.5 text-left rounded-md cursor-pointer transition-colors w-full"
                               style={{

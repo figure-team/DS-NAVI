@@ -17,6 +17,7 @@ import type { FlowFlowNode } from "./FlowNode";
 import StepNode from "./StepNode";
 import type { StepFlowNode } from "./StepNode";
 import { useDashboardStore } from "../store";
+import { useNavigate } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import { mergeElkPositions, nodesToElkInput } from "../utils/layout";
 import { applyElkLayout } from "../utils/elk-layout";
@@ -259,7 +260,7 @@ function buildDomainDetail(
 function DomainGraphViewInner() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
-  const clearActiveDomain = useDashboardStore((s) => s.clearActiveDomain);
+  const navigate = useNavigate(); // P3: 지도 복귀는 URL로
   const { t } = useI18n();
 
   // ktds-fork (ADR-003): diff 오버레이를 도메인 뷰에 투영 — 오버레이의 KG 노드 id를
@@ -348,7 +349,7 @@ function DomainGraphViewInner() {
         <div className="absolute top-3 left-3 z-10">
           <button
             type="button"
-            onClick={() => clearActiveDomain()}
+            onClick={() => navigate("/domains")}
             className="px-3 py-1.5 text-xs rounded-lg bg-elevated border border-border-subtle text-text-secondary hover:text-text-primary transition-colors"
           >
             {t.domainView.backToDomains}

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 import { useViewMode } from "../../hooks/useViewMode";
@@ -26,7 +27,7 @@ export default function TopBar({ onShowKeyboardHelp }: Props) {
     : mode === "docs" ? "산출물"
     : mode === "rtm" ? "추적표"
     : mode === "knowledge" ? "지식그래프"
-    : null;
+    : "홈"; // P3: "/"(홈)과 그 외 미매핑 경로(전부 홈으로 리다이렉트)
 
   return (
     <header className="h-[52px] shrink-0 flex items-center gap-3 px-4 bg-surface border-b border-border-subtle">
@@ -72,8 +73,8 @@ function DomainBreadcrumb() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
   const activeFlowId = useDashboardStore((s) => s.activeFlowId);
-  const clearActiveDomain = useDashboardStore((s) => s.clearActiveDomain);
   const clearActiveFlow = useDashboardStore((s) => s.clearActiveFlow);
+  const navigate = useNavigate(); // P3: 지도 복귀는 URL로
   const { t } = useI18n();
 
   const activeDomainName = useMemo(() => {
@@ -93,7 +94,7 @@ function DomainBreadcrumb() {
       <span className="text-text-muted/50 select-none">›</span>
       <button
         type="button"
-        onClick={() => clearActiveDomain()}
+        onClick={() => navigate("/domains")}
         className={`whitespace-nowrap transition-colors ${
           activeDomainId ? "text-text-muted hover:text-text-secondary" : "text-accent"
         }`}

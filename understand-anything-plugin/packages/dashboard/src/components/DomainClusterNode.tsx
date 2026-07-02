@@ -50,7 +50,7 @@ function DomainClusterNode({ data }: NodeProps<DomainClusterFlowNode>) {
       onClick={() => selectNode(data.domainId)}
       onDoubleClick={() => {
         navigateToDomain(data.domainId);
-        navigate("/domains"); // P2: 구조 그래프에서 도메인 섹션으로 점프
+        navigate(`/domains/${data.domainId}`); // P3: 도메인 흐름 목록으로 직행
       }}
     >
       <Handle type="target" position={Position.Left} className="!bg-accent/60 !w-2 !h-2" />

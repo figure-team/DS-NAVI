@@ -237,6 +237,15 @@ src/
 - **검증**: 빌드+lint+테스트(297+132) green, 딥링크 4종 시각 QA(RTM/산출물은 P1과 픽셀 수준 동일 = 파리티).
 - 미이관 잔여(의도): MobileLayout 반응형 통합의 시각 개편은 P5, 컨텍스트 액션의 TopBar 슬롯화·옴니박스는 P3~P5에서(현재는 GraphWorkbench 자체 툴바로 응집).
 
+## 8.7 P3 구현 기록 (2026-07-03)
+
+- **홈 신설**: `/` = HomePage(app/pages/HomePage.tsx) — P0 승인 시안 구조를 다크 토큰으로 구현(라이트는 P4). 스탯 타일(파일·클래스·도메인·기능 흐름·추적 기능) + 여정 진입 카드(도메인 칩/구조/추적표) + 산출물 문서 요약(doc-list.json, 확정/초안 배지) + 위키 카드(있을 때). rtm.json/doc-list.json은 홈에서 직접 fetch — 없으면 해당 요소만 숨김. NavRail 홈 항목(end 매칭), IndexRedirect 삭제 — "열자마자 도메인 랜딩"(di-ds-navi-001)은 **홈 랜딩으로 대체**(홈이 도메인 지도 진입 카드를 1순위로 제공).
+- **도메인 하위 라우트**: `/domains/:domainId`(흐름 목록) + `?flow=`(인라인 스파인 선택). §3의 `/flows/:flowId`는 **구현하지 않음** — 화면3(전체화면 스파인)이 이미 제거돼 `activeFlowId`는 모바일 가드·브레드크럼용 흔적 기관이고, 실제 화면 상태는 인라인 `selectedFlowId`라 쿼리가 정확한 매핑. DomainsPage가 URL→store 단방향 동기화(navigateToDomain/clearActiveDomain 재사용, 그래프 로드에도 재적용) + ?flow= 양방향(replace). 전환 버튼 전부 navigate() 재배선: DomainMapView 카드/상세, FlowListView·DomainGraphView 지도 복귀, TopBar 브레드크럼 루트, NodeInfo 흐름 점프(`/domains/:id`), DomainClusterNode 더블클릭(`/domains/:id`).
+- **구조 쿼리 동기화**: `/structure?node=<id>&level=class` — 그래프 로드 후 1회 적용(URL→store), 이후 replace 미러(store→URL). "이 노드 봐" 공유 링크 성립.
+- **버그 픽스(딥링크 검증 중 발견)**: ① `/domains/:domainId` 딥링크가 늦게 도착한 setGraph의 activeDomainId 리셋에 지도로 되돌아감 → DomainsPage 동기화를 그래프 로드에도 반응하게 ② `?node=` 선택이 **StrictMode 이중 fetch의 두 번째 setGraph**에 지워짐(store.subscribe 스택 추적으로 실증) → setGraph가 새 그래프에도 존재하는 선택은 보존(재분석 리로드 시 선택 유지 UX 개선 겸).
+- **검증**: 홈·/domains/domain:account·/structure?node=(Category.java NodeInfo 렌더) 스크린샷 확인, 빌드+lint+테스트 green.
+- 미이관 잔여(의도): RTM 인테이크(/rtm/intake/:sid)·산출물(:docId)·위키(/wiki/*) 하위 라우트 — 해당 뷰 내부 배선이 커서 P5 화면 리디자인과 함께. 옴니박스는 P4~P5.
+
 ## 9. 리스크·미결
 
 - ~~KT DS 팔레트 미확보~~ → **해소**: DS-APM 스크린샷에서 추출 완료(§6). 단 공식 브랜드 가이드 대비 검증은 미실시 — 실 가이드 입수 시 1층 토큰만 교체.

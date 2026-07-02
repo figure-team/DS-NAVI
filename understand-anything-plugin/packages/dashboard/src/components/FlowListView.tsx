@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { useDashboardStore } from "../store";
+import { useNavigate } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import FlowSpineView from "./FlowSpineView";
 import CitationChip from "./CitationChip";
@@ -68,7 +69,7 @@ function MethodBadge({ method }: { method: FlowMethod }) {
 export default function FlowListView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
-  const clearActiveDomain = useDashboardStore((s) => s.clearActiveDomain);
+  const navigate = useNavigate(); // P3: 지도 복귀는 URL로
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const { t } = useI18n();
@@ -188,7 +189,7 @@ export default function FlowListView() {
             >
               <button
                 type="button"
-                onClick={() => clearActiveDomain()}
+                onClick={() => navigate("/domains")}
                 className="uppercase text-text-muted hover:text-accent transition-colors cursor-pointer"
                 style={{ letterSpacing: "0.1em" }}
               >

@@ -20,7 +20,7 @@ export default function NavRail() {
   const wikiGraph = useDashboardStore((s) => s.wikiGraph);
   const { t } = useI18n();
 
-  const items: NavItem[] = [];
+  const items: NavItem[] = [{ to: "/", label: "홈", icon: iconHome }];
   if (graph && isKnowledgeGraph) {
     items.push({ to: "/knowledge", label: "지식그래프", icon: iconDomain });
   } else if (graph) {
@@ -40,6 +40,7 @@ export default function NavRail() {
         <NavLink
           key={item.to}
           to={item.to}
+          end={item.to === "/"}
           className={({ isActive }) =>
             `relative flex items-center gap-2.5 px-3 py-2 my-px rounded-lg text-sm font-medium transition-colors ${
               isActive
@@ -71,6 +72,11 @@ const svgProps = {
   className: "w-full h-full",
 } as const;
 
+const iconHome = (
+  <svg {...svgProps}>
+    <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
+  </svg>
+);
 const iconDomain = (
   <svg {...svgProps}>
     <circle cx="7" cy="7" r="3.2" />

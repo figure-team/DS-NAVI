@@ -165,7 +165,6 @@ function DomainNodeDetails({ node, graph }: { node: GraphNode; graph: KnowledgeG
   const selectNode = useDashboardStore((s) => s.selectNode);
   const markPreserveTransientOnce = useDashboardStore((s) => s.markPreserveTransientOnce);
   const navigate = useNavigate();
-  const mode = useViewMode();
   const { t } = useI18n();
   const meta = node.domainMeta;
 
@@ -219,10 +218,8 @@ function DomainNodeDetails({ node, graph }: { node: GraphNode; graph: KnowledgeG
                     navigateToDomain(node.id);
                     selectNode(f.id);
                     // P2: 구조 등 다른 섹션에서의 점프 — 선택을 들고 /domains로 이동.
-                    if (mode !== "domain") {
-                      markPreserveTransientOnce();
-                      navigate("/domains");
-                    }
+                    markPreserveTransientOnce();
+                    navigate(`/domains/${node.id}`);
                   }}
                   className="block w-full text-left px-2 py-1.5 rounded bg-elevated hover:bg-accent/10 text-[11px] text-text-secondary hover:text-accent transition-colors"
                 >

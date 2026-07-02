@@ -485,11 +485,14 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     const searchEngine = new SearchEngine(graph.nodes);
     const query = get().searchQuery;
     const searchResults = query.trim() ? searchEngine.search(query) : [];
-    const { domainGraph, activeDomainId } = get();
+    const { domainGraph, activeDomainId, selectedNodeId } = get();
     // ktds-fork (FRONT_REDESIGN P2): 네비게이션(어느 섹션인가)은 URL이 결정 — 여기서는
     // 도메인 그래프가 이미 있으면 도메인 탐색 위치(activeDomainId)만 보존한다.
     const keepDomainView = domainGraph !== null;
     const { nodesById, nodeIdToLayerId, nodeIdToLayerIds } = buildGraphIndexes(graph);
+    // ktds-fork (FRONT_REDESIGN P3): 새 그래프에도 존재하는 선택은 보존 — ?node= 딥링크가
+    // StrictMode 이중 fetch(setGraph 2회)에 지워지는 버그 + 재분석 리로드 시 선택 유지.
+    const keepSelection = selectedNodeId !== null && nodesById.has(selectedNodeId);
     set({
       graph,
       nodesById,
@@ -499,7 +502,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       searchResults,
       navigationLevel: "overview",
       activeLayerId: null,
-      selectedNodeId: null,
+      selectedNodeId: keepSelection ? selectedNodeId : null,
       focusNodeId: null,
       nodeHistory: [],
       activeDomainId: keepDomainView ? activeDomainId : null,

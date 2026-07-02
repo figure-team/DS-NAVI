@@ -14,8 +14,6 @@ export interface ShellContext {
   accessToken: string;
   loadError: string | null;
   graphIssues: GraphIssue[];
-  /** domain-graph.json 조회가 끝났는지(성공/부재 무관) — index 리다이렉트 판단용. */
-  domainGraphChecked: boolean;
 }
 
 /**
@@ -56,7 +54,6 @@ function RootData({ accessToken }: { accessToken: string }) {
   const [graphIssues, setGraphIssues] = useState<GraphIssue[]>([]);
   const [metaTheme, setMetaTheme] = useState<ThemeConfig | null>(null);
   const [outputLanguage, setOutputLanguage] = useState<string | undefined>();
-  const [domainGraphChecked, setDomainGraphChecked] = useState(false);
 
   useEffect(() => {
     fetch(dataUrl("meta.json", accessToken))
@@ -185,8 +182,7 @@ function RootData({ accessToken }: { accessToken: string }) {
           console.warn(`[domain-graph] validation failed: ${result.fatal}`);
         }
       })
-      .catch(() => {})
-      .finally(() => setDomainGraphChecked(true));
+      .catch(() => {});
   }, [setDomainGraph]);
 
   // ktds-fork (ADR-004): 세분화 위키 그래프 로드 → "문서" 토글 소스. 없으면 토글 미표시.
@@ -212,7 +208,6 @@ function RootData({ accessToken }: { accessToken: string }) {
           accessToken={accessToken}
           loadError={loadError}
           graphIssues={graphIssues}
-          domainGraphChecked={domainGraphChecked}
         />
       </ThemeProvider>
     </I18nProvider>

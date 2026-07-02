@@ -226,6 +226,17 @@ src/
 - **QA 어포던스**: `?onboard=skip`(기존 `onboard=force`와 대칭) — 헤드리스 스크린샷용.
 - **검증**: 딥링크 4종(/structure /domains /rtm /deliverables) + "/" 자동랜딩 스크린샷 확인, 전체 테스트 green.
 
+## 8.6 P2 구현 기록 (2026-07-02)
+
+- **viewMode 삭제 완료 — URL이 네비게이션의 단일 진실**. `store.viewMode`/`setViewMode` 제거, 컴포넌트는 `useViewMode()`(라우트 파생, hooks/useViewMode.ts), 훅 불가 문맥(단축키)은 `currentMode()`(viewModePaths, BASE_URL 스트립). ViewModeUrlBridge·LegacyDashboard 삭제.
+- **섹션별 페이지**: `app/pages/` — GraphWorkbench(구조/지식/위키 공용 본체, mode prop) + Structure/Knowledge/Wiki/Domains/Rtm/Deliverables Page. knowledge 자동전환은 StructurePage의 `isKnowledgeGraph → Navigate("/knowledge")`로.
+- **셸 전역 레이어**(`shell/ShellLayout.tsx`): 단축키+도움말 모달, 온보딩, 코드뷰어(슬라이드업+모달), 경로찾기/영향도 모달, 검증·오류 배너, 모바일 분기. TopBar에 도메인 브레드크럼(구 레거시 헤더에서 승격)과 도움말 버튼 합류.
+- **구 setViewMode의 정리 반쪽** → `resetTransientOnSectionChange`(셸이 섹션 변경 시 호출, 마운트 제외). "선택을 들고 점프"(NodeInfo 문서/도메인 점프)는 `markPreserveTransientOnce`로 1회 보존 — 원자성 유지.
+- **크로스섹션 점프 재배선**: NodeInfo(도메인 흐름·관련 문서), DomainClusterNode(더블클릭), MobileDrawer(뷰 토글) → navigate(). MobileLayout 등 4개 컴포넌트 viewMode 읽기 → useViewMode.
+- **lint 완치**: eslint-plugin-react-hooks 등록(rules-of-hooks=error, exhaustive-deps=warn), fixtures lint 제외, 미사용 import 4건 제거, DocsView 정규식의 리터럴 BOM → `﻿` 이스케이프. `pnpm lint` 0 errors.
+- **검증**: 빌드+lint+테스트(297+132) green, 딥링크 4종 시각 QA(RTM/산출물은 P1과 픽셀 수준 동일 = 파리티).
+- 미이관 잔여(의도): MobileLayout 반응형 통합의 시각 개편은 P5, 컨텍스트 액션의 TopBar 슬롯화·옴니박스는 P3~P5에서(현재는 GraphWorkbench 자체 툴바로 응집).
+
 ## 9. 리스크·미결
 
 - ~~KT DS 팔레트 미확보~~ → **해소**: DS-APM 스크린샷에서 추출 완료(§6). 단 공식 브랜드 가이드 대비 검증은 미실시 — 실 가이드 입수 시 1층 토큰만 교체.

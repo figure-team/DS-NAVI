@@ -1,6 +1,7 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
 
 export default tseslint.config(
   {
@@ -16,6 +17,8 @@ export default tseslint.config(
       '**/.copilot-plugin/**',
       '**/.astro/**',
       '.private/**',
+      // 라우트 추출 테스트 픽스처 — 의도적으로 미사용 인자/any를 포함하는 샘플 코드
+      '**/fixtures/**',
     ],
   },
   eslint.configs.recommended,
@@ -45,6 +48,14 @@ export default tseslint.config(
       globals: {
         ...globals.browser,
       },
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+    },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      // 기존 코드가 의도적 deps 생략을 disable 주석으로 관리 중 — 경고 수준으로 계도.
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
   {

@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useDashboardStore } from "../store";
+import { useNavigate } from "react-router";
+import { useViewMode } from "../hooks/useViewMode";
 import { useI18n } from "../contexts/I18nContext";
 import PersonaSelector from "./PersonaSelector";
 import DiffToggle from "./DiffToggle";
@@ -40,8 +42,8 @@ export default function MobileDrawer({
   const graph = useDashboardStore((s) => s.graph);
   const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const viewMode = useDashboardStore((s) => s.viewMode);
-  const setViewMode = useDashboardStore((s) => s.setViewMode);
+  const viewMode = useViewMode();
+  const navigate = useNavigate();
   const nodeTypeFilters = useDashboardStore((s) => s.nodeTypeFilters);
   const toggleNodeTypeFilter = useDashboardStore((s) => s.toggleNodeTypeFilter);
   const { t } = useI18n();
@@ -146,7 +148,7 @@ export default function MobileDrawer({
               <div className="inline-flex items-center bg-elevated rounded-lg p-0.5">
                 <button
                   type="button"
-                  onClick={() => setViewMode("domain")}
+                  onClick={() => navigate("/domains")}
                   className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                     viewMode === "domain"
                       ? "bg-accent/20 text-accent"
@@ -157,7 +159,7 @@ export default function MobileDrawer({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setViewMode("structural")}
+                  onClick={() => navigate("/structure")}
                   className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                     viewMode === "structural"
                       ? "bg-accent/20 text-accent"

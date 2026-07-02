@@ -8,7 +8,7 @@ import TrustBadge from "./TrustBadge";
 
 /** 표시용 frontmatter(--- ... ---) 제거 — 메타는 헤더/배지로 노출, 본문엔 불필요. */
 function stripFrontmatter(md: string): string {
-  return md.replace(/^﻿?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+  return md.replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
 }
 
 /** 다크 테마 마크다운 컴포넌트(GFM 표 포함). 인라인 스타일로 테마 변수 사용. */

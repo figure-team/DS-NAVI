@@ -244,8 +244,7 @@ interface DashboardStore {
   nextTourStep: () => void;
   prevTourStep: () => void;
 
-  // View mode
-  viewMode: ViewMode;
+  // View mode — 어느 섹션인가는 URL이 단일 진실(useViewMode). store에는 섹션별 데이터만.
   isKnowledgeGraph: boolean;
   domainGraph: KnowledgeGraph | null;
   /** ktds-fork (ADR-004): 세분화 위키 그래프(별도 wiki-graph.json). "문서" 토글 소스. */
@@ -299,9 +298,14 @@ interface DashboardStore {
 
   setDomainGraph: (graph: KnowledgeGraph) => void;
   setWikiGraph: (graph: KnowledgeGraph) => void; // ktds-fork (ADR-004)
-  /** ktds-fork: "문서" 뷰로 전환하며 해당 위키 노드를 선택(원자적). NodeInfo "관련 문서"용. */
+  /** ktds-fork: 위키 문서 노드를 선택(코드뷰어 정리 포함). 호출측이 navigate("/wiki") 동반. */
   openWikiDoc: (nodeId: string) => void;
-  setViewMode: (mode: ViewMode) => void;
+  /** P2: 섹션(URL) 전환 시 선택/흐름/코드뷰어 등 휘발 상태 정리 — 구 setViewMode의 정리 반쪽. */
+  resetTransientOnSectionChange: () => void;
+  /** P2: "선택을 들고 섹션 점프"(openWikiDoc, 도메인 점프)가 다음 1회 정리를 건너뛰게 표시. */
+  preserveTransientOnce: boolean;
+  markPreserveTransientOnce: () => void;
+  consumePreserveTransientOnce: () => void;
   setIsKnowledgeGraph: (value: boolean) => void;
   navigateToDomain: (domainId: string) => void;
   clearActiveDomain: () => void;
@@ -481,11 +485,10 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     const searchEngine = new SearchEngine(graph.nodes);
     const query = get().searchQuery;
     const searchResults = query.trim() ? searchEngine.search(query) : [];
-    const { viewMode, domainGraph, activeDomainId } = get();
-    // Preserve domain view if a domain graph is already loaded
-    const keepDomainView = viewMode === "domain" && domainGraph !== null;
-    // ktds-fork (FRONT_REDESIGN P1): 초기 랜딩은 URL(라우터)이 결정한다. 그래프 로드가
-    // viewMode를 "structural"로 리셋하면 /rtm 등 딥링크가 전부 되돌려지므로 현재 모드 유지.
+    const { domainGraph, activeDomainId } = get();
+    // ktds-fork (FRONT_REDESIGN P2): 네비게이션(어느 섹션인가)은 URL이 결정 — 여기서는
+    // 도메인 그래프가 이미 있으면 도메인 탐색 위치(activeDomainId)만 보존한다.
+    const keepDomainView = domainGraph !== null;
     const { nodesById, nodeIdToLayerId, nodeIdToLayerIds } = buildGraphIndexes(graph);
     set({
       graph,
@@ -499,7 +502,6 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       selectedNodeId: null,
       focusNodeId: null,
       nodeHistory: [],
-      viewMode,
       activeDomainId: keepDomainView ? activeDomainId : null,
       activeFlowId: null,
       selectedFlowId: null,
@@ -944,7 +946,6 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     }
   },
 
-  viewMode: "structural",
   isKnowledgeGraph: false,
   domainGraph: null,
   wikiGraph: null, // ktds-fork (ADR-004)
@@ -1008,11 +1009,10 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     set({ wikiGraph: graph });
   },
 
-  // ktds-fork: setViewMode는 selectedNodeId를 비우므로(뷰 전환+선택을 한 번에 못 함)
-  // navigateToDomain 패턴을 따라 원자적으로 wiki 뷰 전환 + 문서 선택.
+  // ktds-fork: 문서 노드 선택 + 코드뷰어 정리(원자적). /wiki 이동은 호출측 navigate가 담당 —
+  // 선택을 비우는 resetTransientOnSectionChange보다 나중에 실행되도록 호출측에서 순서 주의.
   openWikiDoc: (nodeId) =>
     set({
-      viewMode: "wiki" as const,
       selectedNodeId: nodeId,
       focusNodeId: null,
       codeViewerOpen: false,
@@ -1024,9 +1024,12 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     set({ isKnowledgeGraph: value });
   },
 
-  setViewMode: (mode) => {
+  // P2: 구 setViewMode의 정리 동작만 계승 — 섹션(URL) 전환 시 셸이 호출한다.
+  preserveTransientOnce: false,
+  markPreserveTransientOnce: () => set({ preserveTransientOnce: true }),
+  consumePreserveTransientOnce: () => set({ preserveTransientOnce: false }),
+  resetTransientOnSectionChange: () => {
     set({
-      viewMode: mode,
       selectedNodeId: null,
       focusNodeId: null,
       activeFlowId: null,
@@ -1044,7 +1047,6 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       ? [...nodeHistory, selectedNodeId].slice(-MAX_HISTORY)
       : nodeHistory;
     set({
-      viewMode: "domain" as const,
       activeDomainId: domainId,
       activeFlowId: null,
       selectedFlowId: null,

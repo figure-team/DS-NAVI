@@ -1,19 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { Outlet } from "react-router";
 import { validateGraph } from "@understand-anything/core/schema";
 import type { GraphIssue } from "@understand-anything/core/schema";
 import { useDashboardStore } from "../store";
 import TokenGate from "../components/TokenGate";
-import NavRail from "./shell/NavRail";
-import TopBar from "./shell/TopBar";
-import ViewModeUrlBridge from "./ViewModeUrlBridge";
+import ShellLayout from "./shell/ShellLayout";
 import { DEMO_MODE, dataUrl, resolveInitialToken, storeToken } from "../shared/api/client";
 import { ThemeProvider } from "../themes/index.ts";
 import type { ThemeConfig } from "../themes/index.ts";
 import { I18nProvider } from "../contexts/I18nContext.tsx";
-import { useIsMobile } from "../hooks/useIsMobile";
 
-/** Outlet context — 라우트(레거시 대시보드)가 useOutletContext로 받는다. */
+/** Outlet context — 각 페이지가 useOutletContext로 받는다. */
 export interface ShellContext {
   accessToken: string;
   loadError: string | null;
@@ -115,7 +111,7 @@ function RootData({ accessToken }: { accessToken: string }) {
           setGraph(result.data);
           setGraphIssues(result.issues);
           if ((data as Record<string, unknown>).kind === "knowledge") {
-            useDashboardStore.getState().setViewMode("knowledge");
+            // P2: /knowledge로의 이동은 StructurePage의 isKnowledgeGraph 리다이렉트가 담당.
             useDashboardStore.getState().setIsKnowledgeGraph(true);
           }
           for (const issue of result.issues) {
@@ -223,19 +219,3 @@ function RootData({ accessToken }: { accessToken: string }) {
   );
 }
 
-/** 셸 골격 — NavRail + TopBar + Outlet. 모바일은 라우트(MobileLayout)가 화면을 소유. */
-function ShellLayout(ctx: ShellContext) {
-  const isMobile = useIsMobile();
-  return (
-    <div className="h-screen w-screen flex bg-root text-text-primary noise-overlay">
-      <ViewModeUrlBridge />
-      {!isMobile && <NavRail />}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        {!isMobile && <TopBar />}
-        <div className="flex-1 min-h-0 relative">
-          <Outlet context={ctx satisfies ShellContext} />
-        </div>
-      </div>
-    </div>
-  );
-}

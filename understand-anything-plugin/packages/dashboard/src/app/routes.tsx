@@ -6,7 +6,12 @@ import {
 } from "react-router";
 import Root from "./Root";
 import type { ShellContext } from "./Root";
-import LegacyDashboard from "./legacy/LegacyDashboard";
+import StructurePage from "./pages/StructurePage";
+import KnowledgePage from "./pages/KnowledgePage";
+import WikiPage from "./pages/WikiPage";
+import DomainsPage from "./pages/DomainsPage";
+import RtmPage from "./pages/RtmPage";
+import DeliverablesPage from "./pages/DeliverablesPage";
 import { useDashboardStore } from "../store";
 
 /**
@@ -28,9 +33,9 @@ function IndexRedirect() {
 }
 
 /**
- * 라우트 맵 (FRONT_REDESIGN §3) — P1: 상위 6개 섹션.
- * 모든 섹션이 같은 LegacyDashboard를 마운트하고 ViewModeUrlBridge가 store와 동기화한다.
- * P3에서 섹션별 페이지·하위 라우트(/domains/:domainId 등)로 분화된다.
+ * 라우트 맵 (FRONT_REDESIGN §3) — P2: 섹션별 페이지 컴포넌트.
+ * URL이 네비게이션의 단일 진실 — store에는 viewMode가 없다.
+ * P3에서 하위 라우트(/domains/:domainId 등)로 분화된다.
  */
 export const router = createBrowserRouter(
   [
@@ -39,12 +44,12 @@ export const router = createBrowserRouter(
       element: <Root />,
       children: [
         { index: true, element: <IndexRedirect /> },
-        { path: "structure", element: <LegacyDashboard /> },
-        { path: "domains", element: <LegacyDashboard /> },
-        { path: "wiki", element: <LegacyDashboard /> },
-        { path: "deliverables", element: <LegacyDashboard /> },
-        { path: "rtm", element: <LegacyDashboard /> },
-        { path: "knowledge", element: <LegacyDashboard /> },
+        { path: "structure", element: <StructurePage /> },
+        { path: "domains", element: <DomainsPage /> },
+        { path: "wiki", element: <WikiPage /> },
+        { path: "deliverables", element: <DeliverablesPage /> },
+        { path: "rtm", element: <RtmPage /> },
+        { path: "knowledge", element: <KnowledgePage /> },
         { path: "*", element: <Navigate to="/structure" replace /> },
       ],
     },

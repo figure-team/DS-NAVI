@@ -13,6 +13,7 @@ import "@xyflow/react/dist/style.css";
 import CustomNode from "./CustomNode";
 import type { CustomNodeData } from "./CustomNode";
 import { useDashboardStore } from "../store";
+import { useViewMode } from "../hooks/useViewMode";
 import { applyForceLayout, NODE_WIDTH, NODE_HEIGHT } from "../utils/layout";
 import type { KnowledgeGraph } from "@understand-anything/core/types";
 
@@ -97,7 +98,7 @@ function KnowledgeGraphViewInner() {
   // ktds-fork (ADR-004): "문서" 모드면 위키 그래프를, 아니면 메인(코드/knowledge) 그래프를 렌더.
   const storeGraph = useDashboardStore((s) => s.graph);
   const wikiGraph = useDashboardStore((s) => s.wikiGraph);
-  const viewMode = useDashboardStore((s) => s.viewMode);
+  const viewMode = useViewMode();
   const graph = viewMode === "wiki" && wikiGraph ? wikiGraph : storeGraph;
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const focusNodeId = useDashboardStore((s) => s.focusNodeId);

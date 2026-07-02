@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
 import { useDashboardStore } from "../store";
+import { useNavigate } from "react-router";
 import { useDiffLabels } from "../hooks/useDiffLabels";
 
 export interface DomainClusterData extends Record<string, unknown> {
@@ -21,6 +22,7 @@ export type DomainClusterFlowNode = Node<DomainClusterData, "domain-cluster">;
 
 function DomainClusterNode({ data }: NodeProps<DomainClusterFlowNode>) {
   const navigateToDomain = useDashboardStore((s) => s.navigateToDomain);
+  const navigate = useNavigate();
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const selectNode = useDashboardStore((s) => s.selectNode);
   const isSelected = selectedNodeId === data.domainId;
@@ -46,7 +48,10 @@ function DomainClusterNode({ data }: NodeProps<DomainClusterFlowNode>) {
       }${data.isDiffFaded ? " diff-faded" : ""}`}
       style={diffStyle}
       onClick={() => selectNode(data.domainId)}
-      onDoubleClick={() => navigateToDomain(data.domainId)}
+      onDoubleClick={() => {
+        navigateToDomain(data.domainId);
+        navigate("/domains"); // P2: 구조 그래프에서 도메인 섹션으로 점프
+      }}
     >
       <Handle type="target" position={Position.Left} className="!bg-accent/60 !w-2 !h-2" />
       <Handle type="source" position={Position.Right} className="!bg-accent/60 !w-2 !h-2" />

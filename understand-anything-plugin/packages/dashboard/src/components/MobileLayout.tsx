@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import type { GraphIssue } from "@understand-anything/core/schema";
 import { useDashboardStore } from "../store";
+import { useViewMode } from "../hooks/useViewMode";
 import { useI18n } from "../contexts/I18nContext";
 import GraphView from "./GraphView";
 import DomainMapView from "./DomainMapView";
@@ -41,7 +42,7 @@ export default function MobileLayout({
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const tourActive = useDashboardStore((s) => s.tourActive);
   const persona = useDashboardStore((s) => s.persona);
-  const viewMode = useDashboardStore((s) => s.viewMode);
+  const viewMode = useViewMode();
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
   const activeFlowId = useDashboardStore((s) => s.activeFlowId);

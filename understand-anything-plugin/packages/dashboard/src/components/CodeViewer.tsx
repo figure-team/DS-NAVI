@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Highlight, themes } from "prism-react-renderer";
 import { useDashboardStore } from "../store";
+import { useViewMode } from "../hooks/useViewMode";
 import { useI18n } from "../contexts/I18nContext";
 
 interface CodeViewerProps {
@@ -64,7 +65,7 @@ export default function CodeViewer({
 }: CodeViewerProps) {
   const graph = useDashboardStore((s) => s.graph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const viewMode = useDashboardStore((s) => s.viewMode);
+  const viewMode = useViewMode();
   const codeViewerNodeId = useDashboardStore((s) => s.codeViewerNodeId);
   const codeViewerFilePath = useDashboardStore((s) => s.codeViewerFilePath);
   const codeViewerLine = useDashboardStore((s) => s.codeViewerLine);

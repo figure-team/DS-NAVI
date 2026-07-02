@@ -6,7 +6,6 @@ import { buildCensus } from './census.js'
 import { extractRoutes } from './extract.js'
 import { extractEdges } from './edges.js'
 import { buildSlices, DEFAULT_DEPTH_CAP } from './slices.js'
-import { stableJson } from './persist.js'
 import type { SlicesReport } from './types.js'
 
 const here = dirname(fileURLToPath(import.meta.url))

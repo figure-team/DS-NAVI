@@ -4,7 +4,6 @@ import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 import { useViewMode } from "../../hooks/useViewMode";
 import ImpactJobIndicator from "../../components/ImpactJobIndicator";
-import { ThemePicker } from "../../components/ThemePicker";
 
 interface Props {
   onShowKeyboardHelp: () => void;
@@ -30,7 +29,7 @@ export default function TopBar({ onShowKeyboardHelp }: Props) {
     : "홈"; // P3: "/"(홈)과 그 외 미매핑 경로(전부 홈으로 리다이렉트)
 
   return (
-    <header className="h-[52px] shrink-0 flex items-center gap-3 px-4 bg-surface border-b border-border-subtle">
+    <header className="h-14 shrink-0 flex items-center gap-3 px-4 bg-surface border-b border-border-subtle">
       <h1 className="font-heading text-base text-text-primary tracking-wide truncate max-w-[280px]">
         {graph?.project.name ?? t.common.appName}
       </h1>
@@ -49,7 +48,6 @@ export default function TopBar({ onShowKeyboardHelp }: Props) {
       <div className="flex-1" />
       {/* 영향도 분석 진행 인디케이터 + 완료 토스트 — 전역 레이어(항상 마운트). */}
       <ImpactJobIndicator />
-      <ThemePicker />
       <button
         onClick={onShowKeyboardHelp}
         className="text-text-muted hover:text-accent transition-colors"

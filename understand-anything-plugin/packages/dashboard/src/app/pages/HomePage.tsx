@@ -298,8 +298,8 @@ export default function HomePage() {
         {/* 하단: 산출물 + 최근 활동 — 시안 2fr/1.2fr */}
         <section className="grid grid-cols-1 lg:grid-cols-[2fr_1.2fr] gap-3.5">
           {docs && docs.length > 0 && (
-            <div className="bg-panel border border-border-subtle rounded-[10px] px-5 py-4">
-              <div className="flex items-center mb-1.5">
+            <div className="bg-panel border border-border-subtle rounded-[10px] px-5 py-4 card-shadow">
+              <div className="flex items-center mb-3">
                 <h3 className="text-[13px] font-bold text-text-secondary">산출물 문서</h3>
                 <Link
                   to="/deliverables"
@@ -342,8 +342,8 @@ export default function HomePage() {
             </div>
           )}
           {feed.length > 0 && (
-            <div className="bg-panel border border-border-subtle rounded-[10px] px-5 py-4">
-              <h3 className="text-[13px] font-bold text-text-secondary mb-1.5">최근 활동</h3>
+            <div className="bg-panel border border-border-subtle rounded-[10px] px-5 py-4 card-shadow">
+              <h3 className="text-[13px] font-bold text-text-secondary mb-3">최근 활동</h3>
               {feed.map((item, i) => (
                 <div
                   key={i}
@@ -398,7 +398,7 @@ function fmtWhen(iso: string): string {
 
 function StatTile({ label, value, sub }: { label: string; value: number; sub?: string }) {
   return (
-    <div className="bg-panel border border-border-subtle rounded-[10px] px-4 py-3.5">
+    <div className="bg-panel border border-border-subtle rounded-[10px] px-4 py-3.5 card-shadow">
       <div className="text-[12px] text-text-muted font-medium mb-1.5">{label}</div>
       <div className="text-[26px] font-semibold leading-none tracking-[-0.5px]">
         {value}
@@ -424,7 +424,7 @@ function EntryCard({
   return (
     <Link
       to={to}
-      className="group flex flex-col gap-2.5 bg-panel border border-border-subtle rounded-[10px] p-[18px] hover:border-accent/60 transition-colors"
+      className="group flex flex-col gap-2.5 bg-panel border border-border-subtle rounded-[10px] p-[18px] card-shadow hover:border-accent/60 transition-colors"
     >
       <div className="flex items-center gap-2.5">
         <span className="w-[18px] h-[18px] shrink-0 text-accent">{icon}</span>

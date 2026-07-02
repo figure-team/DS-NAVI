@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { NavLink } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
+import { ThemePicker } from "../../components/ThemePicker";
 
 interface NavItem {
   to: string;
@@ -9,11 +10,16 @@ interface NavItem {
   icon: ReactNode;
 }
 
+interface Props {
+  onShowKeyboardHelp: () => void;
+}
+
 /**
- * 좌측 NavRail (FRONT_REDESIGN §4) — 현행 상단 탭 5개를 대체하는 섹션 내비게이션.
- * P1: 다크 테마 토큰 그대로 사용(라이트 전환은 P4), 표시 조건은 기존 탭 그룹과 동일.
+ * 좌측 NavRail (FRONT_REDESIGN §4, 시안 mockup-shell-home 정합).
+ * 활성 항목 = 중립 배경(bg-elevated) + 본문색 텍스트 + 액센트 아이콘·좌측 바(시안 규칙 —
+ * 액센트 틴트 배경이 아님). 하단 유틸(테마·단축키)은 시안대로 레일 하단에.
  */
-export default function NavRail() {
+export default function NavRail({ onShowKeyboardHelp }: Props) {
   const graph = useDashboardStore((s) => s.graph);
   const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
@@ -32,9 +38,9 @@ export default function NavRail() {
   }
 
   return (
-    <nav className="w-[200px] shrink-0 h-full flex flex-col bg-surface border-r border-border-subtle px-2.5 py-3.5">
-      <div className="flex items-baseline gap-1.5 px-2.5 pb-4">
-        <span className="font-heading font-bold text-base text-text-primary tracking-wide">DS-NAVI</span>
+    <nav className="w-[220px] shrink-0 h-full flex flex-col bg-surface border-r border-border-subtle px-2.5 py-3.5">
+      <div className="flex items-baseline gap-1.5 px-2.5 pt-1 pb-4">
+        <span className="text-[17px] font-bold text-text-primary tracking-[-0.2px]">DS-NAVI</span>
       </div>
       {items.map((item) => (
         <NavLink
@@ -42,10 +48,10 @@ export default function NavRail() {
           to={item.to}
           end={item.to === "/"}
           className={({ isActive }) =>
-            `relative flex items-center gap-2.5 px-3 py-2 my-px rounded-lg text-sm font-medium transition-colors ${
+            `relative flex items-center gap-2.5 px-3 py-[9px] my-px rounded-lg text-sm transition-colors ${
               isActive
-                ? "bg-accent/15 text-accent"
-                : "text-text-muted hover:text-text-primary hover:bg-elevated"
+                ? "bg-elevated text-text-primary font-semibold"
+                : "font-medium text-text-secondary hover:text-text-primary hover:bg-elevated"
             }`
           }
         >
@@ -54,12 +60,29 @@ export default function NavRail() {
               {isActive && (
                 <span className="absolute -left-2.5 top-2 bottom-2 w-[3px] rounded-r bg-accent" />
               )}
-              <span className="w-[17px] h-[17px] shrink-0">{item.icon}</span>
+              <span className={`w-[17px] h-[17px] shrink-0 ${isActive ? "text-accent" : ""}`}>
+                {item.icon}
+              </span>
               {item.label}
             </>
           )}
         </NavLink>
       ))}
+      <div className="flex-1" />
+      {/* 하단 유틸 — 시안: border-t 위에 테마·단축키 도움말. */}
+      <div className="border-t border-border-subtle pt-2 mt-2 flex flex-col gap-0.5">
+        <div className="px-1.5">
+          <ThemePicker />
+        </div>
+        <button
+          type="button"
+          onClick={onShowKeyboardHelp}
+          className="flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[13px] text-text-muted hover:text-text-primary hover:bg-elevated transition-colors"
+        >
+          <span className="w-[16px] h-[16px] shrink-0">{iconKbd}</span>
+          단축키 도움말
+        </button>
+      </div>
     </nav>
   );
 }
@@ -109,5 +132,11 @@ const iconWiki = (
   <svg {...svgProps}>
     <path d="M4 5a2.5 2.5 0 0 1 2.5-2.5H20V19H6.5A2.5 2.5 0 0 0 4 21.5z" />
     <path d="M4 19a2.5 2.5 0 0 1 2.5-2.5H20" />
+  </svg>
+);
+const iconKbd = (
+  <svg {...svgProps}>
+    <rect x="3" y="6" width="18" height="12" rx="2" />
+    <path d="M7 10h.01M11 10h.01M15 10h.01M8 14h8" />
   </svg>
 );

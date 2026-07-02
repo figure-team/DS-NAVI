@@ -225,7 +225,7 @@ export default function ShellLayout(ctx: ShellContext) {
 
   return (
     <div className="h-screen w-screen flex bg-root text-text-primary noise-overlay">
-      <NavRail />
+      <NavRail onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         <TopBar onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />
 

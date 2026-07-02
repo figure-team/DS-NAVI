@@ -55,6 +55,12 @@ export default function ShellLayout(ctx: ShellContext) {
   const mode = useViewMode();
   const { t } = useI18n();
 
+  // 브라우저 탭 타이틀 — 프로젝트가 로드되면 "프로젝트명 · DS-NAVI".
+  const projectName = useDashboardStore((s) => s.graph?.project.name);
+  useEffect(() => {
+    document.title = projectName ? `${projectName} · DS-NAVI` : "DS-NAVI";
+  }, [projectName]);
+
   const dismissOnboarding = useCallback((remember: boolean) => {
     if (remember && typeof window !== "undefined") {
       window.localStorage.setItem(ONBOARDING_DISMISSED_KEY, "1");

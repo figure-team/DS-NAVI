@@ -1,7 +1,7 @@
 # U-A 대시보드 프론트 전면 재구축 설계 (FRONT_REDESIGN)
 
 > 워크트리: `front` / 브랜치: worktree-front (demo/jpetstore-6 기반)
-> 상태: **P0 진행 — 셸·홈 시안 제작 완료, 사용자 승인 대기**
+> 상태: **P0 승인 완료(2026-07-02) → P1 구현 완료 — 사용자 확인 대기**
 > 결정사항(2026-07-02 확정): 프론트 전면 재구축 · react-router 경로 라우팅 · IA 신설계 · **좌측 NavRail · 홈 신설 · 모바일 반응형 통합 · 라이트 테마 + KT 레드**(레퍼런스: KT DS **DS-APM** 제품 화면, 팔레트 추출 완료 — §6)
 > 시안: `docs/ktds/front-redesign/mockup-shell-home.html` (+.png)
 
@@ -216,6 +216,15 @@ src/
 | **P6 마감 QA** | 전체 회귀(테스트+시각), 데모 빌드, 문서 갱신 | 전부 green |
 
 ---
+
+## 8.5 P1 구현 기록 (2026-07-02)
+
+- **신규 구조**: `src/app/`(routes, Root=토큰가드+데이터로딩+셸, shell/NavRail·TopBar, legacy/LegacyDashboard, ViewModeUrlBridge, viewModePaths) + `src/shared/api/client.ts`(토큰·dataUrl 이관). App.tsx는 995줄 → 13줄(RouterProvider).
+- **과도기 동기화**: `ViewModeUrlBridge`가 URL↔store.viewMode 양방향 동기화(ref 가드로 바운스 방지). store 내부 viewMode 변경 지점(openWikiDoc·navigateToDomain·MobileDrawer·knowledge 자동전환)을 P1에서 무수정 흡수 — P2에서 navigate() 치환 후 브리지 제거.
+- **store 수정 2건**: ① `setGraph`의 viewMode→structural 리셋 제거(딥링크가 로드 시점에 되돌려지는 버그) ② `setDomainGraph`의 structural→domain 자동 플립 제거 — "열자마자 도메인 랜딩"은 index 라우트 `IndexRedirect`(domain-graph 조회 완료 대기 → /domains 또는 /structure, 쿼리 보존)로 이관.
+- **레거시 헤더 이관**: 프로젝트명·뷰 탭 그룹 → NavRail/TopBar, ThemePicker·ImpactJobIndicator → TopBar. 산출물/추적표 풀페이지는 레거시 헤더 자체를 숨김(자체 툴바 보유). 나머지 컨텍스트 액션은 P2에서 슬롯화.
+- **QA 어포던스**: `?onboard=skip`(기존 `onboard=force`와 대칭) — 헤드리스 스크린샷용.
+- **검증**: 딥링크 4종(/structure /domains /rtm /deliverables) + "/" 자동랜딩 스크린샷 확인, 전체 테스트 green.
 
 ## 9. 리스크·미결
 

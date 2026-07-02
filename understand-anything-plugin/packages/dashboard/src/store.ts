@@ -484,6 +484,8 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     const { viewMode, domainGraph, activeDomainId } = get();
     // Preserve domain view if a domain graph is already loaded
     const keepDomainView = viewMode === "domain" && domainGraph !== null;
+    // ktds-fork (FRONT_REDESIGN P1): 초기 랜딩은 URL(라우터)이 결정한다. 그래프 로드가
+    // viewMode를 "structural"로 리셋하면 /rtm 등 딥링크가 전부 되돌려지므로 현재 모드 유지.
     const { nodesById, nodeIdToLayerId, nodeIdToLayerIds } = buildGraphIndexes(graph);
     set({
       graph,
@@ -497,7 +499,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
       selectedNodeId: null,
       focusNodeId: null,
       nodeHistory: [],
-      viewMode: keepDomainView ? "domain" as const : "structural" as const,
+      viewMode,
       activeDomainId: keepDomainView ? activeDomainId : null,
       activeFlowId: null,
       selectedFlowId: null,
@@ -996,15 +998,10 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
     set({ expandedBranchParents: new Set(parentIds ?? []) }),
 
   setDomainGraph: (graph) => {
-    // Land on the domain map as the opening view when a domain graph is
-    // available and the user is still on the initial structural view
-    // (spec di-ds-navi-001 success scene ①: "열자마자 도메인 지도 랜딩").
-    // Fires once on load; a deliberate later switch to "코드"/"문서" is preserved.
-    const { viewMode } = get();
-    set({
-      domainGraph: graph,
-      viewMode: viewMode === "structural" ? "domain" : viewMode,
-    });
+    // ktds-fork (FRONT_REDESIGN P1): "열자마자 도메인 지도 랜딩"(di-ds-navi-001)은 이제
+    // 라우터의 index 리다이렉트("/" → /domains)가 담당한다. 여기서 viewMode를 플립하면
+    // /structure 딥링크가 로드 시점에 도메인으로 뺏기므로 데이터만 싣는다.
+    set({ domainGraph: graph });
   },
 
   setWikiGraph: (graph) => { // ktds-fork (ADR-004)

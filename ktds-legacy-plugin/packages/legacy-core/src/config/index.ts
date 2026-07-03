@@ -18,6 +18,51 @@ export const CONFIG_FILENAME = 'understanding.config.json'
  * - inferredRatio*Threshold: 추론(INFERRED) 비율 경고/차단 임계.
  * - supportedSchemaVersions: 호환 KG 스키마 버전.
  */
+/**
+ * 화면설계서(screen-capture) 설정 — `/understand-screens` 캡처 러너가 사용.
+ * baseUrl 무응답 시 startCommand 로 자동 기동(우리가 띄운 것만 종료),
+ * scenarios 로 로그인 등 상태 필요 화면을 커버한다.
+ */
+export const ScreensConfigSchema = z.object({
+  /** 분석 대상 앱 기본 URL (예: "http://localhost:8080/jpetstore"). */
+  baseUrl: z.string(),
+  /** 앱 기동 명령(spawn args 배열, 셸 미경유; cwd=프로젝트 루트). */
+  startCommand: z.array(z.string()).optional(),
+  /** 기동 판정용 경로(baseUrl 상대). */
+  readyPath: z.string().default('/'),
+  readyTimeoutMs: z.number().int().default(180_000),
+  viewport: z
+    .object({
+      width: z.number().int().default(1280),
+      height: z.number().int().default(800),
+    })
+    .default({ width: 1280, height: 800 }),
+  /** 크롤 최대 화면 수. */
+  maxPages: z.number().int().default(40),
+  /** 방문 제외 URL 정규식 문자열 목록. */
+  exclude: z.array(z.string()).default([]),
+  /** 상태 필요 화면 도달 시나리오(로그인, 장바구니 담기 등). */
+  scenarios: z
+    .array(
+      z.object({
+        id: z.string(),
+        title: z.string().optional(),
+        steps: z.array(
+          z.object({
+            action: z.enum(['goto', 'click', 'fill', 'waitFor']),
+            url: z.string().optional(),
+            selector: z.string().optional(),
+            value: z.string().optional(),
+          }),
+        ),
+        /** 시나리오 수행 후 캡처할 URL 목록(baseUrl 상대). */
+        captureAfter: z.array(z.string()).default([]),
+      }),
+    )
+    .default([]),
+})
+export type ScreensConfig = z.infer<typeof ScreensConfigSchema>
+
 export const ConfigSchema = z
   .object({
     networkType: z.number().int().default(3),
@@ -31,6 +76,8 @@ export const ConfigSchema = z
      * 기본값으로 쓴다(없으면 대시보드 1회 입력 폴백). dashboard config 로 복사된다.
      */
     approver: z.string().optional(),
+    /** 화면설계서 캡처 설정 — 없으면 `/understand-screens` 가 설정 안내 후 중단. */
+    screens: ScreensConfigSchema.optional(),
   })
   .passthrough()
 

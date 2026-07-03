@@ -3,12 +3,13 @@ export * from './domain-map/types.js'
 export {
   CONFIG_FILENAME,
   ConfigSchema,
+  ScreensConfigSchema,
   defaultConfig,
   configPath,
   loadConfig,
   writeConfig,
 } from './config/index.js'
-export type { Config } from './config/index.js'
+export type { Config, ScreensConfig } from './config/index.js'
 export { initProject, SPEC_DIR, SPEC_MASTER } from './init/index.js'
 export type { InitResult } from './init/index.js'
 export {
@@ -296,3 +297,4 @@ export {
   anchorFingerprints,
 } from './incremental/index.js'
 export type { FileChangeSet } from './incremental/index.js'
+export * from './screen-capture/index.js'

@@ -5,5 +5,67 @@
   "inferredRatioBlockThreshold": 0.6,
   "supportedSchemaVersions": [
     "1.0.0"
-  ]
+  ],
+  "screens": {
+    "baseUrl": "http://localhost:8080/jpetstore",
+    "startCommand": ["./mvnw", "cargo:run"],
+    "readyPath": "/actions/Catalog.action",
+    "readyTimeoutMs": 300000,
+    "viewport": { "width": 1280, "height": 800 },
+    "maxPages": 40,
+    "exclude": [],
+    "seedUrls": [
+      "actions/Catalog.action?searchProducts=&keyword=fish",
+      "actions/Cart.action?checkOut="
+    ],
+    "scenarios": [
+      {
+        "id": "signon",
+        "title": "로그인 후 계정/주문이력 화면",
+        "steps": [
+          { "action": "goto", "url": "actions/Account.action?signonForm=" },
+          { "action": "fill", "selector": "input[name=username]", "value": "j2ee" },
+          { "action": "fill", "selector": "input[name=password]", "value": "j2ee" },
+          { "action": "click", "selector": "input[name=signon]" }
+        ],
+        "captureAfter": [
+          "actions/Account.action?editAccountForm=",
+          "actions/Order.action?listOrders="
+        ]
+      },
+      {
+        "id": "order-flow",
+        "title": "장바구니 담기 → 주문서 → 배송지 → 확인 → 주문완료",
+        "steps": [
+          { "action": "goto", "url": "actions/Account.action?signonForm=" },
+          { "action": "fill", "selector": "input[name=username]", "value": "j2ee" },
+          { "action": "fill", "selector": "input[name=password]", "value": "j2ee" },
+          { "action": "click", "selector": "input[name=signon]" },
+          { "action": "goto", "url": "actions/Cart.action?addItemToCart=&workingItemId=EST-1" },
+          { "action": "capture", "url": "actions/Cart.action?viewCart=" },
+          { "action": "capture", "url": "actions/Order.action?newOrderForm=" },
+          { "action": "click", "selector": "input[name=shippingAddressRequired]" },
+          { "action": "click", "selector": "input[name=newOrder]" },
+          { "action": "capture" },
+          { "action": "click", "selector": "input[name=newOrder]" },
+          { "action": "capture" },
+          { "action": "click", "selector": "a[href*='confirmed=true']" },
+          { "action": "capture" }
+        ],
+        "captureAfter": []
+      },
+      {
+        "id": "error",
+        "title": "장바구니 없이 주문 시도 → 오류 화면",
+        "steps": [
+          { "action": "goto", "url": "actions/Account.action?signonForm=" },
+          { "action": "fill", "selector": "input[name=username]", "value": "j2ee" },
+          { "action": "fill", "selector": "input[name=password]", "value": "j2ee" },
+          { "action": "click", "selector": "input[name=signon]" },
+          { "action": "capture", "url": "actions/Order.action?newOrderForm=" }
+        ],
+        "captureAfter": []
+      }
+    ]
+  }
 }

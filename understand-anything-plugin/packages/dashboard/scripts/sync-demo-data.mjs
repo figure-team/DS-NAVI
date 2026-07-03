@@ -9,7 +9,7 @@
  * re-analyze the vendored project (e.g. analysis logic changed), just re-run
  * `pnpm sync:demo` (build:demo does this automatically).
  */
-import { cpSync, existsSync, mkdirSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -29,7 +29,11 @@ const FILES = [
   "config.json",
   "impact-overlay.json",
   "rtm.json",
+  "screens.json",
+  "screen-overrides.json",
 ];
+// 캡처 PNG 디렉터리(화면설계서) — 통째로 복사.
+const DIRS = ["screens"];
 
 if (!existsSync(SRC_DIR)) {
   console.error(`[sync:demo] source not found: ${SRC_DIR}`);
@@ -46,5 +50,16 @@ for (const name of FILES) {
   }
   cpSync(src, join(DEST_DIR, name));
   copied += 1;
+}
+for (const name of DIRS) {
+  const src = join(SRC_DIR, name);
+  const dest = join(DEST_DIR, name);
+  if (!existsSync(src)) {
+    console.warn(`[sync:demo] skip dir (absent): ${name}/`);
+    continue;
+  }
+  rmSync(dest, { recursive: true, force: true });
+  cpSync(src, dest, { recursive: true });
+  console.log(`[sync:demo] copied dir ${name}/ → packages/dashboard/public/`);
 }
 console.log(`[sync:demo] copied ${copied}/${FILES.length} files → packages/dashboard/public/`);

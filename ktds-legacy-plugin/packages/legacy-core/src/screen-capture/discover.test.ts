@@ -71,13 +71,37 @@ describe('slugify / shouldVisit', () => {
 })
 
 describe('detectFragments / listJspFilesFromGraph / domainForJsp / reconcileJsps', () => {
-  it('<html> 없는 JSP 는 fragment', () => {
-    expect(
-      detectFragments([
-        { path: 'a/Full.jsp', content: '<!doctype html>\n<HTML>\n<body>x</body></html>' },
-        { path: 'a/IncludeFields.jsp', content: '<%@ taglib %>\n<table>...</table>' },
-      ]),
-    ).toEqual(['a/IncludeFields.jsp'])
+  it('include 피참조 JSP 만 fragment (jpetstore 형태: 상대 경로 지시자)', () => {
+    const jsps = [
+      {
+        path: 'src/main/webapp/WEB-INF/jsp/catalog/Main.jsp',
+        content:
+          '<%@ include file="../common/IncludeTop.jsp"%>\n본문(html 태그 없음)\n<%@ include file="../common/IncludeBottom.jsp"%>',
+      },
+      {
+        path: 'src/main/webapp/WEB-INF/jsp/account/NewAccountForm.jsp',
+        content: '<%@ include file="IncludeAccountFields.jsp"%>',
+      },
+      { path: 'src/main/webapp/WEB-INF/jsp/common/IncludeTop.jsp', content: '<html><body>' },
+      { path: 'src/main/webapp/WEB-INF/jsp/common/IncludeBottom.jsp', content: '</body></html>' },
+      { path: 'src/main/webapp/WEB-INF/jsp/account/IncludeAccountFields.jsp', content: '<table/>' },
+    ]
+    expect(detectFragments(jsps)).toEqual([
+      'src/main/webapp/WEB-INF/jsp/common/IncludeTop.jsp',
+      'src/main/webapp/WEB-INF/jsp/common/IncludeBottom.jsp',
+      'src/main/webapp/WEB-INF/jsp/account/IncludeAccountFields.jsp',
+    ])
+  })
+
+  it('jsp:include(웹앱 루트 절대 경로)도 fragment 로 판별, 본문 페이지는 <html> 없어도 페이지', () => {
+    const jsps = [
+      {
+        path: 'webapp/WEB-INF/jsp/page/Body.jsp',
+        content: '<jsp:include page="/WEB-INF/jsp/common/Nav.jsp" />\n<div>tiles 스타일 본문</div>',
+      },
+      { path: 'webapp/WEB-INF/jsp/common/Nav.jsp', content: '<ul>nav</ul>' },
+    ]
+    expect(detectFragments(jsps)).toEqual(['webapp/WEB-INF/jsp/common/Nav.jsp'])
   })
 
   it('그래프 file 노드에서 JSP 만 추출(정렬·중복 제거)', () => {

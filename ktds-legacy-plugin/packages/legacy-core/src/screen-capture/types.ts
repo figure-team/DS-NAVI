@@ -113,6 +113,14 @@ export const ScreenSchema = z.object({
   domain: z.string().nullable(),
   /** 이 화면 도달에 사용한 시나리오 id(크롤 도달이면 null). */
   scenario: z.string().nullable(),
+  /** window.open/새창으로 이 화면을 연 원 화면 id(팝업이 아니면 null). */
+  openedFrom: z.string().nullable(),
+  /**
+   * 관측 콘텐츠 시그니처 — title+h1+form action 해시.
+   * 서버측 forward(URL 불변 로그인 강제 등)로 서로 다른 URL 이 같은 화면을
+   * 렌더한 경우를 별칭 의심으로 감지하는 데 쓴다(validate/status 보고).
+   */
+  contentSignature: z.string().nullable(),
   capture: ScreenCaptureInfoSchema,
   /** Stage B 화면 개요. */
   summary: z.object({ text: z.string(), confidence: z.enum(CONFIDENCE_VALUES) }).nullable(),

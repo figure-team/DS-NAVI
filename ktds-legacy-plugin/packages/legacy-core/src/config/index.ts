@@ -41,6 +41,8 @@ export const ScreensConfigSchema = z.object({
   maxPages: z.number().int().default(40),
   /** 방문 제외 URL 정규식 문자열 목록. */
   exclude: z.array(z.string()).default([]),
+  /** 크롤 시드 추가 URL(baseUrl 상대) — 링크로 발견 불가한 화면(검색 결과 등). */
+  seedUrls: z.array(z.string()).default([]),
   /** 상태 필요 화면 도달 시나리오(로그인, 장바구니 담기 등). */
   scenarios: z
     .array(
@@ -49,10 +51,13 @@ export const ScreensConfigSchema = z.object({
         title: z.string().optional(),
         steps: z.array(
           z.object({
-            action: z.enum(['goto', 'click', 'fill', 'waitFor']),
+            /** capture = 그 시점의 현재 페이지(또는 url)를 화면으로 캡처(중간 상태용). */
+            action: z.enum(['goto', 'click', 'fill', 'waitFor', 'capture']),
             url: z.string().optional(),
             selector: z.string().optional(),
             value: z.string().optional(),
+            /** click 으로 뜨는 alert/confirm 처리(기본 dismiss — 상태 변경 방지). */
+            dialog: z.enum(['accept', 'dismiss']).optional(),
           }),
         ),
         /** 시나리오 수행 후 캡처할 URL 목록(baseUrl 상대). */

@@ -84,12 +84,56 @@ export function shouldVisit(u: URL, exclude: string[]): boolean {
   return true
 }
 
+/** include 지시자 — `<%@ include file="…" %>` / `<jsp:include page="…">`. */
+const JSP_INCLUDE_RE =
+  /<%@\s*include\s+file\s*=\s*"([^"]+)"|<jsp:include\s+[^>]*page\s*=\s*"([^"]+)"/g
+
+/** '.'/'..' 세그먼트 정규화(선행 '/' 제거). */
+function normalizeSegments(p: string): string {
+  const parts: string[] = []
+  for (const seg of p.split('/')) {
+    if (!seg || seg === '.') continue
+    if (seg === '..') parts.pop()
+    else parts.push(seg)
+  }
+  return parts.join('/')
+}
+
+/** include 대상 경로를 알려진 JSP 경로로 해석(상대=포함 파일 기준, 절대=웹앱 루트 suffix 매칭). */
+function resolveIncludeTarget(
+  fromPath: string,
+  target: string,
+  known: ReadonlySet<string>,
+): string | null {
+  const cand = target.startsWith('/')
+    ? normalizeSegments(target)
+    : normalizeSegments(fromPath.split('/').slice(0, -1).join('/') + '/' + target)
+  if (known.has(cand)) return cand
+  for (const k of known) {
+    if (k.endsWith('/' + cand)) return k
+  }
+  return null
+}
+
 /**
- * JSP fragment 판별 — `<html` 태그가 없으면 include 조각으로 본다
- * (IncludeAccountFields.jsp 등). 반환: fragment 로 판별된 path 목록(입력 순서 유지).
+ * JSP fragment 판별 — 다른 JSP 가 include 지시자로 참조하는 파일은 독립 화면이
+ * 아니라 조각이다(IncludeTop/IncludeAccountFields 등).
+ * `<html>` 부재 휴리스틱은 레이아웃을 include 로 조립하는 앱(jpetstore 등)에서
+ * 본문 페이지까지 오탐하므로 쓰지 않는다 — 피참조 여부가 결정론 기준.
+ * 반환: fragment 로 판별된 path 목록(입력 순서 유지).
  */
 export function detectFragments(jsps: Array<{ path: string; content: string }>): string[] {
-  return jsps.filter(({ content }) => !/<html[\s>]/i.test(content)).map(({ path }) => path)
+  const known = new Set(jsps.map((j) => j.path))
+  const referenced = new Set<string>()
+  for (const { path, content } of jsps) {
+    for (const m of content.matchAll(JSP_INCLUDE_RE)) {
+      const target = m[1] ?? m[2]
+      if (!target) continue
+      const resolved = resolveIncludeTarget(path, target, known)
+      if (resolved && resolved !== path) referenced.add(resolved)
+    }
+  }
+  return jsps.filter((j) => referenced.has(j.path)).map((j) => j.path)
 }
 
 /** 지식그래프 노드에서 JSP 파일 경로 추출(file 노드, .jsp 한정). */

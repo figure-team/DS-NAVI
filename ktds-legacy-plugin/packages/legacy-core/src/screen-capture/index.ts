@@ -62,6 +62,7 @@ export {
   reconcileJsps,
 } from './discover.js'
 export {
+  computeContentSignature,
   mechanicalProjection,
   computeMechanicalHash,
   buildScreensFile,
@@ -74,3 +75,4 @@ export type {
   ScreensValidationStats,
   ScreensValidationResult,
 } from './assemble.js'
+export { loadPlaywright } from './playwright-loader.js'

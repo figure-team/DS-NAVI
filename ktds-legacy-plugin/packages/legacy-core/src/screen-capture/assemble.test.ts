@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   buildScreensFile,
+  computeContentSignature,
   computeMechanicalHash,
   serializeScreens,
   validateScreensFile,
@@ -42,6 +43,8 @@ function screen(id: string, annotations: Annotation[], overrides?: Partial<Scree
     graphNodeId: null,
     domain: null,
     scenario: null,
+    openedFrom: null,
+    contentSignature: null,
     capture: {
       path: `screens/${id.replace(/[^A-Za-z0-9._-]+/g, '_')}.png`,
       width: 1280,
@@ -186,6 +189,20 @@ describe('validateScreensFile', () => {
     )
     const r = validateScreensFile(f)
     expect(r.issues.some((i) => i.code === 'duplicate-annotation-key')).toBe(true)
+  })
+
+  it('contentSignature: title 동일해도 주석 집합이 다르면 구분, 같으면 동일(포워드 감지)', () => {
+    const signonAnns = [
+      ann(1, 'field', { label: 'Username', mechanical: { ...ann(1, 'field').mechanical, name: 'username' } }),
+      ann(1, 'action', { label: 'Login', mechanical: { ...ann(1, 'action').mechanical, name: 'signon', formAction: '/actions/Account.action', href: null } }),
+    ]
+    const itemAnns = [
+      ann(1, 'link', { label: 'Add to Cart', mechanical: { ...ann(1, 'link').mechanical, href: '/actions/Cart.action?addItemToCart=' } }),
+    ]
+    const sig = (anns: Annotation[]) =>
+      computeContentSignature({ title: 'JPetStore Demo', headings: [], annotations: anns })
+    expect(sig(signonAnns)).not.toBe(sig(itemAnns))
+    expect(sig(signonAnns)).toBe(sig([...signonAnns].reverse()))
   })
 
   it('computeMechanicalHash 는 화면 순서에 민감(정렬 후 호출 전제)', () => {

@@ -11,10 +11,34 @@ import { stableJson } from '../domain-map/persist.js'
 import { reconcileJsps } from './discover.js'
 import {
   ScreensFileSchema,
+  type Annotation,
   type MissingScreen,
   type Screen,
   type ScreensFile,
 } from './types.js'
+
+/**
+ * 관측 콘텐츠 시그니처 — 서버측 forward(다른 URL, 같은 렌더) 감지용.
+ * title/헤딩만으로는 판별력이 없어(전 페이지 title 동일한 레거시 흔함)
+ * 주석의 기계 사실(kind|name|href/formAction|label) 집합을 함께 해시한다.
+ */
+export function computeContentSignature(input: {
+  title: string
+  headings: string[]
+  annotations: Annotation[]
+}): string {
+  const keys = [
+    ...new Set(
+      input.annotations.map(
+        (a) =>
+          `${a.kind}|${a.mechanical.name ?? ''}|${a.mechanical.href ?? a.mechanical.formAction ?? ''}|${a.label}`,
+      ),
+    ),
+  ].sort()
+  return createHash('sha256')
+    .update(stableJson({ title: input.title, headings: input.headings, keys }))
+    .digest('hex')
+}
 
 /** mechanical 사실 투영 — Stage B 가 수정할 수 없는 부분만 추출. */
 export function mechanicalProjection(

@@ -698,10 +698,16 @@ function handleScreenOverridePost(
       const store = readScreenOverrides();
       const prev = store[screenId];
       const audit = Array.isArray(prev?.audit) ? prev!.audit : [];
+      // 부분 갱신(확정 전용/주석만 편집) 시 미제공 필드는 이전 값을 보존한다
+      // — titleOverride/annotations 대칭(확정 버튼은 둘 다 안 보냄).
       const record: ScreenOverride = {
         approver: by,
         at: now,
-        ...(typeof titleOverride === "string" ? { titleOverride } : {}),
+        ...(typeof titleOverride === "string"
+          ? { titleOverride }
+          : prev?.titleOverride
+            ? { titleOverride: prev.titleOverride }
+            : {}),
         ...(annotations !== undefined ? { annotations: cleanAnn } : prev?.annotations ? { annotations: prev.annotations } : {}),
         confirmed: true,
         audit: [...audit, { event: prev ? "EDITED" : "CONFIRMED", by, at: now }],

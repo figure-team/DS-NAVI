@@ -25,8 +25,20 @@ if (!existsSync(distEntry)) {
 const projectRoot = process.argv[2] || process.cwd()
 const command = process.argv[3] || 'status'
 const engine = await import(distEntry)
-const { validateScreensFile, SCREENS_FILENAME } = engine
+const { validateScreensFile, reconcileJsps, listJspFilesFromGraph, SCREENS_FILENAME } = engine
 const screensPath = join(projectRoot, '.understand-anything', SCREENS_FILENAME)
+
+/** KG 가 있으면 unmatchedJsps 를 재계산해 저장값의 신선도를 검사한다. */
+function recomputeUnmatched(file) {
+  const kgPath = join(projectRoot, '.understand-anything', 'knowledge-graph.json')
+  if (!existsSync(kgPath)) return null
+  try {
+    const kg = JSON.parse(readFileSync(kgPath, 'utf8'))
+    return reconcileJsps(listJspFilesFromGraph(kg.nodes ?? []), file.screens ?? [], file.fragments ?? [])
+  } catch {
+    return null
+  }
+}
 
 if (command === 'capture') {
   const r = spawnSync(
@@ -54,6 +66,7 @@ const v = validateScreensFile(file)
 const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}%`)
 
 if (command === 'validate') {
+  let ok = v.ok
   if (v.issues.length) {
     console.error(`검증 이슈 ${v.issues.length}건:`)
     for (const i of v.issues) {
@@ -62,15 +75,25 @@ if (command === 'validate') {
   }
   if (v.stats) {
     console.log(
-      `화면 ${v.stats.screenCount} / 주석 ${v.stats.annotationCount} / 확정율 ${pct(v.stats.confirmedActionRate)} / 설명 채움률 ${pct(v.stats.descriptionRate)} / JSP 매핑률 ${pct(v.stats.jspMappedRate)} / 미매핑 JSP ${v.stats.unmatchedJspCount}건`,
+      `화면 ${v.stats.screenCount} / 주석 ${v.stats.annotationCount} / 확정율 ${pct(v.stats.confirmedActionRate)} / 설명 채움률 ${pct(v.stats.descriptionRate)} / JSP 매핑률 ${pct(v.stats.jspMappedRate)}`,
     )
   }
-  if (Array.isArray(file.unmatchedJsps) && file.unmatchedJsps.length) {
-    console.log('미매핑 JSP(전수 커버 게이트 — Stage B 에서 jspFile 매핑 필요):')
-    for (const j of file.unmatchedJsps) console.log(`  - ${j}`)
+  const recomputed = recomputeUnmatched(file)
+  const unmatched = recomputed ?? file.unmatchedJsps ?? []
+  if (recomputed && JSON.stringify(recomputed) !== JSON.stringify(file.unmatchedJsps)) {
+    console.error(
+      `unmatchedJsps 가 낡았습니다(저장 ${file.unmatchedJsps.length}건 ↔ 재계산 ${recomputed.length}건) — Stage B 채움 후 재계산해 기록하세요.`,
+    )
+    ok = false
   }
-  console.log(v.ok ? '검증 통과.' : '검증 실패.')
-  process.exit(v.ok ? 0 : 1)
+  if (unmatched.length) {
+    console.log(`미매핑 JSP ${unmatched.length}건(전수 커버 게이트 — 시나리오/채움 보강 필요):`)
+    for (const j of unmatched) console.log(`  - ${j}`)
+  } else {
+    console.log('미매핑 JSP 0건 — 비-fragment 뷰 전수 커버.')
+  }
+  console.log(ok ? '검증 통과.' : '검증 실패.')
+  process.exit(ok ? 0 : 1)
 }
 
 // status (기본)

@@ -1,0 +1,81 @@
+---
+name: understand-screens
+description: 화면설계서 생성 — 실제 앱 기동·캡처(Stage A) 후 이벤트별 동작을 근거 기반으로 채움(Stage B), 대시보드 화면설계서 탭 데이터
+argument-hint: ["[projectRoot]", "[capture|fill|validate|status]"]
+---
+
+# /understand-screens
+
+> 🌐 **언어:** 사용자에게 보여주는 모든 설명·요약·진행 안내는 **한국어**로 한다(config `outputLanguage`, 기본값 `ko`).
+
+분석 대상 웹앱의 **화면설계서**(캡처 + ①②③/ⓐⓑⓒ 번호 배지 + 항목별 설명 범례)를 생성한다.
+2단 파이프라인: **Stage A**(결정론 캡처 — 앱 기동/크롤/시나리오/routes 조인)는 스크립트가,
+**Stage B**(의미 채움 — JSP 매핑/한국어 설명/호출 체인)는 호스트(Claude)가 수행한다.
+
+## 실행
+
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> capture   # Stage A
+# → Stage B: 아래 "채움 계약"대로 screens.json 을 직접 채운다
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> validate  # 게이트
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status    # 요약
+```
+
+- 선행: `understanding.config.json` 의 `screens` 섹션(baseUrl, startCommand, scenarios 등).
+  없으면 capture 가 예시와 함께 안내 후 종료한다. 로그인/권한 화면은 **시나리오**(테스트
+  계정 포함)로 도달한다 — 계정 정보는 도구가 유추할 수 없으므로 사용자에게 요청한다.
+- 선행(권장): `.spec/map/routes.json`(understand-map 스캔) — 있으면 이벤트→핸들러가
+  결정론 `[확정]`(file:line)으로 선기입된다. `.understand-anything/knowledge-graph.json` 이
+  있으면 JSP 전수 대조(unmatchedJsps)가 활성화된다.
+
+## 산출물
+
+- `.understand-anything/screens.json` — 화면·주석(annotation)·근거. **생성물 불변**:
+  사람 편집은 `screen-overrides.json`(대시보드 탭)만.
+- `.understand-anything/screens/*.png` — fullPage 캡처(주석은 bbox 좌표로 저장, PNG 에
+  굽지 않음 — 대시보드가 오버레이 렌더).
+- `missing[]` — 도달 실패 정직 보고(`http-*`/`redirected-to:*`/`scenario-failed` 등).
+  조용한 누락 금지. `unmatchedJsps[]` 가 비어야 전수 커버.
+
+## Stage B 채움 계약 (호스트 수행)
+
+입력: `screens.json` + `.spec/map/{routes,method-calls}.json` + 컨트롤러/ActionBean 소스.
+**수정 금지**: `annotations[].{no,kind,selector,bbox,eventType,mechanical}` — mechanicalHash
+로 기계 검증되며 변조 시 validate 실패. 채울 것:
+
+1. **화면 단위**: `jspFile`(핸들러 메서드의 ForwardResolution/뷰 반환을 코드로 확인 —
+   근거 file:line 을 `summary.text` 에 포함), `graphNodeId`(`file:<jspFile>`, KG 에 실존할
+   때만), `domain`(뷰 폴더), `title`(한국어), `summary{text,confidence}`.
+   서버측 forward 로 다른 화면이 렌더된 경우(비로그인 → 로그인 폼 등, `contentSignature`
+   별칭 의심 참조) **실제 렌더된 JSP** 를 적고 summary 에 forward 사유를 명기한다.
+2. **주석 단위**: `description`(범례 문장 — 필드는 용도, 액션/링크는 수행 동작),
+   `note`("※ …" 비고, 필요 시), `handler.chain`(ActionBean→Service→Mapper —
+   method-calls.json 우선, 코드 확인 보조), 미조인 `handler` 채움.
+3. **신뢰도 규율(fail-closed)**: `CONFIRMED`/`CONFIRMED_AI` 주장은 `evidence`(file:line)
+   ≥ 1 필수. 코드 근거 없는 유추는 `INFERRED`, 못 찾으면 `UNVERIFIED`. 지어내기 금지.
+4. 같은 핸들러/필드가 여러 화면에 반복되므로 **핸들러→설명 표를 먼저 작성**하고 일괄
+   적용하는 방식을 권장(멱등 — 실패 항목만 재작성). 인앱 핸들러가 없는 링크(외부/앵커/
+   정적 페이지)는 handler 를 **null 로 유지**하고 설명만 기재한다(근거 없는 신뢰도 태깅 금지).
+5. jspFile 매핑 후 `unmatchedJsps` 를 재계산해 기록한다(엔진 `reconcileJsps` +
+   `listJspFilesFromGraph`). validate 가 KG 기준 재계산과 대조해 낡은 값을 실패 처리한다.
+
+## 검증 게이트 (validate)
+
+- zod 스키마 + `mechanicalHash` 불변(Stage A 기계 사실 변조 감지).
+- `CONFIRMED ⇒ evidence ≥ 1`, 화면 id/주석 키 중복 금지.
+- 채움률 보고: description ≥ 90%, `unmatchedJsps = ∅`(비-fragment 뷰 전수 매핑)를
+  목표로 하고 미달 시 시나리오/채움 보강 후 재실행.
+
+## 다양한 상황 대응 (Stage A 가 자동 처리)
+
+- **로그인/권한**: config scenarios(계정별 독립 브라우저 컨텍스트, role 별 시나리오).
+- **선행 상태 화면**(장바구니→주문서 등): 시나리오 steps 의 `capture` 액션으로 중간 캡처.
+- **리다이렉트/서버측 forward**: missing 보고 + contentSignature 별칭 의심.
+- **팝업/새창**: window.open → 별도 화면(`openedFrom`); alert/confirm → 기본 dismiss
+  (스텝 `dialog: accept` 로 변경).
+- **HTTP 오류**: 캡처 대신 `http-<status>` 보고 — 깨진 링크는 그 자체로 QA 근거.
+
+## 출력 해석
+
+화면 수·주석 수·핸들러 확정율·설명 채움률·미매핑 JSP·도달 실패를 한국어로 보고하고,
+대시보드 **화면설계서 탭**(`/understand-dashboard`)에서 열람·편집·확정함을 안내한다.

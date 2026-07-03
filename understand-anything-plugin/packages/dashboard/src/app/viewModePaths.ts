@@ -11,6 +11,7 @@ export const MODE_TO_PATH: Record<ViewMode, string> = {
   wiki: "/wiki",
   docs: "/deliverables",
   rtm: "/rtm",
+  screenspec: "/screens",
   knowledge: "/knowledge",
 };
 

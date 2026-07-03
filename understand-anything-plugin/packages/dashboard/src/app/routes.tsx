@@ -6,6 +6,7 @@ import KnowledgePage from "./pages/KnowledgePage";
 import WikiPage from "./pages/WikiPage";
 import DomainsPage from "./pages/DomainsPage";
 import RtmPage from "./pages/RtmPage";
+import ScreenspecPage from "./pages/ScreenspecPage";
 import DeliverablesPage from "./pages/DeliverablesPage";
 
 /**
@@ -26,6 +27,7 @@ export const router = createBrowserRouter(
         { path: "wiki", element: <WikiPage /> },
         { path: "deliverables/:docId?", element: <DeliverablesPage /> },
         { path: "rtm", element: <RtmPage /> },
+        { path: "screens", element: <ScreenspecPage /> },
         { path: "knowledge", element: <KnowledgePage /> },
         { path: "*", element: <Navigate to="/" replace /> },
       ],

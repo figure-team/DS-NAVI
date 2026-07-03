@@ -33,6 +33,7 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
     if (domainGraph) items.push({ to: "/domains", label: t.drawer.domain, icon: iconDomain });
     items.push({ to: "/structure", label: t.drawer.structural, icon: iconStructure });
     items.push({ to: "/rtm", label: "추적표", icon: iconRtm });
+    items.push({ to: "/screens", label: "화면설계서", icon: iconScreens });
     items.push({ to: "/deliverables", label: "산출물", icon: iconDocs });
     if (wikiGraph) items.push({ to: "/wiki", label: "문서", icon: iconWiki });
   }
@@ -126,6 +127,13 @@ const iconDocs = (
   <svg {...svgProps}>
     <path d="M6 2.5h9L20 8v13.5H6zM14.5 3v5.5H20" />
     <path d="M9 13h7M9 17h5" />
+  </svg>
+);
+const iconScreens = (
+  <svg {...svgProps}>
+    <rect x="3" y="4" width="18" height="12" rx="1.8" />
+    <path d="M9 20h6M12 16v4" />
+    <circle cx="7" cy="8" r="1.1" fill="currentColor" stroke="none" />
   </svg>
 );
 const iconWiki = (

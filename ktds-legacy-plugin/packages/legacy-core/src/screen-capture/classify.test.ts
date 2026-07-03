@@ -64,7 +64,7 @@ describe('classifyKind', () => {
 })
 
 describe('classifyElements', () => {
-  it('읽기 순서 정렬 + kind 그룹별 번호(field=①.., action/link=ⓐ.. 카운터 공유)', () => {
+  it('읽기 순서 정렬 + 종류별 독립 번호(field/action/link 각각 1부터)', () => {
     const out = classifyElements([
       el({ tag: 'a', href: '/b', selector: 'a2', bbox: { x: 10, y: 300, width: 50, height: 20 } }),
       el({ inputType: 'text', selector: 'i1', bbox: { x: 10, y: 100, width: 100, height: 20 } }),
@@ -76,12 +76,15 @@ describe('classifyElements', () => {
         bbox: { x: 10, y: 200, width: 80, height: 24 },
       }),
       el({ inputType: 'password', selector: 'i2', bbox: { x: 10, y: 140, width: 100, height: 20 } }),
+      el({ tag: 'a', href: '/c', selector: 'a3', bbox: { x: 10, y: 320, width: 50, height: 20 } }),
     ])
+    // link 는 action 과 카운터를 공유하지 않고 독립적으로 1,2 로 매겨진다.
     expect(out.map((a) => [a.kind, a.no, a.selector])).toEqual([
       ['field', 1, 'i1'],
       ['field', 2, 'i2'],
       ['action', 1, 's1'],
-      ['link', 2, 'a2'],
+      ['link', 1, 'a2'],
+      ['link', 2, 'a3'],
     ])
   })
 
@@ -138,12 +141,16 @@ describe('pickLabel / badgeGlyph', () => {
     expect(pickLabel(el({ text: 'x'.repeat(120) }))).toHaveLength(80)
   })
 
-  it('배지 글리프: field=①②③, action/link=ⓐⓑⓒ, 범위 밖 폴백', () => {
+  it('배지 글리프: field=①②③, action=ⓐⓑⓒ, link=ⒶⒷⒸ, 범위 밖 폴백', () => {
     expect(badgeGlyph('field', 1)).toBe('①')
     expect(badgeGlyph('field', 21)).toBe('㉑')
     expect(badgeGlyph('action', 1)).toBe('ⓐ')
-    expect(badgeGlyph('link', 3)).toBe('ⓒ')
+    expect(badgeGlyph('action', 3)).toBe('ⓒ')
+    expect(badgeGlyph('link', 1)).toBe('Ⓐ')
+    expect(badgeGlyph('link', 3)).toBe('Ⓒ')
+    expect(badgeGlyph('region', 2)).toBe('②')
     expect(badgeGlyph('action', 27)).toBe('(27)')
+    expect(badgeGlyph('link', 27)).toBe('(27)')
     expect(badgeGlyph('field', 51)).toBe('(51)')
   })
 })

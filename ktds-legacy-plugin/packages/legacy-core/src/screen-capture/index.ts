@@ -41,6 +41,7 @@ export type {
 export {
   CIRCLED_DIGITS,
   CIRCLED_LETTERS,
+  CIRCLED_UPPER,
   badgeGlyph,
   classifyKind,
   pickLabel,

@@ -9,13 +9,25 @@
  */
 import type { Annotation, AnnotationKind, EventType, RawElement } from './types.js'
 
-/** 배지 글리프 — 대시보드/문서 렌더 공용(50/26 초과 시 렌더러가 "(n)" 폴백). */
+/**
+ * 배지 글리프 — 대시보드/문서 렌더 공용. 종류별 3계열 분리(카운터도 3분할):
+ * - 입력 필드(field/region) → 동그라미 숫자 ①②③
+ * - 버튼·이벤트(action)      → 동그라미 소문자 ⓐⓑⓒ
+ * - 링크·이동(link)          → 동그라미 대문자 ⒶⒷⒸ
+ * 각 계열 범위(50/26/26) 초과 시 렌더러가 "(n)" 폴백.
+ */
 export const CIRCLED_DIGITS = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔㉕㉖㉗㉘㉙㉚㉛㉜㉝㉞㉟㊱㊲㊳㊴㊵㊶㊷㊸㊹㊺㊻㊼㊽㊾㊿'
 export const CIRCLED_LETTERS = 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ'
+export const CIRCLED_UPPER = 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ'
 
 /** kind+no → 표시 글리프(범위 초과 시 "(n)" 폴백). */
 export function badgeGlyph(kind: AnnotationKind, no: number): string {
-  const table = kind === 'field' || kind === 'region' ? CIRCLED_DIGITS : CIRCLED_LETTERS
+  const table =
+    kind === 'field' || kind === 'region'
+      ? CIRCLED_DIGITS
+      : kind === 'action'
+        ? CIRCLED_LETTERS
+        : CIRCLED_UPPER
   const glyph = [...table][no - 1]
   return glyph ?? `(${no})`
 }
@@ -96,10 +108,17 @@ export function classifyElements(elements: RawElement[]): Annotation[] {
     if (a.e.bbox.x !== b.e.bbox.x) return a.e.bbox.x - b.e.bbox.x
     return a.e.selector.localeCompare(b.e.selector)
   })
+  // 종류별 독립 카운터 — 입력·버튼·링크가 각각 1부터 시작(예시 슬라이드 관례).
   let fieldNo = 0
   let actionNo = 0
+  let linkNo = 0
   return picked.map(({ e, kind, eventType }) => ({
-    no: kind === 'field' || kind === 'region' ? ++fieldNo : ++actionNo,
+    no:
+      kind === 'field' || kind === 'region'
+        ? ++fieldNo
+        : kind === 'action'
+          ? ++actionNo
+          : ++linkNo,
     kind,
     selector: e.selector,
     bbox: roundBbox(e.bbox),

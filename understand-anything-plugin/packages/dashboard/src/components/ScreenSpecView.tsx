@@ -59,11 +59,36 @@ interface ScreenOverride {
 
 const CIRCLED_DIGITS = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔㉕㉖㉗㉘㉙㉚㉛㉜㉝㉞㉟㊱㊲㊳㊴㊵㊶㊷㊸㊹㊺㊻㊼㊽㊾㊿";
 const CIRCLED_LETTERS = "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ";
+const CIRCLED_UPPER = "ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ";
+function glyphTable(kind: Annotation["kind"]): string {
+  return kind === "field" || kind === "region"
+    ? CIRCLED_DIGITS
+    : kind === "action"
+      ? CIRCLED_LETTERS
+      : CIRCLED_UPPER;
+}
 function badgeGlyph(kind: Annotation["kind"], no: number): string {
-  const table = kind === "field" || kind === "region" ? CIRCLED_DIGITS : CIRCLED_LETTERS;
-  return [...table][no - 1] ?? `(${no})`;
+  return [...glyphTable(kind)][no - 1] ?? `(${no})`;
 }
 const annKey = (a: Annotation) => `${a.kind}:${a.no}`;
+
+/** 종류별 배지 색상 — 입력=남색 / 버튼·이벤트=금색 / 링크=회색. */
+type KindStyle = { bg: string; fg: string; border: string; swatch: string };
+const KIND_STYLE: Record<string, KindStyle> = {
+  field: { bg: "#2f5d8a", fg: "#ffffff", border: "#2f5d8a", swatch: "#4d82bd" },
+  region: { bg: "#2f5d8a", fg: "#ffffff", border: "#2f5d8a", swatch: "#4d82bd" },
+  action: { bg: "var(--color-accent)", fg: "#141414", border: "var(--color-accent)", swatch: "var(--color-accent)" },
+  link: { bg: "#55585c", fg: "#ececec", border: "#8a8d92", swatch: "#8a8d92" },
+};
+const kindStyle = (kind: string): KindStyle => KIND_STYLE[kind] ?? KIND_STYLE.link;
+/** 범례 섹션 순서 — 입력 → 버튼·이벤트 → 링크. */
+const KIND_ORDER: Array<Annotation["kind"]> = ["field", "region", "action", "link"];
+const KIND_SECTION: Record<string, string> = {
+  field: "입력 항목",
+  region: "영역",
+  action: "버튼·이벤트",
+  link: "링크(이동)",
+};
 
 const DOMAIN_LABEL: Record<string, string> = {
   account: "계정(account)",
@@ -367,6 +392,28 @@ export default function ScreenSpecView() {
             </p>
           )}
 
+          {/* 배지 색상 키 */}
+          <div className="mt-3 flex items-center gap-4 text-[11px] text-text-muted">
+            {KIND_ORDER.filter((k) => k !== "region").map((k) => (
+              <span key={k} className="inline-flex items-center gap-1.5">
+                <span
+                  className="inline-flex items-center justify-center rounded-full font-bold"
+                  style={{
+                    width: 16,
+                    height: 16,
+                    fontSize: 10,
+                    background: kindStyle(k).bg,
+                    color: kindStyle(k).fg,
+                    border: `1px solid ${kindStyle(k).border}`,
+                  }}
+                >
+                  {badgeGlyph(k, 1)}
+                </span>
+                {KIND_SECTION[k] ?? k}
+              </span>
+            ))}
+          </div>
+
           {/* 캡처 + 배지 오버레이 */}
           <div
             className="mt-4 relative border border-border-subtle rounded-lg overflow-hidden bg-white"
@@ -381,6 +428,7 @@ export default function ScreenSpecView() {
             {visibleAnns.map((a) => {
               const key = annKey(a);
               const active = hoverKey === key;
+              const st = kindStyle(a.kind);
               return (
                 <span
                   key={key}
@@ -391,14 +439,15 @@ export default function ScreenSpecView() {
                   style={{
                     left: `${((a.bbox.x + a.bbox.width) / sel.capture.width) * 100}%`,
                     top: `${(a.bbox.y / sel.capture.height) * 100}%`,
-                    transform: `translate(-50%, -50%) scale(${active ? 1.35 : 1})`,
+                    transform: `translate(-50%, -50%) scale(${active ? 1.4 : 1})`,
                     width: 20,
                     height: 20,
                     fontSize: 13,
                     lineHeight: "20px",
-                    background: active ? "var(--color-accent)" : "rgba(20,20,20,0.85)",
-                    color: active ? "#141414" : "var(--color-accent)",
-                    border: "1.5px solid var(--color-accent)",
+                    background: st.bg,
+                    color: st.fg,
+                    border: `1.5px solid ${st.border}`,
+                    boxShadow: active ? "0 0 0 2px #fff, 0 0 6px rgba(0,0,0,0.5)" : "0 0 2px rgba(0,0,0,0.6)",
                     zIndex: active ? 10 : 1,
                   }}
                 >
@@ -423,7 +472,24 @@ export default function ScreenSpecView() {
                 </tr>
               </thead>
               <tbody>
-                {visibleAnns.map((a) => {
+                {KIND_ORDER.flatMap((kind) => {
+                  const rows = visibleAnns.filter((a) => a.kind === kind);
+                  if (rows.length === 0) return [];
+                  const st = kindStyle(kind);
+                  const header = (
+                    <tr key={`sec:${kind}`} className="border-b border-border-subtle">
+                      <td colSpan={7} className="pt-3 pb-1">
+                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-text-secondary">
+                          <span
+                            className="inline-block w-2.5 h-2.5 rounded-full"
+                            style={{ background: st.swatch }}
+                          />
+                          {KIND_SECTION[kind] ?? kind} ({rows.length})
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                  const items = rows.map((a) => {
                   const key = annKey(a);
                   const m = merged(a);
                   const d = draftAnn[key];
@@ -436,7 +502,9 @@ export default function ScreenSpecView() {
                         hoverKey === key ? "bg-accent/10" : ""
                       }`}
                     >
-                      <td className="py-1.5 pr-2 text-accent font-semibold">{badgeGlyph(a.kind, a.no)}</td>
+                      <td className="py-1.5 pr-2 font-semibold" style={{ color: kindStyle(a.kind).swatch }}>
+                        {badgeGlyph(a.kind, a.no)}
+                      </td>
                       <td className="py-1.5 pr-2 text-text-muted">{KIND_LABEL[a.kind] ?? a.kind}</td>
                       <td className="py-1.5 pr-2 text-text-primary break-all">
                         {m.label}
@@ -502,6 +570,8 @@ export default function ScreenSpecView() {
                       </td>
                     </tr>
                   );
+                  });
+                  return [header, ...items];
                 })}
               </tbody>
             </table>

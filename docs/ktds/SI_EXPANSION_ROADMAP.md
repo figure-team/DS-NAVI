@@ -17,7 +17,7 @@
 - **목적**: 대외/대내 연계 전수 추출 — HTTP 클라이언트 호출(RestTemplate/WebClient/HttpClient/feign), DB link, 파일 송수신, MQ(JMS/Kafka), 소켓.
 - **확장 지점**: `legacy-core/src/interface-scan/`(신규) — 기존 census·call-chain 스캐너 패턴 재사용. `/understand-map`에 `interfaces` 단계 추가 or 독립 `/understand-interface`.
 - **산출물**: `.spec/map/interfaces.json` + 인터페이스 정의서 md(방향·프로토콜·엔드포인트·데이터·호출 위치 file:line). 대시보드 산출물 탭 노출.
-- **수용 기준**: jpetstore 실측 — 알려진 연계 전수 검출(수동 대조), byte-diff=0, 미해석 항목은 [미확인]으로 남김(침묵 누락 금지).
+- **수용 기준**: 픽스처(`fixtures/interface-scan/`) 스냅샷 전수 green + jpetstore 0건 음성 케이스 고정(조사 결과 jpetstore는 outbound 신호 없음) + eGov cop 실측, byte-diff=0, 미해석 항목은 [미확인]으로 남김(침묵 누락 금지). 상세: `INTERFACE_SCAN_DESIGN.md`.
 
 ### W2. 배치/스케줄 잡 인벤토리 — `분석 커버리지`
 - **목적**: cron/Quartz/`@Scheduled`/shell 잡 전수 추출. 도달성 분석의 "진입점 없음=데드코드" 오판 해소(배치 진입점 등록).
@@ -97,7 +97,7 @@
 | 단계 | 상태 | 커밋 | 비고 |
 |---|---|---|---|
 | 로드맵 | ✅ 작성 | - | 본 문서 |
-| P1 W1 | ⬜ 설계 대기 | | |
+| P1 W1 | 🔷 설계 완료 | | `INTERFACE_SCAN_DESIGN.md`, 구현 대기 |
 | P2 W2 | ⬜ | | |
 | P3 W3 | ⬜ | | |
 | P4 W7 | ⬜ | | |

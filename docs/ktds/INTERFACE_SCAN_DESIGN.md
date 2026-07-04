@@ -1,0 +1,97 @@
+# W1 설계 — 대외 인터페이스 스캔 + 인터페이스 정의서 확장
+
+> 로드맵: `SI_EXPANSION_ROADMAP.md` P1 · 브랜치 `feat/si-expansion`
+> 전제 조사(2026-07-04): `si-인터페이스정의서`(doc-set.ts:36, buildSiInterfaceSpec)는 **수신 라우트 재구성 전용**. outbound(송신/대외 연계) 신호를 잡는 스캐너는 전무 — edges.ts는 프로젝트 내부 파일 의존만 추적. jpetstore-6은 outbound 신호 0건(MyBatis+HSQLDB 로컬 완결)이므로 픽스처 신설 + eGov cop 실측으로 검증한다.
+
+## 1. 목표
+
+대외/대내 연계(송신)를 결정론으로 전수 추출하고, 기존 수신 라우트와 합쳐 **양방향 인터페이스 정의서**를 만든다. 모든 항목 file:line 근거, 미해석은 [미확인]으로 명시(침묵 누락 금지).
+
+## 2. 신호 카탈로그 (Tier)
+
+### T1 — 타입/호출 기반 (결정론, CONFIRMED)
+| 프로토콜 | 신호 |
+|---|---|
+| http | `RestTemplate`, `WebClient`, `FeignClient`/`@FeignClient`, Apache `HttpClient`, `HttpURLConnection`, `OkHttp` |
+| ws(SOAP) | JAX-WS `Service`/`@WebServiceClient`, Axis, CXF 클라이언트, `*.wsdl` 존재 |
+| mq | `JmsTemplate`, `KafkaTemplate`/`@KafkaListener`(수신도 기록), `RabbitTemplate` |
+| file | `JSch`(SFTP), commons-net `FTPClient`, `SmbFile` |
+| socket | `java.net.Socket`, `ServerSocket`(수신) |
+| mail | `JavaMailSender`, `javax.mail.Transport` |
+| db-link | SQL 내 `@dblink` 패턴(mapper XML·DDL), `DATABASE LINK` DDL |
+
+탐지 방식: 기존 스캐너 관례를 따라 tree-sitter Java + 라인 정규식 병용. import 문 + 호출 지점(메서드 인보케이션) 양쪽을 잡되, **호출 지점을 1급 근거**로 기록.
+
+### T2 — 설정/리터럴 해석 (결정론, CONFIRMED/UNRESOLVED)
+- endpoint 인자가 문자열 리터럴 → `resolved` 확정.
+- `${property.key}` / `@Value` / `Environment.getProperty` → `application*.properties|yml`, spring XML `<property>`를 추적해 해석. 실패 시 `endpoint.raw`만 남기고 `[미확인]`.
+- spring XML bean 정의(HttpInvoker, JaxWsPortProxyFactoryBean 등)와 `web.xml`도 스캔 대상.
+
+### T3 — LLM 보강 ([추정], 후순위 P1-c)
+- 대상 시스템 명명(엔드포인트 호스트→시스템명), 송수신 데이터 요약. 전부 `[추정]` 마킹, 기존 INFERRED_CELL 관례 재사용.
+
+## 3. 산출물 스키마 — `.spec/map/interfaces.json`
+
+```jsonc
+{
+  "gitCommit": "<sha>",
+  "items": [
+    {
+      "id": "IF-HTTP-001",              // protocol별 연번 (정렬 후 부여 → 결정론)
+      "direction": "outbound",           // outbound | inbound-extra (MQ 리스너 등 라우트 외 수신)
+      "protocol": "http",               // http|ws|mq|file|socket|mail|db-link
+      "clientType": "RestTemplate",
+      "endpoint": { "raw": "${pay.api.url}/v1/approve", "resolved": "https://…", "resolvedFrom": "application.yml:12" },
+      "dataHint": "POST JSON",          // 결정론으로 잡히는 범위만
+      "callSites": [{ "file": "src/…/PayClient.java", "line": 42, "symbol": "approve" }],
+      "unresolved": false
+    }
+  ],
+  "stats": { "total": 12, "unresolvedEndpoints": 3, "byProtocol": { "http": 8 } }
+}
+```
+
+- 정렬: `(protocol, callSites[0].file, line)` → id 부여. `stableJson`으로 기록. 동일 commit byte-diff=0.
+- 신호 0건이어도 파일은 기록(`items: []`) — "스캔했고 없음"과 "안 스캔함"의 구분이 커버리지의 핵심.
+
+## 4. 파이프라인 통합
+
+1. 신규 모듈 `legacy-core/src/interface-scan/`(scan.ts, resolve.ts, types.ts).
+2. `scanDomainMap`(domain-map/extract.ts:169)의 stage 시퀀스에 `extractInterfaces` 추가(라우트 추출 뒤).
+3. `persist.ts`에 `interfaces.json` 상수 + writer 추가(`writeMapArtifact` 재사용).
+4. `src/index.ts` 재수출, `understand-map.mjs` `runScan` 리포트에 "인터페이스 N건(미해석 M)" 한 줄 추가. 독립 서브커맨드는 두지 않음(스캔 일부).
+5. `coverage-report`: `CoverageInputs`에 interfaces 추가 — 총계·프로토콜별·미해석 수 노출.
+
+## 5. 문서 통합 — 기존 `si-인터페이스정의서` 확장
+
+- 별도 문서를 만들지 않고 기존 문서를 **§1 수신(API) / §2 송신(대외 연계)** 2섹션으로 확장.
+- `buildSiInterfaceSpec`(methodology/si-standard.ts:138)에 `interfaces.json` 입력 추가.
+- §2 컬럼: `IF_ID | 프로토콜 | 방향 | 대상시스템[추정] | 엔드포인트 | 데이터 | 호출 위치(file:line) | 상태(확정/미확인)`.
+- `templates/doc/interface-spec.md`에 §2 섹션 추가(사용자 커스텀 관례 유지 — 프로젝트 오버라이드 우선 로드는 기존 그대로).
+- 대시보드: doc-output 경로로 산출물 탭에 자동 노출(추가 작업 없음).
+
+## 6. 검증 전략
+
+- **픽스처 신설** `legacy-core/fixtures/interface-scan/`: RestTemplate 리터럴/프로퍼티 참조, WebClient, @FeignClient, HttpURLConnection, JmsTemplate, KafkaTemplate, JSch, mapper XML 내 dblink, 미해석 케이스(동적 조립 URL). 각각 기대 JSON 스냅샷.
+- **jpetstore 실측**: 0건 + coverage에 "인터페이스 0건" 명시 — 음성(negative) 케이스로 고정.
+- **eGov cop 실측**(/home/jk/projects/ktds/apm-project/egov-cop): outbound 신호 존재 여부 확인, 있으면 수동 대조.
+- 결정론: 동일 commit 2회 실행 byte-diff=0 테스트.
+
+## 7. 단계
+
+| 단계 | 내용 | 완료 기준 |
+|---|---|---|
+| P1-a | 스키마+T1 스캐너+픽스처+파이프라인 통합 | 픽스처 스냅샷 green, jpetstore 0건 |
+| P1-b | T2 endpoint 해석(properties/yml/XML)+dblink | 참조 해석 픽스처 green, 미해석 [미확인] 처리 |
+| P1-c | 문서 빌더 §2 확장+템플릿+coverage 통합 (+T3 [추정] 보강 훅) | 인터페이스 정의서 양방향 렌더, doc-set 테스트 green |
+| P1-d | eGov cop 실측+결정론 검증+사용자 컨펌 | 실측 리포트, byte-diff=0 |
+
+## 8. 진행 현황
+
+| 단계 | 상태 | 커밋 |
+|---|---|---|
+| 설계 | ✅ | |
+| P1-a | ⬜ | |
+| P1-b | ⬜ | |
+| P1-c | ⬜ | |
+| P1-d | ⬜ | |

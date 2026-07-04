@@ -194,6 +194,42 @@ function outboundRows(input: DocInput): TableRow[] {
   })
 }
 
+/** SI 배치정의서 열 — template batch-list-si 와 1:1. */
+const BATCH_COLUMNS = ['BAT_ID', '배치명', '트리거', '스케줄', '핸들러', '도달범위(파일)', '해석']
+
+/**
+ * si-배치정의서(W2) — batch-jobs.json 승계. 탐지·스케줄·핸들러·도달범위는 결정론 사실
+ * → CONFIRMED(evidence file:line). 배치명은 핸들러 초안 [추정](사람이 업무명으로 교체).
+ * '해석' = 잡 구현 파일 해석 여부(해석됨/[미확인]) — shell/crontab 은 프로젝트 밖이라 '외부'.
+ */
+function buildSiBatchSpec(input: DocInput): GeneratedDoc {
+  const jobs = input.batchJobs?.jobs ?? []
+  const rows: TableRow[] = jobs.map((j): TableRow => {
+    const external = j.trigger === 'shell' || j.trigger === 'crontab'
+    return {
+      cells: [
+        j.id,
+        `${j.name} ${INFERRED_CELL}`,
+        j.trigger,
+        j.schedule ?? EMPTY_CELL,
+        j.handler ?? UNRESOLVED_CELL,
+        String(j.reachableFiles),
+        external ? '외부' : j.unresolvedHandler ? UNRESOLVED_CELL : '해석됨',
+      ],
+      confidence: 'CONFIRMED',
+      evidence: [{ file: j.evidence.file, line: j.evidence.line }],
+    }
+  })
+  return {
+    docId: 'si-배치정의서',
+    title: 'SI 배치정의서',
+    methodology: 'si-standard',
+    sections: [
+      { heading: '배치 목록', key: 'batch-list-si', claims: [], table: { columns: BATCH_COLUMNS, rows } },
+    ],
+  }
+}
+
 function buildSiInterfaceSpec(input: DocInput): GeneratedDoc {
   const rows: TableRow[] = sortedRoutes(input).map((r, i): TableRow => {
     const handler = typeof r.handler === 'string' && r.handler.length > 0 ? r.handler : INFERRED_CELL
@@ -342,13 +378,13 @@ function buildSiTableSpec(input: DocInput): GeneratedDoc {
 }
 
 // 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
-export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec }
+export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec }
 
 /** si-standard 모듈 — SI 정형 3종을 docId 순서로 산출(기능 → 인터페이스 → 테이블). */
 export const siStandardMethodology: MethodologyModule = {
   id: 'si-standard',
   title: 'SI 표준(정형 제출 서식)',
   buildDocSet(input: DocInput): GeneratedDoc[] {
-    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input)]
+    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input)]
   },
 }

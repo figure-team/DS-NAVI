@@ -18,6 +18,7 @@ import type {
 import { buildLayerSignals, deriveStepLayer } from '../domain-map/step-layer.js'
 import type { JpaModel } from '../jpa/types.js'
 import type { InterfaceReport } from '../interface-scan/types.js'
+import type { BatchJobsReport } from '../batch-scan/report.js'
 
 function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
@@ -80,6 +81,17 @@ export const CoverageReportSchema = z.object({
       suspectSignals: z.number().int().nonnegative(),
     })
     .optional(),
+  /** W2 배치 인벤토리 — 총계/트리거별/핸들러 미해석/의심신호. optional: 하위호환. */
+  batch: z
+    .object({
+      total: z.number().int().nonnegative(),
+      byTrigger: z.array(
+        z.object({ trigger: z.string(), count: z.number().int().nonnegative() }),
+      ),
+      unresolvedHandlers: z.number().int().nonnegative(),
+      suspectSignals: z.number().int().nonnegative(),
+    })
+    .optional(),
 })
 export type CoverageReport = z.infer<typeof CoverageReportSchema>
 
@@ -91,6 +103,7 @@ export interface CoverageInputs {
   skeleton?: SkeletonReport | null
   jpaModel?: JpaModel | null
   interfaces?: InterfaceReport | null
+  batchJobs?: BatchJobsReport | null
 }
 
 /** 스캔 산출물에서 통합 커버리지 리포트를 결정론으로 조립(AC-30). */
@@ -149,6 +162,15 @@ export function buildCoverageReport(inputs: CoverageInputs): CoverageReport {
       }
     : undefined
 
+  const batch = inputs.batchJobs
+    ? {
+        total: inputs.batchJobs.stats.total,
+        byTrigger: inputs.batchJobs.stats.byTrigger,
+        unresolvedHandlers: inputs.batchJobs.stats.unresolvedHandlers,
+        suspectSignals: inputs.batchJobs.suspectSignals.count,
+      }
+    : undefined
+
   return CoverageReportSchema.parse({
     schemaVersion: 1,
     gitCommit: census.gitCommit,
@@ -163,6 +185,7 @@ export function buildCoverageReport(inputs: CoverageInputs): CoverageReport {
     droppedSteps,
     jpa,
     ...(interfaces ? { interfaces } : {}),
+    ...(batch ? { batch } : {}),
   })
 }
 
@@ -190,6 +213,23 @@ export function renderCoverageReport(r: CoverageReport): string {
                 `  ⚠️ 탐지 0건이지만 의심 신호 ${r.interfaces.suspectSignals}건(http 리터럴/jdbc/wsdl) — ` +
                   `"연계 없음"이 아니라 사내 공통연계모듈일 수 있음. understanding.config.json ` +
                   `interfaceScan.clients 로 공통모듈 시그니처를 등록하세요(.spec/map/interfaces.json suspectSignals.samples 참조).`,
+              ]
+            : []),
+        ]
+      : []),
+    ...(r.batch
+      ? [
+          `- 배치 잡: ${r.batch.total}건` +
+            (r.batch.byTrigger.length > 0
+              ? ` — ${r.batch.byTrigger.map((t) => `${t.trigger} ${t.count}`).join(', ')}`
+              : '') +
+            (r.batch.unresolvedHandlers > 0
+              ? ` (핸들러 미해석 ${r.batch.unresolvedHandlers}건 [미확인])`
+              : ''),
+          ...(r.batch.suspectSignals > 0
+            ? [
+                `  ⚠️ 잡 명명 관례(*Job/*Batch/*Tasklet)인데 트리거에 안 물린 클래스 ${r.batch.suspectSignals}건 — ` +
+                  `누락 배치일 수 있음(.spec/map/batch-jobs.json suspectSignals.samples 참조).`,
               ]
             : []),
         ]

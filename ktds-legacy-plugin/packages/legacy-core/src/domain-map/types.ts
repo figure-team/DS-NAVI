@@ -60,12 +60,30 @@ export type RouteEntry = z.infer<typeof RouteEntrySchema>
 /** 배치/스케줄 진입점 엔트리. */
 export const BatchEntrySchema = z.object({
   entryId: z.string(),
-  trigger: z.enum(['scheduled', 'quartz', 'task-xml', 'main']),
+  trigger: z.enum([
+    'scheduled',
+    'quartz',
+    'task-xml',
+    'main',
+    // W2 확장 — spring-batch XML / Quartz Java API / 프로그램적 스케줄러 / 외부 트리거.
+    'spring-batch',
+    'quartz-java',
+    'executor',
+    'timer',
+    'shell',
+    'crontab',
+  ]),
   schedule: z.string().nullable(),
   filePath: z.string(),
   line: z.number().int(),
   handler: z.string().nullable(),
   notes: z.array(z.string()),
+  /**
+   * W2: 해석된 잡 구현 파일 — XML 엔트리는 빈 ref → 클래스 → census 파일로 해석
+   * (실패 시 null=[미확인]), Java 엔트리는 filePath 자명. 도달성 루트로 주입되어
+   * "배치 잡 클래스 = 데드코드" 오판을 제거한다. optional: 구 routes.json 하위호환.
+   */
+  handlerFile: z.string().nullable().optional(),
 })
 export type BatchEntry = z.infer<typeof BatchEntrySchema>
 

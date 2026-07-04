@@ -50,6 +50,7 @@ export {
 } from './domain-map/route-key.js'
 export { extractRoutes, scanRoutes, scanDomainMap, buildMap } from './domain-map/extract.js'
 export * from './interface-scan/index.js'
+export * from './batch-scan/index.js'
 export { buildSkeleton, DEFAULT_STEP_CAP } from './domain-map/skeleton.js'
 export {
   DEFAULT_NODE_DETAIL_TEMPLATE,

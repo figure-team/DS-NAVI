@@ -32,6 +32,17 @@ import { extractDbSchema, writeDbSchema } from '../db-schema/index.js'
 import type { DbSchemaModel } from '../db-schema/index.js'
 import { extractInterfaces, INTERFACES_FILENAME } from '../interface-scan/index.js'
 import type { InterfaceReport } from '../interface-scan/index.js'
+import { buildSpringBeanIndex } from '../batch-scan/bean-index.js'
+import { resolveBatchHandlers } from '../batch-scan/resolve.js'
+import {
+  extractCrontabEntries,
+  extractJavaBatchEntriesW2,
+  extractShellBatchEntries,
+  extractSpringBatchXmlJobs,
+  isCrontabPath,
+} from '../batch-scan/extract.js'
+import { buildBatchJobs, BATCH_JOBS_FILENAME } from '../batch-scan/report.js'
+import type { BatchJobsReport } from '../batch-scan/report.js'
 import { buildCoverageReport } from '../coverage-report/index.js'
 import { computeFileFingerprints } from '../incremental/index.js'
 import { readSkeleton } from './persist.js'
@@ -113,6 +124,8 @@ export async function extractRoutes(
     routes.push(...extractSpringRoutes(root, relPath, ctx))
     routes.push(...extractStripesRoutes(root, relPath))
     batchEntries.push(...extractJavaBatchEntries(root, relPath))
+    // W2: quartz-java / executor / timer.
+    batchEntries.push(...extractJavaBatchEntriesW2(root, relPath))
   }
 
   // 4) Next.js 라우트 추출(census 기반).
@@ -135,6 +148,24 @@ export async function extractRoutes(
       continue
     }
     batchEntries.push(...extractXmlBatchEntries(text, relPath))
+    // W2: spring-batch XML 잡(전자정부 배치 표준).
+    batchEntries.push(...extractSpringBatchXmlJobs(text, relPath))
+  }
+
+  // 6b) W2: shell(java 실행 라인) + crontab. census 전체에서 대상 선별.
+  const shellAndCron = census.files
+    .filter((f) => f.lang === 'sh' || f.lang === 'bat' || f.lang === 'cmd' || isCrontabPath(f.relPath))
+    .map((f) => ({ relPath: f.relPath, lang: f.lang }))
+    .sort((a, b) => (a.relPath < b.relPath ? -1 : a.relPath > b.relPath ? 1 : 0))
+  for (const f of shellAndCron) {
+    let text: string
+    try {
+      text = readFileSync(join(projectRoot, f.relPath), 'utf8')
+    } catch {
+      continue
+    }
+    if (isCrontabPath(f.relPath)) batchEntries.push(...extractCrontabEntries(text, f.relPath))
+    else batchEntries.push(...extractShellBatchEntries(text, f.relPath))
   }
 
   // 7) routeId 할당 + 정렬.
@@ -142,12 +173,16 @@ export async function extractRoutes(
   assignRouteIds(sortedRoutes)
   const finalRoutes = sortRoutes(sortedRoutes)
 
+  // 8) W2: 배치 핸들러 해석 — 스프링 빈 인덱스로 XML 엔트리의 잡 클래스 파일을 푼다.
+  const beanIndex = buildSpringBeanIndex(projectRoot, census)
+  const resolvedBatch = resolveBatchHandlers(batchEntries, beanIndex, census)
+
   return {
     schemaVersion: 1,
     gitCommit: census.gitCommit,
     contextPath: readContextPath(projectRoot),
     routes: finalRoutes,
-    batchEntries: sortBatchEntries(batchEntries),
+    batchEntries: sortBatchEntries(resolvedBatch),
   }
 }
 
@@ -176,6 +211,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   candidates: CandidatesReport
   dbSchema: DbSchemaModel
   interfaces: InterfaceReport
+  batchJobs: BatchJobsReport
 }> {
   const census = buildCensus(projectRoot)
   const routes = await extractRoutes(projectRoot, census)
@@ -198,6 +234,9 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   // W1: 대외 인터페이스(송신/라우트 외 수신) 스캔 — interfaces.json. 소비자(docs)는 로드만.
   const interfaces = await extractInterfaces(projectRoot, census)
   writeMapArtifact(projectRoot, INTERFACES_FILENAME, interfaces)
+  // W2: 배치 인벤토리 — batch-jobs.json(내용 파생 안정 id + 도달 범위 + 의심신호).
+  const batchJobs = buildBatchJobs(routes.batchEntries, edges, census)
+  writeMapArtifact(projectRoot, BATCH_JOBS_FILENAME, batchJobs)
   // 보완 D-c/D-b: 통합 커버리지 리포트 + 파일 fingerprint 스냅샷(증분 재스캔 기준).
   const coverage = buildCoverageReport({
     census,
@@ -207,10 +246,11 @@ export async function scanDomainMap(projectRoot: string): Promise<{
     skeleton: readSkeleton(projectRoot),
     jpaModel,
     interfaces,
+    batchJobs,
   })
   writeMapArtifact(projectRoot, COVERAGE_FILENAME, coverage)
   writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, computeFileFingerprints(projectRoot, census))
-  return { census, routes, edges, slices, candidates, dbSchema, interfaces }
+  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs }
 }
 
 /**

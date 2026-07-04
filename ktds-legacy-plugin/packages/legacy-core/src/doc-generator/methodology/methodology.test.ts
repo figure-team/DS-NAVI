@@ -128,6 +128,7 @@ describe('AC-23: methodology swap yields different doc sets', () => {
       'si-기능명세서',
       'si-인터페이스정의서',
       'si-테이블정의서',
+      'si-배치정의서',
     ])
     expect(docs.every((d) => d.methodology === 'si-standard')).toBe(true)
   })
@@ -279,6 +280,76 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
     const doc = byId.get('si-인터페이스정의서')!
     expect(doc.sections[1].heading).toBe('대외 연계(송신·라우트 외 수신)')
     expect(tableOf(doc.sections[1]).rows).toEqual([])
+  })
+
+  it('si-배치정의서: batchJobs 입력 → 행(배치명 [추정]·[미확인]·외부 구분), 미제공 → 0행', () => {
+    const withBatch: DocInput = {
+      ...INPUT,
+      batchJobs: {
+        schemaVersion: 1,
+        gitCommit: null,
+        jobs: [
+          {
+            id: 'BAT-aaaa1111',
+            name: 'orderSyncJobDetail',
+            trigger: 'quartz',
+            schedule: 'cron=0 0 4 * * ?',
+            handler: 'orderSyncJobDetail',
+            handlerFile: 'src/OrderSyncJob.java',
+            unresolvedHandler: false,
+            evidence: { file: 'src/context-batch.xml', line: 13 },
+            reachableFiles: 2,
+            notes: [],
+          },
+          {
+            id: 'BAT-bbbb2222',
+            name: 'ghost',
+            trigger: 'quartz',
+            schedule: null,
+            handler: 'ghost',
+            handlerFile: null,
+            unresolvedHandler: true,
+            evidence: { file: 'src/context-batch.xml', line: 31 },
+            reachableFiles: 1,
+            notes: [],
+          },
+          {
+            id: 'BAT-cccc3333',
+            name: 'settle-batch.jar',
+            trigger: 'shell',
+            schedule: null,
+            handler: 'settle-batch.jar',
+            handlerFile: null,
+            unresolvedHandler: false,
+            evidence: { file: 'bin/run.sh', line: 4 },
+            reachableFiles: 1,
+            notes: [],
+          },
+        ],
+        stats: { total: 3, byTrigger: [{ trigger: 'quartz', count: 2 }, { trigger: 'shell', count: 1 }], unresolvedHandlers: 1 },
+        suspectSignals: { count: 0, samples: [] },
+      },
+    }
+    const doc = getMethodology('si-standard')
+      .buildDocSet(withBatch)
+      .find((d) => d.docId === 'si-배치정의서')!
+    const t = tableOf(doc.sections[0])
+    expect(t.columns).toEqual(['BAT_ID', '배치명', '트리거', '스케줄', '핸들러', '도달범위(파일)', '해석'])
+    expect(t.rows[0].cells).toEqual([
+      'BAT-aaaa1111',
+      'orderSyncJobDetail [추정]',
+      'quartz',
+      'cron=0 0 4 * * ?',
+      'orderSyncJobDetail',
+      '2',
+      '해석됨',
+    ])
+    expect(t.rows[0].evidence).toEqual([{ file: 'src/context-batch.xml', line: 13 }])
+    expect(t.rows[1].cells[6]).toBe('[미확인]')
+    expect(t.rows[2].cells[6]).toBe('외부')
+    // 미제공 → 0행(합성 금지).
+    const empty = byId.get('si-배치정의서')!
+    expect(tableOf(empty.sections[0]).rows).toEqual([])
   })
 
   it('si-테이블정의서: 테이블별 섹션 + 열 = 컬럼|타입|PK|FK|NULL|설명', () => {

@@ -1,0 +1,4 @@
+# 운영 crontab — 주석 라인은 무시
+SHELL=/bin/sh
+0 4 * * * /app/bin/run-settle.sh
+30 5 * * 1-5 /app/bin/report.sh --daily

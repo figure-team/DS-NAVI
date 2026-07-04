@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch">
+
+  <bean id="settleTasklet" class="demo.sb.SettleTasklet" />
+  <bean id="orderReader" class="demo.sb.OrderReader" />
+  <bean id="orderWriter" class="demo.sb.OrderWriter" />
+
+  <batch:job id="settleJob">
+    <batch:step id="settleStep">
+      <batch:tasklet ref="settleTasklet" />
+    </batch:step>
+  </batch:job>
+
+  <batch:job id="orderAggJob">
+    <batch:step id="aggStep">
+      <batch:tasklet>
+        <batch:chunk reader="orderReader" writer="orderWriter" commit-interval="100" />
+      </batch:tasklet>
+    </batch:step>
+  </batch:job>
+</beans>

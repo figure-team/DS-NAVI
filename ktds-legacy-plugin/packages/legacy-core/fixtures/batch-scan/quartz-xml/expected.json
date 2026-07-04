@@ -1,0 +1,83 @@
+{
+  "description": "검수된 오라클(사람 확인 완료) — jobs/stats/suspectSignals 골든 등가",
+  "jobs": [
+    {
+      "id": "BAT-4c313861",
+      "name": "missingJobDetail",
+      "trigger": "quartz",
+      "schedule": "cron=0 0 6 * * ?",
+      "handler": "missingJobDetail",
+      "handlerFile": null,
+      "unresolvedHandler": true,
+      "evidence": {
+        "file": "src/main/resources/context-batch.xml",
+        "line": 31
+      },
+      "reachableFiles": 1,
+      "notes": []
+    },
+    {
+      "id": "BAT-41582079",
+      "name": "orderSyncJobDetail",
+      "trigger": "quartz",
+      "schedule": "cron=0 0 4 * * ?",
+      "handler": "orderSyncJobDetail",
+      "handlerFile": "src/main/java/demo/batch/OrderSyncJob.java",
+      "unresolvedHandler": false,
+      "evidence": {
+        "file": "src/main/resources/context-batch.xml",
+        "line": 13
+      },
+      "reachableFiles": 2,
+      "notes": []
+    },
+    {
+      "id": "BAT-84fb6b7c",
+      "name": "reportJobDetail",
+      "trigger": "quartz",
+      "schedule": "cron=0 30 5 * * ?",
+      "handler": "reportJobDetail",
+      "handlerFile": "src/main/java/demo/batch/ReportJob.java",
+      "unresolvedHandler": false,
+      "evidence": {
+        "file": "src/main/resources/context-batch.xml",
+        "line": 24
+      },
+      "reachableFiles": 1,
+      "notes": []
+    },
+    {
+      "id": "BAT-a4f5a654",
+      "name": "orderSyncJob#cleanup",
+      "trigger": "task-xml",
+      "schedule": "cron=0 15 3 * * ?",
+      "handler": "orderSyncJob#cleanup",
+      "handlerFile": "src/main/java/demo/batch/OrderSyncJob.java",
+      "unresolvedHandler": false,
+      "evidence": {
+        "file": "src/main/resources/context-batch.xml",
+        "line": 38
+      },
+      "reachableFiles": 2,
+      "notes": []
+    }
+  ],
+  "stats": {
+    "total": 4,
+    "byTrigger": [
+      {
+        "trigger": "quartz",
+        "count": 3
+      },
+      {
+        "trigger": "task-xml",
+        "count": 1
+      }
+    ],
+    "unresolvedHandlers": 1
+  },
+  "suspectSignals": {
+    "count": 0,
+    "samples": []
+  }
+}

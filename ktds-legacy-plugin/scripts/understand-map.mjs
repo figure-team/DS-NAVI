@@ -86,10 +86,11 @@ switch (sub) {
 
 async function runScan() {
   const { scanDomainMap } = engine
-  const { census, routes, edges, slices, candidates, dbSchema, interfaces } = await scanDomainMap(projectRoot)
+  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs } = await scanDomainMap(projectRoot)
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
   console.log(`  routes: 라우트 ${routes.routes.length}개 / 배치 ${routes.batchEntries.length}개`)
+  reportBatchJobs(batchJobs)
   console.log(`  edges: 엣지 ${edges.edges.length}개 / 미해소 ${edges.unresolved.length}개`)
   console.log(`  slices: 슬라이스 ${slices.slices.length}개`)
   console.log(`  candidates: 도메인 후보 ${candidates.candidates.length}개`)
@@ -97,6 +98,20 @@ async function runScan() {
   reportDbSchema(dbSchema)
   console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces}.json (동일 commit 재실행 byte-diff=0)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
+}
+
+/** W2 배치 인벤토리 보고 — 미해석 핸들러/의심신호는 경고로 표면화. */
+function reportBatchJobs(batchJobs) {
+  if (!batchJobs) return
+  const { total, byTrigger, unresolvedHandlers } = batchJobs.stats
+  const suspects = batchJobs.suspectSignals?.count ?? 0
+  if (total > 0) {
+    const trig = byTrigger.map((t) => `${t.trigger} ${t.count}`).join(', ')
+    console.log(`  배치 잡: ${total}건 (${trig})${unresolvedHandlers > 0 ? ` — 핸들러 미해석 ${unresolvedHandlers}건 [미확인]` : ''}`)
+  }
+  if (suspects > 0) {
+    console.log(`  ⚠️ 잡 명명 관례인데 트리거에 안 물린 클래스 ${suspects}건 — 누락 배치 가능(.spec/map/batch-jobs.json 참조).`)
+  }
 }
 
 /** W1 대외 인터페이스 스캔 결과 보고 — 0건도 "스캔했고 없음"으로 명시(침묵 누락 금지). */

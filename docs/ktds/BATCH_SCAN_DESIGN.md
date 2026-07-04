@@ -112,10 +112,20 @@ Java 신규 탐지는 W1 java-scan 관례 재사용: 단일 파일 선언 바인
 
 ## 8. 진행 현황
 
-| 단계 | 상태 | 커밋 |
-|---|---|---|
-| 설계 | ✅ | |
-| P2-a | ⬜ | |
-| P2-b | ⬜ | |
-| P2-c | ⬜ | |
-| P2-d | ⬜ | |
+| 단계 | 상태 | 커밋 | 비고 |
+|---|---|---|---|
+| 설계 | ✅ | 08ab1b7 | |
+| P2-a | ✅ | (본 커밋) | 빈 인덱스+핸들러 해석 3방식+slices 배선, 도달성 회귀 테스트 green |
+| P2-b | ✅ | (본 커밋) | spring-batch/quartz-java/executor/timer/shell/crontab, 픽스처 4종 |
+| P2-c | ✅ | (본 커밋) | batch-jobs.json(안정 id·도달범위·의심신호)+coverage+si-배치정의서 |
+| P2-d | ✅ | (본 커밋) | 실측 §9, 적대적 리뷰는 별도 진행 |
+
+## 9. P2-d 실측 결과 (2026-07-04)
+
+- **jpetstore-6**: 배치 0건, 의심신호 0 — 음성 케이스. 전체 파이프라인 2회 실행
+  batch-jobs/routes/slices/coverage sha256 동일(byte-diff=0).
+- **eGov cop**: 배치 0건, 의심신호 1건 = `DeptJob.java` — 직무(부서업무) 의미의 Job 명명.
+  **명명 휴리스틱의 알려진 위양성 패턴**이며, samples 로 사람이 수 초 내 기각 가능(설계 의도).
+- 양성 커버리지: 픽스처 4종 13잡(quartz-xml 4·spring-batch 2·programmatic 3·shell-cron 4).
+- 기존 803종 테스트 무회귀(798 green 시점 기준) — @Scheduled/quartz/task-xml 골든 등가 유지,
+  BatchEntry.handlerFile 은 optional 추가라 구 routes.json 하위호환.

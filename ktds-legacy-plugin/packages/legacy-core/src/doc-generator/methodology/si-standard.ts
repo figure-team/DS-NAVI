@@ -136,29 +136,57 @@ function apiId(index: number): string {
  * 사실 -> CONFIRMED + 근거(file:line). 요청/응답/인증은 그래프에 없어 추론 -> `[추정]`.
  */
 /** §2 대외 연계(송신) 열 — template outbound-list 와 1:1. */
-const OUTBOUND_COLUMNS = ['IF_ID', '프로토콜', '방향', '대상시스템', '엔드포인트', '데이터', '상태']
+const OUTBOUND_COLUMNS = [
+  'IF_ID',
+  '인터페이스명',
+  '프로토콜',
+  '방향',
+  '연계방식',
+  '대상시스템',
+  '엔드포인트',
+  '데이터',
+  '해석',
+]
 
 /** endpoint 셀 — 해석값 우선, 실패 시 raw, 둘 다 없으면 [미확인]. */
 const UNRESOLVED_CELL = '[미확인]'
 
+/** 프로토콜 → 연계방식 분류(파생 추론이므로 셀에 [추정] 마킹). */
+const LINK_MODE: Record<string, string> = {
+  http: '실시간(온라인)',
+  ws: '실시간(온라인)',
+  socket: '실시간(소켓)',
+  mq: '비동기(MQ)',
+  file: '파일 송수신',
+  mail: '메일',
+  'db-link': 'DB 링크',
+}
+
 /**
  * §2 송신/라우트 외 수신 행 — interfaces.json(W1, 결정론 스캔) 승계.
- * 탐지 자체는 CONFIRMED(callSite file:line 근거). 대상시스템은 그래프에 없어 [추정]
- * (T3 LLM 보강 지점). endpoint 미해석은 [미확인] 셀로 표면화(침묵 누락 금지).
+ * - 탐지·엔드포인트·호출지점: 결정론 사실 → CONFIRMED(callSite file:line 근거).
+ * - 인터페이스명: 첫 호출 심볼 기반 초안 → [추정](사람이 업무명으로 교체).
+ * - 연계방식: 프로토콜 파생 분류 → [추정]. 대상시스템: 그래프에 없음 → [추정](T3).
+ * - '해석' 열은 endpoint 정적 해석 여부만 뜻한다(연계 검증/운영 여부 아님 — 감리 오독 방지,
+ *   해석됨/[미확인]). endpoint 미해석은 [미확인] 셀로 표면화(침묵 누락 금지).
  */
 function outboundRows(input: DocInput): TableRow[] {
   const items = input.interfaces?.items ?? []
   return items.map((it): TableRow => {
     const endpoint = it.endpoint.resolved ?? it.endpoint.raw ?? UNRESOLVED_CELL
+    const nameDraft = `${it.callSites[0]?.symbol ?? it.clientType} ${INFERRED_CELL}`
+    const linkMode = `${LINK_MODE[it.protocol] ?? it.protocol} ${INFERRED_CELL}`
     return {
       cells: [
         it.id,
+        nameDraft,
         it.protocol,
-        it.direction === 'outbound' ? '송신' : '수신(라우트외)',
+        it.direction === 'outbound' ? '송신' : '수신',
+        linkMode,
         INFERRED_CELL,
         endpoint,
         it.dataHint ?? EMPTY_CELL,
-        it.unresolved ? UNRESOLVED_CELL : '확정',
+        it.unresolved ? UNRESOLVED_CELL : '해석됨',
       ],
       confidence: 'CONFIRMED',
       evidence: it.callSites.map((c) => ({ file: c.file, line: c.line })),

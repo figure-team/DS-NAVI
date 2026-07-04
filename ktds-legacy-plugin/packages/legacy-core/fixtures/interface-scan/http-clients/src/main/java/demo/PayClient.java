@@ -12,6 +12,11 @@ public class PayClient {
     return restTemplate.postForObject("https://pay.example.com/v1/approve", req, String.class);
   }
 
+  public String retryApprove(PayRequest req) {
+    // 동일 엔드포인트 재호출 — 정의서에는 1행(연계 1건)으로 병합되어야 한다.
+    return restTemplate.postForObject("https://pay.example.com/v1/approve", req, String.class);
+  }
+
   public String status(String id) {
     return restTemplate.exchange(buildUrl(id), HttpMethod.POST, null, String.class).getBody();
   }

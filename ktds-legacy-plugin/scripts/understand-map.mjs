@@ -102,13 +102,19 @@ async function runScan() {
 /** W1 대외 인터페이스 스캔 결과 보고 — 0건도 "스캔했고 없음"으로 명시(침묵 누락 금지). */
 function reportInterfaces(interfaces) {
   if (!interfaces) return
-  const { total, unresolvedEndpoints, byProtocol } = interfaces.stats
+  const { total, unresolvedEndpoints, byProtocol, callSiteTotal } = interfaces.stats
+  const suspects = interfaces.suspectSignals?.count ?? 0
   if (total === 0) {
     console.log('  인터페이스: 0건 (송신/라우트 외 수신 신호 없음 — 스캔 수행됨)')
+    if (suspects > 0) {
+      console.log(`  ⚠️ 의심 신호 ${suspects}건(http 리터럴/jdbc/wsdl) — 사내 공통연계모듈일 수 있습니다.`)
+      console.log('     understanding.config.json 의 interfaceScan.clients 로 공통모듈 시그니처를 등록하세요.')
+      console.log('     (근거: .spec/map/interfaces.json → suspectSignals.samples)')
+    }
     return
   }
   const proto = byProtocol.map((p) => `${p.protocol} ${p.count}`).join(', ')
-  console.log(`  인터페이스: ${total}건 (${proto})${unresolvedEndpoints > 0 ? ` — endpoint 미해석 ${unresolvedEndpoints}건 [미확인]` : ''}`)
+  console.log(`  인터페이스: ${total}건/호출 ${callSiteTotal}지점 (${proto})${unresolvedEndpoints > 0 ? ` — endpoint 미해석 ${unresolvedEndpoints}건 [미확인]` : ''}`)
 }
 
 /** db-schema tier + 라이브 DB 신호(정적 탐지) 보고 + .sql 덤프 권장 게이트(PA-gate). */

@@ -1,28 +1,8 @@
 {
-  "description": "검수된 오라클(사람 확인 완료) — items/stats 골든 등가",
+  "description": "검수된 오라클(사람 확인 완료) — items/stats/suspectSignals 골든 등가",
   "items": [
     {
-      "id": "IF-FILE-001",
-      "direction": "outbound",
-      "protocol": "file",
-      "clientType": "JSch(SFTP)",
-      "endpoint": {
-        "raw": "sftp.example.com:22",
-        "resolved": "sftp.example.com:22",
-        "resolvedFrom": null
-      },
-      "dataHint": null,
-      "callSites": [
-        {
-          "file": "src/main/java/demo/FileTransfer.java",
-          "line": 14,
-          "symbol": "FileTransfer#sendViaSftp"
-        }
-      ],
-      "unresolved": false
-    },
-    {
-      "id": "IF-FILE-002",
+      "id": "IF-FILE-061121a7",
       "direction": "outbound",
       "protocol": "file",
       "clientType": "FTPClient(FTP)",
@@ -42,7 +22,27 @@
       "unresolved": false
     },
     {
-      "id": "IF-MQ-001",
+      "id": "IF-FILE-058913fa",
+      "direction": "outbound",
+      "protocol": "file",
+      "clientType": "JSch(SFTP)",
+      "endpoint": {
+        "raw": "sftp.example.com:22",
+        "resolved": "sftp.example.com:22",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/FileTransfer.java",
+          "line": 14,
+          "symbol": "FileTransfer#sendViaSftp"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-MQ-6dbaf2d5",
       "direction": "outbound",
       "protocol": "mq",
       "clientType": "JmsTemplate",
@@ -62,27 +62,7 @@
       "unresolved": false
     },
     {
-      "id": "IF-MQ-002",
-      "direction": "outbound",
-      "protocol": "mq",
-      "clientType": "KafkaTemplate",
-      "endpoint": {
-        "raw": "order-events",
-        "resolved": "order-events",
-        "resolvedFrom": null
-      },
-      "dataHint": "produce",
-      "callSites": [
-        {
-          "file": "src/main/java/demo/OrderMessaging.java",
-          "line": 13,
-          "symbol": "OrderMessaging#notifyOrder"
-        }
-      ],
-      "unresolved": false
-    },
-    {
-      "id": "IF-MQ-003",
+      "id": "IF-MQ-95943fa2",
       "direction": "inbound-extra",
       "protocol": "mq",
       "clientType": "KafkaListener",
@@ -102,7 +82,27 @@
       "unresolved": false
     },
     {
-      "id": "IF-SOCK-001",
+      "id": "IF-MQ-12cf840f",
+      "direction": "outbound",
+      "protocol": "mq",
+      "clientType": "KafkaTemplate",
+      "endpoint": {
+        "raw": "order-events",
+        "resolved": "order-events",
+        "resolvedFrom": null
+      },
+      "dataHint": "produce",
+      "callSites": [
+        {
+          "file": "src/main/java/demo/OrderMessaging.java",
+          "line": 13,
+          "symbol": "OrderMessaging#notifyOrder"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-SOCK-0985b8d0",
       "direction": "outbound",
       "protocol": "socket",
       "clientType": "Socket",
@@ -122,7 +122,7 @@
       "unresolved": false
     },
     {
-      "id": "IF-SOCK-002",
+      "id": "IF-SOCK-9898c901",
       "direction": "inbound-extra",
       "protocol": "socket",
       "clientType": "ServerSocket",
@@ -158,6 +158,11 @@
         "protocol": "socket",
         "count": 2
       }
-    ]
+    ],
+    "callSiteTotal": 7
+  },
+  "suspectSignals": {
+    "count": 0,
+    "samples": []
   }
 }

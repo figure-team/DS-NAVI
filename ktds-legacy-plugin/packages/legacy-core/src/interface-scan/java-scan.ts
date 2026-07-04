@@ -33,7 +33,7 @@ export interface RawInterfaceSignal {
 
 // ── 클라이언트 타입 카탈로그 ─────────────────────────────────────────────
 
-interface InvocationSpec {
+export interface InvocationSpec {
   protocol: InterfaceProtocol
   clientType: string
   /** 화이트리스트 메서드명 → dataHint (null 허용). */
@@ -235,7 +235,8 @@ function resolveStringExpr(node: Node, constants: Map<string, string>): string |
       return field ? (constants.get(field) ?? null) : null
     }
     case 'binary_expression': {
-      if (node.childForFieldName('operator')?.text !== '+' && !node.text.includes('+')) return null
+      // 문자열 연결(`+`)만 해석 — 다른 연산자는 endpoint 로 합성하지 않는다.
+      if (node.childForFieldName('operator')?.text !== '+') return null
       const left = node.childForFieldName('left')
       const right = node.childForFieldName('right')
       if (!left || !right) return null
@@ -325,8 +326,15 @@ function annotationName(annot: Node): string | null {
  * 단일 Java 파일에서 인터페이스 신호를 추출한다.
  * @param root 파싱된 program 노드
  * @param filePath census relPath
+ * @param customSpecs 프로젝트 커스텀 클라이언트(understanding.config.json seam) —
+ *        내장 카탈로그와 병합하되 내장이 우선(동명 타입 재정의 금지).
  */
-export function scanJavaInterfaces(root: Node, filePath: string): RawInterfaceSignal[] {
+export function scanJavaInterfaces(
+  root: Node,
+  filePath: string,
+  customSpecs?: Record<string, InvocationSpec>,
+): RawInterfaceSignal[] {
+  const specs: Record<string, InvocationSpec> = { ...(customSpecs ?? {}), ...INVOCATION_SPECS }
   const out: RawInterfaceSignal[] = []
   const constants = collectStringConstants(root)
   const seen = new Set<string>()
@@ -351,8 +359,7 @@ export function scanJavaInterfaces(root: Node, filePath: string): RawInterfaceSi
     const typeNode = node.childForFieldName('type')
     if (!typeNode) continue
     const typeName = simpleTypeName(typeNode.text)
-    const known =
-      typeName in INVOCATION_SPECS || typeName === 'URL' || typeName === 'WebClient'
+    const known = typeName in specs || typeName === 'URL' || typeName === 'WebClient'
     if (!known) continue
     if (node.type === 'formal_parameter') {
       const name = node.childForFieldName('name')?.text
@@ -554,7 +561,7 @@ export function scanJavaInterfaces(root: Node, filePath: string): RawInterfaceSi
           : (objNode.childForFieldName('field')?.text ?? '')
       const typeName = bindings.get(recvName)
       if (!typeName) continue
-      const spec = INVOCATION_SPECS[typeName]
+      const spec = specs[typeName]
       if (!spec || !(methodName in spec.methods)) continue
       const arg = argAt(node, spec.endpointArg ?? 0)
       let endpointRaw = arg ? resolveStringExpr(arg, constants) : null

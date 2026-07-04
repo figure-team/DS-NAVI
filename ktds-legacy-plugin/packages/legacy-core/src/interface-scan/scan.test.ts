@@ -20,6 +20,7 @@ interface Oracle {
   description: string
   items: InterfaceReport['items']
   stats: InterfaceReport['stats']
+  suspectSignals: InterfaceReport['suspectSignals']
 }
 
 function loadOracle(fixture: string): Oracle {
@@ -68,10 +69,11 @@ describe('interface scan — golden equivalence', () => {
     expect(report.items.some((i) => (i.endpoint.raw ?? '').includes('COMMENT_LINK'))).toBe(false)
   })
 
-  it('negative: 신호 없는 프로젝트 → items:[] (스캔했고 없음의 증거)', async () => {
+  it('negative: 신호 없는 프로젝트 → items:[] + 의심신호 0 (스캔했고 없음의 증거)', async () => {
     const report = await scan('negative')
     expect(report.items).toEqual([])
-    expect(report.stats).toEqual({ total: 0, unresolvedEndpoints: 0, byProtocol: [] })
+    expect(report.stats).toEqual({ total: 0, unresolvedEndpoints: 0, byProtocol: [], callSiteTotal: 0 })
+    expect(report.suspectSignals).toEqual({ count: 0, samples: [] })
   })
 
   it('결정론: 동일 입력 2회 실행 → byte-identical(stableJson)', async () => {
@@ -80,9 +82,48 @@ describe('interface scan — golden equivalence', () => {
     expect(stableJson(a)).toBe(stableJson(b))
   })
 
-  it('id 는 프로토콜별 연번 — 정렬(protocol, file, line) 후 부여', async () => {
-    const report = await scan('mq-file')
-    const mqIds = report.items.filter((i) => i.protocol === 'mq').map((i) => i.id)
-    expect(mqIds).toEqual(['IF-MQ-001', 'IF-MQ-002', 'IF-MQ-003'])
+  it('병합: 동일 엔드포인트 다중 호출 → 연계 1건 + callSites 누적(건수 부풀림 방지)', async () => {
+    const report = await scan('http-clients')
+    const approve = report.items.filter(
+      (i) => i.endpoint.resolved === 'https://pay.example.com/v1/approve',
+    )
+    expect(approve).toHaveLength(1)
+    expect(approve[0].callSites.map((c) => c.symbol)).toEqual([
+      'PayClient#approve',
+      'PayClient#retryApprove',
+    ])
+    expect(report.stats.callSiteTotal).toBe(report.items.reduce((n, i) => n + i.callSites.length, 0))
+  })
+
+  it('안정 id: 내용 파생(IF-<PROTO>-<hash8>) — 재실행에도 동일 연계는 동일 id', async () => {
+    const a = await scan('http-clients')
+    const b = await scan('http-clients')
+    expect(a.items.map((i) => i.id)).toEqual(b.items.map((i) => i.id))
+    for (const it of a.items) expect(it.id).toMatch(/^IF-[A-Z]+-[0-9a-f]{8}$/)
+    // id 유일성.
+    expect(new Set(a.items.map((i) => i.id)).size).toBe(a.items.length)
+  })
+
+  it('커스텀 seam: understanding.config.json interfaceScan.clients 로 사내 EAI 래퍼 탐지', async () => {
+    const report = await scan('eai-custom')
+    const oracle = loadOracle('eai-custom')
+    expect(report.items).toEqual(oracle.items)
+    expect(report.items).toHaveLength(1)
+    expect(report.items[0].clientType).toBe('EAI(사내공통)')
+    expect(report.items[0].endpoint.resolved).toBe('EAI.SETTLE.REQ')
+    // 미등록 래퍼(LegacyBus)는 잡지 않는다(화이트리스트 원칙).
+    expect(report.items.some((i) => i.clientType.includes('LegacyBus'))).toBe(false)
+  })
+
+  it('의심신호: 카탈로그 밖 연계(자체 HTTP 유틸/jdbc) → items 0 + suspectSignals 표면화', async () => {
+    const report = await scan('suspect')
+    expect(report.items).toEqual([])
+    expect(report.suspectSignals.count).toBe(2)
+    expect(report.suspectSignals.samples.map((s) => s.kind).sort()).toEqual([
+      'http-literal',
+      'jdbc-url',
+    ])
+    // 주석 라인의 URL 은 세지 않는다.
+    expect(report.suspectSignals.samples.some((s) => s.line === 5)).toBe(false)
   })
 })

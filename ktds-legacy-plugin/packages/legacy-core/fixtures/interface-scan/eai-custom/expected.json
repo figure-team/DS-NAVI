@@ -1,0 +1,40 @@
+{
+  "description": "검수된 오라클(사람 확인 완료) — items/stats/suspectSignals 골든 등가",
+  "items": [
+    {
+      "id": "IF-MQ-880a0844",
+      "direction": "outbound",
+      "protocol": "mq",
+      "clientType": "EAI(사내공통)",
+      "endpoint": {
+        "raw": "EAI.SETTLE.REQ",
+        "resolved": "EAI.SETTLE.REQ",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/SettleService.java",
+          "line": 9,
+          "symbol": "SettleService#settle"
+        }
+      ],
+      "unresolved": false
+    }
+  ],
+  "stats": {
+    "total": 1,
+    "unresolvedEndpoints": 0,
+    "byProtocol": [
+      {
+        "protocol": "mq",
+        "count": 1
+      }
+    ],
+    "callSiteTotal": 1
+  },
+  "suspectSignals": {
+    "count": 0,
+    "samples": []
+  }
+}

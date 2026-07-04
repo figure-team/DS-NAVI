@@ -76,6 +76,8 @@ export const CoverageReportSchema = z.object({
       byProtocol: z.array(
         z.object({ protocol: z.string(), count: z.number().int().nonnegative() }),
       ),
+      /** 탐지 밖 의심 신호(http 리터럴/jdbc/wsdl) — 0건 오독(연계 없음) 차단용. */
+      suspectSignals: z.number().int().nonnegative(),
     })
     .optional(),
 })
@@ -143,6 +145,7 @@ export function buildCoverageReport(inputs: CoverageInputs): CoverageReport {
           protocol: p.protocol as string,
           count: p.count,
         })),
+        suspectSignals: inputs.interfaces.suspectSignals.count,
       }
     : undefined
 
@@ -182,6 +185,13 @@ export function renderCoverageReport(r: CoverageReport): string {
             (r.interfaces.byProtocol.length > 0
               ? ` — ${r.interfaces.byProtocol.map((p) => `${p.protocol} ${p.count}`).join(', ')}`
               : ''),
+          ...(r.interfaces.total === 0 && r.interfaces.suspectSignals > 0
+            ? [
+                `  ⚠️ 탐지 0건이지만 의심 신호 ${r.interfaces.suspectSignals}건(http 리터럴/jdbc/wsdl) — ` +
+                  `"연계 없음"이 아니라 사내 공통연계모듈일 수 있음. understanding.config.json ` +
+                  `interfaceScan.clients 로 공통모듈 시그니처를 등록하세요(.spec/map/interfaces.json suspectSignals.samples 참조).`,
+              ]
+            : []),
         ]
       : []),
     '',

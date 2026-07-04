@@ -10,6 +10,24 @@ import { z } from 'zod'
 /** `.spec/map/` 인터페이스 산출물 파일명. */
 export const INTERFACES_FILENAME = 'interfaces.json'
 
+/**
+ * 프로젝트 커스텀 연계 클라이언트(understanding.config.json `interfaceScan.clients`).
+ * 사내 공통 EAI 래퍼(예: EaiClient.send) 등 카탈로그 밖 타입을 화이트리스트에 주입하는
+ * seam — 실 SI 의 공통연계모듈 recall 절벽 대응(플러그인 소스 수정 없이 등록).
+ */
+export const CustomClientSpecSchema = z.object({
+  /** 바인딩 타입 단순명(제네릭/패키지 제외) — 예: "EaiClient". */
+  type: z.string().min(1),
+  protocol: z.enum(['http', 'ws', 'mq', 'file', 'socket', 'mail', 'db-link']),
+  /** 신호로 볼 메서드명 화이트리스트 — 예: ["send", "call"]. */
+  methods: z.array(z.string().min(1)).min(1),
+  /** endpoint 로 읽을 인자 인덱스(기본 0). */
+  endpointArg: z.number().int().nonnegative().default(0),
+  /** 정의서 표기 라벨(기본 type). */
+  label: z.string().optional(),
+})
+export type CustomClientSpec = z.infer<typeof CustomClientSpecSchema>
+
 /** 연계 프로토콜 분류. */
 export const InterfaceProtocolSchema = z.enum([
   'http',
@@ -49,9 +67,14 @@ export const InterfaceEndpointSchema = z.object({
 })
 export type InterfaceEndpoint = z.infer<typeof InterfaceEndpointSchema>
 
-/** 인터페이스 항목 1건. */
+/** 인터페이스 항목 1건 — 동일 (방향,프로토콜,클라이언트,엔드포인트) 신호는 1건으로 병합. */
 export const InterfaceItemSchema = z.object({
-  /** `IF-<PROTO>-NNN` — 정렬 후 부여(결정론). */
+  /**
+   * `IF-<PROTO>-<hash8>` — 내용 파생 안정 id(방향|프로토콜|클라이언트|엔드포인트 sha256).
+   * 위치(정렬 연번)가 아니라 내용에서 나오므로 재스캔·코드 추가에도 같은 연계는 같은 id
+   * (제출된 정의서의 IF_ID 참조가 깨지지 않는다). 미해석 엔드포인트는 첫 callSite 로
+   * 파생(라인 이동 시 변할 수 있음 — [미확인] 항목의 알려진 한계).
+   */
   id: z.string(),
   direction: InterfaceDirectionSchema,
   protocol: InterfaceProtocolSchema,
@@ -79,6 +102,19 @@ export const InterfaceReportSchema = z.object({
         protocol: InterfaceProtocolSchema,
         count: z.number().int().nonnegative(),
       }),
+    ),
+    /** 병합 전 원시 호출 지점 수(연계 건수와 호출 빈도를 구분해 보고). */
+    callSiteTotal: z.number().int().nonnegative(),
+  }),
+  /**
+   * 의심 신호 — 스캐너 카탈로그가 못 잡는 연계(사내 EAI 래퍼 등)의 존재 가능성 지표.
+   * items 0건인데 suspects>0 이면 "연계 없음"이 아니라 "탐지 못함"일 수 있다(커버리지 경고).
+   * http(s):// 문자열 리터럴 / *.wsdl 파일 / jdbc URL 을 결정론 카운트(중복 라인 1회).
+   */
+  suspectSignals: z.object({
+    count: z.number().int().nonnegative(),
+    samples: z.array(
+      z.object({ file: z.string(), line: z.number().int().positive(), kind: z.string() }),
     ),
   }),
 })

@@ -7,6 +7,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { z } from 'zod'
+import { CustomClientSpecSchema } from '../interface-scan/types.js'
 
 /** 설정 파일명 — 프로젝트 루트에 기록. */
 export const CONFIG_FILENAME = 'understanding.config.json'
@@ -83,6 +84,13 @@ export const ConfigSchema = z
     approver: z.string().optional(),
     /** 화면설계서 캡처 설정 — 없으면 `/understand-screens` 가 설정 안내 후 중단. */
     screens: ScreensConfigSchema.optional(),
+    /**
+     * W1 인터페이스 스캔 설정 — 사내 공통 연계모듈(EAI 래퍼 등)을 화이트리스트에
+     * 주입하는 seam. 카탈로그 밖 타입은 이걸로 등록해야 recall 이 나온다.
+     */
+    interfaceScan: z
+      .object({ clients: z.array(CustomClientSpecSchema).default([]) })
+      .optional(),
   })
   .passthrough()
 

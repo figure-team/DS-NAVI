@@ -1,8 +1,28 @@
 {
-  "description": "검수된 오라클(사람 확인 완료) — items/stats 골든 등가",
+  "description": "검수된 오라클(사람 확인 완료) — items/stats/suspectSignals 골든 등가",
   "items": [
     {
-      "id": "IF-DBLINK-001",
+      "id": "IF-DBLINK-cd2db895",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "CUST@CRM_LINK",
+        "resolved": "CUST@CRM_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/mapper/OrderMapper.xml",
+          "line": 9,
+          "symbol": "CRM_LINK"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-ae118582",
       "direction": "outbound",
       "protocol": "db-link",
       "clientType": "dblink(DDL)",
@@ -22,7 +42,7 @@
       "unresolved": false
     },
     {
-      "id": "IF-DBLINK-002",
+      "id": "IF-DBLINK-1b1ec778",
       "direction": "outbound",
       "protocol": "db-link",
       "clientType": "dblink",
@@ -42,7 +62,7 @@
       "unresolved": false
     },
     {
-      "id": "IF-DBLINK-003",
+      "id": "IF-DBLINK-d427ebe6",
       "direction": "outbound",
       "protocol": "db-link",
       "clientType": "dblink",
@@ -60,26 +80,6 @@
         }
       ],
       "unresolved": false
-    },
-    {
-      "id": "IF-DBLINK-004",
-      "direction": "outbound",
-      "protocol": "db-link",
-      "clientType": "dblink",
-      "endpoint": {
-        "raw": "CUST@CRM_LINK",
-        "resolved": "CUST@CRM_LINK",
-        "resolvedFrom": null
-      },
-      "dataHint": null,
-      "callSites": [
-        {
-          "file": "src/main/resources/mapper/OrderMapper.xml",
-          "line": 9,
-          "symbol": "CRM_LINK"
-        }
-      ],
-      "unresolved": false
     }
   ],
   "stats": {
@@ -90,6 +90,11 @@
         "protocol": "db-link",
         "count": 4
       }
-    ]
+    ],
+    "callSiteTotal": 4
+  },
+  "suspectSignals": {
+    "count": 0,
+    "samples": []
   }
 }

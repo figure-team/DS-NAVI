@@ -531,28 +531,30 @@ const RISK_METRIC_KO: Record<string, string> = {
 
 /** 지표 키 → 산정 방법 설명(§1 — 수용기준 "계산 근거 문서화"의 사용자 노출면). */
 const RISK_METHOD_DESC: Record<string, string> = {
-  complexity: '순환복잡도 근사(java AST): 메서드 수 + 결정포인트(if/for/while/do/catch/삼항/case/&&/||). 비 java 는 미측정 [미확인]',
-  churn: 'git 전체 이력에서 파일별 변경 커밋 수(git log --numstat, rename 미추적). 변경 라인은 참고치',
+  complexity: '순환복잡도 근사(java AST): 메서드 수 + 결정포인트(if/for/while/do/catch/삼항/case/&&/||). 비 java 는 미측정 [미확인] — 백분위는 측정(java) 집합 내 순위',
+  churn: 'git 전체 이력에서 파일별 변경 커밋 수(git log --numstat, rename 미추적·shallow clone 은 미측정 처리). 변경 라인은 참고치',
   loc: '파일 라인 수(wc -l 관례, 프로그램목록 승계)',
   fanIn: '이 파일에 의존하는 서로 다른 파일 수(강신호 엣지: 주입/필드/상속/구현/매퍼 — import 제외)',
   fanOut: '이 파일이 의존하는 서로 다른 파일 수(동일 강신호 엣지)',
-  unreached: '진입점(라우트·배치)에서 도달 불가 여부(slices 도달성 — 이진)',
+  unreached: '진입점(라우트·배치)에서 도달 불가 여부(slices 도달성 — 이진). 점수 비반영 플래그: 뷰 forward(JSP 등) 미추적 한계로 오탐 가능 — 데드코드 판정은 사람 확인',
 }
 
 /**
  * si-위험모듈리포트(W4) — risk-report.json 승계.
  * §1 산정 기준: 지표 정의·가중치·정규화/등급 규칙(방법론 서술 — INFERRED, 근거 없음).
- * §2 위험 Top N: 지표는 결정론 사실 → CONFIRMED(filePath:1 근거). 미측정 지표 셀은
- *   [미확인](notes 사유는 risk-report.json). 점수는 백분위 가중 합산 — **프로젝트 내
- *   상대 순위**이지 절대 품질 판정이 아님(§1 에 명시, 오독 방지).
- * §3 지표 커버리지: 측정/미측정·제외 카운트 표면화(침묵 누락 금지, W3 대칭).
+ * §2 위험 Top N: 전 지표 측정 행만 CONFIRMED, 미측정 지표 포함 행은 INFERRED(설계 §5,
+ *   리뷰 C4). 미측정 셀은 [미확인]. 점수는 백분위 가중 합산 — **프로젝트 내 상대
+ *   순위**이지 절대 품질 판정이 아님(§1 에 명시, 오독 방지). 미도달은 비점수 플래그.
+ * §3 지표 커버리지: 측정/미측정(언어별 분해)·무분산·등급 분포·제외 카운트 표면화
+ *   (침묵 누락 금지, W3 대칭 + 리뷰 C1/C2/C8).
+ * 행 단위 사람 재분류(override 원장)는 범위 외 — 문서 편집·확정(D3)으로 커버, 백로그.
  */
 function buildSiRiskReport(input: DocInput): GeneratedDoc {
   const rr = input.riskReport
   const weights = rr?.meta.weights
 
   const criteriaRows: TableRow[] = (
-    ['complexity', 'churn', 'loc', 'fanIn', 'fanOut', 'unreached'] as const
+    ['complexity', 'churn', 'loc', 'fanIn', 'fanOut'] as const
   ).map(
     (k): TableRow => ({
       cells: [RISK_METRIC_KO[k], RISK_METHOD_DESC[k], weights ? String(weights[k]) : EMPTY_CELL],
@@ -561,23 +563,35 @@ function buildSiRiskReport(input: DocInput): GeneratedDoc {
     }),
   )
   criteriaRows.push({
+    cells: ['미도달', RISK_METHOD_DESC.unreached, '플래그(비점수)'],
+    confidence: 'INFERRED',
+    evidence: [],
+  })
+  criteriaRows.push({
     cells: [
       '정규화·합산',
-      '지표별 프로젝트 내 백분위(0~1, 동점 평균) → 가중 합산. 미측정 지표는 가중치 재정규화(미측정 파일 과소평가 방지). 점수는 프로젝트 내 상대 순위이며 절대 품질 판정이 아님',
+      '지표별 프로젝트 내 백분위(0~1, 동점 평균) → 가중 합산(가중치는 휴리스틱 — 점수는 순위로만 해석). 미측정 지표는 가중치 재정규화(미측정 파일 과소평가 방지), 무분산 지표(전 파일 동일값)는 변별 기여가 없어 제외. 점수는 프로젝트 내 상대 순위이며 절대 품질 판정이 아님',
       EMPTY_CELL,
     ],
     confidence: 'INFERRED',
     evidence: [],
   })
   criteriaRows.push({
-    cells: ['등급', '상 ≥ 0.66 · 중 ≥ 0.33 · 하 < 0.33 (고정 임계)', EMPTY_CELL],
+    cells: [
+      '등급',
+      '프로젝트 내 상대 밴드 — 상 = 점수 상위 10%(최소 1본, 동점 상향) · 중 = 상위 30% · 하 = 나머지. 절대 품질 판정 아님',
+      EMPTY_CELL,
+    ],
     confidence: 'INFERRED',
     evidence: [],
   })
 
   const topN = rr?.meta.topN ?? 20
-  const topRows: TableRow[] = (rr?.items ?? []).slice(0, topN).map(
-    (it, i): TableRow => ({
+  const topRows: TableRow[] = (rr?.items ?? []).slice(0, topN).map((it, i): TableRow => {
+    // 설계 §5: 전 지표 측정 행만 [확정], 미측정 지표 포함 행은 [추정](리뷰 C4 —
+    // 서로 다른 지표집합으로 매긴 점수의 통약 한계도 이 강등으로 표면화).
+    const allMeasured = it.metrics.complexity !== null && it.metrics.churnCommits !== null
+    return {
       cells: [
         String(i + 1),
         it.programId,
@@ -594,30 +608,60 @@ function buildSiRiskReport(input: DocInput): GeneratedDoc {
         it.metrics.unreached ? '미도달' : EMPTY_CELL,
         it.factors.map((f) => RISK_METRIC_KO[f] ?? f).join(', '),
       ],
-      confidence: 'CONFIRMED',
+      confidence: allMeasured ? 'CONFIRMED' : 'INFERRED',
       evidence: [{ file: it.filePath, line: 1 }],
-    }),
-  )
+    }
+  })
 
+  const gradeDist = { 상: 0, 중: 0, 하: 0 }
+  for (const it of rr?.items ?? []) gradeDist[it.grade]++
+  const cxBreakdown = (rr?.stats.complexityUnmeasured ?? [])
+    .map((e) => `${e.ext} ${e.count}`)
+    .join(', ')
+  const hasKotlinGap = (rr?.stats.complexityUnmeasured ?? []).some((e) => e.ext === 'kt' || e.ext === 'kts')
   const coverageRows: TableRow[] = rr
     ? [
         { cells: ['랭킹 대상', String(rr.stats.programs), '프로그램목록 승계(test 유형 제외)'] },
         { cells: ['제외(테스트)', String(rr.stats.excluded.test), '위험 랭킹 오염 방지 — 분리 계상'] },
         {
           cells: [
+            '등급 분포',
+            `상 ${gradeDist['상']} · 중 ${gradeDist['중']} · 하 ${gradeDist['하']}`,
+            '상대 밴드(상위 10%/30%) — 절대 판정 아님',
+          ],
+        },
+        {
+          cells: [
             '복잡도 측정',
             `${rr.stats.measured.complexity}/${rr.stats.programs}`,
-            '미측정 = 비 java(jsp·SQL매퍼 등) — [미확인]',
+            `미측정(확장자별): ${cxBreakdown || '없음'}${hasKotlinGap ? ' — kotlin 은 문법 미탑재(지원 백로그, 침묵 누락 아님을 명시)' : ''}`,
           ],
         },
         {
           cells: [
             '변경빈도 측정',
             `${rr.stats.measured.churn}/${rr.stats.programs}`,
-            rr.meta.churnAvailable ? `git 이력 기준(앵커 ${rr.gitCommit ?? '[미확인]'})` : 'git 이력 없음 — 전 항목 [미확인]',
+            rr.meta.churnAvailable ? `git 이력 기준(앵커 ${rr.gitCommit ?? '[미확인]'})` : 'git 이력 없음/shallow clone — 전 항목 [미확인]',
           ],
         },
-        { cells: ['미도달', String(rr.stats.unreached), '진입점에서 도달 불가(데드코드 후보)'] },
+        ...(rr.meta.degenerateMetrics.length > 0
+          ? [
+              {
+                cells: [
+                  '무분산 지표',
+                  rr.meta.degenerateMetrics.map((k) => RISK_METRIC_KO[k] ?? k).join(', '),
+                  '전 파일 동일값 — 랭킹 변별 기여 없음(가중합 제외). 예: 단일 벤더링 커밋의 변경빈도',
+                ],
+              },
+            ]
+          : []),
+        {
+          cells: [
+            '미도달',
+            `${rr.stats.unreached}/${rr.stats.programs}`,
+            '점수 비반영 플래그 — 뷰 forward(JSP) 미추적 한계로 오탐 가능, 데드코드 판정은 사람 확인',
+          ],
+        },
       ].map((r): TableRow => ({ ...r, confidence: 'INFERRED', evidence: [] }))
     : []
 

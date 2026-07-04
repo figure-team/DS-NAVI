@@ -108,6 +108,14 @@ describe('isMapperXmlDocument — 루트 요소 판별(W4 오탐 회귀)', () =>
     expect(isMapperXmlDocument(ORDER_XML)).toBe(true)
   })
 
+  it('xml 선언 외 처리 명령(xml-stylesheet 등)이 앞에 있어도 true(리뷰 R4)', () => {
+    const withPi = `<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="x.xsl"?>
+<mapper namespace="a.B">
+</mapper>`
+    expect(isMapperXmlDocument(withPi)).toBe(true)
+  })
+
   it('본문 코드 예제에만 <mapper 가 실린 문서(maven xdoc) → false', () => {
     // jpetstore src/site/**/xdoc/index.xml 실측 오탐 재현 — 루트는 <document>.
     const xdoc = `<?xml version="1.0" encoding="UTF-8"?>

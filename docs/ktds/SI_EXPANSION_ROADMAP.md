@@ -101,7 +101,7 @@
 | P2 W2 | ✅ 완료(리뷰 통과) | 08ab1b7~ | 핸들러 해석·신호 6종·batch-jobs.json·SI 배치정의서 + 적대적 리뷰 2종 반영 — `BATCH_SCAN_DESIGN.md` §9~10 |
 | P3 W3 | ✅ 완료(리뷰 통과) | fd3940e~ | 프로그램 74본·도메인 조인·FP 하한(미분류 표면화) + 적대적 리뷰 2종 반영 — `PROGRAM_INVENTORY_DESIGN.md` §9~10 |
 | P4 W7 | ✅ 완료(리뷰 통과) | c012eae~ | zero-dep xlsx 라이터·문서/RTM 병기·대시보드 다운로드 + 적대적 리뷰 2종 반영 — `XLSX_EXPORT_DESIGN.md` §8~9 |
-| P5 W4 | ⬜ | | |
+| P5 W4 | ✅ 완료(리뷰 통과) | 61bfad4~ | risk-report.json(지표 5+플래그 1·백분위·상대밴드)·si-위험모듈리포트(12종째)·W3 매퍼 오분류 부수 수정 + 적대적 리뷰 2종(비평 8건·코드 8건) 반영 — `RISK_REPORT_DESIGN.md` §11~12 |
 | P6 W5 | ⬜ | | |
 | P7 W6 | ⬜ | | |
 | P8 W8 | ⬜ | | |

@@ -62,4 +62,17 @@ describe('collectGitChurn', () => {
       rmSync(plain, { recursive: true, force: true })
     }
   })
+
+  it('shallow clone 은 null — 잘린 이력의 churn 은 결정론 보장을 깬다(리뷰 R1)', () => {
+    const dst = join(tmpdir(), `churn-shallow-${process.pid}`)
+    rmSync(dst, { recursive: true, force: true })
+    try {
+      execFileSync('git', ['clone', '-q', '--depth', '1', `file://${repo}`, dst], {
+        stdio: ['ignore', 'ignore', 'ignore'],
+      })
+      expect(collectGitChurn(dst)).toBeNull()
+    } finally {
+      rmSync(dst, { recursive: true, force: true })
+    }
+  })
 })

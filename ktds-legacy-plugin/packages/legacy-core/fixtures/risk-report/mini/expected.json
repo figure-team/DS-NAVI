@@ -1,5 +1,5 @@
 {
-  "gitCommit": "e31bb89b17bf339d0c8f6512d5f4ed0c6c0cebd4",
+  "gitCommit": "c64558efee7bc7e149d24ec73ce39a1d5f7ba44e",
   "items": [
     {
       "domain": "order",
@@ -25,12 +25,11 @@
         "complexity": 1,
         "fanIn": 0.875,
         "fanOut": 0.875,
-        "loc": 1,
-        "unreached": 0
+        "loc": 1
       },
       "notes": [],
       "programId": "PGM-SVC-44d7e5e2",
-      "score": 0.8688,
+      "score": 0.9653,
       "type": "service"
     },
     {
@@ -57,12 +56,11 @@
         "complexity": 0.6667,
         "fanIn": 0.25,
         "fanOut": 0.875,
-        "loc": 0.75,
-        "unreached": 0
+        "loc": 0.75
       },
       "notes": [],
       "programId": "PGM-API-518304d5",
-      "score": 0.5917,
+      "score": 0.6574,
       "type": "api"
     },
     {
@@ -72,7 +70,7 @@
         "loc"
       ],
       "filePath": "src/main/java/demo/dao/OrderDao.java",
-      "grade": "중",
+      "grade": "하",
       "layer": "dao",
       "metrics": {
         "churnCommits": 1,
@@ -89,12 +87,11 @@
         "complexity": 0.3333,
         "fanIn": 0.875,
         "fanOut": 0.25,
-        "loc": 0.5,
-        "unreached": 0
+        "loc": 0.5
       },
       "notes": [],
       "programId": "PGM-DAO-081edcaf",
-      "score": 0.3771,
+      "score": 0.419,
       "type": "dao"
     },
     {
@@ -121,21 +118,20 @@
         "complexity": null,
         "fanIn": 0.25,
         "fanOut": 0.25,
-        "loc": 0,
-        "unreached": 0
+        "loc": 0
       },
       "notes": [
         "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
       ],
       "programId": "PGM-SCR-4e19b03d",
-      "score": 0.25,
+      "score": 0.2885,
       "type": "screen"
     },
     {
       "domain": null,
       "factors": [
-        "unreached",
-        "fanIn"
+        "fanIn",
+        "fanOut"
       ],
       "filePath": "src/main/java/demo/util/OrphanHelper.java",
       "grade": "하",
@@ -155,17 +151,17 @@
         "complexity": 0,
         "fanIn": 0.25,
         "fanOut": 0.25,
-        "loc": 0.25,
-        "unreached": 1
+        "loc": 0.25
       },
       "notes": [],
       "programId": "PGM-COM-d66e2630",
-      "score": 0.2,
+      "score": 0.1111,
       "type": "common"
     }
   ],
   "meta": {
     "churnAvailable": true,
+    "degenerateMetrics": [],
     "edgeKinds": [
       "ctor-param",
       "extends",
@@ -182,12 +178,17 @@
       "complexity": 0.25,
       "fanIn": 0.15,
       "fanOut": 0.1,
-      "loc": 0.15,
-      "unreached": 0.1
+      "loc": 0.15
     }
   },
   "schemaVersion": 1,
   "stats": {
+    "complexityUnmeasured": [
+      {
+        "count": 1,
+        "ext": "jsp"
+      }
+    ],
     "excluded": {
       "test": 0
     },

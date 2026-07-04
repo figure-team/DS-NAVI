@@ -41,8 +41,14 @@ export function countJavaComplexity(root: Node): number {
     } else if (DECISION_TYPES.has(n.type)) {
       decisions++
     } else if (n.type === 'switch_label') {
-      // `case …`(신형 화살표 다중 라벨 포함)만 — default 는 분기 수에 안 센다.
-      if (!n.text.trimStart().startsWith('default')) decisions++
+      // `case …` 만 — default 는 분기 수에 안 센다. 신형 화살표 다중 라벨
+      // (`case A, B ->`)은 라벨 1개이므로 쉼표 수로 분기를 보정한다(리뷰 R6.
+      // 한계: 문자열 case 리터럴 안의 쉼표는 과대계상 — 근사 용도로 허용).
+      const label = n.text.trimStart()
+      if (!label.startsWith('default')) {
+        decisions++
+        for (let i = 0; i < label.length; i++) if (label[i] === ',') decisions++
+      }
     } else if (n.type === 'binary_expression') {
       // 연산자는 무명 child — namedChildren 순회에 안 잡히므로 전 child 를 본다.
       for (let i = 0; i < n.childCount; i++) {

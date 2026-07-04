@@ -75,23 +75,77 @@ describe('risk report — 골든 등가 + 검산', () => {
     expect(rr.stats.unreached).toBeGreaterThanOrEqual(1)
   })
 
-  it('mini: score = 측정 지표 가중합/가중치합(재정규화) — 전 항목 검산', async () => {
+  it('mini: score = 측정·유분산 지표 가중합/가중치합(재정규화) — 전 항목 검산', async () => {
     const rr = await scan(join(fixturesRoot, 'mini'), MINI_CHURN)
+    expect(rr.meta.degenerateMetrics).toEqual([]) // mini 는 전 지표 유분산.
+    const deg = new Set(rr.meta.degenerateMetrics)
     for (const it of rr.items) {
-      const entries: Array<[keyof typeof rr.meta.weights, number]> = [
-        ['loc', it.normalized.loc],
-        ['fanIn', it.normalized.fanIn],
-        ['fanOut', it.normalized.fanOut],
-        ['unreached', it.normalized.unreached],
-      ]
-      if (it.normalized.complexity !== null) entries.push(['complexity', it.normalized.complexity])
-      if (it.normalized.churn !== null) entries.push(['churn', it.normalized.churn])
+      const entries: Array<[keyof typeof rr.meta.weights, number]> = []
+      const push = (k: keyof typeof rr.meta.weights, v: number | null) => {
+        if (v !== null && !deg.has(k)) entries.push([k, v])
+      }
+      push('loc', it.normalized.loc)
+      push('fanIn', it.normalized.fanIn)
+      push('fanOut', it.normalized.fanOut)
+      push('complexity', it.normalized.complexity)
+      push('churn', it.normalized.churn)
       const wSum = entries.reduce((s, [k]) => s + rr.meta.weights[k], 0)
       const expected = entries.reduce((s, [k, v]) => s + rr.meta.weights[k] * v, 0) / wSum
       expect(Math.abs(it.score - expected)).toBeLessThan(0.0001)
       expect(it.score).toBeGreaterThanOrEqual(0)
       expect(it.score).toBeLessThanOrEqual(1)
     }
+  })
+
+  it('mini: 등급 = 상대 밴드(n=5 → 상1·중1·하3, 동점 상향)', async () => {
+    const rr = await scan(join(fixturesRoot, 'mini'), MINI_CHURN)
+    expect(rr.items.map((it) => it.grade)).toEqual(['상', '중', '하', '하', '하'])
+  })
+
+  it('무분산 churn(전 파일 동일) → degenerateMetrics 표면화 + 가중합 제외(리뷰 C2)', async () => {
+    // orphan 포함 전 프로그램 동일 커밋수(단일 벤더링 커밋 시나리오).
+    const flat: ChurnMap = new Map(
+      [...MINI_CHURN.keys(), 'src/main/java/demo/util/OrphanHelper.java'].map((k) => [
+        k,
+        { commits: 1, linesChanged: 1 },
+      ]),
+    )
+    const rr = await scan(join(fixturesRoot, 'mini'), flat)
+    expect(rr.meta.degenerateMetrics).toEqual(['churn'])
+    // 전 항목 churn 정규화값은 0.5 상수로 기록되나 점수엔 미기여 —
+    // churn 없이 재계산한 값과 일치해야 한다.
+    for (const it of rr.items) {
+      expect(it.normalized.churn).toBe(0.5)
+      expect(it.factors).not.toContain('churn')
+      const entries: Array<[keyof typeof rr.meta.weights, number]> = []
+      const push = (k: keyof typeof rr.meta.weights, v: number | null) => {
+        if (v !== null && k !== 'churn') entries.push([k, v])
+      }
+      push('loc', it.normalized.loc)
+      push('fanIn', it.normalized.fanIn)
+      push('fanOut', it.normalized.fanOut)
+      push('complexity', it.normalized.complexity)
+      const wSum = entries.reduce((s, [k]) => s + rr.meta.weights[k], 0)
+      const expected = entries.reduce((s, [k, v]) => s + rr.meta.weights[k] * v, 0) / wSum
+      expect(Math.abs(it.score - expected)).toBeLessThan(0.0001)
+    }
+  })
+
+  it('미도달은 점수 비반영 플래그 — 가중치·정규화에 없음(리뷰 C3)', async () => {
+    const rr = await scan(join(fixturesRoot, 'mini'), MINI_CHURN)
+    expect(Object.keys(rr.meta.weights)).not.toContain('unreached')
+    for (const it of rr.items) {
+      expect('unreached' in it.normalized).toBe(false)
+      expect(it.factors).not.toContain('unreached')
+    }
+    // 플래그·통계는 유지(침묵 누락 금지).
+    expect(rr.items.some((it) => it.metrics.unreached)).toBe(true)
+    expect(rr.stats.unreached).toBeGreaterThanOrEqual(1)
+  })
+
+  it('복잡도 미측정 확장자 분해(stats.complexityUnmeasured, 리뷰 C8)', async () => {
+    const rr = await scan(join(fixturesRoot, 'mini'), MINI_CHURN)
+    expect(rr.stats.complexityUnmeasured).toEqual([{ ext: 'jsp', count: 1 }])
   })
 
   it('mini: churn=null(git 불가) → churnAvailable=false + 전 항목 [미확인]', async () => {

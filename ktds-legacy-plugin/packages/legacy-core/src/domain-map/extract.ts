@@ -217,7 +217,8 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   interfaces: InterfaceReport
   batchJobs: BatchJobsReport
   programInventory: ProgramInventory
-  riskReport: RiskReport
+  /** 위험 리포트 — 산출 실패 시 null(다른 산출물은 유지, 우아한 degrade). */
+  riskReport: RiskReport | null
 }> {
   const census = buildCensus(projectRoot)
   const routes = await extractRoutes(projectRoot, census)
@@ -255,15 +256,21 @@ export async function scanDomainMap(projectRoot: string): Promise<{
     batchJobs,
   })
   writeMapArtifact(projectRoot, PROGRAM_INVENTORY_FILENAME, programInventory)
-  // W4: 위험 모듈 리포트 — risk-report.json(지표 6종 백분위 합산, gitCommit 앵커 결정론).
-  const riskReport = await buildRiskReport(projectRoot, {
-    census,
-    edges,
-    slices,
-    programInventory,
-    churn: collectGitChurn(projectRoot),
-  })
-  writeMapArtifact(projectRoot, RISK_REPORT_FILENAME, riskReport)
+  // W4: 위험 모듈 리포트 — risk-report.json(지표 백분위 합산, gitCommit 앵커 결정론).
+  // 파이프라인 마지막 부가 단계라 실패해도 선행 산출물을 지킨다(null degrade, 리뷰 R2).
+  let riskReport: RiskReport | null = null
+  try {
+    riskReport = await buildRiskReport(projectRoot, {
+      census,
+      edges,
+      slices,
+      programInventory,
+      churn: collectGitChurn(projectRoot),
+    })
+    writeMapArtifact(projectRoot, RISK_REPORT_FILENAME, riskReport)
+  } catch (err) {
+    console.error(`[risk-report] 산출 실패 — 다른 산출물은 유지: ${(err as Error).message}`)
+  }
   // 보완 D-c/D-b: 통합 커버리지 리포트 + 파일 fingerprint 스냅샷(증분 재스캔 기준).
   const coverage = buildCoverageReport({
     census,

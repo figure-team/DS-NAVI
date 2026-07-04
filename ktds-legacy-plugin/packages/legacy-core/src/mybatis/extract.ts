@@ -70,9 +70,10 @@ function lineAt(text: string, index: number): number {
  * 실린 파일(maven xdoc 등 — jpetstore src/site 하위 xdoc/index.xml 실측 오탐 4건)을
  * 매퍼로 오분류해 프로그램 목록·위험 Top N 을 오염시킨다(W4 실측에서 발견).
  * 한계: DOCTYPE 내부 서브셋(`[...]`)은 미지원 — 매퍼 DTD 선언 관례상 등장하지 않음.
+ * 처리 명령(PI)은 xml 선언 외 것(xml-stylesheet 등)도 허용·반복 매칭(리뷰 R4).
  */
 const MAPPER_ROOT_RE = new RegExp(
-  '^\\uFEFF?\\s*(?:<\\?xml[^>]*\\?>\\s*)?(?:(?:<!--[\\s\\S]*?-->|<!DOCTYPE[^>]*>)\\s*)*<mapper[\\s>]',
+  '^\\uFEFF?\\s*(?:(?:<\\?[^>]*\\?>|<!--[\\s\\S]*?-->|<!DOCTYPE[^>]*>)\\s*)*<mapper[\\s>]',
   'i',
 )
 

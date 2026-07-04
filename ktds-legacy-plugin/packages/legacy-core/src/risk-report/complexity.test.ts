@@ -27,6 +27,11 @@ describe('java 복잡도 근사 — 구문별 카운트', () => {
     expect(await measureJavaComplexity(src)).toBe(1 + 3)
   })
 
+  it('신형 화살표 switch: 다중 라벨(case A, B ->)은 쉼표 보정으로 분기 수 계상(리뷰 R6)', async () => {
+    const src = inMethod('switch (x) { case 1, 2 -> f(); case 3 -> g(); default -> h(); }')
+    expect(await measureJavaComplexity(src)).toBe(1 + 3)
+  })
+
   it('&&/|| 는 binary_expression 당 1 — a && b || c = 결정 2 + 삼항 1', async () => {
     expect(await measureJavaComplexity(inMethod('int x = a && b || c ? 1 : 2;'))).toBe(1 + 3)
   })

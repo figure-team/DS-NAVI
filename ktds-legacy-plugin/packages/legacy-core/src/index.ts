@@ -266,6 +266,8 @@ export type {
   OnboardingStop,
 } from './wiki/index.js'
 export { exportHtml, exportVaultHtml, escapeHtml } from './export/index.js'
+export { buildXlsxWorkbook, sanitizeSheetNames, docToSheets, rtmToSheets } from './export/index.js'
+export type { XlsxSheet, XlsxRow, RtmLike } from './export/index.js'
 export { detectStaleClaims, incrementalReapproval, evidenceAnchor } from './stale/index.js'
 export type {
   FingerprintMap,

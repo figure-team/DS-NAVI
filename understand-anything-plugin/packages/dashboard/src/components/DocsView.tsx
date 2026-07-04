@@ -67,6 +67,8 @@ interface DocListItem {
   confirmed: boolean;
   approver: string | null;
   at: string | null;
+  /** W7: 병기된 xlsx 존재 — 다운로드 버튼 노출 조건. */
+  hasXlsx?: boolean;
 }
 
 const APPROVER_LS_KEY = "ktds.approver";
@@ -305,6 +307,16 @@ export default function DocsView() {
               <span className="ml-auto flex items-center gap-2">
                 {saveError && (
                   <span className="text-amber-400" style={{ fontSize: 11 }}>저장 실패: {saveError}</span>
+                )}
+                {selectedDoc.hasXlsx && accessToken && (
+                  <a
+                    href={`/doc-xlsx?token=${encodeURIComponent(accessToken)}&docId=${encodeURIComponent(selectedDoc.docId)}`}
+                    download={`${selectedDoc.docId}.xlsx`}
+                    className="rounded-md border border-border-subtle text-text-secondary hover:text-text-primary transition-colors"
+                    style={{ padding: "4px 12px", fontSize: 12 }}
+                  >
+                    xlsx 다운로드
+                  </a>
                 )}
                 {!canWrite ? (
                   <span className="text-text-muted" style={{ fontSize: 11 }}>읽기전용(라이브 서버 없음)</span>

@@ -1677,6 +1677,7 @@ export default defineConfig({
             pathname === "/doc-list.json" ||
             pathname === "/doc-content.json" ||
             pathname === "/doc" ||
+            pathname === "/doc-xlsx" ||
             pathname === "/impact-analyze" ||
             pathname === "/impact-status" ||
             pathname === "/rtm.json" ||
@@ -1772,9 +1773,33 @@ export default defineConfig({
                 confirmed: !!o,
                 approver: o?.approver ?? null,
                 at: o?.at ?? null,
+                // W7: 병기된 xlsx 존재 여부 — DocsView 다운로드 버튼 노출 조건.
+                hasXlsx: !!dir && fs.existsSync(path.join(dir, `${docId}.xlsx`)),
               };
             });
             sendJson(res, 200, { docs, hasOutput: !!dir });
+            return;
+          }
+          // W7: 병기 xlsx 다운로드 — docId 화이트리스트(doc-output 의 md 보유 문서 + rtm).
+          if (pathname === "/doc-xlsx") {
+            const docId = url.searchParams.get("docId");
+            const dir = docOutputDir();
+            const allowed = docId !== null && (docOutputIds().includes(docId) || docId === "rtm");
+            if (!dir || !allowed) {
+              sendJson(res, 404, { error: "unknown docId" });
+              return;
+            }
+            const file = path.join(dir, `${docId}.xlsx`);
+            if (!fs.existsSync(file)) {
+              sendJson(res, 404, { error: "xlsx not generated — run understand-docs first" });
+              return;
+            }
+            res.writeHead(200, {
+              "Content-Type":
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(docId)}.xlsx`,
+            });
+            res.end(fs.readFileSync(file));
             return;
           }
           if (pathname === "/doc-content.json") {

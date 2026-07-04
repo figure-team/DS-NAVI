@@ -36,6 +36,9 @@ const {
   writeWikiVault,
   buildMyBatisModel,
   readDbSchema,
+  buildXlsxWorkbook,
+  docToSheets,
+  rtmToSheets,
 } = engine
 
 const PLUGIN_DOC_DIR = join(here, '..', 'templates', 'doc')
@@ -251,6 +254,28 @@ for (const entry of DOC_SET) {
   meta.push(m)
 }
 
+// W7: xlsx 병기 — 표 보유 문서만, md 와 동일 데이터(빌더 산출)에서 생성(불일치 금지).
+// 라이터는 의존성 0·고정 타임스탬프라 동일 입력 → byte-identical.
+const xlsxDocs = []
+for (const doc of docs) {
+  const sheets = docToSheets(doc)
+  if (sheets.length === 0) continue
+  writeFileSync(join(OUTPUT_DIR, `${doc.docId}.xlsx`), buildXlsxWorkbook(sheets))
+  xlsxDocs.push(doc.docId)
+}
+// RTM 원장(rtm.json) → rtm.xlsx(요구 원장 + 기능(AS-IS) 원장).
+const rtmPath = join(projectRoot, '.understand-anything', 'rtm.json')
+let rtmXlsx = false
+if (existsSync(rtmPath)) {
+  try {
+    const rtm = JSON.parse(readFileSync(rtmPath, 'utf8'))
+    writeFileSync(join(OUTPUT_DIR, 'rtm.xlsx'), buildXlsxWorkbook(rtmToSheets(rtm)))
+    rtmXlsx = true
+  } catch (err) {
+    console.error(`  rtm.xlsx 생략 — rtm.json 판독 실패: ${err.message}`)
+  }
+}
+
 // 위키 볼트(.spec/wiki/)도 함께 갱신(허브 index 포함).
 const vault = buildWikiVault(docs, (doc) => meta.find((m) => m.docId === doc.docId))
 writeWikiVault(projectRoot, vault)
@@ -266,5 +291,6 @@ for (const m of meta) {
 if (overridden.length > 0) {
   console.log(`  템플릿 프로젝트 override: ${overridden.join(', ')} (${PROJECT_DOC_DIR}/)`)
 }
+console.log(`  xlsx 병기: 문서 ${xlsxDocs.length}종${rtmXlsx ? ' + rtm.xlsx(요구/기능 원장)' : ''} → doc-output/*.xlsx`)
 console.log(`  위키 볼트: .spec/wiki/ (${vault.files.length}개 파일, index.md 허브 포함)`)
 console.log('모든 표 행/주장은 file:line 근거 + 신뢰도 태그를 갖는다(AC-9). 생성물은 편집·확정 가능(D3).')

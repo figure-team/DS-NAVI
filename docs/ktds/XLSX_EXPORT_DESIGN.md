@@ -69,7 +69,15 @@
 | 단계 | 상태 | 커밋 | 비고 |
 |---|---|---|---|
 | 설계 | ✅ | | LibreOffice 부재로 열림 확인은 python 라운드트립 대체 |
-| P4-a | ⬜ | | |
-| P4-b | ⬜ | | |
-| P4-c | ⬜ | | |
-| P4-d | ⬜ | | |
+| P4-a | ✅ | (본 커밋) | 라이터+15테스트, 결정론 byte-equal·python CRC/재판독 통과 |
+| P4-b | ✅ | (본 커밋) | understand-docs 병기(문서 9종+rtm.xlsx), md 재생성 byte-diff=0 |
+| P4-c | ✅ | (본 커밋) | /doc-xlsx(토큰 403·traversal 404)+hasXlsx+DocsView 버튼(시각 확인), examples xlsx 커밋 |
+| P4-d | ⬜ | | 적대적 리뷰 대기 |
+
+## 8. 실측 결과 (2026-07-05)
+
+- jpetstore: 문서 9종 + rtm.xlsx — 프로그램목록 2시트(75/37행), rtm 2시트(3/29행),
+  테이블정의서 13시트, 0행 음성 시트(대외 연계·배치)는 헤더만(침묵 누락 금지).
+- python zipfile 라운드트립: 전 파일 CRC OK, 셀 값 재판독 일치(escape·한글·숫자/선행0·공백).
+- dev 서버: hasXlsx 플래그, MIME/RFC5987 파일명, 무토큰 403, 화이트리스트 밖 docId 404.
+- 대시보드 빌드(tsc+vite) 통과, legacy-core 822 green.

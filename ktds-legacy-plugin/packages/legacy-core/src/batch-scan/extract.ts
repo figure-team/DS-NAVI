@@ -45,8 +45,11 @@ export function extractSpringBatchXmlJobs(rawText: string, filePath: string): Ba
     const id = attrValue(tag, 'id')
     if (!id) continue
     const bodyStart = jm.index + tag.length
-    const closeIdx = text.indexOf('</', bodyStart) >= 0 ? text.indexOf(`</${tag.startsWith('<batch:') ? 'batch:job' : 'job'}>`, bodyStart) : -1
-    const body = closeIdx >= 0 ? text.slice(bodyStart, closeIdx) : text.slice(bodyStart)
+    // self-closing(<batch:job .../>)은 본문 없음. 닫는 태그를 못 찾으면 본문 없음으로
+    // 처리(다음 잡의 step/ref 를 집어삼키는 과확장 방지 — 핸들러는 [미확인]으로 남는다).
+    const closeTag = `</${tag.startsWith('<batch:') ? 'batch:job' : 'job'}>`
+    const closeIdx = tag.endsWith('/>') ? bodyStart : text.indexOf(closeTag, bodyStart)
+    const body = closeIdx >= bodyStart ? text.slice(bodyStart, closeIdx) : ''
     const notes: string[] = []
     // tasklet ref 우선.
     const taskletRef = body.match(/<(?:batch:)?tasklet\b[^>]*\bref\s*=\s*"([^"]*)"/)
@@ -298,10 +301,11 @@ export function extractCrontabEntries(rawText: string, filePath: string): BatchE
   const out: BatchEntry[] = []
   const lines = rawText.split('\n')
   const cronRe = /^\s*((?:[\d*\/,\-]+\s+){4}[\d*\/,\-]+)\s+(\S.*)$/
+  const atRe = /^\s*(@(?:reboot|yearly|annually|monthly|weekly|daily|midnight|hourly))\s+(\S.*)$/
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     if (/^\s*(#|$)/.test(line) || /^\s*\w+=/.test(line)) continue
-    const m = line.match(cronRe)
+    const m = line.match(cronRe) ?? line.match(atRe)
     if (!m) continue
     const command = m[2].trim()
     out.push({

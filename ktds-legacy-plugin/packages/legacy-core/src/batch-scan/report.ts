@@ -87,9 +87,15 @@ export function buildBatchJobs(
     adj.set(e.source, list)
   }
 
+  // 동일 seed(완전 중복 정의: 같은 파일·핸들러·스케줄)가 여러 번 나오면 연번을 붙여
+  // id 유일성을 지킨다 — line 을 seed 에 넣지 않는 이유는 재스캔 안정성(행 이동 무관).
+  const seedCounts = new Map<string, number>()
   const jobs: BatchJob[] = batchEntries.map((b) => {
     const handlerFile = b.handlerFile ?? null
-    const seed = `${b.trigger}|${b.handler ?? ''}|${b.schedule ?? ''}|${b.filePath}`
+    const baseSeed = `${b.trigger}|${b.handler ?? ''}|${b.schedule ?? ''}|${b.filePath}`
+    const n = (seedCounts.get(baseSeed) ?? 0) + 1
+    seedCounts.set(baseSeed, n)
+    const seed = n === 1 ? baseSeed : `${baseSeed}|dup${n}`
     const root = handlerFile ?? b.filePath
     const entryTail = b.entryId.slice(b.entryId.indexOf('#') + 1)
     return {

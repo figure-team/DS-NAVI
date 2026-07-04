@@ -12,6 +12,7 @@ import type { MethodCallGraph } from '../../domain-map/types.js'
 import type { PolicySignalSet } from '../../policy/types.js'
 import type { DbSchemaModel } from '../../db-schema/types.js'
 import type { DomainPolicyInput } from '../../domain-policy/types.js'
+import type { InterfaceReport } from '../../interface-scan/types.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -44,6 +45,8 @@ export interface DocInput {
   dbSchema?: DbSchemaModel | null
   /** 도메인 정책서 입력(PD2) — domain-policy 방법론이 도메인당 1문서를 동적 산출. */
   domainPolicies?: DomainPolicyInput[]
+  /** 대외 인터페이스(W1) — si-인터페이스정의서 §2 송신/라우트 외 수신 섹션 grounding. */
+  interfaces?: InterfaceReport | null
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

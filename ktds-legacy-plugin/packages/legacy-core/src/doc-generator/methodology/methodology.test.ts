@@ -182,6 +182,71 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
     expect(row.cells.slice(4)).toEqual(['[추정]', '[추정]', '[추정]'])
   })
 
+  it('si-인터페이스정의서 §2: interfaces 입력 → 송신 행(탐지 CONFIRMED, 대상시스템 [추정], 미해석 [미확인])', () => {
+    const withInterfaces: DocInput = {
+      ...INPUT,
+      interfaces: {
+        schemaVersion: 1,
+        gitCommit: null,
+        items: [
+          {
+            id: 'IF-HTTP-001',
+            direction: 'outbound',
+            protocol: 'http',
+            clientType: 'RestTemplate',
+            endpoint: { raw: '${pay.api.url}/v1', resolved: 'https://pay.example.com/v1', resolvedFrom: 'application.properties:1' },
+            dataHint: 'POST',
+            callSites: [{ file: 'src/PayClient.java', line: 12, symbol: 'PayClient#approve' }],
+            unresolved: false,
+          },
+          {
+            id: 'IF-HTTP-002',
+            direction: 'outbound',
+            protocol: 'http',
+            clientType: 'RestTemplate',
+            endpoint: { raw: null, resolved: null, resolvedFrom: null },
+            dataHint: null,
+            callSites: [{ file: 'src/PayClient.java', line: 20, symbol: 'PayClient#status' }],
+            unresolved: true,
+          },
+          {
+            id: 'IF-MQ-001',
+            direction: 'inbound-extra',
+            protocol: 'mq',
+            clientType: 'KafkaListener',
+            endpoint: { raw: 'order-events', resolved: 'order-events', resolvedFrom: null },
+            dataHint: 'consume',
+            callSites: [{ file: 'src/OrderListener.java', line: 8, symbol: 'OrderListener#on' }],
+            unresolved: false,
+          },
+        ],
+        stats: { total: 3, unresolvedEndpoints: 1, byProtocol: [{ protocol: 'http', count: 2 }, { protocol: 'mq', count: 1 }] },
+      },
+    }
+    const doc = getMethodology('si-standard')
+      .buildDocSet(withInterfaces)
+      .find((d) => d.docId === 'si-인터페이스정의서')!
+    const sec = doc.sections[1]
+    expect(sec.heading).toBe('대외 연계(송신·라우트 외 수신)')
+    const t = tableOf(sec)
+    expect(t.columns).toEqual(['IF_ID', '프로토콜', '방향', '대상시스템', '엔드포인트', '데이터', '상태'])
+    expect(t.rows).toHaveLength(3)
+    expect(t.rows[0].cells).toEqual(['IF-HTTP-001', 'http', '송신', '[추정]', 'https://pay.example.com/v1', 'POST', '확정'])
+    expect(t.rows[0].confidence).toBe('CONFIRMED')
+    expect(t.rows[0].evidence).toEqual([{ file: 'src/PayClient.java', line: 12 }])
+    // 미해석 endpoint → [미확인] 셀 2곳(엔드포인트/상태) — 침묵 누락 금지.
+    expect(t.rows[1].cells[4]).toBe('[미확인]')
+    expect(t.rows[1].cells[6]).toBe('[미확인]')
+    // 라우트 외 수신(리스너) 방향 표기.
+    expect(t.rows[2].cells[2]).toBe('수신(라우트외)')
+  })
+
+  it('si-인터페이스정의서 §2: interfaces 미제공 → 0행(합성 금지)', () => {
+    const doc = byId.get('si-인터페이스정의서')!
+    expect(doc.sections[1].heading).toBe('대외 연계(송신·라우트 외 수신)')
+    expect(tableOf(doc.sections[1]).rows).toEqual([])
+  })
+
   it('si-테이블정의서: 테이블별 섹션 + 열 = 컬럼|타입|PK|FK|NULL|설명', () => {
     const doc = byId.get('si-테이블정의서')!
     expect(doc.sections.map((s) => s.heading)).toEqual(['ORDERS 테이블'])

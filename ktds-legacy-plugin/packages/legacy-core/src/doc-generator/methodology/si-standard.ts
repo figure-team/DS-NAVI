@@ -135,6 +135,37 @@ function apiId(index: number): string {
  * si-인터페이스정의서 — 라우트 1건 = 표 1행(§3.2). 경로/메서드/핸들러는 라우트 추출
  * 사실 -> CONFIRMED + 근거(file:line). 요청/응답/인증은 그래프에 없어 추론 -> `[추정]`.
  */
+/** §2 대외 연계(송신) 열 — template outbound-list 와 1:1. */
+const OUTBOUND_COLUMNS = ['IF_ID', '프로토콜', '방향', '대상시스템', '엔드포인트', '데이터', '상태']
+
+/** endpoint 셀 — 해석값 우선, 실패 시 raw, 둘 다 없으면 [미확인]. */
+const UNRESOLVED_CELL = '[미확인]'
+
+/**
+ * §2 송신/라우트 외 수신 행 — interfaces.json(W1, 결정론 스캔) 승계.
+ * 탐지 자체는 CONFIRMED(callSite file:line 근거). 대상시스템은 그래프에 없어 [추정]
+ * (T3 LLM 보강 지점). endpoint 미해석은 [미확인] 셀로 표면화(침묵 누락 금지).
+ */
+function outboundRows(input: DocInput): TableRow[] {
+  const items = input.interfaces?.items ?? []
+  return items.map((it): TableRow => {
+    const endpoint = it.endpoint.resolved ?? it.endpoint.raw ?? UNRESOLVED_CELL
+    return {
+      cells: [
+        it.id,
+        it.protocol,
+        it.direction === 'outbound' ? '송신' : '수신(라우트외)',
+        INFERRED_CELL,
+        endpoint,
+        it.dataHint ?? EMPTY_CELL,
+        it.unresolved ? UNRESOLVED_CELL : '확정',
+      ],
+      confidence: 'CONFIRMED',
+      evidence: it.callSites.map((c) => ({ file: c.file, line: c.line })),
+    }
+  })
+}
+
 function buildSiInterfaceSpec(input: DocInput): GeneratedDoc {
   const rows: TableRow[] = sortedRoutes(input).map((r, i): TableRow => {
     const handler = typeof r.handler === 'string' && r.handler.length > 0 ? r.handler : INFERRED_CELL
@@ -149,7 +180,15 @@ function buildSiInterfaceSpec(input: DocInput): GeneratedDoc {
     docId: 'si-인터페이스정의서',
     title: 'SI 인터페이스정의서',
     methodology: 'si-standard',
-    sections: [{ heading: 'API 목록', key: 'api-list', claims: [], table: { columns: API_COLUMNS, rows } }],
+    sections: [
+      { heading: 'API 목록', key: 'api-list', claims: [], table: { columns: API_COLUMNS, rows } },
+      {
+        heading: '대외 연계(송신·라우트 외 수신)',
+        key: 'outbound-list',
+        claims: [],
+        table: { columns: OUTBOUND_COLUMNS, rows: outboundRows(input) },
+      },
+    ],
   }
 }
 

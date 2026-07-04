@@ -74,6 +74,17 @@ if (existsSync(routesPath)) {
   }
 }
 
+// 대외 인터페이스(W1)는 스캔 산출물에서 읽는다(없으면 null → §2 송신 0행).
+let interfaces = null
+const interfacesPath = join(projectRoot, '.spec', 'map', 'interfaces.json')
+if (existsSync(interfacesPath)) {
+  try {
+    interfaces = JSON.parse(readFileSync(interfacesPath, 'utf8'))
+  } catch {
+    // 손상 시 null(정직 — 송신 섹션 0행).
+  }
+}
+
 // MyBatis Mapper XML 스캔(Tier B) — 테이블/CRUD grounding. 매퍼 XML 없으면 빈 모델.
 function findMapperXmls(root) {
   const SKIP = new Set(['node_modules', '.git', 'target', 'build', 'dist', '.understand-anything', '.spec', '.idea'])
@@ -177,7 +188,7 @@ const buildDeps = findBuildDeps(projectRoot)
 // PA3: db-spec 가 DDL 의 실제 컬럼/PK/FK/CHECK 를 grounding 으로 싣도록 map(scan) 산출을 로드.
 // 없으면(맵 미실행/code-only) null → db-spec 은 기존 노드 기반 목록만(우아한 degrade).
 const dbSchema = readDbSchema(projectRoot)
-const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
+const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 

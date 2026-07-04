@@ -16,3 +16,11 @@ methodology: si-standard
 요청/응답/인증은 그래프에 없어 추론 → [추정]. API_ID=API-001.. (routeId 정렬 순서).
 
 | API_ID | HTTP | 경로 | 컨트롤러·핸들러 | 요청 | 응답 | 인증 |
+
+## 대외 연계(송신·라우트 외 수신) {#outbound-list}
+
+interfaces.json(W1 결정론 스캔) 1건 = 표 1행. 탐지·엔드포인트는 코드/설정 근거(file:line)
+→ [확정], 대상시스템은 추론 → [추정], 동적 조립 등 미해석 엔드포인트는 [미확인].
+IF_ID=IF-<프로토콜>-001.. (protocol, file, line 정렬 순서).
+
+| IF_ID | 프로토콜 | 방향 | 대상시스템 | 엔드포인트 | 데이터 | 상태 |

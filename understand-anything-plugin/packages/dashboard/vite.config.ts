@@ -474,10 +474,12 @@ function rtmFunctionIds(): Set<string> {
   return ids;
 }
 /**
- * 편집 허용 셀 화이트리스트 — 사람이 교정/확정하는 표시 셀(name + 4 추적축). 스키마 키
- * (id/featureId/origin/confidence 등 결정론 사실)은 편집 거부.
+ * 편집 허용 셀 화이트리스트 — 사람이 교정/확정하는 표시 셀(name + 4 추적축) +
+ * R7 사용자 정의 필드 값(`custom:<slug>`). 스키마 키(id/featureId/origin/confidence 등
+ * 결정론 사실)은 편집 거부.
  */
 function isEditableRtmCell(key: string): boolean {
+  if (/^custom:[a-z0-9-]{1,40}$/.test(key)) return true;
   return key === "name" || key === "entryPoint" || key === "implementation" || key === "data" || key === "test";
 }
 type RtmOverride = { editedCells: Record<string, string>; approver: string; at: string; audit?: unknown[] };
@@ -565,6 +567,171 @@ function handleRtmOverridePost(
         return;
       }
       sendJson(res, 200, { fnId, ...record });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+// ── W5: RTM 테스트 시나리오 오버레이(_scenarios) — rtm-override 와 동형. ──
+/** rtm.json 의 시나리오 id 집합 — POST tsId 실존 검증용(없으면 빈 집합 = 전부 차단). */
+function rtmScenarioIds(): Set<string> {
+  const ids = new Set<string>();
+  const file = findGraphFile("rtm.json");
+  if (!file) return ids;
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as { testScenarios?: Array<{ id?: unknown }> };
+    for (const s of raw.testScenarios ?? []) if (typeof s.id === "string") ids.add(s.id);
+  } catch {
+    /* 파싱 실패 → 빈 집합 */
+  }
+  return ids;
+}
+/** 시나리오 편집 허용 셀 — 제목 + Given/When/Then(추적선 id·kind 는 결정론 사실이라 거부). */
+function isEditableScenarioCell(key: string): boolean {
+  return key === "title" || key === "given" || key === "when" || key === "then";
+}
+/**
+ * POST /rtm-scenario-override — { tsId, editedCells, approver } 검증 후 `_scenarios` 병합 기록.
+ * 레코드 존재 = 그 시나리오 확정(applyOverlay 가 CONFIRMED 승격). audit append-only.
+ */
+function handleRtmScenarioOverridePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = rtmOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No domain graph found. Run /understand-rtm first." });
+    return;
+  }
+  collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
+    .then((body) => {
+      let parsed: { tsId?: unknown; editedCells?: unknown; approver?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { tsId, editedCells, approver } = parsed ?? {};
+      if (typeof tsId !== "string" || !tsId) {
+        sendJson(res, 400, { error: "tsId is required" });
+        return;
+      }
+      if (typeof approver !== "string" || !approver.trim()) {
+        sendJson(res, 400, { error: "approver is required" });
+        return;
+      }
+      if (!editedCells || typeof editedCells !== "object" || Array.isArray(editedCells)) {
+        sendJson(res, 400, { error: "editedCells object is required" });
+        return;
+      }
+      if (!rtmScenarioIds().has(tsId)) {
+        sendJson(res, 400, { error: "tsId is not in rtm.json" });
+        return;
+      }
+      const clean: Record<string, string> = {};
+      for (const [k, v] of Object.entries(editedCells as Record<string, unknown>)) {
+        if (!isEditableScenarioCell(k)) {
+          sendJson(res, 400, { error: `cell is not editable: ${k}` });
+          return;
+        }
+        if (typeof v !== "string") {
+          sendJson(res, 400, { error: `editedCells[${k}] must be a string` });
+          return;
+        }
+        clean[k] = v;
+      }
+      const now = new Date().toISOString();
+      const by = approver.trim();
+      const store = readRtmOverrides() as Record<string, unknown> & { _scenarios?: Record<string, RtmOverride> };
+      const section: Record<string, RtmOverride> =
+        store._scenarios && typeof store._scenarios === "object" && !Array.isArray(store._scenarios)
+          ? store._scenarios
+          : {};
+      const prev = section[tsId];
+      const audit = Array.isArray(prev?.audit) ? prev!.audit : [];
+      const record: RtmOverride = {
+        editedCells: clean,
+        approver: by,
+        at: now,
+        audit: [...audit, { event: "CONFIRMED", by, at: now }],
+      };
+      section[tsId] = record;
+      store._scenarios = section;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write rtm-overrides:", err);
+        sendJson(res, 500, { error: "Failed to write rtm overrides" });
+        return;
+      }
+      sendJson(res, 200, { tsId, ...record });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+// ── R7: RTM 사용자 정의 필드(_fields) — 정의 추가/삭제(값은 기능 오버레이 custom:* 키). ──
+/**
+ * POST /rtm-field — { op: "add"|"remove", id: "custom:<slug>", label?, approver } 검증 후
+ * `_fields` 기록. 삭제는 정의만 제거(행 값 비파괴 보존 — 재등록 시 복원, §5.1).
+ */
+function handleRtmFieldPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = rtmOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No domain graph found. Run /understand-rtm first." });
+    return;
+  }
+  collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
+    .then((body) => {
+      let parsed: { op?: unknown; id?: unknown; label?: unknown; approver?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { op, id, label, approver } = parsed ?? {};
+      if (op !== "add" && op !== "remove") {
+        sendJson(res, 400, { error: 'op must be "add" or "remove"' });
+        return;
+      }
+      if (typeof id !== "string" || !/^custom:[a-z0-9-]{1,40}$/.test(id)) {
+        sendJson(res, 400, { error: "id must match custom:<slug> (a-z0-9-)" });
+        return;
+      }
+      if (typeof approver !== "string" || !approver.trim()) {
+        sendJson(res, 400, { error: "approver is required" });
+        return;
+      }
+      if (op === "add" && (typeof label !== "string" || !label.trim())) {
+        sendJson(res, 400, { error: "label is required for add" });
+        return;
+      }
+      const store = readRtmOverrides() as Record<string, unknown> & {
+        _fields?: Record<string, { label: string; createdBy: string; at: string }>;
+      };
+      const fields =
+        store._fields && typeof store._fields === "object" && !Array.isArray(store._fields)
+          ? store._fields
+          : {};
+      if (op === "add") {
+        fields[id] = { label: (label as string).trim(), createdBy: approver.trim(), at: new Date().toISOString() };
+      } else {
+        delete fields[id];
+      }
+      store._fields = fields;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write rtm-overrides:", err);
+        sendJson(res, 500, { error: "Failed to write rtm overrides" });
+        return;
+      }
+      sendJson(res, 200, { _fields: fields });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
@@ -1684,6 +1851,8 @@ export default defineConfig({
             pathname === "/rtm-overrides.json" ||
             pathname === "/rtm-override" ||
             pathname === "/rtm-req-override" ||
+            pathname === "/rtm-scenario-override" ||
+            pathname === "/rtm-field" ||
             pathname === "/rtm-intake" ||
             pathname === "/rtm-intake-status" ||
             pathname === "/rtm-intake-confirm" ||
@@ -1732,6 +1901,17 @@ export default defineConfig({
           if (pathname === "/rtm-req-override") {
             if (req.method === "POST") handleRtmReqOverridePost(req, res);
             else sendJson(res, 405, { error: "Use POST to write rtm requirement overrides" });
+            return;
+          }
+          // W5: 시나리오 확정 / R7: 사용자 정의 필드 정의.
+          if (pathname === "/rtm-scenario-override") {
+            if (req.method === "POST") handleRtmScenarioOverridePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to write rtm scenario overrides" });
+            return;
+          }
+          if (pathname === "/rtm-field") {
+            if (req.method === "POST") handleRtmFieldPost(req, res);
+            else sendJson(res, 405, { error: "Use POST to write rtm field defs" });
             return;
           }
           if (pathname === "/rtm-overrides.json") {

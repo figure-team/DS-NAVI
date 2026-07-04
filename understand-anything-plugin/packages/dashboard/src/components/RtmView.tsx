@@ -8,11 +8,14 @@ import { useDashboardStore } from "../store";
 import TrustBadge from "./TrustBadge";
 
 /**
- * 요구사항 추적표(RTM) v2 뷰 — 설계: docs/ktds/RTM_TAB_DESIGN.md / 프로토타입: docs/ktds/rtm-proto.html.
+ * 요구사항 추적표(RTM) v2 뷰 — 설계: docs/ktds/RTM_TAB_DESIGN.md / W5: RTM_TEST_SCENARIO_DESIGN.md.
  *
- * 탭 3개: ① 기능 기준(도메인 그리드) ② 요청 기준(요청 REQ → 요구사항 → AC, supersede·NFR) ③ 현황(커버리지·갭).
- * 생성물 rtm.json 불변, 사람 입력은 rtm-overrides.json 오버레이(기능=최상위 fnId, 요구=_requirements).
- * 검증 스파인 입력: 기능 셀 확정(POST /rtm-override) · 요구 시험결과/검수/lifecycle(POST /rtm-req-override).
+ * 탭 4개: ① 기능 기준(도메인 그리드) ② 요청 기준(요청 REQ → 요구사항 → AC, supersede·NFR)
+ * ③ 시험(W5 단위테스트 시나리오 — 초안 편집·확정) ④ 현황(커버리지·갭).
+ * 생성물 rtm.json 불변, 사람 입력은 rtm-overrides.json 오버레이(기능=최상위 fnId, 요구=_requirements,
+ * 시나리오=_scenarios, 사용자 필드 정의=_fields).
+ * 검증 스파인 입력: 기능 셀 확정(POST /rtm-override) · 요구 시험결과/검수/lifecycle(POST /rtm-req-override)
+ * · 시나리오 확정(POST /rtm-scenario-override) · 필드 정의(POST /rtm-field, R7).
  */
 type Confidence = "CONFIRMED" | "CONFIRMED_AI" | "INFERRED" | "UNVERIFIED";
 type TestResult = "PASS" | "FAIL" | "NA" | "UNTESTED";
@@ -28,7 +31,17 @@ interface FunctionRow {
   entryPoint: TraceCell; implementation: TraceCell; data: TraceCell; test: TraceCell;
   origin: "AS_IS" | "TO_BE"; state: "IMPLEMENTED" | "PARTIAL" | "PLANNED" | "CHANGED" | "ORPHANED";
   requirementHistory: string[]; nfrTags: string[]; rules: FnRule[]; deliverableRefs: { docId: string; anchor?: string }[];
+  custom?: Record<string, string>;
 }
+/** W5 단위테스트 시나리오(결정론 생성 초안 — 확정은 _scenarios 오버레이). */
+interface TestScenario {
+  id: string; fnId: string; reqId: string | null; acId: string | null;
+  kind: "normal" | "exception" | "boundary";
+  title: string; given: string; when: string; then: string;
+  confidence: Confidence; evidence: Evidence[]; notes: string[];
+}
+/** R7 사용자 정의 필드 정의(_fields). */
+interface CustomField { id: string; label: string }
 interface DomainGroup { id: string; name: string; functionCount: number }
 interface Changeset { added: string[]; modified: string[]; removed: string[]; revived: string[] }
 interface Signoff { approved: boolean; by: string | null; at: string | null }
@@ -44,13 +57,15 @@ interface Coverage {
   requirements: { total: number; implemented: number; verified: number; signedOff: number; byLifecycle: Record<string, number> };
   functions: { total: number; implemented: number; planned: number; orphaned: number; confirmed: number };
   tests: { total: number; pass: number; fail: number; untested: number };
+  scenarios?: { total: number; confirmed: number; byKind: { normal: number; exception: number; boundary: number } };
   gaps: { unimplemented: string[]; orphanCode: string[]; unverified: string[] };
   byRequirement: Record<string, { targetsTotal: number; targetsBuilt: number; acsTotal: number; acsPassed: number }>;
 }
 interface Diagnostic { level: "error" | "warn"; code: string; message: string; ref?: string }
 interface RtmModel {
   schemaVersion: number; gitCommit: string | null; domains: DomainGroup[]; functions: FunctionRow[];
-  requirements: Requirement[]; coverage?: Coverage; diagnostics?: Diagnostic[];
+  requirements: Requirement[]; testScenarios?: TestScenario[]; customFields?: CustomField[];
+  coverage?: Coverage; diagnostics?: Diagnostic[];
 }
 interface FnOverride { editedCells: Record<string, string>; approver: string; at: string }
 interface ReqOverride { lifecycle?: string; signoff?: Signoff | null; tests?: Record<string, { result: TestResult; defectId: string | null }>; approver?: string; at?: string }
@@ -82,6 +97,11 @@ const VERB: Record<keyof Changeset, { sym: string; label: string; color: string 
 const AC_KIND: Record<AcKind, { label: string; color: string }> = {
   branch: { label: "분기", color: "#c8b76a" }, precondition: { label: "선행", color: NFR },
   postcondition: { label: "후행", color: OK }, exception: { label: "예외", color: "#d28fb0" }, rule: { label: "규칙", color: "var(--color-text-muted)" },
+};
+const TS_KIND: Record<TestScenario["kind"], { label: string; color: string }> = {
+  normal: { label: "정상", color: "var(--color-status-ok)" },
+  exception: { label: "예외", color: "#d28fb0" },
+  boundary: { label: "경계", color: "var(--color-status-warn)" },
 };
 const TEST_RES: Record<TestResult, { label: string; color: string }> = {
   PASS: { label: "PASS", color: OK }, FAIL: { label: "FAIL", color: BAD }, NA: { label: "N/A", color: "var(--color-text-muted)" }, UNTESTED: { label: "미실행", color: "var(--color-text-muted)" },
@@ -159,11 +179,20 @@ export default function RtmView() {
   const [model, setModel] = useState<RtmModel | null>(null);
   const [fnOv, setFnOv] = useState<Record<string, FnOverride>>({});
   const [reqOv, setReqOv] = useState<Record<string, ReqOverride>>({});
+  // W5/R7: 시나리오 오버레이(_scenarios) · 사용자 필드 정의(_fields — 라이브 원본).
+  const [scOv, setScOv] = useState<Record<string, FnOverride>>({});
+  const [fields, setFields] = useState<CustomField[]>([]);
+  const [fieldsLive, setFieldsLive] = useState(false); // 오버레이 로드 성공 = _fields 가 진실.
   const [error, setError] = useState<string | null>(null);
 
-  const [view, setView] = useState<"function" | "requirement" | "status">("function");
+  const [view, setView] = useState<"function" | "requirement" | "scenario" | "status">("function");
   const [selFn, setSelFn] = useState<string | null>(null);
   const [selReq, setSelReq] = useState<string | null>(null);
+  const [selTs, setSelTs] = useState<string | null>(null);
+  const [tsEditing, setTsEditing] = useState(false);
+  const [tsDraft, setTsDraft] = useState<Record<string, string>>({});
+  const [tsSaving, setTsSaving] = useState(false);
+  const [tsSaveError, setTsSaveError] = useState<string | null>(null);
   const [expandedReqs, setExpandedReqs] = useState<Set<string>>(new Set());
   const [expandedRequests, setExpandedRequests] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState(false);
@@ -183,9 +212,14 @@ export default function RtmView() {
         if (data && typeof data === "object" && !Array.isArray(data)) {
           const raw = data as Record<string, unknown>;
           const reqs = (raw._requirements && typeof raw._requirements === "object" ? raw._requirements : {}) as Record<string, ReqOverride>;
+          const scs = (raw._scenarios && typeof raw._scenarios === "object" ? raw._scenarios : {}) as Record<string, FnOverride>;
           const fns: Record<string, FnOverride> = {};
           for (const [k, v] of Object.entries(raw)) if (!k.startsWith("_")) fns[k] = v as FnOverride;
-          setFnOv(fns); setReqOv(reqs);
+          setFnOv(fns); setReqOv(reqs); setScOv(scs);
+          // R7: _fields = 필드 정의의 라이브 원본(rtm.json customFields 는 생성 시점 스냅샷).
+          const fd = (raw._fields && typeof raw._fields === "object" ? raw._fields : {}) as Record<string, { label?: string }>;
+          setFields(Object.entries(fd).map(([id, v]) => ({ id, label: v?.label ?? id })).sort((a, b) => (a.id < b.id ? -1 : 1)));
+          setFieldsLive(true);
         }
       })
       .catch(() => {});
@@ -450,23 +484,87 @@ export default function RtmView() {
   const reqById = (id: string) => model?.requirements.find((r) => r.id === id);
   const selectedFn = model?.functions.find((f) => f.id === selFn) ?? null;
   const selectedReq = model?.requirements.find((r) => r.id === selReq) ?? null;
+  // W5: 시나리오 병합 helpers — 오버레이(_scenarios) 존재 = 확정.
+  const scenarios = model?.testScenarios ?? [];
+  const selectedTs = scenarios.find((s) => s.id === selTs) ?? null;
+  const effTs = (s: TestScenario, key: "title" | "given" | "when" | "then"): string => {
+    const e = scOv[s.id]?.editedCells?.[key];
+    return typeof e === "string" ? e : s[key];
+  };
+  const tsConfirmed = (s: TestScenario) => s.confidence === "CONFIRMED" || Boolean(scOv[s.id]);
+  const tsConfirmedCount = scenarios.filter(tsConfirmed).length;
+  // R7: 유효 필드 — 라이브(_fields) 우선, 정적(demo)에선 rtm.json 스냅샷 폴백.
+  const effFields: CustomField[] = fieldsLive ? fields : (model?.customFields ?? []);
+  const effCustom = (f: FunctionRow, fieldId: string): string => {
+    const e = fnOv[f.id]?.editedCells?.[fieldId];
+    return typeof e === "string" ? e : f.custom?.[fieldId] ?? "";
+  };
+
+  // W5: 시나리오 확정(POST /rtm-scenario-override) — 기능 확정과 동형.
+  const confirmScenario = useCallback(async (fromEdit: boolean) => {
+    if (!selectedTs || !accessToken) return;
+    const approver = resolveApprover();
+    if (!approver) return;
+    const editedCells: Record<string, string> = {};
+    if (fromEdit) for (const key of ["title", "given", "when", "then"] as const) {
+      if (tsDraft[key] !== undefined && tsDraft[key] !== selectedTs[key]) editedCells[key] = tsDraft[key];
+    }
+    setTsSaving(true); setTsSaveError(null);
+    try {
+      const res = await fetch(`/rtm-scenario-override?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tsId: selectedTs.id, editedCells, approver }) });
+      const data = (await res.json().catch(() => null)) as (FnOverride & { error?: string }) | null;
+      if (!res.ok || !data) { setTsSaveError(data?.error ?? `HTTP ${res.status}`); return; }
+      setScOv((p) => ({ ...p, [selectedTs.id]: { editedCells: data.editedCells, approver: data.approver, at: data.at } }));
+      setTsEditing(false);
+    } catch (e) { setTsSaveError(String(e)); } finally { setTsSaving(false); }
+  }, [selectedTs, accessToken, tsDraft, resolveApprover]);
+
+  // R7: 필드 정의 추가/삭제(POST /rtm-field) — 삭제는 정의만(값 비파괴 보존).
+  const postField = useCallback(async (op: "add" | "remove", id: string, label?: string) => {
+    if (!accessToken) { setToast({ kind: "failed", msg: "읽기전용 — 필드 편집은 dev 서버가 필요합니다." }); return; }
+    const approver = resolveApprover();
+    if (!approver) return;
+    try {
+      const res = await fetch(`/rtm-field?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ op, id, label, approver }) });
+      const data = (await res.json().catch(() => null)) as { _fields?: Record<string, { label?: string }>; error?: string } | null;
+      if (!res.ok || !data?._fields) { setToast({ kind: "failed", msg: `필드 저장 실패: ${data?.error ?? res.status}` }); return; }
+      setFields(Object.entries(data._fields).map(([fid, v]) => ({ id: fid, label: v?.label ?? fid })).sort((a, b) => (a.id < b.id ? -1 : 1)));
+      setFieldsLive(true);
+    } catch (e) { setToast({ kind: "failed", msg: String(e) }); }
+  }, [accessToken, resolveApprover]);
+
+  const addField = useCallback(() => {
+    const label = typeof window !== "undefined" ? window.prompt("추가할 필드 이름(예: 담당자, 릴리스):")?.trim() : "";
+    if (!label) return;
+    // id 는 자동 슬러그(custom:f<ts36>) — 라벨은 한글 가능, id 는 네임스페이스 규칙 준수.
+    const id = `custom:f${Date.now().toString(36)}`;
+    void postField("add", id, label);
+  }, [postField]);
 
   const openFunction = useCallback((id: string) => { setView("function"); setSelReq(null); setSelFn(id); setEditing(false); setSaveError(null); }, []);
 
   const beginEdit = useCallback(() => {
     if (!selectedFn) return;
-    setDraft({ name: effCell(selectedFn, "name"), entryPoint: effCell(selectedFn, "entryPoint"), implementation: effCell(selectedFn, "implementation"), data: effCell(selectedFn, "data"), test: effCell(selectedFn, "test") });
+    const base: Record<string, string> = { name: effCell(selectedFn, "name"), entryPoint: effCell(selectedFn, "entryPoint"), implementation: effCell(selectedFn, "implementation"), data: effCell(selectedFn, "data"), test: effCell(selectedFn, "test") };
+    for (const cf of effFields) base[cf.id] = effCustom(selectedFn, cf.id); // R7 값 편집.
+    setDraft(base);
     setEditing(true); setSaveError(null);
-  }, [selectedFn, fnOv]);
+  }, [selectedFn, fnOv, effFields]);
 
   const onConfirm = useCallback(async (fromEdit: boolean) => {
     if (!selectedFn || !accessToken) return;
     const approver = resolveApprover();
     if (!approver) return;
     const editedCells: Record<string, string> = {};
-    if (fromEdit) for (const key of ["name", "entryPoint", "implementation", "data", "test"] as const) {
-      const original = key === "name" ? selectedFn.name : selectedFn[key].value;
-      if (draft[key] !== undefined && draft[key] !== original) editedCells[key] = draft[key];
+    if (fromEdit) {
+      for (const key of ["name", "entryPoint", "implementation", "data", "test"] as const) {
+        const original = key === "name" ? selectedFn.name : selectedFn[key].value;
+        if (draft[key] !== undefined && draft[key] !== original) editedCells[key] = draft[key];
+      }
+      for (const cf of effFields) { // R7: 원본 = rtm.json custom 스냅샷.
+        const original = selectedFn.custom?.[cf.id] ?? "";
+        if (draft[cf.id] !== undefined && draft[cf.id] !== original) editedCells[cf.id] = draft[cf.id];
+      }
     }
     setSaving(true); setSaveError(null);
     try {
@@ -498,7 +596,7 @@ export default function RtmView() {
 
   // ── 렌더 조각 ──────────────────────────────────────────────────────────
   const tabBtn = (k: typeof view, label: string) => (
-    <button type="button" onClick={() => { setView(k); setSelFn(null); setSelReq(null); }}
+    <button type="button" onClick={() => { setView(k); setSelFn(null); setSelReq(null); setSelTs(null); setTsEditing(false); }}
       className={`rounded-md transition-colors ${view === k ? "bg-accent/20 text-accent" : "text-text-muted hover:text-text-secondary"}`}
       style={{ padding: "5px 14px", fontSize: 12, fontWeight: view === k ? 600 : 500 }}>{label}</button>
   );
@@ -531,7 +629,7 @@ export default function RtmView() {
         <span style={{ fontFamily: "var(--font-heading)", fontSize: 19, color: "var(--color-text-primary)" }}>요구사항 추적표</span>
         <span className="text-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, letterSpacing: ".16em", border: "1px solid var(--color-border-subtle)", borderRadius: 5, padding: "3px 6px" }}>RTM</span>
         <div className="flex items-center gap-1 ml-1 rounded-lg" style={{ background: "var(--color-panel)", border: BORDER, padding: 3 }}>
-          {tabBtn("function", "기능 기준")}{tabBtn("requirement", "요청 기준")}{tabBtn("status", "현황")}
+          {tabBtn("function", "기능 기준")}{tabBtn("requirement", "요청 기준")}{tabBtn("scenario", "시험")}{tabBtn("status", "현황")}
         </div>
         <span className="ml-auto flex items-center gap-3">
           {intakeStatus === "running" && (
@@ -571,7 +669,7 @@ export default function RtmView() {
       )}
 
       {/* 본문 */}
-      <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq) ? "50vh" : intakePanelOpen ? "55vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
+      <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq || selectedTs) ? "50vh" : intakePanelOpen ? "55vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
         {error ? (
           <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>요구사항 추적표를 불러오지 못했습니다 ({error}).<br /><code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>understand-rtm</code> 을 먼저 실행하세요.</div>
         ) : !model ? (
@@ -580,6 +678,8 @@ export default function RtmView() {
           <FunctionView />
         ) : view === "requirement" ? (
           <RequirementView />
+        ) : view === "scenario" ? (
+          <ScenarioView />
         ) : (
           <StatusView />
         )}
@@ -587,6 +687,7 @@ export default function RtmView() {
 
       {selectedFn && view === "function" && model && <FunctionDrawer />}
       {selectedReq && view === "requirement" && model && <RequirementDrawer />}
+      {selectedTs && view === "scenario" && model && <ScenarioDrawer />}
 
       {/* P4: 단계 산출 미리보기/컨펌 패널 */}
       {intakePanelOpen && <IntakeStepPanel />}
@@ -774,7 +875,20 @@ export default function RtmView() {
               <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 14, overflow: "hidden" }}>
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 880 }}>
-                    <thead><tr>{["기능", ...COLS.map((c) => c.label), "상태"].map((h) => <th key={h} style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>{h}</th>)}</tr></thead>
+                    <thead><tr>
+                      {["기능", ...COLS.map((c) => c.label)].map((h) => <th key={h} style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>{h}</th>)}
+                      {/* R7: 사용자 정의 필드 열 — 헤더 × 로 정의 삭제(값 비파괴 보존). */}
+                      {effFields.map((cf) => (
+                        <th key={cf.id} style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: NFR, textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>
+                          {cf.label}
+                          {canWrite && <button type="button" title="필드 삭제(값은 보존 — 재등록 시 복원)" onClick={(e) => { e.stopPropagation(); if (window.confirm(`'${cf.label}' 필드를 삭제할까요? (행 값은 보존)`)) void postField("remove", cf.id); }} className="text-text-muted hover:text-red-400" style={{ marginLeft: 5, fontSize: 10, border: "none", background: "none", cursor: "pointer" }}>×</button>}
+                        </th>
+                      ))}
+                      <th style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>
+                        상태
+                        {canWrite && <button type="button" title="사용자 정의 필드 추가(전 기능 공통 열, R7)" onClick={(e) => { e.stopPropagation(); addField(); }} className="text-text-muted hover:text-accent" style={{ marginLeft: 7, fontSize: 10.5, border: BORDER, borderRadius: 4, background: "none", cursor: "pointer", padding: "1px 6px" }}>＋필드</button>}
+                      </th>
+                    </tr></thead>
                     <tbody>{rows.map((f) => (
                       <tr key={f.id} onClick={() => openFunction(f.id)} style={{ cursor: "pointer", background: f.id === selFn ? "color-mix(in srgb, var(--color-accent) 8%, transparent)" : undefined, boxShadow: isConfirmed(f) ? `inset 2px 0 0 ${GOLD}` : undefined }} className="hover:bg-accent/[0.045]">
                         <td style={{ borderBottom: BORDER, padding: "11px 12px", whiteSpace: "nowrap", verticalAlign: "top" }}>
@@ -783,6 +897,10 @@ export default function RtmView() {
                             {f.nfrTags.map((t) => <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 8.5, fontFamily: "var(--font-mono)", color: NFR, background: "rgba(120,160,190,.12)", border: "1px solid rgba(120,160,190,.25)", borderRadius: 4, padding: "1px 5px", marginLeft: 6 }}>⚡{t}</span>)}</div>
                         </td>
                         {COLS.map((c) => <TraceTd key={c.key} f={f} c={c} />)}
+                        {effFields.map((cf) => {
+                          const v = effCustom(f, cf.id);
+                          return <td key={cf.id} style={{ borderBottom: BORDER, padding: "11px 12px", verticalAlign: "top" }}><span style={{ fontSize: 12.5, color: v ? "var(--color-text-secondary)" : FAINT }}>{v || "—"}</span></td>;
+                        })}
                         <td style={{ borderBottom: BORDER, padding: "11px 12px", whiteSpace: "nowrap", verticalAlign: "top" }}>{isConfirmed(f) ? <TrustBadge confirmedBy={fnOv[f.id].approver} /> : <Pill label={STATE_LABEL[f.state]} color={STATE_COLOR[f.state]} />}</td>
                       </tr>
                     ))}</tbody>
@@ -922,7 +1040,105 @@ export default function RtmView() {
     );
   }
 
-  // ── 뷰③ 현황 ──
+  // ── 뷰③ 시험(W5) — 단위테스트 시나리오 초안(결정론 생성) 검토·편집·확정 ──
+  function ScenarioView() {
+    if (!model) return null;
+    if (scenarios.length === 0) return <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 560 }}>테스트 시나리오가 없습니다. <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>understand-rtm</code> 을 재실행하면 기능 행별 정상/예외/경계 초안이 생성됩니다(전부 [추정]).</div>;
+    const byFn = new Map<string, TestScenario[]>();
+    for (const s of scenarios) { if (!byFn.has(s.fnId)) byFn.set(s.fnId, []); byFn.get(s.fnId)!.push(s); }
+    const sc = cov?.scenarios;
+    return (
+      <>
+        <div className="flex gap-2.5" style={{ marginBottom: 22 }}>
+          <Tile lbl="시나리오" n={sc?.total ?? scenarios.length} />
+          <Tile lbl="확정" n={tsConfirmedCount} d={`/${scenarios.length}`} pct={pct(tsConfirmedCount, scenarios.length)} bar={`linear-gradient(90deg,${GOLD_DIM},${GOLD})`} />
+          <Tile lbl="정상 / 예외 / 경계" n={`${sc?.byKind.normal ?? 0} / ${sc?.byKind.exception ?? 0} / ${sc?.byKind.boundary ?? 0}`} />
+          <Tile lbl="보강 필요" n={scenarios.filter((s) => s.notes.length > 0).length} d=" 건" />
+        </div>
+        <div className="text-text-muted" style={{ fontSize: 11.5, lineHeight: 1.6, marginBottom: 16, maxWidth: 760 }}>
+          기능 행의 코드 근거(진입점·데이터·인수조건)에서 <b>결정론 생성한 초안</b>입니다 — 전부 [추정]. 행을 눌러 Given/When/Then 을 검토·편집·확정하세요(확정은 재생성에도 유지). 시험 <b>수행 결과</b>는 요청 기준 탭의 인수조건 시험결과에 기록합니다.
+        </div>
+        {model.functions.map((f) => {
+          const list = byFn.get(f.id) ?? [];
+          if (list.length === 0) return null;
+          const confirmedN = list.filter(tsConfirmed).length;
+          return (
+            <section key={f.id} style={{ marginBottom: 18 }}>
+              <div className="flex items-center gap-3" style={{ padding: "0 4px 9px" }}>
+                <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}>{f.featureId}</span>
+                <span style={{ fontFamily: "var(--font-heading)", fontSize: 15, color: "var(--color-text-primary)" }}>{effCell(f, "name")}</span>
+                <span className="text-text-muted" style={{ fontSize: 11 }}>{f.domainName}</span>
+                <span className="text-text-muted ml-auto" style={{ fontSize: 11 }}>확정 {confirmedN}/{list.length}</span>
+              </div>
+              <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 12, overflow: "hidden" }}>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 900 }}>
+                    <thead><tr>{["ID", "구분", "제목", "Given", "When", "Then", "상태"].map((h) => <th key={h} style={{ padding: "9px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>{h}</th>)}</tr></thead>
+                    <tbody>{list.map((s) => (
+                      <tr key={s.id} onClick={() => { setSelTs(s.id); setTsEditing(false); setTsSaveError(null); }} style={{ cursor: "pointer", background: s.id === selTs ? "color-mix(in srgb, var(--color-accent) 8%, transparent)" : undefined, boxShadow: tsConfirmed(s) ? `inset 2px 0 0 ${GOLD}` : undefined }} className="hover:bg-accent/[0.045]">
+                        <td style={{ borderBottom: BORDER, padding: "9px 12px", whiteSpace: "nowrap", fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-text-muted)", verticalAlign: "top" }}>{s.id.replace(/^TS-/, "")}{s.acId && <div style={{ color: GOLD_DIM, fontSize: 9.5 }}>{s.reqId}·{s.acId}</div>}</td>
+                        <td style={{ borderBottom: BORDER, padding: "9px 12px", whiteSpace: "nowrap", verticalAlign: "top" }}><span style={{ fontSize: 10, fontFamily: "var(--font-mono)", padding: "2px 7px", borderRadius: 5, color: TS_KIND[s.kind].color, background: "color-mix(in srgb,currentColor 13%,transparent)" }}>{TS_KIND[s.kind].label}</span></td>
+                        <td style={{ borderBottom: BORDER, padding: "9px 12px", verticalAlign: "top", color: "var(--color-text-primary)", fontSize: 12.5, fontWeight: 500 }}>{effTs(s, "title")}{s.notes.length > 0 && <span title={s.notes.join("\n")} style={{ marginLeft: 5, color: WARN, fontSize: 10 }}>⚠</span>}</td>
+                        {(["given", "when", "then"] as const).map((k) => <td key={k} style={{ borderBottom: BORDER, padding: "9px 12px", verticalAlign: "top", color: "var(--color-text-secondary)", fontSize: 12, maxWidth: 240 }}>{effTs(s, k)}</td>)}
+                        <td style={{ borderBottom: BORDER, padding: "9px 12px", whiteSpace: "nowrap", verticalAlign: "top" }}>{tsConfirmed(s) ? <TrustBadge confirmedBy={scOv[s.id]?.approver ?? "확정"} /> : confChip("추정", WARN)}</td>
+                      </tr>
+                    ))}</tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          );
+        })}
+      </>
+    );
+  }
+
+  // ── 시나리오 드로어 — G/W/T 검토·편집·확정(기능 드로어와 동형) ──
+  function ScenarioDrawer() {
+    const s = selectedTs!;
+    const fn = fnById(s.fnId);
+    const confirmed = tsConfirmed(s);
+    return (
+      <div className="absolute bottom-0 left-0 right-0 bg-surface border-t z-20 overflow-auto animate-slide-up" style={{ height: "44vh", borderTopColor: "color-mix(in srgb, var(--color-accent) 22%, transparent)" }}>
+        <div className="flex items-center gap-3 sticky top-0 bg-panel border-b border-border-subtle" style={{ padding: "12px 24px" }}>
+          <span className="text-text-muted" style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{s.id}</span>
+          <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", padding: "2px 7px", borderRadius: 5, color: TS_KIND[s.kind].color, background: "color-mix(in srgb,currentColor 13%,transparent)" }}>{TS_KIND[s.kind].label}</span>
+          <span style={{ fontFamily: "var(--font-heading)", fontSize: 16, color: "var(--color-text-primary)" }}>{effTs(s, "title")}</span>
+          {confirmed ? <TrustBadge confirmedBy={scOv[s.id]?.approver ?? "확정"} /> : <Pill label="초안 [추정]" color={WARN} />}
+          <span className="ml-auto flex items-center gap-2">
+            {tsSaveError && <span className="text-amber-400" style={{ fontSize: 11 }}>저장 실패: {tsSaveError}</span>}
+            {!canWrite ? <span className="text-text-muted" style={{ fontSize: 11 }}>읽기전용</span> : tsEditing ? (
+              <><button type="button" onClick={() => setTsEditing(false)} className="rounded-md border border-border-subtle text-text-secondary" style={{ padding: "5px 13px", fontSize: 12 }}>취소</button>
+                <button type="button" onClick={() => void confirmScenario(true)} disabled={tsSaving} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>{tsSaving ? "저장 중…" : "저장 + 확정"}</button></>
+            ) : (
+              <>{!confirmed && <button type="button" onClick={() => void confirmScenario(false)} disabled={tsSaving} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>✓ 확정</button>}
+                <button type="button" onClick={() => { setTsDraft({ title: effTs(s, "title"), given: effTs(s, "given"), when: effTs(s, "when"), then: effTs(s, "then") }); setTsEditing(true); setTsSaveError(null); }} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent" style={{ padding: "5px 13px", fontSize: 12 }}>편집</button></>
+            )}
+            <button type="button" onClick={() => { setSelTs(null); setTsEditing(false); }} className="text-text-muted hover:text-text-primary" style={{ fontSize: 16, padding: "0 4px" }}>×</button>
+          </span>
+        </div>
+        <div style={{ padding: "16px 24px" }}>
+          <div className="text-text-muted" style={{ fontSize: 11, marginBottom: 12 }}>
+            대상 기능: <button type="button" onClick={() => openFunction(s.fnId)} className="text-text-secondary hover:text-accent" style={{ fontSize: 11.5 }}><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginRight: 4 }}>{fn?.featureId}</span>{fn ? effCell(fn, "name") : s.fnId}</button>
+            {s.reqId && <span style={{ marginLeft: 10 }}>연관: <span style={{ fontFamily: "var(--font-mono)", color: GOLD_DIM }}>{s.reqId}{s.acId ? ` · ${s.acId}` : ""}</span></span>}
+          </div>
+          <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 12 }}><tbody>
+            {(["title", "given", "when", "then"] as const).map((key) => (
+              <tr key={key}><td style={{ padding: "8px 12px 8px 0", color: "var(--color-text-muted)", whiteSpace: "nowrap", verticalAlign: "top", width: 70, fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase" }}>{key === "title" ? "제목" : key}</td>
+                <td style={{ padding: "8px 0", verticalAlign: "top" }}>
+                  {tsEditing ? <textarea value={tsDraft[key] ?? ""} onChange={(e) => setTsDraft((d) => ({ ...d, [key]: e.target.value }))} rows={key === "title" ? 1 : 2} className="w-full resize-y bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent" style={{ fontSize: 12.5, padding: "5px 9px" }} />
+                    : <span className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.55 }}>{effTs(s, key)}</span>}
+                </td></tr>
+            ))}
+          </tbody></table>
+          {s.evidence.length > 0 && <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginTop: 8 }}>근거: {s.evidence.map((e) => (e.line === null ? e.file : `${e.file}:${e.line}`)).join(", ")}</div>}
+          {s.notes.length > 0 && <div style={{ marginTop: 8 }}>{s.notes.map((n, i) => <div key={i} style={{ fontSize: 11.5, color: WARN }}>⚠ {n}</div>)}</div>}
+        </div>
+      </div>
+    );
+  }
+
+  // ── 뷰④ 현황 ──
   function StatusView() {
     if (!model) return null;
     if (!cov) return <div className="text-text-muted" style={{ fontSize: 13 }}>커버리지 데이터가 없습니다(rtm.json v2 재생성 필요).</div>;
@@ -997,7 +1213,23 @@ export default function RtmView() {
                     {!editing && cell && cell.evidence.length > 0 && <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, marginTop: 3 }}>근거: {cell.evidence.map((e) => (e.line === null ? e.file : `${e.file}:${e.line}`)).join(", ")}</div>}
                   </td></tr>;
               })}
+              {/* R7: 사용자 정의 필드 값 — 편집·확정 경로는 기존 셀과 동일(custom:* 키). */}
+              {effFields.map((cf) => (
+                <tr key={cf.id}><td style={{ padding: "9px 12px 9px 0", color: NFR, whiteSpace: "nowrap", verticalAlign: "top", width: 88, fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase" }}>{cf.label}</td>
+                  <td style={{ padding: "9px 0", verticalAlign: "top" }}>
+                    {editing ? <input value={draft[cf.id] ?? ""} onChange={(e) => setDraft((d) => ({ ...d, [cf.id]: e.target.value }))} className="w-full bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent" style={{ fontSize: 12.5, padding: "5px 9px" }} />
+                      : <span className="text-text-secondary" style={{ fontSize: 12.5 }}>{effCustom(f, cf.id) || <span style={{ color: FAINT }}>—</span>}</span>}
+                  </td></tr>
+              ))}
             </tbody></table>
+            {/* W5: 이 기능의 시험 시나리오 요약 — 시험 탭으로 연결. */}
+            {scenarios.some((s) => s.fnId === f.id) && (
+              <button type="button" onClick={() => { setView("scenario"); setSelFn(null); setSelTs(null); }} className="flex items-center gap-2 rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent transition-colors" style={{ marginTop: 12, padding: "6px 12px", fontSize: 11.5 }}>
+                🧪 시험 시나리오 {scenarios.filter((s) => s.fnId === f.id).length}건
+                <span className="text-text-muted">(확정 {scenarios.filter((s) => s.fnId === f.id && tsConfirmed(s)).length})</span>
+                <span className="text-text-muted">— 시험 탭에서 검토 ›</span>
+              </button>
+            )}
           </div>
           <div style={{ padding: "18px 24px", overflow: "auto" }}>
             <div style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: 12 }}>📋 업무 규칙 — 이 기능이 충족할 조건</div>

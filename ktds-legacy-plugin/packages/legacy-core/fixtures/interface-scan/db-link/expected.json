@@ -1,0 +1,95 @@
+{
+  "description": "검수된 오라클(사람 확인 완료) — items/stats 골든 등가",
+  "items": [
+    {
+      "id": "IF-DBLINK-001",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink(DDL)",
+      "endpoint": {
+        "raw": "ERP_LINK",
+        "resolved": "ERP_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/database/link.sql",
+          "line": 2,
+          "symbol": "ERP_LINK"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-002",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "ITEMS@ERP_LINK",
+        "resolved": "ITEMS@ERP_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/database/link.sql",
+          "line": 4,
+          "symbol": "ERP_LINK"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-003",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "ORDERS@ERP_LINK",
+        "resolved": "ORDERS@ERP_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/mapper/OrderMapper.xml",
+          "line": 6,
+          "symbol": "ERP_LINK"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-004",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "CUST@CRM_LINK",
+        "resolved": "CUST@CRM_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/mapper/OrderMapper.xml",
+          "line": 9,
+          "symbol": "CRM_LINK"
+        }
+      ],
+      "unresolved": false
+    }
+  ],
+  "stats": {
+    "total": 4,
+    "unresolvedEndpoints": 0,
+    "byProtocol": [
+      {
+        "protocol": "db-link",
+        "count": 4
+      }
+    ]
+  }
+}

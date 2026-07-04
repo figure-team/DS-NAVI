@@ -86,16 +86,29 @@ switch (sub) {
 
 async function runScan() {
   const { scanDomainMap } = engine
-  const { census, routes, edges, slices, candidates, dbSchema } = await scanDomainMap(projectRoot)
+  const { census, routes, edges, slices, candidates, dbSchema, interfaces } = await scanDomainMap(projectRoot)
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
   console.log(`  routes: 라우트 ${routes.routes.length}개 / 배치 ${routes.batchEntries.length}개`)
   console.log(`  edges: 엣지 ${edges.edges.length}개 / 미해소 ${edges.unresolved.length}개`)
   console.log(`  slices: 슬라이스 ${slices.slices.length}개`)
   console.log(`  candidates: 도메인 후보 ${candidates.candidates.length}개`)
+  reportInterfaces(interfaces)
   reportDbSchema(dbSchema)
-  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema}.json (동일 commit 재실행 byte-diff=0)')
+  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces}.json (동일 commit 재실행 byte-diff=0)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
+}
+
+/** W1 대외 인터페이스 스캔 결과 보고 — 0건도 "스캔했고 없음"으로 명시(침묵 누락 금지). */
+function reportInterfaces(interfaces) {
+  if (!interfaces) return
+  const { total, unresolvedEndpoints, byProtocol } = interfaces.stats
+  if (total === 0) {
+    console.log('  인터페이스: 0건 (송신/라우트 외 수신 신호 없음 — 스캔 수행됨)')
+    return
+  }
+  const proto = byProtocol.map((p) => `${p.protocol} ${p.count}`).join(', ')
+  console.log(`  인터페이스: ${total}건 (${proto})${unresolvedEndpoints > 0 ? ` — endpoint 미해석 ${unresolvedEndpoints}건 [미확인]` : ''}`)
 }
 
 /** db-schema tier + 라이브 DB 신호(정적 탐지) 보고 + .sql 덤프 권장 게이트(PA-gate). */

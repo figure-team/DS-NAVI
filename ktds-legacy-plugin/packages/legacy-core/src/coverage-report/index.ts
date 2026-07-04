@@ -17,6 +17,7 @@ import type {
 } from '../domain-map/types.js'
 import { buildLayerSignals, deriveStepLayer } from '../domain-map/step-layer.js'
 import type { JpaModel } from '../jpa/types.js'
+import type { InterfaceReport } from '../interface-scan/types.js'
 
 function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
@@ -64,6 +65,19 @@ export const CoverageReportSchema = z.object({
     repositories: z.number().int().nonnegative(),
     tierCQueries: z.number().int().nonnegative(),
   }),
+  /**
+   * W1 대외 인터페이스 — 총계/미해석(endpoint [미확인])/프로토콜별.
+   * optional: W1 이전 coverage.json 과의 하위호환(구 파일 zod parse 실패 방지).
+   */
+  interfaces: z
+    .object({
+      total: z.number().int().nonnegative(),
+      unresolvedEndpoints: z.number().int().nonnegative(),
+      byProtocol: z.array(
+        z.object({ protocol: z.string(), count: z.number().int().nonnegative() }),
+      ),
+    })
+    .optional(),
 })
 export type CoverageReport = z.infer<typeof CoverageReportSchema>
 
@@ -74,6 +88,7 @@ export interface CoverageInputs {
   slices: SlicesReport
   skeleton?: SkeletonReport | null
   jpaModel?: JpaModel | null
+  interfaces?: InterfaceReport | null
 }
 
 /** 스캔 산출물에서 통합 커버리지 리포트를 결정론으로 조립(AC-30). */
@@ -120,6 +135,17 @@ export function buildCoverageReport(inputs: CoverageInputs): CoverageReport {
       ) ?? 0,
   }
 
+  const interfaces = inputs.interfaces
+    ? {
+        total: inputs.interfaces.stats.total,
+        unresolvedEndpoints: inputs.interfaces.stats.unresolvedEndpoints,
+        byProtocol: inputs.interfaces.stats.byProtocol.map((p) => ({
+          protocol: p.protocol as string,
+          count: p.count,
+        })),
+      }
+    : undefined
+
   return CoverageReportSchema.parse({
     schemaVersion: 1,
     gitCommit: census.gitCommit,
@@ -133,6 +159,7 @@ export function buildCoverageReport(inputs: CoverageInputs): CoverageReport {
     },
     droppedSteps,
     jpa,
+    ...(interfaces ? { interfaces } : {}),
   })
 }
 
@@ -149,6 +176,14 @@ export function renderCoverageReport(r: CoverageReport): string {
     `- 엣지 해소율: ${r.edges.rate}% (해소 ${r.edges.resolved} / 미해소 ${r.edges.unresolved})`,
     `- cap 절단 step(침묵 누락 방지): ${r.droppedSteps}개`,
     `- JPA: 엔티티 ${r.jpa.entities} · 리포지토리 ${r.jpa.repositories} · Tier C(native [확인필요]) ${r.jpa.tierCQueries}`,
+    ...(r.interfaces
+      ? [
+          `- 대외 인터페이스: ${r.interfaces.total}건 (미해석 endpoint ${r.interfaces.unresolvedEndpoints}건)` +
+            (r.interfaces.byProtocol.length > 0
+              ? ` — ${r.interfaces.byProtocol.map((p) => `${p.protocol} ${p.count}`).join(', ')}`
+              : ''),
+        ]
+      : []),
     '',
     '> 정직성: 미도달·미해소·cap 절단·비-Java 패스스루·Tier C 는 "분석이 덮지 못한/추정한 영역"으로 그대로 노출됩니다.',
   ]

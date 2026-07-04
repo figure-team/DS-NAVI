@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="demo.OrderMapper">
+  <!-- 주석 속 FROM FAKE@COMMENT_LINK 는 잡히면 안 된다 -->
+  <select id="selectErpOrders" resultType="map">
+    SELECT * FROM ORDERS@ERP_LINK WHERE ORD_DT = #{ordDt}
+  </select>
+  <update id="syncCustomer">
+    UPDATE CUST@CRM_LINK SET SYNC_YN = 'Y' WHERE CUST_ID = #{custId}
+  </update>
+</mapper>

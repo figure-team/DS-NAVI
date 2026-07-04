@@ -30,6 +30,8 @@ import { extractJpaModel } from '../jpa/extract.js'
 import { JPA_MODEL_FILENAME } from '../jpa/types.js'
 import { extractDbSchema, writeDbSchema } from '../db-schema/index.js'
 import type { DbSchemaModel } from '../db-schema/index.js'
+import { extractInterfaces, INTERFACES_FILENAME } from '../interface-scan/index.js'
+import type { InterfaceReport } from '../interface-scan/index.js'
 import { buildCoverageReport } from '../coverage-report/index.js'
 import { computeFileFingerprints } from '../incremental/index.js'
 import { readSkeleton } from './persist.js'
@@ -173,6 +175,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   slices: SlicesReport
   candidates: CandidatesReport
   dbSchema: DbSchemaModel
+  interfaces: InterfaceReport
 }> {
   const census = buildCensus(projectRoot)
   const routes = await extractRoutes(projectRoot, census)
@@ -192,6 +195,9 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   // jpa-model 과 동형(census 파생·scan 시점·.spec/map/ 기록). 소비자(docs/policy)는 로드만.
   const dbSchema = extractDbSchema(projectRoot, census)
   writeDbSchema(projectRoot, dbSchema)
+  // W1: 대외 인터페이스(송신/라우트 외 수신) 스캔 — interfaces.json. 소비자(docs)는 로드만.
+  const interfaces = await extractInterfaces(projectRoot, census)
+  writeMapArtifact(projectRoot, INTERFACES_FILENAME, interfaces)
   // 보완 D-c/D-b: 통합 커버리지 리포트 + 파일 fingerprint 스냅샷(증분 재스캔 기준).
   const coverage = buildCoverageReport({
     census,
@@ -200,10 +206,11 @@ export async function scanDomainMap(projectRoot: string): Promise<{
     slices,
     skeleton: readSkeleton(projectRoot),
     jpaModel,
+    interfaces,
   })
   writeMapArtifact(projectRoot, COVERAGE_FILENAME, coverage)
   writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, computeFileFingerprints(projectRoot, census))
-  return { census, routes, edges, slices, candidates, dbSchema }
+  return { census, routes, edges, slices, candidates, dbSchema, interfaces }
 }
 
 /**

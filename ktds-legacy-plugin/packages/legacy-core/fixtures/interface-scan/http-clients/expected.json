@@ -1,0 +1,155 @@
+{
+  "description": "검수된 오라클(사람 확인 완료) — items/stats 골든 등가",
+  "items": [
+    {
+      "id": "IF-HTTP-001",
+      "direction": "outbound",
+      "protocol": "http",
+      "clientType": "FeignClient",
+      "endpoint": {
+        "raw": "${pay.api.url}",
+        "resolved": "https://pay.example.com",
+        "resolvedFrom": "src/main/resources/application.properties:1"
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/MemberFeign.java",
+          "line": 6,
+          "symbol": "MemberFeign"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-HTTP-002",
+      "direction": "outbound",
+      "protocol": "http",
+      "clientType": "WebClient",
+      "endpoint": {
+        "raw": "https://noti.example.com",
+        "resolved": "https://noti.example.com",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/NotiService.java",
+          "line": 6,
+          "symbol": "NotiService"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-HTTP-003",
+      "direction": "outbound",
+      "protocol": "http",
+      "clientType": "WebClient",
+      "endpoint": {
+        "raw": "/push",
+        "resolved": "/push",
+        "resolvedFrom": null
+      },
+      "dataHint": "POST",
+      "callSites": [
+        {
+          "file": "src/main/java/demo/NotiService.java",
+          "line": 9,
+          "symbol": "NotiService#push"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-HTTP-004",
+      "direction": "outbound",
+      "protocol": "http",
+      "clientType": "ApacheHttpClient",
+      "endpoint": {
+        "raw": "https://legacy.example.com/soap",
+        "resolved": "https://legacy.example.com/soap",
+        "resolvedFrom": null
+      },
+      "dataHint": "POST",
+      "callSites": [
+        {
+          "file": "src/main/java/demo/NotiService.java",
+          "line": 14,
+          "symbol": "NotiService#legacySoap"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-HTTP-005",
+      "direction": "outbound",
+      "protocol": "http",
+      "clientType": "RestTemplate",
+      "endpoint": {
+        "raw": "https://pay.example.com/v1/approve",
+        "resolved": "https://pay.example.com/v1/approve",
+        "resolvedFrom": null
+      },
+      "dataHint": "POST",
+      "callSites": [
+        {
+          "file": "src/main/java/demo/PayClient.java",
+          "line": 12,
+          "symbol": "PayClient#approve"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-HTTP-006",
+      "direction": "outbound",
+      "protocol": "http",
+      "clientType": "RestTemplate",
+      "endpoint": {
+        "raw": null,
+        "resolved": null,
+        "resolvedFrom": null
+      },
+      "dataHint": "POST",
+      "callSites": [
+        {
+          "file": "src/main/java/demo/PayClient.java",
+          "line": 16,
+          "symbol": "PayClient#status"
+        }
+      ],
+      "unresolved": true
+    },
+    {
+      "id": "IF-HTTP-007",
+      "direction": "outbound",
+      "protocol": "http",
+      "clientType": "HttpURLConnection",
+      "endpoint": {
+        "raw": "https://noti.example.com/ping",
+        "resolved": "https://noti.example.com/ping",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/PayClient.java",
+          "line": 21,
+          "symbol": "PayClient#ping"
+        }
+      ],
+      "unresolved": false
+    }
+  ],
+  "stats": {
+    "total": 7,
+    "unresolvedEndpoints": 1,
+    "byProtocol": [
+      {
+        "protocol": "http",
+        "count": 7
+      }
+    ]
+  }
+}

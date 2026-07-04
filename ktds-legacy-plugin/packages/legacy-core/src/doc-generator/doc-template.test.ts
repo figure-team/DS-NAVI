@@ -21,6 +21,7 @@ describe('parseDocTemplate — 동봉 템플릿 9종', () => {
     { file: 'feature-spec.md', docId: 'si-기능명세서', methodology: 'si-standard', keys: ['feature-list'] },
     { file: 'interface-spec.md', docId: 'si-인터페이스정의서', methodology: 'si-standard', keys: ['api-list', 'outbound-list'] },
     { file: 'table-spec.md', docId: 'si-테이블정의서', methodology: 'si-standard', keys: ['table-list'] },
+    { file: 'batch-spec.md', docId: 'si-배치정의서', methodology: 'si-standard', keys: ['batch-list-si'] },
     { file: 'program-list.md', docId: '06_program-list', methodology: 'as-built', keys: ['program-list'] },
     { file: 'crud-matrix.md', docId: '07_crud-matrix', methodology: 'as-built', keys: ['crud-matrix'] },
     { file: 'batch-list.md', docId: '08_batch-list', methodology: 'as-built', keys: ['batch-list'] },

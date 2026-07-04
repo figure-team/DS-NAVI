@@ -389,8 +389,21 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
             filePath: 'src/web/OrderController.java',
             type: 'api',
             layer: 'api',
+            domain: 'order',
+            domainVia: 'reachability',
             loc: 42,
             notes: ['route:GET /api/orders'],
+          },
+          {
+            id: 'PGM-COM-bbbb2222',
+            name: 'Order',
+            filePath: 'src/domain/Order.java',
+            type: 'common',
+            layer: 'unknown',
+            domain: 'order',
+            domainVia: 'directory',
+            loc: 30,
+            notes: [],
           },
         ],
         fp: {
@@ -402,38 +415,56 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
               path: '/api/orders',
               evidence: { file: 'src/web/OrderController.java', line: 16 },
             },
+            {
+              kind: 'UNCLASSIFIED',
+              routeId: 'route:ANY /legacy',
+              method: 'ANY',
+              path: '/legacy',
+              evidence: { file: 'src/web/LegacyAction.java', line: 8 },
+            },
           ],
           dataFunctions: [
             { kind: 'ILF', name: 'ORDERS', evidence: { file: 'db/schema.sql', line: 1 } },
             { kind: 'EIF', name: 'ERP_LINK', evidence: { file: 'mapper/OrderMapper.xml', line: 5 } },
           ],
-          summary: { ei: 0, eo: 0, eq: 1, ilf: 1, eif: 1, unadjustedFp: 16.8 },
+          summary: { ei: 0, eo: 0, eq: 1, unclassified: 1, ilf: 1, eif: 1, unadjustedFp: 16.8 },
         },
-        stats: { total: 1, byType: [{ type: 'api', count: 1 }] },
+        stats: {
+          total: 2,
+          byType: [{ type: 'api', count: 1 }, { type: 'common', count: 1 }],
+          excluded: { configXml: 3, otherLang: [{ lang: 'sql', count: 1 }], unreadable: 0 },
+        },
       },
     }
     const doc = getMethodology('si-standard')
       .buildDocSet(withInv)
       .find((d) => d.docId === 'si-프로그램목록')!
     const pgm = tableOf(doc.sections[0])
-    expect(pgm.columns).toEqual(['PGM_ID', '프로그램명', '업무명', '유형', '계층', 'LOC'])
+    expect(pgm.columns).toEqual(['PGM_ID', '프로그램명', '업무명', '소속도메인', '유형', '계층', 'LOC'])
     expect(pgm.rows[0].cells).toEqual([
       'PGM-API-aaaa1111',
       'OrderController',
       '[미확인]', // 업무명 — 사람 채움
+      'order', // reachability 신호 — 마킹 없음
       'API',
       'api',
       '42',
     ])
+    // 디렉토리 폴백 도메인은 [추정] 마킹.
+    expect(pgm.rows[1].cells[3]).toBe('order [추정]')
     const fp = tableOf(doc.sections[1])
     expect(fp.columns).toEqual(['구분', '대상', '상세'])
     expect(fp.rows[0].cells).toEqual(['EQ [추정]', 'route:GET /api/orders', 'GET /api/orders'])
-    expect(fp.rows[1].cells).toEqual(['ILF [추정]', 'ORDERS', '자체 테이블'])
-    expect(fp.rows[2].cells).toEqual(['EIF [추정]', 'ERP_LINK', 'DB링크 참조'])
-    // 집계 행 — INFERRED(간이법 잠정치).
+    // method 미상 라우트는 '미분류'로 표면화(EI 뭉개기 금지).
+    expect(fp.rows[1].cells[0]).toBe('미분류(method 미상) [추정]')
+    expect(fp.rows[2].cells).toEqual(['ILF [추정]', 'ORDERS', '자체 테이블'])
+    expect(fp.rows[3].cells).toEqual(['EIF [추정]', 'ERP_LINK', 'DB링크 참조'])
+    // 집계 행 — INFERRED, 하한(≥) 표기 + 미분류 수가 셀 안에 따라간다(정밀 착시 방지).
     const last = fp.rows[fp.rows.length - 1]
     expect(last.cells[0]).toBe('집계 [추정]')
-    expect(last.cells[2]).toContain('16.8')
+    expect(last.cells[1]).toContain('미분류 1')
+    expect(last.cells[2]).toContain('≥ 16.8')
+    expect(last.cells[2]).toContain('상향')
     expect(last.confidence).toBe('INFERRED')
     // 미제공 → 두 섹션 모두 0행(합성 금지).
     const empty = byId.get('si-프로그램목록')!

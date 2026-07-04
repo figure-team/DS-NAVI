@@ -195,7 +195,7 @@ function outboundRows(input: DocInput): TableRow[] {
 }
 
 /** si-프로그램목록 §1 열 — template program-list-si 와 1:1. */
-const PGM_COLUMNS = ['PGM_ID', '프로그램명', '업무명', '유형', '계층', 'LOC']
+const PGM_COLUMNS = ['PGM_ID', '프로그램명', '업무명', '소속도메인', '유형', '계층', 'LOC']
 /** si-프로그램목록 §2 열 — template fp-basis 와 1:1. */
 const FP_COLUMNS = ['구분', '대상', '상세']
 
@@ -220,23 +220,40 @@ const PGM_TYPE_KO: Record<string, string> = {
  */
 function buildSiProgramList(input: DocInput): GeneratedDoc {
   const inv = input.programInventory
-  const pgmRows: TableRow[] = (inv?.programs ?? []).map((p): TableRow => ({
-    cells: [
-      p.id,
-      p.name,
-      UNRESOLVED_CELL,
-      PGM_TYPE_KO[p.type] ?? p.type,
-      p.layer,
-      String(p.loc),
-    ],
-    confidence: 'CONFIRMED',
-    evidence: [{ file: p.filePath, line: 1 }],
-  }))
+  const pgmRows: TableRow[] = (inv?.programs ?? []).map((p): TableRow => {
+    // 소속도메인 — candidates 조인. reachability=확정 신호, directory/prefix=[추정],
+    // common/ambiguous 는 그 사실 자체를 표기(도메인 확정은 사람 몫).
+    const domainCell =
+      p.domain === null
+        ? UNRESOLVED_CELL
+        : p.domainVia === 'reachability'
+          ? p.domain
+          : p.domainVia === 'common'
+            ? `공용(${p.domain})`
+            : p.domainVia === 'ambiguous'
+              ? `모호(${p.domain}) ${INFERRED_CELL}`
+              : `${p.domain} ${INFERRED_CELL}`
+    return {
+      cells: [
+        p.id,
+        p.name,
+        UNRESOLVED_CELL,
+        domainCell,
+        PGM_TYPE_KO[p.type] ?? p.type,
+        p.layer,
+        String(p.loc),
+      ],
+      confidence: 'CONFIRMED',
+      evidence: [{ file: p.filePath, line: 1 }],
+    }
+  })
 
   const fpRows: TableRow[] = []
   for (const t of inv?.fp.transactions ?? []) {
+    const kindCell =
+      t.kind === 'UNCLASSIFIED' ? `미분류(method 미상) ${INFERRED_CELL}` : `${t.kind} ${INFERRED_CELL}`
     fpRows.push({
-      cells: [`${t.kind} ${INFERRED_CELL}`, t.routeId, `${t.method} ${t.path}`],
+      cells: [kindCell, t.routeId, `${t.method} ${t.path}`],
       confidence: 'CONFIRMED',
       evidence: [{ file: t.evidence.file, line: t.evidence.line }],
     })
@@ -250,11 +267,12 @@ function buildSiProgramList(input: DocInput): GeneratedDoc {
   }
   if (inv) {
     const s = inv.fp.summary
+    // 하한 표기 — 숫자만 복사돼도 "미반영분 존재"가 따라가게 셀 안에 명시(정밀 착시 방지).
     fpRows.push({
       cells: [
         `집계 ${INFERRED_CELL}`,
-        `EI ${s.ei} · EO ${s.eo} · EQ ${s.eq} · ILF ${s.ilf} · EIF ${s.eif}`,
-        `잠정 FP(미조정) = ${s.unadjustedFp}`,
+        `EI ${s.ei} · EQ ${s.eq} · 미분류 ${s.unclassified} · EO 미산출 · ILF ${s.ilf} · EIF ${s.eif}`,
+        `잠정 FP ≥ ${s.unadjustedFp} (미조정 하한 — 미분류 ${s.unclassified}건·EO 재분류 시 상향)`,
       ],
       confidence: 'INFERRED',
       evidence: [],

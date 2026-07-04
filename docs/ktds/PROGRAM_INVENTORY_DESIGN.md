@@ -55,7 +55,7 @@
                         "evidence": { "file": "…", "line": 12 } }],
     "dataFunctions": [{ "kind": "ILF", "name": "ORDERS", "evidence": { "file": "…", "line": 3 } },
                       { "kind": "EIF", "name": "ERP_LINK", "evidence": { "file": "…", "line": 6 } }],
-    "summary": { "ei": 14, "eo": 0, "eq": 8, "ilf": 13, "eif": 1, "unadjustedFp": 158.2 }
+    "summary": { "ei": 14, "eo": 0, "eq": 8, "unclassified": 0, "ilf": 13, "eif": 1, "unadjustedFp": 190.1 }
   },
   "stats": { "total": 45, "byType": [{ "type": "screen", "count": 20 }] }
 }
@@ -93,10 +93,44 @@
 
 ## 8. 진행 현황
 
-| 단계 | 상태 | 커밋 |
-|---|---|---|
-| 설계 | ✅ | |
-| P3-a | ⬜ | |
-| P3-b | ⬜ | |
-| P3-c | ⬜ | |
-| P3-d | ⬜ | |
+| 단계 | 상태 | 커밋 | 비고 |
+|---|---|---|---|
+| 설계 | ✅ | | |
+| P3-a~c | ✅ | fd3940e, 7b35a83 | 수용 기준 통과(화면 22·ILF 13), 814 green |
+| P3-d | ✅ | (본 커밋) | 적대적 리뷰 2종 반영 — §10 |
+
+## 9. 실측 결과 (2026-07-04, 리뷰 반영 후)
+
+- **jpetstore**: 프로그램 74본(도메인 조인 63/74), 화면 라우트 22 ✓, ILF 13 ✓,
+  **미분류 트랜잭션 22건(전 라우트 ANY)·EI 0 → 잠정 FP 하한 97.5** — ANY 를 EI 로
+  뭉개던 초기 산출(185.5)의 체계적 왜곡이 제거된 정직한 하한.
+- excluded 표면화: configXml 8, 기타 언어(gif/png/css 등) 64건 — total=74 의 "전수" 오독 차단.
+- 전 파이프라인 byte-diff=0.
+
+## 10. 적대적 리뷰 반영 (2026-07-04)
+
+### 설계 비평(critic) — 6건 전부 처리
+1. [치명] *ANY→EI 뭉개기로 FP가 라우트×4+테이블×7.5*(EO·EQ·EIF 구조적 0) →
+   **UNCLASSIFIED 버킷** 신설(합산 제외·문서 '미분류' 표기), 집계에 미분류 수 노출.
+2. [높음] *단일 스칼라 정밀 착시* → 집계 셀을 **"잠정 FP ≥ N (미조정 하한 — 재분류 시 상향)"**
+   으로 — 숫자만 복사돼도 경고가 따라감.
+3. [높음] *candidates.json 도메인 조인 누락* → `programs[].domain/domainVia` +
+   문서 '소속도메인' 열(reachability=무마킹, directory/prefix/모호=[추정], 공용 표기).
+   candidate roots 도 조인(root 파일이 files[] 에 없는 갭 발견·수정).
+4. [중] *common 38% 매몰* → 도메인 조인으로 절반 완화 + 범례에 "계층 신호 없음
+   (미분류 아님)" 명시. domain/util 유형 세분은 백로그.
+5. [중] *suspect/제외 표면화 부재* → `stats.excluded{configXml, otherLang[], unreadable}`.
+6. [낮음] *라우트≠기본 프로세스* → 범례 명시.
+
+### 코드 리뷰(reviewer) — CRITICAL/HIGH 0건
+- M1(LOC +1 과대·오라클 라벨 부정직): 선수정 7b35a83 에서 해소 확인.
+- M2(ANY/OPTIONS→EI)·M3(제외 침묵): 위 비평 1·5와 동일 — 반영 확인.
+- L1(이중 컨트롤러 api routeId 유실) → notes 에 api routeId 보존.
+- L2(EIF dedupe 대소문자) → 대문자 정규화.
+- L4(id 유형태그의 재분류 시 변경) → 트레이드오프 주석 명시(육안 카테고리 스캔 우선).
+- L3(web.xml=screen 의미론)·L5(집계행 P4 xlsx 특수처리) → 백로그.
+- 설계문서 예시 산술 오류(158.2→190.1) 정정.
+
+### 백로그
+- common 세분(domain/util/config), git 작성자·최종변경일 열(P7 실적요약 계열과 묶음),
+  web.xml 프로그램 의미론, P4 xlsx 집계행 특수처리, EO 재분류 보조(리포트성 화면 힌트).

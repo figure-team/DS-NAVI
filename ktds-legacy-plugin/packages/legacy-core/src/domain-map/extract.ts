@@ -245,6 +245,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
     census,
     routes,
     edges,
+    candidates,
     jpaModel,
     dbSchema,
     interfaces,

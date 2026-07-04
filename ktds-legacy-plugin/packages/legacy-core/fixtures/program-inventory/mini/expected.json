@@ -8,6 +8,8 @@
       "type": "api",
       "layer": "api",
       "loc": 25,
+      "domain": "order",
+      "domainVia": "reachability",
       "notes": [
         "route:GET /api/orders",
         "route:POST /api/orders"
@@ -20,6 +22,8 @@
       "type": "batch",
       "layer": "api",
       "loc": 8,
+      "domain": "nightly",
+      "domainVia": "reachability",
       "notes": [
         "BAT-SCHED-63bff20b"
       ]
@@ -31,6 +35,8 @@
       "type": "dao",
       "layer": "dao",
       "loc": 11,
+      "domain": "order",
+      "domainVia": "reachability",
       "notes": []
     },
     {
@@ -40,6 +46,8 @@
       "type": "mapper-xml",
       "layer": "db",
       "loc": 7,
+      "domain": "order",
+      "domainVia": "prefix",
       "notes": []
     },
     {
@@ -49,6 +57,8 @@
       "type": "screen",
       "layer": "api",
       "loc": 6,
+      "domain": "order",
+      "domainVia": "reachability",
       "notes": [
         "route:GET /order/list.jsp"
       ]
@@ -60,6 +70,8 @@
       "type": "service",
       "layer": "service",
       "loc": 15,
+      "domain": "order",
+      "domainVia": "reachability",
       "notes": []
     }
   ],
@@ -126,6 +138,7 @@
       "ei": 1,
       "eo": 0,
       "eq": 2,
+      "unclassified": 0,
       "ilf": 2,
       "eif": 1,
       "unadjustedFp": 32.2
@@ -158,6 +171,20 @@
         "type": "service",
         "count": 1
       }
-    ]
+    ],
+    "excluded": {
+      "configXml": 0,
+      "otherLang": [
+        {
+          "lang": "json",
+          "count": 1
+        },
+        {
+          "lang": "sql",
+          "count": 1
+        }
+      ],
+      "unreadable": 0
+    }
   }
 }

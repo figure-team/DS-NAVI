@@ -11,6 +11,8 @@ import { dirname, join } from 'node:path'
 import { buildCensus } from '../domain-map/census.js'
 import { extractRoutes } from '../domain-map/extract.js'
 import { extractEdges } from '../domain-map/edges.js'
+import { buildSlices } from '../domain-map/slices.js'
+import { buildCandidates } from '../domain-map/classify.js'
 import { stableJson } from '../domain-map/persist.js'
 import { extractJpaModel } from '../jpa/extract.js'
 import { extractDbSchema } from '../db-schema/index.js'
@@ -26,10 +28,12 @@ async function scan(root: string): Promise<ProgramInventory> {
   const census = buildCensus(root)
   const routes = await extractRoutes(root, census)
   const edges = await extractEdges(root, census)
+  const slices = buildSlices(census, routes, edges)
   return buildProgramInventory(root, {
     census,
     routes,
     edges,
+    candidates: buildCandidates(census, routes, slices),
     jpaModel: await extractJpaModel(root, census),
     dbSchema: extractDbSchema(root, census),
     interfaces: await extractInterfaces(root, census),
@@ -46,10 +50,10 @@ describe('program inventory — golden equivalence + 수용 기준', () => {
     expect(inv.stats).toEqual(oracle.stats)
   })
 
-  it('mini: FP 집계 — 간이법 가중치 검산(EI1·EQ2·ILF2·EIF1 = 32.2)', async () => {
+  it('mini: FP 집계 — 간이법 가중치 검산(EI1·EQ2·ILF2·EIF1 = 32.2, 미분류 0)', async () => {
     const inv = await scan(join(fixturesRoot, 'mini'))
     const s = inv.fp.summary
-    expect([s.ei, s.eo, s.eq, s.ilf, s.eif]).toEqual([1, 0, 2, 2, 1])
+    expect([s.ei, s.eo, s.eq, s.unclassified, s.ilf, s.eif]).toEqual([1, 0, 2, 0, 2, 1])
     expect(s.unadjustedFp).toBe(1 * 4.0 + 2 * 3.9 + 2 * 7.5 + 1 * 5.4)
   })
 
@@ -80,6 +84,13 @@ describe('program inventory — golden equivalence + 수용 기준', () => {
       expect(inv.fp.summary.ilf).toBe(13)
       // jpetstore 는 dblink 없음 → EIF 0.
       expect(inv.fp.summary.eif).toBe(0)
+      // Stripes/web.xml 라우트는 전부 method ANY — EI 로 뭉개지 않고 미분류 22건으로
+      // 표면화되어야 한다(잠정 FP 는 ILF 13×7.5 = 97.5 하한).
+      expect(inv.fp.summary.unclassified).toBe(22)
+      expect(inv.fp.summary.ei).toBe(0)
+      expect(inv.fp.summary.unadjustedFp).toBe(97.5)
+      // 도메인 조인 — 소속 도메인이 채워진 프로그램이 존재해야 한다(candidates 승계).
+      expect(inv.programs.some((p) => p.domain !== null)).toBe(true)
     },
   )
 })

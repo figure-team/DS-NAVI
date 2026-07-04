@@ -37,7 +37,9 @@ export function extractSpringBatchXmlJobs(rawText: string, filePath: string): Ba
   if (!rawText.includes('springframework.org/schema/batch')) return []
   const text = stripXmlComments(rawText)
   const out: BatchEntry[] = []
-  const jobRe = /<(?:batch:)?job\b[^>]*>/g
+  // 태그명이 정확히 job 일 때만 — `\b` 는 job-repository/job-listener 의 '-' 앞에서도
+  // 매칭되므로(오탐 실증) 공백·닫힘만 허용하는 lookahead 로 제한한다.
+  const jobRe = /<(?:batch:)?job(?=[\s>/])[^>]*>/g
   let jm: RegExpExecArray | null
   while ((jm = jobRe.exec(text)) !== null) {
     const tag = jm[0]

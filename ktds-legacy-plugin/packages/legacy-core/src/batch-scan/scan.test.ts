@@ -13,6 +13,10 @@ import { extractRoutes } from '../domain-map/extract.js'
 import { extractEdges } from '../domain-map/edges.js'
 import { buildSlices } from '../domain-map/slices.js'
 import { stableJson } from '../domain-map/persist.js'
+import { extractXmlBatchEntries } from '../domain-map/routes/batch.js'
+import { collectBeans, type BeanIndex } from './bean-index.js'
+import { resolveBatchHandlers } from './resolve.js'
+import { extractSpringBatchXmlJobs } from './extract.js'
 import { buildBatchJobs, type BatchJobsReport } from './report.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -119,6 +123,65 @@ describe('batch scan — golden equivalence', () => {
     expect(stableJson(a.report)).toBe(stableJson(b.report))
     for (const j of a.report.jobs) expect(j.id).toMatch(/^BAT-[A-Z]+-[0-9a-f]{8}$/)
     expect(new Set(a.report.jobs.map((j) => j.id)).size).toBe(a.report.jobs.length)
+  })
+
+  // ── 적대적 코드리뷰 회귀 프로브(인라인 XML) ─────────────────────────────
+
+  it('리뷰1: <job-repository>/<job-listener> 태그는 spring-batch 잡으로 오탐하지 않음', () => {
+    const xml = `<beans xmlns:batch="http://www.springframework.org/schema/batch">
+<batch:job-repository id="jobRepo" />
+<job-repository id="jobRepo2" xmlns="http://www.springframework.org/schema/batch"/>
+<batch:job id="realJob"><batch:step id="s"><batch:tasklet ref="t"/></batch:step></batch:job>
+</beans>`
+    expect(extractSpringBatchXmlJobs(xml, 'a.xml').map((e) => e.entryId)).toEqual([
+      'batch:a.xml#realJob',
+    ])
+  })
+
+  it('리뷰2: 중첩 빈 — 외부 속성 보존 + 중첩 속성 오귀속 차단(틀린 확정값 방지)', () => {
+    const xml = `<beans>
+<bean id="outerDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+  <property name="jobDataAsMap">
+    <bean class="demo.Whatever"><property name="jobClass" value="demo.WrongJob"/></bean>
+  </property>
+  <property name="jobClass" value="demo.RightJob"/>
+</bean>
+</beans>`
+    const idx: BeanIndex = new Map()
+    collectBeans(xml, 'b.xml', idx)
+    // 첫 </bean> 근사였다면 jobClass=WrongJob(오귀속) + RightJob 유실이었다.
+    expect(idx.get('outerDetail')!.properties.get('jobClass')).toEqual({
+      value: 'demo.RightJob',
+      ref: null,
+    })
+  })
+
+  it('리뷰3: 인라인 jobDetail 관용구 — 중첩 MethodInvoking 의 targetObject#method 해석 + cron 보존', () => {
+    const xml = `<beans>
+<bean id="syncJob" class="demo.SyncJob"/>
+<bean id="trig" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+  <property name="jobDetail">
+    <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+      <property name="targetObject" ref="syncJob"/><property name="targetMethod" value="run"/>
+    </bean>
+  </property>
+  <property name="cronExpression" value="0 0 1 * * ?"/>
+</bean>
+</beans>`
+    const entries = extractXmlBatchEntries(xml, 'c.xml')
+    const idx: BeanIndex = new Map()
+    collectBeans(xml, 'c.xml', idx)
+    const census = {
+      schemaVersion: 1 as const,
+      gitCommit: null,
+      fileCount: 1,
+      files: [{ relPath: 'src/demo/SyncJob.java', lang: 'java' }],
+    }
+    const resolved = resolveBatchHandlers(entries, idx, census)
+    expect(resolved.map((e) => [e.handler, e.schedule, e.handlerFile])).toEqual([
+      // 첫 </bean> 근사였다면 handler=null·schedule=null(cron 유실)이었다.
+      ['syncJob#run', 'cron=0 0 1 * * ?', 'src/demo/SyncJob.java'],
+    ])
   })
 
   it('sliceRoot: slices.json 의 slice.root 와 조인 가능(P3 입력 계약)', async () => {

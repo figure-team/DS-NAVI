@@ -41,6 +41,45 @@ function attrValue(tag: string, name: string): string | null {
   return m ? m[1] : null
 }
 
+/**
+ * 여는 태그 위치에서 깊이 추적으로 "그 빈 자신의" 본문 범위를 구한다.
+ * 첫 `</bean>` 근사는 중첩 빈에서 ①외부 property 유실 ②중첩 빈 property 가 외부에
+ * 오귀속되는 "틀린 값" 경로를 만든다(실증) — 깊이 카운트로 정확한 닫힘을 찾는다.
+ */
+export function beanBodyRange(text: string, openEnd: number): { end: number } {
+  const tokenRe = /<bean\b[^>]*>|<\/bean>/g
+  tokenRe.lastIndex = openEnd
+  let depth = 1
+  let tm: RegExpExecArray | null
+  while ((tm = tokenRe.exec(text)) !== null) {
+    if (tm[0] === '</bean>') {
+      depth--
+      if (depth === 0) return { end: tm.index }
+    } else if (!tm[0].endsWith('/>')) {
+      depth++
+    }
+  }
+  return { end: text.length }
+}
+
+/** 본문에서 중첩 빈 구간을 공백으로 지운다(속성 오귀속 방지, 오프셋 보존). */
+export function blankNestedBeans(body: string): string {
+  let result = body
+  const openRe = /<bean\b[^>]*>/g
+  let om: RegExpExecArray | null
+  while ((om = openRe.exec(result)) !== null) {
+    const open = om[0]
+    const start = om.index
+    const end = open.endsWith('/>')
+      ? start + open.length
+      : beanBodyRange(result, start + open.length).end + '</bean>'.length
+    const span = result.slice(start, Math.min(end, result.length))
+    result = result.slice(0, start) + span.replace(/[^\n]/g, ' ') + result.slice(start + span.length)
+    openRe.lastIndex = start + span.length
+  }
+  return result
+}
+
 /** 단일 XML 텍스트에서 빈 정의를 수집해 인덱스에 누적한다(첫 출현 승리). */
 export function collectBeans(rawText: string, relPath: string, out: BeanIndex): void {
   const text = stripXmlComments(rawText)
@@ -52,8 +91,9 @@ export function collectBeans(rawText: string, relPath: string, out: BeanIndex): 
     if (!id) continue
     if (out.has(id)) continue
     const bodyStart = bm.index + tag.length
-    const closeIdx = tag.endsWith('/>') ? bodyStart : text.indexOf('</bean>', bodyStart)
-    const body = tag.endsWith('/>') ? '' : closeIdx >= 0 ? text.slice(bodyStart, closeIdx) : text.slice(bodyStart)
+    const rawBody = tag.endsWith('/>') ? '' : text.slice(bodyStart, beanBodyRange(text, bodyStart).end)
+    // 중첩 빈 내부 property 는 이 빈의 것이 아니다 — 지우고 스캔(틀린 확정값 방지).
+    const body = blankNestedBeans(rawBody)
     const properties = new Map<string, { value: string | null; ref: string | null }>()
     const propRe = /<property\b[^>]*\bname\s*=\s*"([^"]*)"[^>]*\/?>/g
     let pm: RegExpExecArray | null

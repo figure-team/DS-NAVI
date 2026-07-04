@@ -152,7 +152,26 @@ injection 엣지 생성을 실증했고, quartz-xml 픽스처의 OrderSyncJob→
 - 별도 repo 배치 스크립트(운영 형상) 인입 경로, 배치 체인(선행관계) 자동 추론, Class.forName.
 - "핸들러 해소로 un-orphan 된 잡 클래스 수" 델타 지표.
 
-### 코드 리뷰(reviewer) 처리 → 하단 추가 예정
+### 적대적 코드 리뷰 처리 (인라인 수행 — 세션 한도로 외부 리뷰어 중단, 동일 체크리스트로
+### 본 세션이 프로브 공격 실행)
+
+**발견·수정 3건(전부 프로브 실증 후 수정, 회귀 프로브 3건으로 고정)**
+1. [HIGH] `<batch:job-repository>`/`<job-repository>` 가 spring-batch 잡으로 오탐 —
+   `\b` 가 `-` 앞에서 매칭. → 태그명 정확 일치 lookahead(`(?=[\s>/])`)로 수정.
+2. [HIGH] 중첩 빈 property 오귀속 — 빈 본문을 "첫 `</bean>`"으로 근사해 ①중첩 빈의
+   jobClass 가 외부 빈에 귀속(**틀린 handlerFile**), ②외부 자신의 후속 property 유실.
+   → 깊이 추적 본문(beanBodyRange) + 중첩 빈 블랭킹(blankNestedBeans)으로 수정.
+3. [MED] 인라인 jobDetail 관용구(`<property name="jobDetail"><bean class="…MethodInvoking…">`)
+   에서 cronExpression 유실 + 핸들러 미해석 — batch.ts 도 동일 첫-`</bean>` 근사였음.
+   → 깊이 추적 본문 적용 + 중첩 MethodInvoking 의 `targetObject#targetMethod` 해석
+   (해석 체인: `syncJob#run` → 빈 class → 파일). 스프링+Quartz 고전 관용구 recall 확보.
+
+**이상 없음 확인**: 기존 라우트/배치 골든 등가 무회귀(805 green), shell `\bjava\b`(javadoc
+비매칭)·crontab 파일 선별·트리거 enum 하위호환(신규 필드는 optional, 구 파일 파싱 무해),
+jpetstore 전 파이프라인 byte-diff=0.
+
+**백로그(코드 리뷰 계열)**: SimpleTriggerFactoryBean, 중첩 JobDetailFactoryBean(jobClass)
+인라인 관용구, spring-batch flow/split 스텝, 구조 의심신호의 주석 내 org.quartz 위양성.
 
 ## 9. P2-d 실측 결과 (2026-07-04)
 

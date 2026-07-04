@@ -31,6 +31,10 @@ export {
   RtmFunctionOverrideSchema,
   RtmTestOverrideSchema,
   RtmRequirementOverrideSchema,
+  TestScenarioKindSchema,
+  RtmTestScenarioSchema,
+  RtmScenarioOverrideSchema,
+  RtmCustomFieldSchema,
   RtmModelSchema,
 } from './types.js'
 export type {
@@ -60,9 +64,14 @@ export type {
   RtmFunctionOverride,
   RtmTestOverride,
   RtmRequirementOverride,
+  TestScenarioKind,
+  RtmTestScenario,
+  RtmScenarioOverride,
+  RtmCustomField,
   RtmModel,
 } from './types.js'
 export { buildRtm } from './build-rtm.js'
+export { buildTestScenarios, attachTestScenarios } from './test-scenarios.js'
 export { applyRequirements } from './apply-requirements.js'
 export { applyOverlay } from './apply-overlay.js'
 export { computeCoverage } from './coverage.js'

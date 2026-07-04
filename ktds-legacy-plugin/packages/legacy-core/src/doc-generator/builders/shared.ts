@@ -16,6 +16,7 @@ import type { InterfaceReport } from '../../interface-scan/types.js'
 import type { BatchJobsReport } from '../../batch-scan/report.js'
 import type { ProgramInventory } from '../../program-inventory/index.js'
 import type { RiskReport } from '../../risk-report/index.js'
+import type { RtmModel } from '../../rtm/types.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -56,6 +57,8 @@ export interface DocInput {
   programInventory?: ProgramInventory | null
   /** 위험 모듈 리포트(W4) — si-위험모듈리포트 grounding. */
   riskReport?: RiskReport | null
+  /** RTM 원장(W5) — si-단위테스트시나리오 grounding(rtm.json 로드, zod 미경유 가능 — 방어적 접근). */
+  rtm?: RtmModel | null
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

@@ -122,6 +122,17 @@ if (existsSync(riskReportPath)) {
   }
 }
 
+// RTM 원장(W5)은 rtm.json 에서 읽는다(없으면 null → si-단위테스트시나리오 0행).
+let rtm = null
+const rtmModelPath = join(projectRoot, '.understand-anything', 'rtm.json')
+if (existsSync(rtmModelPath)) {
+  try {
+    rtm = JSON.parse(readFileSync(rtmModelPath, 'utf8'))
+  } catch {
+    // 손상 시 null(정직 — 시나리오 0행).
+  }
+}
+
 // MyBatis Mapper XML 스캔(Tier B) — 테이블/CRUD grounding. 매퍼 XML 없으면 빈 모델.
 function findMapperXmls(root) {
   const SKIP = new Set(['node_modules', '.git', 'target', 'build', 'dist', '.understand-anything', '.spec', '.idea'])
@@ -226,7 +237,7 @@ const buildDeps = findBuildDeps(projectRoot)
 // PA3: db-spec 가 DDL 의 실제 컬럼/PK/FK/CHECK 를 grounding 으로 싣도록 map(scan) 산출을 로드.
 // 없으면(맵 미실행/code-only) null → db-spec 은 기존 노드 기반 목록만(우아한 degrade).
 const dbSchema = readDbSchema(projectRoot)
-const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, programInventory, riskReport, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
+const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, programInventory, riskReport, rtm, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 

@@ -10,6 +10,29 @@ exports[`determinism: SI golden skeleton + double-run > renderSkeleton golden: s
 "
 `;
 
+exports[`determinism: SI golden skeleton + double-run > renderSkeleton golden: si-단위테스트시나리오 1`] = `
+"## 작성 기준
+
+| 항목 | 내용 | 신뢰도 | 근거 |
+| --- | --- | --- | --- |
+| 정상 | 기능 행의 진입점(라우트)·데이터(테이블×CRUD) 시드로 정상 흐름 1건 생성 | [추정] |  |
+| 예외 | 요구사항 인수조건(AC) 중 exception 유형당 1건(AC 문장 인용, 요구/AC 추적선 보존). 없으면 일반형 1건 + [미확인] | [추정] |  |
+| 경계 | 데이터 시드(0건·최대치) 기준 1건. 데이터 근거 없으면 일반형 + [미확인] | [추정] |  |
+| 지위 | 전부 결정론 템플릿 생성 초안([추정]) — 대시보드 시험 탭에서 편집·확정하면 [확정] 승격(재생성에도 오버레이 유지) | [추정] |  |
+| 수행 기록 | 시나리오는 설계 초안 — 시험 수행 결과는 요구사항 AC 의 시험결과(TestRef)에 기록(확정 후 caseId 연결은 사람 몫) | [추정] |  |
+
+## 시나리오 원장
+
+| 시나리오ID | 기능ID | 기능명 | 요구ID | AC | 구분 | 제목 | Given | When | Then | 상태 | 신뢰도 | 근거 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+## 시나리오 커버리지
+
+| 항목 | 값 | 비고 | 신뢰도 | 근거 |
+| --- | --- | --- | --- | --- |
+"
+`;
+
 exports[`determinism: SI golden skeleton + double-run > renderSkeleton golden: si-배치정의서 1`] = `
 "## 배치 목록
 

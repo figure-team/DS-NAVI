@@ -109,8 +109,56 @@ export const RtmFunctionRowSchema = z.object({
   nfrTags: z.array(z.string()).default([]),
   rules: z.array(RtmFunctionRuleSchema).default([]),
   deliverableRefs: z.array(DeliverableRefSchema).default([]),
+  /** R7 사용자 정의 필드 값 — key = `custom:<id>` (오버레이 editedCells 에서 병합). */
+  custom: z.record(z.string(), z.string()).default({}),
 })
 export type RtmFunctionRow = z.infer<typeof RtmFunctionRowSchema>
+
+// ── W5 테스트 시나리오(설계: RTM_TEST_SCENARIO_DESIGN.md) ────────────────────
+/** 시나리오 종류 — 정상/예외/경계. */
+export const TestScenarioKindSchema = z.enum(['normal', 'exception', 'boundary'])
+export type TestScenarioKind = z.infer<typeof TestScenarioKindSchema>
+
+/**
+ * 단위테스트 시나리오 초안 — 기능 행별 결정론 템플릿 생성(전부 INFERRED [추정]).
+ * 확정은 rtm-overrides.json `_scenarios` 오버레이(확정 시 CONFIRMED 승격 — 기능 셀과
+ * 달리 시나리오 확정 = 사람 검토 완료 의미가 명확). AC.tests[](수행 결과)와 별개 축:
+ * 시나리오 = 설계 초안, TestRef = 수행 기록(확정 후 caseId 연결은 사람 몫).
+ */
+export const RtmTestScenarioSchema = z.object({
+  /** `TS-<featureId>-<N|E|B><seq>` — featureId 좌표 기반(재스캔 시 flow 증감이면 이동 가능). */
+  id: z.string(),
+  fnId: z.string(),
+  reqId: z.string().nullable().default(null),
+  acId: z.string().nullable().default(null),
+  kind: TestScenarioKindSchema,
+  title: z.string(),
+  given: z.string(),
+  when: z.string(),
+  then: z.string(),
+  confidence: RtmConfidenceSchema,
+  /** 원천 셀(진입점/구현) evidence 승계. */
+  evidence: z.array(EvidenceSchema).default([]),
+  /** [미확인] 축소 생성 사유 등. */
+  notes: z.array(z.string()).default([]),
+})
+export type RtmTestScenario = z.infer<typeof RtmTestScenarioSchema>
+
+// ── R7 사용자 정의 필드(§5.1 활성화) ─────────────────────────────────────────
+/**
+ * 사용자 정의 필드 정의 — rtm-overrides.json `_fields` 섹션(id 키 record)이 원본.
+ * 행 값은 기능 오버레이 editedCells["custom:<id>"] (기존 record 스키마가 이미 수용).
+ * 정의 삭제는 비파괴(값 보존 — 재등록 시 복원).
+ */
+export const RtmCustomFieldSchema = z.object({
+  /** `custom:<slug>` 네임스페이스 고정. */
+  id: z.string(),
+  label: z.string(),
+  scope: z.literal('function'),
+  createdBy: z.string(),
+  at: z.string(),
+})
+export type RtmCustomField = z.infer<typeof RtmCustomFieldSchema>
 
 /** 도메인 그룹 헤더. */
 export const RtmDomainSchema = z.object({
@@ -252,6 +300,18 @@ export const RtmCoverageSchema = z.object({
     fail: z.number().int(),
     untested: z.number().int(),
   }),
+  /** W5 시나리오 롤업 — 초안/확정 카운트(optional: 구버전 rtm.json 하위호환). */
+  scenarios: z
+    .object({
+      total: z.number().int(),
+      confirmed: z.number().int(),
+      byKind: z.object({
+        normal: z.number().int(),
+        exception: z.number().int(),
+        boundary: z.number().int(),
+      }),
+    })
+    .optional(),
   gaps: z.object({
     unimplemented: z.array(z.string()),
     orphanCode: z.array(z.string()),
@@ -318,6 +378,18 @@ export const RtmRequirementOverrideSchema = z.object({
 export type RtmRequirementOverride = z.infer<typeof RtmRequirementOverrideSchema>
 
 /**
+ * 시나리오 오버레이(W5) — G/W/T·제목 편집 + 확정. on-disk 에서는 `_scenarios` 아래 tsId 키.
+ * 적용 시 해당 시나리오 confidence → CONFIRMED. editedCells 키: title/given/when/then.
+ */
+export const RtmScenarioOverrideSchema = z.object({
+  editedCells: z.record(z.string(), z.string()).default({}),
+  approver: z.string(),
+  at: z.string(),
+  audit: z.array(RtmAuditEventSchema).default([]),
+})
+export type RtmScenarioOverride = z.infer<typeof RtmScenarioOverrideSchema>
+
+/**
  * rtm.json — RTM 구조화 산출물(생성물, 불변). 사람 편집/확정은 rtm-overrides.json 오버레이.
  * coverage 는 computeCoverage 결과(파생). 모든 배열은 정렬되어 byte-identical 재실행을 보장한다.
  */
@@ -327,6 +399,10 @@ export const RtmModelSchema = z.object({
   domains: z.array(RtmDomainSchema),
   functions: z.array(RtmFunctionRowSchema),
   requirements: z.array(RtmRequirementSchema),
+  /** W5 단위테스트 시나리오 초안(결정론 생성) — 구버전 rtm.json 은 빈 배열로 파싱. */
+  testScenarios: z.array(RtmTestScenarioSchema).default([]),
+  /** R7 사용자 정의 필드 정의(오버레이 `_fields` 병합 결과) — id ASC. */
+  customFields: z.array(RtmCustomFieldSchema).default([]),
   coverage: RtmCoverageSchema.optional(),
   diagnostics: z.array(RtmDiagnosticSchema).optional(),
 })

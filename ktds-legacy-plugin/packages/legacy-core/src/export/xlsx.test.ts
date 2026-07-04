@@ -135,7 +135,7 @@ describe('docToSheets / rtmToSheets', () => {
     expect(sheets[1].rows[2].style).toBe('bold')
   })
 
-  it('RTM: 문서정보+요구/기능/커버리지 4시트, 검수·시험 열(검증 스파인), 빈 원장도 헤더', () => {
+  it('RTM: 문서정보+요구/기능/시나리오/커버리지 5시트, 검수·시험 열(검증 스파인), 빈 원장도 헤더', () => {
     const sheets = rtmToSheets({
       requirements: [
         {
@@ -166,6 +166,7 @@ describe('docToSheets / rtmToSheets', () => {
       '문서정보',
       '요구사항 원장',
       '기능(AS-IS) 원장',
+      '테스트 시나리오',
       '커버리지 현황',
     ])
     expect(sheets[1].rows[1].cells).toEqual([
@@ -178,6 +179,44 @@ describe('docToSheets / rtmToSheets', () => {
     expect(empty[1].rows).toHaveLength(1)
     expect(empty[2].rows).toHaveLength(1)
     expect(empty[3].rows).toHaveLength(1)
+    expect(empty[4].rows).toHaveLength(1)
+  })
+
+  it('RTM: 테스트 시나리오 시트(W5) + 사용자 정의 필드 동적 열(R7)', () => {
+    const sheets = rtmToSheets({
+      functions: [
+        {
+          id: 'order/create',
+          featureId: 'FN-001',
+          name: '주문 생성',
+          custom: { 'custom:owner': '김PM' },
+        },
+      ],
+      customFields: [{ id: 'custom:owner', label: '담당자' }],
+      testScenarios: [
+        {
+          id: 'TS-FN-001-N1', fnId: 'order/create', reqId: null, acId: null, kind: 'normal',
+          title: '주문 생성 정상 처리', given: 'g', when: 'w', then: 't',
+          confidence: 'INFERRED', evidence: [{ file: 'src/A.java', line: 3 }],
+          notes: ['[미확인] x'],
+        },
+        {
+          id: 'TS-FN-001-E1', fnId: 'order/create', reqId: 'REQ-001', acId: 'AC-1', kind: 'exception',
+          title: 'e', given: 'g', when: 'w', then: 't', confidence: 'CONFIRMED', evidence: [], notes: [],
+        },
+      ],
+    })
+    // 기능 원장: 커스텀 열이 '연관 요구' 뒤·'근거' 앞.
+    expect(sheets[2].rows[0].cells).toContain('담당자')
+    expect(sheets[2].rows[1].cells).toContain('김PM')
+    // 시나리오 시트: 추적선(FN/REQ/AC)·상태·비고·근거.
+    const ts = sheets[3]
+    expect(ts.name).toBe('테스트 시나리오')
+    expect(ts.rows[1].cells).toEqual([
+      'TS-FN-001-N1', 'FN-001', '주문 생성', '', '', '정상', '주문 생성 정상 처리', 'g', 'w', 't', '초안 [추정]', '[미확인] x', 'src/A.java:3',
+    ])
+    expect(ts.rows[2].cells[3]).toBe('REQ-001')
+    expect(ts.rows[2].cells[10]).toBe('확정')
   })
 
   it('RTM: 검수 사인오프·커버리지 현황 평탄화(감리 "검수 근거" 대응 — W7 비평 2)', () => {
@@ -191,7 +230,7 @@ describe('docToSheets / rtmToSheets', () => {
       },
     })
     expect(sheets[1].rows[1].cells[10]).toBe('검수(이준경 @ 2026-07-01)')
-    const cov = sheets[3].rows.map((r) => r.cells.join('|'))
+    const cov = sheets[4].rows.map((r) => r.cells.join('|'))
     expect(cov).toContain('requirements|total|2')
     expect(cov).toContain('requirements|signedOff|1')
     expect(cov).toContain('gaps|unimplemented|REQ-002')

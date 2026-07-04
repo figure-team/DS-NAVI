@@ -678,14 +678,93 @@ function buildSiRiskReport(input: DocInput): GeneratedDoc {
   }
 }
 
-// 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
-export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec, buildSiProgramList, buildSiRiskReport }
+// ──────────────────────────────────────────────────────────────────────────
+// si-단위테스트시나리오 (W5) — rtm.json testScenarios 승계. 요구↔테스트 추적성.
+// ──────────────────────────────────────────────────────────────────────────
 
-/** si-standard 모듈 — SI 정형 문서를 docId 순서로 산출(기능 → 인터페이스 → 테이블 → 배치 → 프로그램 → 위험). */
+/** §1 작성 기준 열 — template ts-criteria 와 1:1. */
+const TS_CRITERIA_COLUMNS = ['항목', '내용']
+/** §2 시나리오 원장 열 — template ts-ledger 와 1:1. */
+const TS_LEDGER_COLUMNS = ['시나리오ID', '기능ID', '기능명', '요구ID', 'AC', '구분', '제목', 'Given', 'When', 'Then', '상태']
+/** §3 커버리지 열 — template ts-coverage 와 1:1. */
+const TS_COVERAGE_COLUMNS = ['항목', '값', '비고']
+
+const TS_KIND_KO: Record<string, string> = { normal: '정상', exception: '예외', boundary: '경계' }
+
+/**
+ * si-단위테스트시나리오(W5) — rtm.json testScenarios[] 승계(결정론 템플릿 생성 초안).
+ * §1 작성 기준: 종류별 생성 규칙 + 초안/확정 지위 + TestRef(수행 기록) 연결 안내(INFERRED).
+ * §2 원장: 시나리오 confidence 그대로 승계(초안 INFERRED [추정] / 대시보드 확정 CONFIRMED),
+ *   근거는 원천 셀 evidence 승계분. 미확정 셀 텍스트에 상태 표기(오독 방지).
+ * §3 커버리지: 종류별/확정/축소 생성([미확인] 노트 보유) 카운트 표면화.
+ */
+function buildSiTestScenarios(input: DocInput): GeneratedDoc {
+  const rtm = input.rtm
+  const scenarios = rtm?.testScenarios ?? []
+  const fnById = new Map((rtm?.functions ?? []).map((f) => [f.id, f]))
+
+  const criteriaRows: TableRow[] = [
+    ['정상', '기능 행의 진입점(라우트)·데이터(테이블×CRUD) 시드로 정상 흐름 1건 생성'],
+    ['예외', '요구사항 인수조건(AC) 중 exception 유형당 1건(AC 문장 인용, 요구/AC 추적선 보존). 없으면 일반형 1건 + [미확인]'],
+    ['경계', '데이터 시드(0건·최대치) 기준 1건. 데이터 근거 없으면 일반형 + [미확인]'],
+    ['지위', '전부 결정론 템플릿 생성 초안([추정]) — 대시보드 시험 탭에서 편집·확정하면 [확정] 승격(재생성에도 오버레이 유지)'],
+    ['수행 기록', '시나리오는 설계 초안 — 시험 수행 결과는 요구사항 AC 의 시험결과(TestRef)에 기록(확정 후 caseId 연결은 사람 몫)'],
+  ].map(
+    (cells): TableRow => ({ cells, confidence: 'INFERRED', evidence: [] }),
+  )
+
+  const ledgerRows: TableRow[] = scenarios.map((s): TableRow => {
+    const fn = fnById.get(s.fnId)
+    return {
+      cells: [
+        s.id,
+        fn?.featureId ?? UNRESOLVED_CELL,
+        fn?.name ?? UNRESOLVED_CELL,
+        s.reqId ?? EMPTY_CELL,
+        s.acId ?? EMPTY_CELL,
+        TS_KIND_KO[s.kind] ?? s.kind,
+        s.title,
+        s.given,
+        s.when,
+        s.then,
+        s.confidence === 'CONFIRMED' ? '확정' : `초안 ${INFERRED_CELL}`,
+      ],
+      confidence: s.confidence === 'CONFIRMED' ? 'CONFIRMED' : 'INFERRED',
+      evidence: s.evidence,
+    }
+  })
+
+  const reduced = scenarios.filter((s) => s.notes.some((n) => n.includes('[미확인]'))).length
+  const kindCount = (k: string) => scenarios.filter((s) => s.kind === k).length
+  const coverageRows: TableRow[] = rtm
+    ? [
+        { cells: ['시나리오 총계', String(scenarios.length), `기능 ${rtm.functions.length}본 × 정상/예외/경계(예외는 AC 수만큼)`] },
+        { cells: ['종류별', `정상 ${kindCount('normal')} · 예외 ${kindCount('exception')} · 경계 ${kindCount('boundary')}`, EMPTY_CELL] },
+        { cells: ['확정', `${scenarios.filter((s) => s.confidence === 'CONFIRMED').length}/${scenarios.length}`, '대시보드 시험 탭 확정 반영분'] },
+        { cells: ['축소 생성', String(reduced), '시드 부족([미확인] 노트 보유) — 사람 보강 대상'] },
+      ].map((r): TableRow => ({ ...r, confidence: 'INFERRED', evidence: [] }))
+    : []
+
+  return {
+    docId: 'si-단위테스트시나리오',
+    title: 'SI 단위테스트시나리오',
+    methodology: 'si-standard',
+    sections: [
+      { heading: '작성 기준', key: 'ts-criteria', claims: [], table: { columns: TS_CRITERIA_COLUMNS, rows: criteriaRows } },
+      { heading: '시나리오 원장', key: 'ts-ledger', claims: [], table: { columns: TS_LEDGER_COLUMNS, rows: ledgerRows } },
+      { heading: '시나리오 커버리지', key: 'ts-coverage', claims: [], table: { columns: TS_COVERAGE_COLUMNS, rows: coverageRows } },
+    ],
+  }
+}
+
+// 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
+export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec, buildSiProgramList, buildSiRiskReport, buildSiTestScenarios }
+
+/** si-standard 모듈 — SI 정형 문서를 docId 순서로 산출(기능 → 인터페이스 → 테이블 → 배치 → 프로그램 → 위험 → 시나리오). */
 export const siStandardMethodology: MethodologyModule = {
   id: 'si-standard',
   title: 'SI 표준(정형 제출 서식)',
   buildDocSet(input: DocInput): GeneratedDoc[] {
-    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input), buildSiProgramList(input), buildSiRiskReport(input)]
+    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input), buildSiProgramList(input), buildSiRiskReport(input), buildSiTestScenarios(input)]
   },
 }

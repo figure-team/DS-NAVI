@@ -107,6 +107,7 @@ interface RtmGroundedLike {
 }
 
 interface RtmFunctionLike {
+  id?: string
   featureId?: string
   name?: string
   domainName?: string
@@ -116,11 +117,33 @@ interface RtmFunctionLike {
   test?: RtmGroundedLike | null
   state?: string
   requirementHistory?: string[]
+  /** R7 사용자 정의 필드 값(key = custom:<id>). */
+  custom?: Record<string, string>
+}
+
+/** W5 테스트 시나리오 1건(내보내기 필드만). */
+interface RtmScenarioLike {
+  id?: string
+  fnId?: string
+  reqId?: string | null
+  acId?: string | null
+  kind?: string
+  title?: string
+  given?: string
+  when?: string
+  then?: string
+  confidence?: string
+  evidence?: Array<{ file: string; line: number | null }>
+  notes?: string[]
 }
 
 export interface RtmLike {
   requirements?: RtmRequirementLike[]
   functions?: RtmFunctionLike[]
+  /** W5 단위테스트 시나리오(있으면 §4 시트). */
+  testScenarios?: RtmScenarioLike[]
+  /** R7 사용자 정의 필드 정의 — 기능 원장 동적 열. */
+  customFields?: Array<{ id?: string; label?: string }>
   /** 커버리지 요약(현황 뷰) — 있는 그대로 §3 시트로 평탄화. */
   coverage?: {
     requirements?: Record<string, unknown>
@@ -141,7 +164,8 @@ function groundedEvidence(g: RtmGroundedLike | null | undefined): string {
 }
 
 /**
- * RTM 원장 → 시트 4개(문서정보 + §1 요구사항 원장 + §2 기능(AS-IS) 원장 + §3 커버리지 현황).
+ * RTM 원장 → 시트 5개(문서정보 + §1 요구사항 원장 + §2 기능(AS-IS) 원장 + §3 테스트
+ * 시나리오(W5) + §4 커버리지 현황). 기능 원장에는 R7 사용자 정의 필드가 동적 열로 붙는다.
  * 검증 스파인(검수 signoff·시험 test)을 열로 승계 — 감리의 "검수 근거" 질의에 xlsx 로
  * 답할 수 있어야 한다(W7 비평 반영). 빈 원장도 헤더는 출력(빈 원장 결정과 정합).
  * 주: 대시보드 행단위 오버레이(rtm-overrides)는 미반영 — 문서정보 시트에 지위 명시,
@@ -170,9 +194,15 @@ export function rtmToSheets(rtm: RtmLike, meta?: XlsxDocMeta): XlsxSheet[] {
     })),
   ]
 
+  // R7: 사용자 정의 필드 → 기능 원장 동적 열(정의 순 — applyOverlay 가 id ASC 정렬).
+  const customFields = (rtm.customFields ?? []).filter((f) => typeof f.id === 'string')
   const fnRows: XlsxRow[] = [
     {
-      cells: ['FN_ID', '기능명', '도메인', '진입점', '구현', '시험', '상태', '연관 요구', '근거'],
+      cells: [
+        'FN_ID', '기능명', '도메인', '진입점', '구현', '시험', '상태', '연관 요구',
+        ...customFields.map((f) => f.label ?? f.id ?? ''),
+        '근거',
+      ],
       style: 'header',
     },
     ...(rtm.functions ?? []).map((f): XlsxRow => ({
@@ -185,9 +215,40 @@ export function rtmToSheets(rtm: RtmLike, meta?: XlsxDocMeta): XlsxSheet[] {
         groundedCell(f.test) || '미시험',
         f.state ?? '',
         (f.requirementHistory ?? []).join(', '),
+        ...customFields.map((cf) => f.custom?.[cf.id ?? ''] ?? ''),
         groundedEvidence(f.entryPoint) || groundedEvidence(f.implementation),
       ],
     })),
+  ]
+
+  // W5: 테스트 시나리오 원장 — 초안 [추정]/확정 구분, 기능/요구/AC 추적선 승계.
+  const TS_KIND_KO: Record<string, string> = { normal: '정상', exception: '예외', boundary: '경계' }
+  const fnByIdForTs = new Map((rtm.functions ?? []).map((f) => [f.id ?? '', f]))
+  const tsRows: XlsxRow[] = [
+    {
+      cells: ['TS_ID', 'FN_ID', '기능명', '요구ID', 'AC', '구분', '제목', 'Given', 'When', 'Then', '상태', '비고', '근거'],
+      style: 'header',
+    },
+    ...(rtm.testScenarios ?? []).map((s): XlsxRow => {
+      const fn = fnByIdForTs.get(s.fnId ?? '')
+      return {
+        cells: [
+          s.id ?? '',
+          fn?.featureId ?? '',
+          fn?.name ?? '',
+          s.reqId ?? '',
+          s.acId ?? '',
+          TS_KIND_KO[s.kind ?? ''] ?? (s.kind ?? ''),
+          s.title ?? '',
+          s.given ?? '',
+          s.when ?? '',
+          s.then ?? '',
+          s.confidence === 'CONFIRMED' ? '확정' : '초안 [추정]',
+          (s.notes ?? []).join(' / '),
+          (s.evidence ?? []).map((e) => (e.line === null ? e.file : `${e.file}:${e.line}`)).join(', '),
+        ],
+      }
+    }),
   ]
 
   // §3 커버리지 현황 — 요약 객체를 (구분, 항목, 값) 3열로 평탄화(추적표 '현황' 뷰 대응).
@@ -206,6 +267,7 @@ export function rtmToSheets(rtm: RtmLike, meta?: XlsxDocMeta): XlsxSheet[] {
     infoSheet('요구사항 추적표(RTM)', 'rtm', meta),
     { name: '요구사항 원장', rows: reqRows },
     { name: '기능(AS-IS) 원장', rows: fnRows },
+    { name: '테스트 시나리오', rows: tsRows },
     { name: '커버리지 현황', rows: covRows },
   ]
 }

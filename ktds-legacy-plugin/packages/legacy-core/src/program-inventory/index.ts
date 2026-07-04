@@ -205,9 +205,16 @@ export function buildProgramInventory(
       if (!domainByFile.has(f.relPath)) domainByFile.set(f.relPath, { domain: c.key, via: f.via })
     }
   }
+  // 공용 파일의 owners 는 root 파일 경로 — 도메인 키로 번역해 표기(경로 나열은 문서에서
+  // 판독 불가). 키 미등록 root 는 basename 폴백.
+  const rootToKey = new Map<string, string>()
+  for (const c of inputs.candidates?.candidates ?? []) {
+    for (const r of c.roots) if (!rootToKey.has(r)) rootToKey.set(r, c.key)
+  }
   for (const c of inputs.candidates?.common ?? []) {
-    if (!domainByFile.has(c.relPath))
-      domainByFile.set(c.relPath, { domain: c.owners.slice().sort(cmp).join('+'), via: 'common' })
+    if (domainByFile.has(c.relPath)) continue
+    const keys = [...new Set(c.owners.map((o) => rootToKey.get(o) ?? baseNameOf(o)))].sort(cmp)
+    domainByFile.set(c.relPath, { domain: keys.join('+'), via: 'common' })
   }
   for (const a of inputs.candidates?.ambiguous ?? []) {
     if (!domainByFile.has(a.relPath))

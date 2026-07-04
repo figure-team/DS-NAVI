@@ -107,6 +107,31 @@
 - coverage.json 에 `interfaces: {total:0, unresolvedEndpoints:0, byProtocol:[]}` 정상 기록
   ("스캔했고 없음"의 증거).
 
+## 10. 적대적 리뷰 반영 (2026-07-04, 010d0d3)
+
+비평 지적 8건 중 5건 즉시 반영, 3건 후속 백로그로 결정.
+
+**반영됨**
+1. *recall 절벽·false 0건* → ①suspectSignals(http 리터럴/jdbc/wsdl, 테스트 경로 제외) +
+   0건 시 커버리지·runScan 경고, ②`understanding.config.json interfaceScan.clients` 커스텀
+   연계모듈 seam(사내 EAI 래퍼 등록, 플러그인 수정 불요). eGov cop 실측에서 raw jdbc
+   DB유틸(SmsBasicDBUtil)을 의심신호로 실검출.
+2. *call-site 당 1행 건수 부풀림* → (방향,프로토콜,클라이언트,엔드포인트) 병합 +
+   callSites 누적, stats 에 total(연계 건수)/callSiteTotal(호출 지점) 분리.
+3. *위치 연번 id 불안정* → 내용 파생 `IF-<PROTO>-<sha256 8hex>`. 미해석 항목만 첫
+   callSite 파생(라인 이동 시 변동 — 알려진 한계로 스키마 주석 명시).
+4. *'상태=확정' 감리 오독* → '해석' 열(해석됨/[미확인])로 의미 축소, 신뢰도 열과 충돌 제거.
+5. *감리 열 부족* → 인터페이스명(첫 호출 심볼 초안 [추정])·연계방식(프로토콜 파생 [추정])
+   열 추가. '수신(라우트외)' 은어 제거, 템플릿 범례에 MQ 리스너 내부/대외 판단은 사람 몫 명시.
+
+**후속 백로그(범위 외 결정)**
+- **사람 확정 레인**: §2 행의 인터페이스명/대상시스템/연계방식/주기를 대시보드에서 편집·확정
+  (기존 노드상세·RTM 확정 플로우 재사용). → 별도 후속 단계(P6 RTM 계열과 묶어 검토).
+- **주기/전문포맷/오류처리/암호화 열**: 정적 분석으로 합성 불가 — 확정 레인과 함께 사람 입력.
+- **P11 매칭 키**: endpoint host/path 분해 + 대상시스템 정규 키는 P11 설계 시 schemaVersion 2 로.
+- **§1(내부 API)·§2(대외) 문서 분리 여부**: 발주처 양식에 따라 갈림 — 템플릿 오버라이드로
+  대응 가능하므로 현행 병합 유지, P4(xlsx) 시 시트 분리로 재검토.
+
 ### 구현 범위 주석 (설계 §2 카탈로그 대비)
 - 구현됨: RestTemplate·WebClient(create/체인 uri)·FeignClient·Apache HttpClient(HttpGet/Post/Put/Delete/Patch)·
   HttpURLConnection(URL.openConnection)·OkHttp(Request.Builder.url)·JDK HttpClient(HttpRequest…uri)·

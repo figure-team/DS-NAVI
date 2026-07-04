@@ -88,10 +88,32 @@
 
 ## 8. 진행 현황
 
-| 단계 | 상태 | 커밋 |
-|---|---|---|
-| 설계 | ✅ | |
-| P1-a | ⬜ | |
-| P1-b | ⬜ | |
-| P1-c | ⬜ | |
-| P1-d | ⬜ | |
+| 단계 | 상태 | 커밋 | 비고 |
+|---|---|---|---|
+| 설계 | ✅ | 1c0a3f6 | |
+| P1-a | ✅ | 410f9c7 | 스캐너+픽스처 4종(18항목) 골든 등가 8테스트 |
+| P1-b | ✅ | 410f9c7 | `${key}`/`${key:default}` properties+yml 해석, P1-a 와 동시 구현 |
+| P1-c | ✅ | 207fbeb | §2 outbound-list, 방법론 테스트 2건, 스냅샷 검수 갱신 |
+| P1-d | ✅ | (본 커밋) | 실측 결과 아래 §9 |
+
+## 9. P1-d 실측 결과 (2026-07-04)
+
+- **jpetstore-6** (148파일): 인터페이스 **0건** — 설계 예상대로 음성 케이스. 로컬 HSQLDB 완결형.
+- **eGov cop** (587파일): 인터페이스 **0건**. 스캐너 누락이 아님을 raw grep 교차 검증
+  (RestTemplate/HttpClient/Feign/JMS/Kafka/Socket/FTP/JSch/DATABASE LINK — 전 패턴 0히트).
+  UI 컴포넌트 모듈 특성상 타당. **양성 커버리지는 픽스처 4종 18항목이 담당.**
+- **결정론**: jpetstore 사본에서 `scanDomainMap` 2회 실행 —
+  interfaces.json/coverage.json/census.json sha256 동일(byte-diff=0).
+- coverage.json 에 `interfaces: {total:0, unresolvedEndpoints:0, byProtocol:[]}` 정상 기록
+  ("스캔했고 없음"의 증거).
+
+### 구현 범위 주석 (설계 §2 카탈로그 대비)
+- 구현됨: RestTemplate·WebClient(create/체인 uri)·FeignClient·Apache HttpClient(HttpGet/Post/Put/Delete/Patch)·
+  HttpURLConnection(URL.openConnection)·OkHttp(Request.Builder.url)·JDK HttpClient(HttpRequest…uri)·
+  JmsTemplate·KafkaTemplate·RabbitTemplate·@Kafka/Jms/RabbitListener·JSch·FTPClient·SmbFile·
+  Socket/ServerSocket·JavaMailSender/Transport.send·JaxWsProxyFactoryBean·@WebServiceClient·
+  dblink(FROM/JOIN/INTO/UPDATE `t@link` + CREATE DATABASE LINK)
+- 미구현(후속): Axis 클라이언트, spring XML bean(HttpInvoker/JaxWsPortProxyFactoryBean) 정의,
+  web.xml 기반 신호, `*.wsdl` 파일 존재 신호, mail endpoint 의 spring.mail.host 프로퍼티 승계
+- 한계(정직): 수신자 타입 해석은 **단일 파일 내** 선언만(필드 주입 타입이 다른 파일에 있으면
+  누락 가능 — Tier3 후속), 문자열 해석은 리터럴/같은 파일 상수/`+`연결/URI.create 까지

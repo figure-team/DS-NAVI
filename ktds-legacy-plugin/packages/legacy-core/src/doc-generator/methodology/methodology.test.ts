@@ -129,14 +129,16 @@ describe('AC-23: methodology swap yields different doc sets', () => {
       'si-인터페이스정의서',
       'si-테이블정의서',
       'si-배치정의서',
+      'si-프로그램목록',
     ])
     expect(docs.every((d) => d.methodology === 'si-standard')).toBe(true)
   })
 
-  it('동일 입력에서 두 모듈의 문서 집합이 다르다', () => {
+  it('동일 입력에서 두 모듈의 문서 집합이 다르다(docId 서로소)', () => {
     const asBuilt = getMethodology('as-built').buildDocSet(INPUT)
     const si = getMethodology('si-standard').buildDocSet(INPUT)
-    expect(asBuilt.length).not.toBe(si.length)
+    // 문서 수는 W2/W3 로 우연히 같아질 수 있다 — 본질 불변식은 docId 집합의 서로소.
+    expect(asBuilt.map((d) => d.docId)).not.toEqual(si.map((d) => d.docId))
     const asIds = new Set(asBuilt.map((d) => d.docId))
     expect(si.some((d) => asIds.has(d.docId))).toBe(false)
   })
@@ -372,6 +374,71 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
     // 미제공 → 0행(합성 금지).
     const empty = byId.get('si-배치정의서')!
     expect(tableOf(empty.sections[0]).rows).toEqual([])
+  })
+
+  it('si-프로그램목록: programInventory 입력 → §1 업무명 [미확인]·§2 FP [추정]+집계, 미제공 → 0행', () => {
+    const withInv: DocInput = {
+      ...INPUT,
+      programInventory: {
+        schemaVersion: 1,
+        gitCommit: null,
+        programs: [
+          {
+            id: 'PGM-API-aaaa1111',
+            name: 'OrderController',
+            filePath: 'src/web/OrderController.java',
+            type: 'api',
+            layer: 'api',
+            loc: 42,
+            notes: ['route:GET /api/orders'],
+          },
+        ],
+        fp: {
+          transactions: [
+            {
+              kind: 'EQ',
+              routeId: 'route:GET /api/orders',
+              method: 'GET',
+              path: '/api/orders',
+              evidence: { file: 'src/web/OrderController.java', line: 16 },
+            },
+          ],
+          dataFunctions: [
+            { kind: 'ILF', name: 'ORDERS', evidence: { file: 'db/schema.sql', line: 1 } },
+            { kind: 'EIF', name: 'ERP_LINK', evidence: { file: 'mapper/OrderMapper.xml', line: 5 } },
+          ],
+          summary: { ei: 0, eo: 0, eq: 1, ilf: 1, eif: 1, unadjustedFp: 16.8 },
+        },
+        stats: { total: 1, byType: [{ type: 'api', count: 1 }] },
+      },
+    }
+    const doc = getMethodology('si-standard')
+      .buildDocSet(withInv)
+      .find((d) => d.docId === 'si-프로그램목록')!
+    const pgm = tableOf(doc.sections[0])
+    expect(pgm.columns).toEqual(['PGM_ID', '프로그램명', '업무명', '유형', '계층', 'LOC'])
+    expect(pgm.rows[0].cells).toEqual([
+      'PGM-API-aaaa1111',
+      'OrderController',
+      '[미확인]', // 업무명 — 사람 채움
+      'API',
+      'api',
+      '42',
+    ])
+    const fp = tableOf(doc.sections[1])
+    expect(fp.columns).toEqual(['구분', '대상', '상세'])
+    expect(fp.rows[0].cells).toEqual(['EQ [추정]', 'route:GET /api/orders', 'GET /api/orders'])
+    expect(fp.rows[1].cells).toEqual(['ILF [추정]', 'ORDERS', '자체 테이블'])
+    expect(fp.rows[2].cells).toEqual(['EIF [추정]', 'ERP_LINK', 'DB링크 참조'])
+    // 집계 행 — INFERRED(간이법 잠정치).
+    const last = fp.rows[fp.rows.length - 1]
+    expect(last.cells[0]).toBe('집계 [추정]')
+    expect(last.cells[2]).toContain('16.8')
+    expect(last.confidence).toBe('INFERRED')
+    // 미제공 → 두 섹션 모두 0행(합성 금지).
+    const empty = byId.get('si-프로그램목록')!
+    expect(tableOf(empty.sections[0]).rows).toEqual([])
+    expect(tableOf(empty.sections[1]).rows).toEqual([])
   })
 
   it('si-테이블정의서: 테이블별 섹션 + 열 = 컬럼|타입|PK|FK|NULL|설명', () => {

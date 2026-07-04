@@ -86,7 +86,7 @@ switch (sub) {
 
 async function runScan() {
   const { scanDomainMap } = engine
-  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs } = await scanDomainMap(projectRoot)
+  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory } = await scanDomainMap(projectRoot)
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
   console.log(`  routes: 라우트 ${routes.routes.length}개 / 배치 ${routes.batchEntries.length}개`)
@@ -96,6 +96,11 @@ async function runScan() {
   console.log(`  candidates: 도메인 후보 ${candidates.candidates.length}개`)
   reportInterfaces(interfaces)
   reportDbSchema(dbSchema)
+  if (programInventory) {
+    const byType = programInventory.stats.byType.map((t) => `${t.type} ${t.count}`).join(', ')
+    console.log(`  프로그램: ${programInventory.stats.total}본 (${byType})`)
+    console.log(`  잠정 FP(간이법 미조정, [추정]): ${programInventory.fp.summary.unadjustedFp} — EI ${programInventory.fp.summary.ei}·EQ ${programInventory.fp.summary.eq}·ILF ${programInventory.fp.summary.ilf}·EIF ${programInventory.fp.summary.eif}`)
+  }
   console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces}.json (동일 commit 재실행 byte-diff=0)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
 }

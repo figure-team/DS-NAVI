@@ -43,6 +43,8 @@ import {
 } from '../batch-scan/extract.js'
 import { buildBatchJobs, BATCH_JOBS_FILENAME } from '../batch-scan/report.js'
 import type { BatchJobsReport } from '../batch-scan/report.js'
+import { buildProgramInventory, PROGRAM_INVENTORY_FILENAME } from '../program-inventory/index.js'
+import type { ProgramInventory } from '../program-inventory/index.js'
 import { buildCoverageReport } from '../coverage-report/index.js'
 import { computeFileFingerprints } from '../incremental/index.js'
 import { readSkeleton } from './persist.js'
@@ -212,6 +214,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   dbSchema: DbSchemaModel
   interfaces: InterfaceReport
   batchJobs: BatchJobsReport
+  programInventory: ProgramInventory
 }> {
   const census = buildCensus(projectRoot)
   const routes = await extractRoutes(projectRoot, census)
@@ -237,6 +240,17 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   // W2: 배치 인벤토리 — batch-jobs.json(내용 파생 안정 id + 도달 범위 + 의심신호).
   const batchJobs = buildBatchJobs(projectRoot, routes.batchEntries, edges, census)
   writeMapArtifact(projectRoot, BATCH_JOBS_FILENAME, batchJobs)
+  // W3: 프로그램 목록 + FP 산정 기초 — program-inventory.json(W1/W2 취합).
+  const programInventory = buildProgramInventory(projectRoot, {
+    census,
+    routes,
+    edges,
+    jpaModel,
+    dbSchema,
+    interfaces,
+    batchJobs,
+  })
+  writeMapArtifact(projectRoot, PROGRAM_INVENTORY_FILENAME, programInventory)
   // 보완 D-c/D-b: 통합 커버리지 리포트 + 파일 fingerprint 스냅샷(증분 재스캔 기준).
   const coverage = buildCoverageReport({
     census,
@@ -247,10 +261,11 @@ export async function scanDomainMap(projectRoot: string): Promise<{
     jpaModel,
     interfaces,
     batchJobs,
+    programInventory,
   })
   writeMapArtifact(projectRoot, COVERAGE_FILENAME, coverage)
   writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, computeFileFingerprints(projectRoot, census))
-  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs }
+  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory }
 }
 
 /**

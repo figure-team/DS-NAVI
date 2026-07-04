@@ -16,6 +16,7 @@ import {
 } from './builders/index.js'
 import {
   buildSiBatchSpec,
+  buildSiProgramList,
   buildSiFeatureSpec,
   buildSiInterfaceSpec,
   buildSiTableSpec,
@@ -37,6 +38,7 @@ export const DOC_SET: DocSetEntry[] = [
   { docId: 'si-인터페이스정의서', templateFile: 'interface-spec.md', build: buildSiInterfaceSpec },
   { docId: 'si-테이블정의서', templateFile: 'table-spec.md', build: buildSiTableSpec },
   { docId: 'si-배치정의서', templateFile: 'batch-spec.md', build: buildSiBatchSpec },
+  { docId: 'si-프로그램목록', templateFile: 'program-inventory.md', build: buildSiProgramList },
   { docId: '06_program-list', templateFile: 'program-list.md', build: buildProgramList },
   { docId: '07_crud-matrix', templateFile: 'crud-matrix.md', build: buildCrudMatrix },
   { docId: '08_batch-list', templateFile: 'batch-list.md', build: buildBatchList },

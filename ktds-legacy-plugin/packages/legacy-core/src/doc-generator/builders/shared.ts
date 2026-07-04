@@ -14,6 +14,7 @@ import type { DbSchemaModel } from '../../db-schema/types.js'
 import type { DomainPolicyInput } from '../../domain-policy/types.js'
 import type { InterfaceReport } from '../../interface-scan/types.js'
 import type { BatchJobsReport } from '../../batch-scan/report.js'
+import type { ProgramInventory } from '../../program-inventory/index.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -50,6 +51,8 @@ export interface DocInput {
   interfaces?: InterfaceReport | null
   /** 배치 인벤토리(W2) — si-배치정의서 grounding. */
   batchJobs?: BatchJobsReport | null
+  /** 프로그램 목록+FP 기초(W3) — si-프로그램목록 grounding. */
+  programInventory?: ProgramInventory | null
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

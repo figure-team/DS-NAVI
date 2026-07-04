@@ -19,6 +19,7 @@ import { buildLayerSignals, deriveStepLayer } from '../domain-map/step-layer.js'
 import type { JpaModel } from '../jpa/types.js'
 import type { InterfaceReport } from '../interface-scan/types.js'
 import type { BatchJobsReport } from '../batch-scan/report.js'
+import type { ProgramInventory } from '../program-inventory/index.js'
 
 function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
@@ -92,6 +93,14 @@ export const CoverageReportSchema = z.object({
       suspectSignals: z.number().int().nonnegative(),
     })
     .optional(),
+  /** W3 프로그램 목록 + 잠정 FP([추정]) — PM 정량화 첫 숫자. optional: 하위호환. */
+  programs: z
+    .object({
+      total: z.number().int().nonnegative(),
+      byType: z.array(z.object({ type: z.string(), count: z.number().int().nonnegative() })),
+      unadjustedFp: z.number().nonnegative(),
+    })
+    .optional(),
 })
 export type CoverageReport = z.infer<typeof CoverageReportSchema>
 
@@ -104,6 +113,7 @@ export interface CoverageInputs {
   jpaModel?: JpaModel | null
   interfaces?: InterfaceReport | null
   batchJobs?: BatchJobsReport | null
+  programInventory?: ProgramInventory | null
 }
 
 /** 스캔 산출물에서 통합 커버리지 리포트를 결정론으로 조립(AC-30). */
@@ -171,6 +181,17 @@ export function buildCoverageReport(inputs: CoverageInputs): CoverageReport {
       }
     : undefined
 
+  const programs = inputs.programInventory
+    ? {
+        total: inputs.programInventory.stats.total,
+        byType: inputs.programInventory.stats.byType.map((t) => ({
+          type: t.type as string,
+          count: t.count,
+        })),
+        unadjustedFp: inputs.programInventory.fp.summary.unadjustedFp,
+      }
+    : undefined
+
   return CoverageReportSchema.parse({
     schemaVersion: 1,
     gitCommit: census.gitCommit,
@@ -186,6 +207,7 @@ export function buildCoverageReport(inputs: CoverageInputs): CoverageReport {
     jpa,
     ...(interfaces ? { interfaces } : {}),
     ...(batch ? { batch } : {}),
+    ...(programs ? { programs } : {}),
   })
 }
 
@@ -215,6 +237,12 @@ export function renderCoverageReport(r: CoverageReport): string {
                   `interfaceScan.clients 로 공통모듈 시그니처를 등록하세요(.spec/map/interfaces.json suspectSignals.samples 참조).`,
               ]
             : []),
+        ]
+      : []),
+    ...(r.programs
+      ? [
+          `- 프로그램: ${r.programs.total}본 — ${r.programs.byType.map((t) => `${t.type} ${t.count}`).join(', ')}`,
+          `- 잠정 FP(간이법 미조정, [추정]): ${r.programs.unadjustedFp}`,
         ]
       : []),
     ...(r.batch

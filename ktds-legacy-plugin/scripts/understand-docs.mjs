@@ -96,6 +96,17 @@ if (existsSync(batchJobsPath)) {
   }
 }
 
+// 프로그램 목록+FP 기초(W3)는 스캔 산출물에서 읽는다(없으면 null → si-프로그램목록 0행).
+let programInventory = null
+const programInventoryPath = join(projectRoot, '.spec', 'map', 'program-inventory.json')
+if (existsSync(programInventoryPath)) {
+  try {
+    programInventory = JSON.parse(readFileSync(programInventoryPath, 'utf8'))
+  } catch {
+    // 손상 시 null(정직 — 프로그램목록 0행).
+  }
+}
+
 // MyBatis Mapper XML 스캔(Tier B) — 테이블/CRUD grounding. 매퍼 XML 없으면 빈 모델.
 function findMapperXmls(root) {
   const SKIP = new Set(['node_modules', '.git', 'target', 'build', 'dist', '.understand-anything', '.spec', '.idea'])
@@ -199,7 +210,7 @@ const buildDeps = findBuildDeps(projectRoot)
 // PA3: db-spec 가 DDL 의 실제 컬럼/PK/FK/CHECK 를 grounding 으로 싣도록 map(scan) 산출을 로드.
 // 없으면(맵 미실행/code-only) null → db-spec 은 기존 노드 기반 목록만(우아한 degrade).
 const dbSchema = readDbSchema(projectRoot)
-const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
+const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, programInventory, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 

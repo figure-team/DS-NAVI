@@ -194,6 +194,84 @@ function outboundRows(input: DocInput): TableRow[] {
   })
 }
 
+/** si-프로그램목록 §1 열 — template program-list-si 와 1:1. */
+const PGM_COLUMNS = ['PGM_ID', '프로그램명', '업무명', '유형', '계층', 'LOC']
+/** si-프로그램목록 §2 열 — template fp-basis 와 1:1. */
+const FP_COLUMNS = ['구분', '대상', '상세']
+
+/** 프로그램 유형 → 한국어 표기. */
+const PGM_TYPE_KO: Record<string, string> = {
+  screen: '화면',
+  api: 'API',
+  batch: '배치',
+  service: '서비스',
+  dao: 'DAO',
+  db: 'DB',
+  'mapper-xml': 'SQL매퍼',
+  common: '공통/기타',
+}
+
+/**
+ * si-프로그램목록(W3) — program-inventory.json 승계.
+ * §1 프로그램 목록: 파일·유형·계층·LOC 는 결정론 사실 → CONFIRMED(filePath:1 근거).
+ *   업무명은 정적 분석 불가 — [미확인] 사람 채움(W2 교훈: 생략 대신 표면화).
+ * §2 규모산정(FP) 기초: 후보 구분(EI/EQ/ILF/EIF)은 method/출처 기반 잠정 → 셀에 [추정].
+ *   집계 행(잠정 FP)은 간이법 평균복잡도 미조정치 — 범례에 가중치·EO 재분류 안내.
+ */
+function buildSiProgramList(input: DocInput): GeneratedDoc {
+  const inv = input.programInventory
+  const pgmRows: TableRow[] = (inv?.programs ?? []).map((p): TableRow => ({
+    cells: [
+      p.id,
+      p.name,
+      UNRESOLVED_CELL,
+      PGM_TYPE_KO[p.type] ?? p.type,
+      p.layer,
+      String(p.loc),
+    ],
+    confidence: 'CONFIRMED',
+    evidence: [{ file: p.filePath, line: 1 }],
+  }))
+
+  const fpRows: TableRow[] = []
+  for (const t of inv?.fp.transactions ?? []) {
+    fpRows.push({
+      cells: [`${t.kind} ${INFERRED_CELL}`, t.routeId, `${t.method} ${t.path}`],
+      confidence: 'CONFIRMED',
+      evidence: [{ file: t.evidence.file, line: t.evidence.line }],
+    })
+  }
+  for (const d of inv?.fp.dataFunctions ?? []) {
+    fpRows.push({
+      cells: [`${d.kind} ${INFERRED_CELL}`, d.name, d.kind === 'ILF' ? '자체 테이블' : 'DB링크 참조'],
+      confidence: 'CONFIRMED',
+      evidence: [{ file: d.evidence.file, line: d.evidence.line }],
+    })
+  }
+  if (inv) {
+    const s = inv.fp.summary
+    fpRows.push({
+      cells: [
+        `집계 ${INFERRED_CELL}`,
+        `EI ${s.ei} · EO ${s.eo} · EQ ${s.eq} · ILF ${s.ilf} · EIF ${s.eif}`,
+        `잠정 FP(미조정) = ${s.unadjustedFp}`,
+      ],
+      confidence: 'INFERRED',
+      evidence: [],
+    })
+  }
+
+  return {
+    docId: 'si-프로그램목록',
+    title: 'SI 프로그램목록',
+    methodology: 'si-standard',
+    sections: [
+      { heading: '프로그램 목록', key: 'program-list-si', claims: [], table: { columns: PGM_COLUMNS, rows: pgmRows } },
+      { heading: '규모산정(FP) 기초', key: 'fp-basis', claims: [], table: { columns: FP_COLUMNS, rows: fpRows } },
+    ],
+  }
+}
+
 /** SI 배치정의서 열 — template batch-list-si 와 1:1. */
 const BATCH_COLUMNS = [
   'BAT_ID',
@@ -397,13 +475,13 @@ function buildSiTableSpec(input: DocInput): GeneratedDoc {
 }
 
 // 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
-export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec }
+export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec, buildSiProgramList }
 
 /** si-standard 모듈 — SI 정형 3종을 docId 순서로 산출(기능 → 인터페이스 → 테이블). */
 export const siStandardMethodology: MethodologyModule = {
   id: 'si-standard',
   title: 'SI 표준(정형 제출 서식)',
   buildDocSet(input: DocInput): GeneratedDoc[] {
-    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input)]
+    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input), buildSiProgramList(input)]
   },
 }

@@ -2,7 +2,7 @@
   "description": "검수된 오라클(사람 확인 완료) — jobs/stats/suspectSignals 골든 등가",
   "jobs": [
     {
-      "id": "BAT-cf9e0f14",
+      "id": "BAT-EXEC-cf9e0f14",
       "name": "SchedulerConfig#registerExecutor",
       "trigger": "executor",
       "schedule": null,
@@ -13,13 +13,14 @@
         "file": "src/main/java/demo/batch/SchedulerConfig.java",
         "line": 19
       },
+      "sliceRoot": "src/main/java/demo/batch/SchedulerConfig.java",
       "reachableFiles": 1,
       "notes": [
         "method=scheduleAtFixedRate"
       ]
     },
     {
-      "id": "BAT-d4364292",
+      "id": "BAT-QJAVA-d4364292",
       "name": "SettleJob",
       "trigger": "quartz-java",
       "schedule": "cron=0 0 2 * * ?",
@@ -30,11 +31,12 @@
         "file": "src/main/java/demo/batch/SchedulerConfig.java",
         "line": 10
       },
+      "sliceRoot": "src/main/java/demo/batch/SettleJob.java",
       "reachableFiles": 1,
       "notes": []
     },
     {
-      "id": "BAT-2cf30521",
+      "id": "BAT-TIMER-2cf30521",
       "name": "SchedulerConfig#registerTimer",
       "trigger": "timer",
       "schedule": null,
@@ -45,6 +47,7 @@
         "file": "src/main/java/demo/batch/SchedulerConfig.java",
         "line": 25
       },
+      "sliceRoot": "src/main/java/demo/batch/SchedulerConfig.java",
       "reachableFiles": 1,
       "notes": [
         "method=schedule"

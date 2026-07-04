@@ -290,7 +290,7 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
         gitCommit: null,
         jobs: [
           {
-            id: 'BAT-aaaa1111',
+            id: 'BAT-QUARTZ-aaaa1111',
             name: 'orderSyncJobDetail',
             trigger: 'quartz',
             schedule: 'cron=0 0 4 * * ?',
@@ -298,11 +298,12 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
             handlerFile: 'src/OrderSyncJob.java',
             unresolvedHandler: false,
             evidence: { file: 'src/context-batch.xml', line: 13 },
+            sliceRoot: 'src/OrderSyncJob.java',
             reachableFiles: 2,
             notes: [],
           },
           {
-            id: 'BAT-bbbb2222',
+            id: 'BAT-QUARTZ-bbbb2222',
             name: 'ghost',
             trigger: 'quartz',
             schedule: null,
@@ -310,11 +311,12 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
             handlerFile: null,
             unresolvedHandler: true,
             evidence: { file: 'src/context-batch.xml', line: 31 },
+            sliceRoot: 'src/context-batch.xml',
             reachableFiles: 1,
             notes: [],
           },
           {
-            id: 'BAT-cccc3333',
+            id: 'BAT-SHELL-cccc3333',
             name: 'settle-batch.jar',
             trigger: 'shell',
             schedule: null,
@@ -322,6 +324,7 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
             handlerFile: null,
             unresolvedHandler: false,
             evidence: { file: 'bin/run.sh', line: 4 },
+            sliceRoot: 'bin/run.sh',
             reachableFiles: 1,
             notes: [],
           },
@@ -334,19 +337,38 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
       .buildDocSet(withBatch)
       .find((d) => d.docId === 'si-배치정의서')!
     const t = tableOf(doc.sections[0])
-    expect(t.columns).toEqual(['BAT_ID', '배치명', '트리거', '스케줄', '핸들러', '도달범위(파일)', '해석'])
+    expect(t.columns).toEqual([
+      'BAT_ID',
+      '배치명',
+      '트리거',
+      '스케줄',
+      '핸들러',
+      '데이터대상',
+      '선행/후행',
+      '수행서버',
+      '재기동/실패처리',
+      '도달범위(파일)',
+      '해석',
+    ])
     expect(t.rows[0].cells).toEqual([
-      'BAT-aaaa1111',
+      'BAT-QUARTZ-aaaa1111',
       'orderSyncJobDetail [추정]',
       'quartz',
       'cron=0 0 4 * * ?',
       'orderSyncJobDetail',
+      '[미확인]', // 데이터대상 — 운영 지식, 사람 채움
+      '[미확인]', // 선행/후행
+      '[미확인]', // 수행서버
+      '[미확인]', // 재기동/실패처리
       '2',
       '해석됨',
     ])
     expect(t.rows[0].evidence).toEqual([{ file: 'src/context-batch.xml', line: 13 }])
-    expect(t.rows[1].cells[6]).toBe('[미확인]')
-    expect(t.rows[2].cells[6]).toBe('외부')
+    // 미해석 행: 스케줄·도달범위·해석 모두 [미확인](카운트 1 의 "사소한 배치" 오독 방지).
+    expect(t.rows[1].cells[3]).toBe('[미확인]')
+    expect(t.rows[1].cells[9]).toBe('[미확인]')
+    expect(t.rows[1].cells[10]).toBe('[미확인]')
+    expect(t.rows[2].cells[10]).toBe('외부')
     // 미제공 → 0행(합성 금지).
     const empty = byId.get('si-배치정의서')!
     expect(tableOf(empty.sections[0]).rows).toEqual([])

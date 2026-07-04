@@ -12,7 +12,11 @@
  * 결정론: jobs (trigger, handler, file, line) 정렬, stats/suspects 정렬. 0건도 기록.
  */
 import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { z } from 'zod'
+import { loadConfig } from '../config/index.js'
+import { DEFAULT_DEPTH_CAP } from '../domain-map/slices.js'
 import type { BatchEntry, CensusReport, EdgesReport } from '../domain-map/types.js'
 
 /** `.spec/map/` 배치 인벤토리 파일명. */
@@ -20,7 +24,7 @@ export const BATCH_JOBS_FILENAME = 'batch-jobs.json'
 
 export const BatchJobSchema = z.object({
   id: z.string(),
-  /** handler 기반 표기 초안(사람 확정 전) — 없으면 entryId 꼬리. */
+  /** handler 기반 표기 초안(사람 확정 전) — crontab/shell 은 실행체 basename. */
   name: z.string(),
   trigger: z.string(),
   schedule: z.string().nullable(),
@@ -28,6 +32,12 @@ export const BatchJobSchema = z.object({
   handlerFile: z.string().nullable(),
   unresolvedHandler: z.boolean(),
   evidence: z.object({ file: z.string(), line: z.number().int() }),
+  /**
+   * 도달성 BFS 루트(handlerFile ?? filePath) — slices.json 의 slice.root 와 조인하는 키.
+   * P3(프로그램 목록)가 배치 경계 멤버 파일 목록을 slices 에서 얻을 때 사용.
+   */
+  sliceRoot: z.string(),
+  /** sliceRoot 에서 파일 엣지 BFS 도달 수(루트 포함, slices 와 동일 depthCap). */
   reachableFiles: z.number().int().nonnegative(),
   notes: z.array(z.string()),
 })
@@ -56,11 +66,12 @@ const XML_TRIGGERS = new Set(['quartz', 'task-xml', 'spring-batch'])
 
 const SUSPECT_SAMPLE_CAP = 10
 
-/** 파일 엣지 BFS 도달 수(루트 포함). */
+/** 파일 엣지 BFS 도달 수(루트 포함) — slices 와 동일 depthCap(두 '도달' 숫자의 의미 정합). */
 function reachableCount(root: string, adj: Map<string, string[]>): number {
   const reached = new Set<string>([root])
   let frontier = [root]
-  while (frontier.length > 0) {
+  let depth = 0
+  while (frontier.length > 0 && depth < DEFAULT_DEPTH_CAP) {
     const next: string[] = []
     for (const cur of frontier) {
       for (const t of adj.get(cur) ?? []) {
@@ -70,12 +81,38 @@ function reachableCount(root: string, adj: Map<string, string[]>): number {
       }
     }
     frontier = next
+    depth++
   }
   return reached.size
 }
 
-/** batchEntries + edges + census → BatchJobsReport(파일 기록 없음). */
+/** crontab/shell 실행체 표기 초안 — 명령 첫 토큰의 basename(운영자 가독). */
+function commandBasename(command: string): string {
+  const first = command.trim().split(/\s+/)[0] ?? command
+  const seg = first.split('/')
+  return seg[seg.length - 1] || first
+}
+
+/** 트리거 → id 태그(W1 IF-<PROTO>- 관례 정합 — 카테고리 육안 스캔 가능). */
+const TRIGGER_TAG: Record<string, string> = {
+  scheduled: 'SCHED',
+  main: 'MAIN',
+  quartz: 'QUARTZ',
+  'task-xml': 'TASK',
+  'spring-batch': 'SB',
+  'quartz-java': 'QJAVA',
+  executor: 'EXEC',
+  timer: 'TIMER',
+  shell: 'SHELL',
+  crontab: 'CRON',
+}
+
+/**
+ * batchEntries + edges + census → BatchJobsReport(파일 기록 없음).
+ * @param projectRoot 구조 기반 의심신호(java 파일 판독)와 억제 config 로드에 사용.
+ */
 export function buildBatchJobs(
+  projectRoot: string,
   batchEntries: BatchEntry[],
   edges: Pick<EdgesReport, 'edges'>,
   census: CensusReport,
@@ -98,16 +135,22 @@ export function buildBatchJobs(
     const seed = n === 1 ? baseSeed : `${baseSeed}|dup${n}`
     const root = handlerFile ?? b.filePath
     const entryTail = b.entryId.slice(b.entryId.indexOf('#') + 1)
+    const name =
+      b.trigger === 'spring-batch'
+        ? entryTail // 잡 id 가 업무명 — handler(실행체 빈)보다 우선.
+        : b.trigger === 'crontab' || b.trigger === 'shell'
+          ? commandBasename(b.handler ?? entryTail) // 명령 전문 대신 실행체 basename.
+          : (b.handler ?? entryTail)
     return {
-      id: `BAT-${createHash('sha256').update(seed).digest('hex').slice(0, 8)}`,
-      // spring-batch 는 잡 id(entryId 꼬리)가 업무명 — handler(실행체 빈)보다 우선.
-      name: b.trigger === 'spring-batch' ? entryTail : (b.handler ?? entryTail),
+      id: `BAT-${TRIGGER_TAG[b.trigger] ?? b.trigger.toUpperCase()}-${createHash('sha256').update(seed).digest('hex').slice(0, 8)}`,
+      name,
       trigger: b.trigger,
       schedule: b.schedule,
       handler: b.handler,
       handlerFile,
       unresolvedHandler: XML_TRIGGERS.has(b.trigger) && handlerFile === null,
       evidence: { file: b.filePath, line: b.line },
+      sliceRoot: root,
       reachableFiles: reachableCount(root, adj),
       notes: [...b.notes].sort(cmp),
     }
@@ -126,23 +169,35 @@ export function buildBatchJobs(
     .map(([trigger, count]) => ({ trigger, count }))
     .sort((a, b) => cmp(a.trigger, b.trigger))
 
-  // 의심 신호 — 잡 명명 관례 파일인데 어떤 엔트리(파일/핸들러)에도 안 물림.
+  // 의심 신호 — 어떤 엔트리(파일/핸들러)에도 안 물린 잡 후보.
+  //  · job-structure: 배치 API 사용 흔적(org.quartz / QuartzJobBean / JobExecutionContext /
+  //    springframework.batch) — 명명 관례가 없는 레거시에서도 걸리는 구조 신호(1급).
+  //  · job-named-class: *Job/*Batch/*Tasklet 명명 관례(2급, 위양성 가능 — 예: DeptJob=직무).
+  //  억제: understanding.config.json `batchScan.ignoreSuspects`(relPath 정확 일치)로
+  //  확인 완료된 위양성을 재발 없이 잠재운다(W1 interfaceScan.clients seam 과 동일 철학).
   const covered = new Set<string>()
   for (const j of jobs) {
     covered.add(j.evidence.file)
     if (j.handlerFile) covered.add(j.handlerFile)
   }
+  const ignore = new Set(loadConfig(projectRoot)?.batchScan?.ignoreSuspects ?? [])
   const isTestPath = (p: string) => p.split('/').some((seg) => seg === 'test' || seg === 'tests')
-  const suspects = census.files
-    .filter(
-      (f) =>
-        f.lang === 'java' &&
-        /(Job|Batch|Tasklet)\.java$/.test(f.relPath) &&
-        !covered.has(f.relPath) &&
-        !isTestPath(f.relPath),
-    )
-    .map((f) => ({ file: f.relPath, kind: 'job-named-class' }))
-    .sort((a, b) => cmp(a.file, b.file))
+  const STRUCTURE_RE = /org\.quartz|QuartzJobBean|JobExecutionContext|springframework\.batch/
+  const suspects: Array<{ file: string; kind: string }> = []
+  for (const f of census.files) {
+    if (f.lang !== 'java' || covered.has(f.relPath) || isTestPath(f.relPath) || ignore.has(f.relPath))
+      continue
+    let structural = false
+    try {
+      structural = STRUCTURE_RE.test(readFileSync(join(projectRoot, f.relPath), 'utf8'))
+    } catch {
+      // 판독 실패 파일은 구조 신호 판단 불가 — 명명 신호만 적용.
+    }
+    if (structural) suspects.push({ file: f.relPath, kind: 'job-structure' })
+    else if (/(Job|Batch|Tasklet)\.java$/.test(f.relPath))
+      suspects.push({ file: f.relPath, kind: 'job-named-class' })
+  }
+  suspects.sort((a, b) => cmp(a.kind, b.kind) || cmp(a.file, b.file))
 
   return BatchJobsReportSchema.parse({
     schemaVersion: 1,

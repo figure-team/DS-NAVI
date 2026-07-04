@@ -2,7 +2,7 @@
   "description": "검수된 오라클(사람 확인 완료) — jobs/stats/suspectSignals 골든 등가",
   "jobs": [
     {
-      "id": "BAT-4c313861",
+      "id": "BAT-QUARTZ-4c313861",
       "name": "missingJobDetail",
       "trigger": "quartz",
       "schedule": "cron=0 0 6 * * ?",
@@ -13,11 +13,12 @@
         "file": "src/main/resources/context-batch.xml",
         "line": 31
       },
+      "sliceRoot": "src/main/resources/context-batch.xml",
       "reachableFiles": 1,
       "notes": []
     },
     {
-      "id": "BAT-41582079",
+      "id": "BAT-QUARTZ-41582079",
       "name": "orderSyncJobDetail",
       "trigger": "quartz",
       "schedule": "cron=0 0 4 * * ?",
@@ -28,11 +29,12 @@
         "file": "src/main/resources/context-batch.xml",
         "line": 13
       },
+      "sliceRoot": "src/main/java/demo/batch/OrderSyncJob.java",
       "reachableFiles": 2,
       "notes": []
     },
     {
-      "id": "BAT-84fb6b7c",
+      "id": "BAT-QUARTZ-84fb6b7c",
       "name": "reportJobDetail",
       "trigger": "quartz",
       "schedule": "cron=0 30 5 * * ?",
@@ -43,11 +45,12 @@
         "file": "src/main/resources/context-batch.xml",
         "line": 24
       },
+      "sliceRoot": "src/main/java/demo/batch/ReportJob.java",
       "reachableFiles": 1,
       "notes": []
     },
     {
-      "id": "BAT-a4f5a654",
+      "id": "BAT-TASK-a4f5a654",
       "name": "orderSyncJob#cleanup",
       "trigger": "task-xml",
       "schedule": "cron=0 15 3 * * ?",
@@ -58,6 +61,7 @@
         "file": "src/main/resources/context-batch.xml",
         "line": 38
       },
+      "sliceRoot": "src/main/java/demo/batch/OrderSyncJob.java",
       "reachableFiles": 2,
       "notes": []
     }

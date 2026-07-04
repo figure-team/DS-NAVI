@@ -120,6 +120,40 @@ Java 신규 탐지는 W1 java-scan 관례 재사용: 단일 파일 선언 바인
 | P2-c | ✅ | (본 커밋) | batch-jobs.json(안정 id·도달범위·의심신호)+coverage+si-배치정의서 |
 | P2-d | ✅ | (본 커밋) | 실측 §9, 적대적 리뷰는 별도 진행 |
 
+## 10. 적대적 리뷰 반영 (2026-07-04)
+
+### 설계 비평(critic) 처리
+
+**반박(사실 검증으로 기각)** — "DI 주입 절단으로 잡의 하위 협력자가 여전히 unreached"(축2 핵심):
+엣지 추출은 `injection`(@Autowired·@Resource·@Inject)·`field-type`·`impl`(인터페이스→구현)
+엣지를 이미 산출한다(domain-map/types.ts EdgeKind). `@Autowired private SettleDao` 프로브로
+injection 엣지 생성을 실증했고, quartz-xml 픽스처의 OrderSyncJob→OrderDao 를 @Autowired 로
+바꿔 **DI 경유 도달성 회귀 테스트로 고정**. 실제 잔여 한계는 `Class.forName` 리플렉션 잡
+(§한계에 명시)뿐.
+
+**반영**
+1. *운영 정의서 컬럼 부재(치명)* → 데이터대상·선행/후행·수행서버·재기동/실패처리 4열을
+   **[미확인] 사람-채움 열**로 추가(생략 대신 표면화 — W1 철학 정합). 템플릿에 "정적
+   인벤토리 기반 초안, 제출 전 사람 확정 필수" 명시.
+2. *도달범위 숫자 오독* → 미해석 행은 [미확인](루트=XML 카운트 1 오독 방지), BFS 를 slices
+   와 동일 depthCap 으로 정합, 템플릿에 의미(정적 근사) 명시.
+3. *id 체계 W1 불일치* → `BAT-<트리거태그>-<hash8>`(BAT-QUARTZ-…, BAT-CRON-…).
+   시드 중복(동일 정의 2행)은 dup 연번으로 유일성 보장(선수정 8d91936).
+4. *의심신호 늑대소년* → ①구조 신호 1급 추가(org.quartz/QuartzJobBean/JobExecutionContext/
+   springframework.batch 사용인데 미배선 — 명명 관례 없는 배치의 위음성 방지),
+   ②`batchScan.ignoreSuspects` config 로 확인된 위양성(DeptJob) 영구 억제.
+5. *P3 입력 부족* → `sliceRoot`(slices.json slice.root 조인 키) 필드 추가 — 배치 경계
+   멤버 파일 목록은 slices 에서 조인(중복 저장 없이).
+6. *배치명 초안 품질* → crontab/shell 은 명령 전문 대신 실행체 basename.
+
+**백로그(범위 외 결정)**
+- main() 트리거의 FP 구분(@SpringBootApplication/CLI 제외) — 기존 골든 등가 영역이라 신중 접근.
+- as-built/API 순번 id(API-001) 재스캔 불안정 — W1/W2 교훈의 소급 적용, 별도 과제.
+- 별도 repo 배치 스크립트(운영 형상) 인입 경로, 배치 체인(선행관계) 자동 추론, Class.forName.
+- "핸들러 해소로 un-orphan 된 잡 클래스 수" 델타 지표.
+
+### 코드 리뷰(reviewer) 처리 → 하단 추가 예정
+
 ## 9. P2-d 실측 결과 (2026-07-04)
 
 - **jpetstore-6**: 배치 0건, 의심신호 0 — 음성 케이스. 전체 파이프라인 2회 실행

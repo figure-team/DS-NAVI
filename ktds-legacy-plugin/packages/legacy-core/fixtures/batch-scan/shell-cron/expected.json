@@ -2,8 +2,8 @@
   "description": "검수된 오라클(사람 확인 완료) — jobs/stats/suspectSignals 골든 등가",
   "jobs": [
     {
-      "id": "BAT-c7e81dbc",
-      "name": "/app/bin/report.sh --daily",
+      "id": "BAT-CRON-c7e81dbc",
+      "name": "report.sh",
       "trigger": "crontab",
       "schedule": "cron=30 5 * * 1-5",
       "handler": "/app/bin/report.sh --daily",
@@ -13,12 +13,13 @@
         "file": "etc/crontab",
         "line": 4
       },
+      "sliceRoot": "etc/crontab",
       "reachableFiles": 1,
       "notes": []
     },
     {
-      "id": "BAT-68294395",
-      "name": "/app/bin/run-settle.sh",
+      "id": "BAT-CRON-68294395",
+      "name": "run-settle.sh",
       "trigger": "crontab",
       "schedule": "cron=0 4 * * *",
       "handler": "/app/bin/run-settle.sh",
@@ -28,11 +29,12 @@
         "file": "etc/crontab",
         "line": 3
       },
+      "sliceRoot": "etc/crontab",
       "reachableFiles": 1,
       "notes": []
     },
     {
-      "id": "BAT-fb57ea6d",
+      "id": "BAT-SHELL-fb57ea6d",
       "name": "demo.batch.SettleMain",
       "trigger": "shell",
       "schedule": null,
@@ -43,11 +45,12 @@
         "file": "bin/run-settle.sh",
         "line": 5
       },
+      "sliceRoot": "bin/run-settle.sh",
       "reachableFiles": 1,
       "notes": []
     },
     {
-      "id": "BAT-12185b06",
+      "id": "BAT-SHELL-12185b06",
       "name": "settle-batch.jar",
       "trigger": "shell",
       "schedule": null,
@@ -58,6 +61,7 @@
         "file": "bin/run-settle.sh",
         "line": 4
       },
+      "sliceRoot": "bin/run-settle.sh",
       "reachableFiles": 1,
       "notes": []
     }

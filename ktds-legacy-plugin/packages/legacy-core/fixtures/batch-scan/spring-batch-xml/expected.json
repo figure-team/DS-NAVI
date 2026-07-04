@@ -2,7 +2,7 @@
   "description": "검수된 오라클(사람 확인 완료) — jobs/stats/suspectSignals 골든 등가",
   "jobs": [
     {
-      "id": "BAT-94cebc7a",
+      "id": "BAT-SB-94cebc7a",
       "name": "orderAggJob",
       "trigger": "spring-batch",
       "schedule": null,
@@ -13,6 +13,7 @@
         "file": "src/main/resources/job-settle.xml",
         "line": 15
       },
+      "sliceRoot": "src/main/resources/job-settle.xml",
       "reachableFiles": 1,
       "notes": [
         "reader=orderReader",
@@ -20,7 +21,7 @@
       ]
     },
     {
-      "id": "BAT-2b2b7ec8",
+      "id": "BAT-SB-2b2b7ec8",
       "name": "settleJob",
       "trigger": "spring-batch",
       "schedule": null,
@@ -31,6 +32,7 @@
         "file": "src/main/resources/job-settle.xml",
         "line": 9
       },
+      "sliceRoot": "src/main/java/demo/sb/SettleTasklet.java",
       "reachableFiles": 1,
       "notes": []
     }

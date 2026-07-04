@@ -235,7 +235,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   const interfaces = await extractInterfaces(projectRoot, census)
   writeMapArtifact(projectRoot, INTERFACES_FILENAME, interfaces)
   // W2: 배치 인벤토리 — batch-jobs.json(내용 파생 안정 id + 도달 범위 + 의심신호).
-  const batchJobs = buildBatchJobs(routes.batchEntries, edges, census)
+  const batchJobs = buildBatchJobs(projectRoot, routes.batchEntries, edges, census)
   writeMapArtifact(projectRoot, BATCH_JOBS_FILENAME, batchJobs)
   // 보완 D-c/D-b: 통합 커버리지 리포트 + 파일 fingerprint 스냅샷(증분 재스캔 기준).
   const coverage = buildCoverageReport({

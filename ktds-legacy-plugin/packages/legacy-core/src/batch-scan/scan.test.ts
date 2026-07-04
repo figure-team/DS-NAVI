@@ -34,11 +34,11 @@ async function scan(fixture: string) {
   const census = buildCensus(root)
   const routes = await extractRoutes(root, census)
   const edges = await extractEdges(root, census)
-  return { census, routes, edges, report: buildBatchJobs(routes.batchEntries, edges, census) }
+  return { census, routes, edges, report: buildBatchJobs(root, routes.batchEntries, edges, census) }
 }
 
 describe('batch scan — golden equivalence', () => {
-  for (const fx of ['quartz-xml', 'spring-batch-xml', 'programmatic', 'shell-cron']) {
+  for (const fx of ['quartz-xml', 'spring-batch-xml', 'programmatic', 'shell-cron', 'structure-suspect']) {
     it(`${fx}: jobs/stats/suspects 오라클 일치`, async () => {
       const { report } = await scan(fx)
       const oracle = loadOracle(fx)
@@ -48,14 +48,28 @@ describe('batch scan — golden equivalence', () => {
     })
   }
 
-  it('도달성 회귀(핵심): quartz XML 잡 클래스·하위 의존이 unreached 로 오판되지 않음', async () => {
+  it('도달성 회귀(핵심): quartz XML 잡 클래스·DI 주입 하위 의존이 unreached 로 오판되지 않음', async () => {
     const { census, routes, edges } = await scan('quartz-xml')
     const slices = buildSlices(census, routes, edges)
     const status = new Map(slices.ownership.map((o) => [o.relPath, o.status]))
     // 핸들러 해석 전에는 셋 다 unreached(XML 파일엔 엣지가 없음)였다.
     expect(status.get('src/main/java/demo/batch/OrderSyncJob.java')).not.toBe('unreached')
     expect(status.get('src/main/java/demo/batch/ReportJob.java')).not.toBe('unreached')
+    // OrderDao 는 @Autowired 주입(injection 엣지)으로 도달 — "DI 절단" 반박 회귀.
     expect(status.get('src/main/java/demo/batch/OrderDao.java')).not.toBe('unreached')
+  })
+
+  it('의심신호: 구조 신호(1급)·명명 신호(2급)·ignoreSuspects 억제(위양성 잠재우기)', async () => {
+    const { report } = await scan('structure-suspect')
+    expect(report.jobs).toEqual([]) // 어떤 트리거에도 배선 안 됨
+    const byFile = new Map(report.suspectSignals.samples.map((s) => [s.file, s.kind]))
+    // 명명 관례 없어도 구조 신호로 걸린다(위음성 방지).
+    expect(byFile.get('src/main/java/demo/SettlementDaily.java')).toBe('job-structure')
+    // *Job 명명이어도 구조 신호가 1급.
+    expect(byFile.get('src/main/java/demo/UnwiredQuartzJob.java')).toBe('job-structure')
+    // 확인된 위양성(DeptJob=직무)은 config 로 억제 — 늑대소년 방지.
+    expect(byFile.has('src/main/java/demo/DeptJob.java')).toBe(false)
+    expect(report.suspectSignals.count).toBe(2)
   })
 
   it('핸들러 해석 3방식 + 미해석 [미확인] 표면화', async () => {
@@ -99,11 +113,18 @@ describe('batch scan — golden equivalence', () => {
     expect(agg.unresolvedHandler).toBe(true)
   })
 
-  it('안정 id: BAT-<hash8> 형식 + 유일 + 재실행 동일', async () => {
+  it('안정 id: BAT-<트리거태그>-<hash8> 형식 + 유일 + 재실행 동일', async () => {
     const a = await scan('quartz-xml')
     const b = await scan('quartz-xml')
     expect(stableJson(a.report)).toBe(stableJson(b.report))
-    for (const j of a.report.jobs) expect(j.id).toMatch(/^BAT-[0-9a-f]{8}$/)
+    for (const j of a.report.jobs) expect(j.id).toMatch(/^BAT-[A-Z]+-[0-9a-f]{8}$/)
     expect(new Set(a.report.jobs.map((j) => j.id)).size).toBe(a.report.jobs.length)
+  })
+
+  it('sliceRoot: slices.json 의 slice.root 와 조인 가능(P3 입력 계약)', async () => {
+    const { census, routes, edges, report } = await scan('quartz-xml')
+    const slices = buildSlices(census, routes, edges)
+    const sliceRoots = new Set(slices.slices.map((s) => s.root))
+    for (const j of report.jobs) expect(sliceRoots.has(j.sliceRoot)).toBe(true)
   })
 })

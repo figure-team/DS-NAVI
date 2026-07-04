@@ -91,6 +91,13 @@ export const ConfigSchema = z
     interfaceScan: z
       .object({ clients: z.array(CustomClientSpecSchema).default([]) })
       .optional(),
+    /**
+     * W2 배치 스캔 설정 — ignoreSuspects: 확인 완료된 의심신호 위양성(relPath 정확 일치)을
+     * 잠재운다(예: 직무 의미의 DeptJob.java). 늑대소년 방지 seam.
+     */
+    batchScan: z
+      .object({ ignoreSuspects: z.array(z.string()).default([]) })
+      .optional(),
   })
   .passthrough()
 

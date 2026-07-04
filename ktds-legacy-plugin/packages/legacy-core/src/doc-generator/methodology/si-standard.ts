@@ -195,12 +195,27 @@ function outboundRows(input: DocInput): TableRow[] {
 }
 
 /** SI 배치정의서 열 — template batch-list-si 와 1:1. */
-const BATCH_COLUMNS = ['BAT_ID', '배치명', '트리거', '스케줄', '핸들러', '도달범위(파일)', '해석']
+const BATCH_COLUMNS = [
+  'BAT_ID',
+  '배치명',
+  '트리거',
+  '스케줄',
+  '핸들러',
+  '데이터대상',
+  '선행/후행',
+  '수행서버',
+  '재기동/실패처리',
+  '도달범위(파일)',
+  '해석',
+]
 
 /**
  * si-배치정의서(W2) — batch-jobs.json 승계. 탐지·스케줄·핸들러·도달범위는 결정론 사실
- * → CONFIRMED(evidence file:line). 배치명은 핸들러 초안 [추정](사람이 업무명으로 교체).
+ * → CONFIRMED(evidence file:line). 배치명은 초안 [추정](사람이 업무명으로 교체).
+ * 운영 축 4열(데이터대상·선행/후행·수행서버·재기동)은 정적 분석 불가 — [미확인]으로
+ * 표면화해 사람이 운영 지식으로 채운다(생략하면 그 필드가 기대된다는 것조차 안 보인다).
  * '해석' = 잡 구현 파일 해석 여부(해석됨/[미확인]) — shell/crontab 은 프로젝트 밖이라 '외부'.
+ * 도달범위는 미해석 행에서 [미확인](루트=XML 인 카운트 1 이 "사소한 배치"로 오독되는 것 방지).
  */
 function buildSiBatchSpec(input: DocInput): GeneratedDoc {
   const jobs = input.batchJobs?.jobs ?? []
@@ -211,9 +226,13 @@ function buildSiBatchSpec(input: DocInput): GeneratedDoc {
         j.id,
         `${j.name} ${INFERRED_CELL}`,
         j.trigger,
-        j.schedule ?? EMPTY_CELL,
+        j.schedule ?? UNRESOLVED_CELL,
         j.handler ?? UNRESOLVED_CELL,
-        String(j.reachableFiles),
+        UNRESOLVED_CELL,
+        UNRESOLVED_CELL,
+        UNRESOLVED_CELL,
+        UNRESOLVED_CELL,
+        j.unresolvedHandler ? UNRESOLVED_CELL : String(j.reachableFiles),
         external ? '외부' : j.unresolvedHandler ? UNRESOLVED_CELL : '해석됨',
       ],
       confidence: 'CONFIRMED',

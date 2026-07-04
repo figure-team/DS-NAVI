@@ -13,6 +13,10 @@ evidenceRate: 1
 
 ## 기능 목록
 
+도메인 노드 1개 = 표 1행. 설명=도메인 summary, 진입점=domainMeta.entryPoint,
+업무규칙=domainMeta.businessRules(없으면 [추정]). 관련 API/테이블은 그래프에 도메인↔라우트/
+테이블 연결정보가 없으면 [추정](합성 금지, grounding 보존). 기능ID=FN-001.. (도메인 순서).
+
 | 기능ID | 기능명 | 설명 | 진입점 | 관련 API | 관련 테이블 | 업무규칙 | 신뢰도 | 근거 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | FN-001 | 계정/회원 | 계정 도메인은 회원 로그인(signon)·로그아웃(signoff)·신규 등록(newAccount)·프로필 수정(editAccount)을 처리하고, 로그인 시 즐겨찾기 카테고리(favouriteCategoryId)의 상품을 MyList로 로딩하는 Stripes ActionBean 흐름을 담당한다. | [추정] | [추정] | [추정] | 계정 수정 시 account·profile은 항상 갱신하되, signon(비밀번호)은 비밀번호가 비어있지 않은 경우에만 updateSignon으로 갱신한다., 로그아웃은 세션을 무효화(invalidate)하고 빈 상태로 clear한다., 로그인 성공 시 password를 null로 비우고 favouriteCategoryId 기준 상품 목록을 MyList로 로딩한 뒤, 인증 플래그를 켜고 accountBean을 세션에 저장한다., 로그인은 AccountService.getAccount(username, password)로 자격증명을 검증하며, 결과가 null이면 인증 실패 메시지를 세팅하고 로그인 폼으로 되돌린다., 신규 계정 생성은 AccountService.insertAccount가 account·profile·signon 세 테이블 행을 트랜잭션으로 함께 기록한다., 인증 상태는 authenticated 플래그와 account 및 username의 존재를 모두 만족해야 true로 판단한다. | [확정] | `src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java:43`, `src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java:170` |

@@ -13,6 +13,8 @@ evidenceRate: 0.976
 
 ## 레이어
 
+시스템을 구성하는 계층(api/service/dao/db 등)과 구성요소 수. layer 집계에서 채운다([추정]).
+
 <!-- claims:FENCE:OPEN -->
 - [추정] 레이어: api (27개 구성요소).
 - [추정] 레이어: dao (21개 구성요소).
@@ -20,6 +22,8 @@ evidenceRate: 0.976
 <!-- claims:FENCE:CLOSE -->
 
 ## 의존 방향
+
+모듈/계층 간 의존 방향. depends_on·imports 엣지에서 채운다([확정]).
 
 <!-- claims:FENCE:OPEN -->
 - [확정] 의존: src/main/java/org/mybatis/jpetstore/domain/CartItem.java → src/main/java/org/mybatis/jpetstore/domain/Item.java (field-type). 근거: `src/main/java/org/mybatis/jpetstore/domain/CartItem.java:31`
@@ -147,5 +151,7 @@ evidenceRate: 0.976
 <!-- claims:FENCE:CLOSE -->
 
 ## 순환 의존 후보
+
+탐지된 순환 의존(있으면). 순환탐지 결과에서 채운다([확인 필요] — 동적 호출 미반영 가능).
 
 _(항목 없음)_

@@ -33,6 +33,8 @@ export const ProgramTypeSchema = z.enum([
   'db',
   'mapper-xml',
   'common',
+  /** 테스트 코드(경로 세그먼트 test/tests) — 운영 프로그램과 분리 계상(감리 관례). */
+  'test',
 ])
 export type ProgramType = z.infer<typeof ProgramTypeSchema>
 
@@ -143,6 +145,7 @@ const TYPE_TAG: Record<ProgramType, string> = {
   db: 'DB',
   'mapper-xml': 'MAP',
   common: 'COM',
+  test: 'TST',
 }
 
 /** 간이법 평균복잡도 가중치(미조정). */
@@ -255,8 +258,12 @@ export function buildProgramInventory(
     const layer = deriveStepLayer(f.relPath, null, signals)
     // notes: routeId/BAT-id 는 자체 접두어를 갖는 안정 식별자 — 그대로 기록(중복 제거).
     const notes = new Set<string>()
+    const isTest = f.relPath.split('/').some((seg) => seg === 'test' || seg === 'tests')
     let type: ProgramType
-    if (screenRoutes.has(f.relPath) || isJsp) {
+    if (isTest) {
+      // 테스트 코드는 운영 프로그램과 분리 — 감리 목록에서 섞이면 본수가 부풀려 읽힌다.
+      type = 'test'
+    } else if (screenRoutes.has(f.relPath) || isJsp) {
       type = 'screen'
       for (const id of screenRoutes.get(f.relPath) ?? []) notes.add(id)
       // 이중 컨트롤러(form+api): api routeId 도 notes 에 보존(추적성 유실 방지).

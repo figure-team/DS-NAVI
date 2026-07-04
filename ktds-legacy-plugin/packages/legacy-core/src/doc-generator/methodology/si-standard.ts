@@ -209,6 +209,7 @@ const PGM_TYPE_KO: Record<string, string> = {
   db: 'DB',
   'mapper-xml': 'SQL매퍼',
   common: '공통/기타',
+  test: '테스트',
 }
 
 /**

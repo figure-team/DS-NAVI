@@ -13,6 +13,10 @@ evidenceRate: 1
 
 ## 프로그램 목록
 
+소스 파일/클래스 1개 = 표 1행. 파일 경로·클래스는 census/노드 사실 → [확정] + 근거(file:line).
+레이어=노드 layer(api/service/dao/db/other), 책임 요약=노드 summary(없으면 빈칸).
+프로그램ID=PG-001.. (파일 경로 정렬 순서).
+
 | 프로그램ID | 파일 경로 | 클래스 | 레이어 | 책임 요약 | 신뢰도 | 근거 |
 | --- | --- | --- | --- | --- | --- | --- |
 | PG-001 | src/main/java/org/mybatis/jpetstore/domain/Account.java | Account | unknown | editAccount 흐름에서 갱신되는 데이터 구조인 Account 엔티티다. | [확정] | `src/main/java/org/mybatis/jpetstore/domain/Account.java:27` |

@@ -13,6 +13,10 @@ evidenceRate: 1
 
 ## 고영향 컴포넌트
 
+피의존수(fan-in)·전이 영향 파일수 기준 상위 컴포넌트. 변경 시 파급이 큰 핫스팟.
+fan-in/fan-out 은 depends_on/imports/calls 엣지 집계 → [확정]. 전이 영향 파일수는 impact
+엔진(reach) 결과. 레이어=노드 layer. 컴포넌트=파일 경로(근거 file:line). 피의존수 내림차순.
+
 | 컴포넌트 | 피의존수(fan-in) | 의존수(fan-out) | 전이 영향(파일수) | 레이어 | 신뢰도 | 근거 |
 | --- | --- | --- | --- | --- | --- | --- |
 | src/main/java/org/mybatis/jpetstore/domain/Item.java | 5 | 0 | 0 | unknown | [확정] | `src/main/java/org/mybatis/jpetstore/domain/Item.java:26` |
@@ -36,6 +40,9 @@ evidenceRate: 1
 | src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java | 0 | 2 | 7 | api | [확정] | `src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java:107` |
 
 ## 도메인 간 의존
+
+도메인 경계를 넘는 의존(결합). skeleton 의 교차 도메인 의존 엣지 → [확정] + 근거 건수.
+출발/도착 도메인, 가중치, 근거 건수. 가중치 내림차순.
 
 | 출발 도메인 | 도착 도메인 | 가중치 | 근거 건수 | 신뢰도 | 근거 |
 | --- | --- | --- | --- | --- | --- |

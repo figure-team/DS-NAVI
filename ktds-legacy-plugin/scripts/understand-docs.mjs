@@ -10,7 +10,7 @@
  */
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const distEntry = join(here, '..', 'packages', 'legacy-core', 'dist', 'index.js')
@@ -256,20 +256,29 @@ for (const entry of DOC_SET) {
 
 // W7: xlsx 병기 — 표 보유 문서만, md 와 동일 데이터(빌더 산출)에서 생성(불일치 금지).
 // 라이터는 의존성 0·고정 타임스탬프라 동일 입력 → byte-identical.
+// 재생성 전 기존 .xlsx 전부 제거 — 문서가 표를 잃거나 개명되면 낡은 파일이 잔존해
+// hasXlsx 로 계속 서빙되는 사고 방지(이 디렉터리의 xlsx 는 전부 본 스크립트 산출물).
+for (const f of readdirSync(OUTPUT_DIR)) {
+  if (f.endsWith('.xlsx')) rmSync(join(OUTPUT_DIR, f))
+}
 const xlsxDocs = []
+const xlsxMeta = { sourceCommit }
 for (const doc of docs) {
-  const sheets = docToSheets(doc)
+  const sheets = docToSheets(doc, xlsxMeta)
   if (sheets.length === 0) continue
   writeFileSync(join(OUTPUT_DIR, `${doc.docId}.xlsx`), buildXlsxWorkbook(sheets))
   xlsxDocs.push(doc.docId)
 }
-// RTM 원장(rtm.json) → rtm.xlsx(요구 원장 + 기능(AS-IS) 원장).
+// RTM 원장(rtm.json) → rtm.xlsx(문서정보+요구/기능 원장+커버리지 현황).
 const rtmPath = join(projectRoot, '.understand-anything', 'rtm.json')
 let rtmXlsx = false
 if (existsSync(rtmPath)) {
   try {
     const rtm = JSON.parse(readFileSync(rtmPath, 'utf8'))
-    writeFileSync(join(OUTPUT_DIR, 'rtm.xlsx'), buildXlsxWorkbook(rtmToSheets(rtm)))
+    writeFileSync(
+      join(OUTPUT_DIR, 'rtm.xlsx'),
+      buildXlsxWorkbook(rtmToSheets(rtm, { sourceCommit: rtm.gitCommit ?? sourceCommit })),
+    )
     rtmXlsx = true
   } catch (err) {
     console.error(`  rtm.xlsx 생략 — rtm.json 판독 실패: ${err.message}`)

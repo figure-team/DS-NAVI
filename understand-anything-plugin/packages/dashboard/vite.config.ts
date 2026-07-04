@@ -1775,6 +1775,20 @@ export default defineConfig({
                 at: o?.at ?? null,
                 // W7: 병기된 xlsx 존재 여부 — DocsView 다운로드 버튼 노출 조건.
                 hasXlsx: !!dir && fs.existsSync(path.join(dir, `${docId}.xlsx`)),
+                // W7 비평 반영: xlsx 는 스캔 스냅샷 — 확정 편집(오버레이) 존재 또는
+                // md 가 더 새로우면 stale(버튼에 "미반영 편집 있음" 경고 노출).
+                xlsxStale: (() => {
+                  if (!dir) return false;
+                  const xf = path.join(dir, `${docId}.xlsx`);
+                  if (!fs.existsSync(xf)) return false;
+                  if (o) return true; // 확정 편집 오버레이 존재 → xlsx 에 미반영
+                  try {
+                    const mf = path.join(dir, `${docId}.md`);
+                    return fs.statSync(mf).mtimeMs > fs.statSync(xf).mtimeMs;
+                  } catch {
+                    return false;
+                  }
+                })(),
               };
             });
             sendJson(res, 200, { docs, hasOutput: !!dir });

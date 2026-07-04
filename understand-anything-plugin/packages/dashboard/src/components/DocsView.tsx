@@ -69,6 +69,8 @@ interface DocListItem {
   at: string | null;
   /** W7: 병기된 xlsx 존재 — 다운로드 버튼 노출 조건. */
   hasXlsx?: boolean;
+  /** W7: xlsx 가 스캔 스냅샷보다 낡음(확정 편집 미반영/md 갱신) — 경고 라벨. */
+  xlsxStale?: boolean;
 }
 
 const APPROVER_LS_KEY = "ktds.approver";
@@ -312,10 +314,19 @@ export default function DocsView() {
                   <a
                     href={`/doc-xlsx?token=${encodeURIComponent(accessToken)}&docId=${encodeURIComponent(selectedDoc.docId)}`}
                     download={`${selectedDoc.docId}.xlsx`}
-                    className="rounded-md border border-border-subtle text-text-secondary hover:text-text-primary transition-colors"
+                    className={`rounded-md border transition-colors ${
+                      selectedDoc.xlsxStale
+                        ? "border-amber-400/60 text-amber-500 hover:text-amber-400"
+                        : "border-border-subtle text-text-secondary hover:text-text-primary"
+                    }`}
                     style={{ padding: "4px 12px", fontSize: 12 }}
+                    title={
+                      selectedDoc.xlsxStale
+                        ? "이 xlsx 는 스캔 스냅샷입니다 — 이후의 확정 편집/문서 갱신이 반영되지 않았습니다. 최신화: /understand-docs 재실행."
+                        : "정적 스캔 스냅샷(원천 데이터) — 확정 편집은 md 가 진실입니다."
+                    }
                   >
-                    xlsx 다운로드
+                    {selectedDoc.xlsxStale ? "xlsx(스냅샷 · 미반영 편집 있음)" : "xlsx 다운로드"}
                   </a>
                 )}
                 {!canWrite ? (

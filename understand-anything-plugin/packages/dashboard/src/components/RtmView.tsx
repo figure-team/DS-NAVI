@@ -540,6 +540,17 @@ export default function RtmView() {
               {CIRCLED[Math.min(session?.producedStep ?? 0, 4)]} 단계 생성 중…
             </span>
           )}
+          {canWrite && (
+            <a
+              href={`/doc-xlsx?token=${encodeURIComponent(accessToken ?? "")}&docId=rtm`}
+              download="rtm.xlsx"
+              className="rounded-lg border border-border-subtle text-text-secondary hover:text-text-primary transition-colors"
+              style={{ padding: "6px 14px", fontSize: 12 }}
+              title="RTM xlsx(문서정보·요구/기능 원장·커버리지 현황) — understand-docs 실행 시점 스냅샷. 행단위 확정 오버레이는 미반영(md/탭이 진실)."
+            >
+              xlsx 다운로드
+            </a>
+          )}
           <button type="button" onClick={() => { setIntakeOpen(true); setIntakeError(null); setTargetStep(5); }} disabled={intakeStatus === "running"}
             className="rounded-lg border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-40" style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600 }}
             title="자연어로 새 요구사항을 요청 → 가이드 5단계로 분해·문서화(전부 [추정])">＋ 새 요청</button>

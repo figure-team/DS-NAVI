@@ -22,8 +22,46 @@ function isAggregateRow(row: TableRow): boolean {
   return row.confidence === 'INFERRED' && (row.cells[0] ?? '').startsWith('집계')
 }
 
-/** GeneratedDoc → 시트 목록(표 보유 섹션당 1시트). 표 섹션 없으면 빈 배열. */
-export function docToSheets(doc: GeneratedDoc): XlsxSheet[] {
+/** 문서정보 시트에 실을 메타(W7 비평 반영 — 표지·지위·태그 의미 안내). */
+export interface XlsxDocMeta {
+  sourceCommit?: string | null
+}
+
+/**
+ * '문서정보' 표지 시트 — 발주처 서식 관례 + 오독 방지 안내 3종:
+ * ① 본 파일의 지위(스캔 스냅샷 원천 데이터 — 대시보드 확정 편집 미반영),
+ * ② 신뢰도 [확정] = 정적 분석 근거 보유(사람 검수·사인오프 아님),
+ * ③ 재생성 경로. 소스 커밋으로 시점 식별(타임스탬프 대신 — 결정론 유지).
+ */
+function infoSheet(title: string, methodology: string | undefined, meta?: XlsxDocMeta): XlsxSheet {
+  return {
+    name: '문서정보',
+    rows: [
+      { cells: ['항목', '내용'], style: 'header' },
+      { cells: ['문서명', title] },
+      { cells: ['방법론', methodology ?? ''] },
+      { cells: ['소스 커밋', meta?.sourceCommit ?? '[미확인]'] },
+      { cells: ['작성자 / 버전 / 작성일', '[미확인] — 제출 전 사람이 채움'] },
+      {
+        cells: [
+          '본 파일의 지위',
+          '정적 스캔 스냅샷(원천 데이터) — 대시보드에서의 확정 편집은 반영되지 않음. 최신화는 /understand-docs 재실행.',
+        ],
+        style: 'bold',
+      },
+      {
+        cells: [
+          '신뢰도 표기',
+          '[확정]=정적 분석 근거(file:line) 보유, [추정]=추론, [미확인]=사람 채움 대상 — 사람 검수/사인오프 여부와 무관.',
+        ],
+        style: 'bold',
+      },
+    ],
+  }
+}
+
+/** GeneratedDoc → 시트 목록(문서정보 + 표 보유 섹션당 1시트). 표 섹션 없으면 빈 배열. */
+export function docToSheets(doc: GeneratedDoc, meta?: XlsxDocMeta): XlsxSheet[] {
   const sheets: XlsxSheet[] = []
   for (const section of doc.sections) {
     const table = section.table
@@ -39,7 +77,8 @@ export function docToSheets(doc: GeneratedDoc): XlsxSheet[] {
     ]
     sheets.push({ name: section.heading, rows })
   }
-  return sheets
+  // 표 섹션이 하나라도 있어야 xlsx 실익 — 있으면 문서정보 표지를 맨 앞에.
+  return sheets.length > 0 ? [infoSheet(doc.title, doc.methodology, meta), ...sheets] : []
 }
 
 // ── RTM ──────────────────────────────────────────────────────────────────
@@ -56,6 +95,8 @@ interface RtmRequirementLike {
   dependsOn?: string[]
   source?: { kind?: string; raw?: string } | null
   acceptanceCriteria?: unknown[]
+  /** 검수 사인오프(검증 스파인) — null 이면 미검수. */
+  signoff?: { approver?: string | null; at?: string | null } | null
 }
 
 /** rtm.json 의 기능 1건(내보내기 필드만). entryPoint/implementation 은 grounded 값. */
@@ -71,6 +112,8 @@ interface RtmFunctionLike {
   domainName?: string
   entryPoint?: RtmGroundedLike | null
   implementation?: RtmGroundedLike | null
+  /** 시험 근거(검증 스파인) — value 비면 미시험. */
+  test?: RtmGroundedLike | null
   state?: string
   requirementHistory?: string[]
 }
@@ -78,6 +121,13 @@ interface RtmFunctionLike {
 export interface RtmLike {
   requirements?: RtmRequirementLike[]
   functions?: RtmFunctionLike[]
+  /** 커버리지 요약(현황 뷰) — 있는 그대로 §3 시트로 평탄화. */
+  coverage?: {
+    requirements?: Record<string, unknown>
+    functions?: Record<string, unknown>
+    tests?: Record<string, unknown>
+    gaps?: Record<string, unknown>
+  } | null
 }
 
 function groundedCell(g: RtmGroundedLike | null | undefined): string {
@@ -91,13 +141,16 @@ function groundedEvidence(g: RtmGroundedLike | null | undefined): string {
 }
 
 /**
- * RTM 원장 → 시트 2개(§1 요구사항 원장, §2 기능(AS-IS) 원장 — 요구↔기능 추적은
- * functions[].requirementHistory 승계). 빈 원장도 헤더는 출력(빈 원장 결정과 정합).
+ * RTM 원장 → 시트 4개(문서정보 + §1 요구사항 원장 + §2 기능(AS-IS) 원장 + §3 커버리지 현황).
+ * 검증 스파인(검수 signoff·시험 test)을 열로 승계 — 감리의 "검수 근거" 질의에 xlsx 로
+ * 답할 수 있어야 한다(W7 비평 반영). 빈 원장도 헤더는 출력(빈 원장 결정과 정합).
+ * 주: 대시보드 행단위 오버레이(rtm-overrides)는 미반영 — 문서정보 시트에 지위 명시,
+ * 오버레이 병합은 백로그(설계 §10).
  */
-export function rtmToSheets(rtm: RtmLike): XlsxSheet[] {
+export function rtmToSheets(rtm: RtmLike, meta?: XlsxDocMeta): XlsxSheet[] {
   const reqRows: XlsxRow[] = [
     {
-      cells: ['REQ_ID', '요구사항', '유형', 'NFR', '우선순위', '수명주기', '상태', '선행요구', '출처', '수용기준 수'],
+      cells: ['REQ_ID', '요구사항', '유형', 'NFR', '우선순위', '수명주기', '상태', '선행요구', '출처', '수용기준 수', '검수'],
       style: 'header',
     },
     ...(rtm.requirements ?? []).map((r): XlsxRow => ({
@@ -112,13 +165,14 @@ export function rtmToSheets(rtm: RtmLike): XlsxSheet[] {
         (r.dependsOn ?? []).join(', '),
         r.source?.kind ? `${r.source.kind}${r.source.raw ? `: ${r.source.raw}` : ''}` : '',
         String((r.acceptanceCriteria ?? []).length),
+        r.signoff ? `검수(${r.signoff.approver ?? ''}${r.signoff.at ? ` @ ${r.signoff.at}` : ''})` : '미검수',
       ],
     })),
   ]
 
   const fnRows: XlsxRow[] = [
     {
-      cells: ['FN_ID', '기능명', '도메인', '진입점', '구현', '상태', '연관 요구', '근거'],
+      cells: ['FN_ID', '기능명', '도메인', '진입점', '구현', '시험', '상태', '연관 요구', '근거'],
       style: 'header',
     },
     ...(rtm.functions ?? []).map((f): XlsxRow => ({
@@ -128,6 +182,7 @@ export function rtmToSheets(rtm: RtmLike): XlsxSheet[] {
         f.domainName ?? '',
         groundedCell(f.entryPoint),
         groundedCell(f.implementation),
+        groundedCell(f.test) || '미시험',
         f.state ?? '',
         (f.requirementHistory ?? []).join(', '),
         groundedEvidence(f.entryPoint) || groundedEvidence(f.implementation),
@@ -135,8 +190,22 @@ export function rtmToSheets(rtm: RtmLike): XlsxSheet[] {
     })),
   ]
 
+  // §3 커버리지 현황 — 요약 객체를 (구분, 항목, 값) 3열로 평탄화(추적표 '현황' 뷰 대응).
+  const covRows: XlsxRow[] = [{ cells: ['구분', '항목', '값'], style: 'header' }]
+  const cov = rtm.coverage ?? {}
+  for (const [group, obj] of Object.entries(cov)) {
+    if (!obj || typeof obj !== 'object') continue
+    for (const [k, v] of Object.entries(obj)) {
+      covRows.push({
+        cells: [group, k, Array.isArray(v) ? v.join(', ') : typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v)],
+      })
+    }
+  }
+
   return [
+    infoSheet('요구사항 추적표(RTM)', 'rtm', meta),
     { name: '요구사항 원장', rows: reqRows },
     { name: '기능(AS-IS) 원장', rows: fnRows },
+    { name: '커버리지 현황', rows: covRows },
   ]
 }

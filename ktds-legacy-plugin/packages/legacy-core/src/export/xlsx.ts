@@ -100,18 +100,25 @@ function zipStore(entries: ZipEntry[]): Buffer {
 // ── SpreadsheetML ────────────────────────────────────────────────────────
 
 function xmlEscape(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+  return (
+    s
+      // XML 1.0 불법 제어문자 제거(탭/개행/CR 은 합법이라 보존) — RTM 요구사항 텍스트 등
+      // 임의 입력이 셀에 오므로, 하나라도 남으면 파일 전체가 열리지 않는다.
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+  )
 }
 
 /** 셀 값이 숫자 셀 자격인지(정수/소수, 지수·앞자리0 제외 — 코드/ID 오변환 방지). */
 function isNumericCell(v: string): boolean {
   if (!/^-?\d+(\.\d+)?$/.test(v)) return false
   // 선행 0(01, 007 등)은 식별자일 가능성 — 문자열 유지.
-  return !/^-?0\d/.test(v)
+  if (/^-?0\d/.test(v)) return false
+  // 엑셀 유효자리 15 초과(계좌·대형 ID)는 반올림 손상 — 문자열 유지(리뷰 F6).
+  return v.replace(/[-.]/g, '').length <= 15
 }
 
 /** 열 번호(0-based) → A, B, …, AA. */
@@ -149,6 +156,15 @@ function sheetXml(sheet: XlsxSheet): string {
     colCount > 0
       ? `<cols>${widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('')}</cols>`
       : ''
+  // 발주처 서식 관례(W7 비평 반영): 첫 행이 헤더면 틀고정(1행) + 자동필터.
+  const hasHeader = sheet.rows[0]?.style === 'header'
+  const sheetViews = hasHeader
+    ? '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
+    : '<sheetViews><sheetView workbookViewId="0"/></sheetViews>'
+  const autoFilter =
+    hasHeader && colCount > 0 && sheet.rows.length > 1
+      ? `<autoFilter ref="A1:${colLetter(colCount - 1)}${sheet.rows.length}"/>`
+      : ''
   const rowsXml = sheet.rows
     .map((row, ri) => {
       const s = STYLE_INDEX[row.style ?? 'normal']
@@ -168,8 +184,10 @@ function sheetXml(sheet: XlsxSheet): string {
   return (
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    sheetViews +
     cols +
     `<sheetData>${rowsXml}</sheetData>` +
+    autoFilter +
     '</worksheet>'
   )
 }
@@ -188,20 +206,30 @@ const STYLES_XML =
   '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
   '</cellXfs></styleSheet>'
 
-/** 시트명 정제 — 금지문자 제거, 31자 절단, 빈 이름 폴백, 중복 연번(결정론). */
+/**
+ * 시트명 정제 — 금지문자 제거, 선행/후행 작은따옴표 제거·예약명(History) 회피(리뷰 F7),
+ * 31자 절단, 빈 이름 폴백, 중복 연번(연번 부여 결과가 기존 이름과 재충돌하면 증가 —
+ * 리뷰 F4: `['같음','같음','같음 (2)']` 류 입력에서 중복 시트명이 나오면 워크북 손상).
+ */
 export function sanitizeSheetNames(names: string[]): string[] {
-  const seen = new Map<string, number>()
+  const used = new Set<string>()
   return names.map((raw, i) => {
-    let name = raw.replace(/[\\/:*?\[\]]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 31)
+    let name = raw
+      .replace(/[\\/:*?\[\]]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^'+|'+$/g, '')
+      .slice(0, 31)
+      .trim()
     if (name.length === 0) name = `Sheet${i + 1}`
-    const key = name.toLowerCase()
-    const n = (seen.get(key) ?? 0) + 1
-    seen.set(key, n)
-    if (n > 1) {
+    if (name.toLowerCase() === 'history') name = `${name}_` // 엑셀 예약명
+    let candidate = name
+    for (let n = 2; used.has(candidate.toLowerCase()); n++) {
       const suffix = ` (${n})`
-      name = name.slice(0, 31 - suffix.length) + suffix
+      candidate = name.slice(0, 31 - suffix.length) + suffix
     }
-    return name
+    used.add(candidate.toLowerCase())
+    return candidate
   })
 }
 

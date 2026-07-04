@@ -604,14 +604,14 @@ function handleRtmScenarioOverridePost(
   }
   collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
     .then((body) => {
-      let parsed: { tsId?: unknown; editedCells?: unknown; approver?: unknown };
+      let parsed: { tsId?: unknown; editedCells?: unknown; approver?: unknown; edited?: unknown };
       try {
         parsed = JSON.parse(body);
       } catch {
         sendJson(res, 400, { error: "Invalid JSON body" });
         return;
       }
-      const { tsId, editedCells, approver } = parsed ?? {};
+      const { tsId, editedCells, approver, edited } = parsed ?? {};
       if (typeof tsId !== "string" || !tsId) {
         sendJson(res, 400, { error: "tsId is required" });
         return;
@@ -649,11 +649,13 @@ function handleRtmScenarioOverridePost(
           : {};
       const prev = section[tsId];
       const audit = Array.isArray(prev?.audit) ? prev!.audit : [];
+      // 무편집 검토 승인과 편집 확정을 audit 로 구분(리뷰 C3 — 일괄 rubber-stamp 추적 가능).
+      const event = edited === false ? "CONFIRMED_NO_EDIT" : "CONFIRMED";
       const record: RtmOverride = {
         editedCells: clean,
         approver: by,
         at: now,
-        audit: [...audit, { event: "CONFIRMED", by, at: now }],
+        audit: [...audit, { event, by, at: now }],
       };
       section[tsId] = record;
       store._scenarios = section;

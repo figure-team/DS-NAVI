@@ -126,7 +126,11 @@ export type TestScenarioKind = z.infer<typeof TestScenarioKindSchema>
  * 시나리오 = 설계 초안, TestRef = 수행 기록(확정 후 caseId 연결은 사람 몫).
  */
 export const RtmTestScenarioSchema = z.object({
-  /** `TS-<featureId>-<N|E|B><seq>` — featureId 좌표 기반(재스캔 시 flow 증감이면 이동 가능). */
+  /**
+   * 안정 id — `TS-<fnId>-<N|B|E|E:reqId:acId>`. fnId(flow 노드 id)·(reqId,acId) 기반이라
+   * 재스캔의 flow/AC 증감에도 이동하지 않는다(위치값 featureId 기반이면 확정 오버레이가
+   * 무음 오귀속 — 리뷰 C1).
+   */
   id: z.string(),
   fnId: z.string(),
   reqId: z.string().nullable().default(null),

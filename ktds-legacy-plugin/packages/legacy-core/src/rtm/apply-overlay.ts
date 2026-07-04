@@ -118,7 +118,12 @@ function applyFnEdits(f: RtmFunctionRow, ov: RtmFunctionOverride): RtmFunctionRo
   }
 }
 
-/** 시나리오 오버레이 적용 — G/W/T·제목 덮기 + 확정(CONFIRMED 승격, W5 설계 §4). */
+/**
+ * 시나리오 오버레이 적용 — G/W/T·제목 덮기 + 확정(CONFIRMED 승격, W5 설계 §4).
+ * 대시보드 확정은 항상 그 시점 G/W/T 전체를 editedCells 에 **스냅샷 박제**한다(리뷰 R1 —
+ * 아니면 재생성 시 확정 배지를 단 채 본문이 조용히 바뀐다). editedCells 가 부분/비어
+ * 있는 수기 오버레이는 생성 텍스트가 남는다(그 몫은 작성자 책임 — 부분 덮기 허용 유지).
+ */
 function applyScenarioEdits(s: RtmTestScenario, ov: RtmScenarioOverride): RtmTestScenario {
   const e = ov.editedCells
   const pick = (key: 'title' | 'given' | 'when' | 'then'): string =>
@@ -165,20 +170,30 @@ export function applyOverlay(model: RtmModel, rawOverlay: Record<string, unknown
   )
   const confirmedIds = new Set(Object.keys(fnOv))
   const merged: RtmModel = { ...model, functions, requirements, testScenarios, customFields: fields }
-  // 재스캔으로 사라진 시나리오를 가리키는 오버레이 — 조용한 손실 금지(warn 표면화).
-  const tsIds = new Set(testScenarios.map((s) => s.id))
-  const orphanWarns = Object.keys(scOv)
-    .filter((id) => !tsIds.has(id))
-    .sort(cmp)
-    .map((id) => ({
-      level: 'warn' as const,
-      code: 'SCENARIO_OVERRIDE_ORPHAN',
-      message: `시나리오 오버레이가 존재하지 않는 시나리오를 가리킴(재생성으로 소실 가능): ${id}`,
-      ref: id,
-    }))
+  // 재스캔으로 사라진 대상을 가리키는 오버레이 — 조용한 손실 금지(warn 표면화, 3축 대칭 R7).
+  const orphanWarns = (
+    section: Record<string, unknown>,
+    live: Set<string>,
+    code: string,
+    what: string,
+  ) =>
+    Object.keys(section)
+      .filter((id) => !live.has(id))
+      .sort(cmp)
+      .map((id) => ({
+        level: 'warn' as const,
+        code,
+        message: `${what} 오버레이가 존재하지 않는 대상을 가리킴(재생성으로 소실 가능): ${id}`,
+        ref: id,
+      }))
+  const warns = [
+    ...orphanWarns(fnOv, new Set(functions.map((f) => f.id)), 'FN_OVERRIDE_ORPHAN', '기능'),
+    ...orphanWarns(reqOv, new Set(requirements.map((r) => r.id)), 'REQ_OVERRIDE_ORPHAN', '요구사항'),
+    ...orphanWarns(scOv, new Set(testScenarios.map((s) => s.id)), 'SCENARIO_OVERRIDE_ORPHAN', '시나리오'),
+  ]
   return {
     ...merged,
     coverage: computeCoverage(merged, confirmedIds),
-    diagnostics: [...computeDiagnostics(merged), ...orphanWarns],
+    diagnostics: [...computeDiagnostics(merged), ...warns],
   }
 }

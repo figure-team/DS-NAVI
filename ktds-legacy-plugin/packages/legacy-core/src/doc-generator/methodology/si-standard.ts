@@ -703,15 +703,28 @@ function buildSiTestScenarios(input: DocInput): GeneratedDoc {
   const scenarios = rtm?.testScenarios ?? []
   const fnById = new Map((rtm?.functions ?? []).map((f) => [f.id, f]))
 
+  // 최상단 현황 행(리뷰 C6) — 84행 완결형 표 외형이 "테스트 설계 완료"로 읽히는 것 차단.
+  const scnAll = rtm?.testScenarios ?? []
+  const statusRow: TableRow = {
+    cells: [
+      '현황',
+      rtm
+        ? `확정 ${scnAll.filter((s) => s.confidence === 'CONFIRMED').length}/${scnAll.length} · 축소 생성 ${scnAll.filter((s) => s.notes.some((n) => n.includes('[미확인]'))).length}/${scnAll.length} · 시험 수행결과 미연결 — 본 문서는 초안 스켈레톤(검토·보강 전제)`
+        : 'rtm.json 없음 — understand-rtm 실행 필요',
+    ],
+    confidence: 'INFERRED',
+    evidence: [],
+  }
   const criteriaRows: TableRow[] = [
+    statusRow,
+    ...[
     ['정상', '기능 행의 진입점(라우트)·데이터(테이블×CRUD) 시드로 정상 흐름 1건 생성'],
     ['예외', '요구사항 인수조건(AC) 중 exception 유형당 1건(AC 문장 인용, 요구/AC 추적선 보존). 없으면 일반형 1건 + [미확인]'],
     ['경계', '데이터 시드(0건·최대치) 기준 1건. 데이터 근거 없으면 일반형 + [미확인]'],
     ['지위', '전부 결정론 템플릿 생성 초안([추정]) — 대시보드 시험 탭에서 편집·확정하면 [확정] 승격(재생성에도 오버레이 유지)'],
     ['수행 기록', '시나리오는 설계 초안 — 시험 수행 결과는 요구사항 AC 의 시험결과(TestRef)에 기록(확정 후 caseId 연결은 사람 몫)'],
-  ].map(
-    (cells): TableRow => ({ cells, confidence: 'INFERRED', evidence: [] }),
-  )
+    ].map((cells): TableRow => ({ cells, confidence: 'INFERRED', evidence: [] })),
+  ]
 
   const ledgerRows: TableRow[] = scenarios.map((s): TableRow => {
     const fn = fnById.get(s.fnId)

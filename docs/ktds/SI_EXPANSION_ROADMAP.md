@@ -102,7 +102,7 @@
 | P3 W3 | ✅ 완료(리뷰 통과) | fd3940e~ | 프로그램 74본·도메인 조인·FP 하한(미분류 표면화) + 적대적 리뷰 2종 반영 — `PROGRAM_INVENTORY_DESIGN.md` §9~10 |
 | P4 W7 | ✅ 완료(리뷰 통과) | c012eae~ | zero-dep xlsx 라이터·문서/RTM 병기·대시보드 다운로드 + 적대적 리뷰 2종 반영 — `XLSX_EXPORT_DESIGN.md` §8~9 |
 | P5 W4 | ✅ 완료(리뷰 통과) | 61bfad4~ | risk-report.json(지표 5+플래그 1·백분위·상대밴드)·si-위험모듈리포트(12종째)·W3 매퍼 오분류 부수 수정 + 적대적 리뷰 2종(비평 8건·코드 8건) 반영 — `RISK_REPORT_DESIGN.md` §11~12 |
-| P6 W5 | ⬜ | | |
+| P6 W5 | ✅ 완료(리뷰 통과) | e499966~ | testScenarios[](안정 id·확정 스냅샷 박제)·si-단위테스트시나리오(13종째)·rtm.xlsx 5시트·시험 탭·R6 스모크QA·R7 사용자 필드 + 적대적 리뷰 2종(비평 7건·코드 8건) 반영 — `RTM_TEST_SCENARIO_DESIGN.md` §11~12 |
 | P7 W6 | ⬜ | | |
 | P8 W8 | ⬜ | | |
 | P9 W9 | ⬜ | | |

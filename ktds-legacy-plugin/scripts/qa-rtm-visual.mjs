@@ -15,14 +15,15 @@
  * 주의: ④⑤는 rtm-overrides.json 에 QA 데이터가 기록된다(수동 QA 게이트 전용 —
  * 데모 데이터 커밋 전엔 오버레이 파일을 정리할 것).
  */
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const [baseUrl, token, outDirArg] = process.argv.slice(2)
+const [baseUrl, token, outDirArg, cleanupGraphDir] = process.argv.slice(2)
 if (!baseUrl || !token) {
-  console.error('사용: node qa-rtm-visual.mjs <baseUrl> <token> [outDir]')
+  console.error('사용: node qa-rtm-visual.mjs <baseUrl> <token> [outDir] [cleanupGraphDir]')
+  console.error('  cleanupGraphDir 지정 시 종료 후 rtm-overrides.json 에서 QA봇 기록을 자동 제거(오염 방지, C7)')
   process.exit(2)
 }
 const outDir = outDirArg || join(process.cwd(), '.understand-anything', 'qa')
@@ -65,10 +66,11 @@ const assert = (cond, msg) => {
   if (cond) console.log(`  ✓ ${msg}`)
   else { failures.push(msg); console.error(`  ✗ ${msg}`) }
 }
-/** 텍스트로 버튼 클릭(evaluate — 오버레이 간섭 회피 관례). */
+/** 텍스트로 버튼 클릭(evaluate — 오버레이 간섭 회피 관례). 정확 일치 우선(오클릭 방지, R6). */
 const clickButton = (text) =>
   page.evaluate((t) => {
-    const btn = [...document.querySelectorAll('button')].find((b) => b.textContent?.trim() === t || b.textContent?.includes(t))
+    const all = [...document.querySelectorAll('button')]
+    const btn = all.find((b) => b.textContent?.trim() === t) ?? all.find((b) => b.textContent?.includes(t))
     if (btn) { btn.click(); return true }
     return false
   }, text)
@@ -86,7 +88,11 @@ try {
   await page.waitForTimeout(400)
   const tsRows = await page.locator('table tbody tr').count()
   assert(tsRows > 0, `시나리오 표 렌더 — 행 ${tsRows}개`)
-  assert((await page.getByText('정상', { exact: false }).count()) > 0, '구분 배지(정상) 표시')
+  // 구분 배지는 표 2열 셀 텍스트로 정밀 단언(타일/소개문 매칭 오탐 방지, 리뷰 C5).
+  const badgeKinds = await page.evaluate(() =>
+    [...new Set([...document.querySelectorAll('table tbody tr td:nth-child(2)')].map((td) => td.textContent?.trim()))].filter(Boolean),
+  )
+  assert(badgeKinds.includes('정상') && badgeKinds.includes('예외') && badgeKinds.includes('경계'), `구분 배지 3종 렌더(${badgeKinds.join('/')})`)
   await shot('rtm-2-scenarios.png')
 
   // ③ 첫 시나리오 드로어.
@@ -98,13 +104,15 @@ try {
   assert((await page.getByText('초안 [추정]').count()) > 0 || (await page.getByText('Given', { exact: false }).count()) > 0, '시나리오 드로어 열림')
   await shot('rtm-3-drawer.png')
 
-  // ④ 확정 1건 — TrustBadge 반영.
+  // ④ 확정 1건 — 오버레이 원장 기준으로 라운드트립 판정(textContent 오탐 방지, 리뷰 C5).
   const confirmed = await clickButton('✓ 확정')
   assert(confirmed, '확정 버튼 클릭')
   await page.waitForTimeout(900)
   await shot('rtm-4-confirmed.png')
-  const badge = await page.evaluate(() => document.body.textContent?.includes('QA봇'))
-  assert(Boolean(badge), '확정자(QA봇) 배지 반영 — 라운드트립')
+  const ovRes = await fetch(`${baseUrl}/rtm-overrides.json?token=${encodeURIComponent(token)}`)
+  const ov = ovRes.ok ? await ovRes.json() : {}
+  const qaScenarios = Object.entries(ov._scenarios ?? {}).filter(([, v]) => v?.approver === 'QA봇')
+  assert(qaScenarios.length === 1, `확정 오버레이 기록(_scenarios, QA봇) — 라운드트립 ${qaScenarios.map(([k]) => k).join(',')}`)
 
   // ⑤ R7: 기능 기준 탭에서 +필드 → 커스텀 열 추가.
   assert(await clickButton('기능 기준'), '기능 기준 탭 복귀')
@@ -131,6 +139,25 @@ if (severe.length > 0) {
   failures.push(`errors: ${severe.length}`)
 } else {
   console.log('  ✓ HTTP/console error 0건(선택적 리소스 제외)')
+}
+
+// C7: QA 가 기록한 오버레이 자동 정리(실 오버레이 오염 방지) — QA봇 서명 항목만 제거.
+if (cleanupGraphDir) {
+  const ovFile = join(cleanupGraphDir, '.understand-anything', 'rtm-overrides.json')
+  if (existsSync(ovFile)) {
+    try {
+      const raw = JSON.parse(readFileSync(ovFile, 'utf8'))
+      for (const [k, v] of Object.entries(raw._scenarios ?? {})) if (v?.approver === 'QA봇') delete raw._scenarios[k]
+      for (const [k, v] of Object.entries(raw._fields ?? {})) if (v?.createdBy === 'QA봇') delete raw._fields[k]
+      for (const [k, v] of Object.entries(raw)) if (!k.startsWith('_') && v?.approver === 'QA봇') delete raw[k]
+      if (raw._scenarios && Object.keys(raw._scenarios).length === 0) delete raw._scenarios
+      if (raw._fields && Object.keys(raw._fields).length === 0) delete raw._fields
+      writeFileSync(ovFile, JSON.stringify(raw, null, 2) + '\n', 'utf8')
+      console.log('  🧹 QA봇 오버레이 기록 정리 완료')
+    } catch (e) {
+      console.error(`  ⚠ 오버레이 정리 실패(수동 확인 필요): ${e?.message ?? e}`)
+    }
+  }
 }
 
 if (failures.length > 0) {

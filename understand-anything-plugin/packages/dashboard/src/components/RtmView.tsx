@@ -206,8 +206,9 @@ export default function RtmView() {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((data: RtmModel) => { if (Array.isArray(data?.functions)) setModel(data); else setError("rtm.json 형식 오류"); })
       .catch((e) => setError(String(e instanceof Error ? e.message : e)));
+    // 404/미존재는 null — "빈 오버레이(라이브)"와 구분해 _fields 폴백이 살아있게(리뷰 R2).
     fetch(`${dataBase}rtm-overrides.json${tokenQ}`)
-      .then((r) => (r.ok ? r.json() : {}))
+      .then((r) => (r.ok ? r.json() : null))
       .then((data: unknown) => {
         if (data && typeof data === "object" && !Array.isArray(data)) {
           const raw = data as Record<string, unknown>;
@@ -501,17 +502,22 @@ export default function RtmView() {
   };
 
   // W5: 시나리오 확정(POST /rtm-scenario-override) — 기능 확정과 동형.
+  // 확정은 항상 그 시점 G/W/T **전체 스냅샷**을 박제한다(리뷰 R1 — 부분/빈 editedCells 면
+  // 재생성 시 [확정] 배지를 단 채 본문이 조용히 바뀐다). edited 로 무편집 검토를 audit 구분(C3).
   const confirmScenario = useCallback(async (fromEdit: boolean) => {
     if (!selectedTs || !accessToken) return;
     const approver = resolveApprover();
     if (!approver) return;
     const editedCells: Record<string, string> = {};
-    if (fromEdit) for (const key of ["title", "given", "when", "then"] as const) {
-      if (tsDraft[key] !== undefined && tsDraft[key] !== selectedTs[key]) editedCells[key] = tsDraft[key];
+    let edited = false;
+    for (const key of ["title", "given", "when", "then"] as const) {
+      const next = fromEdit && tsDraft[key] !== undefined ? tsDraft[key] : effTs(selectedTs, key);
+      editedCells[key] = next;
+      if (next !== selectedTs[key]) edited = true;
     }
     setTsSaving(true); setTsSaveError(null);
     try {
-      const res = await fetch(`/rtm-scenario-override?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tsId: selectedTs.id, editedCells, approver }) });
+      const res = await fetch(`/rtm-scenario-override?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tsId: selectedTs.id, editedCells, approver, edited }) });
       const data = (await res.json().catch(() => null)) as (FnOverride & { error?: string }) | null;
       if (!res.ok || !data) { setTsSaveError(data?.error ?? `HTTP ${res.status}`); return; }
       setScOv((p) => ({ ...p, [selectedTs.id]: { editedCells: data.editedCells, approver: data.approver, at: data.at } }));
@@ -536,10 +542,20 @@ export default function RtmView() {
   const addField = useCallback(() => {
     const label = typeof window !== "undefined" ? window.prompt("추가할 필드 이름(예: 담당자, 릴리스):")?.trim() : "";
     if (!label) return;
-    // id 는 자동 슬러그(custom:f<ts36>) — 라벨은 한글 가능, id 는 네임스페이스 규칙 준수.
-    const id = `custom:f${Date.now().toString(36)}`;
+    // id = 라벨 파생 결정론 슬러그(리뷰 C4) — 같은 라벨 재등록 = 같은 id → 삭제 후
+    // 재추가 시 기존 값 복원이 실제로 동작한다(타임스탬프 id 면 복원 계약이 깨짐).
+    // ascii 는 슬러그, 한글 등은 djb2 해시 hex(결정론).
+    const ascii = label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 32);
+    let id: string;
+    if (ascii.length >= 2) id = `custom:${ascii}`;
+    else {
+      let h = 5381;
+      for (let i = 0; i < label.length; i++) h = ((h * 33) ^ label.charCodeAt(i)) >>> 0;
+      id = `custom:h${h.toString(16)}`;
+    }
+    if (effFields.some((f) => f.id === id)) { setToast({ kind: "failed", msg: `같은 필드가 이미 있습니다: ${label}` }); return; }
     void postField("add", id, label);
-  }, [postField]);
+  }, [postField, effFields]);
 
   const openFunction = useCallback((id: string) => { setView("function"); setSelReq(null); setSelFn(id); setEditing(false); setSaveError(null); }, []);
 

@@ -11,6 +11,7 @@
  * 사유를 notes `[미확인]` 으로 표기한다(0건 행 없음 — 수용 기준 ①).
  * 결정론: 기능 행 순서(모델 정렬) × 종류(N→E→B) × rules acId ASC. Date.now/난수 없음.
  */
+import { createHash } from 'node:crypto'
 import type { RtmFunctionRow, RtmModel, RtmTestScenario } from './types.js'
 import { computeCoverage } from './coverage.js'
 import { computeDiagnostics } from './validate.js'
@@ -28,16 +29,29 @@ function whenOf(f: RtmFunctionRow): { when: string; degraded: boolean } {
   return { when: '기능 실행(진입 경로 미상)', degraded: true }
 }
 
+/**
+ * 시나리오 안정 id — **fnId(flow 노드 id) 파생**(리뷰 C1). featureId(FN-###)는 위치값
+ * (도메인/flow 증감 시 시프트)이라 확정 오버레이가 무음 오귀속된다. fnId 는 공백/경로가
+ * 섞인 긴 문자열이라 sha256 8hex 로 축약(program-inventory PGM-id 관례), 예외 축은 seq
+ * 대신 (reqId, acId) 를 박아 AC 추가/삭제에도 안정. 대상 기능은 fnId 필드로 역참조.
+ *   정상 TS-<h8>-N · 경계 TS-<h8>-B · 예외(AC) TS-<h8>-E:<reqId>:<acId> · 예외(일반형) TS-<h8>-E
+ */
+export function scenarioId(fnId: string, suffix: string): string {
+  const h8 = createHash('sha256').update(fnId).digest('hex').slice(0, 8)
+  return `TS-${h8}-${suffix}`
+}
+
 /** 한 기능 행의 시나리오 3종+ 생성. */
 function scenariosOf(f: RtmFunctionRow): RtmTestScenario[] {
   const out: RtmTestScenario[] = []
   const { when, degraded } = whenOf(f)
   const baseNotes = degraded ? ['[미확인] 진입점 없음 — 호출 절차는 사람 보강'] : []
-  const evidence = f.entryPoint.evidence.length > 0 ? f.entryPoint.evidence : f.implementation.evidence
+  // 원천 셀 evidence 승계 — 시나리오별 복사(참조 공유로 원천 셀 오염 방지, 리뷰 R3).
+  const evidence = [...(f.entryPoint.evidence.length > 0 ? f.entryPoint.evidence : f.implementation.evidence)]
   const hasData = f.data.value.trim().length > 0
 
   out.push({
-    id: `TS-${f.featureId}-N1`,
+    id: scenarioId(f.id, 'N'),
     fnId: f.id,
     reqId: null,
     acId: null,
@@ -60,7 +74,7 @@ function scenariosOf(f: RtmFunctionRow): RtmTestScenario[] {
   if (exceptions.length > 0) {
     exceptions.forEach((r, i) => {
       out.push({
-        id: `TS-${f.featureId}-E${i + 1}`,
+        id: scenarioId(f.id, `E:${r.reqId}:${r.acId}`),
         fnId: f.id,
         reqId: r.reqId,
         acId: r.acId,
@@ -76,7 +90,7 @@ function scenariosOf(f: RtmFunctionRow): RtmTestScenario[] {
     })
   } else {
     out.push({
-      id: `TS-${f.featureId}-E1`,
+      id: scenarioId(f.id, 'E'),
       fnId: f.id,
       reqId: null,
       acId: null,
@@ -92,7 +106,7 @@ function scenariosOf(f: RtmFunctionRow): RtmTestScenario[] {
   }
 
   out.push({
-    id: `TS-${f.featureId}-B1`,
+    id: scenarioId(f.id, 'B'),
     fnId: f.id,
     reqId: null,
     acId: null,

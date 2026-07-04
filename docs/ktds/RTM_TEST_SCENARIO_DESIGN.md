@@ -23,7 +23,7 @@ RTM 기능 행에는 이미 결정론 시드가 있다: `entryPoint`(라우트+m
 | 경계(boundary) | data 존재 시 0건/최대치, entryPoint 파라미터 유무 | Given 경계 데이터(0건·최대) → When 호출 → Then 안전 처리 |
 
 - entryPoint 없는 행(서비스/공통): When 을 "핵심 메서드 직접 호출(구현: `<파일>`)"로 축소 생성 + notes `[미확인] 진입점 없음 — 절차는 사람 보강`.
-- 시나리오 ID: `TS-<fnId>-<N|E|B><seq>` (fnId 는 이미 안정 id — 재스캔 안정, 내용 아닌 좌표 기반).
+- 시나리오 ID(리뷰 C1 반영): `TS-<sha256(fnId)8hex>-<N|B|E|E:reqId:acId>` — **fnId(flow 노드 안정 id) 파생 + 예외는 (reqId,acId) 임베드**. featureId(FN-###)나 seq 는 위치값이라 재스캔의 flow/AC 증감 시 확정 오버레이가 무음 오귀속된다(초기 구현의 결함을 리뷰로 교정). 대상 기능은 `fnId` 필드로 역참조.
 - AC 연계: exception 시나리오는 원 AC id 를 `acId` 로 기록(요구↔AC↔시나리오 추적선). AC.tests[](TestRef, 결과 기록)와는 별개 축 — 시나리오=설계 초안, TestRef=수행 결과(기존 모델 유지, 시나리오 확정 후 caseId 로 TestRef 연결은 사람 몫·범례 안내).
 
 ## 3. 데이터 모델 — rtm.json `testScenarios[]` (top-level)
@@ -49,8 +49,9 @@ RTM 기능 행에는 이미 결정론 시드가 있다: `entryPoint`(라우트+m
 
 - `.understand-anything/rtm-overrides.json` 에 예약 접두 관례로 `_scenarios` 추가:
   `{"_scenarios": {"<tsId>": {"editedCells": {"title"?/"given"?/"when"?/"then"?}, "approver", "at", "audit": []}}}` — 기존 `_requirements` 와 동형. `apply-overlay.ts` `splitOverlay` 가 `_` 키를 이미 스킵하므로 하위호환.
-- `applyOverlay` 확장: `_scenarios` 를 model.testScenarios 에 병합 — 편집 셀 덮어쓰기 + **해당 시나리오 confidence → CONFIRMED**(기능 행과 달리 시나리오는 확정=검토 완료 의미 명확, 근거는 승계분 유지). 미존재 tsId 는 무시 대신 diagnostics 경고(스캔 재생성으로 사라진 초안 표면화).
-- dev 엔드포인트: `POST /rtm-scenario-override` (vite.config.ts — `/rtm-override` 와 동형: tsId 존재 검증·editedCells 화이트리스트·approver 필수·audit append-only).
+- `applyOverlay` 확장: `_scenarios` 를 model.testScenarios 에 병합 — 편집 셀 덮어쓰기 + **해당 시나리오 confidence → CONFIRMED**(기능 행과 달리 시나리오는 확정=검토 완료 의미 명확, 근거는 승계분 유지). 미존재 대상을 가리키는 오버레이는 무시 대신 diagnostics 경고 — 기능/요구/시나리오 3축 대칭(리뷰 R7).
+- **확정 = 스냅샷 박제(리뷰 R1)**: 대시보드 확정은 항상 그 시점 G/W/T·제목 **전체**를 editedCells 에 기록한다. 아니면 재생성 시 [확정] 배지를 단 채 본문이 조용히 바뀐다(내용 드리프트). 무편집 검토 승인은 audit event `CONFIRMED_NO_EDIT` 로 구분(리뷰 C3 — rubber-stamp 추적 가능).
+- dev 엔드포인트: `POST /rtm-scenario-override` (vite.config.ts — `/rtm-override` 와 동형: tsId 존재 검증·editedCells 화이트리스트·approver 필수·audit append-only·edited 플래그).
 
 ## 5. 산출물 — SI 문서 + xlsx
 
@@ -60,14 +61,14 @@ RTM 기능 행에는 이미 결정론 시드가 있다: `entryPoint`(라우트+m
 ## 6. 대시보드 — RtmView 시험 서브뷰 + R7 필드
 
 - **시험 서브뷰**: view 토글에 4번째 탭 `시험`(기능/요청/현황과 병렬). 기능별 그룹 표(시나리오ID·구분·제목·G/W/T·상태[초안/확정]) + 행 클릭 → 드로어에서 G/W/T 편집 → 확정(`POST /rtm-scenario-override`, 승인자 resolveApprover 재사용). FunctionDrawer 에도 해당 기능 시나리오 요약 카운트 배지.
-- **R7 사용자 정의 필드**(§5.1 활성화): 필드 정의는 `_fields` 섹션(`{id: "custom:<slug>", label, scope: "function", createdBy, at}`), 행 값은 기존 `editedCells["custom:<id>"]`(스키마 이미 수용 — record(string,string)). UI: 기능 뷰 표 헤더 끝 `+필드` 버튼(라벨 입력→정의 등록), 커스텀 열 헤더 메뉴로 삭제(정의만 제거, 값 비파괴 보존 — §5.1). 값 편집은 기존 셀 편집·확정 경로 그대로. 엔드포인트: `POST /rtm-override` 에 `kind: "field-def"` 분기(정의 추가/삭제, audit 기록). applyOverlay 가 `_fields` 를 `model.customFields[]` 로 노출 + 행 `custom` 값 병합.
+- **R7 사용자 정의 필드**(§5.1 활성화): 필드 정의는 `_fields` 섹션(`{id: "custom:<slug>", label, scope: "function", createdBy, at}`), 행 값은 기존 `editedCells["custom:<id>"]`(스키마 이미 수용 — record(string,string)). UI: 기능 뷰 표 헤더 끝 `+필드` 버튼(라벨 입력→정의 등록), 커스텀 열 헤더 ×로 삭제(정의만 제거, 값 비파괴 보존 — §5.1). **id 는 라벨 파생 결정론 슬러그**(ascii 슬러그 또는 djb2 해시 — 리뷰 C4: 타임스탬프 id 면 같은 라벨 재등록이 새 id 가 되어 "재등록 시 값 복원" 계약이 깨짐). 값 편집은 기존 셀 편집·확정 경로 그대로. 엔드포인트: `POST /rtm-field`(op add/remove, custom:* 네임스페이스 강제). applyOverlay 가 `_fields` 를 `model.customFields[]` 로 노출 + 행 `custom` 값 병합.
 - xlsx: 커스텀 필드는 기능(AS-IS) 원장 시트에 동적 열로 추가(rtmToSheets — 정의 순).
 
-## 7. R6 — RTM 탭 시각QA(playwright)
+## 7. R6 — RTM 탭 헤드리스 스모크QA(playwright)
 
 - `scripts/qa-rtm-visual.mjs`(신규): legacy-core `loadPlaywright()` + screens-capture 의 launch/context/screenshot 패턴 재사용. dev 서버(고정 토큰·`--strictPort` 별도 포트, jpetstore 데이터) 대상.
-- 시나리오: ①`/rtm?token=…&onboard=skip` 기능 뷰 렌더(행>0·4축 셀) ②시험 탭 → 시나리오 표 렌더 ③드로어 열기(evaluate 클릭) ④시나리오 확정 1건(승인자 주입) 후 [확정] 반영 ⑤`+필드` 로 커스텀 열 추가·값 편집 반영 ⑥각 단계 스크린샷 `.understand-anything/qa/rtm-*.png` + console error 0 단언.
-- 실행 전제(HANDOFF §헤드리스 QA): CJK 폰트(fonts-noto-cjk), chromium executablePath 캐시, onboarding localStorage 억제 — 스크립트 헤더에 문서화. CI 아닌 수동 QA 게이트(실측 단계에서 실행·스크린샷 육안 확인).
+- 시나리오: ①`/rtm?token=…&onboard=skip` 기능 뷰 렌더(행>0) ②시험 탭 → 시나리오 표 + 구분 배지 3종(표 셀 단위 정밀 단언 — 리뷰 C5) ③드로어 열기(evaluate 클릭) ④시나리오 확정 1건 → **rtm-overrides.json `_scenarios` 원장 기준 라운드트립 판정**(textContent 오탐 방지) ⑤`+필드` 커스텀 열 반영 ⑥각 단계 스크린샷 + HTTP/console error 0(선택적 리소스 404 허용) ⑦cleanupGraphDir 지정 시 QA봇 기록 자동 정리(리뷰 C7 — 실 오버레이 오염 방지).
+- 실행 전제(HANDOFF §헤드리스 QA): CJK 폰트(fonts-noto-cjk), chromium executablePath 캐시, onboarding localStorage 억제 — 스크립트 헤더에 문서화. **명명 정직성(리뷰 C5): 픽셀 회귀 비교가 아닌 존재·라운드트립 스모크** — 레이아웃 회귀는 스크린샷 육안 확인 몫, 기준 스크린샷 diff 는 백로그. CI 아닌 수동 QA 게이트.
 
 ## 8. 검증
 
@@ -87,15 +88,43 @@ RTM 기능 행에는 이미 결정론 시드가 있다: `entryPoint`(라우트+m
 ## 10. 백로그(선반영 안 함)
 
 - 시나리오 → AC.tests[] caseId 자동 연결(수행 결과 기록은 사람/도구 몫 — 범례 안내만).
-- LLM 보강 레인(시나리오 문장 자연화) — 결정론 초안 위 선택 단계, W10 골든셋 이후.
-- R6 의 CI 상시화(현재 수동 QA 게이트).
+- LLM 보강 레인(시나리오 문장 자연화·CRUD 별 검증 포인트 분해 — 리뷰 C2) — 결정론 초안 위 선택 단계, W10 골든셋 이후.
+- R6 의 CI 상시화 + 기준 스크린샷 픽셀 diff(리뷰 C5).
+- 산출물 확정 상태 2단 표기(검토됨/편집확정 — audit event 는 이미 구분, 문서 렌더 백로그, 리뷰 C3).
+- audit 원장 상한/압축, `_fields` 삭제 후 고아 값 리포트(리뷰 R8).
+- coverage.functions.confirmed 를 4축 편집 기준으로 좁히기(현재 custom 값 편집도 확정 계상 — "편집=즉시 확정" 철학과 일관, 리뷰 R4 disposition).
 
 ## 11. 진행 현황
 
 | 단계 | 상태 | 커밋 | 비고 |
 |---|---|---|---|
-| P6-a 설계 | ✅ | | 본 문서 |
-| P6-b 엔진 | ⬜ | | |
-| P6-c 산출물 | ⬜ | | |
-| P6-d 대시보드 | ⬜ | | |
-| P6-e 시각QA+실측+리뷰 | ⬜ | | |
+| P6-a 설계 | ✅ | e499966 | 본 문서 |
+| P6-b 엔진 | ✅ | 6e7301c | test-scenarios.ts·오버레이 _scenarios/_fields·coverage.scenarios·이력 배선 |
+| P6-c 산출물 | ✅ | 6e7301c | si-단위테스트시나리오(13종째)·rtm.xlsx 5시트·커스텀 동적 열 |
+| P6-d 대시보드 | ✅ | 678cdff | 시험 탭·드로어 확정·R7 +필드/열/드로어 편집·엔드포인트 2종 |
+| P6-e 시각QA+실측+리뷰 | ✅ | | jpetstore 84건·byte-diff=0·QA 통과(스크린샷 육안) + 적대적 리뷰 2종 반영(§12) |
+
+## 12. 적대적 리뷰 반영 (2026-07-05)
+
+### 설계 비평(critic) — 7건 처리
+| # | 심각도 | 요지 | 처분 |
+|---|---|---|---|
+| C1 | HIGH | 위치값(featureId·seq) 기반 시나리오 id → 재스캔 시 확정 오버레이 무음 오귀속(설계 §2 자체 위반) | **반영** — id 를 sha256(fnId)8hex + (reqId,acId) 임베드로 교체, §2 정정 |
+| C2 | MED | 84건 대부분 동일 문구(예외 26/28 일반형) — RTM 행 재진술에 가까움 | **부분 반영** — 문서 최상단 현황 행(C6)과 결합 표면화. CRUD 별 검증 포인트 분해·LLM 자연화 백로그 |
+| C3 | MED | 무편집 확정도 [확정] 승격 — rubber-stamp 구별 불가 | **반영(추적)** — audit event CONFIRMED_NO_EDIT 구분 + 스냅샷 박제(R1)로 내용 고정. 문서 2단 표기는 백로그 |
+| C4 | MED | R7 타임스탬프 id → "재등록 시 값 복원" 계약이 UI 로 도달 불가 | **반영** — 라벨 파생 결정론 슬러그/해시 id(같은 라벨=같은 id=복원 실동작) + 중복 라벨 거부 |
+| C5 | MED | R6 은 존재 단언 스모크인데 "시각QA" 명명 과대 + 오탐 가능 단언 2건 | **반영** — 배지 셀 단위 단언·오버레이 원장 기준 확정 판정·§7 "스모크" 명명 정정. 픽셀 diff 백로그 |
+| C6 | MED | 84행 완결형 표 외형이 "테스트 설계 완료"로 읽힘 | **반영** — §1 최상단 현황 행(확정 x/84·축소 y/84·수행결과 미연결·초안 스켈레톤) 강제 노출 |
+| C7 | LOW | QA 가 실 오버레이 오염(수동 정리 의존) | **반영** — cleanupGraphDir 인자로 QA봇 기록 자동 정리 |
+
+### 코드 리뷰(reviewer) — CRITICAL 0·HIGH 1, 8건 처리
+| # | 심각도 | 요지 | 처분 |
+|---|---|---|---|
+| R1 | HIGH | 무편집 확정 후 재생성 시 본문이 [확정] 배지 단 채 무음 드리프트 | **반영** — 확정은 항상 G/W/T 전체 스냅샷 박제(editedCells) + 회귀 테스트(재생성 드리프트 차단 검증) |
+| R2 | MED | rtm-overrides 404 가 라이브 취급 → customFields 폴백 사문화 | **반영** — 404→null 구분, 폴백 생존 |
+| R3 | MED | 시나리오 evidence 배열 참조 공유(원천 셀 오염 위험) | **반영** — 시나리오별 복사 |
+| R4 | LOW | custom 값 편집만으로 functions.confirmed 증가 | **문서화** — "편집=즉시 확정" 철학과 일관, 좁히기는 백로그 |
+| R5 | LOW | Date.now id 동일 ms 충돌 | **반영(C4 로 해소)** — 라벨 파생 결정론 id |
+| R6 | LOW | clickButton 부분일치 오클릭 여지 | **반영** — 정확 일치 우선 2패스 |
+| R7 | LOW | 고아 오버레이 경고가 시나리오만(비대칭) | **반영** — FN/REQ/SCENARIO 3축 대칭 warn + 테스트 |
+| R8 | LOW | audit 무한 성장·_fields 삭제 후 고아 값 | **문서화** — 사람 행동 상한, 백로그 |

@@ -25,7 +25,7 @@ if (!existsSync(distEntry)) {
 
 const projectRoot = process.argv[2] || process.cwd()
 const engine = await import(distEntry)
-const { buildRtm, applyRequirements, applyOverlay, buildMyBatisModel } = engine
+const { buildRtm, applyRequirements, applyOverlay, buildMyBatisModel, isMapperXmlDocument } = engine
 
 // 입력은 디스크의 fill 완료 그래프(비파괴). buildMap 호출 금지(채움 소실).
 const graphPath = join(projectRoot, '.understand-anything', 'domain-graph.json')
@@ -79,7 +79,8 @@ function findMapperXmls(root) {
         } catch {
           continue
         }
-        if (content.includes('<mapper') && content.includes('namespace')) {
+        // 루트 요소 기준 판별 — 부분 문자열 검사는 문서 코드 예제(maven xdoc)를 오분류(W4).
+        if (isMapperXmlDocument(content)) {
           out.push({ relPath: relative(root, p), content })
         }
       }

@@ -15,6 +15,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { z } from 'zod'
 import { buildLayerSignals, deriveStepLayer } from '../domain-map/step-layer.js'
+import { isMapperXmlDocument } from '../mybatis/extract.js'
 import type { CandidatesReport, CensusReport, EdgesReport, RoutesReport } from '../domain-map/types.js'
 import type { JpaModel } from '../jpa/types.js'
 import type { DbSchemaModel } from '../db-schema/types.js'
@@ -248,7 +249,9 @@ export function buildProgramInventory(
     }
     // XML 은 MyBatis 매퍼, 또는 라우트를 앵커하는 파일(web.xml 서블릿 매핑)만 프로그램으로
     // 센다 — 후자를 빼면 servlet 라우트가 목록에서 침묵 누락된다(jpetstore 실측으로 확인).
-    const isMapperXml = isXml && text !== null && text.includes('<mapper') && text.includes('namespace')
+    // 매퍼 판별은 루트 요소 기준(mybatis.isMapperXmlDocument) — 부분 문자열 검사는 문서
+    // 코드 예제(maven xdoc)를 매퍼로 오분류한다(W4 실측 오탐 4건).
+    const isMapperXml = isXml && text !== null && isMapperXmlDocument(text)
     const hasRoute = screenRoutes.has(f.relPath) || apiRoutes.has(f.relPath)
     if (isXml && !isMapperXml && !hasRoute) {
       excludedConfigXml++

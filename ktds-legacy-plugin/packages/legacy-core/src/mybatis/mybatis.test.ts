@@ -3,7 +3,7 @@
  * 인라인 매퍼 XML 픽스처로 다중 FROM·INSERT·UPDATE·동적 태그·서브쿼리를 검증한다.
  */
 import { describe, it, expect } from 'vitest'
-import { parseMapperXml, buildMyBatisModel, namespaceBaseName } from './extract.js'
+import { parseMapperXml, buildMyBatisModel, namespaceBaseName, isMapperXmlDocument } from './extract.js'
 
 const ACCOUNT_XML = `<?xml version="1.0"?>
 <mapper namespace="org.mybatis.jpetstore.mapper.AccountMapper">
@@ -91,5 +91,34 @@ describe('namespaceBaseName', () => {
   it('마지막 . 뒤', () => {
     expect(namespaceBaseName('org.mybatis.jpetstore.mapper.AccountMapper')).toBe('AccountMapper')
     expect(namespaceBaseName('PlainMapper')).toBe('PlainMapper')
+  })
+})
+
+describe('isMapperXmlDocument — 루트 요소 판별(W4 오탐 회귀)', () => {
+  it('실전 매퍼 헤더(선언+라이선스 주석+DOCTYPE) → true', () => {
+    const real = `<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2010-2022 the original author or authors.
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.jpetstore.mapper.AccountMapper">
+</mapper>`
+    expect(isMapperXmlDocument(real)).toBe(true)
+    expect(isMapperXmlDocument(ACCOUNT_XML)).toBe(true)
+    expect(isMapperXmlDocument(ORDER_XML)).toBe(true)
+  })
+
+  it('본문 코드 예제에만 <mapper 가 실린 문서(maven xdoc) → false', () => {
+    // jpetstore src/site/**/xdoc/index.xml 실측 오탐 재현 — 루트는 <document>.
+    const xdoc = `<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0">
+  <body><section name="Sample Code"><source>
+    &lt;mapper namespace="org.mybatis.jpetstore.mapper.OrderMapper"&gt;
+    <mapper namespace="org.mybatis.jpetstore.mapper.OrderMapper">
+  </source></section></body>
+</document>`
+    expect(isMapperXmlDocument(xdoc)).toBe(false)
+    // parseMapperXml 도 동일 게이트(모델 오염 차단).
+    expect(parseMapperXml(xdoc, 'src/site/xdoc/index.xml')).toBeNull()
   })
 })

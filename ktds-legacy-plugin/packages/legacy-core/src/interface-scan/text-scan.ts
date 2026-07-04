@@ -28,9 +28,13 @@ function lineAt(text: string, index: number): number {
   return line
 }
 
-/** `FROM|JOIN|INTO|UPDATE <table>@<link>` 참조. */
+/**
+ * `FROM|JOIN|INTO|UPDATE <table>@<link>` 참조 + 콤마 조인 후속(`FROM a@l1, b@l2`).
+ * 콤마 규칙은 `식별자@식별자` 형태에만 걸려 이메일 등 일반 텍스트와 충돌하지 않는다
+ * (XML 주석은 사전 제거, SQL 문자열 밖 `x@y` 콤마 나열은 SQL 에서 조인 목록뿐).
+ */
 const DBLINK_REF_RE =
-  /\b(?:FROM|JOIN|INTO|UPDATE)\s+([A-Za-z_][\w$#.]*)@([A-Za-z_][\w$#.]*)/gi
+  /(?:\b(?:FROM|JOIN|INTO|UPDATE)\s+|,\s*)([A-Za-z_][\w$#.]*)@([A-Za-z_][\w$#.]*)/gi
 
 /** `CREATE [PUBLIC] DATABASE LINK <name>` DDL. */
 const DBLINK_DDL_RE = /\bCREATE\s+(?:PUBLIC\s+)?DATABASE\s+LINK\s+([A-Za-z_"][\w$#."]*)/gi

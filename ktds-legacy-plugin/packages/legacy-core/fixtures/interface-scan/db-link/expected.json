@@ -80,18 +80,38 @@
         }
       ],
       "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-79afaf32",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "STOCK@WMS_LINK",
+        "resolved": "STOCK@WMS_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/database/link.sql",
+          "line": 4,
+          "symbol": "WMS_LINK"
+        }
+      ],
+      "unresolved": false
     }
   ],
   "stats": {
-    "total": 4,
+    "total": 5,
     "unresolvedEndpoints": 0,
     "byProtocol": [
       {
         "protocol": "db-link",
-        "count": 4
+        "count": 5
       }
     ],
-    "callSiteTotal": 4
+    "callSiteTotal": 5
   },
   "suspectSignals": {
     "count": 0,

@@ -22,6 +22,26 @@
       "unresolved": false
     },
     {
+      "id": "IF-HTTP-c69cf5f7",
+      "direction": "outbound",
+      "protocol": "http",
+      "clientType": "JdkHttpClient",
+      "endpoint": {
+        "raw": "https://inv.example.com/v2/stock",
+        "resolved": "https://inv.example.com/v2/stock",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/JdkCaller.java",
+          "line": 10,
+          "symbol": "JdkCaller#callInventory"
+        }
+      ],
+      "unresolved": false
+    },
+    {
       "id": "IF-HTTP-d6559529",
       "direction": "outbound",
       "protocol": "http",
@@ -148,15 +168,15 @@
     }
   ],
   "stats": {
-    "total": 7,
+    "total": 8,
     "unresolvedEndpoints": 1,
     "byProtocol": [
       {
         "protocol": "http",
-        "count": 7
+        "count": 8
       }
     ],
-    "callSiteTotal": 8
+    "callSiteTotal": 9
   },
   "suspectSignals": {
     "count": 2,

@@ -158,8 +158,41 @@ function child(node: Node, type: string): Node | null {
   return null
 }
 
+/** Java 이스케이프 시퀀스 → 실제 문자(단일 문자 이스케이프). */
+const JAVA_ESCAPES: Record<string, string> = {
+  n: '\n',
+  t: '\t',
+  r: '\r',
+  b: '\b',
+  f: '\f',
+  s: ' ',
+  '"': '"',
+  "'": "'",
+  '\\': '\\',
+  '0': '\0',
+}
+
+/**
+ * 문자열 리터럴 전체 값 복원 — fragment + escape_sequence 를 순서대로 이어붙인다.
+ * 첫 fragment 만 취하면 이스케이프 뒤가 조용히 절단되어 "틀린 확정값"이 된다
+ * (예: "smb://host/a\tb" → "smb://host/a"). 침묵 누락 금지 불변식 위반이므로 전체 복원.
+ */
 function stringLiteralValue(node: Node): string {
-  return childrenOfType(node, 'string_fragment')[0]?.text ?? ''
+  let out = ''
+  for (const c of node.namedChildren) {
+    if (!c) continue
+    if (c.type === 'string_fragment') out += c.text
+    else if (c.type === 'escape_sequence') {
+      const t = c.text
+      if (t.startsWith('\\u')) {
+        const code = Number.parseInt(t.slice(2), 16)
+        out += Number.isNaN(code) ? t : String.fromCharCode(code)
+      } else {
+        out += JAVA_ESCAPES[t[1]] ?? t.slice(1)
+      }
+    }
+  }
+  return out
 }
 
 /** 모든 자손을 깊이우선 순회(결정론: 선언 순서). */
@@ -200,21 +233,49 @@ function enclosingSymbol(node: Node): string {
   return method ?? '<top>'
 }
 
-/** 같은 파일의 `static final String NAME = "..."` 상수 수집. */
+/** 상수를 둘러싼 타입 선언의 이름(가장 가까운 class/interface/enum). */
+function enclosingTypeName(node: Node): string | null {
+  let cur: Node | null = node.parent
+  while (cur) {
+    if (
+      cur.type === 'class_declaration' ||
+      cur.type === 'interface_declaration' ||
+      cur.type === 'enum_declaration'
+    ) {
+      return cur.childForFieldName('name')?.text ?? null
+    }
+    cur = cur.parent
+  }
+  return null
+}
+
+/**
+ * 같은 파일의 `static final String NAME = "..."` 상수 수집.
+ * 키는 `Class.NAME`(한정) + `NAME`(비한정) 이중 등록 — 비한정 키는 파일 내 동명 상수가
+ * 값이 다르면 제거(모호 → 해석 포기가 "틀린 확정값"보다 낫다). 한정 참조(Ext.API_URL)가
+ * 로컬 상수로 잘못 풀리는 것은 resolveStringExpr 의 한정 조회가 차단.
+ */
 function collectStringConstants(root: Node): Map<string, string> {
   const out = new Map<string, string>()
+  const ambiguousPlain = new Set<string>()
   for (const node of walk(root)) {
     if (node.type !== 'field_declaration') continue
     const mods = child(node, 'modifiers')?.text ?? ''
     if (!/\bstatic\b/.test(mods) || !/\bfinal\b/.test(mods)) continue
     const typeNode = node.childForFieldName('type')
     if (!typeNode || typeNode.text !== 'String') continue
+    const cls = enclosingTypeName(node)
     for (const decl of childrenOfType(node, 'variable_declarator')) {
       const name = decl.childForFieldName('name')?.text
       const value = decl.childForFieldName('value')
-      if (name && value?.type === 'string_literal') out.set(name, stringLiteralValue(value))
+      if (!name || value?.type !== 'string_literal') continue
+      const v = stringLiteralValue(value)
+      if (cls) out.set(`${cls}.${name}`, v)
+      if (out.has(name) && out.get(name) !== v) ambiguousPlain.add(name)
+      else out.set(name, v)
     }
   }
+  for (const name of ambiguousPlain) out.delete(name)
   return out
 }
 
@@ -231,8 +292,12 @@ function resolveStringExpr(node: Node, constants: Map<string, string>): string |
     case 'identifier':
       return constants.get(node.text) ?? null
     case 'field_access': {
+      // 한정 참조는 한정 키로만 조회 — Ext.API_URL 을 로컬 API_URL 로 오해석하지 않는다.
       const field = node.childForFieldName('field')?.text
-      return field ? (constants.get(field) ?? null) : null
+      const qualifier = node.childForFieldName('object')?.text
+      if (!field || !qualifier) return null
+      if (qualifier === 'this') return constants.get(field) ?? null
+      return constants.get(`${simpleTypeName(qualifier)}.${field}`) ?? null
     }
     case 'binary_expression': {
       // 문자열 연결(`+`)만 해석 — 다른 연산자는 endpoint 로 합성하지 않는다.
@@ -245,10 +310,10 @@ function resolveStringExpr(node: Node, constants: Map<string, string>): string |
       return l !== null && r !== null ? l + r : null
     }
     case 'method_invocation': {
-      // URI.create("...") / URI.create(CONST) — http 체인에서 흔한 래핑.
+      // URI.create("...") / java.net.URI.create(CONST) — http 체인에서 흔한 래핑.
       const obj = node.childForFieldName('object')?.text
       const name = node.childForFieldName('name')?.text
-      if (obj === 'URI' && name === 'create') {
+      if (obj && simpleTypeName(obj) === 'URI' && name === 'create') {
         const arg = firstArg(node)
         return arg ? resolveStringExpr(arg, constants) : null
       }
@@ -347,8 +412,11 @@ export function scanJavaInterfaces(
   }
 
   // 1) 선언 바인딩 — 식별자 → 클라이언트 타입(+생성 초기화의 endpoint raw).
-  const bindings = new Map<string, string>()
-  const boundEndpoint = new Map<string, string>()
+  //    파일 내 "모든" 선언의 타입을 모아, 같은 이름이 서로 다른 타입으로도 선언되면
+  //    바인딩에서 제외한다(스코프 미추적의 방어 — 메서드 A 의 RestTemplate client 가
+  //    메서드 B 의 무관한 Widget client 호출을 오탐시키는 것을 차단).
+  const declTypes = new Map<string, Set<string>>()
+  const declEndpoints = new Map<string, Set<string>>()
   for (const node of walk(root)) {
     if (
       node.type !== 'field_declaration' &&
@@ -359,24 +427,41 @@ export function scanJavaInterfaces(
     const typeNode = node.childForFieldName('type')
     if (!typeNode) continue
     const typeName = simpleTypeName(typeNode.text)
-    const known = typeName in specs || typeName === 'URL' || typeName === 'WebClient'
-    if (!known) continue
+    const record = (name: string) => {
+      const set = declTypes.get(name) ?? new Set<string>()
+      set.add(typeName)
+      declTypes.set(name, set)
+    }
     if (node.type === 'formal_parameter') {
       const name = node.childForFieldName('name')?.text
-      if (name) bindings.set(name, typeName)
+      if (name) record(name)
       continue
     }
     for (const decl of childrenOfType(node, 'variable_declarator')) {
       const name = decl.childForFieldName('name')?.text
       if (!name) continue
-      bindings.set(name, typeName)
+      record(name)
       const value = decl.childForFieldName('value')
       if (value?.type === 'object_creation_expression') {
         const arg = firstArg(value)
         const raw = arg ? resolveStringExpr(arg, constants) : null
-        if (raw !== null) boundEndpoint.set(name, raw)
+        if (raw !== null) {
+          const set = declEndpoints.get(name) ?? new Set<string>()
+          set.add(raw)
+          declEndpoints.set(name, set)
+        }
       }
     }
+  }
+  const bindings = new Map<string, string>()
+  const boundEndpoint = new Map<string, string>()
+  for (const [name, types] of declTypes) {
+    if (types.size !== 1) continue // 동명 이타입 선언 → 모호, 바인딩 포기(오탐 방지)
+    const typeName = [...types][0]
+    if (!(typeName in specs) && typeName !== 'URL' && typeName !== 'WebClient') continue
+    bindings.set(name, typeName)
+    const eps = declEndpoints.get(name)
+    if (eps && eps.size === 1) boundEndpoint.set(name, [...eps][0])
   }
 
   for (const node of walk(root)) {
@@ -498,10 +583,19 @@ export function scanJavaInterfaces(
       const isWebClient =
         inner?.type === 'identifier' &&
         (bindings.get(innerText) === 'WebClient' || innerText === 'WebClient')
+      // HttpRequest.newBuilder()…uri(..) — innermostReceiver 는 체인 최내곽의
+      // `HttpRequest` 까지 내려간다. 비한정이면 identifier, FQN(java.net.http.…)이면
+      // field_access 노드(method_invocation 이 아님에 주의).
       const isJdkHttp =
-        inner?.type === 'method_invocation' && /^HttpRequest\s*\.\s*newBuilder/.test(innerText)
-      const isOkHttp =
-        inner?.type === 'object_creation_expression' && /Request\s*\.\s*Builder/.test(innerText)
+        (inner?.type === 'identifier' || inner?.type === 'field_access') &&
+        simpleTypeName(innerText) === 'HttpRequest'
+      // OkHttp: 생성 타입의 마지막 두 세그먼트가 정확히 Request.Builder 일 때만
+      // (PurchaseRequest.Builder 같은 도메인 빌더 오탐 방지).
+      const creationType =
+        inner?.type === 'object_creation_expression'
+          ? (inner.childForFieldName('type')?.text ?? '')
+          : ''
+      const isOkHttp = creationType.split('.').slice(-2).join('.') === 'Request.Builder'
       if (isWebClient || isJdkHttp || isOkHttp) {
         const arg = firstArg(node)
         // dataHint: WebClient 체인의 HTTP 동사(webClient.get().uri(..)).

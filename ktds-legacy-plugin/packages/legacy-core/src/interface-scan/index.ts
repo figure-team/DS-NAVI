@@ -158,14 +158,16 @@ export async function extractInterfaces(
     }
   }
 
-  // T2 해석.
-  const resolvedSignals = raw.map((sig) => {
+  // T2 해석. 빈 문자열 endpoint 는 "없음"으로 정규화 — ""가 해석 성공(확정)으로
+  // 표기되는 것을 막는다(unresolved=true 로 표면화).
+  const resolvedSignals = raw.map((s) => {
+    const sig = s.endpointRaw === '' ? { ...s, endpointRaw: null } : s
     let resolved: string | null = null
     let resolvedFrom: string | null = null
     if (sig.endpointRaw !== null) {
       const r = resolvePlaceholders(sig.endpointRaw, props)
-      resolved = r.resolved
-      resolvedFrom = r.resolvedFrom
+      resolved = r.resolved === '' ? null : r.resolved
+      resolvedFrom = resolved === null ? null : r.resolvedFrom
     }
     return { sig, resolved, resolvedFrom }
   })

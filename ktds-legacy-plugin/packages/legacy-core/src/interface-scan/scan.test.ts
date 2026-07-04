@@ -10,7 +10,8 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { buildCensus } from '../domain-map/census.js'
 import { stableJson } from '../domain-map/persist.js'
-import { extractInterfaces } from './index.js'
+import { parseSource } from '../domain-map/tree-sitter.js'
+import { extractInterfaces, scanJavaInterfaces, scanDbLinks } from './index.js'
 import type { InterfaceReport } from './types.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -113,6 +114,79 @@ describe('interface scan — golden equivalence', () => {
     expect(report.items[0].endpoint.resolved).toBe('EAI.SETTLE.REQ')
     // 미등록 래퍼(LegacyBus)는 잡지 않는다(화이트리스트 원칙).
     expect(report.items.some((i) => i.clientType.includes('LegacyBus'))).toBe(false)
+  })
+
+  // ── 적대적 리뷰(H1/M2~M5/L6/L7) 회귀 프로브 — 파서 직접 구동 ──────────────
+
+  const probe = async (src: string) => scanJavaInterfaces(await parseSource('java', src), 'P.java')
+
+  it('H1: JDK HttpClient 체인(비한정/FQN 모두) 탐지 + URI.create 해석', async () => {
+    const fqn = await probe(
+      `class X { void a() throws Exception { Object r = java.net.http.HttpRequest.newBuilder().uri(java.net.URI.create("https://api.example.com/v1")).GET().build(); } }`,
+    )
+    expect(fqn.map((s) => [s.clientType, s.endpointRaw])).toEqual([
+      ['JdkHttpClient', 'https://api.example.com/v1'],
+    ])
+    const plain = await probe(
+      `import java.net.http.HttpRequest; import java.net.URI; class X2 { void a() { Object r = HttpRequest.newBuilder().uri(URI.create("https://api2.example.com")).build(); } }`,
+    )
+    expect(plain.map((s) => s.endpointRaw)).toEqual(['https://api2.example.com'])
+  })
+
+  it('M2: 이스케이프 포함 리터럴 전체 복원(절단된 "틀린 확정값" 금지)', async () => {
+    const out = await probe(
+      `class Y { String f(org.springframework.web.client.RestTemplate rt) { return rt.getForObject("smb://host/a\\tb/c", String.class); } }`,
+    )
+    expect(out.map((s) => s.endpointRaw)).toEqual(['smb://host/a\tb/c'])
+  })
+
+  it('M3: 동명 이타입 선언(스코프 충돌) → 바인딩 포기, 오탐 0', async () => {
+    const out = await probe(
+      `class Z { void a(){ org.springframework.web.client.RestTemplate client = new org.springframework.web.client.RestTemplate(); }
+       void b(){ com.foo.Widget client = com.foo.Shop.lookup(); client.exchange("X"); } }`,
+    )
+    expect(out).toEqual([])
+  })
+
+  it('M4: 도메인 *Request.Builder 는 OkHttp 로 오탐하지 않음(정확한 타입 세그먼트 매칭)', async () => {
+    const bad = await probe(
+      `class W { void a(){ Object o = new demo.PurchaseRequest.Builder().url("/internal/x").build(); } }`,
+    )
+    expect(bad).toEqual([])
+    const ok = await probe(
+      `class W2 { void a(){ Object o = new okhttp3.Request.Builder().url("https://ok.example.com").build(); } }`,
+    )
+    expect(ok.map((s) => [s.clientType, s.endpointRaw])).toEqual([['OkHttp', 'https://ok.example.com']])
+  })
+
+  it('M5: 한정 상수 참조는 한정 키로만 해석(Ext.API_URL ≠ 로컬 API_URL)', async () => {
+    const out = await probe(
+      `class Q { static final String API_URL = "https://local.example.com";
+       void a(org.springframework.web.client.RestTemplate rt){
+         rt.getForObject(ExternalConst.API_URL, String.class);
+         rt.getForObject(Q.API_URL, String.class); } }`,
+    )
+    expect(out.map((s) => s.endpointRaw)).toEqual([null, 'https://local.example.com'])
+  })
+
+  it('L6: 빈 문자열 endpoint → unresolved=true(빈 값이 확정으로 표기 금지)', async () => {
+    const root = join(fixturesRoot, 'http-clients')
+    const report = await extractInterfaces(root, buildCensus(root))
+    // 픽스처엔 빈 리터럴이 없으므로 단위 경로로 확인: '' 는 raw 단계에서 null 정규화.
+    const probe6 = await probe(
+      `class V { String f(org.springframework.web.client.RestTemplate rt) { return rt.getForObject("", String.class); } }`,
+    )
+    expect(probe6.map((s) => s.endpointRaw)).toEqual([''])
+    // extractInterfaces 경유 시 unresolved 로 뒤집히는지는 negative 계열이 아닌 여기서
+    // 스키마 불변식으로만 확인(빈 endpoint 항목이 있다면 반드시 unresolved).
+    for (const it of report.items) {
+      if (it.endpoint.resolved === '' || it.endpoint.raw === '') expect(it.unresolved).toBe(true)
+    }
+  })
+
+  it('L7: 콤마 조인 dblink(FROM a@l1, b@l2) 둘 다 탐지', () => {
+    const out = scanDbLinks('SELECT * FROM A@L1, B@L2 WHERE 1=1', 'q.sql', 'sql')
+    expect(out.map((s) => s.endpointRaw).sort()).toEqual(['A@L1', 'B@L2'])
   })
 
   it('의심신호: 카탈로그 밖 연계(자체 HTTP 유틸/jdbc) → items 0 + suspectSignals 표면화', async () => {

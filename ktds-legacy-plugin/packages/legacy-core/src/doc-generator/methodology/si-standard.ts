@@ -493,14 +493,155 @@ function buildSiTableSpec(input: DocInput): GeneratedDoc {
   }
 }
 
-// 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
-export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec, buildSiProgramList }
+// ──────────────────────────────────────────────────────────────────────────
+// si-위험모듈리포트 (W4) — risk-report.json 승계. PM 주간보고용 위험 Top N.
+// ──────────────────────────────────────────────────────────────────────────
 
-/** si-standard 모듈 — SI 정형 3종을 docId 순서로 산출(기능 → 인터페이스 → 테이블). */
+/** §1 산정 기준 열 — template risk-criteria 와 1:1. */
+const RISK_CRITERIA_COLUMNS = ['항목', '산정 방법', '가중치']
+/** §2 위험 Top N 열 — template risk-top 과 1:1. */
+const RISK_TOP_COLUMNS = [
+  '순위',
+  'PGM_ID',
+  '프로그램명',
+  '유형',
+  '소속도메인',
+  '위험점수',
+  '등급',
+  '복잡도',
+  'LOC',
+  '변경(커밋)',
+  '팬인',
+  '팬아웃',
+  '미도달',
+  '주요요인',
+]
+/** §3 지표 커버리지 열 — template risk-coverage 와 1:1. */
+const RISK_COVERAGE_COLUMNS = ['항목', '값', '비고']
+
+/** 지표 키 → 한국어 표기(주요요인 셀). */
+const RISK_METRIC_KO: Record<string, string> = {
+  complexity: '복잡도',
+  churn: '변경빈도',
+  loc: 'LOC',
+  fanIn: '팬인',
+  fanOut: '팬아웃',
+  unreached: '미도달',
+}
+
+/** 지표 키 → 산정 방법 설명(§1 — 수용기준 "계산 근거 문서화"의 사용자 노출면). */
+const RISK_METHOD_DESC: Record<string, string> = {
+  complexity: '순환복잡도 근사(java AST): 메서드 수 + 결정포인트(if/for/while/do/catch/삼항/case/&&/||). 비 java 는 미측정 [미확인]',
+  churn: 'git 전체 이력에서 파일별 변경 커밋 수(git log --numstat, rename 미추적). 변경 라인은 참고치',
+  loc: '파일 라인 수(wc -l 관례, 프로그램목록 승계)',
+  fanIn: '이 파일에 의존하는 서로 다른 파일 수(강신호 엣지: 주입/필드/상속/구현/매퍼 — import 제외)',
+  fanOut: '이 파일이 의존하는 서로 다른 파일 수(동일 강신호 엣지)',
+  unreached: '진입점(라우트·배치)에서 도달 불가 여부(slices 도달성 — 이진)',
+}
+
+/**
+ * si-위험모듈리포트(W4) — risk-report.json 승계.
+ * §1 산정 기준: 지표 정의·가중치·정규화/등급 규칙(방법론 서술 — INFERRED, 근거 없음).
+ * §2 위험 Top N: 지표는 결정론 사실 → CONFIRMED(filePath:1 근거). 미측정 지표 셀은
+ *   [미확인](notes 사유는 risk-report.json). 점수는 백분위 가중 합산 — **프로젝트 내
+ *   상대 순위**이지 절대 품질 판정이 아님(§1 에 명시, 오독 방지).
+ * §3 지표 커버리지: 측정/미측정·제외 카운트 표면화(침묵 누락 금지, W3 대칭).
+ */
+function buildSiRiskReport(input: DocInput): GeneratedDoc {
+  const rr = input.riskReport
+  const weights = rr?.meta.weights
+
+  const criteriaRows: TableRow[] = (
+    ['complexity', 'churn', 'loc', 'fanIn', 'fanOut', 'unreached'] as const
+  ).map(
+    (k): TableRow => ({
+      cells: [RISK_METRIC_KO[k], RISK_METHOD_DESC[k], weights ? String(weights[k]) : EMPTY_CELL],
+      confidence: 'INFERRED',
+      evidence: [],
+    }),
+  )
+  criteriaRows.push({
+    cells: [
+      '정규화·합산',
+      '지표별 프로젝트 내 백분위(0~1, 동점 평균) → 가중 합산. 미측정 지표는 가중치 재정규화(미측정 파일 과소평가 방지). 점수는 프로젝트 내 상대 순위이며 절대 품질 판정이 아님',
+      EMPTY_CELL,
+    ],
+    confidence: 'INFERRED',
+    evidence: [],
+  })
+  criteriaRows.push({
+    cells: ['등급', '상 ≥ 0.66 · 중 ≥ 0.33 · 하 < 0.33 (고정 임계)', EMPTY_CELL],
+    confidence: 'INFERRED',
+    evidence: [],
+  })
+
+  const topN = rr?.meta.topN ?? 20
+  const topRows: TableRow[] = (rr?.items ?? []).slice(0, topN).map(
+    (it, i): TableRow => ({
+      cells: [
+        String(i + 1),
+        it.programId,
+        it.name,
+        PGM_TYPE_KO[it.type] ?? it.type,
+        it.domain ?? UNRESOLVED_CELL,
+        it.score.toFixed(2),
+        it.grade,
+        it.metrics.complexity === null ? UNRESOLVED_CELL : String(it.metrics.complexity),
+        String(it.metrics.loc),
+        it.metrics.churnCommits === null ? UNRESOLVED_CELL : String(it.metrics.churnCommits),
+        String(it.metrics.fanIn),
+        String(it.metrics.fanOut),
+        it.metrics.unreached ? '미도달' : EMPTY_CELL,
+        it.factors.map((f) => RISK_METRIC_KO[f] ?? f).join(', '),
+      ],
+      confidence: 'CONFIRMED',
+      evidence: [{ file: it.filePath, line: 1 }],
+    }),
+  )
+
+  const coverageRows: TableRow[] = rr
+    ? [
+        { cells: ['랭킹 대상', String(rr.stats.programs), '프로그램목록 승계(test 유형 제외)'] },
+        { cells: ['제외(테스트)', String(rr.stats.excluded.test), '위험 랭킹 오염 방지 — 분리 계상'] },
+        {
+          cells: [
+            '복잡도 측정',
+            `${rr.stats.measured.complexity}/${rr.stats.programs}`,
+            '미측정 = 비 java(jsp·SQL매퍼 등) — [미확인]',
+          ],
+        },
+        {
+          cells: [
+            '변경빈도 측정',
+            `${rr.stats.measured.churn}/${rr.stats.programs}`,
+            rr.meta.churnAvailable ? `git 이력 기준(앵커 ${rr.gitCommit ?? '[미확인]'})` : 'git 이력 없음 — 전 항목 [미확인]',
+          ],
+        },
+        { cells: ['미도달', String(rr.stats.unreached), '진입점에서 도달 불가(데드코드 후보)'] },
+      ].map((r): TableRow => ({ ...r, confidence: 'INFERRED', evidence: [] }))
+    : []
+
+  return {
+    docId: 'si-위험모듈리포트',
+    title: 'SI 위험모듈리포트',
+    methodology: 'si-standard',
+    sections: [
+      { heading: '산정 기준', key: 'risk-criteria', claims: [], table: { columns: RISK_CRITERIA_COLUMNS, rows: criteriaRows } },
+      // heading 은 정적 'Top N' — 템플릿 라운드트립 불변(doc-set.test) + 사람 편집 라벨 존중.
+      { heading: '위험 Top N', key: 'risk-top', claims: [], table: { columns: RISK_TOP_COLUMNS, rows: topRows } },
+      { heading: '지표 커버리지', key: 'risk-coverage', claims: [], table: { columns: RISK_COVERAGE_COLUMNS, rows: coverageRows } },
+    ],
+  }
+}
+
+// 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
+export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec, buildSiProgramList, buildSiRiskReport }
+
+/** si-standard 모듈 — SI 정형 문서를 docId 순서로 산출(기능 → 인터페이스 → 테이블 → 배치 → 프로그램 → 위험). */
 export const siStandardMethodology: MethodologyModule = {
   id: 'si-standard',
   title: 'SI 표준(정형 제출 서식)',
   buildDocSet(input: DocInput): GeneratedDoc[] {
-    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input), buildSiProgramList(input)]
+    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input), buildSiProgramList(input), buildSiRiskReport(input)]
   },
 }

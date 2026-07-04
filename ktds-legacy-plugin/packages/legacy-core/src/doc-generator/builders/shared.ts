@@ -15,6 +15,7 @@ import type { DomainPolicyInput } from '../../domain-policy/types.js'
 import type { InterfaceReport } from '../../interface-scan/types.js'
 import type { BatchJobsReport } from '../../batch-scan/report.js'
 import type { ProgramInventory } from '../../program-inventory/index.js'
+import type { RiskReport } from '../../risk-report/index.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -53,6 +54,8 @@ export interface DocInput {
   batchJobs?: BatchJobsReport | null
   /** 프로그램 목록+FP 기초(W3) — si-프로그램목록 grounding. */
   programInventory?: ProgramInventory | null
+  /** 위험 모듈 리포트(W4) — si-위험모듈리포트 grounding. */
+  riskReport?: RiskReport | null
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

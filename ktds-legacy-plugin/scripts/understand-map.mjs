@@ -86,7 +86,7 @@ switch (sub) {
 
 async function runScan() {
   const { scanDomainMap } = engine
-  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory } = await scanDomainMap(projectRoot)
+  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport } = await scanDomainMap(projectRoot)
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
   console.log(`  routes: 라우트 ${routes.routes.length}개 / 배치 ${routes.batchEntries.length}개`)
@@ -101,8 +101,29 @@ async function runScan() {
     console.log(`  프로그램: ${programInventory.stats.total}본 (${byType})`)
     console.log(`  잠정 FP(간이법 미조정, [추정]): ${programInventory.fp.summary.unadjustedFp} — EI ${programInventory.fp.summary.ei}·EQ ${programInventory.fp.summary.eq}·ILF ${programInventory.fp.summary.ilf}·EIF ${programInventory.fp.summary.eif}`)
   }
-  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces}.json (동일 commit 재실행 byte-diff=0)')
+  reportRisk(riskReport)
+  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces,batch-jobs,program-inventory,risk-report}.json (동일 commit 재실행 byte-diff=0)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
+}
+
+/** W4 위험 리포트 보고 — 등급 분포 + 지표 커버리지(미측정 표면화). */
+function reportRisk(riskReport) {
+  if (!riskReport) return
+  const { programs, measured, unreached } = riskReport.stats
+  if (programs === 0) return
+  const byGrade = { 상: 0, 중: 0, 하: 0 }
+  for (const it of riskReport.items) byGrade[it.grade]++
+  const top = riskReport.items[0]
+  console.log(
+    `  위험: ${programs}본 랭킹 (상 ${byGrade['상']}·중 ${byGrade['중']}·하 ${byGrade['하']}, 미도달 ${unreached}) — 1위 ${top.name}(${top.score})`,
+  )
+  const cxMiss = programs - measured.complexity
+  if (cxMiss > 0 || !riskReport.meta.churnAvailable) {
+    const parts = []
+    if (cxMiss > 0) parts.push(`복잡도 미측정 ${cxMiss}건(비 java)`)
+    if (!riskReport.meta.churnAvailable) parts.push('변경빈도 미측정(git 이력 없음)')
+    console.log(`    [미확인] ${parts.join(' · ')} — si-위험모듈리포트 §지표 커버리지 참조`)
+  }
 }
 
 /** W2 배치 인벤토리 보고 — 미해석 핸들러/의심신호는 경고로 표면화. */

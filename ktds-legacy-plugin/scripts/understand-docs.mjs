@@ -35,6 +35,7 @@ const {
   buildWikiVault,
   writeWikiVault,
   buildMyBatisModel,
+  isMapperXmlDocument,
   readDbSchema,
   buildXlsxWorkbook,
   docToSheets,
@@ -110,6 +111,17 @@ if (existsSync(programInventoryPath)) {
   }
 }
 
+// 위험 모듈 리포트(W4)는 스캔 산출물에서 읽는다(없으면 null → si-위험모듈리포트 0행).
+let riskReport = null
+const riskReportPath = join(projectRoot, '.spec', 'map', 'risk-report.json')
+if (existsSync(riskReportPath)) {
+  try {
+    riskReport = JSON.parse(readFileSync(riskReportPath, 'utf8'))
+  } catch {
+    // 손상 시 null(정직 — 위험 리포트 0행).
+  }
+}
+
 // MyBatis Mapper XML 스캔(Tier B) — 테이블/CRUD grounding. 매퍼 XML 없으면 빈 모델.
 function findMapperXmls(root) {
   const SKIP = new Set(['node_modules', '.git', 'target', 'build', 'dist', '.understand-anything', '.spec', '.idea'])
@@ -132,7 +144,8 @@ function findMapperXmls(root) {
         } catch {
           continue
         }
-        if (content.includes('<mapper') && content.includes('namespace')) {
+        // 루트 요소 기준 판별 — 부분 문자열 검사는 문서 코드 예제(maven xdoc)를 오분류(W4).
+        if (isMapperXmlDocument(content)) {
           out.push({ relPath: relative(root, p), content })
         }
       }
@@ -213,7 +226,7 @@ const buildDeps = findBuildDeps(projectRoot)
 // PA3: db-spec 가 DDL 의 실제 컬럼/PK/FK/CHECK 를 grounding 으로 싣도록 map(scan) 산출을 로드.
 // 없으면(맵 미실행/code-only) null → db-spec 은 기존 노드 기반 목록만(우아한 degrade).
 const dbSchema = readDbSchema(projectRoot)
-const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, programInventory, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
+const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, programInventory, riskReport, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
 const sourceCommit = graph.gitCommit ?? null
 const graphSource = 'domain-graph.json(채움)'
 

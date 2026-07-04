@@ -45,6 +45,8 @@ import { buildBatchJobs, BATCH_JOBS_FILENAME } from '../batch-scan/report.js'
 import type { BatchJobsReport } from '../batch-scan/report.js'
 import { buildProgramInventory, PROGRAM_INVENTORY_FILENAME } from '../program-inventory/index.js'
 import type { ProgramInventory } from '../program-inventory/index.js'
+import { buildRiskReport, collectGitChurn, RISK_REPORT_FILENAME } from '../risk-report/index.js'
+import type { RiskReport } from '../risk-report/index.js'
 import { buildCoverageReport } from '../coverage-report/index.js'
 import { computeFileFingerprints } from '../incremental/index.js'
 import { readSkeleton } from './persist.js'
@@ -215,6 +217,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   interfaces: InterfaceReport
   batchJobs: BatchJobsReport
   programInventory: ProgramInventory
+  riskReport: RiskReport
 }> {
   const census = buildCensus(projectRoot)
   const routes = await extractRoutes(projectRoot, census)
@@ -252,6 +255,15 @@ export async function scanDomainMap(projectRoot: string): Promise<{
     batchJobs,
   })
   writeMapArtifact(projectRoot, PROGRAM_INVENTORY_FILENAME, programInventory)
+  // W4: 위험 모듈 리포트 — risk-report.json(지표 6종 백분위 합산, gitCommit 앵커 결정론).
+  const riskReport = await buildRiskReport(projectRoot, {
+    census,
+    edges,
+    slices,
+    programInventory,
+    churn: collectGitChurn(projectRoot),
+  })
+  writeMapArtifact(projectRoot, RISK_REPORT_FILENAME, riskReport)
   // 보완 D-c/D-b: 통합 커버리지 리포트 + 파일 fingerprint 스냅샷(증분 재스캔 기준).
   const coverage = buildCoverageReport({
     census,
@@ -266,7 +278,7 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   })
   writeMapArtifact(projectRoot, COVERAGE_FILENAME, coverage)
   writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, computeFileFingerprints(projectRoot, census))
-  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory }
+  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport }
 }
 
 /**

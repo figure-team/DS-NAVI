@@ -1,9 +1,9 @@
 /**
- * 문서 세트 레지스트리(D2) — 템플릿 기반 산출물 9종의 docId ↔ 빌더 ↔ 템플릿 파일 매핑.
+ * 문서 세트 레지스트리(D2) — 템플릿 기반 산출물 12종의 docId ↔ 빌더 ↔ 템플릿 파일 매핑.
  *
  * understand-docs 가 이 세트를 돌며 각 문서의 템플릿(.md, `templates/doc/`)을 로드해
  * 빌더 산출에 입힌다(applyDocTemplate). 템플릿 미로드 시 빌더 기본 구조 그대로(폴백).
- * 근거 가능 9종: as-built 6 + SI 3. (방법론 모듈과 별개의 "전체 세트" 진입점.)
+ * 근거 가능 12종: as-built 6 + SI 6. (방법론 모듈과 별개의 "전체 세트" 진입점.)
  */
 import type { DocInput } from './builders/index.js'
 import {
@@ -20,6 +20,7 @@ import {
   buildSiFeatureSpec,
   buildSiInterfaceSpec,
   buildSiTableSpec,
+  buildSiRiskReport,
 } from './methodology/si-standard.js'
 import type { GeneratedDoc } from './types.js'
 
@@ -30,7 +31,7 @@ export interface DocSetEntry {
   build: (input: DocInput) => GeneratedDoc
 }
 
-/** 근거 가능 9종(고정 순서). docId 는 빌더 산출/템플릿 frontmatter 와 일치. */
+/** 근거 가능 12종(고정 순서). docId 는 빌더 산출/템플릿 frontmatter 와 일치. */
 export const DOC_SET: DocSetEntry[] = [
   { docId: '01_tech-stack', templateFile: 'tech-stack.md', build: buildTechStack },
   { docId: '02_architecture', templateFile: 'architecture.md', build: buildArchitecture },
@@ -39,6 +40,7 @@ export const DOC_SET: DocSetEntry[] = [
   { docId: 'si-테이블정의서', templateFile: 'table-spec.md', build: buildSiTableSpec },
   { docId: 'si-배치정의서', templateFile: 'batch-spec.md', build: buildSiBatchSpec },
   { docId: 'si-프로그램목록', templateFile: 'program-inventory.md', build: buildSiProgramList },
+  { docId: 'si-위험모듈리포트', templateFile: 'risk-report.md', build: buildSiRiskReport },
   { docId: '06_program-list', templateFile: 'program-list.md', build: buildProgramList },
   { docId: '07_crud-matrix', templateFile: 'crud-matrix.md', build: buildCrudMatrix },
   { docId: '08_batch-list', templateFile: 'batch-list.md', build: buildBatchList },

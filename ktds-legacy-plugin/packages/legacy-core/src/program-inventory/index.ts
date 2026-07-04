@@ -161,7 +161,9 @@ export function buildProgramInventory(
 
   const programs: Program[] = []
   for (const f of census.files) {
-    const isJava = f.lang === 'java'
+    // kotlin 도 프로그램 단위로 포함 — 제외하면 침묵 누락(라우트 추출은 java 전용이라
+    // kt 컨트롤러는 계층 관례로만 분류됨, 엔진 커버리지 한계는 coverage 가 표면화).
+    const isJava = f.lang === 'java' || f.lang === 'kotlin'
     const isJsp = f.lang === 'jsp'
     const isXml = f.lang === 'xml'
     if (!isJava && !isJsp && !isXml) continue
@@ -208,7 +210,11 @@ export function buildProgramInventory(
       filePath: f.relPath,
       type,
       layer,
-      loc: text === null ? 0 : text.split('\n').length,
+      // LOC = wc -l 관례(개행 종료 파일의 빈 꼬리 세그먼트 미계상).
+      loc:
+        text === null || text.length === 0
+          ? 0
+          : text.split('\n').length - (text.endsWith('\n') ? 1 : 0),
       notes: [...notes].sort(cmp),
     })
   }

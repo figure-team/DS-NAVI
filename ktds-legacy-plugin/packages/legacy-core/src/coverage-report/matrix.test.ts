@@ -97,9 +97,12 @@ describe('coverage-matrix — 지원 수준 선언·미지원 표면화 (W9)', (
 })
 
 describe('coverage-matrix — 문서 drift (CI 고정)', () => {
-  it('docs/ktds/COVERAGE_MATRIX.md 가 단일 소스 렌더와 byte 일치한다', () => {
-    const here = dirname(fileURLToPath(import.meta.url))
-    const mdPath = join(here, '..', '..', '..', '..', '..', 'docs', 'ktds', 'COVERAGE_MATRIX.md')
+  // lean main(마켓플레이스)은 docs/ktds 자체가 없음 — 게이트의 강제 서식지는 demo 라인.
+  // 디렉터리가 존재하면(=demo) 반드시 강제: 파일 부재/불일치를 skip 이 아니라 실패로 본다.
+  const here = dirname(fileURLToPath(import.meta.url))
+  const docsDir = join(here, '..', '..', '..', '..', '..', 'docs', 'ktds')
+  it.skipIf(!existsSync(docsDir))('docs/ktds/COVERAGE_MATRIX.md 가 단일 소스 렌더와 byte 일치한다', () => {
+    const mdPath = join(docsDir, 'COVERAGE_MATRIX.md')
     expect(existsSync(mdPath), 'COVERAGE_MATRIX.md 부재 — qa-coverage-matrix.mjs --write 로 생성').toBe(true)
     expect(readFileSync(mdPath, 'utf8'), 'drift — matrix.ts 변경 후 qa-coverage-matrix.mjs --write 재생성 필요').toBe(
       renderCoverageMatrixMd(),

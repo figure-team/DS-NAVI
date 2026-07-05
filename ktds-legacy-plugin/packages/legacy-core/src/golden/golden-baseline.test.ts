@@ -18,7 +18,9 @@ const EXAMPLE_ROOT = join(here, '..', '..', '..', '..', '..', 'examples', 'jpets
 
 const readJson = (p: string) => JSON.parse(readFileSync(p, 'utf8'))
 
-describe('golden 기준선 — 스위트 내 회귀 게이트', () => {
+// lean main(마켓플레이스)에는 examples/ 벤더링이 없어 인용 위치 검증 대상이 없다 —
+// 게이트의 강제 서식지는 demo 라인(존재하면 반드시 강제, 부재 시에만 skip).
+describe.skipIf(!existsSync(EXAMPLE_ROOT))('golden 기준선 — 스위트 내 회귀 게이트', () => {
   it('실 골든 자기채점(domain-graph·rtm)이 baseline.json 과 일치한다', () => {
     expect(existsSync(join(GOLDEN_DIR, 'baseline.json'))).toBe(true)
     const baseline = readJson(join(GOLDEN_DIR, 'baseline.json'))

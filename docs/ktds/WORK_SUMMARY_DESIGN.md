@@ -39,7 +39,8 @@ LLM 산문이 섞이지 않는다.
 엔진은 `Date.now()`/`new Date()` 를 호출하지 않는다(전 모듈 관례). 기간은 두 방식:
 
 - **명시 범위** `--range <from>..<to>`: `git rev-list from..to` 집합 그대로(날짜 무관).
-  to 생략 시 HEAD. 동일 레포 상태 ⇒ 동일 집합.
+  to 생략 시 HEAD. 동일 레포 상태 ⇒ 동일 집합. **시각 윈도가 없으므로 원장(RTM/문서)
+  진척은 [미확인]으로 degrade** — 커밋 집합으로 시각 범위를 지어내지 않는다(날조 금지).
 - **상대 기간** `--weeks N`(기본 1) / `--month YYYY-MM`: 앵커 = **HEAD(=to) 커밋의
   committer date**. 윈도 = 반개구간 `(anchor − N×7일, anchor]`, month 는
   `[YYYY-MM-01T00:00:00Z, 익월 1일)` 반개구간. 벽시계가 아닌 커밋 시각 앵커라서
@@ -109,15 +110,22 @@ meta 에 해석 결과를 박제한다: `{mode, rawArg, fromIso|fromSha, toIso|t
   "commits": [ { "sha": "...", "dateIso": "...", "author": "...", "subject": "...", "isMerge": false,
                  "files": [{ "path": "...", "added": 3, "deleted": 1 }] } ],   // date DESC, sha ASC
   "totals": { "commits": 0, "mergeCommits": 0, "authors": 0, "files": 0, "added": 0, "deleted": 0 },
-  "modules": [ { "key": "...", "source": "program-inventory|dir|unresolved",
-                 "commits": 0, "files": 0, "linesChanged": 0 } ],              // linesChanged DESC, key ASC
+  "modules": [ { "key": "...", "source": "program-inventory|dir", "commits": 0, "files": 0,
+                 "linesChanged": 0, "topFiles": ["..."] } ],                   // linesChanged DESC, key ASC
   "rtmProgress": null | { "functionsConfirmed": 0, "scenariosConfirmed": 0, "requirementsConfirmed": 0,
-                          "confirmEvents": 0, "editEvents": 0, "unparsableAt": 0 },
+                          "confirmEvents": 0, "editEvents": 0, "auditlessEntities": 0, "unparsableAt": 0 },
   "docProgress": null | { "submitted": 0, "approved": 0, "returned": 0,
                           "approvedDocs": ["<docId>"], "unparsableAt": 0 },
-  "meta": { "gitAvailable": true, "shallow": false, "prefix": "", "moduleSource": "..." }
+  "meta": { "gitAvailable": true, "gitStatus": "ok|no-git|shallow", "prefix": "", "moduleSource": "program-inventory|dir" }
 }
 ```
+
+구현 조정(설계 대비): `unresolved` 버킷은 없다 — 디렉터리 폴백이 전 파일을 귀속하므로
+미귀속이 발생하지 않는다(루트 파일은 `(root)`). `topFiles`(모듈당 변경 상위 3파일)는
+문서 행의 file 근거 승계용 — 없으면 모듈 표가 전행 무근거 INFERRED 가 되어 문서
+승인 게이트(INFERRED>0.6)에 조직적으로 걸린다(jpetstore 실측 31%→54% 개선).
+`auditlessEntities` = audit[] 없는 구원장 엔티티의 at 폴백 집계 표면화(최초/재확정
+구분 불가 한계를 수치로 노출).
 
 git 불가/shallow → `commits:[]` + `meta.gitAvailable=false`(또는 shallow=true) — 문서는
 전 섹션 [미확인]. 배열 전부 명시 정렬(byte 결정론).
@@ -176,25 +184,88 @@ git 불가/shallow → `commits:[]` + `meta.gitAvailable=false`(또는 shallow=t
 ## 9. 백로그
 
 - 대시보드 산출물 탭에서 기간 선택 재수집 버튼(현재는 CLI 재실행)
-- work-summary stale 자동 감지(생성 앵커 sha ≠ HEAD 경고 — xlsxStale 패턴)
-- 작성자별 실적 분해(민감도 검토 필요 — 개인 평가 오용 우려로 기본 비활성)
-- 다주 추이(직전 기간 대비 증감) — 기간 2개 수집 비교
+- work-summary stale 자동 감지(생성 앵커 sha ≠ HEAD 경고 — xlsxStale 패턴) + 원장
+  파일 해시 앵커 병기(진척 수치의 재현 경계 명시 — 리뷰 C2 후속)
+- **작성자별 실적 분해는 제공하지 않는다(정책 확정, 리뷰 C5)** — 커밋 표의 작성자
+  열은 이력 투명성 목적(git 공개 정보)으로만 노출하고 문서 §2 에 명기. 집계·분해
+  기능을 추가하려면 민감도 재검토 선행.
+- 다주 추이(직전 기간 대비 증감) — 기간 2개 수집 비교(리뷰 지적: 주간보고 최대
+  가치 축, work-summary.json 2개 비교로 구현 가능 — 차기 우선 후보)
 - RTM 원장의 git 이력 추적(원장을 커밋하는 운영 관례 도입 시 과거 시점 복원 가능)
+- 생성물 패턴 프로젝트 커스텀 seam(현재 고정 목록 GENERATED_PATH_PATTERNS — 리뷰 C1 후속)
+- month 경계 타임존 옵션(현재 UTC 고정, 문서 명기 — 리뷰 R5: KST 월경계 수요 시)
+- 커밋 제목 RS 제어문자·경로 제어문자 인용 파싱(리뷰 R7/R8 — 실무 미발생 판단, churn R7 동일)
 
 ## 10. 진행 현황 (ledger)
 
 | 단계 | 상태 | 커밋 | 비고 |
 |---|---|---|---|
-| P7-a 설계 | ✅ | | 본 문서 |
-| P7-b 수집·리포트 모듈 | ⬜ | | |
-| P7-c SI 문서·배선 | ⬜ | | |
-| P7-d 스킬·스크립트 | ⬜ | | |
-| P7-e 실측·리뷰 | ⬜ | | |
+| P7-a 설계 | ✅ | c0501fc | 본 문서 |
+| P7-b 수집·리포트 모듈 | ✅ | a8bcbee | work-summary/(collect+집계), 테스트 17건 |
+| P7-c SI 문서·배선 | ✅ | b2a743c | si-실적요약보고서(14종째)+템플릿+DOC_SET/DocInput |
+| P7-d 스킬·스크립트 | ✅ | 499198d | /understand-report, 그래프 무관 단독 빌드, topFiles 근거 |
+| P7-e 실측·리뷰 | ✅ | 06d29f9 | §11 실측 + 적대적 리뷰 2종 반영(§12 disposition) |
 
-## 11. 실측 결과
+## 11. 실측 결과 (2026-07-05)
 
-(P7-e 에서 기록)
+- **이 레포(수용 기준) `--weeks 1`**: HEAD b2a743c 기준 윈도 (2026-06-28T10:10:57Z ~
+  2026-07-05T10:10:57Z] — 커밋 87건(머지 1) · 파일 326개(+43272/−8333). `git log
+  --since/--until` 실물 87건과 **정확 일치**. 재실행 md5 동일(byte-diff=0). 상위 모듈
+  examples/ktds-legacy-plugin/understand-anything-plugin(디렉터리 버킷). RTM/문서 진척은
+  원장 부재로 [미확인](이 레포는 분석 대상이 아니라 개발 레포 — 정직한 degrade).
+  근거율 78%.
+- **jpetstore(vendored 하위 디렉터리) `--weeks 2`**: prefix `examples/jpetstore-6/` 벗김
+  정상, program-inventory 도메인 조인(order/account/web-inf) + dir 폴백 혼합. 커밋 12건
+  · 파일 212개. 근거율 54%(topFiles 근거 승계 전 31% — 승인 게이트 차단선 아래였음).
+- **`--range 2572453..HEAD`**: rev-list 집합 35건, 진척 [미확인](시각 윈도 없음) 정상.
+- 테스트: legacy-core 903 green(work-summary 17 + si-work-summary 8 포함), 골든
+  스냅샷(si-실적요약보고서 스켈레톤) 1건 추가.
+- **리뷰 반영 후 재실측(06d29f9)**: 이 레포 1주 = 커밋 88건 · 실적 파일 275개
+  (+26776/−6210) · **생성물 별도 53개(+16784/−2140)** — 상위 모듈이 examples(벤더링
+  잡음)에서 ktds-legacy-plugin·understand-anything-plugin·opencode-plugin(실작업)으로
+  교정(C1 해소 실증). 재실행 md5 동일. jpetstore 근거율 51%. 테스트 910 green.
+  주의: `git log --since/--until` 대조는 근사 검증(경계 포함성 상이 가능) — 반개구간
+  포함성 자체는 report.test 의 경계 케이스가 직접 단언(리뷰 C8).
 
-## 12. 적대적 리뷰 반영
+## 12. 적대적 리뷰 반영 (2026-07-05, 06d29f9)
 
-(P7-e 에서 기록)
+설계 비평(critic, REVISE — 중대 5·경미 3) + 코드 리뷰(code-reviewer, COMMENT — M4·L5·OQ1).
+
+**설계 비평 disposition**
+- C1(중대, 반영): 헤드라인 churn 이 기계 생성물에 오염(screens.json 13,230줄이 상위
+  파일 1위 — 실증). → `GENERATED_PATH_PATTERNS` 분리 집계(totals.generated, 모듈
+  귀속 제외, meta 에 패턴 박제, §2 기준 행). 재실측: 상위 모듈 examples(±17,279)
+  → ktds-legacy-plugin(±16,649) 등 실작업으로 교정, 생성물 53개(±18.9k) 별도 표기.
+- C2(중대, 반영): "byte 동일" 재현 주장이 원장(작업트리 현재 상태) 변동과 내부 모순.
+  → §2 재현 행을 "git 실적은 byte 동일 / 진척은 원장 현재 상태 기준(재현 경계)"으로
+  조건화. 원장 해시 앵커는 백로그.
+- C3(중대, 반영): weeks/month 가 전체 이력 수집 → 대형 레포 256MB 절벽 + no-git 오진단.
+  → 스크립트가 해석 윈도 −1일 여유로 `--since` 바운드 전달(결정론 불변, 테스트 고정),
+  수집기는 maxBuffer/ENOBUFS 를 gitStatus 'too-large' 로 구분 표면화.
+- C4(중대, 반영): RTM 진척 count-only(문서 진척 approvedDocs 와 입도 비대칭).
+  → `*ConfirmedIds`(ASC, 상한 20 + "외 N건") 병기, 문서 비고에 나열.
+- C5(중대, 정책 명문화): 작성자 노출 vs "작성자별 분해 기본 비활성" 백로그 모순.
+  → (b)안 채택 — 커밋 표 작성자 열은 이력 투명성 목적 유지, **집계·분해는 제공하지
+  않음**을 §2 산정 기준 행 + §9 백로그에 정책으로 확정.
+- C6(경미, 문구 정확화): auditless at 폴백은 "최초/재확정 구분 불가"가 아니라 **확정
+  여부 자체 구분 불가**(편집만 된 구원장도 전환 계상 가능) — 코드 주석·문서 비고 교정.
+- C7(경미, 반영): 하위 디렉터리 모드 머지 과소 — §2 에 조건부 캐비엇 행 자동 추가.
+- C8(경미, 백로그+검증 보완): 반개구간 방향 비대칭은 §2 문서화 유지. §11 의
+  `--since/--until` 대조는 근사 검증임을 명기(경계 포함성은 단위테스트가 직접 단언).
+
+**코드 리뷰 disposition**
+- R1(M, 반영): weeks/month 불량 인자 uncaught throw → 스크립트 사전 검증 + try/catch(exit 2).
+- R2(M, 반영): collectWorkLog 공개 API 의 git 옵션 인젝션 → `-` 시작 revRange/sinceIso
+  거부(throw) + 테스트.
+- R3(M, 반영): 최초 확정 at 손상 시 윈도 안 재확정이 전환으로 오계상 → 확정 이벤트
+  at 파싱 실패 엔티티는 전환에서 보수적 제외 + `suspectEntities` 표면화 + 테스트.
+- R4(M, 반영): 모듈 key 충돌(도메인명=디렉터리명) 동점 정렬 비결정 → source tie-break
+  명시 + 테스트.
+- R5(OQ, 문서화+백로그): month UTC 경계의 tz 오귀속(월초 ±9h) — §2 에 UTC 경계 명기,
+  tz 옵션은 백로그(결정론 우선).
+- R6(L, 반영): `A...B` 3점 → 전용 안내 메시지. R7/R8(L, 백로그): RS 제어문자·경로
+  인용 — collect.ts 주석 명기(실무 미발생). R9(L, 주석): `_` 접두 예약 관례 의존 명기.
+  R10(L, 반영): 배열형 최상위 오버레이 값 가드 + 테스트.
+
+반영 후: 910 테스트 green(신규 8), 골든 스냅샷 갱신 1(문구 변경 의도분), 재실측
+byte-diff=0 유지, jpetstore 근거율 51%(승인 차단선 0.6 미만 유지).

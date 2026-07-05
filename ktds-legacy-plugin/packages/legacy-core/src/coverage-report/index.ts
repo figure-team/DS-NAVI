@@ -20,6 +20,7 @@ import type { JpaModel } from '../jpa/types.js'
 import type { InterfaceReport } from '../interface-scan/types.js'
 import type { BatchJobsReport } from '../batch-scan/report.js'
 import type { ProgramInventory } from '../program-inventory/index.js'
+import { computeLangSupport } from './matrix.js'
 
 function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
@@ -99,6 +100,27 @@ export const CoverageReportSchema = z.object({
       total: z.number().int().nonnegative(),
       byType: z.array(z.object({ type: z.string(), count: z.number().int().nonnegative() })),
       unadjustedFp: z.number().nonnegative(),
+    })
+    .optional(),
+  /**
+   * W9 언어 지원 현황 — 매트릭스(coverage-report/matrix.ts) × census.
+   * 핵심 구조분석(routes·edges·complexity 전부 none) 미지원 소스 파일을 계상해
+   * files.byLang 숫자에 묻히는 침묵 누락을 없앤다. optional: 하위호환.
+   */
+  langSupport: z
+    .object({
+      unsupportedFiles: z.number().int().nonnegative(),
+      byLang: z.array(
+        z.object({
+          lang: z.string(),
+          files: z.number().int().nonnegative(),
+          best: z.enum(['full', 'partial', 'none']),
+          core: z.enum(['full', 'partial', 'none']),
+          capabilities: z.array(
+            z.object({ key: z.string(), tier: z.enum(['full', 'partial', 'none']) }),
+          ),
+        }),
+      ),
     })
     .optional(),
 })
@@ -195,6 +217,7 @@ export function buildCoverageReport(inputs: CoverageInputs): CoverageReport {
   return CoverageReportSchema.parse({
     schemaVersion: 1,
     gitCommit: census.gitCommit,
+    langSupport: computeLangSupport(census),
     files: { total: census.fileCount, byLang, nonJavaPassthrough },
     layers: { resolved, unknown, rate: pct(resolved, census.files.length), byLayer },
     reachability: { reached, unreached, rate: pct(reached, reached + unreached) },
@@ -218,6 +241,16 @@ export function renderCoverageReport(r: CoverageReport): string {
     '',
     `- 스캔 파일: ${r.files.total}개 (비-Java 패스스루 ${r.files.nonJavaPassthrough}개 — UA 네이티브가 덮음)`,
     `  - 언어별: ${r.files.byLang.map((l) => `${l.lang} ${l.count}`).join(', ')}`,
+    ...(r.langSupport && r.langSupport.unsupportedFiles > 0
+      ? [
+          `  ⚠️ 스캐너 미지원 소스 ${r.langSupport.unsupportedFiles}파일 [미확인] — ` +
+            r.langSupport.byLang
+              .filter((l) => l.best === 'none')
+              .map((l) => `${l.lang} ${l.files}`)
+              .join(' · ') +
+            ' (어떤 스캐너도 덮지 않음 — docs/ktds/COVERAGE_MATRIX.md 지원 수준 참조)',
+        ]
+      : []),
     `- 계층 해소율: ${r.layers.rate}% (해소 ${r.layers.resolved} / 미해소 ${r.layers.unknown})`,
     `  - 계층별: ${r.layers.byLayer.map((l) => `${l.layer} ${l.count}`).join(', ')}`,
     `- 도달성: ${r.reachability.rate}% (도달 ${r.reachability.reached} / 미도달 ${r.reachability.unreached})`,

@@ -87,9 +87,10 @@ switch (sub) {
 async function runScan() {
   const { scanDomainMap } = engine
   const noCache = hasFlag('--no-cache')
-  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache } = await scanDomainMap(projectRoot, { readCache: !noCache })
+  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache, coverage } = await scanDomainMap(projectRoot, { readCache: !noCache })
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
+  reportLangSupport(coverage)
   reportScanCache(scanCache, noCache)
   console.log(`  routes: 라우트 ${routes.routes.length}개 / 배치 ${routes.batchEntries.length}개`)
   reportBatchJobs(batchJobs)
@@ -106,6 +107,20 @@ async function runScan() {
   reportRisk(riskReport)
   console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces,batch-jobs,program-inventory,risk-report}.json (동일 commit 재실행 byte-diff=0)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
+}
+
+/** W9 언어 지원 보고 — 핵심 구조분석 미지원 소스는 침묵 대신 경고(정직성). */
+function reportLangSupport(coverage) {
+  const ls = coverage?.langSupport
+  if (!ls || ls.unsupportedFiles === 0) return
+  const detail = ls.byLang
+    .filter((l) => l.best === 'none')
+    .map((l) => `${l.lang} ${l.files}`)
+    .join(' · ')
+  console.log(
+    `  ⚠️ 스캐너 미지원 소스 ${ls.unsupportedFiles}파일 [미확인] — ${detail}` +
+      ' (어떤 스캐너도 덮지 않음: docs/ktds/COVERAGE_MATRIX.md 지원 수준 참조)',
+  )
 }
 
 /** W8 증분 캐시 보고 — 재사용/재추출 건수(파일단위 팩트, 정직성 표기). */

@@ -300,6 +300,23 @@ export {
 } from './coverage-report/index.js'
 export type { CoverageReport, CoverageInputs } from './coverage-report/index.js'
 export {
+  COVERAGE_MATRIX,
+  ANALYSIS_RELEVANT_LANGS,
+  CORE_CAPABILITIES,
+  tierOf,
+  coreTierOf,
+  bestTierOf,
+  computeLangSupport,
+  renderCoverageMatrixMd,
+} from './coverage-report/matrix.js'
+export type {
+  CoverageTier,
+  CapabilityKey,
+  CapabilityCoverage,
+  LangSupport,
+  LangSupportRow,
+} from './coverage-report/matrix.js'
+export {
   computeFileFingerprints,
   diffFingerprints,
   isUnchanged,

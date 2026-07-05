@@ -455,6 +455,8 @@ export async function scanDomainMap(
   riskReport: RiskReport | null
   /** W8 캐시 세션 — buildMap 이 method-calls 에 재사용 후 finalize 재호출. */
   scanCache: ScanCacheSession
+  /** W9 통합 커버리지(언어 지원 현황 포함) — CLI 가 미지원 표면화에 사용. */
+  coverage: ReturnType<typeof buildCoverageReport>
 }> {
   const census = buildCensus(projectRoot)
   // W8: 파일단위 팩트 캐시 세션 — fingerprint 1회 계산(캐시 검증 + fingerprints.json 공용).
@@ -529,7 +531,7 @@ export async function scanDomainMap(
   // 세션이 스캔 선두에 계산한 동일 함수·동일 census 의 fingerprint 를 그대로 기록.
   writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, scanCache.fingerprints)
   scanCache.finalize()
-  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache }
+  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache, coverage }
 }
 
 /**

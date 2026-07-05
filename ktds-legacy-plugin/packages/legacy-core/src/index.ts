@@ -331,3 +331,25 @@ export {
 } from './scan-cache/index.js'
 export type { ScanCacheSection, SectionStats } from './scan-cache/index.js'
 export * from './screen-capture/index.js'
+export {
+  collectCitations,
+  scoreCitations,
+  extractDomainGraphUnits,
+  extractDomainGraphKeyItems,
+  extractRtmUnits,
+  extractRtmKeyItems,
+  scoreStructure,
+  scoreRecall,
+  scoreGoldenArtifact,
+  normalizeText,
+} from './golden/index.js'
+export type {
+  Citation as GoldenCitation,
+  CitationScore,
+  StructureUnit,
+  StructureScore,
+  KeyItem,
+  RecallScore,
+  ArtifactScore,
+  GoldenArtifactKind,
+} from './golden/index.js'

@@ -45,7 +45,12 @@ export function buildSlices(
     set.add(entryId)
   }
   for (const r of routes.routes) addEntry(r.filePath, r.routeId)
-  for (const b of routes.batchEntries) addEntry(b.filePath, b.entryId)
+  for (const b of routes.batchEntries) {
+    addEntry(b.filePath, b.entryId)
+    // W2: 해석된 잡 구현 파일도 루트로 — XML 엔트리의 filePath(XML)는 엣지가 없어
+    // 잡 클래스가 미도달(데드코드)로 오판되던 것을 제거한다.
+    if (b.handlerFile && b.handlerFile !== b.filePath) addEntry(b.handlerFile, b.entryId)
+  }
 
   // 2) 인접 리스트(source -> target[]).
   const adj = new Map<string, string[]>()

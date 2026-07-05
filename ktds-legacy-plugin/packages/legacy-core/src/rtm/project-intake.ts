@@ -86,6 +86,7 @@ export function intakeFnStub(
     nfrTags: [],
     rules: [],
     deliverableRefs: [],
+    custom: {},
   }
 }
 

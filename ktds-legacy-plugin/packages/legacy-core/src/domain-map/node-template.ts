@@ -11,7 +11,7 @@
  * 메서드·호출관계는 결정론(엔진이 calls 엣지로 보유)이라 템플릿 섹션이 아니다.
  */
 import { z } from 'zod'
-import { FlowLayerSchema, type FlowLayer } from './types.js'
+import type { FlowLayer } from './types.js'
 
 export const NodeDetailSectionSchema = z.object({
   /** 섹션 id — fill steps[].detail 의 key 이자 ktdsClaims kind 의 'detail:<id>' 접미. */

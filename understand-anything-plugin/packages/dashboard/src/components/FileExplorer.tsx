@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { GraphNode } from "@understand-anything/core/types";
 import { useDashboardStore } from "../store";
+import { useViewMode } from "../hooks/useViewMode";
 import { useI18n } from "../contexts/I18nContext";
 
 interface FileEntry {
@@ -147,7 +148,7 @@ export default function FileExplorer() {
   // ktds-fork (ADR-004): "문서" 모드면 위키 문서 트리(feature/api/table)를 보인다.
   const storeGraph = useDashboardStore((s) => s.graph);
   const wikiGraph = useDashboardStore((s) => s.wikiGraph);
-  const viewMode = useDashboardStore((s) => s.viewMode);
+  const viewMode = useViewMode();
   const graph = viewMode === "wiki" && wikiGraph ? wikiGraph : storeGraph;
   const openCodeViewer = useDashboardStore((s) => s.openCodeViewer);
   const navigateToNode = useDashboardStore((s) => s.navigateToNode);

@@ -30,13 +30,79 @@ function deriveFromAccent(accentHex: string, isDark: boolean): Record<string, st
   };
 }
 
+/**
+ * FRONT_REDESIGN P4: 프리셋 colors 맵에 없는 3층(component) 토큰의 모드별 기본값.
+ * 지식 노드·레이어·diff 색은 배경 밝기에 따라 가독 범위가 달라 모드 단위로 스위치한다.
+ * (프리셋이 같은 키를 정의하면 프리셋이 이긴다 — 적용 순서 참고.)
+ */
+const MODE_EXTRAS: Record<"dark" | "light", Record<string, string>> = {
+  dark: {
+    "node-article": "#d4a574",
+    "node-entity": "#7ba4c9",
+    "node-topic": "#c9b06c",
+    "node-claim": "#6fb07a",
+    "node-source": "#8a8a8a",
+    "layer-api": "#d4a574",
+    "layer-service": "#38bdf8",
+    "layer-dao": "#a78bfa",
+    "layer-db": "#f87171",
+    "layer-other": "#6b7280",
+    "diff-changed": "#e05252",
+    "diff-affected": "#d4a030",
+    "diff-changed-dim": "rgba(224, 82, 82, 0.25)",
+    "diff-affected-dim": "rgba(212, 160, 48, 0.25)",
+    "status-ok": "#7fae8a",
+    "status-warn": "#d8a25e",
+    "status-error": "#cf8a86",
+    "status-info": "#9fc1d8",
+    "method-get": "#38bdf8",
+    "method-post": "#6ee7b7",
+    "method-put": "#fcd34d",
+    "method-delete": "#f87171",
+    "method-any": "#cbd5e1",
+    "method-batch": "#a78bfa",
+    "method-event": "#d4a574",
+    "method-flow": "#94a3b8",
+  },
+  light: {
+    "node-article": "#92400e",
+    "node-entity": "#2e6a8f",
+    "node-topic": "#8a6d1f",
+    "node-claim": "#2e7a4e",
+    "node-source": "#6b7280",
+    "layer-api": "#b45309",
+    "layer-service": "#0369a1",
+    "layer-dao": "#6d28d9",
+    "layer-db": "#b91c1c",
+    "layer-other": "#4b5563",
+    "diff-changed": "#c11322",
+    "diff-affected": "#b45309",
+    "diff-changed-dim": "rgba(193, 19, 34, 0.22)",
+    "diff-affected-dim": "rgba(180, 83, 9, 0.22)",
+    "status-ok": "#1a7f37",
+    "status-warn": "#b45309",
+    "status-error": "#c11322",
+    "status-info": "#175cd3",
+    "method-get": "#0369a1",
+    "method-post": "#047857",
+    "method-put": "#a16207",
+    "method-delete": "#b91c1c",
+    "method-any": "#475569",
+    "method-batch": "#6d28d9",
+    "method-event": "#b45309",
+    "method-flow": "#64748b",
+  },
+};
+
 export function applyTheme(config: ThemeConfig): void {
   const preset = getPreset(config.presetId);
   const accent = getAccent(preset, config.accentId);
   const style = document.documentElement.style;
 
-  // 1. Apply base preset colors
-  for (const [key, value] of Object.entries(preset.colors)) {
+  // 1. Mode-level component tokens (P4) — 프리셋 전환 시 이전 프리셋 잔류값 방지를 위해
+  //    항상 전체 키를 다시 쓴다.
+  const extras = MODE_EXTRAS[preset.isDark ? "dark" : "light"];
+  for (const [key, value] of Object.entries(extras)) {
     style.setProperty(`--color-${key}`, value);
   }
 
@@ -51,15 +117,20 @@ export function applyTheme(config: ThemeConfig): void {
     style.setProperty(`--${key}`, value);
   }
 
-  // 4. Set data-theme for CSS-only selectors
+  // 4. Apply base preset colors LAST — 프리셋이 파생값(보더·엣지 등)을 오버라이드할 수 있게.
+  for (const [key, value] of Object.entries(preset.colors)) {
+    style.setProperty(`--color-${key}`, value);
+  }
+
+  // 5. Set data-theme for CSS-only selectors
   document.documentElement.setAttribute("data-theme", preset.isDark ? "dark" : "light");
 
-  // 5. Apply heading font preference
+  // 6. Apply heading font preference — P4 기본은 산세리프(Pretendard).
   const fontMap: Record<string, string> = {
     serif: "var(--font-serif)",
     sans: "var(--font-sans)",
     mono: "var(--font-mono)",
   };
-  const headingFont = config.headingFont ?? "serif";
-  style.setProperty("--font-heading", fontMap[headingFont] ?? fontMap.serif);
+  const headingFont = config.headingFont ?? "sans";
+  style.setProperty("--font-heading", fontMap[headingFont] ?? fontMap.sans);
 }

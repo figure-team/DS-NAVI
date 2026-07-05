@@ -1,0 +1,168 @@
+{
+  "description": "검수된 오라클(사람 확인 완료) — items/stats/suspectSignals 골든 등가",
+  "items": [
+    {
+      "id": "IF-FILE-061121a7",
+      "direction": "outbound",
+      "protocol": "file",
+      "clientType": "FTPClient(FTP)",
+      "endpoint": {
+        "raw": "ftp.example.com",
+        "resolved": "ftp.example.com",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/FileTransfer.java",
+          "line": 19,
+          "symbol": "FileTransfer#sendViaFtp"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-FILE-058913fa",
+      "direction": "outbound",
+      "protocol": "file",
+      "clientType": "JSch(SFTP)",
+      "endpoint": {
+        "raw": "sftp.example.com:22",
+        "resolved": "sftp.example.com:22",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/FileTransfer.java",
+          "line": 14,
+          "symbol": "FileTransfer#sendViaSftp"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-MQ-6dbaf2d5",
+      "direction": "outbound",
+      "protocol": "mq",
+      "clientType": "JmsTemplate",
+      "endpoint": {
+        "raw": "ORDER.QUEUE",
+        "resolved": "ORDER.QUEUE",
+        "resolvedFrom": null
+      },
+      "dataHint": "produce",
+      "callSites": [
+        {
+          "file": "src/main/java/demo/OrderMessaging.java",
+          "line": 12,
+          "symbol": "OrderMessaging#notifyOrder"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-MQ-95943fa2",
+      "direction": "inbound-extra",
+      "protocol": "mq",
+      "clientType": "KafkaListener",
+      "endpoint": {
+        "raw": "order-events",
+        "resolved": "order-events",
+        "resolvedFrom": null
+      },
+      "dataHint": "consume",
+      "callSites": [
+        {
+          "file": "src/main/java/demo/OrderMessaging.java",
+          "line": 16,
+          "symbol": "OrderMessaging#onOrderEvent"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-MQ-12cf840f",
+      "direction": "outbound",
+      "protocol": "mq",
+      "clientType": "KafkaTemplate",
+      "endpoint": {
+        "raw": "order-events",
+        "resolved": "order-events",
+        "resolvedFrom": null
+      },
+      "dataHint": "produce",
+      "callSites": [
+        {
+          "file": "src/main/java/demo/OrderMessaging.java",
+          "line": 13,
+          "symbol": "OrderMessaging#notifyOrder"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-SOCK-0985b8d0",
+      "direction": "outbound",
+      "protocol": "socket",
+      "clientType": "Socket",
+      "endpoint": {
+        "raw": "10.0.0.5:9999",
+        "resolved": "10.0.0.5:9999",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/FileTransfer.java",
+          "line": 23,
+          "symbol": "FileTransfer#rawSocket"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-SOCK-9898c901",
+      "direction": "inbound-extra",
+      "protocol": "socket",
+      "clientType": "ServerSocket",
+      "endpoint": {
+        "raw": "port 8888",
+        "resolved": "port 8888",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/java/demo/FileTransfer.java",
+          "line": 24,
+          "symbol": "FileTransfer#rawSocket"
+        }
+      ],
+      "unresolved": false
+    }
+  ],
+  "stats": {
+    "total": 7,
+    "unresolvedEndpoints": 0,
+    "byProtocol": [
+      {
+        "protocol": "file",
+        "count": 2
+      },
+      {
+        "protocol": "mq",
+        "count": 3
+      },
+      {
+        "protocol": "socket",
+        "count": 2
+      }
+    ],
+    "callSiteTotal": 7
+  },
+  "suspectSignals": {
+    "count": 0,
+    "samples": []
+  }
+}

@@ -1,4 +1,5 @@
 export type PresetId =
+  | "ds-navi-light"
   | "dark-gold"
   | "dark-ocean"
   | "dark-forest"
@@ -30,7 +31,9 @@ export interface ThemeConfig {
   headingFont?: HeadingFont;
 }
 
+// FRONT_REDESIGN P4: 기본 테마 = DS-NAVI 라이트(DS-APM 디자인 언어, 설계문서 §6).
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
-  presetId: "dark-gold",
-  accentId: "gold",
+  presetId: "ds-navi-light",
+  accentId: "ktred",
+  headingFont: "sans",
 };

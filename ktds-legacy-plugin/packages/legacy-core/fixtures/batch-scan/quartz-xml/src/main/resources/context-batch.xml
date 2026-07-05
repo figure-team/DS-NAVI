@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans">
+
+  <!-- 잡 구현 빈 -->
+  <bean id="orderSyncJob" class="demo.batch.OrderSyncJob" />
+
+  <!-- MethodInvoking 방식: targetObject ref → 잡 클래스 -->
+  <bean id="orderSyncJobDetail"
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+    <property name="targetObject" ref="orderSyncJob" />
+    <property name="targetMethod" value="execute" />
+  </bean>
+  <bean id="orderSyncTrigger"
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <property name="jobDetail" ref="orderSyncJobDetail" />
+    <property name="cronExpression" value="0 0 4 * * ?" />
+  </bean>
+
+  <!-- JobDetailFactoryBean 방식: jobClass → 잡 클래스 -->
+  <bean id="reportJobDetail"
+        class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+    <property name="jobClass" value="demo.batch.ReportJob" />
+  </bean>
+  <bean id="reportTrigger"
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <property name="jobDetail" ref="reportJobDetail" />
+    <property name="cronExpression" value="0 30 5 * * ?" />
+  </bean>
+
+  <!-- 해석 불가 케이스: 존재하지 않는 빈 ref → handlerFile null([미확인]) -->
+  <bean id="ghostTrigger"
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <property name="jobDetail" ref="missingJobDetail" />
+    <property name="cronExpression" value="0 0 6 * * ?" />
+  </bean>
+
+  <!-- task:scheduled 방식 -->
+  <task:scheduled ref="orderSyncJob" method="cleanup" cron="0 15 3 * * ?" xmlns:task="http://www.springframework.org/schema/task" />
+</beans>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useDashboardStore } from "../store";
+import { useNavigate } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import { buildDomainCards } from "../utils/domainData";
 import DomainCardDetail from "./DomainCardDetail";
@@ -18,7 +19,7 @@ import GroundedBar from "./GroundedBar";
  */
 export default function DomainMapView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const navigateToDomain = useDashboardStore((s) => s.navigateToDomain);
+  const navigate = useNavigate(); // P3: 도메인 진입은 URL로
   const { t } = useI18n();
   // 카드 상세 — '상세보기' 클릭 시 모달로 띄운다(화면2 노드 상세와 동형). null = 닫힘.
   const [detailId, setDetailId] = useState<string | null>(null);
@@ -134,7 +135,7 @@ export default function DomainMapView() {
                 {/* 본문 = 기능 보기(화면2)로 이동. 근거 상세는 우측 상단 '상세보기' 토글로 분리. */}
                 <button
                   type="button"
-                  onClick={() => navigateToDomain(card.id)}
+                  onClick={() => navigate(`/domains/${card.id}`)}
                   className="w-full text-left cursor-pointer"
                   style={{ padding: 24 }}
                 >
@@ -218,7 +219,7 @@ export default function DomainMapView() {
                 card={detailCard}
                 onViewFeatures={() => {
                   setDetailId(null);
-                  navigateToDomain(detailCard.id);
+                  navigate(`/domains/${detailCard.id}`);
                 }}
               />
             </div>

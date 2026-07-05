@@ -1,0 +1,120 @@
+{
+  "description": "검수된 오라클(사람 확인 완료) — items/stats/suspectSignals 골든 등가",
+  "items": [
+    {
+      "id": "IF-DBLINK-cd2db895",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "CUST@CRM_LINK",
+        "resolved": "CUST@CRM_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/mapper/OrderMapper.xml",
+          "line": 9,
+          "symbol": "CRM_LINK"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-ae118582",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink(DDL)",
+      "endpoint": {
+        "raw": "ERP_LINK",
+        "resolved": "ERP_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/database/link.sql",
+          "line": 2,
+          "symbol": "ERP_LINK"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-1b1ec778",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "ITEMS@ERP_LINK",
+        "resolved": "ITEMS@ERP_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/database/link.sql",
+          "line": 4,
+          "symbol": "ERP_LINK"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-d427ebe6",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "ORDERS@ERP_LINK",
+        "resolved": "ORDERS@ERP_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/mapper/OrderMapper.xml",
+          "line": 6,
+          "symbol": "ERP_LINK"
+        }
+      ],
+      "unresolved": false
+    },
+    {
+      "id": "IF-DBLINK-79afaf32",
+      "direction": "outbound",
+      "protocol": "db-link",
+      "clientType": "dblink",
+      "endpoint": {
+        "raw": "STOCK@WMS_LINK",
+        "resolved": "STOCK@WMS_LINK",
+        "resolvedFrom": null
+      },
+      "dataHint": null,
+      "callSites": [
+        {
+          "file": "src/main/resources/database/link.sql",
+          "line": 4,
+          "symbol": "WMS_LINK"
+        }
+      ],
+      "unresolved": false
+    }
+  ],
+  "stats": {
+    "total": 5,
+    "unresolvedEndpoints": 0,
+    "byProtocol": [
+      {
+        "protocol": "db-link",
+        "count": 5
+      }
+    ],
+    "callSiteTotal": 5
+  },
+  "suspectSignals": {
+    "count": 0,
+    "samples": []
+  }
+}

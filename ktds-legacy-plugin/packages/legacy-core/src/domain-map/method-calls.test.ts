@@ -11,7 +11,6 @@
 import { describe, it, expect } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { readFileSync } from 'node:fs'
 import { extractJavaFacts, type JavaFileFacts } from './java-facts.js'
 import { buildGraphFromFacts, buildMethodCallGraph } from './method-calls.js'
 import { stableJson } from './persist.js'

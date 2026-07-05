@@ -1,0 +1,202 @@
+{
+  "gitCommit": "c64558efee7bc7e149d24ec73ce39a1d5f7ba44e",
+  "items": [
+    {
+      "domain": "order",
+      "factors": [
+        "churn",
+        "complexity"
+      ],
+      "filePath": "src/main/java/demo/service/OrderService.java",
+      "grade": "상",
+      "layer": "service",
+      "metrics": {
+        "churnCommits": 10,
+        "churnLines": 500,
+        "complexity": 12,
+        "fanIn": 1,
+        "fanOut": 1,
+        "loc": 43,
+        "unreached": false
+      },
+      "name": "OrderService",
+      "normalized": {
+        "churn": 1,
+        "complexity": 1,
+        "fanIn": 0.875,
+        "fanOut": 0.875,
+        "loc": 1
+      },
+      "notes": [],
+      "programId": "PGM-SVC-44d7e5e2",
+      "score": 0.9653,
+      "type": "service"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanOut",
+        "churn"
+      ],
+      "filePath": "src/main/java/demo/web/OrderController.java",
+      "grade": "중",
+      "layer": "api",
+      "metrics": {
+        "churnCommits": 3,
+        "churnLines": 40,
+        "complexity": 3,
+        "fanIn": 0,
+        "fanOut": 1,
+        "loc": 25,
+        "unreached": false
+      },
+      "name": "OrderController",
+      "normalized": {
+        "churn": 0.75,
+        "complexity": 0.6667,
+        "fanIn": 0.25,
+        "fanOut": 0.875,
+        "loc": 0.75
+      },
+      "notes": [],
+      "programId": "PGM-API-518304d5",
+      "score": 0.6574,
+      "type": "api"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanIn",
+        "loc"
+      ],
+      "filePath": "src/main/java/demo/dao/OrderDao.java",
+      "grade": "하",
+      "layer": "dao",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 5,
+        "complexity": 2,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 11,
+        "unreached": false
+      },
+      "name": "OrderDao",
+      "normalized": {
+        "churn": 0.25,
+        "complexity": 0.3333,
+        "fanIn": 0.875,
+        "fanOut": 0.25,
+        "loc": 0.5
+      },
+      "notes": [],
+      "programId": "PGM-DAO-081edcaf",
+      "score": 0.419,
+      "type": "dao"
+    },
+    {
+      "domain": "list",
+      "factors": [
+        "churn",
+        "fanIn"
+      ],
+      "filePath": "src/main/webapp/order/list.jsp",
+      "grade": "하",
+      "layer": "api",
+      "metrics": {
+        "churnCommits": 2,
+        "churnLines": 12,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 6,
+        "unreached": false
+      },
+      "name": "list",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.25,
+        "fanOut": 0.25,
+        "loc": 0
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-4e19b03d",
+      "score": 0.2885,
+      "type": "screen"
+    },
+    {
+      "domain": null,
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/demo/util/OrphanHelper.java",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 0,
+        "churnLines": 0,
+        "complexity": 1,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 7,
+        "unreached": true
+      },
+      "name": "OrphanHelper",
+      "normalized": {
+        "churn": 0,
+        "complexity": 0,
+        "fanIn": 0.25,
+        "fanOut": 0.25,
+        "loc": 0.25
+      },
+      "notes": [],
+      "programId": "PGM-COM-d66e2630",
+      "score": 0.1111,
+      "type": "common"
+    }
+  ],
+  "meta": {
+    "churnAvailable": true,
+    "degenerateMetrics": [],
+    "edgeKinds": [
+      "ctor-param",
+      "extends",
+      "field-type",
+      "impl",
+      "implements",
+      "injection",
+      "mapper-xml",
+      "mybatis"
+    ],
+    "topN": 20,
+    "weights": {
+      "churn": 0.25,
+      "complexity": 0.25,
+      "fanIn": 0.15,
+      "fanOut": 0.1,
+      "loc": 0.15
+    }
+  },
+  "schemaVersion": 1,
+  "stats": {
+    "complexityUnmeasured": [
+      {
+        "count": 1,
+        "ext": "jsp"
+      }
+    ],
+    "excluded": {
+      "test": 0
+    },
+    "measured": {
+      "churn": 5,
+      "complexity": 4
+    },
+    "programs": 5,
+    "unreached": 1
+  }
+}

@@ -72,6 +72,14 @@ export default function ExportMenu() {
     let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
     svgContent += `<rect width="100%" height="100%" fill="#0a0a0a"/>`;
 
+    // P5: SVG는 단독 파일이라 CSS 변수를 해석하지 못한다 — 내보내기 시점 테마 값을 굽는다.
+    const css = getComputedStyle(document.documentElement);
+    const tok = (name: string, fallback: string) => css.getPropertyValue(name).trim() || fallback;
+    const edgeColor = tok("--color-edge", "rgba(120,120,120,0.35)");
+    const nodeFill = tok("--color-panel", "#ffffff");
+    const nodeStroke = tok("--color-border-medium", "#d5d8de");
+    const nodeText = tok("--color-text-primary", "#1a1b1f");
+
     edges.forEach((edge) => {
       const sourceNode = nodes.find((n) => n.id === edge.source);
       const targetNode = nodes.find((n) => n.id === edge.target);
@@ -82,7 +90,7 @@ export default function ExportMenu() {
       const tx = targetNode.position.x + (targetNode.width ?? 200) / 2 + offsetX;
       const ty = targetNode.position.y + (targetNode.height ?? 80) / 2 + offsetY;
 
-      svgContent += `<line x1="${sx}" y1="${sy}" x2="${tx}" y2="${ty}" stroke="rgba(212,165,116,0.3)" stroke-width="1.5"/>`;
+      svgContent += `<line x1="${sx}" y1="${sy}" x2="${tx}" y2="${ty}" stroke="${edgeColor}" stroke-width="1.5"/>`;
     });
 
     nodes.forEach((node) => {
@@ -93,8 +101,8 @@ export default function ExportMenu() {
       const w = node.width ?? 200;
       const h = node.height ?? 80;
 
-      svgContent += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#1a1a1a" stroke="rgba(212,165,116,0.2)" stroke-width="1"/>`;
-      svgContent += `<text x="${x + w / 2}" y="${y + h / 2}" fill="#d4a574" text-anchor="middle" dominant-baseline="middle" font-size="12">${escapeXml(String(node.data.label ?? node.id))}</text>`;
+      svgContent += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${nodeFill}" stroke="${nodeStroke}" stroke-width="1"/>`;
+      svgContent += `<text x="${x + w / 2}" y="${y + h / 2}" fill="${nodeText}" text-anchor="middle" dominant-baseline="middle" font-size="12">${escapeXml(String(node.data.label ?? node.id))}</text>`;
     });
 
     svgContent += `</svg>`;

@@ -3,96 +3,122 @@
 @source "../index.html";
 
 @theme {
+  /* FRONT_REDESIGN P4: 첫 페인트 기본값 = DS-NAVI 라이트(ds-navi-light 프리셋과 동일).
+     런타임 값은 theme-engine(applyTheme)이 CSS 변수로 덮어쓴다. */
   /* Base */
-  --color-root: #0a0a0a;
-  --color-surface: #111111;
-  --color-elevated: #1a1a1a;
-  --color-panel: #141414;
+  --color-root: #f4f5f7;
+  --color-surface: #fcfcfd;
+  --color-elevated: #eff0f3;
+  --color-panel: #ffffff;
 
   /* Accent */
-  --color-accent: #d4a574;
-  --color-accent-dim: #c9a96e;
-  --color-accent-bright: #e8c49a;
+  --color-accent: #d81b2c;
+  --color-accent-dim: #b91525;
+  --color-accent-bright: #e8404f;
 
   /* Text */
-  --color-text-primary: #f5f0eb;
-  --color-text-secondary: #a39787;
-  --color-text-muted: #6b5f53;
+  --color-text-primary: #1a1b1f;
+  --color-text-secondary: #43474e;
+  --color-text-muted: #6b727b;
 
   /* Borders */
-  --color-border-subtle: rgba(212, 165, 116, 0.12);
-  --color-border-medium: rgba(212, 165, 116, 0.25);
+  --color-border-subtle: #e6e8ec;
+  --color-border-medium: #d5d8de;
 
   /* Node types */
-  --color-node-file: #4a7c9b;
-  --color-node-function: #5a9e6f;
-  --color-node-class: #8b6fb0;
-  --color-node-module: #c9a06c;
-  --color-node-concept: #b07a8a;
-  --color-node-config: #5eead4;
-  --color-node-document: #7dd3fc;
-  --color-node-service: #a78bfa;
-  --color-node-table: #6ee7b7;
-  --color-node-endpoint: #fdba74;
-  --color-node-pipeline: #fda4af;
-  --color-node-schema: #fcd34d;
-  --color-node-resource: #a5b4fc;
+  --color-node-file: #1f6fab;
+  --color-node-function: #3f9142;
+  --color-node-class: #7a4fc9;
+  --color-node-module: #b07818;
+  --color-node-concept: #b04a72;
+  --color-node-config: #0d9488;
+  --color-node-document: #0284c7;
+  --color-node-service: #7c3aed;
+  --color-node-table: #059669;
+  --color-node-endpoint: #ea580c;
+  --color-node-pipeline: #e11d48;
+  --color-node-schema: #a16207;
+  --color-node-resource: #4f46e5;
 
   /* Knowledge node types */
-  --color-node-article: #d4a574;
-  --color-node-entity: #7ba4c9;
-  --color-node-topic: #c9b06c;
-  --color-node-claim: #6fb07a;
-  --color-node-source: #8a8a8a;
+  --color-node-article: #92400e;
+  --color-node-entity: #2e6a8f;
+  --color-node-topic: #8a6d1f;
+  --color-node-claim: #2e7a4e;
+  --color-node-source: #6b7280;
 
   /* Diff */
-  --color-diff-changed: #e05252;
-  --color-diff-affected: #d4a030;
-  --color-diff-changed-dim: rgba(224, 82, 82, 0.25);
-  --color-diff-affected-dim: rgba(212, 160, 48, 0.25);
+  --color-diff-changed: #c11322;
+  --color-diff-affected: #b45309;
+  --color-diff-changed-dim: rgba(193, 19, 34, 0.22);
+  --color-diff-affected-dim: rgba(180, 83, 9, 0.22);
 
   /* Glass */
-  --glass-bg: rgba(20, 20, 20, 0.8);
-  --glass-bg-heavy: rgba(20, 20, 20, 0.95);
-  --glass-border: rgba(212, 165, 116, 0.1);
-  --glass-border-heavy: rgba(212, 165, 116, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(216, 27, 44, 0.08);
+  --glass-border-heavy: rgba(216, 27, 44, 0.12);
 
   /* Scrollbar */
-  --scrollbar-thumb: rgba(212, 165, 116, 0.2);
-  --scrollbar-thumb-hover: rgba(212, 165, 116, 0.35);
+  --scrollbar-thumb: rgba(216, 27, 44, 0.2);
+  --scrollbar-thumb-hover: rgba(216, 27, 44, 0.35);
 
   /* Glow */
-  --glow-accent: rgba(212, 165, 116, 0.15);
-  --glow-accent-strong: rgba(212, 165, 116, 0.4);
-  --glow-accent-pulse: rgba(212, 165, 116, 0.6);
+  --glow-accent: rgba(216, 27, 44, 0.15);
+  --glow-accent-strong: rgba(216, 27, 44, 0.4);
+  --glow-accent-pulse: rgba(216, 27, 44, 0.6);
 
-  /* Edges */
-  --color-edge: rgba(212, 165, 116, 0.3);
-  --color-edge-dim: rgba(212, 165, 116, 0.08);
-  --color-edge-dot: rgba(212, 165, 116, 0.15);
+  /* Edges — 중립(구조 그래프 엣지가 액센트로 물들지 않게) */
+  --color-edge: rgba(26, 27, 31, 0.28);
+  --color-edge-dim: rgba(26, 27, 31, 0.08);
+  --color-edge-dot: rgba(26, 27, 31, 0.14);
 
   /* Accent overlays */
-  --color-accent-overlay-bg: rgba(212, 165, 116, 0.05);
-  --color-accent-overlay-border: rgba(212, 165, 116, 0.25);
+  --color-accent-overlay-bg: rgba(216, 27, 44, 0.05);
+  --color-accent-overlay-border: rgba(216, 27, 44, 0.25);
 
   /* Kbd */
-  --kbd-bg: rgba(212, 165, 116, 0.1);
+  --kbd-bg: rgba(216, 27, 44, 0.1);
+
+  /* Status (시맨틱 상태 — §6: 색+라벨 동반, 액센트와 분리) */
+  --color-status-ok: #1a7f37;
+  --color-status-warn: #b45309;
+  --color-status-error: #c11322;
+  --color-status-info: #175cd3;
+
+  /* HTTP method badges (categorical) */
+  --color-method-get: #0369a1;
+  --color-method-post: #047857;
+  --color-method-put: #a16207;
+  --color-method-delete: #b91c1c;
+  --color-method-any: #475569;
+  --color-method-batch: #6d28d9;
+  --color-method-event: #b45309;
+  --color-method-flow: #64748b;
 
   /* Layer colors (flow spine view) */
-  --color-layer-api: #d4a574;
-  --color-layer-service: #38bdf8;
-  --color-layer-dao: #a78bfa;
-  --color-layer-db: #f87171;
-  --color-layer-other: #6b7280;
+  --color-layer-api: #b45309;
+  --color-layer-service: #0369a1;
+  --color-layer-dao: #6d28d9;
+  --color-layer-db: #b91c1c;
+  --color-layer-other: #4b5563;
 
-  /* Typography */
+  /* Typography — P4: Pretendard 기본(DM Serif는 테마 옵션으로 유지) */
   --font-serif: 'DM Serif Display', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-heading: var(--font-serif);
+  --font-sans: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Inter', system-ui, sans-serif;
+  --font-heading: var(--font-sans);
 }
 
 .font-heading { font-family: var(--font-heading); }
+
+/* 시안(mockup-shell-home)의 --shadow-card — 라이트 카드 입체감. 다크는 무음. */
+.card-shadow {
+  box-shadow: 0 1px 2px rgba(26, 27, 31, 0.04), 0 1px 3px rgba(26, 27, 31, 0.06);
+}
+[data-theme="dark"] .card-shadow {
+  box-shadow: none;
+}
 
 /* Base styles */
 html {

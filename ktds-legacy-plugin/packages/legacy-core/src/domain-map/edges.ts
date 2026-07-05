@@ -12,7 +12,15 @@ import { join } from 'node:path'
 import type { Node } from 'web-tree-sitter'
 import { extractJavaFacts, type JavaFileFacts } from './java-facts.js'
 import { parseSource } from './tree-sitter.js'
+import type { ScanCacheSession } from '../scan-cache/index.js'
 import type { CensusReport, EdgeKind, EdgeRecord, EdgesReport, Unresolved } from './types.js'
+
+/**
+ * W8 캐시 섹션 salt — JavaFileFacts 형태(java-facts.ts)나 mybatis namespace 수집 의미가
+ * 바뀌면 bump. `java-facts` 섹션은 method-calls.ts 와 공유(동일 extractJavaFacts 출력).
+ */
+export const JAVA_FACTS_SALT = 'v1'
+const MYBATIS_NS_SALT = 'v1'
 
 /** 주입 어노테이션(필드/생성자). */
 const INJECT_ANNOTATIONS = new Set(['Autowired', 'Resource', 'Inject'])
@@ -149,25 +157,55 @@ function collectMyBatisNamespaces(root: Node): Set<string> {
 export async function extractEdges(
   projectRoot: string,
   census: CensusReport,
+  cache?: ScanCacheSession,
 ): Promise<EdgesReport> {
   const javaFiles = census.files.filter((f) => f.lang === 'java')
   const xmlFiles = census.files.filter(
     (f) => f.lang === 'xml' && f.relPath.endsWith('Mapper.xml'),
   )
 
+  // W8: 파일단위 팩트 캐시 — null 값 = 판독 실패 파일(기존 동작대로 제외).
+  // mybatis ns 는 소비부가 정렬 순회라 배열(집합 원소)로 저장해도 동일 결과.
+  const factsSec = cache?.section<JavaFileFacts | null>('java-facts', JAVA_FACTS_SALT)
+  const nsSec = cache?.section<string[] | null>('mybatis-ns', MYBATIS_NS_SALT)
+
   // 1) Java 팩트 + (mybatis 탐지용) 파싱 루트를 relPath 정렬 순으로 수집.
   const factsByPath = new Map<string, JavaFileFacts>()
   const mybatisNs = new Map<string, Set<string>>()
   const sortedJava = [...javaFiles].sort((a, b) => cmp(a.relPath, b.relPath))
   for (const f of sortedJava) {
+    const factsHit = factsSec?.get(f.relPath)
+    const nsHit = nsSec?.get(f.relPath)
+    if (factsHit !== undefined && nsHit !== undefined) {
+      if (factsHit !== null && nsHit !== null) {
+        factsByPath.set(f.relPath, factsHit)
+        mybatisNs.set(f.relPath, new Set(nsHit))
+      }
+      continue
+    }
     let src: string
     try {
       src = readFileSync(join(projectRoot, f.relPath), 'utf8')
     } catch {
+      // null 캐시는 fingerprint 도 'absent' 일 때만(일시 오류 박제 방지, 리뷰 R2).
+      if (cache?.isAbsent(f.relPath)) {
+        factsSec?.put(f.relPath, null)
+        nsSec?.put(f.relPath, null)
+      }
       continue
     }
-    factsByPath.set(f.relPath, await extractJavaFacts(f.relPath, src))
-    mybatisNs.set(f.relPath, collectMyBatisNamespaces(await parseSource('java', src)))
+    // 파일별 오류 격리(다른 스캐너와 동일 규약, 비평 C7) — 추출 실패는 캐시하지 않고
+    // 그 파일만 제외한다(다음 실행에 재시도).
+    try {
+      const facts = await extractJavaFacts(f.relPath, src)
+      const ns = collectMyBatisNamespaces(await parseSource('java', src))
+      factsByPath.set(f.relPath, facts)
+      mybatisNs.set(f.relPath, ns)
+      factsSec?.put(f.relPath, facts)
+      nsSec?.put(f.relPath, [...ns])
+    } catch {
+      // 증거 없는 엣지 금지 — facts 없이 둔다.
+    }
   }
 
   const allFacts = [...factsByPath.values()]

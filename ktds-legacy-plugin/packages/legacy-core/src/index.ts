@@ -3,12 +3,13 @@ export * from './domain-map/types.js'
 export {
   CONFIG_FILENAME,
   ConfigSchema,
+  ScreensConfigSchema,
   defaultConfig,
   configPath,
   loadConfig,
   writeConfig,
 } from './config/index.js'
-export type { Config } from './config/index.js'
+export type { Config, ScreensConfig } from './config/index.js'
 export { initProject, SPEC_DIR, SPEC_MASTER } from './init/index.js'
 export type { InitResult } from './init/index.js'
 export {
@@ -39,6 +40,8 @@ export {
   writeDomainGraph,
   uaDir,
   DOMAIN_GRAPH_FILENAME,
+  writeMapArtifact,
+  readMapArtifact,
 } from './domain-map/persist.js'
 export {
   normalizePath,
@@ -48,6 +51,11 @@ export {
   sortBatchEntries,
 } from './domain-map/route-key.js'
 export { extractRoutes, scanRoutes, scanDomainMap, buildMap } from './domain-map/extract.js'
+export * from './interface-scan/index.js'
+export * from './batch-scan/index.js'
+export * from './program-inventory/index.js'
+export * from './risk-report/index.js'
+export * from './work-summary/index.js'
 export { buildSkeleton, DEFAULT_STEP_CAP } from './domain-map/skeleton.js'
 export {
   DEFAULT_NODE_DETAIL_TEMPLATE,
@@ -262,6 +270,8 @@ export type {
   OnboardingStop,
 } from './wiki/index.js'
 export { exportHtml, exportVaultHtml, escapeHtml } from './export/index.js'
+export { buildXlsxWorkbook, sanitizeSheetNames, docToSheets, rtmToSheets } from './export/index.js'
+export type { XlsxSheet, XlsxRow, RtmLike } from './export/index.js'
 export { detectStaleClaims, incrementalReapproval, evidenceAnchor } from './stale/index.js'
 export type {
   FingerprintMap,
@@ -290,9 +300,57 @@ export {
 } from './coverage-report/index.js'
 export type { CoverageReport, CoverageInputs } from './coverage-report/index.js'
 export {
+  COVERAGE_MATRIX,
+  NON_ANALYSIS_LANGS,
+  CORE_CAPABILITIES,
+  tierOf,
+  coreTierOf,
+  bestTierOf,
+  computeLangSupport,
+  renderCoverageMatrixMd,
+} from './coverage-report/matrix.js'
+export type {
+  CoverageTier,
+  CapabilityKey,
+  CapabilityCoverage,
+  LangSupport,
+  LangSupportRow,
+} from './coverage-report/matrix.js'
+export {
   computeFileFingerprints,
   diffFingerprints,
   isUnchanged,
   anchorFingerprints,
 } from './incremental/index.js'
 export type { FileChangeSet } from './incremental/index.js'
+export {
+  ScanCacheSession,
+  createScanCacheSession,
+  SCAN_CACHE_FILENAME,
+  SCAN_CACHE_SCHEMA_VERSION,
+} from './scan-cache/index.js'
+export type { ScanCacheSection, SectionStats } from './scan-cache/index.js'
+export * from './screen-capture/index.js'
+export {
+  GOLDEN_SCORER_VERSION,
+  collectCitations,
+  scoreCitations,
+  extractDomainGraphUnits,
+  extractDomainGraphKeyItems,
+  extractRtmUnits,
+  extractRtmKeyItems,
+  scoreStructure,
+  scoreRecall,
+  scoreGoldenArtifact,
+  normalizeText,
+} from './golden/index.js'
+export type {
+  Citation as GoldenCitation,
+  CitationScore,
+  StructureUnit,
+  StructureScore,
+  KeyItem,
+  RecallScore,
+  ArtifactScore,
+  GoldenArtifactKind,
+} from './golden/index.js'

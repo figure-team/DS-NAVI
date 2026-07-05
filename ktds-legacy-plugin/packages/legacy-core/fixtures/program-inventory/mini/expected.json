@@ -1,0 +1,190 @@
+{
+  "description": "검수된 오라클(사람 확인 완료) — programs/fp/stats 골든 등가",
+  "programs": [
+    {
+      "id": "PGM-API-518304d5",
+      "name": "OrderController",
+      "filePath": "src/main/java/demo/web/OrderController.java",
+      "type": "api",
+      "layer": "api",
+      "loc": 25,
+      "domain": "order",
+      "domainVia": "reachability",
+      "notes": [
+        "route:GET /api/orders",
+        "route:POST /api/orders"
+      ]
+    },
+    {
+      "id": "PGM-BAT-e16064bb",
+      "name": "NightlyJob",
+      "filePath": "src/main/java/demo/batch/NightlyJob.java",
+      "type": "batch",
+      "layer": "api",
+      "loc": 8,
+      "domain": "nightly",
+      "domainVia": "reachability",
+      "notes": [
+        "BAT-SCHED-63bff20b"
+      ]
+    },
+    {
+      "id": "PGM-DAO-081edcaf",
+      "name": "OrderDao",
+      "filePath": "src/main/java/demo/dao/OrderDao.java",
+      "type": "dao",
+      "layer": "dao",
+      "loc": 11,
+      "domain": "order",
+      "domainVia": "reachability",
+      "notes": []
+    },
+    {
+      "id": "PGM-MAP-fd691144",
+      "name": "OrderMapper",
+      "filePath": "src/main/resources/mapper/OrderMapper.xml",
+      "type": "mapper-xml",
+      "layer": "db",
+      "loc": 7,
+      "domain": "order",
+      "domainVia": "prefix",
+      "notes": []
+    },
+    {
+      "id": "PGM-SCR-4e19b03d",
+      "name": "list",
+      "filePath": "src/main/webapp/order/list.jsp",
+      "type": "screen",
+      "layer": "api",
+      "loc": 6,
+      "domain": "order",
+      "domainVia": "reachability",
+      "notes": [
+        "route:GET /order/list.jsp"
+      ]
+    },
+    {
+      "id": "PGM-SVC-44d7e5e2",
+      "name": "OrderService",
+      "filePath": "src/main/java/demo/service/OrderService.java",
+      "type": "service",
+      "layer": "service",
+      "loc": 15,
+      "domain": "order",
+      "domainVia": "reachability",
+      "notes": []
+    }
+  ],
+  "fp": {
+    "transactions": [
+      {
+        "kind": "EQ",
+        "routeId": "route:GET /api/orders",
+        "method": "GET",
+        "path": "/api/orders",
+        "evidence": {
+          "file": "src/main/java/demo/web/OrderController.java",
+          "line": 16
+        }
+      },
+      {
+        "kind": "EQ",
+        "routeId": "route:GET /order/list.jsp",
+        "method": "GET",
+        "path": "/order/list.jsp",
+        "evidence": {
+          "file": "src/main/webapp/order/list.jsp",
+          "line": 1
+        }
+      },
+      {
+        "kind": "EI",
+        "routeId": "route:POST /api/orders",
+        "method": "POST",
+        "path": "/api/orders",
+        "evidence": {
+          "file": "src/main/java/demo/web/OrderController.java",
+          "line": 21
+        }
+      }
+    ],
+    "dataFunctions": [
+      {
+        "kind": "EIF",
+        "name": "ERP_LINK",
+        "evidence": {
+          "file": "src/main/resources/mapper/OrderMapper.xml",
+          "line": 5
+        }
+      },
+      {
+        "kind": "ILF",
+        "name": "ORDERS",
+        "evidence": {
+          "file": "src/main/resources/database/schema.sql",
+          "line": 1
+        }
+      },
+      {
+        "kind": "ILF",
+        "name": "ORDER_ITEM",
+        "evidence": {
+          "file": "src/main/resources/database/schema.sql",
+          "line": 6
+        }
+      }
+    ],
+    "summary": {
+      "ei": 1,
+      "eo": 0,
+      "eq": 2,
+      "unclassified": 0,
+      "ilf": 2,
+      "eif": 1,
+      "unadjustedFp": 32.2
+    }
+  },
+  "stats": {
+    "total": 6,
+    "byType": [
+      {
+        "type": "api",
+        "count": 1
+      },
+      {
+        "type": "batch",
+        "count": 1
+      },
+      {
+        "type": "dao",
+        "count": 1
+      },
+      {
+        "type": "mapper-xml",
+        "count": 1
+      },
+      {
+        "type": "screen",
+        "count": 1
+      },
+      {
+        "type": "service",
+        "count": 1
+      }
+    ],
+    "excluded": {
+      "configXml": 0,
+      "otherLang": [
+        {
+          "lang": "json",
+          "count": 1
+        },
+        {
+          "lang": "sql",
+          "count": 1
+        }
+      ],
+      "unreadable": 0
+    }
+  }
+}

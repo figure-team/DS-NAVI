@@ -1,0 +1,54 @@
+{
+  "description": "검수된 오라클(사람 확인 완료) — jobs/stats/suspectSignals 골든 등가",
+  "jobs": [
+    {
+      "id": "BAT-SB-94cebc7a",
+      "name": "orderAggJob",
+      "trigger": "spring-batch",
+      "schedule": null,
+      "handler": "orderReader",
+      "handlerFile": null,
+      "unresolvedHandler": true,
+      "evidence": {
+        "file": "src/main/resources/job-settle.xml",
+        "line": 15
+      },
+      "sliceRoot": "src/main/resources/job-settle.xml",
+      "reachableFiles": 1,
+      "notes": [
+        "reader=orderReader",
+        "writer=orderWriter"
+      ]
+    },
+    {
+      "id": "BAT-SB-2b2b7ec8",
+      "name": "settleJob",
+      "trigger": "spring-batch",
+      "schedule": null,
+      "handler": "settleTasklet",
+      "handlerFile": "src/main/java/demo/sb/SettleTasklet.java",
+      "unresolvedHandler": false,
+      "evidence": {
+        "file": "src/main/resources/job-settle.xml",
+        "line": 9
+      },
+      "sliceRoot": "src/main/java/demo/sb/SettleTasklet.java",
+      "reachableFiles": 1,
+      "notes": []
+    }
+  ],
+  "stats": {
+    "total": 2,
+    "byTrigger": [
+      {
+        "trigger": "spring-batch",
+        "count": 2
+      }
+    ],
+    "unresolvedHandlers": 1
+  },
+  "suspectSignals": {
+    "count": 0,
+    "samples": []
+  }
+}

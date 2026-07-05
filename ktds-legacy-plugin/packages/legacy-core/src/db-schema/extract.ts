@@ -12,11 +12,29 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { gitCommitHash } from '../domain-map/persist.js'
 import type { CensusReport } from '../domain-map/types.js'
+import type { ScanCacheSession } from '../scan-cache/index.js'
 import { extractDdlFromSource } from './ddl-scan.js'
 import { extractDataloadFromSource } from './dataload-scan.js'
+import type { InsertRow } from './dataload-scan.js'
 import { discoverLiveDbSignals } from './discover.js'
 import { DbSchemaModelSchema, DATALOAD_ROW_CAP } from './types.js'
 import type { DbSchemaModel, DbTable, DbSchemaTier } from './types.js'
+
+/** W8 캐시 섹션 salt — ddl-scan/dataload-scan 의 파싱 의미가 바뀌면 bump. */
+const SQL_FACTS_SALT = 'v1'
+
+/**
+ * W8 캐시 팩트 — .sql 파일 1개의 DDL/데이터로드 파싱 결과(내용의 순수 함수).
+ * 파싱 실패 메시지도 소스의 순수 함수라 함께 캐시(unresolved 재생 동일).
+ * 병합(중복 테이블·COMMENT 부착·행 합성·tier)은 파일 간 결합이라 매회 재계산 —
+ * 병합이 테이블 객체를 변조하므로 캐시 get 의 깊은 복사가 전제다.
+ */
+interface SqlFileFacts {
+  ddl: { tables: DbTable[]; comments: Array<{ table: string; column: string | null; text: string }> } | null
+  ddlError: string | null
+  inserts: InsertRow[] | null
+  insertsError: string | null
+}
 
 function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
@@ -34,42 +52,71 @@ function looksLikeCodeTable(table: DbTable): boolean {
 }
 
 /** census 의 .sql 파일을 파싱해 DB 스키마 모델 생성. */
-export function extractDbSchema(projectRoot: string, census: CensusReport): DbSchemaModel {
+export function extractDbSchema(
+  projectRoot: string,
+  census: CensusReport,
+  cache?: ScanCacheSession,
+): DbSchemaModel {
   const tableByKey = new Map<string, DbTable>()
   const unresolved: Array<{ ref: string; reason: string }> = []
   let sqlFileCount = 0
 
   const key = (name: string) => name.toLowerCase()
+  const sqlSec = cache?.section<SqlFileFacts | null>('sql-facts', SQL_FACTS_SALT)
 
-  // 소스 1회 읽어 캐시(파일 순서 무관한 2-패스를 위해).
-  const sources: Array<{ relPath: string; source: string }> = []
+  // 파일별 팩트 수집 — 캐시 히트는 판독·파싱 생략(null 캐시 = 판독 실패, 카운트 제외 동일).
+  const fileFacts: Array<{ relPath: string; facts: SqlFileFacts }> = []
   for (const f of census.files) {
     if (f.lang !== 'sql') continue
     sqlFileCount++
+    const hit = sqlSec?.get(f.relPath)
+    if (hit !== undefined) {
+      if (hit === null) sqlFileCount--
+      else fileFacts.push({ relPath: f.relPath, facts: hit })
+      continue
+    }
+    let source: string
     try {
-      sources.push({ relPath: f.relPath, source: readFileSync(join(projectRoot, f.relPath), 'utf8') })
+      source = readFileSync(join(projectRoot, f.relPath), 'utf8')
     } catch {
       sqlFileCount--
+      // null 캐시는 fingerprint 도 'absent' 일 때만(일시 오류 박제 방지, 리뷰 R2).
+      if (cache?.isAbsent(f.relPath)) sqlSec?.put(f.relPath, null)
+      continue
     }
+    const facts: SqlFileFacts = { ddl: null, ddlError: null, inserts: null, insertsError: null }
+    try {
+      facts.ddl = extractDdlFromSource(source, f.relPath)
+    } catch (err) {
+      facts.ddlError = (err as Error).message
+    }
+    try {
+      facts.inserts = extractDataloadFromSource(source)
+    } catch (err) {
+      facts.insertsError = (err as Error).message
+    }
+    sqlSec?.put(f.relPath, facts)
+    fileFacts.push({ relPath: f.relPath, facts })
   }
 
   // 패스 1: 모든 DDL(테이블) 수집 — dataload 합성이 실제 DDL 을 가리지 않게 선행.
   const pendingComments: Array<{ relPath: string; table: string; column: string | null; text: string }> = []
-  for (const { relPath, source } of sources) {
-    try {
-      const { tables, comments } = extractDdlFromSource(source, relPath)
-      for (const t of tables) {
-        const k = key(t.name)
-        if (tableByKey.has(k)) {
-          unresolved.push({ ref: `${relPath}:${t.name}`, reason: '중복 CREATE TABLE(첫 정의 유지)' })
-          continue
-        }
-        tableByKey.set(k, t)
-      }
-      for (const c of comments) pendingComments.push({ relPath, ...c })
-    } catch (err) {
-      unresolved.push({ ref: relPath, reason: `DDL 파싱 실패: ${(err as Error).message}` })
+  for (const { relPath, facts } of fileFacts) {
+    if (facts.ddlError !== null) {
+      unresolved.push({ ref: relPath, reason: `DDL 파싱 실패: ${facts.ddlError}` })
+      continue
     }
+    if (facts.ddl === null) continue
+    const { tables, comments } = facts.ddl
+    for (const t of tables) {
+      const k = key(t.name)
+      if (tableByKey.has(k)) {
+        unresolved.push({ ref: `${relPath}:${t.name}`, reason: '중복 CREATE TABLE(첫 정의 유지)' })
+        continue
+      }
+      tableByKey.set(k, t)
+    }
+    for (const c of comments) pendingComments.push({ relPath, ...c })
   }
 
   // 패스 1b: COMMENT ON 부착(모든 CREATE 수집 후 — 파일 경계 무관).
@@ -89,9 +136,12 @@ export function extractDbSchema(projectRoot: string, census: CensusReport): DbSc
   }
 
   // 패스 2: dataload INSERT(실제 DDL 테이블 존재 후 부착·합성).
-  for (const { relPath: f_relPath, source } of sources) {
-    try {
-      for (const ins of extractDataloadFromSource(source)) {
+  for (const { relPath: f_relPath, facts } of fileFacts) {
+    if (facts.insertsError !== null) {
+      unresolved.push({ ref: f_relPath, reason: `dataload 파싱 실패: ${facts.insertsError}` })
+      continue
+    }
+    for (const ins of facts.inserts ?? []) {
         const k = key(ins.table)
         let t = tableByKey.get(k)
         if (!t) {
@@ -130,10 +180,7 @@ export function extractDbSchema(projectRoot: string, census: CensusReport): DbSc
             values[colNames[i] ?? `col${i}`] = v
           })
           t.rows.push({ values, line: ins.line })
-        }
       }
-    } catch (err) {
-      unresolved.push({ ref: f_relPath, reason: `dataload 파싱 실패: ${(err as Error).message}` })
     }
   }
 

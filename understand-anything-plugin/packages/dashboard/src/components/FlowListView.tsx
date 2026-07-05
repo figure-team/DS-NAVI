@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { useDashboardStore } from "../store";
+import { useNavigate } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import FlowSpineView from "./FlowSpineView";
 import CitationChip from "./CitationChip";
@@ -33,15 +34,20 @@ import {
  */
 
 // Method badge palette — ported from prototype `.method-*` classes.
+// P5: 모드별 가독을 테마 엔진(method-* 토큰)이 책임진다 — bg는 동일 색 15% 틴트.
+const methodStyle = (m: FlowMethod) => ({
+  bg: `color-mix(in srgb, var(--color-method-${m.toLowerCase()}) 15%, transparent)`,
+  color: `var(--color-method-${m.toLowerCase()})`,
+});
 const METHOD_STYLE: Record<FlowMethod, { bg: string; color: string }> = {
-  GET: { bg: "rgba(90,158,111,0.2)", color: "#6ee7b7" },
-  POST: { bg: "rgba(74,124,155,0.2)", color: "#7dd3fc" },
-  PUT: { bg: "rgba(201,160,108,0.2)", color: "#fcd34d" },
-  DELETE: { bg: "rgba(248,113,113,0.2)", color: "#f87171" },
-  ANY: { bg: "rgba(203,213,225,0.18)", color: "#cbd5e1" },
-  BATCH: { bg: "rgba(167,139,250,0.2)", color: "#a78bfa" },
-  EVENT: { bg: "rgba(56,189,248,0.2)", color: "#38bdf8" },
-  FLOW: { bg: "rgba(212,165,116,0.18)", color: "#d4a574" },
+  GET: methodStyle("GET"),
+  POST: methodStyle("POST"),
+  PUT: methodStyle("PUT"),
+  DELETE: methodStyle("DELETE"),
+  ANY: methodStyle("ANY"),
+  BATCH: methodStyle("BATCH"),
+  EVENT: methodStyle("EVENT"),
+  FLOW: methodStyle("FLOW"),
 };
 
 const GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
@@ -68,7 +74,7 @@ function MethodBadge({ method }: { method: FlowMethod }) {
 export default function FlowListView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
-  const clearActiveDomain = useDashboardStore((s) => s.clearActiveDomain);
+  const navigate = useNavigate(); // P3: 지도 복귀는 URL로
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const { t } = useI18n();
@@ -188,7 +194,7 @@ export default function FlowListView() {
             >
               <button
                 type="button"
-                onClick={() => clearActiveDomain()}
+                onClick={() => navigate("/domains")}
                 className="uppercase text-text-muted hover:text-accent transition-colors cursor-pointer"
                 style={{ letterSpacing: "0.1em" }}
               >
@@ -234,13 +240,13 @@ export default function FlowListView() {
                       style={{
                         padding: "10px 12px",
                         background: isSelected
-                          ? "rgba(212,165,116,0.07)"
+                          ? "color-mix(in srgb, var(--color-accent) 7%, transparent)"
                           : "var(--color-elevated)",
                         borderColor: isSelected
                           ? "var(--color-accent)"
                           : "var(--color-border-subtle)",
                         boxShadow: isSelected
-                          ? "0 0 0 1px rgba(212,165,116,0.18) inset"
+                          ? "0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent) inset"
                           : undefined,
                       }}
                     >

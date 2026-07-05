@@ -24,15 +24,16 @@ import VerdictBadge from "./VerdictBadge";
 import TrustBadge from "./TrustBadge";
 import NodeDetailModal from "./NodeDetailModal";
 
+// P5: 모드별 가독을 테마 엔진(method-* 토큰)이 책임진다.
 const METHOD_COLOR: Record<FlowMethod, string> = {
-  GET: "#38bdf8",
-  POST: "#6ee7b7",
-  PUT: "#fcd34d",
-  DELETE: "#f87171",
-  ANY: "#cbd5e1",
-  BATCH: "#a78bfa",
-  EVENT: "#d4a574",
-  FLOW: "#94a3b8",
+  GET: "var(--color-method-get)",
+  POST: "var(--color-method-post)",
+  PUT: "var(--color-method-put)",
+  DELETE: "var(--color-method-delete)",
+  ANY: "var(--color-method-any)",
+  BATCH: "var(--color-method-batch)",
+  EVENT: "var(--color-method-event)",
+  FLOW: "var(--color-method-flow)",
 };
 
 /**
@@ -50,7 +51,7 @@ const METHOD_COLOR: Record<FlowMethod, string> = {
 // Theme tokens (US-007). Fallbacks keep the lane colors resolving before the
 // theme layer lands; promote the prototype's hardcoded rgba to CSS vars.
 const LAYER_COLOR: Record<FlowLayer, string> = {
-  api: "var(--color-layer-api, #d4a574)",
+  api: "var(--color-layer-api)",
   service: "var(--color-layer-service, #38bdf8)",
   dao: "var(--color-layer-dao, #a78bfa)",
   db: "var(--color-layer-db, #f87171)",

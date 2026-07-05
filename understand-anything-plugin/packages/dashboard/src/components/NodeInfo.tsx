@@ -1,6 +1,8 @@
 import { useState } from "react";
 import ClaimsContent from "./ClaimsContent"; // ktds-fork (ADR-004): 본문 마크다운 + 근거 배지 카드
 import { useDashboardStore } from "../store";
+import { useNavigate } from "react-router";
+import { useViewMode } from "../hooks/useViewMode";
 import { useI18n } from "../contexts/I18nContext";
 import type { NodeType, EdgeType, KnowledgeGraph, GraphNode } from "@understand-anything/core/types";
 
@@ -161,6 +163,8 @@ function KnowledgeNodeDetails({ node, graph }: { node: GraphNode; graph: Knowled
 function DomainNodeDetails({ node, graph }: { node: GraphNode; graph: KnowledgeGraph }) {
   const navigateToDomain = useDashboardStore((s) => s.navigateToDomain);
   const selectNode = useDashboardStore((s) => s.selectNode);
+  const markPreserveTransientOnce = useDashboardStore((s) => s.markPreserveTransientOnce);
+  const navigate = useNavigate();
   const { t } = useI18n();
   const meta = node.domainMeta;
 
@@ -210,7 +214,13 @@ function DomainNodeDetails({ node, graph }: { node: GraphNode; graph: KnowledgeG
                 <button
                   key={f.id}
                   type="button"
-                  onClick={() => { navigateToDomain(node.id); selectNode(f.id); }}
+                  onClick={() => {
+                    navigateToDomain(node.id);
+                    selectNode(f.id);
+                    // P2: 구조 등 다른 섹션에서의 점프 — 선택을 들고 /domains로 이동.
+                    markPreserveTransientOnce();
+                    navigate(`/domains/${node.id}`);
+                  }}
                   className="block w-full text-left px-2 py-1.5 rounded bg-elevated hover:bg-accent/10 text-[11px] text-text-secondary hover:text-accent transition-colors"
                 >
                   {f.name}
@@ -285,6 +295,9 @@ function DomainNodeDetails({ node, graph }: { node: GraphNode; graph: KnowledgeG
 function RelatedDocsSection({ node }: { node: GraphNode }) {
   const wikiGraph = useDashboardStore((s) => s.wikiGraph);
   const openWikiDoc = useDashboardStore((s) => s.openWikiDoc);
+  const markPreserveTransientOnce = useDashboardStore((s) => s.markPreserveTransientOnce);
+  const navigate = useNavigate();
+  const mode = useViewMode();
   const doc = wikiGraph?.nodes.find((n) => n.id === node.id && n.type === "article");
   if (!doc) return null;
   return (
@@ -292,7 +305,14 @@ function RelatedDocsSection({ node }: { node: GraphNode }) {
       <h3 className="text-[11px] font-semibold text-accent uppercase tracking-wider mb-2">관련 문서</h3>
       <button
         type="button"
-        onClick={() => openWikiDoc(doc.id)}
+        onClick={() => {
+          openWikiDoc(doc.id);
+          // P2: 문서 선택을 들고 /wiki로 섹션 이동(원자성은 preserve 플래그가 보장).
+          if (mode !== "wiki") {
+            markPreserveTransientOnce();
+            navigate("/wiki");
+          }
+        }}
         className="block w-full text-left px-3 py-2 rounded-lg bg-elevated border border-border-subtle hover:border-accent/40 hover:bg-accent/5 transition-colors"
       >
         <div className="text-[12px] text-text-primary truncate">{doc.name}</div>
@@ -319,7 +339,7 @@ export default function NodeInfo() {
   const setFocusNode = useDashboardStore((s) => s.setFocusNode);
   const openCodeViewer = useDashboardStore((s) => s.openCodeViewer);
   const focusNodeId = useDashboardStore((s) => s.focusNodeId);
-  const viewMode = useDashboardStore((s) => s.viewMode);
+  const viewMode = useViewMode();
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const wikiGraph = useDashboardStore((s) => s.wikiGraph); // ktds-fork (ADR-004)
 

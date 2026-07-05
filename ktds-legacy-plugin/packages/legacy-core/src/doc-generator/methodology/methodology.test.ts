@@ -122,20 +122,26 @@ describe('AC-23: methodology swap yields different doc sets', () => {
     expect(docs.every((d) => d.methodology === 'as-built')).toBe(true)
   })
 
-  it('si-standard -> SI 정형 3종', () => {
+  it('si-standard -> SI 정형 8종(W4 위험 리포트·W5 시나리오·W6 실적 요약 포함)', () => {
     const docs = getMethodology('si-standard').buildDocSet(INPUT)
     expect(docs.map((d) => d.docId)).toEqual([
       'si-기능명세서',
       'si-인터페이스정의서',
       'si-테이블정의서',
+      'si-배치정의서',
+      'si-프로그램목록',
+      'si-위험모듈리포트',
+      'si-단위테스트시나리오',
+      'si-실적요약보고서',
     ])
     expect(docs.every((d) => d.methodology === 'si-standard')).toBe(true)
   })
 
-  it('동일 입력에서 두 모듈의 문서 집합이 다르다', () => {
+  it('동일 입력에서 두 모듈의 문서 집합이 다르다(docId 서로소)', () => {
     const asBuilt = getMethodology('as-built').buildDocSet(INPUT)
     const si = getMethodology('si-standard').buildDocSet(INPUT)
-    expect(asBuilt.length).not.toBe(si.length)
+    // 문서 수는 W2/W3 로 우연히 같아질 수 있다 — 본질 불변식은 docId 집합의 서로소.
+    expect(asBuilt.map((d) => d.docId)).not.toEqual(si.map((d) => d.docId))
     const asIds = new Set(asBuilt.map((d) => d.docId))
     expect(si.some((d) => asIds.has(d.docId))).toBe(false)
   })
@@ -180,6 +186,293 @@ describe('AC-24/AC-36: SI table columns + headings conform to §2', () => {
     expect(row.evidence).toEqual([{ file: 'src/web/OrderController.java', line: 42 }])
     // 요청/응답/인증은 추론 -> [추정].
     expect(row.cells.slice(4)).toEqual(['[추정]', '[추정]', '[추정]'])
+  })
+
+  it('si-인터페이스정의서 §2: interfaces 입력 → 송신 행(탐지 CONFIRMED, 대상시스템 [추정], 미해석 [미확인])', () => {
+    const withInterfaces: DocInput = {
+      ...INPUT,
+      interfaces: {
+        schemaVersion: 1,
+        gitCommit: null,
+        items: [
+          {
+            id: 'IF-HTTP-aaaa1111',
+            direction: 'outbound',
+            protocol: 'http',
+            clientType: 'RestTemplate',
+            endpoint: { raw: '${pay.api.url}/v1', resolved: 'https://pay.example.com/v1', resolvedFrom: 'application.properties:1' },
+            dataHint: 'POST',
+            callSites: [
+              { file: 'src/PayClient.java', line: 12, symbol: 'PayClient#approve' },
+              { file: 'src/PayClient.java', line: 30, symbol: 'PayClient#retry' },
+            ],
+            unresolved: false,
+          },
+          {
+            id: 'IF-HTTP-bbbb2222',
+            direction: 'outbound',
+            protocol: 'http',
+            clientType: 'RestTemplate',
+            endpoint: { raw: null, resolved: null, resolvedFrom: null },
+            dataHint: null,
+            callSites: [{ file: 'src/PayClient.java', line: 20, symbol: 'PayClient#status' }],
+            unresolved: true,
+          },
+          {
+            id: 'IF-MQ-cccc3333',
+            direction: 'inbound-extra',
+            protocol: 'mq',
+            clientType: 'KafkaListener',
+            endpoint: { raw: 'order-events', resolved: 'order-events', resolvedFrom: null },
+            dataHint: 'consume',
+            callSites: [{ file: 'src/OrderListener.java', line: 8, symbol: 'OrderListener#on' }],
+            unresolved: false,
+          },
+        ],
+        stats: {
+          total: 3,
+          unresolvedEndpoints: 1,
+          byProtocol: [{ protocol: 'http', count: 2 }, { protocol: 'mq', count: 1 }],
+          callSiteTotal: 4,
+        },
+        suspectSignals: { count: 0, samples: [] },
+      },
+    }
+    const doc = getMethodology('si-standard')
+      .buildDocSet(withInterfaces)
+      .find((d) => d.docId === 'si-인터페이스정의서')!
+    const sec = doc.sections[1]
+    expect(sec.heading).toBe('대외 연계(송신·라우트 외 수신)')
+    const t = tableOf(sec)
+    expect(t.columns).toEqual([
+      'IF_ID',
+      '인터페이스명',
+      '프로토콜',
+      '방향',
+      '연계방식',
+      '대상시스템',
+      '엔드포인트',
+      '데이터',
+      '해석',
+    ])
+    expect(t.rows).toHaveLength(3)
+    expect(t.rows[0].cells).toEqual([
+      'IF-HTTP-aaaa1111',
+      'PayClient#approve [추정]',
+      'http',
+      '송신',
+      '실시간(온라인) [추정]',
+      '[추정]',
+      'https://pay.example.com/v1',
+      'POST',
+      '해석됨',
+    ])
+    expect(t.rows[0].confidence).toBe('CONFIRMED')
+    // 병합된 호출 지점 전부 근거로 승계.
+    expect(t.rows[0].evidence).toEqual([
+      { file: 'src/PayClient.java', line: 12 },
+      { file: 'src/PayClient.java', line: 30 },
+    ])
+    // 미해석 endpoint → [미확인] 셀 2곳(엔드포인트/해석) — 침묵 누락 금지.
+    expect(t.rows[1].cells[6]).toBe('[미확인]')
+    expect(t.rows[1].cells[8]).toBe('[미확인]')
+    // 라우트 외 수신(리스너) 방향 표기 + 연계방식 분류.
+    expect(t.rows[2].cells[3]).toBe('수신')
+    expect(t.rows[2].cells[4]).toBe('비동기(MQ) [추정]')
+  })
+
+  it('si-인터페이스정의서 §2: interfaces 미제공 → 0행(합성 금지)', () => {
+    const doc = byId.get('si-인터페이스정의서')!
+    expect(doc.sections[1].heading).toBe('대외 연계(송신·라우트 외 수신)')
+    expect(tableOf(doc.sections[1]).rows).toEqual([])
+  })
+
+  it('si-배치정의서: batchJobs 입력 → 행(배치명 [추정]·[미확인]·외부 구분), 미제공 → 0행', () => {
+    const withBatch: DocInput = {
+      ...INPUT,
+      batchJobs: {
+        schemaVersion: 1,
+        gitCommit: null,
+        jobs: [
+          {
+            id: 'BAT-QUARTZ-aaaa1111',
+            name: 'orderSyncJobDetail',
+            trigger: 'quartz',
+            schedule: 'cron=0 0 4 * * ?',
+            handler: 'orderSyncJobDetail',
+            handlerFile: 'src/OrderSyncJob.java',
+            unresolvedHandler: false,
+            evidence: { file: 'src/context-batch.xml', line: 13 },
+            sliceRoot: 'src/OrderSyncJob.java',
+            reachableFiles: 2,
+            notes: [],
+          },
+          {
+            id: 'BAT-QUARTZ-bbbb2222',
+            name: 'ghost',
+            trigger: 'quartz',
+            schedule: null,
+            handler: 'ghost',
+            handlerFile: null,
+            unresolvedHandler: true,
+            evidence: { file: 'src/context-batch.xml', line: 31 },
+            sliceRoot: 'src/context-batch.xml',
+            reachableFiles: 1,
+            notes: [],
+          },
+          {
+            id: 'BAT-SHELL-cccc3333',
+            name: 'settle-batch.jar',
+            trigger: 'shell',
+            schedule: null,
+            handler: 'settle-batch.jar',
+            handlerFile: null,
+            unresolvedHandler: false,
+            evidence: { file: 'bin/run.sh', line: 4 },
+            sliceRoot: 'bin/run.sh',
+            reachableFiles: 1,
+            notes: [],
+          },
+        ],
+        stats: { total: 3, byTrigger: [{ trigger: 'quartz', count: 2 }, { trigger: 'shell', count: 1 }], unresolvedHandlers: 1 },
+        suspectSignals: { count: 0, samples: [] },
+      },
+    }
+    const doc = getMethodology('si-standard')
+      .buildDocSet(withBatch)
+      .find((d) => d.docId === 'si-배치정의서')!
+    const t = tableOf(doc.sections[0])
+    expect(t.columns).toEqual([
+      'BAT_ID',
+      '배치명',
+      '트리거',
+      '스케줄',
+      '핸들러',
+      '데이터대상',
+      '선행/후행',
+      '수행서버',
+      '재기동/실패처리',
+      '도달범위(파일)',
+      '해석',
+    ])
+    expect(t.rows[0].cells).toEqual([
+      'BAT-QUARTZ-aaaa1111',
+      'orderSyncJobDetail [추정]',
+      'quartz',
+      'cron=0 0 4 * * ?',
+      'orderSyncJobDetail',
+      '[미확인]', // 데이터대상 — 운영 지식, 사람 채움
+      '[미확인]', // 선행/후행
+      '[미확인]', // 수행서버
+      '[미확인]', // 재기동/실패처리
+      '2',
+      '해석됨',
+    ])
+    expect(t.rows[0].evidence).toEqual([{ file: 'src/context-batch.xml', line: 13 }])
+    // 미해석 행: 스케줄·도달범위·해석 모두 [미확인](카운트 1 의 "사소한 배치" 오독 방지).
+    expect(t.rows[1].cells[3]).toBe('[미확인]')
+    expect(t.rows[1].cells[9]).toBe('[미확인]')
+    expect(t.rows[1].cells[10]).toBe('[미확인]')
+    expect(t.rows[2].cells[10]).toBe('외부')
+    // 미제공 → 0행(합성 금지).
+    const empty = byId.get('si-배치정의서')!
+    expect(tableOf(empty.sections[0]).rows).toEqual([])
+  })
+
+  it('si-프로그램목록: programInventory 입력 → §1 업무명 [미확인]·§2 FP [추정]+집계, 미제공 → 0행', () => {
+    const withInv: DocInput = {
+      ...INPUT,
+      programInventory: {
+        schemaVersion: 1,
+        gitCommit: null,
+        programs: [
+          {
+            id: 'PGM-API-aaaa1111',
+            name: 'OrderController',
+            filePath: 'src/web/OrderController.java',
+            type: 'api',
+            layer: 'api',
+            domain: 'order',
+            domainVia: 'reachability',
+            loc: 42,
+            notes: ['route:GET /api/orders'],
+          },
+          {
+            id: 'PGM-COM-bbbb2222',
+            name: 'Order',
+            filePath: 'src/domain/Order.java',
+            type: 'common',
+            layer: 'unknown',
+            domain: 'order',
+            domainVia: 'directory',
+            loc: 30,
+            notes: [],
+          },
+        ],
+        fp: {
+          transactions: [
+            {
+              kind: 'EQ',
+              routeId: 'route:GET /api/orders',
+              method: 'GET',
+              path: '/api/orders',
+              evidence: { file: 'src/web/OrderController.java', line: 16 },
+            },
+            {
+              kind: 'UNCLASSIFIED',
+              routeId: 'route:ANY /legacy',
+              method: 'ANY',
+              path: '/legacy',
+              evidence: { file: 'src/web/LegacyAction.java', line: 8 },
+            },
+          ],
+          dataFunctions: [
+            { kind: 'ILF', name: 'ORDERS', evidence: { file: 'db/schema.sql', line: 1 } },
+            { kind: 'EIF', name: 'ERP_LINK', evidence: { file: 'mapper/OrderMapper.xml', line: 5 } },
+          ],
+          summary: { ei: 0, eo: 0, eq: 1, unclassified: 1, ilf: 1, eif: 1, unadjustedFp: 16.8 },
+        },
+        stats: {
+          total: 2,
+          byType: [{ type: 'api', count: 1 }, { type: 'common', count: 1 }],
+          excluded: { configXml: 3, otherLang: [{ lang: 'sql', count: 1 }], unreadable: 0 },
+        },
+      },
+    }
+    const doc = getMethodology('si-standard')
+      .buildDocSet(withInv)
+      .find((d) => d.docId === 'si-프로그램목록')!
+    const pgm = tableOf(doc.sections[0])
+    expect(pgm.columns).toEqual(['PGM_ID', '프로그램명', '업무명', '소속도메인', '유형', '계층', 'LOC'])
+    expect(pgm.rows[0].cells).toEqual([
+      'PGM-API-aaaa1111',
+      'OrderController',
+      '[미확인]', // 업무명 — 사람 채움
+      'order', // reachability 신호 — 마킹 없음
+      'API',
+      'api',
+      '42',
+    ])
+    // 디렉토리 폴백 도메인은 [추정] 마킹.
+    expect(pgm.rows[1].cells[3]).toBe('order [추정]')
+    const fp = tableOf(doc.sections[1])
+    expect(fp.columns).toEqual(['구분', '대상', '상세'])
+    expect(fp.rows[0].cells).toEqual(['EQ [추정]', 'route:GET /api/orders', 'GET /api/orders'])
+    // method 미상 라우트는 '미분류'로 표면화(EI 뭉개기 금지).
+    expect(fp.rows[1].cells[0]).toBe('미분류(method 미상) [추정]')
+    expect(fp.rows[2].cells).toEqual(['ILF [추정]', 'ORDERS', '자체 테이블'])
+    expect(fp.rows[3].cells).toEqual(['EIF [추정]', 'ERP_LINK', 'DB링크 참조'])
+    // 집계 행 — INFERRED, 하한(≥) 표기 + 미분류 수가 셀 안에 따라간다(정밀 착시 방지).
+    const last = fp.rows[fp.rows.length - 1]
+    expect(last.cells[0]).toBe('집계 [추정]')
+    expect(last.cells[1]).toContain('미분류 1')
+    expect(last.cells[2]).toContain('≥ 16.8')
+    expect(last.cells[2]).toContain('상향')
+    expect(last.confidence).toBe('INFERRED')
+    // 미제공 → 두 섹션 모두 0행(합성 금지).
+    const empty = byId.get('si-프로그램목록')!
+    expect(tableOf(empty.sections[0]).rows).toEqual([])
+    expect(tableOf(empty.sections[1]).rows).toEqual([])
   })
 
   it('si-테이블정의서: 테이블별 섹션 + 열 = 컬럼|타입|PK|FK|NULL|설명', () => {

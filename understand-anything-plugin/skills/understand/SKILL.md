@@ -364,6 +364,15 @@ Output: `$PROJECT_ROOT/.understand-anything/intermediate/assembled-graph.json`
 
 Include the script's warnings in `$PHASE_WARNINGS` for the reviewer.
 
+### Phase 3.5 — RESOLVE CALL EDGES (deterministic)
+
+Run the deterministic Tier-1 call-edge resolver bundled with this skill:
+```bash
+node <SKILL_DIR>/resolve-call-edges.mjs $PROJECT_ROOT
+```
+
+This reads the global call graph persisted by `compute-batches.mjs` (`intermediate/call-graph.json`) and resolves it into method-level `calls` edges directly against the assembled graph's function nodes, then merges those edges back into `assembled-graph.json`. It bypasses the LLM batch-locality that otherwise collapses `calls` coverage at scale (each file-analyzer only sees its own batch, so cross-function calls are almost never emitted). Resolution is precision-first: an edge is emitted only when a callee name resolves to a single function node — uniquely by name, or uniquely after filtering candidates to imported files — and ambiguous callees are skipped (left for a future Tier 2 receiver-type resolver). The script prints a resolution breakdown and before/after `calls` counts to stderr; add its summary to `$PHASE_WARNINGS`.
+
 ### Incremental update path
 
 Write the changed-files list (one path per line) to a temp file:
@@ -388,6 +397,10 @@ After batches complete:
 4. Run the same merge script — it will combine `batch-existing.json` with the fresh `batch-*.json` files:
    ```bash
    python <SKILL_DIR>/merge-batch-graphs.py $PROJECT_ROOT
+   ```
+5. Run the same deterministic call-edge resolver as Phase 3.5 so re-analyzed files get their method-level `calls` edges resolved into the assembled graph:
+   ```bash
+   node <SKILL_DIR>/resolve-call-edges.mjs $PROJECT_ROOT
    ```
 
 ---

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -8,7 +9,7 @@ import TrustBadge from "./TrustBadge";
 
 /** 표시용 frontmatter(--- ... ---) 제거 — 메타는 헤더/배지로 노출, 본문엔 불필요. */
 function stripFrontmatter(md: string): string {
-  return md.replace(/^﻿?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+  return md.replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
 }
 
 /** 다크 테마 마크다운 컴포넌트(GFM 표 포함). 인라인 스타일로 테마 변수 사용. */
@@ -66,6 +67,10 @@ interface DocListItem {
   confirmed: boolean;
   approver: string | null;
   at: string | null;
+  /** W7: 병기된 xlsx 존재 — 다운로드 버튼 노출 조건. */
+  hasXlsx?: boolean;
+  /** W7: xlsx 가 스캔 스냅샷보다 낡음(확정 편집 미반영/md 갱신) — 경고 라벨. */
+  xlsxStale?: boolean;
 }
 
 const APPROVER_LS_KEY = "ktds.approver";
@@ -85,8 +90,11 @@ export default function DocsView() {
   const approverHandle = useDashboardStore((s) => s.approverHandle);
   const setApproverHandle = useDashboardStore((s) => s.setApproverHandle);
 
+  // P5 잔여 해소: 선택 문서는 URL(:docId)이 진실 — 딥링크·공유 가능.
+  const { docId: routeDocId } = useParams();
+  const navigate = useNavigate();
   const [docs, setDocs] = useState<DocListItem[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(routeDocId ?? null);
   const [content, setContent] = useState<string>("");
   const [confirmedBy, setConfirmedBy] = useState<string | null>(null);
   const [listError, setListError] = useState<string | null>(null);
@@ -98,6 +106,11 @@ export default function DocsView() {
 
   const tokenQ = accessToken ? `?token=${encodeURIComponent(accessToken)}` : "";
   const canWrite = Boolean(accessToken);
+
+  // URL(:docId) → 선택 동기화(뒤로가기/딥링크).
+  useEffect(() => {
+    if (routeDocId) setSelected(routeDocId);
+  }, [routeDocId]);
 
   // 문서 목록 로드.
   useEffect(() => {
@@ -253,12 +266,12 @@ export default function DocsView() {
                             <button
                               key={d.docId}
                               type="button"
-                              onClick={() => setSelected(d.docId)}
+                              onClick={() => navigate(`/deliverables/${encodeURIComponent(d.docId)}`)}
                               title={d.docId}
                               className="flex items-center gap-1.5 text-left rounded-md cursor-pointer transition-colors w-full"
                               style={{
                                 padding: "6px 8px",
-                                background: isSel ? "rgba(212,165,116,0.10)" : "transparent",
+                                background: isSel ? "color-mix(in srgb, var(--color-accent) 10%, transparent)" : "transparent",
                                 color: isSel ? "var(--color-accent)" : undefined,
                               }}
                             >
@@ -296,6 +309,25 @@ export default function DocsView() {
               <span className="ml-auto flex items-center gap-2">
                 {saveError && (
                   <span className="text-amber-400" style={{ fontSize: 11 }}>저장 실패: {saveError}</span>
+                )}
+                {selectedDoc.hasXlsx && accessToken && (
+                  <a
+                    href={`/doc-xlsx?token=${encodeURIComponent(accessToken)}&docId=${encodeURIComponent(selectedDoc.docId)}`}
+                    download={`${selectedDoc.docId}.xlsx`}
+                    className={`rounded-md border transition-colors ${
+                      selectedDoc.xlsxStale
+                        ? "border-amber-400/60 text-amber-500 hover:text-amber-400"
+                        : "border-border-subtle text-text-secondary hover:text-text-primary"
+                    }`}
+                    style={{ padding: "4px 12px", fontSize: 12 }}
+                    title={
+                      selectedDoc.xlsxStale
+                        ? "이 xlsx 는 스캔 스냅샷입니다 — 이후의 확정 편집/문서 갱신이 반영되지 않았습니다. 최신화: /understand-docs 재실행."
+                        : "정적 스캔 스냅샷(원천 데이터) — 확정 편집은 md 가 진실입니다."
+                    }
+                  >
+                    {selectedDoc.xlsxStale ? "xlsx(스냅샷 · 미반영 편집 있음)" : "xlsx 다운로드"}
+                  </a>
                 )}
                 {!canWrite ? (
                   <span className="text-text-muted" style={{ fontSize: 11 }}>읽기전용(라이브 서버 없음)</span>

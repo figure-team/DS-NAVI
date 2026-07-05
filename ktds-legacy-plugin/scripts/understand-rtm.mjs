@@ -25,7 +25,7 @@ if (!existsSync(distEntry)) {
 
 const projectRoot = process.argv[2] || process.cwd()
 const engine = await import(distEntry)
-const { buildRtm, applyRequirements, applyOverlay, buildMyBatisModel } = engine
+const { buildRtm, applyRequirements, applyOverlay, attachTestScenarios, buildMyBatisModel, isMapperXmlDocument } = engine
 
 // 입력은 디스크의 fill 완료 그래프(비파괴). buildMap 호출 금지(채움 소실).
 const graphPath = join(projectRoot, '.understand-anything', 'domain-graph.json')
@@ -79,7 +79,8 @@ function findMapperXmls(root) {
         } catch {
           continue
         }
-        if (content.includes('<mapper') && content.includes('namespace')) {
+        // 루트 요소 기준 판별 — 부분 문자열 검사는 문서 코드 예제(maven xdoc)를 오분류(W4).
+        if (isMapperXmlDocument(content)) {
           out.push({ relPath: relative(root, p), content })
         }
       }
@@ -121,8 +122,13 @@ if (existsSync(reqPath)) {
   }
 }
 
-// 사람 오버레이(.understand-anything/rtm-overrides.json) — 셀 교정·lifecycle·검수·시험결과 입력을
-// 모델에 반영(검증 스파인 입력 경로). 적용 후 coverage 가 실데이터를 반영한다. 없으면 무변경.
+// W5: 단위테스트 시나리오 초안 — 결정론 템플릿 생성(정상/예외/경계, 전부 [추정]).
+// applyRequirements 뒤(rules=AC 역참조가 채워진 뒤)·applyOverlay 앞(확정 병합 전).
+model = attachTestScenarios(model)
+
+// 사람 오버레이(.understand-anything/rtm-overrides.json) — 셀 교정·lifecycle·검수·시험결과·
+// 시나리오 확정(_scenarios)·사용자 필드(_fields) 입력을 모델에 반영(검증 스파인 입력 경로).
+// 적용 후 coverage 가 실데이터를 반영한다. 없으면 무변경.
 let overlayCount = 0
 const overlayPath = join(projectRoot, '.understand-anything', 'rtm-overrides.json')
 if (existsSync(overlayPath)) {
@@ -152,7 +158,7 @@ console.log(`  RTM → .understand-anything/rtm.json`)
 const dropped = reqCount - model.requirements.length
 console.log(
   `  도메인 ${model.domains.length} · 기능 ${model.functions.length} · 요구사항 ${model.requirements.length}` +
-    `${dropped > 0 ? `(입력 ${reqCount}, 드롭 ${dropped})` : ''} · 추적셀 근거율 ${rate}%` +
+    `${dropped > 0 ? `(입력 ${reqCount}, 드롭 ${dropped})` : ''} · 시나리오 ${model.testScenarios.length}건(확정 ${model.coverage?.scenarios?.confirmed ?? 0}) · 추적셀 근거율 ${rate}%` +
     `${overlayCount > 0 ? ` · 사람 오버레이 ${overlayCount} 적용` : ''}`,
 )
 const cov = model.coverage

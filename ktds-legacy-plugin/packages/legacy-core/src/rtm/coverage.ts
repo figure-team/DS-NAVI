@@ -102,6 +102,17 @@ export function computeCoverage(model: RtmModel, confirmedIds: Set<string> = new
       confirmed: fns.filter((f) => confirmedIds.has(f.id)).length,
     },
     tests: { total: tTotal, pass: tPass, fail: tFail, untested: tUntested },
+    // W5 시나리오 롤업 — 확정 = 오버레이 적용 후 CONFIRMED(초안은 INFERRED).
+    // 방어적 접근: 구버전 rtm.json/픽스처는 필드가 없을 수 있다(zod 미경유 로드).
+    scenarios: {
+      total: (model.testScenarios ?? []).length,
+      confirmed: (model.testScenarios ?? []).filter((s) => s.confidence === 'CONFIRMED').length,
+      byKind: {
+        normal: (model.testScenarios ?? []).filter((s) => s.kind === 'normal').length,
+        exception: (model.testScenarios ?? []).filter((s) => s.kind === 'exception').length,
+        boundary: (model.testScenarios ?? []).filter((s) => s.kind === 'boundary').length,
+      },
+    },
     gaps: {
       unimplemented: reqs.filter((r) => r.status === 'ACTIVE' && !reqImplemented(r)).map((r) => r.id).sort(cmp),
       orphanCode: fns.filter((f) => f.state === 'ORPHANED').map((f) => f.id).sort(cmp),

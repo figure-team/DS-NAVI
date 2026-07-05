@@ -12,6 +12,12 @@ import type { MethodCallGraph } from '../../domain-map/types.js'
 import type { PolicySignalSet } from '../../policy/types.js'
 import type { DbSchemaModel } from '../../db-schema/types.js'
 import type { DomainPolicyInput } from '../../domain-policy/types.js'
+import type { InterfaceReport } from '../../interface-scan/types.js'
+import type { BatchJobsReport } from '../../batch-scan/report.js'
+import type { ProgramInventory } from '../../program-inventory/index.js'
+import type { RiskReport } from '../../risk-report/index.js'
+import type { RtmModel } from '../../rtm/types.js'
+import type { WorkSummaryReport } from '../../work-summary/index.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -44,6 +50,18 @@ export interface DocInput {
   dbSchema?: DbSchemaModel | null
   /** 도메인 정책서 입력(PD2) — domain-policy 방법론이 도메인당 1문서를 동적 산출. */
   domainPolicies?: DomainPolicyInput[]
+  /** 대외 인터페이스(W1) — si-인터페이스정의서 §2 송신/라우트 외 수신 섹션 grounding. */
+  interfaces?: InterfaceReport | null
+  /** 배치 인벤토리(W2) — si-배치정의서 grounding. */
+  batchJobs?: BatchJobsReport | null
+  /** 프로그램 목록+FP 기초(W3) — si-프로그램목록 grounding. */
+  programInventory?: ProgramInventory | null
+  /** 위험 모듈 리포트(W4) — si-위험모듈리포트 grounding. */
+  riskReport?: RiskReport | null
+  /** RTM 원장(W5) — si-단위테스트시나리오 grounding(rtm.json 로드, zod 미경유 가능 — 방어적 접근). */
+  rtm?: RtmModel | null
+  /** 실적 요약(W6) — si-실적요약보고서 grounding(work-summary.json 로드). */
+  workSummary?: WorkSummaryReport | null
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

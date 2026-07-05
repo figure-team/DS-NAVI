@@ -248,6 +248,7 @@ export function buildRtm(input: DocInput, gitCommit: string | null = null): RtmM
         nfrTags: [],
         rules: [],
         deliverableRefs: [],
+        custom: {},
       })
     }
   }
@@ -258,7 +259,17 @@ export function buildRtm(input: DocInput, gitCommit: string | null = null): RtmM
     functionCount: domainCounts.get(gk) ?? 0,
   }))
 
-  const model: RtmModel = { schemaVersion: 2, gitCommit, domains, functions, requirements: [] }
+  // testScenarios 는 여기서 비움 — rules(AC 역참조)가 applyRequirements 뒤에 채워지므로
+  // 시나리오 생성은 attachTestScenarios(파이프라인 후단) 몫(W5).
+  const model: RtmModel = {
+    schemaVersion: 2,
+    gitCommit,
+    domains,
+    functions,
+    requirements: [],
+    testScenarios: [],
+    customFields: [],
+  }
   const withCov: RtmModel = { ...model, coverage: computeCoverage(model) }
   return { ...withCov, diagnostics: computeDiagnostics(withCov) }
 }

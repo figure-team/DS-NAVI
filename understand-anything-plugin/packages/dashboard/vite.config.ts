@@ -474,10 +474,12 @@ function rtmFunctionIds(): Set<string> {
   return ids;
 }
 /**
- * 편집 허용 셀 화이트리스트 — 사람이 교정/확정하는 표시 셀(name + 4 추적축). 스키마 키
- * (id/featureId/origin/confidence 등 결정론 사실)은 편집 거부.
+ * 편집 허용 셀 화이트리스트 — 사람이 교정/확정하는 표시 셀(name + 4 추적축) +
+ * R7 사용자 정의 필드 값(`custom:<slug>`). 스키마 키(id/featureId/origin/confidence 등
+ * 결정론 사실)은 편집 거부.
  */
 function isEditableRtmCell(key: string): boolean {
+  if (/^custom:[a-z0-9-]{1,40}$/.test(key)) return true;
   return key === "name" || key === "entryPoint" || key === "implementation" || key === "data" || key === "test";
 }
 type RtmOverride = { editedCells: Record<string, string>; approver: string; at: string; audit?: unknown[] };
@@ -567,6 +569,374 @@ function handleRtmOverridePost(
       sendJson(res, 200, { fnId, ...record });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+// ── W5: RTM 테스트 시나리오 오버레이(_scenarios) — rtm-override 와 동형. ──
+/** rtm.json 의 시나리오 id 집합 — POST tsId 실존 검증용(없으면 빈 집합 = 전부 차단). */
+function rtmScenarioIds(): Set<string> {
+  const ids = new Set<string>();
+  const file = findGraphFile("rtm.json");
+  if (!file) return ids;
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as { testScenarios?: Array<{ id?: unknown }> };
+    for (const s of raw.testScenarios ?? []) if (typeof s.id === "string") ids.add(s.id);
+  } catch {
+    /* 파싱 실패 → 빈 집합 */
+  }
+  return ids;
+}
+/** 시나리오 편집 허용 셀 — 제목 + Given/When/Then(추적선 id·kind 는 결정론 사실이라 거부). */
+function isEditableScenarioCell(key: string): boolean {
+  return key === "title" || key === "given" || key === "when" || key === "then";
+}
+/**
+ * POST /rtm-scenario-override — { tsId, editedCells, approver } 검증 후 `_scenarios` 병합 기록.
+ * 레코드 존재 = 그 시나리오 확정(applyOverlay 가 CONFIRMED 승격). audit append-only.
+ */
+function handleRtmScenarioOverridePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = rtmOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No domain graph found. Run /understand-rtm first." });
+    return;
+  }
+  collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
+    .then((body) => {
+      let parsed: { tsId?: unknown; editedCells?: unknown; approver?: unknown; edited?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { tsId, editedCells, approver, edited } = parsed ?? {};
+      if (typeof tsId !== "string" || !tsId) {
+        sendJson(res, 400, { error: "tsId is required" });
+        return;
+      }
+      if (typeof approver !== "string" || !approver.trim()) {
+        sendJson(res, 400, { error: "approver is required" });
+        return;
+      }
+      if (!editedCells || typeof editedCells !== "object" || Array.isArray(editedCells)) {
+        sendJson(res, 400, { error: "editedCells object is required" });
+        return;
+      }
+      if (!rtmScenarioIds().has(tsId)) {
+        sendJson(res, 400, { error: "tsId is not in rtm.json" });
+        return;
+      }
+      const clean: Record<string, string> = {};
+      for (const [k, v] of Object.entries(editedCells as Record<string, unknown>)) {
+        if (!isEditableScenarioCell(k)) {
+          sendJson(res, 400, { error: `cell is not editable: ${k}` });
+          return;
+        }
+        if (typeof v !== "string") {
+          sendJson(res, 400, { error: `editedCells[${k}] must be a string` });
+          return;
+        }
+        clean[k] = v;
+      }
+      const now = new Date().toISOString();
+      const by = approver.trim();
+      const store = readRtmOverrides() as Record<string, unknown> & { _scenarios?: Record<string, RtmOverride> };
+      const section: Record<string, RtmOverride> =
+        store._scenarios && typeof store._scenarios === "object" && !Array.isArray(store._scenarios)
+          ? store._scenarios
+          : {};
+      const prev = section[tsId];
+      const audit = Array.isArray(prev?.audit) ? prev!.audit : [];
+      // 무편집 검토 승인과 편집 확정을 audit 로 구분(리뷰 C3 — 일괄 rubber-stamp 추적 가능).
+      const event = edited === false ? "CONFIRMED_NO_EDIT" : "CONFIRMED";
+      const record: RtmOverride = {
+        editedCells: clean,
+        approver: by,
+        at: now,
+        audit: [...audit, { event, by, at: now }],
+      };
+      section[tsId] = record;
+      store._scenarios = section;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write rtm-overrides:", err);
+        sendJson(res, 500, { error: "Failed to write rtm overrides" });
+        return;
+      }
+      sendJson(res, 200, { tsId, ...record });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+// ── R7: RTM 사용자 정의 필드(_fields) — 정의 추가/삭제(값은 기능 오버레이 custom:* 키). ──
+/**
+ * POST /rtm-field — { op: "add"|"remove", id: "custom:<slug>", label?, approver } 검증 후
+ * `_fields` 기록. 삭제는 정의만 제거(행 값 비파괴 보존 — 재등록 시 복원, §5.1).
+ */
+function handleRtmFieldPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = rtmOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No domain graph found. Run /understand-rtm first." });
+    return;
+  }
+  collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
+    .then((body) => {
+      let parsed: { op?: unknown; id?: unknown; label?: unknown; approver?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { op, id, label, approver } = parsed ?? {};
+      if (op !== "add" && op !== "remove") {
+        sendJson(res, 400, { error: 'op must be "add" or "remove"' });
+        return;
+      }
+      if (typeof id !== "string" || !/^custom:[a-z0-9-]{1,40}$/.test(id)) {
+        sendJson(res, 400, { error: "id must match custom:<slug> (a-z0-9-)" });
+        return;
+      }
+      if (typeof approver !== "string" || !approver.trim()) {
+        sendJson(res, 400, { error: "approver is required" });
+        return;
+      }
+      if (op === "add" && (typeof label !== "string" || !label.trim())) {
+        sendJson(res, 400, { error: "label is required for add" });
+        return;
+      }
+      const store = readRtmOverrides() as Record<string, unknown> & {
+        _fields?: Record<string, { label: string; createdBy: string; at: string }>;
+      };
+      const fields =
+        store._fields && typeof store._fields === "object" && !Array.isArray(store._fields)
+          ? store._fields
+          : {};
+      if (op === "add") {
+        fields[id] = { label: (label as string).trim(), createdBy: approver.trim(), at: new Date().toISOString() };
+      } else {
+        delete fields[id];
+      }
+      store._fields = fields;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write rtm-overrides:", err);
+        sendJson(res, 500, { error: "Failed to write rtm overrides" });
+        return;
+      }
+      sendJson(res, 200, { _fields: fields });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+// ── S4: 화면설계서 — 오버레이(rtm-overrides 동형) + 캡처 PNG 스트리밍. ──
+/** screens.json 경로(.understand-anything/). */
+function screensFilePath(): string | null {
+  return findGraphFile("screens.json");
+}
+/** screen-overrides.json 경로 — screens.json 형제(재생성 생존). */
+function screenOverridesFilePath(): string | null {
+  const f = screensFilePath();
+  return f ? path.join(path.dirname(f), "screen-overrides.json") : null;
+}
+/** screens.json 의 화면 id 집합 — POST screenId 실존 검증용(없으면 빈 집합 = 전부 차단). */
+function screenIds(): Set<string> {
+  const ids = new Set<string>();
+  const file = screensFilePath();
+  if (!file) return ids;
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as { screens?: Array<{ id?: unknown }> };
+    for (const s of raw.screens ?? []) if (typeof s.id === "string") ids.add(s.id);
+  } catch {
+    /* 파싱 실패 → 빈 집합 */
+  }
+  return ids;
+}
+/** 주석 오버라이드 키(`<kind>:<no>`)와 편집 허용 필드 — 스키마(legacy-core)와 동일 규칙. */
+const SCREEN_ANNOTATION_KEY_RE = /^(field|action|link|region):\d+$/;
+type ScreenAnnotationOverride = { description?: string; label?: string; note?: string; hidden?: boolean };
+type ScreenOverride = {
+  approver: string;
+  at: string;
+  titleOverride?: string;
+  annotations?: Record<string, ScreenAnnotationOverride>;
+  confirmed: boolean;
+  audit: unknown[];
+};
+/** screen-overrides.json 읽기 — 없거나 손상이면 {}. */
+function readScreenOverrides(): Record<string, ScreenOverride> {
+  const file = screenOverridesFilePath();
+  if (!file || !fs.existsSync(file)) return {};
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf-8"));
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, ScreenOverride>) : {};
+  } catch {
+    return {};
+  }
+}
+/**
+ * POST /screen-override — { screenId, titleOverride?, annotations?, approver } 검증 후 병합 기록.
+ * 검증: screenId 실존(screens.json) · annotations 키 `<kind>:<no>` + 필드 화이트리스트
+ * (description/label/note 문자열, hidden 불리언) · approver 비어있지 않음.
+ * 레코드 존재 = 화면 확정. audit append-only. 생성물(screens.json) 불변.
+ */
+function handleScreenOverridePost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  const file = screenOverridesFilePath();
+  if (!file) {
+    sendJson(res, 404, { error: "No screens.json found. Run /understand-screens first." });
+    return;
+  }
+  collectRequestBody(req, MAX_OVERRIDE_BODY_BYTES)
+    .then((body) => {
+      let parsed: { screenId?: unknown; titleOverride?: unknown; annotations?: unknown; approver?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const { screenId, titleOverride, annotations, approver } = parsed ?? {};
+      if (typeof screenId !== "string" || !screenId) {
+        sendJson(res, 400, { error: "screenId is required" });
+        return;
+      }
+      if (typeof approver !== "string" || !approver.trim()) {
+        sendJson(res, 400, { error: "approver is required" });
+        return;
+      }
+      if (!screenIds().has(screenId)) {
+        sendJson(res, 400, { error: "screenId is not in screens.json" });
+        return;
+      }
+      if (titleOverride !== undefined && typeof titleOverride !== "string") {
+        sendJson(res, 400, { error: "titleOverride must be a string" });
+        return;
+      }
+      const cleanAnn: Record<string, ScreenAnnotationOverride> = {};
+      if (annotations !== undefined) {
+        if (!annotations || typeof annotations !== "object" || Array.isArray(annotations)) {
+          sendJson(res, 400, { error: "annotations must be an object" });
+          return;
+        }
+        for (const [key, value] of Object.entries(annotations as Record<string, unknown>)) {
+          if (!SCREEN_ANNOTATION_KEY_RE.test(key)) {
+            sendJson(res, 400, { error: `invalid annotation key: ${key}` });
+            return;
+          }
+          if (!value || typeof value !== "object" || Array.isArray(value)) {
+            sendJson(res, 400, { error: `annotations[${key}] must be an object` });
+            return;
+          }
+          const v = value as Record<string, unknown>;
+          const clean: ScreenAnnotationOverride = {};
+          for (const [fk, fv] of Object.entries(v)) {
+            if (fk === "hidden") {
+              if (typeof fv !== "boolean") {
+                sendJson(res, 400, { error: `annotations[${key}].hidden must be a boolean` });
+                return;
+              }
+              clean.hidden = fv;
+            } else if (fk === "description" || fk === "label" || fk === "note") {
+              if (typeof fv !== "string") {
+                sendJson(res, 400, { error: `annotations[${key}].${fk} must be a string` });
+                return;
+              }
+              clean[fk] = fv;
+            } else {
+              sendJson(res, 400, { error: `annotation field is not editable: ${fk}` });
+              return;
+            }
+          }
+          cleanAnn[key] = clean;
+        }
+      }
+      const now = new Date().toISOString();
+      const by = approver.trim();
+      const store = readScreenOverrides();
+      const prev = store[screenId];
+      const audit = Array.isArray(prev?.audit) ? prev!.audit : [];
+      // 부분 갱신(확정 전용/주석만 편집) 시 미제공 필드는 이전 값을 보존한다
+      // — titleOverride/annotations 대칭(확정 버튼은 둘 다 안 보냄).
+      const record: ScreenOverride = {
+        approver: by,
+        at: now,
+        ...(typeof titleOverride === "string"
+          ? { titleOverride }
+          : prev?.titleOverride
+            ? { titleOverride: prev.titleOverride }
+            : {}),
+        ...(annotations !== undefined ? { annotations: cleanAnn } : prev?.annotations ? { annotations: prev.annotations } : {}),
+        confirmed: true,
+        audit: [...audit, { event: prev ? "EDITED" : "CONFIRMED", by, at: now }],
+      };
+      store[screenId] = record;
+      try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify(store, null, 2) + "\n", "utf8");
+      } catch (err) {
+        console.error("[understand-anything] Failed to write screen-overrides:", err);
+        sendJson(res, 500, { error: "Failed to write screen overrides" });
+        return;
+      }
+      sendJson(res, 200, { screenId, ...record });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+/** 캡처 PNG 최대 크기 — fullPage 스크린샷 상한. */
+const MAX_SCREEN_ASSET_BYTES = 10 * 1024 * 1024;
+/**
+ * GET /screen-asset?path=screens/<slug>.png — 캡처 PNG 스트리밍(토큰 게이트 뒤).
+ * `/file-content.json` 은 바이너리를 거부(415)하므로 이미지 전용 경로가 필요하다.
+ * 방어: 파일명 정규식 + resolve 후 screens/ 디렉터리 격리(containment) 재확인.
+ */
+function handleScreenAssetGet(url: URL, res: import("http").ServerResponse): void {
+  const rel = url.searchParams.get("path") ?? "";
+  if (!/^screens\/[A-Za-z0-9._-]+\.png$/.test(rel)) {
+    sendJson(res, 400, { error: "invalid asset path" });
+    return;
+  }
+  const sf = screensFilePath();
+  if (!sf) {
+    sendJson(res, 404, { error: "No screens.json found. Run /understand-screens first." });
+    return;
+  }
+  const screensDir = path.resolve(path.dirname(sf), "screens");
+  const abs = path.resolve(path.dirname(sf), rel);
+  if (abs !== screensDir && !abs.startsWith(screensDir + path.sep)) {
+    sendJson(res, 403, { error: "path escapes screens directory" });
+    return;
+  }
+  let stat: import("fs").Stats;
+  try {
+    stat = fs.statSync(abs);
+  } catch {
+    sendJson(res, 404, { error: "asset not found" });
+    return;
+  }
+  if (!stat.isFile()) {
+    sendJson(res, 404, { error: "asset not found" });
+    return;
+  }
+  if (stat.size > MAX_SCREEN_ASSET_BYTES) {
+    sendJson(res, 413, { error: "asset too large" });
+    return;
+  }
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "image/png");
+  res.setHeader("Content-Length", String(stat.size));
+  fs.createReadStream(abs).pipe(res);
 }
 
 // ── 검증 스파인 입력: 요구사항 오버레이(lifecycle·고객검수·시험결과) — _requirements 아래 기록.
@@ -1476,19 +1846,26 @@ export default defineConfig({
             pathname === "/doc-list.json" ||
             pathname === "/doc-content.json" ||
             pathname === "/doc" ||
+            pathname === "/doc-xlsx" ||
             pathname === "/impact-analyze" ||
             pathname === "/impact-status" ||
             pathname === "/rtm.json" ||
             pathname === "/rtm-overrides.json" ||
             pathname === "/rtm-override" ||
             pathname === "/rtm-req-override" ||
+            pathname === "/rtm-scenario-override" ||
+            pathname === "/rtm-field" ||
             pathname === "/rtm-intake" ||
             pathname === "/rtm-intake-status" ||
             pathname === "/rtm-intake-confirm" ||
             pathname === "/rtm-intake-discard" ||
             pathname === "/rtm-intake-doc" ||
             pathname === "/rtm-change" ||
-            pathname === "/rtm-change-status";
+            pathname === "/rtm-change-status" ||
+            pathname === "/screens.json" ||
+            pathname === "/screen-overrides.json" ||
+            pathname === "/screen-override" ||
+            pathname === "/screen-asset";
 
           if (!isProtectedEndpoint) {
             next();
@@ -1528,8 +1905,34 @@ export default defineConfig({
             else sendJson(res, 405, { error: "Use POST to write rtm requirement overrides" });
             return;
           }
+          // W5: 시나리오 확정 / R7: 사용자 정의 필드 정의.
+          if (pathname === "/rtm-scenario-override") {
+            if (req.method === "POST") handleRtmScenarioOverridePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to write rtm scenario overrides" });
+            return;
+          }
+          if (pathname === "/rtm-field") {
+            if (req.method === "POST") handleRtmFieldPost(req, res);
+            else sendJson(res, 405, { error: "Use POST to write rtm field defs" });
+            return;
+          }
           if (pathname === "/rtm-overrides.json") {
             sendJson(res, 200, readRtmOverrides());
+            return;
+          }
+
+          // S4: 화면설계서 — 오버레이(편집/확정) 읽기/쓰기 + 캡처 PNG.
+          if (pathname === "/screen-override") {
+            if (req.method === "POST") handleScreenOverridePost(req, res);
+            else sendJson(res, 405, { error: "Use POST to write screen overrides" });
+            return;
+          }
+          if (pathname === "/screen-overrides.json") {
+            sendJson(res, 200, readScreenOverrides());
+            return;
+          }
+          if (pathname === "/screen-asset") {
+            handleScreenAssetGet(url, res);
             return;
           }
 
@@ -1552,9 +1955,47 @@ export default defineConfig({
                 confirmed: !!o,
                 approver: o?.approver ?? null,
                 at: o?.at ?? null,
+                // W7: 병기된 xlsx 존재 여부 — DocsView 다운로드 버튼 노출 조건.
+                hasXlsx: !!dir && fs.existsSync(path.join(dir, `${docId}.xlsx`)),
+                // W7 비평 반영: xlsx 는 스캔 스냅샷 — 확정 편집(오버레이) 존재 또는
+                // md 가 더 새로우면 stale(버튼에 "미반영 편집 있음" 경고 노출).
+                xlsxStale: (() => {
+                  if (!dir) return false;
+                  const xf = path.join(dir, `${docId}.xlsx`);
+                  if (!fs.existsSync(xf)) return false;
+                  if (o) return true; // 확정 편집 오버레이 존재 → xlsx 에 미반영
+                  try {
+                    const mf = path.join(dir, `${docId}.md`);
+                    return fs.statSync(mf).mtimeMs > fs.statSync(xf).mtimeMs;
+                  } catch {
+                    return false;
+                  }
+                })(),
               };
             });
             sendJson(res, 200, { docs, hasOutput: !!dir });
+            return;
+          }
+          // W7: 병기 xlsx 다운로드 — docId 화이트리스트(doc-output 의 md 보유 문서 + rtm).
+          if (pathname === "/doc-xlsx") {
+            const docId = url.searchParams.get("docId");
+            const dir = docOutputDir();
+            const allowed = docId !== null && (docOutputIds().includes(docId) || docId === "rtm");
+            if (!dir || !allowed) {
+              sendJson(res, 404, { error: "unknown docId" });
+              return;
+            }
+            const file = path.join(dir, `${docId}.xlsx`);
+            if (!fs.existsSync(file)) {
+              sendJson(res, 404, { error: "xlsx not generated — run understand-docs first" });
+              return;
+            }
+            res.writeHead(200, {
+              "Content-Type":
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(docId)}.xlsx`,
+            });
+            res.end(fs.readFileSync(file));
             return;
           }
           if (pathname === "/doc-content.json") {
@@ -1681,6 +2122,8 @@ export default defineConfig({
               ? "domain-graph.json"
               : pathname === "/rtm.json"
               ? "rtm.json"
+              : pathname === "/screens.json"
+              ? "screens.json"
               : "knowledge-graph.json";
 
           const candidates = graphFileCandidates(fileName);

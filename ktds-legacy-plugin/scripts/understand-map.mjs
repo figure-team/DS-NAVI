@@ -86,16 +86,117 @@ switch (sub) {
 
 async function runScan() {
   const { scanDomainMap } = engine
-  const { census, routes, edges, slices, candidates, dbSchema } = await scanDomainMap(projectRoot)
+  const noCache = hasFlag('--no-cache')
+  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache, coverage } = await scanDomainMap(projectRoot, { readCache: !noCache })
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
+  reportLangSupport(coverage)
+  reportScanCache(scanCache, noCache)
   console.log(`  routes: 라우트 ${routes.routes.length}개 / 배치 ${routes.batchEntries.length}개`)
+  reportBatchJobs(batchJobs)
   console.log(`  edges: 엣지 ${edges.edges.length}개 / 미해소 ${edges.unresolved.length}개`)
   console.log(`  slices: 슬라이스 ${slices.slices.length}개`)
   console.log(`  candidates: 도메인 후보 ${candidates.candidates.length}개`)
+  reportInterfaces(interfaces)
   reportDbSchema(dbSchema)
-  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema}.json (동일 commit 재실행 byte-diff=0)')
+  if (programInventory) {
+    const byType = programInventory.stats.byType.map((t) => `${t.type} ${t.count}`).join(', ')
+    console.log(`  프로그램: ${programInventory.stats.total}본 (${byType})`)
+    console.log(`  잠정 FP(간이법 미조정, [추정]): ${programInventory.fp.summary.unadjustedFp} — EI ${programInventory.fp.summary.ei}·EQ ${programInventory.fp.summary.eq}·ILF ${programInventory.fp.summary.ilf}·EIF ${programInventory.fp.summary.eif}`)
+  }
+  reportRisk(riskReport)
+  console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces,batch-jobs,program-inventory,risk-report}.json (동일 commit 재실행 byte-diff=0)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
+}
+
+/** W9 언어 지원 보고 — 핵심 구조분석 미지원 소스는 침묵 대신 경고(정직성). */
+function reportLangSupport(coverage) {
+  const ls = coverage?.langSupport
+  if (!ls) return
+  if (ls.unsupportedFiles > 0) {
+    const detail = ls.byLang
+      .filter((l) => l.best === 'none')
+      .map((l) => `${l.lang} ${l.files}`)
+      .join(' · ')
+    console.log(
+      `  ⚠️ 스캐너 미지원 소스 ${ls.unsupportedFiles}파일 [미확인] — ${detail}` +
+        ' (어떤 스캐너도 덮지 않음: docs/ktds/COVERAGE_MATRIX.md 지원 수준 참조)',
+    )
+  }
+  if (ls.partialFiles > 0) {
+    const detail = ls.byLang
+      .filter((l) => l.best === 'partial')
+      .map((l) => `${l.lang} ${l.files}`)
+      .join(' · ')
+    console.log(
+      `  ◐ 부분 지원 소스 ${ls.partialFiles}파일 — ${detail} (좁은 관용구만 스캔, 범위는 COVERAGE_MATRIX.md 비고)`,
+    )
+  }
+}
+
+/** W8 증분 캐시 보고 — 재사용/재추출 건수(파일단위 팩트, 정직성 표기). */
+function reportScanCache(scanCache, noCache) {
+  if (!scanCache) return
+  const { reused, recomputed, sections } = scanCache.statsSummary()
+  const detail = Object.entries(sections)
+    .map(([name, s]) => `${name} ${s.reused}/${s.recomputed}`)
+    .join(' · ')
+  console.log(
+    `  캐시(.spec/cache): 재사용 ${reused}·재추출 ${recomputed}${noCache ? ' — --no-cache(전체 재추출·캐시 재구축)' : ''}`,
+  )
+  if (detail) console.log(`    (섹션별 재사용/재추출: ${detail})`)
+}
+
+/** W4 위험 리포트 보고 — 등급 분포 + 지표 커버리지(미측정 표면화). */
+function reportRisk(riskReport) {
+  if (!riskReport) return
+  const { programs, measured, unreached } = riskReport.stats
+  if (programs === 0) return
+  const byGrade = { 상: 0, 중: 0, 하: 0 }
+  for (const it of riskReport.items) byGrade[it.grade]++
+  const top = riskReport.items[0]
+  console.log(
+    `  위험: ${programs}본 랭킹 (상 ${byGrade['상']}·중 ${byGrade['중']}·하 ${byGrade['하']}, 미도달 ${unreached}) — 1위 ${top.name}(${top.score})`,
+  )
+  const cxMiss = programs - measured.complexity
+  if (cxMiss > 0 || !riskReport.meta.churnAvailable) {
+    const parts = []
+    if (cxMiss > 0) parts.push(`복잡도 미측정 ${cxMiss}건(비 java)`)
+    if (!riskReport.meta.churnAvailable) parts.push('변경빈도 미측정(git 이력 없음)')
+    console.log(`    [미확인] ${parts.join(' · ')} — si-위험모듈리포트 §지표 커버리지 참조`)
+  }
+}
+
+/** W2 배치 인벤토리 보고 — 미해석 핸들러/의심신호는 경고로 표면화. */
+function reportBatchJobs(batchJobs) {
+  if (!batchJobs) return
+  const { total, byTrigger, unresolvedHandlers } = batchJobs.stats
+  const suspects = batchJobs.suspectSignals?.count ?? 0
+  if (total > 0) {
+    const trig = byTrigger.map((t) => `${t.trigger} ${t.count}`).join(', ')
+    console.log(`  배치 잡: ${total}건 (${trig})${unresolvedHandlers > 0 ? ` — 핸들러 미해석 ${unresolvedHandlers}건 [미확인]` : ''}`)
+  }
+  if (suspects > 0) {
+    console.log(`  ⚠️ 잡 명명 관례인데 트리거에 안 물린 클래스 ${suspects}건 — 누락 배치 가능(.spec/map/batch-jobs.json 참조).`)
+  }
+}
+
+/** W1 대외 인터페이스 스캔 결과 보고 — 0건도 "스캔했고 없음"으로 명시(침묵 누락 금지). */
+function reportInterfaces(interfaces) {
+  if (!interfaces) return
+  const { total, unresolvedEndpoints, byProtocol, callSiteTotal } = interfaces.stats
+  const suspects = interfaces.suspectSignals?.count ?? 0
+  if (total === 0) {
+    console.log('  인터페이스: 0건 (송신/라우트 외 수신 신호 없음 — 스캔 수행됨)')
+    if (suspects > 0) {
+      console.log(`  ⚠️ 의심 신호 ${suspects}건(http 리터럴/jdbc/wsdl) — 사내 공통연계모듈일 수 있습니다.`)
+      console.log('     understanding.config.json 의 interfaceScan.clients 로 공통모듈 시그니처를 등록하세요.')
+      console.log('     (근거: .spec/map/interfaces.json → suspectSignals.samples)')
+    }
+    return
+  }
+  const proto = byProtocol.map((p) => `${p.protocol} ${p.count}`).join(', ')
+  console.log(`  인터페이스: ${total}건/호출 ${callSiteTotal}지점 (${proto})${unresolvedEndpoints > 0 ? ` — endpoint 미해석 ${unresolvedEndpoints}건 [미확인]` : ''}`)
 }
 
 /** db-schema tier + 라이브 DB 신호(정적 탐지) 보고 + .sql 덤프 권장 게이트(PA-gate). */

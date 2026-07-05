@@ -12,7 +12,8 @@ import { DEFAULT_THEME_CONFIG } from "./types.ts";
 import { getPreset } from "./presets.ts";
 import { applyTheme } from "./theme-engine.ts";
 
-const STORAGE_KEY = "ua-theme";
+// P4: DS-NAVI 라이트 리브랜딩 — 키 버전 업으로 기존 저장값을 1회 무효화(새 기본값 적용).
+const STORAGE_KEY = "ua-theme-v2";
 
 interface ThemeContextValue {
   config: ThemeConfig;
@@ -46,8 +47,18 @@ function saveToLocalStorage(config: ThemeConfig): void {
   }
 }
 
+/** P6: ?theme=<presetId> — 헤드리스 QA·데모 링크용 1회 프리셋 강제(저장하지 않음). */
+function themeFromUrl(): ThemeConfig | null {
+  if (typeof window === "undefined") return null;
+  const presetId = new URLSearchParams(window.location.search).get("theme");
+  if (!presetId) return null;
+  const preset = getPreset(presetId);
+  if (preset.id !== presetId) return null; // 알 수 없는 프리셋이면 무시
+  return { presetId: preset.id, accentId: preset.defaultAccentId };
+}
+
 function resolveInitialTheme(metaTheme?: ThemeConfig | null): ThemeConfig {
-  return loadFromLocalStorage() ?? metaTheme ?? DEFAULT_THEME_CONFIG;
+  return themeFromUrl() ?? loadFromLocalStorage() ?? metaTheme ?? DEFAULT_THEME_CONFIG;
 }
 
 interface ThemeProviderProps {
@@ -70,7 +81,7 @@ export function ThemeProvider({ metaTheme, children }: ThemeProviderProps) {
 
   // Update if metaTheme arrives later (async fetch) and no localStorage preference exists
   useEffect(() => {
-    if (metaTheme && !loadFromLocalStorage()) {
+    if (metaTheme && !loadFromLocalStorage() && !themeFromUrl()) {
       setConfig(metaTheme);
     }
   }, [metaTheme]);

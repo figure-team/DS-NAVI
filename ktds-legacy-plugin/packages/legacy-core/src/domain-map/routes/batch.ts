@@ -13,6 +13,7 @@
  */
 import type { Node } from 'web-tree-sitter'
 import { childrenOfType, startLine } from '../tree-sitter.js'
+import { beanBodyRange, blankNestedBeans } from '../../batch-scan/bean-index.js'
 import type { BatchEntry } from '../types.js'
 
 /** @Scheduled 가 받는, schedule 문자열을 구성하는 속성(우선순위 순). */
@@ -169,20 +170,35 @@ export function extractXmlBatchEntries(rawText: string, filePath: string): Batch
   const out: BatchEntry[] = []
   const text = stripXmlComments(rawText)
 
-  // 1) Quartz CronTrigger 빈. 여는 태그를 찾고, 다음 </bean> 까지를 본문으로 근사.
+  // 1) Quartz CronTrigger 빈. 본문은 깊이 추적으로 정확히 — 첫 </bean> 근사는 중첩 빈
+  //    (인라인 jobDetail 관용구)에서 cronExpression 유실/속성 오귀속을 만든다(W2 실증).
   const beanOpenRe = /<bean\b[^>]*>/g
   let bm: RegExpExecArray | null
   while ((bm = beanOpenRe.exec(text)) !== null) {
     const tag = bm[0]
     const cls = attrValue(tag, 'class')
     if (!cls || !/CronTriggerFactoryBean$/.test(cls)) continue
-    // 본문 = 여는 태그 끝 ~ 첫 </bean>.
     const bodyStart = bm.index + tag.length
-    const closeIdx = text.indexOf('</bean>', bodyStart)
-    const body = closeIdx >= 0 ? text.slice(bodyStart, closeIdx) : text.slice(bodyStart)
-    const jobDetail = readBeanProperty(body, 'jobDetail')
-    const cronProp = readBeanProperty(body, 'cronExpression')
-    const handler = jobDetail.ref
+    const rawBody = tag.endsWith('/>') ? '' : text.slice(bodyStart, beanBodyRange(text, bodyStart).end)
+    // 트리거 자신의 속성은 중첩 빈을 지운 본문에서 읽는다.
+    const ownBody = blankNestedBeans(rawBody)
+    const jobDetail = readBeanProperty(ownBody, 'jobDetail')
+    const cronProp = readBeanProperty(ownBody, 'cronExpression')
+    let handler = jobDetail.ref
+    // 인라인 jobDetail 관용구: <property name="jobDetail"><bean class="…MethodInvoking…">
+    //   <property name="targetObject" ref="X"/><property name="targetMethod" value="m"/>
+    // ref 가 없으면 중첩 MethodInvoking 빈에서 X#m 으로 해석(원본 rawBody 에서).
+    if (handler === null) {
+      const region = rawBody.match(
+        /<property\b[^>]*\bname\s*=\s*"jobDetail"[^>]*>([\s\S]*?)<\/property>/,
+      )
+      const inner = region?.[1] ?? ''
+      if (/MethodInvokingJobDetailFactoryBean/.test(inner)) {
+        const targetRef = inner.match(/<property\b[^>]*\bname\s*=\s*"targetObject"[^>]*\bref\s*=\s*"([^"]*)"/)
+        const targetMethod = inner.match(/<property\b[^>]*\bname\s*=\s*"targetMethod"[^>]*\bvalue\s*=\s*"([^"]*)"/)
+        if (targetRef) handler = targetMethod ? `${targetRef[1]}#${targetMethod[1]}` : targetRef[1]
+      }
+    }
     const schedule = cronProp.value !== null ? `cron=${cronProp.value}` : null
     const symbol = handler ?? attrValue(tag, 'id') ?? 'trigger'
     out.push({

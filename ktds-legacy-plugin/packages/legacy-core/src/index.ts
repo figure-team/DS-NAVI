@@ -53,6 +53,7 @@ export * from './interface-scan/index.js'
 export * from './batch-scan/index.js'
 export * from './program-inventory/index.js'
 export * from './risk-report/index.js'
+export * from './work-summary/index.js'
 export { buildSkeleton, DEFAULT_STEP_CAP } from './domain-map/skeleton.js'
 export {
   DEFAULT_NODE_DETAIL_TEMPLATE,

@@ -136,6 +136,37 @@ export function resolveRange(
  * [미확인] 표기한다(커밋 집합으로 시각 범위를 지어내지 않는다 — 날조 금지).
  * 윈도 미해석(fromIso/toIso null)도 null — 호출자가 집계 자체를 null 로 degrade.
  */
+/**
+ * 직전 기간(W6-b, 설계 §13) — 현재 윈도와 동일 길이·인접. weeks 는 (from−길이, from],
+ * month 는 직전 달력 월 [전월 1일, 당월 1일). 반개구간 방향이 모드별로 유지되므로
+ * 현재 하한 경계의 커밋은 정확히 한쪽에만 속한다(이중 계상 0). range/미해석은 null.
+ */
+export function resolvePreviousRange(range: ResolvedRange): ResolvedRange | null {
+  if (range.mode === 'range' || range.fromIso === null || range.toIso === null) return null
+  if (range.mode === 'weeks') {
+    const fromMs = Date.parse(range.fromIso)
+    const toMs = Date.parse(range.toIso)
+    return {
+      mode: 'weeks',
+      rawArg: range.rawArg,
+      fromIso: new Date(fromMs - (toMs - fromMs)).toISOString(),
+      toIso: range.fromIso,
+      anchorSha: range.anchorSha,
+    }
+  }
+  const m = /^(\d{4})-(\d{2})$/.exec(range.rawArg)
+  if (!m) return null
+  const year = Number(m[1])
+  const month = Number(m[2])
+  return {
+    mode: 'month',
+    rawArg: range.rawArg,
+    fromIso: new Date(Date.UTC(year, month - 2, 1)).toISOString(),
+    toIso: new Date(Date.UTC(year, month - 1, 1)).toISOString(),
+    anchorSha: null,
+  }
+}
+
 export function makeWindow(range: ResolvedRange): ((iso: string) => boolean) | null {
   if (range.mode === 'range') return null
   if (range.fromIso === null || range.toIso === null) return null
@@ -219,6 +250,37 @@ export const DocProgressSchema = z.object({
 })
 export type DocProgress = z.infer<typeof DocProgressSchema>
 
+export const WorkTotalsSchema = z.object({
+  commits: z.number().int().nonnegative(),
+  mergeCommits: z.number().int().nonnegative(),
+  authors: z.number().int().nonnegative(),
+  /** files/added/deleted 는 생성물 제외분(실적 근사) — 생성물은 generated 로 분리(리뷰 C1). */
+  files: z.number().int().nonnegative(),
+  added: z.number().int().nonnegative(),
+  deleted: z.number().int().nonnegative(),
+  /** 생성물/산출물(GENERATED_PATH_PATTERNS) 분리 집계 — 제외가 아니라 표면화. */
+  generated: z.object({
+    files: z.number().int().nonnegative(),
+    added: z.number().int().nonnegative(),
+    deleted: z.number().int().nonnegative(),
+  }),
+})
+export type WorkTotals = z.infer<typeof WorkTotalsSchema>
+
+/**
+ * 직전 기간(W6-b, 설계 §13) — 현재 윈도와 동일 길이·인접(반개구간 방향 동일). 증감은
+ * 저장하지 않는다(문서 빌더가 파생 계산 — 원천 중복 금지). 원장 진척 추이도 **현재
+ * 원장 상태**에서 두 윈도를 각각 집계한 것(§3.4 재현 경계 동일).
+ */
+export const PreviousWindowSchema = z.object({
+  fromIso: z.string(),
+  toIso: z.string(),
+  totals: WorkTotalsSchema,
+  rtmProgress: RtmProgressSchema.nullable(),
+  docProgress: DocProgressSchema.nullable(),
+})
+export type PreviousWindow = z.infer<typeof PreviousWindowSchema>
+
 export const WorkSummaryReportSchema = z.object({
   schemaVersion: z.literal(1),
   /** 결정론 앵커 — 수집 시점 HEAD. null = git 불가. */
@@ -226,21 +288,9 @@ export const WorkSummaryReportSchema = z.object({
   range: ResolvedRangeSchema,
   /** 윈도 내 커밋만(dateIso DESC, sha ASC). */
   commits: z.array(WorkCommitSchema),
-  totals: z.object({
-    commits: z.number().int().nonnegative(),
-    mergeCommits: z.number().int().nonnegative(),
-    authors: z.number().int().nonnegative(),
-    /** files/added/deleted 는 생성물 제외분(실적 근사) — 생성물은 generated 로 분리(리뷰 C1). */
-    files: z.number().int().nonnegative(),
-    added: z.number().int().nonnegative(),
-    deleted: z.number().int().nonnegative(),
-    /** 생성물/산출물(GENERATED_PATH_PATTERNS) 분리 집계 — 제외가 아니라 표면화. */
-    generated: z.object({
-      files: z.number().int().nonnegative(),
-      added: z.number().int().nonnegative(),
-      deleted: z.number().int().nonnegative(),
-    }),
-  }),
+  totals: WorkTotalsSchema,
+  /** 다주 추이(W6-b) — null = range 모드(시각 축 없음)/git 불가/윈도 미해석. */
+  previous: PreviousWindowSchema.nullable(),
   /** linesChanged DESC, key ASC. */
   modules: z.array(WorkModuleSchema),
   /** null = 원장 없음 또는 윈도 미해석([미확인] — 0 과 구분). */
@@ -497,6 +547,43 @@ function buildModules(
     .sort((a, b) => b.linesChanged - a.linesChanged || cmp(a.key, b.key) || cmp(a.source, b.source))
 }
 
+/** 윈도 커밋 집합의 합계 — 생성물 분리 포함(리뷰 C1). 현재/직전 윈도 공용(W6-b). */
+function computeTotals(commits: WorkLogCommit[]): WorkTotals {
+  const fileSet = new Set<string>()
+  const genFileSet = new Set<string>()
+  const authorSet = new Set<string>()
+  let added = 0
+  let deleted = 0
+  let genAdded = 0
+  let genDeleted = 0
+  let merges = 0
+  for (const c of commits) {
+    authorSet.add(c.author)
+    if (c.isMerge) merges += 1
+    for (const f of c.files) {
+      // 생성물 분리 집계(리뷰 C1) — churn 은 사실이지만 실적이 아니다.
+      if (isGeneratedPath(f.path)) {
+        genFileSet.add(f.path)
+        genAdded += f.added
+        genDeleted += f.deleted
+      } else {
+        fileSet.add(f.path)
+        added += f.added
+        deleted += f.deleted
+      }
+    }
+  }
+  return {
+    commits: commits.length,
+    mergeCommits: merges,
+    authors: authorSet.size,
+    files: fileSet.size,
+    added,
+    deleted,
+    generated: { files: genFileSet.size, added: genAdded, deleted: genDeleted },
+  }
+}
+
 /**
  * 실적 요약 조립(파일 기록 없음 — 호출자가 writeMapArtifact). 순수 함수:
  * 모든 입력은 주입, 시계 미사용 — 동일 입력 ⇒ byte 동일 출력.
@@ -522,45 +609,29 @@ export function buildWorkSummary(inputs: WorkSummaryInputs): WorkSummaryReport {
     return tb - ta || cmp(a.sha, b.sha)
   })
 
-  const fileSet = new Set<string>()
-  const genFileSet = new Set<string>()
-  const authorSet = new Set<string>()
-  let added = 0
-  let deleted = 0
-  let genAdded = 0
-  let genDeleted = 0
-  let merges = 0
-  for (const c of commits) {
-    authorSet.add(c.author)
-    if (c.isMerge) merges += 1
-    for (const f of c.files) {
-      // 생성물 분리 집계(리뷰 C1) — churn 은 사실이지만 실적이 아니다.
-      if (isGeneratedPath(f.path)) {
-        genFileSet.add(f.path)
-        genAdded += f.added
-        genDeleted += f.deleted
-      } else {
-        fileSet.add(f.path)
-        added += f.added
-        deleted += f.deleted
-      }
-    }
-  }
+  // 직전 기간(W6-b) — git 가용 + 시각 윈도 해석 가능일 때만. 수집이 --since 로
+  // 바운드된 경우 스크립트가 두 윈도를 덮게 확장한다(설계 §13).
+  const prevRange = ok !== null ? resolvePreviousRange(range) : null
+  const prevWindow = prevRange !== null ? makeWindow(prevRange) : null
+  const prevCommits =
+    ok !== null && prevWindow !== null ? ok.commits.filter((c) => prevWindow(c.dateIso)) : null
 
   return WorkSummaryReportSchema.parse({
     schemaVersion: 1,
     gitCommit: ok?.headSha ?? null,
     range,
     commits,
-    totals: {
-      commits: commits.length,
-      mergeCommits: merges,
-      authors: authorSet.size,
-      files: fileSet.size,
-      added,
-      deleted,
-      generated: { files: genFileSet.size, added: genAdded, deleted: genDeleted },
-    },
+    totals: computeTotals(commits),
+    previous:
+      prevRange === null || prevWindow === null || prevCommits === null
+        ? null
+        : {
+            fromIso: prevRange.fromIso,
+            toIso: prevRange.toIso,
+            totals: computeTotals(prevCommits),
+            rtmProgress: rtmOverlay === null ? null : scanRtmProgress(rtmOverlay, prevWindow),
+            docProgress: docStates === null ? null : scanDocProgress(docStates, prevWindow),
+          },
     modules: buildModules(commits, programInventory),
     // 윈도 미해석(git 불가한 weeks 모드)이면 원장이 있어도 집계 불가 — null degrade.
     rtmProgress: rtmOverlay === null || inWindow === null ? null : scanRtmProgress(rtmOverlay, inWindow),

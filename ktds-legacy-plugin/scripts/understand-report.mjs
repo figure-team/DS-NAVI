@@ -99,7 +99,8 @@ if (spec.mode === 'range') {
 
 // ── ① 수집 ──────────────────────────────────────────────────────────────────
 // 상대 기간은 --since 로 로그 출력을 바운드(리뷰 C3 — 대형 레포 256MB 절벽 방지).
-// 윈도 하한보다 1일 여유를 두고, 윈도 필터는 build 단계가 다시 적용한다(결정론 불변).
+// 다주 추이(W6-b)의 직전 기간까지 덮도록 두 윈도 길이 + 1일 여유. 윈도 필터는
+// build 단계가 다시 적용한다(결정론 불변).
 let sinceIso
 if (spec.mode === 'weeks') {
   try {
@@ -109,14 +110,15 @@ if (spec.mode === 'weeks') {
     }).trim()
     const headMs = Date.parse(headIso)
     if (!Number.isNaN(headMs)) {
-      sinceIso = new Date(headMs - (spec.weeks * 7 + 1) * 24 * 60 * 60 * 1000).toISOString()
+      sinceIso = new Date(headMs - (spec.weeks * 14 + 1) * 24 * 60 * 60 * 1000).toISOString()
     }
   } catch {
     // git 불가 — collectWorkLog 가 no-git 으로 표면화.
   }
 } else if (spec.mode === 'month') {
   const [y, mo] = spec.month.split('-').map(Number)
-  sinceIso = new Date(Date.UTC(y, mo - 1, 1) - 24 * 60 * 60 * 1000).toISOString()
+  // 직전 달력 월 1일 − 1일 여유.
+  sinceIso = new Date(Date.UTC(y, mo - 2, 1) - 24 * 60 * 60 * 1000).toISOString()
 }
 const collected = collectWorkLog(projectRoot, {
   revRange: spec.mode === 'range' ? spec.range : undefined,

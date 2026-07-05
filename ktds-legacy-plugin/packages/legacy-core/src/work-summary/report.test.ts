@@ -9,6 +9,7 @@ import type { WorkLogResult } from './collect.js'
 import {
   buildWorkSummary,
   makeWindow,
+  resolvePreviousRange,
   resolveRange,
   scanDocProgress,
   scanRtmProgress,
@@ -80,6 +81,17 @@ describe('resolveRange / makeWindow', () => {
   it('range: 시각 윈도 없음(null) — 원장 진척은 [미확인] degrade', () => {
     const r = resolveRange({ mode: 'range', range: 'A..B' }, null)
     expect(makeWindow(r)).toBeNull()
+  })
+
+  it('직전 기간(W6-b): 동일 길이·인접, 반개구간 방향 유지', () => {
+    const cur = resolveRange({ mode: 'weeks', weeks: 1 }, { sha: HEAD, dateIso: '2026-06-30T12:00:00Z' })
+    const prev = resolvePreviousRange(cur)!
+    expect(prev.fromIso).toBe('2026-06-16T12:00:00.000Z')
+    expect(prev.toIso).toBe('2026-06-23T12:00:00.000Z') // = 현재 하한(경계 커밋은 한쪽에만).
+    const prevMonth = resolvePreviousRange(resolveRange({ mode: 'month', month: '2026-06' }, null))!
+    expect(prevMonth.fromIso).toBe('2026-05-01T00:00:00.000Z')
+    expect(prevMonth.toIso).toBe('2026-06-01T00:00:00.000Z')
+    expect(resolvePreviousRange(resolveRange({ mode: 'range', range: 'A..B' }, null))).toBeNull()
   })
 
   it('불량 인자는 명시 오류(월 형식/주 수)', () => {
@@ -165,6 +177,47 @@ describe('buildWorkSummary', () => {
       { key: 'docs', source: 'dir', commits: 1, files: 1, linesChanged: 10, topFiles: ['docs/readme.md'] },
       { key: 'order', source: 'program-inventory', commits: 2, files: 1, linesChanged: 10, topFiles: ['src/a.java'] },
     ])
+  })
+
+  it('다주 추이(W6-b): 경계 커밋은 직전 윈도에만 귀속(이중 계상 0) + 원장 두 윈도 집계', () => {
+    const report = buildWorkSummary({
+      spec: { mode: 'weeks', weeks: 1 },
+      collected: fixtureLog(),
+      rtmOverlay: {
+        // 직전 윈도(6/16 12:00 ~ 6/23 12:00] 안 확정 — previous 에만 계상.
+        'FN-prev': {
+          at: '2026-06-20T00:00:00Z',
+          audit: [{ event: 'CONFIRMED', by: 'u', at: '2026-06-20T00:00:00Z' }],
+        },
+      },
+      docStates: null,
+      programInventory: null,
+    })
+    // cccc2(6/23T12:00 정각) = 현재 하한 경계 — 현재 제외, 직전 포함.
+    expect(report.commits.map((c) => c.sha)).toEqual([HEAD, 'bbbb1'])
+    expect(report.previous).not.toBeNull()
+    expect(report.previous!.fromIso).toBe('2026-06-16T12:00:00.000Z')
+    expect(report.previous!.toIso).toBe('2026-06-23T12:00:00.000Z')
+    expect(report.previous!.totals.commits).toBe(1)
+    expect(report.previous!.totals.added).toBe(1) // src/b.java +1.
+    expect(report.rtmProgress!.functionsConfirmed).toBe(0)
+    expect(report.previous!.rtmProgress!.functionsConfirmed).toBe(1)
+    expect(report.previous!.docProgress).toBeNull() // 원장 없음 — 0 과 구분.
+  })
+
+  it('다주 추이: range/git 불가는 previous null', () => {
+    const rangeReport = buildWorkSummary({
+      spec: { mode: 'range', range: 'X..Y' },
+      collected: fixtureLog(),
+      ...emptyLedgers,
+    })
+    expect(rangeReport.previous).toBeNull()
+    const noGit = buildWorkSummary({
+      spec: { mode: 'month', month: '2026-06' },
+      collected: { kind: 'no-git' },
+      ...emptyLedgers,
+    })
+    expect(noGit.previous).toBeNull()
   })
 
   it('모듈 key 충돌(도메인명=디렉터리명) 동점 — source tie-break 로 결정론(리뷰 R4)', () => {

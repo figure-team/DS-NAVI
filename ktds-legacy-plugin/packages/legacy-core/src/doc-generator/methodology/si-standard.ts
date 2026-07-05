@@ -787,6 +787,41 @@ const WS_PROGRESS_COLUMNS = ['항목', '값', '비고']
 /** RTM 확정 원장 경로 — 진척 행의 근거 파일(수치의 원천). */
 const RTM_OVERLAY_FILE = '.understand-anything/rtm-overrides.json'
 
+/**
+ * 다주 추이 행(W6-b, 설계 §13) — 직전 기간 대비 증감을 수집 수치에서 파생 계산.
+ * previous 가 없으면(커밋 범위 모드/git 불가) 행 자체를 내지 않는다(§2 기준에 사유 명기).
+ */
+function trendRows(ws: WorkSummaryReport): TableRow[] {
+  const p = ws.previous
+  if (p === null) return []
+  const delta = (cur: number, prev: number): string => {
+    const d = cur - prev
+    return `${prev}→${cur}(${d >= 0 ? '+' : ''}${d})`
+  }
+  const parts = [
+    `커밋 ${delta(ws.totals.commits, p.totals.commits)}`,
+    `실적 라인 ${delta(ws.totals.added + ws.totals.deleted, p.totals.added + p.totals.deleted)}`,
+  ]
+  if (ws.rtmProgress !== null && p.rtmProgress !== null) {
+    const cur =
+      ws.rtmProgress.functionsConfirmed + ws.rtmProgress.scenariosConfirmed + ws.rtmProgress.requirementsConfirmed
+    const prev =
+      p.rtmProgress.functionsConfirmed + p.rtmProgress.scenariosConfirmed + p.rtmProgress.requirementsConfirmed
+    parts.push(`RTM 전환 ${delta(cur, prev)}`)
+  }
+  if (ws.docProgress !== null && p.docProgress !== null) {
+    parts.push(`문서 승인 ${delta(ws.docProgress.approved, p.docProgress.approved)}`)
+  }
+  const close = ws.range.mode === 'weeks' ? ']' : ')'
+  return [
+    {
+      cells: ['직전 기간 대비', `${parts.join(' · ')} — 직전 (${p.fromIso} ~ ${p.toIso}${close}`],
+      confidence: 'INFERRED',
+      evidence: [],
+    },
+  ]
+}
+
 /** 기간 서술(§3.5 결정론 문형) — 수집 meta 의 해석 결과만 재배열(날조 금지). */
 function wsRangeText(ws: WorkSummaryReport): string {
   const r = ws.range
@@ -844,6 +879,8 @@ function buildSiWorkSummary(input: DocInput): GeneratedDoc {
                 .map((m) => `${m.key}(±${m.linesChanged})`)
                 .join(', '),
         ]),
+        // 다주 추이(W6-b) — 증감은 여기서 파생 계산(산출물에 저장하지 않음, 설계 §13).
+        ...trendRows(ws),
         textRow([
           'RTM 진척',
           ws.rtmProgress === null
@@ -866,6 +903,7 @@ function buildSiWorkSummary(input: DocInput): GeneratedDoc {
     ['작성자 표기', '커밋 표의 작성자 열은 이력 투명성 목적(git 공개 정보) — 작성자별 실적 집계·분해는 제공하지 않는다(개인 평가 오용 방지, 설계 §9)'],
     ['모듈 귀속', '프로그램목록(W3) 도메인 조인 우선, 미포함 파일은 최상위 디렉터리 버킷 [추정]'],
     ['진척 원장', 'RTM = rtm-overrides.json audit[](확정 이벤트 CONFIRMED/CONFIRMED_NO_EDIT, 엔티티별 최초 확정만 전환으로 집계 — 재확정 중복 방지) · 문서 = .spec/docs/*.state.json audit[]. 원장은 작업트리의 현재 상태 — 과거 시점 스냅샷 복원은 하지 않음'],
+    ['추이 산정', '직전 기간 = 현재 윈도와 동일 길이·인접(주간 (from−길이, from] · 월간 직전 달력 월) — 경계 커밋은 정확히 한쪽에만 귀속(이중 계상 0). 증감은 두 윈도 수집치의 파생 계산이며, RTM/문서 진척 추이도 현재 원장 상태에서 두 윈도를 각각 집계한 것(재현 경계 동일). 커밋 범위 모드는 추이 없음'],
     ['재현', 'git 실적(커밋/파일/모듈)은 동일 커밋(HEAD)·동일 인자 재실행 시 byte 동일. **RTM/문서 진척은 원장의 현재 상태 기준** — 원장이 그새 자랐으면(확정 추가) 재실행 값이 달라진다(재현 경계, 설계 §3.4)'],
     ...(ws && ws.meta.prefix.length > 0
       ? [['하위 디렉터리 모드', `프로젝트가 레포 하위 경로(${ws.meta.prefix}) — git 경로 단순화로 머지 커밋이 과소 집계될 수 있음`]]

@@ -53,6 +53,7 @@ function fixtureReport(over?: Partial<WorkSummaryReport>): WorkSummaryReport {
       { key: 'order', source: 'program-inventory', commits: 1, files: 1, linesChanged: 8, topFiles: ['src/a.java'] },
       { key: 'src', source: 'dir', commits: 1, files: 1, linesChanged: 6, topFiles: ['src/a.java'] },
     ],
+    previous: null,
     rtmProgress: {
       functionsConfirmed: 2,
       scenariosConfirmed: 1,
@@ -114,6 +115,51 @@ describe('buildSiWorkSummary', () => {
     expect(rows[1].cells[5]).toBe('머지')
     expect(rows[1].confidence).toBe('INFERRED')
     expect(rows[1].evidence).toEqual([])
+  })
+
+  it('다주 추이(W6-b): 직전 기간 대비 행 — 증감 파생 계산, previous 없으면 행 없음', () => {
+    const noTrend = section({ ...BASE, workSummary: fixtureReport() }, 'ws-highlight')
+    expect(noTrend.table!.rows.some((r) => r.cells[0] === '직전 기간 대비')).toBe(false)
+
+    const withTrend = {
+      ...BASE,
+      workSummary: fixtureReport({
+        previous: {
+          fromIso: '2026-06-16T12:00:00.000Z',
+          toIso: '2026-06-23T12:00:00.000Z',
+          totals: {
+            commits: 5,
+            mergeCommits: 0,
+            authors: 1,
+            files: 4,
+            added: 100,
+            deleted: 20,
+            generated: { files: 0, added: 0, deleted: 0 },
+          },
+          rtmProgress: {
+            functionsConfirmed: 1,
+            scenariosConfirmed: 0,
+            requirementsConfirmed: 0,
+            functionsConfirmedIds: ['FN-z'],
+            scenariosConfirmedIds: [],
+            requirementsConfirmedIds: [],
+            confirmEvents: 1,
+            editEvents: 0,
+            auditlessEntities: 0,
+            suspectEntities: 0,
+            unparsableAt: 0,
+          },
+          docProgress: { submitted: 0, approved: 0, returned: 0, approvedDocs: [], unparsableAt: 0 },
+        },
+      }),
+    }
+    const hl = new Map(section(withTrend, 'ws-highlight').table!.rows.map((r) => [r.cells[0], r.cells[1]]))
+    const trend = hl.get('직전 기간 대비')!
+    expect(trend).toContain('커밋 5→2(-3)')
+    expect(trend).toContain('실적 라인 120→6(-114)')
+    expect(trend).toContain('RTM 전환 1→3(+2)')
+    expect(trend).toContain('문서 승인 0→1(+1)')
+    expect(trend).toContain('2026-06-16T12:00:00.000Z ~ 2026-06-23T12:00:00.000Z]') // weeks 반개구간 표기.
   })
 
   it('모듈 행: 도메인 조인 = 파일 근거 승계 [확정], 디렉터리 버킷 = 귀속 자체가 [추정]', () => {

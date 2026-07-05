@@ -158,10 +158,13 @@ export function resolvePreviousRange(range: ResolvedRange): ResolvedRange | null
   if (!m) return null
   const year = Number(m[1])
   const month = Number(m[2])
+  // 직전 달(1월 → 전년 12월 롤오버). rawArg 도 직전 달로 — 창과 라벨 불일치 방지(리뷰 T3).
+  const prevYear = month === 1 ? year - 1 : year
+  const prevMonth = month === 1 ? 12 : month - 1
   return {
     mode: 'month',
-    rawArg: range.rawArg,
-    fromIso: new Date(Date.UTC(year, month - 2, 1)).toISOString(),
+    rawArg: `${prevYear}-${String(prevMonth).padStart(2, '0')}`,
+    fromIso: new Date(Date.UTC(prevYear, prevMonth - 1, 1)).toISOString(),
     toIso: new Date(Date.UTC(year, month - 1, 1)).toISOString(),
     anchorSha: null,
   }

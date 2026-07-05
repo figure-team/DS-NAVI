@@ -159,7 +159,33 @@ describe('buildSiWorkSummary', () => {
     expect(trend).toContain('실적 라인 120→6(-114)')
     expect(trend).toContain('RTM 전환 1→3(+2)')
     expect(trend).toContain('문서 승인 0→1(+1)')
-    expect(trend).toContain('2026-06-16T12:00:00.000Z ~ 2026-06-23T12:00:00.000Z]') // weeks 반개구간 표기.
+    expect(trend).toContain('(2026-06-16T12:00:00.000Z ~ 2026-06-23T12:00:00.000Z]') // weeks (from,to].
+  })
+
+  it('다주 추이: 구버전 산출물(previous 키 부재)은 크래시 없이 행 생략(리뷰 T1)', () => {
+    const stale = fixtureReport() as Record<string, unknown>
+    delete stale.previous // raw JSON.parse 로드 경로의 구버전 형상 재현.
+    const doc = buildSiWorkSummary({ ...BASE, workSummary: stale as never })
+    const rows = doc.sections.find((s) => s.key === 'ws-highlight')!.table!.rows
+    expect(rows.some((r) => r.cells[0] === '직전 기간 대비')).toBe(false)
+  })
+
+  it('다주 추이: 월간은 [from, to) 표기(리뷰 T2)', () => {
+    const input = {
+      ...BASE,
+      workSummary: fixtureReport({
+        range: { mode: 'month', rawArg: '2026-06', fromIso: '2026-06-01T00:00:00.000Z', toIso: '2026-07-01T00:00:00.000Z', anchorSha: null },
+        previous: {
+          fromIso: '2026-05-01T00:00:00.000Z',
+          toIso: '2026-06-01T00:00:00.000Z',
+          totals: { commits: 1, mergeCommits: 0, authors: 1, files: 1, added: 2, deleted: 0, generated: { files: 0, added: 0, deleted: 0 } },
+          rtmProgress: null,
+          docProgress: null,
+        },
+      }),
+    }
+    const hl = new Map(section(input, 'ws-highlight').table!.rows.map((r) => [r.cells[0], r.cells[1]]))
+    expect(hl.get('직전 기간 대비')).toContain('[2026-05-01T00:00:00.000Z ~ 2026-06-01T00:00:00.000Z)')
   })
 
   it('모듈 행: 도메인 조인 = 파일 근거 승계 [확정], 디렉터리 버킷 = 귀속 자체가 [추정]', () => {

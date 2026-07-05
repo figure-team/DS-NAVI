@@ -124,11 +124,17 @@ if (existsSync(riskReportPath)) {
 
 // 실적 요약(W6)은 스캔 산출물에서 읽는다(없으면 null → si-실적요약보고서 현황 행 안내).
 // 주의: 기간은 understand-report 수집 시점의 해석 결과가 박제됨 — 새 기간은 재수집.
+// 스키마 검증(safeParse)으로 로드 — 구버전/형식 이탈 산출물은 크래시 대신 현황 행으로
+// degrade(W6-b 리뷰 T1: 빌더 크래시가 뒤 문서 전체 생성을 중단시키는 경로 차단).
 let workSummary = null
 const workSummaryPath = join(projectRoot, '.spec', 'map', 'work-summary.json')
 if (existsSync(workSummaryPath)) {
   try {
-    workSummary = JSON.parse(readFileSync(workSummaryPath, 'utf8'))
+    const parsed = engine.WorkSummaryReportSchema.safeParse(
+      JSON.parse(readFileSync(workSummaryPath, 'utf8')),
+    )
+    if (parsed.success) workSummary = parsed.data
+    else console.error('  work-summary.json 형식 불일치(구버전?) — understand-report 재실행 권장. 실적 문서는 현황 행으로 생성.')
   } catch {
     // 손상 시 null(정직 — 현황 행 안내).
   }

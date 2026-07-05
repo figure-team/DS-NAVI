@@ -91,6 +91,12 @@ describe('resolveRange / makeWindow', () => {
     const prevMonth = resolvePreviousRange(resolveRange({ mode: 'month', month: '2026-06' }, null))!
     expect(prevMonth.fromIso).toBe('2026-05-01T00:00:00.000Z')
     expect(prevMonth.toIso).toBe('2026-06-01T00:00:00.000Z')
+    expect(prevMonth.rawArg).toBe('2026-05') // 창과 라벨 일치(리뷰 T3).
+    // 1월 → 전년 12월 롤오버(리뷰 T4).
+    const janPrev = resolvePreviousRange(resolveRange({ mode: 'month', month: '2026-01' }, null))!
+    expect(janPrev.fromIso).toBe('2025-12-01T00:00:00.000Z')
+    expect(janPrev.toIso).toBe('2026-01-01T00:00:00.000Z')
+    expect(janPrev.rawArg).toBe('2025-12')
     expect(resolvePreviousRange(resolveRange({ mode: 'range', range: 'A..B' }, null))).toBeNull()
   })
 

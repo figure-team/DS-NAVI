@@ -793,7 +793,9 @@ const RTM_OVERLAY_FILE = '.understand-anything/rtm-overrides.json'
  */
 function trendRows(ws: WorkSummaryReport): TableRow[] {
   const p = ws.previous
-  if (p === null) return []
+  // 구버전 산출물(zod 미경유 raw 로드)은 previous 가 undefined — null 과 동일하게
+  // 행 생략으로 degrade(리뷰 T1: 크래시가 문서셋 전체 생성을 중단시키는 경로 차단).
+  if (!p) return []
   const delta = (cur: number, prev: number): string => {
     const d = cur - prev
     return `${prev}→${cur}(${d >= 0 ? '+' : ''}${d})`
@@ -812,10 +814,12 @@ function trendRows(ws: WorkSummaryReport): TableRow[] {
   if (ws.docProgress !== null && p.docProgress !== null) {
     parts.push(`문서 승인 ${delta(ws.docProgress.approved, p.docProgress.approved)}`)
   }
+  // 반개구간 표기는 양끝 모두 모드별(리뷰 T2) — weeks (from,to] · month [from,to).
+  const open = ws.range.mode === 'weeks' ? '(' : '['
   const close = ws.range.mode === 'weeks' ? ']' : ')'
   return [
     {
-      cells: ['직전 기간 대비', `${parts.join(' · ')} — 직전 (${p.fromIso} ~ ${p.toIso}${close}`],
+      cells: ['직전 기간 대비', `${parts.join(' · ')} — 직전 ${open}${p.fromIso} ~ ${p.toIso}${close}`],
       confidence: 'INFERRED',
       evidence: [],
     },

@@ -40,6 +40,8 @@ export {
   writeDomainGraph,
   uaDir,
   DOMAIN_GRAPH_FILENAME,
+  writeMapArtifact,
+  readMapArtifact,
 } from './domain-map/persist.js'
 export {
   normalizePath,

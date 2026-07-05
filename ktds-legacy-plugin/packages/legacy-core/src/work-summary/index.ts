@@ -149,6 +149,8 @@ export const WorkModuleSchema = z.object({
   commits: z.number().int().nonnegative(),
   files: z.number().int().nonnegative(),
   linesChanged: z.number().int().nonnegative(),
+  /** 변경 상위 파일(변경라인 DESC, path ASC, 최대 3) — 문서 행의 file 근거 승계용. */
+  topFiles: z.array(z.string()),
 })
 export type WorkModule = z.infer<typeof WorkModuleSchema>
 
@@ -373,7 +375,12 @@ function buildModules(
     : null
   const acc = new Map<
     string,
-    { source: WorkModule['source']; commits: Set<string>; files: Set<string>; lines: number }
+    {
+      source: WorkModule['source']
+      commits: Set<string>
+      fileLines: Map<string, number>
+      lines: number
+    }
   >()
   for (const c of commits) {
     for (const f of c.files) {
@@ -381,11 +388,11 @@ function buildModules(
       const mapKey = `${source}\x1f${key}`
       let cur = acc.get(mapKey)
       if (!cur) {
-        cur = { source, commits: new Set(), files: new Set(), lines: 0 }
+        cur = { source, commits: new Set(), fileLines: new Map(), lines: 0 }
         acc.set(mapKey, cur)
       }
       cur.commits.add(c.sha)
-      cur.files.add(f.path)
+      cur.fileLines.set(f.path, (cur.fileLines.get(f.path) ?? 0) + f.added + f.deleted)
       cur.lines += f.added + f.deleted
     }
   }
@@ -394,8 +401,12 @@ function buildModules(
       key: mapKey.slice(mapKey.indexOf('\x1f') + 1),
       source: v.source,
       commits: v.commits.size,
-      files: v.files.size,
+      files: v.fileLines.size,
       linesChanged: v.lines,
+      topFiles: [...v.fileLines.entries()]
+        .sort((a, b) => b[1] - a[1] || cmp(a[0], b[0]))
+        .slice(0, 3)
+        .map(([path]) => path),
     }))
     .sort((a, b) => b.linesChanged - a.linesChanged || cmp(a.key, b.key))
 }

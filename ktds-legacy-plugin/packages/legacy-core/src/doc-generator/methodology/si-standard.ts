@@ -880,8 +880,11 @@ function buildSiWorkSummary(input: DocInput): GeneratedDoc {
     }
   })
 
-  const moduleRows: TableRow[] = (ws?.modules ?? []).map(
-    (m): TableRow => ({
+  const moduleRows: TableRow[] = (ws?.modules ?? []).map((m): TableRow => {
+    // 변경 상위 파일을 근거로 승계 — 도메인 조인 행은 실측 귀속(CONFIRMED),
+    // 디렉터리 버킷은 귀속 자체가 관례 추정이라 파일 근거가 있어도 INFERRED.
+    const evidence: Evidence[] = m.topFiles.map((f) => ({ file: f, line: null }))
+    return {
       cells: [
         m.key,
         m.source === 'program-inventory' ? '프로그램목록 도메인 조인' : `최상위 디렉터리 ${INFERRED_CELL}`,
@@ -889,10 +892,10 @@ function buildSiWorkSummary(input: DocInput): GeneratedDoc {
         String(m.files),
         String(m.linesChanged),
       ],
-      confidence: 'INFERRED',
-      evidence: [],
-    }),
-  )
+      confidence: m.source === 'program-inventory' && evidence.length > 0 ? 'CONFIRMED' : 'INFERRED',
+      evidence,
+    }
+  })
 
   const progressRows: TableRow[] = []
   if (ws) {

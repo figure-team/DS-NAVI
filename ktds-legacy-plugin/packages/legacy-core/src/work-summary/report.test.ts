@@ -123,8 +123,8 @@ describe('buildWorkSummary', () => {
       ...emptyLedgers,
     })
     expect(report.modules).toEqual([
-      { key: 'docs', source: 'dir', commits: 1, files: 1, linesChanged: 10 },
-      { key: 'src', source: 'dir', commits: 2, files: 1, linesChanged: 10 },
+      { key: 'docs', source: 'dir', commits: 1, files: 1, linesChanged: 10, topFiles: ['docs/readme.md'] },
+      { key: 'src', source: 'dir', commits: 2, files: 1, linesChanged: 10, topFiles: ['src/a.java'] },
     ])
   })
 
@@ -145,8 +145,8 @@ describe('buildWorkSummary', () => {
     expect(report.meta.moduleSource).toBe('program-inventory')
     // 동점(linesChanged) tie-break = key ASC.
     expect(report.modules).toEqual([
-      { key: 'docs', source: 'dir', commits: 1, files: 1, linesChanged: 10 },
-      { key: 'order', source: 'program-inventory', commits: 2, files: 1, linesChanged: 10 },
+      { key: 'docs', source: 'dir', commits: 1, files: 1, linesChanged: 10, topFiles: ['docs/readme.md'] },
+      { key: 'order', source: 'program-inventory', commits: 2, files: 1, linesChanged: 10, topFiles: ['src/a.java'] },
     ])
   })
 

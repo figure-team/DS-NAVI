@@ -41,7 +41,10 @@ function fixtureReport(over?: Partial<WorkSummaryReport>): WorkSummaryReport {
       },
     ],
     totals: { commits: 2, mergeCommits: 1, authors: 1, files: 1, added: 5, deleted: 1 },
-    modules: [{ key: 'src', source: 'dir', commits: 1, files: 1, linesChanged: 6 }],
+    modules: [
+      { key: 'order', source: 'program-inventory', commits: 1, files: 1, linesChanged: 8, topFiles: ['src/a.java'] },
+      { key: 'src', source: 'dir', commits: 1, files: 1, linesChanged: 6, topFiles: ['src/a.java'] },
+    ],
     rtmProgress: {
       functionsConfirmed: 2,
       scenariosConfirmed: 1,
@@ -78,7 +81,7 @@ describe('buildSiWorkSummary', () => {
     expect(byKey.get('기간')).toContain('최근 1주')
     expect(byKey.get('기간')).toContain('2026-06-23T12:00:00.000Z')
     expect(byKey.get('실적')).toBe('커밋 2건(작성자 1명, 머지 1건), 파일 1개 변경(+5/−1)')
-    expect(byKey.get('변경 상위 모듈')).toBe('src(±6)')
+    expect(byKey.get('변경 상위 모듈')).toBe('order(±8), src(±6)')
     expect(byKey.get('RTM 진척')).toBe('추정→확정 전환 3건(기능 2 · 시나리오 1 · 요구사항 0)')
     expect(byKey.get('문서 진척')).toBe('제출 1 · 승인 1 · 반려 0')
   })
@@ -93,6 +96,17 @@ describe('buildSiWorkSummary', () => {
     expect(rows[1].cells[5]).toBe('머지')
     expect(rows[1].confidence).toBe('INFERRED')
     expect(rows[1].evidence).toEqual([])
+  })
+
+  it('모듈 행: 도메인 조인 = 파일 근거 승계 [확정], 디렉터리 버킷 = 귀속 자체가 [추정]', () => {
+    const input = { ...BASE, workSummary: fixtureReport() }
+    const rows = section(input, 'ws-modules').table!.rows
+    expect(rows[0].cells[0]).toBe('order')
+    expect(rows[0].confidence).toBe('CONFIRMED')
+    expect(rows[0].evidence).toEqual([{ file: 'src/a.java', line: null }])
+    expect(rows[1].cells[0]).toBe('src')
+    expect(rows[1].confidence).toBe('INFERRED') // 파일 근거가 있어도 귀속이 관례 추정.
+    expect(rows[1].evidence).toEqual([{ file: 'src/a.java', line: null }])
   })
 
   it('진척 행: 원장 파일을 근거로 승계(CONFIRMED)', () => {

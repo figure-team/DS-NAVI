@@ -112,15 +112,26 @@ async function runScan() {
 /** W9 언어 지원 보고 — 핵심 구조분석 미지원 소스는 침묵 대신 경고(정직성). */
 function reportLangSupport(coverage) {
   const ls = coverage?.langSupport
-  if (!ls || ls.unsupportedFiles === 0) return
-  const detail = ls.byLang
-    .filter((l) => l.best === 'none')
-    .map((l) => `${l.lang} ${l.files}`)
-    .join(' · ')
-  console.log(
-    `  ⚠️ 스캐너 미지원 소스 ${ls.unsupportedFiles}파일 [미확인] — ${detail}` +
-      ' (어떤 스캐너도 덮지 않음: docs/ktds/COVERAGE_MATRIX.md 지원 수준 참조)',
-  )
+  if (!ls) return
+  if (ls.unsupportedFiles > 0) {
+    const detail = ls.byLang
+      .filter((l) => l.best === 'none')
+      .map((l) => `${l.lang} ${l.files}`)
+      .join(' · ')
+    console.log(
+      `  ⚠️ 스캐너 미지원 소스 ${ls.unsupportedFiles}파일 [미확인] — ${detail}` +
+        ' (어떤 스캐너도 덮지 않음: docs/ktds/COVERAGE_MATRIX.md 지원 수준 참조)',
+    )
+  }
+  if (ls.partialFiles > 0) {
+    const detail = ls.byLang
+      .filter((l) => l.best === 'partial')
+      .map((l) => `${l.lang} ${l.files}`)
+      .join(' · ')
+    console.log(
+      `  ◐ 부분 지원 소스 ${ls.partialFiles}파일 — ${detail} (좁은 관용구만 스캔, 범위는 COVERAGE_MATRIX.md 비고)`,
+    )
+  }
 }
 
 /** W8 증분 캐시 보고 — 재사용/재추출 건수(파일단위 팩트, 정직성 표기). */

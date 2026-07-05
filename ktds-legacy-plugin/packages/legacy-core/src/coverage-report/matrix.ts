@@ -97,8 +97,10 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
       java: { tier: 'full', note: '클라이언트 카탈로그(HTTP/WS/MQ/파일/소켓/메일)+config seam' },
       xml: { tier: 'partial', note: 'db-link 신호만' },
       sql: { tier: 'partial', note: 'db-link 신호만' },
-      properties: { tier: 'partial', note: '${…} endpoint 플레이스홀더 해석 보조(항목 생산 없음)' },
     },
+    // 리뷰 C8: 산출물에 나타나지 않는 "해석 보조"는 tier 축(산출 기준)과 분리해 각주로.
+    exceptions:
+      'properties 는 ${…} endpoint 플레이스홀더 해석의 입력 보조일 뿐 항목을 생산하지 않음(산출 기준 none)',
   },
   {
     key: 'jpa',
@@ -110,11 +112,16 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
   {
     key: 'db-schema',
     label: 'DB 스키마',
+    // 산출 스트림 2개: tables(.sql DDL/dataload) + liveDbSignals(빌드/설정 파일의
+    // jdbc URL·드라이버 의존성 — discover.ts). java 는 어느 스트림에도 기여하지 않아
+    // 행 없음(리뷰 C2 — 실코드 근거 없는 과대 주장 삭제).
     byLang: {
-      sql: { tier: 'full', note: 'CREATE TABLE DDL·COMMENT·dataload INSERT' },
-      java: { tier: 'partial', note: '라이브 DB 연결 신호(정적 탐지) 보조' },
-      xml: { tier: 'partial', note: '라이브 DB 연결 신호 보조' },
-      properties: { tier: 'partial', note: '라이브 DB 연결 신호 보조' },
+      sql: { tier: 'full', note: 'CREATE TABLE DDL·COMMENT·dataload INSERT(tables)' },
+      xml: { tier: 'partial', note: 'liveDbSignals — pom.xml 드라이버 의존성·설정 jdbc URL' },
+      properties: { tier: 'partial', note: 'liveDbSignals — 설정 jdbc URL' },
+      yaml: { tier: 'partial', note: 'liveDbSignals — 설정 jdbc URL(application.yml 등)' },
+      gradle: { tier: 'partial', note: 'liveDbSignals — *.gradle 드라이버 의존성' },
+      kts: { tier: 'partial', note: 'liveDbSignals — *.gradle.kts 드라이버 의존성' },
     },
   },
   {
@@ -127,39 +134,66 @@ export const COVERAGE_MATRIX: CapabilityCoverage[] = [
 ]
 
 /**
- * 분석 유관 소스 언어 — census 에 등장하면 "구조분석 대상일 것으로 기대되는" 언어.
- * 여기 있는데 핵심 기능이 전부 none 이면 미지원으로 **센다**(침묵 누락 금지).
- * 문서/설정/마크업(md·html·css·json·yaml 등)은 대상 아님.
- * (미지 확장자는 census 가 확장자 자체를 lang 으로 쓴다 — pc/pks/pkb/cbl 등 레거시
- * 확장자를 여기 등재해 두면 등장 즉시 미지원으로 표면화된다.)
+ * 계상 **제외** 언어(denylist) — 문서/마크업/자산/데이터/순수 설정.
+ * 미지원 판정은 "여기 없는 모든 언어"가 대상이다: 화이트리스트였던 초기 설계는
+ * 미등재 레거시 언어(asp·vb·jcl·rpg 등)가 계상 밖으로 새는 새 침묵 사각을 만들었다
+ * (리뷰 C3) — 방향을 뒤집어 **모르는 언어일수록 표면화**되게 한다.
+ * (census 는 미지 확장자를 확장자 자체로 lang 화하므로 .vb 가 오면 lang='vb' 로 등장
+ * → 여기 없음 → 미지원 계상.)
+ *
+ * 알려진 한계(정직): 확장자 없는 파일(lang='other' — LICENSE/Makefile/Dockerfile/
+ * crontab 등)은 소스/비소스가 섞여 계상하지 않는다. crontab 은 batch 가 경로 관례로
+ * 별도 탐지(매트릭스 exceptions).
  */
-export const ANALYSIS_RELEVANT_LANGS: ReadonlySet<string> = new Set([
-  'java',
-  'xml',
-  'jsp',
-  'sql',
-  'typescript',
-  'tsx',
-  'javascript',
-  'kotlin',
-  'python',
-  'sh',
-  'bat',
-  'cmd',
-  'groovy',
-  'scala',
-  'cs',
-  'c',
-  'cpp',
-  'go',
-  'rb',
-  'php',
-  // 레거시 SI 단골 — Pro*C / PL/SQL 패키지 / COBOL
-  'pc',
-  'pks',
-  'pkb',
-  'cbl',
-  'cob',
+export const NON_ANALYSIS_LANGS: ReadonlySet<string> = new Set([
+  // 문서/마크업
+  'md',
+  'markdown',
+  'html',
+  'htm',
+  'css',
+  'scss',
+  'less',
+  'txt',
+  'rst',
+  'adoc',
+  // 데이터/스키마 텍스트(코드 아님)
+  'json',
+  'jsonc',
+  'csv',
+  'tsv',
+  'xsd',
+  'dtd',
+  // 순수 설정(매트릭스에 산출 행이 있으면 그 행으로 다뤄짐 — yaml/properties 는
+  // db-schema liveDbSignals partial 로 등재돼 있어 "미지원" 아님. 계상 축(소스 지원
+  // 헤드라인)에서는 제외해 설정 파일 수가 소스 지표를 흐리지 않게 한다)
+  'yaml',
+  'properties',
+  'ini',
+  'toml',
+  'conf',
+  'env',
+  // 자산/바이너리/생성물
+  'svg',
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'ico',
+  'webp',
+  'pdf',
+  'woff',
+  'woff2',
+  'ttf',
+  'eot',
+  'map',
+  'lock',
+  'jar',
+  'class',
+  'war',
+  'zip',
+  // 확장자 없음(소스/비소스 혼재 — 상단 한계 참조)
+  'other',
 ])
 
 /** 핵심 구조분석 기능 — 전부 none 인 언어의 파일이 "핵심 미지원" 카운트 대상. */
@@ -210,12 +244,17 @@ export interface LangSupportRow {
 
 export interface LangSupport {
   /**
-   * **어떤 기능도 덮지 않는**(best=none) 분석 유관 언어 파일 총수 — 진짜 침묵 사각.
+   * **어떤 기능도 덮지 않는**(best=none) 소스 언어 파일 총수 — 진짜 침묵 사각.
    * (sql 처럼 구조분석은 없어도 db-schema 가 덮는 언어는 여기 안 센다 — 실측에서
    *  sql/cmd 오보로 드러난 초기 정의(core 기준)를 정정.)
    */
   unsupportedFiles: number
-  /** census 에 존재하는 분석 유관 언어만(lang 정렬). */
+  /**
+   * 부분 지원(best=partial) 언어 파일 총수 — "좁은 관용구만 스캔"을 지원으로
+   * 오독하지 않게 별도 표면화(리뷰 C6: 500줄 셸 + java 실행 1줄 = '지원' 착시 방지).
+   */
+  partialFiles: number
+  /** census 에 존재하는 계상 대상 언어만(lang 정렬). */
   byLang: LangSupportRow[]
 }
 
@@ -223,7 +262,8 @@ export interface LangSupport {
 export function computeLangSupport(census: CensusReport): LangSupport {
   const counts = new Map<string, number>()
   for (const f of census.files) {
-    if (!ANALYSIS_RELEVANT_LANGS.has(f.lang)) continue
+    // denylist — 여기 없는 모든 언어(미지 확장자 포함)가 계상 대상(리뷰 C3).
+    if (NON_ANALYSIS_LANGS.has(f.lang)) continue
     counts.set(f.lang, (counts.get(f.lang) ?? 0) + 1)
   }
   const byLang: LangSupportRow[] = [...counts.entries()]
@@ -238,7 +278,10 @@ export function computeLangSupport(census: CensusReport): LangSupport {
   const unsupportedFiles = byLang
     .filter((r) => r.best === 'none')
     .reduce((n, r) => n + r.files, 0)
-  return { unsupportedFiles, byLang }
+  const partialFiles = byLang
+    .filter((r) => r.best === 'partial')
+    .reduce((n, r) => n + r.files, 0)
+  return { unsupportedFiles, partialFiles, byLang }
 }
 
 const TIER_MARK: Record<CoverageTier, string> = { full: '●', partial: '◐', none: '—' }
@@ -266,11 +309,13 @@ export function renderCoverageMatrixMd(): string {
     '- ◐ partial — 특정 관용구/프레임워크/파일 관례만(범위를 비고에 명기)',
     '- — none — 산출물에 절대 나타나지 않아야 함(두 타깃 실측 검증 대상). 표에 없는 언어의 기본값',
     '',
-    '미지원 표면화: 분석 유관 소스 언어(kotlin·python·Pro*C(pc)·PL/SQL(pks/pkb)·COBOL(cbl) 등)가',
-    '감지됐는데 **어떤 기능도 덮지 않으면** 침묵 누락 대신 coverage.json',
-    '`langSupport.unsupportedFiles` 로 "미지원 N건 [미확인]" 이 계상되고 스캔 출력·커버리지',
-    '리포트에 경고가 뜬다. (구조분석(routes·edges·complexity) 요약은 행별 `core` tier 로 노출 —',
-    '예: sql 은 db-schema 로 덮이므로 미지원이 아니지만 core=none.)',
+    '미지원 표면화: 문서/자산/순수 설정(denylist)을 제외한 **모든** 소스 언어가 계상 대상이다 —',
+    '미지 확장자(asp·vb·jcl·rpg 등 미등재 레거시 포함)일수록 표면화된다. 어떤 기능도 덮지 않는',
+    '언어(best=none)는 coverage.json `langSupport.unsupportedFiles` 로 "미지원 N건 [미확인]",',
+    '좁은 관용구만 스캔되는 언어(best=partial)는 `partialFiles` 로 "부분 지원 N건" 이 계상되고',
+    '스캔 출력·커버리지 리포트에 노출된다. 구조분석(routes·edges·complexity) 요약은 행별',
+    '`core` tier — 예: sql 은 db-schema 로 덮여 미지원은 아니지만 core=none.',
+    '알려진 한계: 확장자 없는 파일(lang=other, LICENSE/Makefile 등)은 소스/비소스 혼재로 계상하지 않는다.',
     '',
     '## 기능 × 언어',
     '',

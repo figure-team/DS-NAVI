@@ -10,24 +10,26 @@
 - ◐ partial — 특정 관용구/프레임워크/파일 관례만(범위를 비고에 명기)
 - — none — 산출물에 절대 나타나지 않아야 함(두 타깃 실측 검증 대상). 표에 없는 언어의 기본값
 
-미지원 표면화: 분석 유관 소스 언어(kotlin·python·Pro*C(pc)·PL/SQL(pks/pkb)·COBOL(cbl) 등)가
-감지됐는데 **어떤 기능도 덮지 않으면** 침묵 누락 대신 coverage.json
-`langSupport.unsupportedFiles` 로 "미지원 N건 [미확인]" 이 계상되고 스캔 출력·커버리지
-리포트에 경고가 뜬다. (구조분석(routes·edges·complexity) 요약은 행별 `core` tier 로 노출 —
-예: sql 은 db-schema 로 덮이므로 미지원이 아니지만 core=none.)
+미지원 표면화: 문서/자산/순수 설정(denylist)을 제외한 **모든** 소스 언어가 계상 대상이다 —
+미지 확장자(asp·vb·jcl·rpg 등 미등재 레거시 포함)일수록 표면화된다. 어떤 기능도 덮지 않는
+언어(best=none)는 coverage.json `langSupport.unsupportedFiles` 로 "미지원 N건 [미확인]",
+좁은 관용구만 스캔되는 언어(best=partial)는 `partialFiles` 로 "부분 지원 N건" 이 계상되고
+스캔 출력·커버리지 리포트에 노출된다. 구조분석(routes·edges·complexity) 요약은 행별
+`core` tier — 예: sql 은 db-schema 로 덮여 미지원은 아니지만 core=none.
+알려진 한계: 확장자 없는 파일(lang=other, LICENSE/Makefile 등)은 소스/비소스 혼재로 계상하지 않는다.
 
 ## 기능 × 언어
 
-| 기능 | bat | cmd | java | javascript | jsp | properties | sh | sql | tsx | typescript | xml |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 진입점(라우트) | — | — | ● | ◐ | ◐ | — | — | — | ◐ | ◐ | ◐ |
-| 배치 진입점 | ◐ | ◐ | ● | — | — | — | ◐ | — | — | — | ◐ |
-| 구조 의존(엣지) | — | — | ● | — | — | — | — | — | — | — | ◐ |
-| 메서드 호출 그래프 | — | — | ● | — | — | — | — | — | — | — | — |
-| 대외 인터페이스 | — | — | ● | — | — | ◐ | — | ◐ | — | — | ◐ |
-| JPA/Spring Data | — | — | ● | — | — | — | — | — | — | — | — |
-| DB 스키마 | — | — | ◐ | — | — | ◐ | — | ● | — | — | ◐ |
-| 복잡도(위험 리포트) | — | — | ● | — | — | — | — | — | — | — | — |
+| 기능 | bat | cmd | gradle | java | javascript | jsp | kts | properties | sh | sql | tsx | typescript | xml | yaml |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 진입점(라우트) | — | — | — | ● | ◐ | ◐ | — | — | — | — | ◐ | ◐ | ◐ | — |
+| 배치 진입점 | ◐ | ◐ | — | ● | — | — | — | — | ◐ | — | — | — | ◐ | — |
+| 구조 의존(엣지) | — | — | — | ● | — | — | — | — | — | — | — | — | ◐ | — |
+| 메서드 호출 그래프 | — | — | — | ● | — | — | — | — | — | — | — | — | — | — |
+| 대외 인터페이스 | — | — | — | ● | — | — | — | — | — | ◐ | — | — | ◐ | — |
+| JPA/Spring Data | — | — | — | ● | — | — | — | — | — | — | — | — | — | — |
+| DB 스키마 | — | — | ◐ | — | — | — | ◐ | ◐ | — | ● | — | — | ◐ | ◐ |
+| 복잡도(위험 리포트) | — | — | — | ● | — | — | — | — | — | — | — | — | — | — |
 
 ## 비고(범위·한계 근거)
 
@@ -61,9 +63,9 @@
 ### 대외 인터페이스 (`interfaces`)
 
 - java: ● full — 클라이언트 카탈로그(HTTP/WS/MQ/파일/소켓/메일)+config seam
-- properties: ◐ partial — ${…} endpoint 플레이스홀더 해석 보조(항목 생산 없음)
 - sql: ◐ partial — db-link 신호만
 - xml: ◐ partial — db-link 신호만
+- (예외) properties 는 ${…} endpoint 플레이스홀더 해석의 입력 보조일 뿐 항목을 생산하지 않음(산출 기준 none)
 
 ### JPA/Spring Data (`jpa`)
 
@@ -71,10 +73,12 @@
 
 ### DB 스키마 (`db-schema`)
 
-- java: ◐ partial — 라이브 DB 연결 신호(정적 탐지) 보조
-- properties: ◐ partial — 라이브 DB 연결 신호 보조
-- sql: ● full — CREATE TABLE DDL·COMMENT·dataload INSERT
-- xml: ◐ partial — 라이브 DB 연결 신호 보조
+- gradle: ◐ partial — liveDbSignals — *.gradle 드라이버 의존성
+- kts: ◐ partial — liveDbSignals — *.gradle.kts 드라이버 의존성
+- properties: ◐ partial — liveDbSignals — 설정 jdbc URL
+- sql: ● full — CREATE TABLE DDL·COMMENT·dataload INSERT(tables)
+- xml: ◐ partial — liveDbSignals — pom.xml 드라이버 의존성·설정 jdbc URL
+- yaml: ◐ partial — liveDbSignals — 설정 jdbc URL(application.yml 등)
 
 ### 복잡도(위험 리포트) (`complexity`)
 

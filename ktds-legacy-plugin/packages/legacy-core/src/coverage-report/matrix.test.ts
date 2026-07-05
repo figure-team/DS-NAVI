@@ -41,25 +41,45 @@ describe('coverage-matrix — 지원 수준 선언·미지원 표면화 (W9)', (
     expect(coreTierOf('sql')).toBe('none')
     expect(bestTierOf('kotlin')).toBe('none')
     expect(bestTierOf('java')).toBe('full')
+    // C1/C2 정정 고정: yaml/gradle 은 liveDbSignals 산출 언어(partial), java 는 db-schema 행 없음.
+    expect(tierOf('db-schema', 'yaml')).toBe('partial')
+    expect(tierOf('db-schema', 'gradle')).toBe('partial')
+    expect(tierOf('db-schema', 'java')).toBe('none')
+    // C8 정정 고정: properties 는 interfaces 산출을 생산하지 않는다(해석 보조 각주).
+    expect(tierOf('interfaces', 'properties')).toBe('none')
   })
 
-  it('computeLangSupport: kotlin/Pro*C 만 미지원으로 세고 sql/cmd 는 세지 않는다', () => {
+  it('computeLangSupport: kotlin/Pro*C 는 미지원, cmd 는 부분 지원, sql/md 는 미지원 아님', () => {
     writeFile(root, 'src/A.java', 'public class A {}\n')
     writeFile(root, 'src/B.kt', 'class B\n')
     writeFile(root, 'src/C.kt', 'class C\n')
     writeFile(root, 'src/legacy/D.pc', 'EXEC SQL SELECT 1;\n')
     writeFile(root, 'db/schema.sql', 'CREATE TABLE t (id INT);\n')
     writeFile(root, 'bin/run.cmd', 'java -jar app.jar\n')
-    writeFile(root, 'README.md', '# 문서 — 분석 유관 아님\n')
+    writeFile(root, 'README.md', '# 문서 — denylist 제외\n')
 
     const ls = computeLangSupport(buildCensus(root))
     expect(ls.unsupportedFiles).toBe(3) // kotlin 2 + pc 1 (sql/cmd/md 제외)
+    expect(ls.partialFiles).toBe(1) // cmd — 좁은 관용구(batch)만이라 별도 표면화(C6)
     const byLang = Object.fromEntries(ls.byLang.map((r) => [r.lang, r]))
     expect(byLang['kotlin']).toMatchObject({ files: 2, best: 'none', core: 'none' })
     expect(byLang['pc']).toMatchObject({ files: 1, best: 'none' })
     expect(byLang['sql']).toMatchObject({ best: 'full', core: 'none' })
     expect(byLang['cmd']).toMatchObject({ best: 'partial' })
-    expect(byLang['md']).toBeUndefined() // 분석 유관 언어 아님 — 계상 밖(문서류)
+    expect(byLang['md']).toBeUndefined() // denylist(문서류) — 계상 밖
+  })
+
+  it('denylist 뒤집기(C3): 미등재 레거시 확장자(.vb)도 등장 즉시 미지원으로 센다', () => {
+    writeFile(root, 'src/A.java', 'public class A {}\n')
+    writeFile(root, 'legacy/Old.vb', "Module Old\nEnd Module\n")
+    writeFile(root, 'legacy/JOB1.jcl', '//JOB1 JOB\n')
+    writeFile(root, 'config/app.yaml', 'db:\n  url: jdbc:mysql://x\n') // 순수 설정 — 계상 밖
+    const ls = computeLangSupport(buildCensus(root))
+    expect(ls.unsupportedFiles).toBe(2) // vb 1 + jcl 1
+    const langs = ls.byLang.map((r) => r.lang)
+    expect(langs).toContain('vb')
+    expect(langs).toContain('jcl')
+    expect(langs).not.toContain('yaml')
   })
 
   it('java 뿐인 프로젝트는 미지원 0건', () => {

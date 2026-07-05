@@ -110,6 +110,7 @@ export const CoverageReportSchema = z.object({
   langSupport: z
     .object({
       unsupportedFiles: z.number().int().nonnegative(),
+      partialFiles: z.number().int().nonnegative(),
       byLang: z.array(
         z.object({
           lang: z.string(),
@@ -249,6 +250,16 @@ export function renderCoverageReport(r: CoverageReport): string {
               .map((l) => `${l.lang} ${l.files}`)
               .join(' · ') +
             ' (어떤 스캐너도 덮지 않음 — docs/ktds/COVERAGE_MATRIX.md 지원 수준 참조)',
+        ]
+      : []),
+    ...(r.langSupport && r.langSupport.partialFiles > 0
+      ? [
+          `  ◐ 부분 지원 소스 ${r.langSupport.partialFiles}파일 — ` +
+            r.langSupport.byLang
+              .filter((l) => l.best === 'partial')
+              .map((l) => `${l.lang} ${l.files}`)
+              .join(' · ') +
+            ' (좁은 관용구만 스캔 — "지원"으로 오독 금지, 범위는 COVERAGE_MATRIX.md 비고)',
         ]
       : []),
     `- 계층 해소율: ${r.layers.rate}% (해소 ${r.layers.resolved} / 미해소 ${r.layers.unknown})`,

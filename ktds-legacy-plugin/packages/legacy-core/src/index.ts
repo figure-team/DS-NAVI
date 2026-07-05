@@ -301,7 +301,7 @@ export {
 export type { CoverageReport, CoverageInputs } from './coverage-report/index.js'
 export {
   COVERAGE_MATRIX,
-  ANALYSIS_RELEVANT_LANGS,
+  NON_ANALYSIS_LANGS,
   CORE_CAPABILITIES,
   tierOf,
   coreTierOf,

@@ -40,7 +40,15 @@ function fixtureReport(over?: Partial<WorkSummaryReport>): WorkSummaryReport {
         files: [],
       },
     ],
-    totals: { commits: 2, mergeCommits: 1, authors: 1, files: 1, added: 5, deleted: 1 },
+    totals: {
+      commits: 2,
+      mergeCommits: 1,
+      authors: 1,
+      files: 1,
+      added: 5,
+      deleted: 1,
+      generated: { files: 0, added: 0, deleted: 0 },
+    },
     modules: [
       { key: 'order', source: 'program-inventory', commits: 1, files: 1, linesChanged: 8, topFiles: ['src/a.java'] },
       { key: 'src', source: 'dir', commits: 1, files: 1, linesChanged: 6, topFiles: ['src/a.java'] },
@@ -49,13 +57,23 @@ function fixtureReport(over?: Partial<WorkSummaryReport>): WorkSummaryReport {
       functionsConfirmed: 2,
       scenariosConfirmed: 1,
       requirementsConfirmed: 0,
+      functionsConfirmedIds: ['FN-a', 'FN-b'],
+      scenariosConfirmedIds: ['TS-1'],
+      requirementsConfirmedIds: [],
       confirmEvents: 4,
       editEvents: 1,
       auditlessEntities: 0,
+      suspectEntities: 0,
       unparsableAt: 0,
     },
     docProgress: { submitted: 1, approved: 1, returned: 0, approvedDocs: ['si-기능명세서'], unparsableAt: 0 },
-    meta: { gitAvailable: true, gitStatus: 'ok', prefix: '', moduleSource: 'dir' },
+    meta: {
+      gitAvailable: true,
+      gitStatus: 'ok',
+      prefix: '',
+      moduleSource: 'dir',
+      generatedPatterns: ['.understand-anything/'],
+    },
     ...over,
   }
 }
@@ -114,6 +132,7 @@ describe('buildSiWorkSummary', () => {
     const rows = section(input, 'ws-progress').table!.rows
     const fn = rows.find((r) => r.cells[0] === 'RTM 확정 전환(기능)')!
     expect(fn.cells[1]).toBe('2')
+    expect(fn.cells[2]).toContain('FN-a, FN-b') // "무엇이 확정됐나" id 나열(리뷰 C4).
     expect(fn.confidence).toBe('CONFIRMED')
     expect(fn.evidence).toEqual([{ file: '.understand-anything/rtm-overrides.json', line: null }])
     const doc = rows.find((r) => r.cells[0] === '문서 제출/승인/반려')!
@@ -143,14 +162,57 @@ describe('buildSiWorkSummary', () => {
       ...BASE,
       workSummary: fixtureReport({
         commits: [],
-        totals: { commits: 0, mergeCommits: 0, authors: 0, files: 0, added: 0, deleted: 0 },
+        totals: {
+          commits: 0,
+          mergeCommits: 0,
+          authors: 0,
+          files: 0,
+          added: 0,
+          deleted: 0,
+          generated: { files: 0, added: 0, deleted: 0 },
+        },
         modules: [],
-        meta: { gitAvailable: false, gitStatus: 'shallow', prefix: '', moduleSource: 'dir' },
+        meta: {
+          gitAvailable: false,
+          gitStatus: 'shallow',
+          prefix: '',
+          moduleSource: 'dir',
+          generatedPatterns: ['.understand-anything/'],
+        },
       }),
     }
     const hl = new Map(section(input, 'ws-highlight').table!.rows.map((r) => [r.cells[0], r.cells[1]]))
     expect(hl.get('실적')).toContain('[미확인]')
     expect(hl.get('실적')).toContain('shallow')
+  })
+
+  it('생성물 분리 표기 + 하위 디렉터리 모드 캐비엇(리뷰 C1/C7)', () => {
+    const input = {
+      ...BASE,
+      workSummary: fixtureReport({
+        totals: {
+          commits: 2,
+          mergeCommits: 1,
+          authors: 1,
+          files: 1,
+          added: 5,
+          deleted: 1,
+          generated: { files: 3, added: 13000, deleted: 10 },
+        },
+        meta: {
+          gitAvailable: true,
+          gitStatus: 'ok',
+          prefix: 'examples/jpetstore-6/',
+          moduleSource: 'dir',
+          generatedPatterns: ['.understand-anything/'],
+        },
+      }),
+    }
+    const hl = new Map(section(input, 'ws-highlight').table!.rows.map((r) => [r.cells[0], r.cells[1]]))
+    expect(hl.get('실적')).toContain('생성물/산출물 별도 3개(+13000/−10) — 실적 아님')
+    const criteria = section(input, 'ws-criteria').table!.rows.map((r) => r.cells[0])
+    expect(criteria).toContain('하위 디렉터리 모드') // 머지 과소 캐비엇(리뷰 C7).
+    expect(criteria).toContain('실적 vs 생성물')
   })
 
   it('근거 게이트: 무근거 CONFIRMED 0(저장 차단 위반 없음)', () => {

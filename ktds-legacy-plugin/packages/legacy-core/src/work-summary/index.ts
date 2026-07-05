@@ -23,10 +23,38 @@ import { cmp } from '../utils/cmp.js'
 import type { WorkLogCommit, WorkLogResult } from './collect.js'
 
 export { collectWorkLog } from './collect.js'
-export type { WorkLogCommit, WorkLogFile, WorkLogResult } from './collect.js'
+export type { CollectWorkLogOptions, WorkLogCommit, WorkLogFile, WorkLogResult } from './collect.js'
 
 /** `.spec/map/` 실적 요약 파일명. */
 export const WORK_SUMMARY_FILENAME = 'work-summary.json'
+
+/**
+ * 생성물/산출물 경로 패턴(리뷰 C1) — churn 은 사실이지만 실적이 아니다: 도구가 생성해
+ * 커밋한 산출물(분석 JSON·doc-output·lock 파일)이 헤드라인 "변경 상위 모듈"을 지배하면
+ * 사람 작업 실적이 왜곡된다(이 레포 실측: screens.json 13,230줄이 1위). 제외가 아니라
+ * **분리 집계**한다 — totals.generated 로 표면화(침묵 누락 금지). 패턴은 meta 에 박제.
+ */
+export const GENERATED_PATH_PATTERNS: readonly string[] = [
+  '.understand-anything/',
+  '.spec/',
+  'dist/',
+  'node_modules/',
+  'pnpm-lock.yaml',
+  'package-lock.json',
+  'yarn.lock',
+]
+
+/** 경로가 생성물 패턴에 걸리는가 — 디렉터리 패턴(`x/`)은 세그먼트 접두, 파일 패턴은 basename 일치. */
+export function isGeneratedPath(path: string): boolean {
+  for (const pat of GENERATED_PATH_PATTERNS) {
+    if (pat.endsWith('/')) {
+      if (path.startsWith(pat) || path.includes(`/${pat}`)) return true
+    } else if (path === pat || path.endsWith(`/${pat}`)) {
+      return true
+    }
+  }
+  return false
+}
 
 /** 확정 이벤트 어휘 — 기록처(대시보드 dev 서버)의 audit event 문자열과 일치해야 한다. */
 export const CONFIRM_EVENTS: ReadonlySet<string> = new Set(['CONFIRMED', 'CONFIRMED_NO_EDIT'])
@@ -154,16 +182,28 @@ export const WorkModuleSchema = z.object({
 })
 export type WorkModule = z.infer<typeof WorkModuleSchema>
 
+/** 전환 엔티티 id 나열 상한 — 초과분은 count 로만(문서 표 폭주 방지, 리뷰 C4). */
+export const CONFIRMED_IDS_CAP = 20
+
 export const RtmProgressSchema = z.object({
   /** 윈도 내 최초 확정 엔티티 수(추정→확정 전환). */
   functionsConfirmed: z.number().int().nonnegative(),
   scenariosConfirmed: z.number().int().nonnegative(),
   requirementsConfirmed: z.number().int().nonnegative(),
+  /** 전환 엔티티 id(ASC, 상한 CONFIRMED_IDS_CAP) — "무엇이 확정됐나"(리뷰 C4, approvedDocs 대칭). */
+  functionsConfirmedIds: z.array(z.string()),
+  scenariosConfirmedIds: z.array(z.string()),
+  requirementsConfirmedIds: z.array(z.string()),
   /** 윈도 내 이벤트 총수(재확정 포함) — 전환 수와 구분. */
   confirmEvents: z.number().int().nonnegative(),
   editEvents: z.number().int().nonnegative(),
   /** audit[] 없는 구원장 엔티티 — at 필드로 폴백 집계(표면화). */
   auditlessEntities: z.number().int().nonnegative(),
+  /**
+   * 확정 이벤트의 at 파싱 실패로 최초 확정 시각을 알 수 없는 엔티티 — 전환 집계에서
+   * 보수적으로 제외(리뷰 R3: 손상된 과거 확정이 이번 기간 전환으로 오계상되는 것 방지).
+   */
+  suspectEntities: z.number().int().nonnegative(),
   /** at 파싱 실패 이벤트 수 — 드롭하지 않고 표면화(침묵 누락 금지). */
   unparsableAt: z.number().int().nonnegative(),
 })
@@ -190,9 +230,16 @@ export const WorkSummaryReportSchema = z.object({
     commits: z.number().int().nonnegative(),
     mergeCommits: z.number().int().nonnegative(),
     authors: z.number().int().nonnegative(),
+    /** files/added/deleted 는 생성물 제외분(실적 근사) — 생성물은 generated 로 분리(리뷰 C1). */
     files: z.number().int().nonnegative(),
     added: z.number().int().nonnegative(),
     deleted: z.number().int().nonnegative(),
+    /** 생성물/산출물(GENERATED_PATH_PATTERNS) 분리 집계 — 제외가 아니라 표면화. */
+    generated: z.object({
+      files: z.number().int().nonnegative(),
+      added: z.number().int().nonnegative(),
+      deleted: z.number().int().nonnegative(),
+    }),
   }),
   /** linesChanged DESC, key ASC. */
   modules: z.array(WorkModuleSchema),
@@ -201,10 +248,12 @@ export const WorkSummaryReportSchema = z.object({
   docProgress: DocProgressSchema.nullable(),
   meta: z.object({
     gitAvailable: z.boolean(),
-    /** shallow 는 gitAvailable=false 의 사유 구분(잘린 이력 ≠ git 부재). */
-    gitStatus: z.enum(['ok', 'no-git', 'shallow']),
+    /** gitAvailable=false 의 사유 구분 — 잘린 이력(shallow)/git 부재/출력 256MB 초과(too-large). */
+    gitStatus: z.enum(['ok', 'no-git', 'shallow', 'too-large']),
     prefix: z.string(),
     moduleSource: z.enum(['program-inventory', 'dir']),
+    /** 생성물 분리에 쓴 패턴 박제(재현 근거, 리뷰 C1). */
+    generatedPatterns: z.array(z.string()),
   }),
 })
 export type WorkSummaryReport = z.infer<typeof WorkSummaryReportSchema>
@@ -232,35 +281,51 @@ function auditEvents(entity: LedgerEntity): Array<{ event: string; at: string }>
 /**
  * 원장 섹션(엔티티 id → override) 하나의 전환/이벤트 집계.
  * 전환 = 최초 확정 이벤트 at ∈ 윈도. audit 이 빈 구원장 엔티티는 at 필드로 폴백
- * (auditless 로 표면화 — 최초/재확정 구분 불가한 한계를 수치로 드러낸다).
+ * (auditless 로 표면화 — at 은 마지막 수정 시각이라 **확정 여부 자체를 구분할 수
+ * 없다**(편집만 된 구원장도 전환 계상 가능, 리뷰 C6 — 과대계상 방향을 수치로 노출).
+ * 확정 이벤트의 at 이 파싱 불가한 엔티티는 최초 확정 시각 미상 — 전환에서 보수적으로
+ * 제외하고 suspect 로 표면화(리뷰 R3: 과거 확정의 손상이 이번 기간 전환으로 오계상 방지).
  */
 function scanSection(
   section: Record<string, LedgerEntity>,
   inWindow: (iso: string) => boolean,
-): { converted: number; confirmEvents: number; editEvents: number; auditless: number; unparsable: number } {
-  let converted = 0
+): {
+  converted: number
+  convertedIds: string[]
+  confirmEvents: number
+  editEvents: number
+  auditless: number
+  suspect: number
+  unparsable: number
+} {
+  const convertedIds: string[] = []
   let confirmEvents = 0
   let editEvents = 0
   let auditless = 0
+  let suspect = 0
   let unparsable = 0
   for (const key of Object.keys(section)) {
     const entity = section[key]
-    if (entity === null || typeof entity !== 'object') continue
+    // 배열도 typeof 'object' — 원장 형식이 아니므로 제외(리뷰 R10).
+    if (entity === null || typeof entity !== 'object' || Array.isArray(entity)) continue
     const events = auditEvents(entity)
     if (events.length === 0) {
       auditless += 1
       const at = typeof entity.at === 'string' ? entity.at : ''
       if (Number.isNaN(Date.parse(at))) unparsable += 1
       else if (inWindow(at)) {
-        converted += 1
+        convertedIds.push(key)
         confirmEvents += 1
       }
       continue
     }
     let firstConfirm: string | null = null
+    let confirmAtBroken = false
     for (const e of events) {
       if (Number.isNaN(Date.parse(e.at))) {
         unparsable += 1
+        // 확정 이벤트인데 시각 미상 — 이 엔티티의 "최초 확정"은 알 수 없다(리뷰 R3).
+        if (CONFIRM_EVENTS.has(e.event)) confirmAtBroken = true
         continue
       }
       if (CONFIRM_EVENTS.has(e.event)) {
@@ -270,9 +335,22 @@ function scanSection(
         editEvents += 1
       }
     }
-    if (firstConfirm !== null && inWindow(firstConfirm)) converted += 1
+    if (confirmAtBroken) {
+      suspect += 1
+    } else if (firstConfirm !== null && inWindow(firstConfirm)) {
+      convertedIds.push(key)
+    }
   }
-  return { converted, confirmEvents, editEvents, auditless, unparsable }
+  convertedIds.sort(cmp)
+  return {
+    converted: convertedIds.length,
+    convertedIds: convertedIds.slice(0, CONFIRMED_IDS_CAP),
+    confirmEvents,
+    editEvents,
+    auditless,
+    suspect,
+    unparsable,
+  }
 }
 
 /** rtm-overrides.json(파싱된 객체) → 윈도 내 RTM 진척. 원장 형식이 아니면 0 집계. */
@@ -281,12 +359,13 @@ export function scanRtmProgress(
   inWindow: (iso: string) => boolean,
 ): RtmProgress {
   const overlay =
-    rawOverlay !== null && typeof rawOverlay === 'object'
+    rawOverlay !== null && typeof rawOverlay === 'object' && !Array.isArray(rawOverlay)
       ? (rawOverlay as Record<string, unknown>)
       : {}
   const sectionOf = (v: unknown): Record<string, LedgerEntity> =>
-    v !== null && typeof v === 'object' ? (v as Record<string, LedgerEntity>) : {}
-  // 최상위 fnId 키(예약 섹션 _* 제외) = 기능 행 오버레이.
+    v !== null && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, LedgerEntity>) : {}
+  // 최상위 fnId 키(예약 섹션 _* 제외) = 기능 행 오버레이 — `_` 접두 예약은 온디스크
+  // 스키마 관례(apply-overlay.ts 헤더)에 의존한다(리뷰 R9: 비-_ 메타키 신설 시 재검토).
   const fnSection: Record<string, LedgerEntity> = {}
   for (const key of Object.keys(overlay)) {
     if (key.startsWith('_')) continue
@@ -299,9 +378,13 @@ export function scanRtmProgress(
     functionsConfirmed: fn.converted,
     scenariosConfirmed: sc.converted,
     requirementsConfirmed: rq.converted,
+    functionsConfirmedIds: fn.convertedIds,
+    scenariosConfirmedIds: sc.convertedIds,
+    requirementsConfirmedIds: rq.convertedIds,
     confirmEvents: fn.confirmEvents + sc.confirmEvents + rq.confirmEvents,
     editEvents: fn.editEvents + sc.editEvents + rq.editEvents,
     auditlessEntities: fn.auditless + sc.auditless + rq.auditless,
+    suspectEntities: fn.suspect + sc.suspect + rq.suspect,
     unparsableAt: fn.unparsable + sc.unparsable + rq.unparsable,
   })
 }
@@ -384,6 +467,8 @@ function buildModules(
   >()
   for (const c of commits) {
     for (const f of c.files) {
+      // 생성물은 모듈 실적에서 제외(totals.generated 로 분리 표면화, 리뷰 C1).
+      if (isGeneratedPath(f.path)) continue
       const { key, source } = moduleKeyOf(f.path, byPath)
       const mapKey = `${source}\x1f${key}`
       let cur = acc.get(mapKey)
@@ -408,7 +493,8 @@ function buildModules(
         .slice(0, 3)
         .map(([path]) => path),
     }))
-    .sort((a, b) => b.linesChanged - a.linesChanged || cmp(a.key, b.key))
+    // key 동일·동점에서도 결정론(리뷰 R4) — 도메인명과 디렉터리명이 겹칠 수 있어 source 로 최종 tie-break.
+    .sort((a, b) => b.linesChanged - a.linesChanged || cmp(a.key, b.key) || cmp(a.source, b.source))
 }
 
 /**
@@ -437,17 +523,27 @@ export function buildWorkSummary(inputs: WorkSummaryInputs): WorkSummaryReport {
   })
 
   const fileSet = new Set<string>()
+  const genFileSet = new Set<string>()
   const authorSet = new Set<string>()
   let added = 0
   let deleted = 0
+  let genAdded = 0
+  let genDeleted = 0
   let merges = 0
   for (const c of commits) {
     authorSet.add(c.author)
     if (c.isMerge) merges += 1
     for (const f of c.files) {
-      fileSet.add(f.path)
-      added += f.added
-      deleted += f.deleted
+      // 생성물 분리 집계(리뷰 C1) — churn 은 사실이지만 실적이 아니다.
+      if (isGeneratedPath(f.path)) {
+        genFileSet.add(f.path)
+        genAdded += f.added
+        genDeleted += f.deleted
+      } else {
+        fileSet.add(f.path)
+        added += f.added
+        deleted += f.deleted
+      }
     }
   }
 
@@ -463,6 +559,7 @@ export function buildWorkSummary(inputs: WorkSummaryInputs): WorkSummaryReport {
       files: fileSet.size,
       added,
       deleted,
+      generated: { files: genFileSet.size, added: genAdded, deleted: genDeleted },
     },
     modules: buildModules(commits, programInventory),
     // 윈도 미해석(git 불가한 weeks 모드)이면 원장이 있어도 집계 불가 — null degrade.
@@ -474,6 +571,7 @@ export function buildWorkSummary(inputs: WorkSummaryInputs): WorkSummaryReport {
       gitStatus: collected.kind,
       prefix: ok?.prefix ?? '',
       moduleSource: programInventory ? 'program-inventory' : 'dir',
+      generatedPatterns: [...GENERATED_PATH_PATTERNS],
     },
   })
 }

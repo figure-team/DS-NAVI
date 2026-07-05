@@ -104,16 +104,33 @@ describe('buildWorkSummary', () => {
       files: 2,
       added: 17,
       deleted: 3,
+      generated: { files: 0, added: 0, deleted: 0 },
     })
     // 원장 파일 없음 → null(0 과 구분).
     expect(report.rtmProgress).toBeNull()
     expect(report.docProgress).toBeNull()
-    expect(report.meta).toEqual({
+    expect(report.meta).toMatchObject({
       gitAvailable: true,
       gitStatus: 'ok',
       prefix: '',
       moduleSource: 'dir',
     })
+    expect(report.meta.generatedPatterns.length).toBeGreaterThan(0)
+  })
+
+  it('생성물 분리 집계(리뷰 C1) — churn 은 사실이지만 실적이 아니다', () => {
+    const log = fixtureLog()
+    if (log.kind !== 'ok') throw new Error('unreachable')
+    log.commits[0].files.push(
+      { path: '.understand-anything/screens.json', added: 13000, deleted: 0 },
+      { path: 'sub/pnpm-lock.yaml', added: 200, deleted: 10 },
+    )
+    const report = buildWorkSummary({ spec: { mode: 'weeks', weeks: 1 }, collected: log, ...emptyLedgers })
+    // 실적 합계는 오염되지 않고, 생성물은 별도 표면화.
+    expect(report.totals.files).toBe(2)
+    expect(report.totals.generated).toEqual({ files: 2, added: 13200, deleted: 10 })
+    // 모듈 귀속에서도 제외.
+    expect(report.modules.map((m) => m.key).sort()).toEqual(['docs', 'src'])
   })
 
   it('모듈 귀속: 디렉터리 폴백 — 최상위 세그먼트, linesChanged DESC', () => {
@@ -147,6 +164,24 @@ describe('buildWorkSummary', () => {
     expect(report.modules).toEqual([
       { key: 'docs', source: 'dir', commits: 1, files: 1, linesChanged: 10, topFiles: ['docs/readme.md'] },
       { key: 'order', source: 'program-inventory', commits: 2, files: 1, linesChanged: 10, topFiles: ['src/a.java'] },
+    ])
+  })
+
+  it('모듈 key 충돌(도메인명=디렉터리명) 동점 — source tie-break 로 결정론(리뷰 R4)', () => {
+    const inventory = {
+      programs: [{ filePath: 'src/a.java', domain: 'docs' }], // 도메인명이 dir 버킷 'docs' 와 충돌.
+    } as unknown as ProgramInventory
+    const report = buildWorkSummary({
+      spec: { mode: 'weeks', weeks: 1 },
+      collected: fixtureLog(),
+      rtmOverlay: null,
+      docStates: null,
+      programInventory: inventory,
+    })
+    // linesChanged 동점(10) → key 동일('docs') → source ASC('dir' < 'program-inventory').
+    expect(report.modules.map((m) => [m.key, m.source])).toEqual([
+      ['docs', 'dir'],
+      ['docs', 'program-inventory'],
     ])
   })
 
@@ -267,8 +302,39 @@ describe('scanRtmProgress', () => {
       w,
     )
     expect(p.functionsConfirmed).toBe(1) // FN-old 폴백 집계.
+    expect(p.functionsConfirmedIds).toEqual(['FN-old'])
     expect(p.auditlessEntities).toBe(2)
+    // FN-badevt: 확정 이벤트의 시각 미상 — 전환에서 보수적 제외(리뷰 R3).
+    expect(p.suspectEntities).toBe(1)
     expect(p.unparsableAt).toBe(2) // FN-bad(at) + FN-badevt(event at).
+  })
+
+  it('최초 확정 at 손상 + 윈도 안 재확정 — 전환 오계상 금지(리뷰 R3, 보수화)', () => {
+    const p = scanRtmProgress(
+      {
+        'FN-x': {
+          at: '2026-06-26T00:00:00Z',
+          audit: [
+            { event: 'CONFIRMED', by: 'u', at: 'corrupted' }, // 진짜 최초 확정(과거)이 손상.
+            { event: 'CONFIRMED', by: 'u', at: '2026-06-26T00:00:00Z' }, // 윈도 안 재확정.
+          ],
+        },
+      },
+      w,
+    )
+    expect(p.functionsConfirmed).toBe(0) // 최초 확정 시각 미상 — 전환 아님.
+    expect(p.suspectEntities).toBe(1)
+    expect(p.confirmEvents).toBe(1) // 이벤트 집계는 유지.
+  })
+
+  it('배열/비객체 최상위 값은 원장 형식이 아님 — 노이즈 없이 무시(리뷰 R10)', () => {
+    const p = scanRtmProgress(
+      { 'FN-arr': [{ at: '2026-06-25T00:00:00Z' }], 'FN-num': 3, _scenarios: [] },
+      w,
+    )
+    expect(p.functionsConfirmed).toBe(0)
+    expect(p.auditlessEntities).toBe(0)
+    expect(p.unparsableAt).toBe(0)
   })
 })
 

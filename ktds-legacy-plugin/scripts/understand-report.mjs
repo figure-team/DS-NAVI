@@ -64,8 +64,21 @@ const {
   docToSheets,
 } = engine
 
+// 인자 사전 검증 — 오타가 스택트레이스가 아니라 안내로 끝나게(리뷰 R1, range 와 대칭).
+if (spec.mode === 'weeks' && (!Number.isInteger(spec.weeks) || spec.weeks < 1)) {
+  console.error(`--weeks 는 1 이상의 정수여야 합니다. 입력: ${process.argv.slice(2).join(' ')}`)
+  process.exit(2)
+}
+if (spec.mode === 'month' && !/^\d{4}-(0[1-9]|1[0-2])$/.test(spec.month)) {
+  console.error(`--month 형식: YYYY-MM (01~12). 입력: ${spec.month}`)
+  process.exit(2)
+}
 // range 모드는 rev 를 사전 검증해 사용자 오류를 구분 표면화(수집기는 no-git 으로 뭉갠다).
 if (spec.mode === 'range') {
+  if (spec.range.includes('...')) {
+    console.error(`--range 는 2점(A..B)만 지원합니다 — symmetric diff(A...B)는 미지원. 입력: ${spec.range}`)
+    process.exit(2)
+  }
   const m = /^(.+?)\.\.(.*)$/.exec(spec.range)
   if (!m) {
     console.error(`--range 형식: <from>..<to> (to 생략 시 HEAD). 입력: ${spec.range}`)
@@ -85,9 +98,34 @@ if (spec.mode === 'range') {
 }
 
 // ── ① 수집 ──────────────────────────────────────────────────────────────────
-const collected = collectWorkLog(projectRoot, spec.mode === 'range' ? spec.range : undefined)
+// 상대 기간은 --since 로 로그 출력을 바운드(리뷰 C3 — 대형 레포 256MB 절벽 방지).
+// 윈도 하한보다 1일 여유를 두고, 윈도 필터는 build 단계가 다시 적용한다(결정론 불변).
+let sinceIso
+if (spec.mode === 'weeks') {
+  try {
+    const headIso = execFileSync('git', ['-C', projectRoot, 'show', '-s', '--format=%cI', 'HEAD'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
+    const headMs = Date.parse(headIso)
+    if (!Number.isNaN(headMs)) {
+      sinceIso = new Date(headMs - (spec.weeks * 7 + 1) * 24 * 60 * 60 * 1000).toISOString()
+    }
+  } catch {
+    // git 불가 — collectWorkLog 가 no-git 으로 표면화.
+  }
+} else if (spec.mode === 'month') {
+  const [y, mo] = spec.month.split('-').map(Number)
+  sinceIso = new Date(Date.UTC(y, mo - 1, 1) - 24 * 60 * 60 * 1000).toISOString()
+}
+const collected = collectWorkLog(projectRoot, {
+  revRange: spec.mode === 'range' ? spec.range : undefined,
+  sinceIso,
+})
 if (collected.kind === 'shallow') {
   console.error('경고: shallow clone — 잘린 이력은 결정론 보장이 불가해 git 실적을 [미확인]으로 남깁니다.')
+} else if (collected.kind === 'too-large') {
+  console.error('경고: git 이력 출력이 256MB 를 초과 — 더 짧은 기간(--weeks)으로 재시도하세요. git 실적은 [미확인].')
 } else if (collected.kind === 'no-git') {
   console.error('경고: git 이력 수집 불가(레포 아님/이력 없음) — git 실적을 [미확인]으로 남깁니다.')
 }
@@ -130,7 +168,13 @@ if (existsSync(docsDir)) {
 }
 
 // ── ② 집계·기록 ────────────────────────────────────────────────────────────
-const report = buildWorkSummary({ spec, collected, programInventory, rtmOverlay, docStates })
+let report
+try {
+  report = buildWorkSummary({ spec, collected, programInventory, rtmOverlay, docStates })
+} catch (err) {
+  console.error(`실적 집계 실패: ${err.message}`)
+  process.exit(2)
+}
 const artifactPath = writeMapArtifact(projectRoot, WORK_SUMMARY_FILENAME, report)
 
 // ── ③ si-실적요약보고서 단독 빌드 ───────────────────────────────────────────

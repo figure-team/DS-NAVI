@@ -818,11 +818,20 @@ function buildSiWorkSummary(input: DocInput): GeneratedDoc {
         gitUnavailable
           ? textRow([
               '실적',
-              `${UNRESOLVED_CELL} git 이력 수집 불가(${ws.meta.gitStatus === 'shallow' ? 'shallow clone — 잘린 이력은 결정론 불가' : 'git 레포 아님/이력 없음'})`,
+              `${UNRESOLVED_CELL} git 이력 수집 불가(${
+                ws.meta.gitStatus === 'shallow'
+                  ? 'shallow clone — 잘린 이력은 결정론 불가'
+                  : ws.meta.gitStatus === 'too-large'
+                    ? '이력 출력 256MB 초과 — 짧은 기간(--weeks)으로 재시도'
+                    : 'git 레포 아님/이력 없음'
+              })`,
             ])
           : textRow([
               '실적',
-              `커밋 ${ws.totals.commits}건(작성자 ${ws.totals.authors}명, 머지 ${ws.totals.mergeCommits}건), 파일 ${ws.totals.files}개 변경(+${ws.totals.added}/−${ws.totals.deleted})`,
+              `커밋 ${ws.totals.commits}건(작성자 ${ws.totals.authors}명, 머지 ${ws.totals.mergeCommits}건), 파일 ${ws.totals.files}개 변경(+${ws.totals.added}/−${ws.totals.deleted})` +
+                (ws.totals.generated.files > 0
+                  ? ` · 생성물/산출물 별도 ${ws.totals.generated.files}개(+${ws.totals.generated.added}/−${ws.totals.generated.deleted}) — 실적 아님`
+                  : ''),
             ]),
         textRow([
           '변경 상위 모듈',
@@ -851,11 +860,16 @@ function buildSiWorkSummary(input: DocInput): GeneratedDoc {
 
   const criteriaRows: TableRow[] = [
     ['날짜 축', '커밋의 committer date — cherry-pick/rebase 후에도 "이 기간에 랜딩됐다"가 실적 기준(author date 는 원 작성 시점)'],
-    ['기간 해석', '주간 = HEAD 커밋 시각 앵커 반개구간 (from, to] · 월간 = 달력 월 [1일, 익월 1일) · 커밋 범위 = rev-list 집합(시각 윈도 없음). 벽시계 미사용 — 같은 HEAD 면 언제 실행해도 동일'],
+    ['기간 해석', '주간 = HEAD 커밋 시각 앵커 반개구간 (from, to] · 월간 = 달력 월 [1일, 익월 1일) **UTC 경계**(로컬 자정 아님 — 월초 인접 커밋은 오프셋만큼 이전 달로 귀속될 수 있음) · 커밋 범위 = rev-list 집합(시각 윈도 없음). 벽시계 미사용 — 같은 HEAD 면 언제 실행해도 동일'],
+    ['실적 vs 생성물', '분석 산출물·lock 파일 등 생성물 경로(meta.generatedPatterns)는 파일/라인 합계·모듈 귀속에서 분리 — churn 은 사실이지만 실적이 아니다. 분리분은 하이라이트에 별도 표기(침묵 제외 아님)'],
     ['커밋 행 신뢰도', '변경 파일 근거 보유 행 [확정](상위 3개 파일 승계) · 머지 등 파일 근거 없는 행 [추정](file:line 근거 체계의 한계, 커밋 해시로 검증 가능)'],
+    ['작성자 표기', '커밋 표의 작성자 열은 이력 투명성 목적(git 공개 정보) — 작성자별 실적 집계·분해는 제공하지 않는다(개인 평가 오용 방지, 설계 §9)'],
     ['모듈 귀속', '프로그램목록(W3) 도메인 조인 우선, 미포함 파일은 최상위 디렉터리 버킷 [추정]'],
     ['진척 원장', 'RTM = rtm-overrides.json audit[](확정 이벤트 CONFIRMED/CONFIRMED_NO_EDIT, 엔티티별 최초 확정만 전환으로 집계 — 재확정 중복 방지) · 문서 = .spec/docs/*.state.json audit[]. 원장은 작업트리의 현재 상태 — 과거 시점 스냅샷 복원은 하지 않음'],
-    ['재현', 'work-summary.json 의 gitCommit(HEAD)·range 해석 결과가 앵커 — 동일 커밋·동일 인자 재실행 시 byte 동일'],
+    ['재현', 'git 실적(커밋/파일/모듈)은 동일 커밋(HEAD)·동일 인자 재실행 시 byte 동일. **RTM/문서 진척은 원장의 현재 상태 기준** — 원장이 그새 자랐으면(확정 추가) 재실행 값이 달라진다(재현 경계, 설계 §3.4)'],
+    ...(ws && ws.meta.prefix.length > 0
+      ? [['하위 디렉터리 모드', `프로젝트가 레포 하위 경로(${ws.meta.prefix}) — git 경로 단순화로 머지 커밋이 과소 집계될 수 있음`]]
+      : []),
   ].map(textRow)
 
   const commitRows: TableRow[] = (ws?.commits ?? []).map((c, i): TableRow => {
@@ -904,14 +918,22 @@ function buildSiWorkSummary(input: DocInput): GeneratedDoc {
     } else {
       const p = ws.rtmProgress
       const rtmEv: Evidence[] = [{ file: RTM_OVERLAY_FILE, line: null }]
+      // "무엇이 확정됐나" — 전환 id 나열(리뷰 C4, approvedDocs 대칭). 상한 초과분은 count 로.
+      const idNote = (count: number, ids: string[], lead: string): string => {
+        if (count === 0) return lead
+        const listed = ids.join(', ')
+        const rest = count - ids.length
+        return `${lead ? `${lead} — ` : ''}${listed}${rest > 0 ? ` 외 ${rest}건` : ''}`
+      }
       const notes = [
-        p.auditlessEntities > 0 ? `구원장(audit 없음) ${p.auditlessEntities}건은 at 폴백 — 최초/재확정 구분 불가` : '',
+        p.auditlessEntities > 0 ? `구원장(audit 없음) ${p.auditlessEntities}건은 at 폴백 — 확정 여부 자체 구분 불가(편집도 전환 계상 가능)` : '',
+        p.suspectEntities > 0 ? `최초 확정 시각 미상 ${p.suspectEntities}건은 전환에서 보수적 제외` : '',
         p.unparsableAt > 0 ? `시각 파싱 실패 ${p.unparsableAt}건(집계 제외, 표면화)` : '',
       ].filter((s) => s.length > 0)
       progressRows.push(
-        { cells: ['RTM 확정 전환(기능)', String(p.functionsConfirmed), '엔티티별 최초 확정만'], confidence: 'CONFIRMED', evidence: rtmEv },
-        { cells: ['RTM 확정 전환(시나리오)', String(p.scenariosConfirmed), EMPTY_CELL], confidence: 'CONFIRMED', evidence: rtmEv },
-        { cells: ['RTM 확정 전환(요구사항)', String(p.requirementsConfirmed), EMPTY_CELL], confidence: 'CONFIRMED', evidence: rtmEv },
+        { cells: ['RTM 확정 전환(기능)', String(p.functionsConfirmed), idNote(p.functionsConfirmed, p.functionsConfirmedIds, '엔티티별 최초 확정만')], confidence: 'CONFIRMED', evidence: rtmEv },
+        { cells: ['RTM 확정 전환(시나리오)', String(p.scenariosConfirmed), idNote(p.scenariosConfirmed, p.scenariosConfirmedIds, EMPTY_CELL)], confidence: 'CONFIRMED', evidence: rtmEv },
+        { cells: ['RTM 확정 전환(요구사항)', String(p.requirementsConfirmed), idNote(p.requirementsConfirmed, p.requirementsConfirmedIds, EMPTY_CELL)], confidence: 'CONFIRMED', evidence: rtmEv },
         { cells: ['RTM 이벤트(확정/편집)', `${p.confirmEvents}/${p.editEvents}`, notes.join(' · ') || '재확정 포함 총수'], confidence: 'CONFIRMED', evidence: rtmEv },
       )
     }

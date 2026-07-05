@@ -80,10 +80,23 @@ describe('collectWorkLog', () => {
     const all = collectWorkLog(repo)
     if (all.kind !== 'ok') throw new Error('unreachable')
     const c1 = all.commits.find((c) => c.subject === 'c1')!
-    const r = collectWorkLog(repo, `${c1.sha}..HEAD`)
+    const r = collectWorkLog(repo, { revRange: `${c1.sha}..HEAD` })
     expect(r.kind).toBe('ok')
     if (r.kind !== 'ok') return
     expect(r.commits.map((c) => c.subject).sort()).toEqual(['c2', 'merge topic', 'topic'])
+  })
+
+  it('sinceIso — 로그 출력을 하한으로 바운드(대형 레포 절벽 방지, 리뷰 C3)', () => {
+    const r = collectWorkLog(repo, { sinceIso: '2026-01-04T00:00:00Z' })
+    expect(r.kind).toBe('ok')
+    if (r.kind !== 'ok') return
+    // c1(1/1)은 하한 이전 — 제외. 윈도 정밀 필터는 build 단계 책임.
+    expect(r.commits.map((c) => c.subject).sort()).toEqual(['c2', 'merge topic', 'topic'])
+  })
+
+  it('`-` 시작 revRange/sinceIso 는 거부 — git 옵션 인젝션 방지(리뷰 R2)', () => {
+    expect(() => collectWorkLog(repo, { revRange: '--output=/tmp/x' })).toThrow(/rev 범위/)
+    expect(() => collectWorkLog(repo, { sinceIso: '--all' })).toThrow(/ISO/)
   })
 
   it('하위 디렉터리 루트: --show-prefix 로 relPath 좌표계 정렬 + pathspec 축소', () => {
@@ -99,7 +112,7 @@ describe('collectWorkLog', () => {
   })
 
   it('잘못된 revRange 는 no-git 수렴(스크립트가 rev-parse 사전 검증으로 구분)', () => {
-    expect(collectWorkLog(repo, 'no-such-ref..HEAD').kind).toBe('no-git')
+    expect(collectWorkLog(repo, { revRange: 'no-such-ref..HEAD' }).kind).toBe('no-git')
   })
 
   it('git 레포가 아니면 no-git', () => {

@@ -52,6 +52,19 @@ export type WorkLogResult =
   | { kind: 'no-git' }
   /** shallow clone — 잘린 이력은 같은 커밋에서도 클론마다 달라 결정론을 깬다. */
   | { kind: 'shallow' }
+  /** 출력 256MB 초과 — no-git 과 사유를 구분 표면화(대형 레포는 sinceIso 바운드 권장, 리뷰 C3). */
+  | { kind: 'too-large' }
+
+export interface CollectWorkLogOptions {
+  /** `A..B` rev 범위 — 해당 집합만 수집. `-` 시작 문자열은 거부(git 옵션 인젝션 방지, 리뷰 R2). */
+  revRange?: string
+  /**
+   * `git log --since` 하한(ISO) — 상대 기간 모드에서 전체 이력 수집을 바운드(리뷰 C3:
+   * 대형 레포 256MB 절벽 방지). 윈도 필터는 build 단계에서 다시 적용되므로 호출자는
+   * 윈도 하한보다 여유(예: −1일)를 두고 넘긴다 — 같은 HEAD·같은 인자면 결과 동일(결정론).
+   */
+  sinceIso?: string
+}
 
 function git(projectRoot: string, args: string[]): string {
   return execFileSync('git', ['-C', projectRoot, '-c', 'core.quotepath=false', ...args], {
@@ -66,11 +79,22 @@ const RS = '\x1e'
 const FS = '\x1f'
 
 /**
- * 커밋+numstat 수집. revRange(`A..B`)를 주면 해당 집합만, 없으면 전체 이력.
- * 잘못된 revRange 도 no-git 으로 수렴한다 — 호출자(스크립트)가 rev-parse 로
- * 사전 검증해 사용자 오류를 구분 표면화한다.
+ * 커밋+numstat 수집. revRange(`A..B`)를 주면 해당 집합만, sinceIso 를 주면 그 이후만,
+ * 둘 다 없으면 전체 이력. 잘못된 revRange 는 no-git 으로 수렴한다 — 호출자(스크립트)가
+ * rev-parse 로 사전 검증해 사용자 오류를 구분 표면화한다.
+ * 한계(리뷰 R7/R8, 백로그): 커밋 제목에 RS(\x1e) 제어문자가 있으면 해당 레코드가 중간
+ * 분할되고, 경로에 탭/개행 등 제어문자가 있으면 git 이 C-스타일 인용을 해 매칭이
+ * 어긋난다 — 소스 제목/파일명에선 사실상 미발생(churn R7 과 동일 판단).
  */
-export function collectWorkLog(projectRoot: string, revRange?: string): WorkLogResult {
+export function collectWorkLog(projectRoot: string, opts?: CollectWorkLogOptions): WorkLogResult {
+  const revRange = opts?.revRange
+  // git 옵션 인젝션 방지(리뷰 R2) — 이 함수는 공개 API 라 rev 범위만 허용한다.
+  if (revRange !== undefined && revRange.startsWith('-')) {
+    throw new Error(`revRange 는 rev 범위(A..B)만 허용: ${JSON.stringify(revRange)}`)
+  }
+  if (opts?.sinceIso !== undefined && opts.sinceIso.startsWith('-')) {
+    throw new Error(`sinceIso 는 ISO 시각만 허용: ${JSON.stringify(opts.sinceIso)}`)
+  }
   let headSha: string
   let headDateIso: string
   let prefix: string
@@ -85,6 +109,7 @@ export function collectWorkLog(projectRoot: string, revRange?: string): WorkLogR
     const logArgs = [
       'log',
       ...(revRange ? [revRange] : []),
+      ...(opts?.sinceIso ? [`--since=${opts.sinceIso}`] : []),
       '--numstat',
       '--no-renames',
       `--format=${RS}%H${FS}%cI${FS}%an${FS}%P${FS}%s`,
@@ -92,7 +117,12 @@ export function collectWorkLog(projectRoot: string, revRange?: string): WorkLogR
       ...(prefix ? ['--', '.'] : []),
     ]
     raw = git(projectRoot, logArgs)
-  } catch {
+  } catch (err) {
+    // 256MB 상한 초과는 "git 없음"과 다르다 — 사유를 구분해 오진단을 막는다(리뷰 C3).
+    const msg = err instanceof Error ? err.message : ''
+    if ((err as NodeJS.ErrnoException).code === 'ENOBUFS' || msg.includes('maxBuffer')) {
+      return { kind: 'too-large' }
+    }
     return { kind: 'no-git' }
   }
 

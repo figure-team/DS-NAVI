@@ -332,6 +332,7 @@ export {
 export type { ScanCacheSection, SectionStats } from './scan-cache/index.js'
 export * from './screen-capture/index.js'
 export {
+  GOLDEN_SCORER_VERSION,
   collectCitations,
   scoreCitations,
   extractDomainGraphUnits,

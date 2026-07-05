@@ -106,7 +106,7 @@
 | P7 W6 | ✅ 완료(리뷰 통과) | c0501fc~872487e | /understand-report·work-summary.json·si-실적요약보고서(14종째)·생성물 분리 집계 + 적대적 리뷰 2종(비평 8건·코드 10건) 반영 + **W6-b 다주 추이**(직전 기간 대비, 코드 리뷰 4건 반영) — `WORK_SUMMARY_DESIGN.md` §11~13 |
 | P8 W8 | ✅ 완료(리뷰 통과) | 001bf02~ | scan-cache 파일단위 팩트 캐시(7섹션·consumed-ctx 정밀 무효화·골든 캐시 회귀)·`--no-cache`·qa-incremental-bench — eGov 증분 15.1%(AC ≤20%)·byte-diff=0 + 적대적 리뷰 2종(비평 9건·코드 4건) 반영 — `INCREMENTAL_SCAN_DESIGN.md` §8~9 |
 | P9 W9 | ✅ 완료(리뷰 통과) | 073bf40~ | coverage-matrix 단일 소스(COVERAGE_MATRIX.md 생성물+drift CI)·langSupport(미지원/부분지원 표면화·denylist)·qa-coverage-matrix(실측 ⊆ 주장 + 과대주장 WARN) — 두 타깃 모순 0건 + 적대적 리뷰 2종(비평 10건·코드 5건) 반영 — `COVERAGE_MATRIX_DESIGN.md` §7~8 |
-| P10 W10 | ⬜ | | |
+| P10 W10 | ✅ 완료(리뷰 통과) | bf70da5~ | 골든셋 채점기(지표 3종+개수/초과 보조)·jpetstore 기준선(scorer v2)·회귀 게이트(스위트 내 배선+qa-golden-score) + 적대적 리뷰 2종(비평 7건·코드 13건) 반영 — `GOLDEN_SET_DESIGN.md` §7~8 |
 | P11 W11 | ⬜ | | |
 
 ## 4. 범위 외 (명시)

@@ -48,7 +48,7 @@ import type { ProgramInventory } from '../program-inventory/index.js'
 import { buildRiskReport, collectGitChurn, RISK_REPORT_FILENAME } from '../risk-report/index.js'
 import type { RiskReport } from '../risk-report/index.js'
 import { buildCoverageReport } from '../coverage-report/index.js'
-import { computeFileFingerprints } from '../incremental/index.js'
+import { ScanCacheSession } from '../scan-cache/index.js'
 import { readSkeleton } from './persist.js'
 
 /** `.spec/map/` 통합 커버리지 리포트 파일명(보완 D-c). */
@@ -83,10 +83,98 @@ import type {
   SlicesReport,
 } from './types.js'
 
+/**
+ * spring-routes 캐시 팩트(W8) — 한 java 파일의 ctx 기여분 + 추출 결과 + consumed-ctx.
+ * **salt bump 규약**: 이 형태나 라우트/배치 추출 의미가 바뀌면 SPRING_ROUTES_SALT bump.
+ */
+const SPRING_ROUTES_SALT = 'v1'
+
+interface ConsumedSpringCtx {
+  /** 조회된 상수 키 → 값(부재는 null). */
+  constants: Record<string, string | null>
+  /** composedVerb.has 조회 결과. */
+  composedVerbHas: Record<string, boolean>
+  /** composedVerb.get 조회 결과(부재/undefined 는 null). */
+  composedVerb: Record<string, string | null>
+  /** composedStereotype.has 조회 결과. */
+  composedStereotype: Record<string, boolean>
+}
+
+interface SpringRouteFileFacts {
+  /** collectConstants 기여분(파일 내 수집 순서 보존 — 병합 재생 동일성). */
+  constants: Array<[string, string]>
+  /** collectComposedAnnotations 기여분(verb undefined 는 null 로 인코드). */
+  composedVerb: Array<[string, RouteMethod | null]>
+  composedStereotype: string[]
+  /** spring + stripes 라우트(routeId 부여 전 — id 는 전역 병합 단계). */
+  routes: RouteEntry[]
+  /** java 배치 진입점(W1 + W2, 핸들러 해석 전). */
+  batch: BatchEntry[]
+  consumed: ConsumedSpringCtx
+}
+
+function emptyConsumed(): ConsumedSpringCtx {
+  return { constants: {}, composedVerbHas: {}, composedVerb: {}, composedStereotype: {} }
+}
+
+/**
+ * 기록용 ctx 래퍼 — extractSpringRoutes 가 실제 조회한 키·결과를 consumed 에 남긴다.
+ * extractSpringRoutes 는 ctx 를 get/has 로만 소비한다(spring.ts) — 순회(iteration)를
+ * 쓰도록 바뀌면 이 래퍼(빈 컬렉션에 위임 오버라이드)로는 안 보이므로, 그 경우 캐시
+ * 재사용 검증(consumedSpringCtxValid)도 함께 재설계해야 한다.
+ */
+function recordingSpringContext(base: SpringContext, rec: ConsumedSpringCtx): SpringContext {
+  const constants = new (class extends Map<string, string> {
+    override get(k: string): string | undefined {
+      const v = base.constants.get(k)
+      rec.constants[k] = v ?? null
+      return v
+    }
+  })()
+  const composedVerb = new (class extends Map<string, RouteMethod | undefined> {
+    override has(k: string): boolean {
+      const r = base.composedVerb.has(k)
+      rec.composedVerbHas[k] = r
+      return r
+    }
+    override get(k: string): RouteMethod | undefined {
+      const v = base.composedVerb.get(k)
+      rec.composedVerb[k] = v ?? null
+      return v
+    }
+  })()
+  const composedStereotype = new (class extends Set<string> {
+    override has(k: string): boolean {
+      const r = base.composedStereotype.has(k)
+      rec.composedStereotype[k] = r
+      return r
+    }
+  })()
+  return { constants, composedVerb, composedStereotype }
+}
+
+/** 기록된 consumed-ctx 를 새 병합 ctx 에 재생 — 전부 동치면 캐시 라우트 재사용 가능. */
+function consumedSpringCtxValid(c: ConsumedSpringCtx, ctx: SpringContext): boolean {
+  for (const [k, v] of Object.entries(c.constants)) {
+    if ((ctx.constants.get(k) ?? null) !== v) return false
+  }
+  for (const [k, v] of Object.entries(c.composedVerbHas)) {
+    if (ctx.composedVerb.has(k) !== v) return false
+  }
+  for (const [k, v] of Object.entries(c.composedVerb)) {
+    if ((ctx.composedVerb.get(k) ?? null) !== v) return false
+  }
+  for (const [k, v] of Object.entries(c.composedStereotype)) {
+    if (ctx.composedStereotype.has(k) !== v) return false
+  }
+  return true
+}
+
 /** 프로젝트 루트에서 라우트/배치 보고를 추출한다(파일 기록 없음). */
 export async function extractRoutes(
   projectRoot: string,
   census: CensusReport,
+  cache?: ScanCacheSession,
 ): Promise<{
   schemaVersion: 1
   gitCommit: string | null
@@ -95,41 +183,106 @@ export async function extractRoutes(
   batchEntries: BatchEntry[]
 }> {
   const javaFiles = census.files.filter((f) => f.lang === 'java')
+  const routeSec = cache?.section<SpringRouteFileFacts | null>('spring-routes', SPRING_ROUTES_SALT)
 
-  // 1) 모든 Java 파일 1회 파싱(루트 노드 캐시).
+  // 1) 파일별 준비 — 캐시 히트(내용 해시 일치)는 파싱 생략, 미스만 1회 파싱.
+  //    null 캐시 = 판독 실패 파일(기존 동작대로 제외, 매회 재시도 안 함).
   const parsed = new Map<string, Node>()
+  const cachedByPath = new Map<string, SpringRouteFileFacts>()
   for (const f of javaFiles) {
+    const hit = routeSec?.get(f.relPath)
+    if (hit !== undefined) {
+      if (hit !== null) cachedByPath.set(f.relPath, hit)
+      continue
+    }
     try {
       const src = readFileSync(join(projectRoot, f.relPath), 'utf8')
       parsed.set(f.relPath, await parseSource('java', src))
     } catch {
       // 파싱 실패 파일은 조용히 건너뛰지 않고 단순 제외(증거 없는 라우트 금지).
+      routeSec?.put(f.relPath, null)
     }
   }
 
-  // 2) 상수 + composed 레지스트리 구축(전 파일 스캔).
+  // 2) 상수 + composed 레지스트리 구축 — census 순서로 파일 기여분을 재생(full 과 동일
+  //    순서·동일 override 규칙 → 병합 결과 동일). 신규 파일은 기여분을 지금 수집.
   const ctx: SpringContext = {
     constants: new Map<string, string>(),
     composedVerb: new Map<string, RouteMethod | undefined>(),
     composedStereotype: new Set<string>(),
   }
-  for (const root of parsed.values()) {
-    collectConstants(root, ctx.constants)
-    collectComposedAnnotations(root, ctx.composedVerb, ctx.composedStereotype)
+  const freshContrib = new Map<
+    string,
+    Pick<SpringRouteFileFacts, 'constants' | 'composedVerb' | 'composedStereotype'>
+  >()
+  for (const f of javaFiles) {
+    const hit = cachedByPath.get(f.relPath)
+    if (hit) {
+      for (const [k, v] of hit.constants) ctx.constants.set(k, v)
+      for (const [k, v] of hit.composedVerb) ctx.composedVerb.set(k, v === null ? undefined : v)
+      for (const k of hit.composedStereotype) ctx.composedStereotype.add(k)
+      continue
+    }
+    const root = parsed.get(f.relPath)
+    if (!root) continue
+    const cMap = new Map<string, string>()
+    const vMap = new Map<string, RouteMethod | undefined>()
+    const sSet = new Set<string>()
+    collectConstants(root, cMap)
+    collectComposedAnnotations(root, vMap, sSet)
+    freshContrib.set(f.relPath, {
+      constants: [...cMap],
+      composedVerb: [...vMap].map(([k, v]) => [k, v ?? null] as [string, RouteMethod | null]),
+      composedStereotype: [...sSet],
+    })
+    for (const [k, v] of cMap) ctx.constants.set(k, v)
+    for (const [k, v] of vMap) ctx.composedVerb.set(k, v)
+    for (const k of sSet) ctx.composedStereotype.add(k)
   }
 
   // 3) Java 기반 추출(Spring 라우트 + Stripes 라우트 + Java 배치 진입점).
-  //    relPath 정렬 순회로 결정론을 보장한다.
+  //    relPath 정렬 순회로 결정론을 보장한다. 캐시 재사용은 consumed-ctx(그 파일이 실제
+  //    조회한 상수/composed)가 새 ctx 에서도 전부 동치일 때만 — 다른 파일의 상수 변경이
+  //    이 파일 라우트에 실제 영향을 줄 때만 재추출된다.
   const routes: RouteEntry[] = []
   const batchEntries: BatchEntry[] = []
-  const sortedJava = [...parsed.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+  const sortedJava = [...new Set([...parsed.keys(), ...cachedByPath.keys()])].sort((a, b) =>
+    a < b ? -1 : a > b ? 1 : 0,
+  )
   for (const relPath of sortedJava) {
-    const root = parsed.get(relPath)!
-    routes.push(...extractSpringRoutes(root, relPath, ctx))
-    routes.push(...extractStripesRoutes(root, relPath))
-    batchEntries.push(...extractJavaBatchEntries(root, relPath))
-    // W2: quartz-java / executor / timer.
-    batchEntries.push(...extractJavaBatchEntriesW2(root, relPath))
+    const hit = cachedByPath.get(relPath)
+    if (hit && consumedSpringCtxValid(hit.consumed, ctx)) {
+      routes.push(...hit.routes)
+      batchEntries.push(...hit.batch)
+      continue
+    }
+    let root = parsed.get(relPath)
+    if (!root) {
+      // 내용은 그대로인데 consumed-ctx 무효(다른 파일의 상수 변경) — 이제 파싱 필요.
+      try {
+        root = await parseSource('java', readFileSync(join(projectRoot, relPath), 'utf8'))
+      } catch {
+        routeSec?.put(relPath, null)
+        continue
+      }
+      parsed.set(relPath, root)
+    }
+    const consumed = emptyConsumed()
+    const recCtx = cache ? recordingSpringContext(ctx, consumed) : ctx
+    const fileRoutes = [...extractSpringRoutes(root, relPath, recCtx), ...extractStripesRoutes(root, relPath)]
+    // W2: quartz-java / executor / timer 는 extractJavaBatchEntriesW2.
+    const fileBatch = [...extractJavaBatchEntries(root, relPath), ...extractJavaBatchEntriesW2(root, relPath)]
+    routes.push(...fileRoutes)
+    batchEntries.push(...fileBatch)
+    if (routeSec) {
+      // 기여분은 내용의 순수 함수 — 해시 유효 캐시(ctx 무효 케이스)에서 그대로 승계.
+      const contrib = freshContrib.get(relPath) ?? {
+        constants: hit!.constants,
+        composedVerb: hit!.composedVerb,
+        composedStereotype: hit!.composedStereotype,
+      }
+      routeSec.put(relPath, { ...contrib, routes: fileRoutes, batch: fileBatch, consumed })
+    }
   }
 
   // 4) Next.js 라우트 추출(census 기반).
@@ -207,7 +360,13 @@ export async function scanRoutes(projectRoot: string): Promise<{
  * 다섯 산출물을 `.spec/map/` 에 기록하고 모두 반환한다(결정론).
  * 후보(candidates)는 빌드/기록만 한다 — 확정(confirm)은 별도 사람 게이트 단계다(자동 확정 금지).
  */
-export async function scanDomainMap(projectRoot: string): Promise<{
+export async function scanDomainMap(
+  projectRoot: string,
+  opts: {
+    /** false 면 저장 캐시를 읽지 않는다(`--no-cache` — 전체 재추출 후 캐시 재구축). */
+    readCache?: boolean
+  } = {},
+): Promise<{
   census: CensusReport
   routes: Awaited<ReturnType<typeof extractRoutes>>
   edges: EdgesReport
@@ -219,10 +378,14 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   programInventory: ProgramInventory
   /** 위험 리포트 — 산출 실패 시 null(다른 산출물은 유지, 우아한 degrade). */
   riskReport: RiskReport | null
+  /** W8 캐시 세션 — buildMap 이 method-calls 에 재사용 후 finalize 재호출. */
+  scanCache: ScanCacheSession
 }> {
   const census = buildCensus(projectRoot)
-  const routes = await extractRoutes(projectRoot, census)
-  const edges = await extractEdges(projectRoot, census)
+  // W8: 파일단위 팩트 캐시 세션 — fingerprint 1회 계산(캐시 검증 + fingerprints.json 공용).
+  const scanCache = new ScanCacheSession(projectRoot, census, { read: opts.readCache !== false })
+  const routes = await extractRoutes(projectRoot, census, scanCache)
+  const edges = await extractEdges(projectRoot, census, scanCache)
   const slices = buildSlices(census, routes, edges)
   const candidates = buildCandidates(census, routes, slices)
   writeCensus(projectRoot, census)
@@ -232,14 +395,14 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   writeCandidates(projectRoot, candidates)
   // 보완 B(JPA): jpa-model.json 도 스캔 시 산출 — impact db-grounding 이 동기 로드한다.
   // (JPA 신호 없는 프로젝트는 entities/repositories 빈 배열. MyBatis 와 공존, AC-16b.)
-  const jpaModel = await extractJpaModel(projectRoot, census)
+  const jpaModel = await extractJpaModel(projectRoot, census, scanCache)
   writeMapArtifact(projectRoot, JPA_MODEL_FILENAME, jpaModel)
   // PA1: db-schema(정적 .sql DDL/dataload + 라이브 신호 정적 탐지) — map 이 단독 소유.
   // jpa-model 과 동형(census 파생·scan 시점·.spec/map/ 기록). 소비자(docs/policy)는 로드만.
-  const dbSchema = extractDbSchema(projectRoot, census)
+  const dbSchema = extractDbSchema(projectRoot, census, scanCache)
   writeDbSchema(projectRoot, dbSchema)
   // W1: 대외 인터페이스(송신/라우트 외 수신) 스캔 — interfaces.json. 소비자(docs)는 로드만.
-  const interfaces = await extractInterfaces(projectRoot, census)
+  const interfaces = await extractInterfaces(projectRoot, census, scanCache)
   writeMapArtifact(projectRoot, INTERFACES_FILENAME, interfaces)
   // W2: 배치 인벤토리 — batch-jobs.json(내용 파생 안정 id + 도달 범위 + 의심신호).
   const batchJobs = buildBatchJobs(projectRoot, routes.batchEntries, edges, census)
@@ -260,13 +423,17 @@ export async function scanDomainMap(projectRoot: string): Promise<{
   // 파이프라인 마지막 부가 단계라 실패해도 선행 산출물을 지킨다(null degrade, 리뷰 R2).
   let riskReport: RiskReport | null = null
   try {
-    riskReport = await buildRiskReport(projectRoot, {
-      census,
-      edges,
-      slices,
-      programInventory,
-      churn: collectGitChurn(projectRoot),
-    })
+    riskReport = await buildRiskReport(
+      projectRoot,
+      {
+        census,
+        edges,
+        slices,
+        programInventory,
+        churn: collectGitChurn(projectRoot),
+      },
+      scanCache,
+    )
     writeMapArtifact(projectRoot, RISK_REPORT_FILENAME, riskReport)
   } catch (err) {
     console.error(`[risk-report] 산출 실패 — 다른 산출물은 유지: ${(err as Error).message}`)
@@ -284,8 +451,10 @@ export async function scanDomainMap(projectRoot: string): Promise<{
     programInventory,
   })
   writeMapArtifact(projectRoot, COVERAGE_FILENAME, coverage)
-  writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, computeFileFingerprints(projectRoot, census))
-  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport }
+  // 세션이 스캔 선두에 계산한 동일 함수·동일 census 의 fingerprint 를 그대로 기록.
+  writeMapArtifact(projectRoot, FINGERPRINTS_FILENAME, scanCache.fingerprints)
+  scanCache.finalize()
+  return { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache }
 }
 
 /**
@@ -330,7 +499,9 @@ export async function buildMap(
   // P3: 메서드 단위 호출 그래프 빌드/기록 후 skeleton refinement 로 전달.
   // 트레이스가 핸들러에서 프로젝트 파일로 해소되면 step 이 메서드 정밀이 되고,
   // 아니면 skeleton 내부에서 슬라이스 파일 단위로 폴백한다(P2 동작 유지).
-  const methodCallGraph = await buildMethodCallGraph(projectRoot, scan.census)
+  const methodCallGraph = await buildMethodCallGraph(projectRoot, scan.census, scan.scanCache)
+  // method-calls 의 java-facts 관측까지 반영해 캐시 재기록(finalize 는 멱등).
+  scan.scanCache.finalize()
   writeMethodCalls(projectRoot, methodCallGraph)
   const skeleton = await buildSkeleton(
     projectRoot,

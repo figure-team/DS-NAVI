@@ -29,8 +29,12 @@ import { ProgramTypeSchema } from '../program-inventory/index.js'
 import { computeFanIn } from '../impact/reach.js'
 import { STRONG_EDGE_KINDS } from '../impact/types.js'
 import { cmp } from '../utils/cmp.js'
+import type { ScanCacheSession } from '../scan-cache/index.js'
 import { measureJavaComplexity } from './complexity.js'
 import type { ChurnMap } from './churn.js'
+
+/** W8 캐시 섹션 salt — countJavaComplexity 의 계상 규칙이 바뀌면 bump. */
+const COMPLEXITY_SALT = 'v1'
 
 export { countJavaComplexity, measureJavaComplexity } from './complexity.js'
 export { collectGitChurn, type ChurnEntry, type ChurnMap } from './churn.js'
@@ -235,8 +239,11 @@ function computeFanOut(
 export async function buildRiskReport(
   projectRoot: string,
   inputs: RiskReportInputs,
+  cache?: ScanCacheSession,
 ): Promise<RiskReport> {
   const { census, edges, slices, programInventory, churn } = inputs
+  // W8: 파일단위 복잡도 캐시 — {c:null} = 판독/파싱 실패(노트 재생). 백분위·등급은 매회 재계산.
+  const cxSec = cache?.section<{ c: number | null }>('complexity', COMPLEXITY_SALT)
   const allowedKinds = new Set<EdgeKind>(STRONG_EDGE_KINDS)
 
   const ranked = programInventory.programs.filter((p) => p.type !== 'test')
@@ -254,10 +261,18 @@ export async function buildRiskReport(
       const notes: string[] = []
       let complexity: number | null = null
       if (p.filePath.endsWith('.java')) {
-        try {
-          complexity = await measureJavaComplexity(readFileSync(join(projectRoot, p.filePath), 'utf8'))
-        } catch {
-          notes.push('[미확인] 복잡도 미측정(판독/파싱 실패)')
+        const hit = cxSec?.get(p.filePath)
+        if (hit !== undefined) {
+          complexity = hit.c
+          if (hit.c === null) notes.push('[미확인] 복잡도 미측정(판독/파싱 실패)')
+        } else {
+          try {
+            complexity = await measureJavaComplexity(readFileSync(join(projectRoot, p.filePath), 'utf8'))
+            cxSec?.put(p.filePath, { c: complexity })
+          } catch {
+            notes.push('[미확인] 복잡도 미측정(판독/파싱 실패)')
+            cxSec?.put(p.filePath, { c: null })
+          }
         }
       } else {
         const ext = p.filePath.includes('.') ? p.filePath.slice(p.filePath.lastIndexOf('.') + 1) : '?'

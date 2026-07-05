@@ -306,4 +306,11 @@ export {
   anchorFingerprints,
 } from './incremental/index.js'
 export type { FileChangeSet } from './incremental/index.js'
+export {
+  ScanCacheSession,
+  createScanCacheSession,
+  SCAN_CACHE_FILENAME,
+  SCAN_CACHE_SCHEMA_VERSION,
+} from './scan-cache/index.js'
+export type { ScanCacheSection, SectionStats } from './scan-cache/index.js'
 export * from './screen-capture/index.js'

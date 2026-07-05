@@ -86,9 +86,11 @@ switch (sub) {
 
 async function runScan() {
   const { scanDomainMap } = engine
-  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport } = await scanDomainMap(projectRoot)
+  const noCache = hasFlag('--no-cache')
+  const { census, routes, edges, slices, candidates, dbSchema, interfaces, batchJobs, programInventory, riskReport, scanCache } = await scanDomainMap(projectRoot, { readCache: !noCache })
   console.log(`understand-map scan 완료 — ${projectRoot}`)
   console.log(`  census: 파일 ${census.fileCount}개`)
+  reportScanCache(scanCache, noCache)
   console.log(`  routes: 라우트 ${routes.routes.length}개 / 배치 ${routes.batchEntries.length}개`)
   reportBatchJobs(batchJobs)
   console.log(`  edges: 엣지 ${edges.edges.length}개 / 미해소 ${edges.unresolved.length}개`)
@@ -104,6 +106,19 @@ async function runScan() {
   reportRisk(riskReport)
   console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces,batch-jobs,program-inventory,risk-report}.json (동일 commit 재실행 byte-diff=0)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
+}
+
+/** W8 증분 캐시 보고 — 재사용/재추출 건수(파일단위 팩트, 정직성 표기). */
+function reportScanCache(scanCache, noCache) {
+  if (!scanCache) return
+  const { reused, recomputed, sections } = scanCache.statsSummary()
+  const detail = Object.entries(sections)
+    .map(([name, s]) => `${name} ${s.reused}/${s.recomputed}`)
+    .join(' · ')
+  console.log(
+    `  캐시(.spec/cache): 재사용 ${reused}·재추출 ${recomputed}${noCache ? ' — --no-cache(전체 재추출·캐시 재구축)' : ''}`,
+  )
+  if (detail) console.log(`    (섹션별 재사용/재추출: ${detail})`)
 }
 
 /** W4 위험 리포트 보고 — 등급 분포 + 지표 커버리지(미측정 표면화). */

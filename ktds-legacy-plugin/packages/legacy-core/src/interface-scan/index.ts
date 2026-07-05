@@ -19,6 +19,7 @@ import { join } from 'node:path'
 import { parseSource } from '../domain-map/tree-sitter.js'
 import { gitCommitHash } from '../domain-map/persist.js'
 import { loadConfig } from '../config/index.js'
+import type { ScanCacheSession } from '../scan-cache/index.js'
 import type { CensusReport } from '../domain-map/types.js'
 import { scanJavaInterfaces, type InvocationSpec, type RawInterfaceSignal } from './java-scan.js'
 import { scanDbLinks } from './text-scan.js'
@@ -113,10 +114,17 @@ function collectSuspects(
   return { count, samples }
 }
 
+/**
+ * W8 캐시 섹션 salt — scanJavaInterfaces 의 신호 형태/의미가 바뀌면 bump.
+ * 파일 외 의존(interfaceScan.clients config)은 salt 에 config 해시로 함께 인코드된다.
+ */
+const INTERFACE_SIGNALS_SALT = 'v1'
+
 /** 프로젝트 전체에서 인터페이스 신호를 추출해 InterfaceReport 를 만든다(파일 기록 없음). */
 export async function extractInterfaces(
   projectRoot: string,
   census: CensusReport,
+  cache?: ScanCacheSession,
 ): Promise<InterfaceReport> {
   const props = buildPropertyIndex(projectRoot, census)
 
@@ -133,16 +141,32 @@ export async function extractInterfaces(
       .map((f) => f.relPath)
       .sort(cmp)
 
+  // W8: 파일단위 raw 신호 캐시 — config(clients) 변경은 섹션 salt 로 통째 무효.
+  // 플레이스홀더 해석·병합·의심신호·프로퍼티 인덱스는 전역 단계라 매회 재계산.
+  const cfgHash = createHash('sha256').update(JSON.stringify(cfgClients)).digest('hex').slice(0, 8)
+  const sigSec = cache?.section<RawInterfaceSignal[] | null>(
+    'interface-signals',
+    `${INTERFACE_SIGNALS_SALT}:cfg-${cfgHash}`,
+  )
+
   // Java(T1) — 파싱 실패 파일은 제외(증거 없는 항목 금지, routes 추출과 동일 원칙).
   for (const relPath of byLang('java')) {
+    const hit = sigSec?.get(relPath)
+    if (hit !== undefined) {
+      if (hit !== null) raw.push(...hit)
+      continue
+    }
     let root
     try {
       const src = readFileSync(join(projectRoot, relPath), 'utf8')
       root = await parseSource('java', src)
     } catch {
+      sigSec?.put(relPath, null)
       continue
     }
-    raw.push(...scanJavaInterfaces(root, relPath, customSpecs))
+    const sigs = scanJavaInterfaces(root, relPath, customSpecs)
+    sigSec?.put(relPath, sigs)
+    raw.push(...sigs)
   }
 
   // XML/SQL(db-link).

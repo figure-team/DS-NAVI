@@ -25,6 +25,8 @@ import {
   type ReceiverDesc,
 } from './java-facts.js'
 import { gitCommitHash } from './persist.js'
+import { JAVA_FACTS_SALT } from './edges.js'
+import type { ScanCacheSession } from '../scan-cache/index.js'
 import type { CensusReport, MethodCallGraph, ReceiverKind, ResolvedCall } from './types.js'
 
 function cmp(a: string | number, b: string | number): number {
@@ -552,23 +554,36 @@ export function buildGraphFromFacts(
 export async function buildMethodCallGraph(
   projectRoot: string,
   census: CensusReport,
+  cache?: ScanCacheSession,
 ): Promise<MethodCallGraph> {
+  // W8: edges.ts 와 `java-facts` 섹션 공유(동일 extractJavaFacts 출력) — 같은 스캔에서
+  // edges 가 먼저 채우면 여기는 파싱 0회. null 값 = 판독 실패 파일(제외 동작 동일).
+  const factsSec = cache?.section<JavaFileFacts | null>('java-facts', JAVA_FACTS_SALT)
   const javaFacts = new Map<string, JavaFileFacts>()
   const javaRels = census.files
     .filter((f) => f.lang === 'java')
     .map((f) => f.relPath)
     .sort(cmp)
   for (const rel of javaRels) {
+    const hit = factsSec?.get(rel)
+    if (hit !== undefined) {
+      if (hit !== null) javaFacts.set(rel, hit)
+      continue
+    }
     let src: string
     try {
       src = readFileSync(join(projectRoot, rel), 'utf8')
     } catch {
+      factsSec?.put(rel, null)
       continue
     }
     try {
-      javaFacts.set(rel, await extractJavaFacts(rel, src))
+      const facts = await extractJavaFacts(rel, src)
+      javaFacts.set(rel, facts)
+      factsSec?.put(rel, facts)
     } catch {
-      // 파싱 실패 파일은 facts 없이 둔다(증거 없는 호출 금지).
+      // 파싱 실패 파일은 facts 없이 둔다(증거 없는 호출 금지). 캐시하지 않는다 —
+      // edges.ts 는 같은 실패를 전파하므로 null 을 공유 섹션에 남기면 두 소비자 동작이 갈린다.
     }
   }
   return buildGraphFromFacts(javaFacts, gitCommitHash(projectRoot))

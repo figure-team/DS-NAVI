@@ -13,6 +13,7 @@ import { join } from 'node:path'
 import type { Node } from 'web-tree-sitter'
 import { parseSource, startLine } from '../domain-map/tree-sitter.js'
 import { gitCommitHash } from '../domain-map/persist.js'
+import type { ScanCacheSession } from '../scan-cache/index.js'
 import type { CensusReport } from '../domain-map/types.js'
 import {
   JpaModelSchema,
@@ -411,34 +412,65 @@ export async function extractJpaFromSource(
   return { entities, repositories, unresolved }
 }
 
+/** W8 캐시 섹션 salt — JPA 추출 의미(애너테이션 인식/파생쿼리 규칙)가 바뀌면 bump. */
+const JPA_FACTS_SALT = 'v1'
+
+/** W8 캐시 팩트 — java 파일 1개의 JPA 기여분(내용의 순수 함수, 실패 메시지 포함). */
+interface JpaFileFacts {
+  entities: JpaEntity[]
+  repositories: JpaRepository[]
+  unresolved: Array<{ ref: string; reason: string }>
+}
+
 /** 프로젝트 전체 census 의 Java 파일을 스캔해 jpa-model.json 모델을 만든다(결정론). */
-export async function extractJpaModel(projectRoot: string, census: CensusReport): Promise<JpaModel> {
+export async function extractJpaModel(
+  projectRoot: string,
+  census: CensusReport,
+  cache?: ScanCacheSession,
+): Promise<JpaModel> {
   const entities: JpaEntity[] = []
   const repositories: JpaRepository[] = []
   const unresolved: Array<{ ref: string; reason: string }> = []
+  // W8: null 캐시 = 판독 실패(기존 동작대로 제외). 사전필터 미스는 빈 팩트로 캐시 —
+  // full 스캔에서도 기여가 없는 파일이라 산출 동일, 재실행 때 판독까지 생략된다.
+  const jpaSec = cache?.section<JpaFileFacts | null>('jpa-facts', JPA_FACTS_SALT)
 
   for (const f of census.files) {
     if (f.lang !== 'java') continue
+    const hit = jpaSec?.get(f.relPath)
+    if (hit !== undefined) {
+      if (hit !== null) {
+        entities.push(...hit.entities)
+        repositories.push(...hit.repositories)
+        unresolved.push(...hit.unresolved)
+      }
+      continue
+    }
     let source: string
     try {
       source = readFileSync(join(projectRoot, f.relPath), 'utf8')
     } catch {
+      jpaSec?.put(f.relPath, null)
       continue
     }
     // 빠른 사전 필터: JPA 신호가 전혀 없으면 파싱 생략(결정론 무관, 성능).
     if (!/@Entity|Repository|@Table|@Column|@Query|@OneToMany|@ManyToOne|@OneToOne|@ManyToMany/.test(source)) {
+      jpaSec?.put(f.relPath, { entities: [], repositories: [], unresolved: [] })
       continue
     }
     // 파일별 파싱 오류 격리(정직성): 한 파일이 실패해도 스캔 전체를 중단하지 않고
     // unresolved 로 보고한다. scanDomainMap 이 모든 스캔 경로에서 호출되므로 필수.
+    // 실패 메시지도 소스의 순수 함수 — 팩트에 포함해 재생 동일성 유지.
+    let facts: JpaFileFacts
     try {
-      const r = await extractJpaFromSource(source, f.relPath)
-      entities.push(...r.entities)
-      repositories.push(...r.repositories)
-      unresolved.push(...r.unresolved)
+      facts = await extractJpaFromSource(source, f.relPath)
     } catch (err) {
-      unresolved.push({ ref: f.relPath, reason: `JPA 파싱 실패: ${(err as Error).message}` })
+      facts = { entities: [], repositories: [], unresolved: [{ ref: f.relPath, reason: `JPA 파싱 실패: ${(err as Error).message}` }] }
     }
+    jpaSec?.put(f.relPath, facts)
+    entities.push(...facts.entities)
+    repositories.push(...facts.repositories)
+    unresolved.push(...facts.unresolved)
   }
 
   entities.sort((a, b) => cmp(a.relPath, b.relPath) || cmp(a.className, b.className))

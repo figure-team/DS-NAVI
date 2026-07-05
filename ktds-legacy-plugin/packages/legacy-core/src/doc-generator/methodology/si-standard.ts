@@ -28,6 +28,7 @@ import {
 import type { Confidence } from '../../types.js'
 import type { Evidence, GeneratedDoc, TableRow } from '../types.js'
 import type { MethodologyModule } from './types.js'
+import type { WorkSummaryReport } from '../../work-summary/index.js'
 
 /** 추론(미상) 셀 표기 — template §2 인터페이스정의서 `[추정]` 규약. */
 const INFERRED_CELL = '[추정]'
@@ -770,14 +771,186 @@ function buildSiTestScenarios(input: DocInput): GeneratedDoc {
   }
 }
 
-// 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
-export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec, buildSiProgramList, buildSiRiskReport, buildSiTestScenarios }
+// ──────────────────────────────────────────────────────────────────────────
+// si-실적요약보고서 (W6) — work-summary.json 승계. 기간 실적·모듈·진척.
+// ──────────────────────────────────────────────────────────────────────────
 
-/** si-standard 모듈 — SI 정형 문서를 docId 순서로 산출(기능 → 인터페이스 → 테이블 → 배치 → 프로그램 → 위험 → 시나리오). */
+/** §1 하이라이트 / §2 산정 기준 열 — template ws-highlight / ws-criteria 와 1:1. */
+const WS_TEXT_COLUMNS = ['항목', '내용']
+/** §3 커밋 이력 열 — template ws-commits 와 1:1. */
+const WS_COMMIT_COLUMNS = ['순번', '커밋', '일시', '작성자', '제목', '구분', '파일', '추가', '삭제']
+/** §4 모듈별 변경 열 — template ws-modules 와 1:1. */
+const WS_MODULE_COLUMNS = ['모듈', '귀속 근거', '커밋', '파일', '변경라인']
+/** §5 진척 열 — template ws-progress 와 1:1. */
+const WS_PROGRESS_COLUMNS = ['항목', '값', '비고']
+
+/** RTM 확정 원장 경로 — 진척 행의 근거 파일(수치의 원천). */
+const RTM_OVERLAY_FILE = '.understand-anything/rtm-overrides.json'
+
+/** 기간 서술(§3.5 결정론 문형) — 수집 meta 의 해석 결과만 재배열(날조 금지). */
+function wsRangeText(ws: WorkSummaryReport): string {
+  const r = ws.range
+  if (r.mode === 'range') return `커밋 범위 ${r.rawArg} — rev-list 집합(시각 윈도 없음)`
+  if (r.mode === 'month') return `${r.rawArg} 달력 월 [${r.fromIso ?? UNRESOLVED_CELL} ~ ${r.toIso ?? UNRESOLVED_CELL})`
+  return `최근 ${r.rawArg}주 (${r.fromIso ?? UNRESOLVED_CELL} ~ ${r.toIso ?? UNRESOLVED_CELL}] — 앵커 = HEAD 커밋 시각(벽시계 아님)`
+}
+
+/**
+ * si-실적요약보고서(W6) — work-summary.json 승계(결정론 수집·집계).
+ * §1 하이라이트: 수집 수치를 고정 문형에 끼운 사람 말 요약 — LLM 산문 불개입(날조 0 의
+ *   구조적 보장). 수치 재배열 서술이라 INFERRED 로 두되 원천 표(§3~§5)가 확정을 진다.
+ * §3 커밋 이력: 파일 근거 보유 행 CONFIRMED(변경 파일 상위 3개 승계), 머지 등 파일
+ *   근거 없는 행은 INFERRED(file:line 근거 체계의 한계 — §2 명기, 날조 대신 강등).
+ * §4 모듈: 집계 행(단일 file:line 없음) — inventory 조인은 도메인 근거, dir 폴백은 [추정].
+ * §5 진척: 원장 파일 자체를 근거로 승계(수치의 원천). 원장 없음/기간 축 없음(range)은
+ *   [미확인] — 0(이벤트 없음)과 구분.
+ */
+function buildSiWorkSummary(input: DocInput): GeneratedDoc {
+  const ws = input.workSummary
+
+  const textRow = (cells: string[]): TableRow => ({ cells, confidence: 'INFERRED', evidence: [] })
+
+  const gitUnavailable = ws !== undefined && ws !== null && !ws.meta.gitAvailable
+  const highlightRows: TableRow[] = !ws
+    ? [textRow(['현황', 'work-summary.json 없음 — understand-report 실행 필요'])]
+    : [
+        textRow(['기간', wsRangeText(ws)]),
+        gitUnavailable
+          ? textRow([
+              '실적',
+              `${UNRESOLVED_CELL} git 이력 수집 불가(${ws.meta.gitStatus === 'shallow' ? 'shallow clone — 잘린 이력은 결정론 불가' : 'git 레포 아님/이력 없음'})`,
+            ])
+          : textRow([
+              '실적',
+              `커밋 ${ws.totals.commits}건(작성자 ${ws.totals.authors}명, 머지 ${ws.totals.mergeCommits}건), 파일 ${ws.totals.files}개 변경(+${ws.totals.added}/−${ws.totals.deleted})`,
+            ]),
+        textRow([
+          '변경 상위 모듈',
+          ws.modules.length === 0
+            ? gitUnavailable
+              ? UNRESOLVED_CELL
+              : '변경 없음'
+            : ws.modules
+                .slice(0, 3)
+                .map((m) => `${m.key}(±${m.linesChanged})`)
+                .join(', '),
+        ]),
+        textRow([
+          'RTM 진척',
+          ws.rtmProgress === null
+            ? `${UNRESOLVED_CELL} ${ws.range.mode === 'range' ? '커밋 범위 모드는 시각 윈도가 없어 원장 집계 불가' : '확정 원장(rtm-overrides.json) 없음 또는 기간 미해석'}`
+            : `추정→확정 전환 ${ws.rtmProgress.functionsConfirmed + ws.rtmProgress.scenariosConfirmed + ws.rtmProgress.requirementsConfirmed}건(기능 ${ws.rtmProgress.functionsConfirmed} · 시나리오 ${ws.rtmProgress.scenariosConfirmed} · 요구사항 ${ws.rtmProgress.requirementsConfirmed})`,
+        ]),
+        textRow([
+          '문서 진척',
+          ws.docProgress === null
+            ? `${UNRESOLVED_CELL} ${ws.range.mode === 'range' ? '커밋 범위 모드는 시각 윈도가 없어 원장 집계 불가' : '문서 상태 원장(.spec/docs) 없음 또는 기간 미해석'}`
+            : `제출 ${ws.docProgress.submitted} · 승인 ${ws.docProgress.approved} · 반려 ${ws.docProgress.returned}`,
+        ]),
+      ]
+
+  const criteriaRows: TableRow[] = [
+    ['날짜 축', '커밋의 committer date — cherry-pick/rebase 후에도 "이 기간에 랜딩됐다"가 실적 기준(author date 는 원 작성 시점)'],
+    ['기간 해석', '주간 = HEAD 커밋 시각 앵커 반개구간 (from, to] · 월간 = 달력 월 [1일, 익월 1일) · 커밋 범위 = rev-list 집합(시각 윈도 없음). 벽시계 미사용 — 같은 HEAD 면 언제 실행해도 동일'],
+    ['커밋 행 신뢰도', '변경 파일 근거 보유 행 [확정](상위 3개 파일 승계) · 머지 등 파일 근거 없는 행 [추정](file:line 근거 체계의 한계, 커밋 해시로 검증 가능)'],
+    ['모듈 귀속', '프로그램목록(W3) 도메인 조인 우선, 미포함 파일은 최상위 디렉터리 버킷 [추정]'],
+    ['진척 원장', 'RTM = rtm-overrides.json audit[](확정 이벤트 CONFIRMED/CONFIRMED_NO_EDIT, 엔티티별 최초 확정만 전환으로 집계 — 재확정 중복 방지) · 문서 = .spec/docs/*.state.json audit[]. 원장은 작업트리의 현재 상태 — 과거 시점 스냅샷 복원은 하지 않음'],
+    ['재현', 'work-summary.json 의 gitCommit(HEAD)·range 해석 결과가 앵커 — 동일 커밋·동일 인자 재실행 시 byte 동일'],
+  ].map(textRow)
+
+  const commitRows: TableRow[] = (ws?.commits ?? []).map((c, i): TableRow => {
+    const files = c.files
+    const added = files.reduce((s, f) => s + f.added, 0)
+    const deleted = files.reduce((s, f) => s + f.deleted, 0)
+    const evidence: Evidence[] = files.slice(0, 3).map((f) => ({ file: f.path, line: null }))
+    return {
+      cells: [
+        String(i + 1),
+        c.sha.slice(0, 8),
+        c.dateIso,
+        c.author,
+        c.subject,
+        c.isMerge ? '머지' : EMPTY_CELL,
+        String(files.length),
+        String(added),
+        String(deleted),
+      ],
+      confidence: evidence.length > 0 ? 'CONFIRMED' : 'INFERRED',
+      evidence,
+    }
+  })
+
+  const moduleRows: TableRow[] = (ws?.modules ?? []).map(
+    (m): TableRow => ({
+      cells: [
+        m.key,
+        m.source === 'program-inventory' ? '프로그램목록 도메인 조인' : `최상위 디렉터리 ${INFERRED_CELL}`,
+        String(m.commits),
+        String(m.files),
+        String(m.linesChanged),
+      ],
+      confidence: 'INFERRED',
+      evidence: [],
+    }),
+  )
+
+  const progressRows: TableRow[] = []
+  if (ws) {
+    if (ws.rtmProgress === null) {
+      progressRows.push(textRow(['RTM 진척', UNRESOLVED_CELL, ws.range.mode === 'range' ? '시각 윈도 없음(커밋 범위 모드)' : '원장 없음 또는 기간 미해석 — 0 과 구분']))
+    } else {
+      const p = ws.rtmProgress
+      const rtmEv: Evidence[] = [{ file: RTM_OVERLAY_FILE, line: null }]
+      const notes = [
+        p.auditlessEntities > 0 ? `구원장(audit 없음) ${p.auditlessEntities}건은 at 폴백 — 최초/재확정 구분 불가` : '',
+        p.unparsableAt > 0 ? `시각 파싱 실패 ${p.unparsableAt}건(집계 제외, 표면화)` : '',
+      ].filter((s) => s.length > 0)
+      progressRows.push(
+        { cells: ['RTM 확정 전환(기능)', String(p.functionsConfirmed), '엔티티별 최초 확정만'], confidence: 'CONFIRMED', evidence: rtmEv },
+        { cells: ['RTM 확정 전환(시나리오)', String(p.scenariosConfirmed), EMPTY_CELL], confidence: 'CONFIRMED', evidence: rtmEv },
+        { cells: ['RTM 확정 전환(요구사항)', String(p.requirementsConfirmed), EMPTY_CELL], confidence: 'CONFIRMED', evidence: rtmEv },
+        { cells: ['RTM 이벤트(확정/편집)', `${p.confirmEvents}/${p.editEvents}`, notes.join(' · ') || '재확정 포함 총수'], confidence: 'CONFIRMED', evidence: rtmEv },
+      )
+    }
+    if (ws.docProgress === null) {
+      progressRows.push(textRow(['문서 진척', UNRESOLVED_CELL, ws.range.mode === 'range' ? '시각 윈도 없음(커밋 범위 모드)' : '문서 상태 원장 없음 — 0 과 구분']))
+    } else {
+      const d = ws.docProgress
+      const docEv: Evidence[] = d.approvedDocs.slice(0, 3).map((id) => ({ file: `.spec/docs/${id}.state.json`, line: null }))
+      progressRows.push({
+        cells: [
+          '문서 제출/승인/반려',
+          `${d.submitted}/${d.approved}/${d.returned}`,
+          [d.approvedDocs.length > 0 ? `승인: ${d.approvedDocs.join(', ')}` : '', d.unparsableAt > 0 ? `시각 파싱 실패 ${d.unparsableAt}건` : ''].filter((s) => s.length > 0).join(' · ') || EMPTY_CELL,
+        ],
+        confidence: docEv.length > 0 ? 'CONFIRMED' : 'INFERRED',
+        evidence: docEv,
+      })
+    }
+  }
+
+  return {
+    docId: 'si-실적요약보고서',
+    title: 'SI 실적요약보고서',
+    methodology: 'si-standard',
+    sections: [
+      { heading: '실적 하이라이트', key: 'ws-highlight', claims: [], table: { columns: WS_TEXT_COLUMNS, rows: highlightRows } },
+      { heading: '산정 기준', key: 'ws-criteria', claims: [], table: { columns: WS_TEXT_COLUMNS, rows: criteriaRows } },
+      { heading: '커밋 이력', key: 'ws-commits', claims: [], table: { columns: WS_COMMIT_COLUMNS, rows: commitRows } },
+      { heading: '모듈별 변경', key: 'ws-modules', claims: [], table: { columns: WS_MODULE_COLUMNS, rows: moduleRows } },
+      { heading: 'RTM·문서 진척', key: 'ws-progress', claims: [], table: { columns: WS_PROGRESS_COLUMNS, rows: progressRows } },
+    ],
+  }
+}
+
+// 개별 빌더 export — 템플릿 기반 문서 세트(doc-set) 레지스트리가 docId 단위로 호출.
+export { buildSiFeatureSpec, buildSiInterfaceSpec, buildSiTableSpec, buildSiBatchSpec, buildSiProgramList, buildSiRiskReport, buildSiTestScenarios, buildSiWorkSummary }
+
+/** si-standard 모듈 — SI 정형 문서를 docId 순서로 산출(기능 → 인터페이스 → 테이블 → 배치 → 프로그램 → 위험 → 시나리오 → 실적). */
 export const siStandardMethodology: MethodologyModule = {
   id: 'si-standard',
   title: 'SI 표준(정형 제출 서식)',
   buildDocSet(input: DocInput): GeneratedDoc[] {
-    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input), buildSiProgramList(input), buildSiRiskReport(input), buildSiTestScenarios(input)]
+    return [buildSiFeatureSpec(input), buildSiInterfaceSpec(input), buildSiTableSpec(input), buildSiBatchSpec(input), buildSiProgramList(input), buildSiRiskReport(input), buildSiTestScenarios(input), buildSiWorkSummary(input)]
   },
 }

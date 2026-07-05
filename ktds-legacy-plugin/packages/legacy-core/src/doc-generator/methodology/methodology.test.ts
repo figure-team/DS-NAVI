@@ -122,7 +122,7 @@ describe('AC-23: methodology swap yields different doc sets', () => {
     expect(docs.every((d) => d.methodology === 'as-built')).toBe(true)
   })
 
-  it('si-standard -> SI 정형 7종(W4 위험 리포트·W5 시나리오 포함)', () => {
+  it('si-standard -> SI 정형 8종(W4 위험 리포트·W5 시나리오·W6 실적 요약 포함)', () => {
     const docs = getMethodology('si-standard').buildDocSet(INPUT)
     expect(docs.map((d) => d.docId)).toEqual([
       'si-기능명세서',
@@ -132,6 +132,7 @@ describe('AC-23: methodology swap yields different doc sets', () => {
       'si-프로그램목록',
       'si-위험모듈리포트',
       'si-단위테스트시나리오',
+      'si-실적요약보고서',
     ])
     expect(docs.every((d) => d.methodology === 'si-standard')).toBe(true)
   })

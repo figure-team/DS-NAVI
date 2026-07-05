@@ -42,6 +42,41 @@ exports[`determinism: SI golden skeleton + double-run > renderSkeleton golden: s
 "
 `;
 
+exports[`determinism: SI golden skeleton + double-run > renderSkeleton golden: si-실적요약보고서 1`] = `
+"## 실적 하이라이트
+
+| 항목 | 내용 | 신뢰도 | 근거 |
+| --- | --- | --- | --- |
+| 현황 | work-summary.json 없음 — understand-report 실행 필요 | [추정] |  |
+
+## 산정 기준
+
+| 항목 | 내용 | 신뢰도 | 근거 |
+| --- | --- | --- | --- |
+| 날짜 축 | 커밋의 committer date — cherry-pick/rebase 후에도 "이 기간에 랜딩됐다"가 실적 기준(author date 는 원 작성 시점) | [추정] |  |
+| 기간 해석 | 주간 = HEAD 커밋 시각 앵커 반개구간 (from, to] · 월간 = 달력 월 [1일, 익월 1일) · 커밋 범위 = rev-list 집합(시각 윈도 없음). 벽시계 미사용 — 같은 HEAD 면 언제 실행해도 동일 | [추정] |  |
+| 커밋 행 신뢰도 | 변경 파일 근거 보유 행 [확정](상위 3개 파일 승계) · 머지 등 파일 근거 없는 행 [추정](file:line 근거 체계의 한계, 커밋 해시로 검증 가능) | [추정] |  |
+| 모듈 귀속 | 프로그램목록(W3) 도메인 조인 우선, 미포함 파일은 최상위 디렉터리 버킷 [추정] | [추정] |  |
+| 진척 원장 | RTM = rtm-overrides.json audit[](확정 이벤트 CONFIRMED/CONFIRMED_NO_EDIT, 엔티티별 최초 확정만 전환으로 집계 — 재확정 중복 방지) · 문서 = .spec/docs/*.state.json audit[]. 원장은 작업트리의 현재 상태 — 과거 시점 스냅샷 복원은 하지 않음 | [추정] |  |
+| 재현 | work-summary.json 의 gitCommit(HEAD)·range 해석 결과가 앵커 — 동일 커밋·동일 인자 재실행 시 byte 동일 | [추정] |  |
+
+## 커밋 이력
+
+| 순번 | 커밋 | 일시 | 작성자 | 제목 | 구분 | 파일 | 추가 | 삭제 | 신뢰도 | 근거 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+## 모듈별 변경
+
+| 모듈 | 귀속 근거 | 커밋 | 파일 | 변경라인 | 신뢰도 | 근거 |
+| --- | --- | --- | --- | --- | --- | --- |
+
+## RTM·문서 진척
+
+| 항목 | 값 | 비고 | 신뢰도 | 근거 |
+| --- | --- | --- | --- | --- |
+"
+`;
+
 exports[`determinism: SI golden skeleton + double-run > renderSkeleton golden: si-위험모듈리포트 1`] = `
 "## 산정 기준
 

@@ -17,6 +17,7 @@ import type { BatchJobsReport } from '../../batch-scan/report.js'
 import type { ProgramInventory } from '../../program-inventory/index.js'
 import type { RiskReport } from '../../risk-report/index.js'
 import type { RtmModel } from '../../rtm/types.js'
+import type { WorkSummaryReport } from '../../work-summary/index.js'
 import { claim } from '../claims.js'
 import type { Claim, Evidence } from '../types.js'
 
@@ -59,6 +60,8 @@ export interface DocInput {
   riskReport?: RiskReport | null
   /** RTM 원장(W5) — si-단위테스트시나리오 grounding(rtm.json 로드, zod 미경유 가능 — 방어적 접근). */
   rtm?: RtmModel | null
+  /** 실적 요약(W6) — si-실적요약보고서 grounding(work-summary.json 로드). */
+  workSummary?: WorkSummaryReport | null
 }
 
 /** node.id ASC 안정 정렬(결정론 tie-break). */

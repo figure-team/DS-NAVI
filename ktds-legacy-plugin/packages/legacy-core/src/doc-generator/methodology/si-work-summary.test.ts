@@ -1,0 +1,151 @@
+/**
+ * si-실적요약보고서 빌더 테스트(W6) — 고정 WorkSummaryReport 주입.
+ * 검증 축: 하이라이트 고정 문형(수집 사실만) · 커밋 행 근거 승계(머지는 [추정] 강등) ·
+ * 진척 행 원장 근거 · null degrade([미확인] ≠ 0) · 근거 게이트(무근거 CONFIRMED 0).
+ */
+import { describe, it, expect } from 'vitest'
+import type { WorkSummaryReport } from '../../work-summary/index.js'
+import { enforceEvidence } from '../../evidence/index.js'
+import type { DocInput } from '../builders/index.js'
+import { buildSiWorkSummary } from './si-standard.js'
+
+const BASE: DocInput = { nodes: [], edges: [] }
+
+function fixtureReport(over?: Partial<WorkSummaryReport>): WorkSummaryReport {
+  return {
+    schemaVersion: 1,
+    gitCommit: 'aaaa000000000000000000000000000000000000',
+    range: {
+      mode: 'weeks',
+      rawArg: '1',
+      fromIso: '2026-06-23T12:00:00.000Z',
+      toIso: '2026-06-30T12:00:00.000Z',
+      anchorSha: 'aaaa000000000000000000000000000000000000',
+    },
+    commits: [
+      {
+        sha: 'aaaa000000000000000000000000000000000000',
+        dateIso: '2026-06-30T12:00:00Z',
+        author: 'tester',
+        subject: 'feat: a',
+        isMerge: false,
+        files: [{ path: 'src/a.java', added: 5, deleted: 1 }],
+      },
+      {
+        sha: 'bbbb100000000000000000000000000000000000',
+        dateIso: '2026-06-28T12:00:00Z',
+        author: 'tester',
+        subject: 'merge topic',
+        isMerge: true,
+        files: [],
+      },
+    ],
+    totals: { commits: 2, mergeCommits: 1, authors: 1, files: 1, added: 5, deleted: 1 },
+    modules: [{ key: 'src', source: 'dir', commits: 1, files: 1, linesChanged: 6 }],
+    rtmProgress: {
+      functionsConfirmed: 2,
+      scenariosConfirmed: 1,
+      requirementsConfirmed: 0,
+      confirmEvents: 4,
+      editEvents: 1,
+      auditlessEntities: 0,
+      unparsableAt: 0,
+    },
+    docProgress: { submitted: 1, approved: 1, returned: 0, approvedDocs: ['si-기능명세서'], unparsableAt: 0 },
+    meta: { gitAvailable: true, gitStatus: 'ok', prefix: '', moduleSource: 'dir' },
+    ...over,
+  }
+}
+
+function section(docInput: DocInput, key: string) {
+  const doc = buildSiWorkSummary(docInput)
+  return doc.sections.find((s) => s.key === key)!
+}
+
+describe('buildSiWorkSummary', () => {
+  it('workSummary 없음 → 현황 행(실행 안내), 표는 빈 상태(합성 금지)', () => {
+    const hl = section(BASE, 'ws-highlight')
+    expect(hl.table!.rows).toHaveLength(1)
+    expect(hl.table!.rows[0].cells[1]).toContain('understand-report')
+    expect(section(BASE, 'ws-commits').table!.rows).toHaveLength(0)
+    expect(section(BASE, 'ws-progress').table!.rows).toHaveLength(0)
+  })
+
+  it('하이라이트: 수집 수치만 고정 문형에 끼운다(날조 0)', () => {
+    const input = { ...BASE, workSummary: fixtureReport() }
+    const rows = section(input, 'ws-highlight').table!.rows
+    const byKey = new Map(rows.map((r) => [r.cells[0], r.cells[1]]))
+    expect(byKey.get('기간')).toContain('최근 1주')
+    expect(byKey.get('기간')).toContain('2026-06-23T12:00:00.000Z')
+    expect(byKey.get('실적')).toBe('커밋 2건(작성자 1명, 머지 1건), 파일 1개 변경(+5/−1)')
+    expect(byKey.get('변경 상위 모듈')).toBe('src(±6)')
+    expect(byKey.get('RTM 진척')).toBe('추정→확정 전환 3건(기능 2 · 시나리오 1 · 요구사항 0)')
+    expect(byKey.get('문서 진척')).toBe('제출 1 · 승인 1 · 반려 0')
+  })
+
+  it('커밋 행: 파일 근거 승계 [확정], 머지(파일 근거 없음)는 [추정] 강등', () => {
+    const input = { ...BASE, workSummary: fixtureReport() }
+    const rows = section(input, 'ws-commits').table!.rows
+    expect(rows).toHaveLength(2)
+    expect(rows[0].cells[1]).toBe('aaaa0000') // sha 8자.
+    expect(rows[0].confidence).toBe('CONFIRMED')
+    expect(rows[0].evidence).toEqual([{ file: 'src/a.java', line: null }])
+    expect(rows[1].cells[5]).toBe('머지')
+    expect(rows[1].confidence).toBe('INFERRED')
+    expect(rows[1].evidence).toEqual([])
+  })
+
+  it('진척 행: 원장 파일을 근거로 승계(CONFIRMED)', () => {
+    const input = { ...BASE, workSummary: fixtureReport() }
+    const rows = section(input, 'ws-progress').table!.rows
+    const fn = rows.find((r) => r.cells[0] === 'RTM 확정 전환(기능)')!
+    expect(fn.cells[1]).toBe('2')
+    expect(fn.confidence).toBe('CONFIRMED')
+    expect(fn.evidence).toEqual([{ file: '.understand-anything/rtm-overrides.json', line: null }])
+    const doc = rows.find((r) => r.cells[0] === '문서 제출/승인/반려')!
+    expect(doc.cells[1]).toBe('1/1/0')
+    expect(doc.evidence).toEqual([{ file: '.spec/docs/si-기능명세서.state.json', line: null }])
+  })
+
+  it('원장 null([미확인]) — 0 과 구분, range 모드는 사유 명시', () => {
+    const input = {
+      ...BASE,
+      workSummary: fixtureReport({
+        range: { mode: 'range', rawArg: 'A..B', fromIso: null, toIso: null, anchorSha: null },
+        rtmProgress: null,
+        docProgress: null,
+      }),
+    }
+    const hl = new Map(section(input, 'ws-highlight').table!.rows.map((r) => [r.cells[0], r.cells[1]]))
+    expect(hl.get('RTM 진척')).toContain('[미확인]')
+    expect(hl.get('RTM 진척')).toContain('시각 윈도')
+    const rows = section(input, 'ws-progress').table!.rows
+    expect(rows).toHaveLength(2)
+    expect(rows.every((r) => r.cells[1] === '[미확인]')).toBe(true)
+  })
+
+  it('git 불가: 실적 [미확인] + shallow 사유 구분', () => {
+    const input = {
+      ...BASE,
+      workSummary: fixtureReport({
+        commits: [],
+        totals: { commits: 0, mergeCommits: 0, authors: 0, files: 0, added: 0, deleted: 0 },
+        modules: [],
+        meta: { gitAvailable: false, gitStatus: 'shallow', prefix: '', moduleSource: 'dir' },
+      }),
+    }
+    const hl = new Map(section(input, 'ws-highlight').table!.rows.map((r) => [r.cells[0], r.cells[1]]))
+    expect(hl.get('실적')).toContain('[미확인]')
+    expect(hl.get('실적')).toContain('shallow')
+  })
+
+  it('근거 게이트: 무근거 CONFIRMED 0(저장 차단 위반 없음)', () => {
+    const doc = buildSiWorkSummary({ ...BASE, workSummary: fixtureReport() })
+    expect(enforceEvidence(doc).violations).toEqual([])
+  })
+
+  it('byte 결정론 — 동일 입력 2회 직렬화 동일', () => {
+    const input = { ...BASE, workSummary: fixtureReport() }
+    expect(JSON.stringify(buildSiWorkSummary(input))).toBe(JSON.stringify(buildSiWorkSummary(input)))
+  })
+})

@@ -22,7 +22,7 @@
  * 결정론: 캐시 파일은 섹션명·relPath 정렬로 기록, 타임스탬프 없음 — 동일 commit 에서
  * 재실행해도 byte-diff=0.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { CensusReport } from '../domain-map/types.js'
 import { computeFileFingerprints } from '../incremental/index.js'
@@ -126,15 +126,26 @@ export class ScanCacheSession {
     this.prev = opts.read === false ? null : loadStoredCache(projectRoot)
   }
 
+  /** 파일이 census fingerprint 기준으로도 판독 불가('absent')인가 — null 캐시 동의 조건(리뷰 R2). */
+  isAbsent(relPath: string): boolean {
+    return this.fingerprints[relPath] === 'absent'
+  }
+
   /**
    * 섹션 핸들. salt 는 추출기 버전(+config 해시 등 파일 외 의존)을 인코드 —
-   * 저장본과 다르면 섹션 전체 미스.
+   * 저장본과 다르면 섹션 전체 미스. 같은 세션에서 같은 섹션명을 다른 salt 로 다시
+   * 열면 앞선 소비자의 기록이 소실되므로 개발 오류로 즉시 던진다(리뷰 R3).
    */
   section<T>(name: string, salt: string): ScanCacheSection<T> {
     const prevSection = this.prev?.sections[name]
     const prevEntries = prevSection && prevSection.salt === salt ? prevSection.entries : {}
     let nextSection = this.next.get(name)
-    if (!nextSection || nextSection.salt !== salt) {
+    if (nextSection && nextSection.salt !== salt) {
+      throw new Error(
+        `[scan-cache] 섹션 '${name}' 을 서로 다른 salt 로 재오픈(${nextSection.salt} → ${salt}) — 공유 섹션은 동일 salt 상수를 import 해 쓰세요.`,
+      )
+    }
+    if (!nextSection) {
       nextSection = { salt, entries: new Map() }
       this.next.set(name, nextSection)
     }
@@ -145,12 +156,18 @@ export class ScanCacheSession {
 
     return {
       get: (relPath: string): T | undefined => {
+        // read-your-writes: 같은 실행에서 다른 스캐너가 이미 기록한 팩트도 재사용 —
+        // 콜드 실행에서도 edges→method-calls 공유가 성립한다(리뷰 R1). 그 파일은 이미
+        // recomputed 로 계상됐으므로 통계는 손대지 않는다. 재사용 이월분(관측 이월로
+        // next 에 복사된 prev 엔트리)도 같은 경로로 반환된다(값 동일 — hash 검증 통과분).
+        const fresh = nextEntries.get(relPath)
+        if (fresh !== undefined) return structuredClone(fresh.value) as T
         const entry = prevEntries[relPath]
         const hash = fingerprints[relPath]
         if (!entry || hash === undefined || entry.hash !== hash) return undefined
         // 관측 이월: 히트 엔트리는 next 로 옮겨 finalize 때 살아남는다(저장본 원본 유지).
         const key = statKey(name, relPath)
-        if (!nextEntries.has(relPath) && !reusedKeys.has(key)) {
+        if (!reusedKeys.has(key)) {
           nextEntries.set(relPath, entry)
           reusedKeys.add(key)
           stat.reused++
@@ -189,8 +206,10 @@ export class ScanCacheSession {
   /**
    * 캐시 기록(결정론: 섹션명·relPath 정렬, 타임스탬프 없음). 여러 번 호출해도 안전 —
    * 마지막 호출 시점까지의 관측 상태를 기록한다(buildMap 이 method-calls 후 재호출).
-   * 이번 실행에서 열지 않은 섹션은 "현재 해시와 일치하는" 엔트리만 이월(부분 실행 보호
-   * + 삭제 파일 프루닝).
+   * 이월 규칙(열린/미개방 섹션 공통): 관측분 ∪ (salt 일치 + 현재 해시 일치 + 미관측
+   * prev 엔트리) — 부분 실행/도중 예외(예: risk-report degrade)가 캐시를 침묵 침식하지
+   * 않는다(비평 C5). 삭제·변경 파일은 해시 검증에서 자연 프루닝.
+   * 기록은 임시 파일 + rename 으로 원자적(동시 실행 torn write 방지, 비평 C6).
    */
   finalize(): void {
     const out: StoredCache = { schemaVersion: SCAN_CACHE_SCHEMA_VERSION, sections: {} }
@@ -198,29 +217,35 @@ export class ScanCacheSession {
     for (const name of Object.keys(this.prev?.sections ?? {})) names.add(name)
     for (const name of [...names].sort(cmp)) {
       const observed = this.next.get(name)
-      const entries: Record<string, StoredEntry> = {}
-      if (observed) {
-        for (const rel of [...observed.entries.keys()].sort(cmp)) {
-          entries[rel] = observed.entries.get(rel)!
-        }
-        out.sections[name] = { salt: observed.salt, entries }
-      } else {
-        // 미개방 섹션 이월 — 여전히 유효한(해시 일치) 엔트리만.
-        const prevSection = this.prev!.sections[name]
-        for (const rel of Object.keys(prevSection.entries).sort(cmp)) {
+      const prevSection = this.prev?.sections[name]
+      const salt = observed ? observed.salt : prevSection!.salt
+      const merged = new Map<string, StoredEntry>()
+      // prev 이월분 먼저(관측분이 있으면 아래에서 덮어쓴다).
+      if (prevSection && prevSection.salt === salt) {
+        for (const rel of Object.keys(prevSection.entries)) {
           const entry = prevSection.entries[rel]
           if (this.fingerprints[rel] !== undefined && entry.hash === this.fingerprints[rel]) {
-            entries[rel] = entry
+            merged.set(rel, entry)
           }
         }
-        if (Object.keys(entries).length > 0) {
-          out.sections[name] = { salt: prevSection.salt, entries }
-        }
       }
+      if (observed) {
+        for (const [rel, entry] of observed.entries) merged.set(rel, entry)
+      }
+      if (merged.size === 0) continue
+      const entries: Record<string, StoredEntry> = {}
+      for (const rel of [...merged.keys()].sort(cmp)) entries[rel] = merged.get(rel)!
+      out.sections[name] = { salt, entries }
     }
     const dir = specCacheDir(this.projectRoot)
     mkdirSync(dir, { recursive: true })
-    writeFileSync(join(dir, SCAN_CACHE_FILENAME), JSON.stringify(out), 'utf8')
+    // 캐시 디렉터리 자기-ignore(파생물 커밋 방지 — 대상 프로젝트의 .gitignore 무수정).
+    const selfIgnore = join(dir, '.gitignore')
+    if (!existsSync(selfIgnore)) writeFileSync(selfIgnore, '*\n', 'utf8')
+    const finalPath = join(dir, SCAN_CACHE_FILENAME)
+    const tmpPath = `${finalPath}.tmp-${process.pid}`
+    writeFileSync(tmpPath, JSON.stringify(out), 'utf8')
+    renameSync(tmpPath, finalPath)
   }
 }
 

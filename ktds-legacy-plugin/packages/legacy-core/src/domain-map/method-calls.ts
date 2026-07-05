@@ -556,8 +556,9 @@ export async function buildMethodCallGraph(
   census: CensusReport,
   cache?: ScanCacheSession,
 ): Promise<MethodCallGraph> {
-  // W8: edges.ts 와 `java-facts` 섹션 공유(동일 extractJavaFacts 출력) — 같은 스캔에서
-  // edges 가 먼저 채우면 여기는 파싱 0회. null 값 = 판독 실패 파일(제외 동작 동일).
+  // W8: edges.ts 와 `java-facts` 섹션 공유(동일 extractJavaFacts 출력) — 같은 실행에서
+  // edges 가 먼저 채운 팩트도 read-your-writes 로 재사용(콜드 포함, 리뷰 R1).
+  // null 값 = 판독 실패 파일(제외 동작 동일).
   const factsSec = cache?.section<JavaFileFacts | null>('java-facts', JAVA_FACTS_SALT)
   const javaFacts = new Map<string, JavaFileFacts>()
   const javaRels = census.files
@@ -574,7 +575,8 @@ export async function buildMethodCallGraph(
     try {
       src = readFileSync(join(projectRoot, rel), 'utf8')
     } catch {
-      factsSec?.put(rel, null)
+      // null 캐시는 fingerprint 도 'absent' 일 때만(일시 오류 박제 방지, 리뷰 R2).
+      if (cache?.isAbsent(rel)) factsSec?.put(rel, null)
       continue
     }
     try {
@@ -582,8 +584,8 @@ export async function buildMethodCallGraph(
       javaFacts.set(rel, facts)
       factsSec?.put(rel, facts)
     } catch {
-      // 파싱 실패 파일은 facts 없이 둔다(증거 없는 호출 금지). 캐시하지 않는다 —
-      // edges.ts 는 같은 실패를 전파하므로 null 을 공유 섹션에 남기면 두 소비자 동작이 갈린다.
+      // 파싱 실패 파일은 facts 없이 둔다(증거 없는 호출 금지). 추출 실패는 캐시하지
+      // 않는다 — edges.ts 와 동일 규약(그 파일만 제외, 다음 실행 재시도).
     }
   }
   return buildGraphFromFacts(javaFacts, gitCommitHash(projectRoot))

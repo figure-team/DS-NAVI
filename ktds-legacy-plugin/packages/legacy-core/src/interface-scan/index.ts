@@ -161,7 +161,9 @@ export async function extractInterfaces(
       const src = readFileSync(join(projectRoot, relPath), 'utf8')
       root = await parseSource('java', src)
     } catch {
-      sigSec?.put(relPath, null)
+      // null 캐시는 fingerprint 도 'absent' 일 때만 — 일시 오류/파싱 예외는 캐시하지
+      // 않고 다음 실행에 재시도한다(리뷰 R2).
+      if (cache?.isAbsent(relPath)) sigSec?.put(relPath, null)
       continue
     }
     const sigs = scanJavaInterfaces(root, relPath, customSpecs)

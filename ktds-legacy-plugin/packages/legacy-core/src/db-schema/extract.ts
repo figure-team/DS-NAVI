@@ -80,7 +80,8 @@ export function extractDbSchema(
       source = readFileSync(join(projectRoot, f.relPath), 'utf8')
     } catch {
       sqlFileCount--
-      sqlSec?.put(f.relPath, null)
+      // null 캐시는 fingerprint 도 'absent' 일 때만(일시 오류 박제 방지, 리뷰 R2).
+      if (cache?.isAbsent(f.relPath)) sqlSec?.put(f.relPath, null)
       continue
     }
     const facts: SqlFileFacts = { ddl: null, ddlError: null, inserts: null, insertsError: null }

@@ -450,7 +450,8 @@ export async function extractJpaModel(
     try {
       source = readFileSync(join(projectRoot, f.relPath), 'utf8')
     } catch {
-      jpaSec?.put(f.relPath, null)
+      // null 캐시는 fingerprint 도 'absent' 일 때만(일시 오류 박제 방지, 리뷰 R2).
+      if (cache?.isAbsent(f.relPath)) jpaSec?.put(f.relPath, null)
       continue
     }
     // 빠른 사전 필터: JPA 신호가 전혀 없으면 파싱 생략(결정론 무관, 성능).

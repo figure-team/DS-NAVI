@@ -187,16 +187,25 @@ export async function extractEdges(
     try {
       src = readFileSync(join(projectRoot, f.relPath), 'utf8')
     } catch {
-      factsSec?.put(f.relPath, null)
-      nsSec?.put(f.relPath, null)
+      // null 캐시는 fingerprint 도 'absent' 일 때만(일시 오류 박제 방지, 리뷰 R2).
+      if (cache?.isAbsent(f.relPath)) {
+        factsSec?.put(f.relPath, null)
+        nsSec?.put(f.relPath, null)
+      }
       continue
     }
-    const facts = await extractJavaFacts(f.relPath, src)
-    const ns = collectMyBatisNamespaces(await parseSource('java', src))
-    factsByPath.set(f.relPath, facts)
-    mybatisNs.set(f.relPath, ns)
-    factsSec?.put(f.relPath, facts)
-    nsSec?.put(f.relPath, [...ns])
+    // 파일별 오류 격리(다른 스캐너와 동일 규약, 비평 C7) — 추출 실패는 캐시하지 않고
+    // 그 파일만 제외한다(다음 실행에 재시도).
+    try {
+      const facts = await extractJavaFacts(f.relPath, src)
+      const ns = collectMyBatisNamespaces(await parseSource('java', src))
+      factsByPath.set(f.relPath, facts)
+      mybatisNs.set(f.relPath, ns)
+      factsSec?.put(f.relPath, facts)
+      nsSec?.put(f.relPath, [...ns])
+    } catch {
+      // 증거 없는 엣지 금지 — facts 없이 둔다.
+    }
   }
 
   const allFacts = [...factsByPath.values()]

@@ -86,12 +86,15 @@ import type {
 /**
  * spring-routes 캐시 팩트(W8) — 한 java 파일의 ctx 기여분 + 추출 결과 + consumed-ctx.
  * **salt bump 규약**: 이 형태나 라우트/배치 추출 의미가 바뀌면 SPRING_ROUTES_SALT bump.
+ * (이력: v1→v2 — consumed 에 constantsHas 추가 + 기록 래퍼 위반-즉시-실패화, 리뷰 C2.)
  */
-const SPRING_ROUTES_SALT = 'v1'
+const SPRING_ROUTES_SALT = 'v2'
 
 interface ConsumedSpringCtx {
   /** 조회된 상수 키 → 값(부재는 null). */
   constants: Record<string, string | null>
+  /** constants.has 조회 결과(현재 spring.ts 는 get 만 쓰지만 래퍼 완결성 유지). */
+  constantsHas: Record<string, boolean>
   /** composedVerb.has 조회 결과. */
   composedVerbHas: Record<string, boolean>
   /** composedVerb.get 조회 결과(부재/undefined 는 null). */
@@ -114,14 +117,22 @@ interface SpringRouteFileFacts {
 }
 
 function emptyConsumed(): ConsumedSpringCtx {
-  return { constants: {}, composedVerbHas: {}, composedVerb: {}, composedStereotype: {} }
+  return { constants: {}, constantsHas: {}, composedVerbHas: {}, composedVerb: {}, composedStereotype: {} }
+}
+
+/** 기록 래퍼가 지원하지 않는 소비 방식 — 침묵 누락 대신 즉시 실패(비평 C2). */
+function unsupportedCtxAccess(what: string): never {
+  throw new Error(
+    `[scan-cache] spring ctx 를 ${what} 로 소비하려 했습니다 — consumed-ctx 기록은 get/has 만 ` +
+      '지원합니다. spring.ts 의 소비 방식을 바꿨다면 recordingSpringContext/consumedSpringCtxValid 를 ' +
+      '함께 재설계하고 SPRING_ROUTES_SALT 를 bump 하세요.',
+  )
 }
 
 /**
  * 기록용 ctx 래퍼 — extractSpringRoutes 가 실제 조회한 키·결과를 consumed 에 남긴다.
- * extractSpringRoutes 는 ctx 를 get/has 로만 소비한다(spring.ts) — 순회(iteration)를
- * 쓰도록 바뀌면 이 래퍼(빈 컬렉션에 위임 오버라이드)로는 안 보이므로, 그 경우 캐시
- * 재사용 검증(consumedSpringCtxValid)도 함께 재설계해야 한다.
+ * get/has 이외의 소비(순회·size·entries 등)는 기록 불가능한 의존이므로 **조용히 틀리는
+ * 대신 즉시 던진다**(비평 C2) — 소비 방식이 바뀌면 테스트가 요란하게 실패한다.
  */
 function recordingSpringContext(base: SpringContext, rec: ConsumedSpringCtx): SpringContext {
   const constants = new (class extends Map<string, string> {
@@ -129,6 +140,29 @@ function recordingSpringContext(base: SpringContext, rec: ConsumedSpringCtx): Sp
       const v = base.constants.get(k)
       rec.constants[k] = v ?? null
       return v
+    }
+    override has(k: string): boolean {
+      const r = base.constants.has(k)
+      rec.constantsHas[k] = r
+      return r
+    }
+    override get size(): number {
+      return unsupportedCtxAccess('constants.size')
+    }
+    override entries(): never {
+      return unsupportedCtxAccess('constants.entries()')
+    }
+    override keys(): never {
+      return unsupportedCtxAccess('constants.keys()')
+    }
+    override values(): never {
+      return unsupportedCtxAccess('constants.values()')
+    }
+    override forEach(): never {
+      return unsupportedCtxAccess('constants.forEach()')
+    }
+    override [Symbol.iterator](): never {
+      return unsupportedCtxAccess('constants 순회')
     }
   })()
   const composedVerb = new (class extends Map<string, RouteMethod | undefined> {
@@ -142,12 +176,48 @@ function recordingSpringContext(base: SpringContext, rec: ConsumedSpringCtx): Sp
       rec.composedVerb[k] = v ?? null
       return v
     }
+    override get size(): number {
+      return unsupportedCtxAccess('composedVerb.size')
+    }
+    override entries(): never {
+      return unsupportedCtxAccess('composedVerb.entries()')
+    }
+    override keys(): never {
+      return unsupportedCtxAccess('composedVerb.keys()')
+    }
+    override values(): never {
+      return unsupportedCtxAccess('composedVerb.values()')
+    }
+    override forEach(): never {
+      return unsupportedCtxAccess('composedVerb.forEach()')
+    }
+    override [Symbol.iterator](): never {
+      return unsupportedCtxAccess('composedVerb 순회')
+    }
   })()
   const composedStereotype = new (class extends Set<string> {
     override has(k: string): boolean {
       const r = base.composedStereotype.has(k)
       rec.composedStereotype[k] = r
       return r
+    }
+    override get size(): number {
+      return unsupportedCtxAccess('composedStereotype.size')
+    }
+    override entries(): never {
+      return unsupportedCtxAccess('composedStereotype.entries()')
+    }
+    override keys(): never {
+      return unsupportedCtxAccess('composedStereotype.keys()')
+    }
+    override values(): never {
+      return unsupportedCtxAccess('composedStereotype.values()')
+    }
+    override forEach(): never {
+      return unsupportedCtxAccess('composedStereotype.forEach()')
+    }
+    override [Symbol.iterator](): never {
+      return unsupportedCtxAccess('composedStereotype 순회')
     }
   })()
   return { constants, composedVerb, composedStereotype }
@@ -157,6 +227,9 @@ function recordingSpringContext(base: SpringContext, rec: ConsumedSpringCtx): Sp
 function consumedSpringCtxValid(c: ConsumedSpringCtx, ctx: SpringContext): boolean {
   for (const [k, v] of Object.entries(c.constants)) {
     if ((ctx.constants.get(k) ?? null) !== v) return false
+  }
+  for (const [k, v] of Object.entries(c.constantsHas ?? {})) {
+    if (ctx.constants.has(k) !== v) return false
   }
   for (const [k, v] of Object.entries(c.composedVerbHas)) {
     if (ctx.composedVerb.has(k) !== v) return false
@@ -200,7 +273,9 @@ export async function extractRoutes(
       parsed.set(f.relPath, await parseSource('java', src))
     } catch {
       // 파싱 실패 파일은 조용히 건너뛰지 않고 단순 제외(증거 없는 라우트 금지).
-      routeSec?.put(f.relPath, null)
+      // null 캐시는 fingerprint 도 판독 실패('absent')에 동의할 때만 — 일시 오류가
+      // 실제 내용 해시에 "팩트 없음"으로 박제되는 것을 막는다(리뷰 R2).
+      if (cache?.isAbsent(f.relPath)) routeSec?.put(f.relPath, null)
     }
   }
 
@@ -262,7 +337,7 @@ export async function extractRoutes(
       try {
         root = await parseSource('java', readFileSync(join(projectRoot, relPath), 'utf8'))
       } catch {
-        routeSec?.put(relPath, null)
+        if (cache?.isAbsent(relPath)) routeSec?.put(relPath, null)
         continue
       }
       parsed.set(relPath, root)

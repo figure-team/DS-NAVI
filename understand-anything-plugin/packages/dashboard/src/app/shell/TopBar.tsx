@@ -25,6 +25,7 @@ export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
     : mode === "wiki" ? "문서"
     : mode === "docs" ? "산출물"
     : mode === "rtm" ? "추적표"
+    : mode === "screenspec" ? "화면설계서"
     : mode === "knowledge" ? "지식그래프"
     : "홈"; // "/"(홈)과 그 외 미매핑 경로(전부 홈으로 리다이렉트)
 

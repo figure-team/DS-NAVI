@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDashboardStore } from "../store";
 import TrustBadge from "./TrustBadge";
+import { Badge, BtnAccent, BtnOutline, ConfBadge, PageHead, type ConfKind } from "./proto/Proto";
 
 /**
  * ktds-fork (S4): 화면설계서 뷰 — SI 화면설계서 슬라이드 재현.
@@ -102,6 +103,12 @@ const CONFIDENCE_LABEL: Record<string, string> = {
   CONFIRMED_AI: "확정(AI)",
   INFERRED: "추정",
   UNVERIFIED: "확인 필요",
+};
+const CONF_KIND: Record<string, ConfKind> = {
+  CONFIRMED: "fix",
+  CONFIRMED_AI: "ai",
+  INFERRED: "est",
+  UNVERIFIED: "chk",
 };
 const KIND_LABEL: Record<string, string> = {
   field: "입력",
@@ -261,139 +268,119 @@ export default function ScreenSpecView() {
   const notes = visibleAnns.filter((a) => merged(a).note);
 
   return (
-    <div className="flex-1 min-h-0 flex">
-      {/* 좌: 화면 목록(도메인 그룹) */}
-      <aside className="w-64 shrink-0 border-r border-border-subtle overflow-y-auto bg-surface">
-        {groups.map(([domain, screens]) => (
-          <div key={domain} className="py-2">
-            <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-text-muted">
-              {DOMAIN_LABEL[domain] ?? domain}
-            </div>
-            {screens.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => {
-                  setSelId(s.id);
-                  setEditing(false);
-                  setHoverKey(null);
-                }}
-                className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
-                  s.id === sel.id ? "bg-accent/15 text-accent" : "text-text-secondary hover:bg-elevated"
-                }`}
-              >
-                <span className="truncate block">{title(s)}</span>
-                <span className="flex items-center gap-1 text-[10px] text-text-muted">
-                  {s.scenario && <span title={`시나리오 ${s.scenario} 로 도달`}>⚙ {s.scenario}</span>}
-                  {overrides[s.id]?.confirmed && <span className="text-accent">✓ 확정</span>}
-                </span>
-              </button>
-            ))}
-          </div>
-        ))}
-        {(file.missing.length > 0 || file.unmatchedJsps.length > 0) && (
-          <div className="px-3 py-2 border-t border-border-subtle text-[10px] text-text-muted space-y-1">
-            {file.missing.length > 0 && (
-              <details>
-                <summary className="cursor-pointer">도달 실패 보고 {file.missing.length}건</summary>
-                <ul className="mt-1 space-y-0.5">
-                  {file.missing.map((m) => (
-                    <li key={m.url + m.reason} className="break-all">
-                      {m.url} — {m.reason}
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            )}
-            {file.unmatchedJsps.length > 0 && <div>미매핑 JSP {file.unmatchedJsps.length}건</div>}
-          </div>
-        )}
-      </aside>
+    <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
+      {/* pmpl-proto page-head — 미매핑·도달 실패는 침묵 누락 대신 헤더 메타로 표면화 */}
+      <PageHead
+        title="화면설계서"
+        meta={
+          <>
+            화면 <b className="text-text-primary tabular-nums">{file.screens.length}</b>
+            {" · "}도달 실패 <b className="text-text-primary tabular-nums">{file.missing.length}</b>건
+            {" · "}미매핑 <b className="text-text-primary tabular-nums">{file.unmatchedJsps.length}</b>건
+          </>
+        }
+      />
 
-      {/* 우: 슬라이드 상세 */}
-      <div className="flex-1 min-w-0 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-6 py-4">
-          {/* 헤더 */}
-          <div className="flex items-start gap-3 flex-wrap">
-            <div className="flex-1 min-w-0">
-              {editing ? (
-                <input
-                  value={draftTitle}
-                  onChange={(e) => setDraftTitle(e.target.value)}
-                  className="w-full bg-elevated border border-border-subtle rounded px-2 py-1 text-lg text-text-primary"
-                />
-              ) : (
-                <h1 className="text-lg font-semibold text-text-primary">{title(sel)}</h1>
-              )}
-              <div className="mt-1 flex items-center gap-2 flex-wrap text-[11px]">
-                <code className="px-1.5 py-0.5 rounded bg-elevated text-text-secondary break-all">{sel.url}</code>
-                {sel.jspFile && (
-                  <code className="px-1.5 py-0.5 rounded bg-elevated text-text-muted break-all" title="렌더 JSP">
-                    {sel.jspFile}
-                  </code>
-                )}
-                {sel.scenario && (
-                  <span className="text-text-muted" title="이 화면 도달에 사용한 시나리오">
-                    시나리오: {sel.scenario}
-                  </span>
-                )}
-                <TrustBadge confirmedBy={selOv?.approver ?? null} />
-              </div>
+      {/* 프로토 .scr — 좌 260px 트리 카드 + 우 상세 카드 */}
+      <div className="grid items-start grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]" style={{ gap: 14 }}>
+        <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow proto-tree">
+          {groups.map(([domain, screens]) => (
+            <div key={domain}>
+              <div className="fold">{DOMAIN_LABEL[domain] ?? domain} ({screens.length})</div>
+              {screens.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => {
+                    setSelId(s.id);
+                    setEditing(false);
+                    setHoverKey(null);
+                  }}
+                  className={`doc ${s.id === sel.id ? "on" : ""}`}
+                  title={s.scenario ? `시나리오 ${s.scenario} 로 도달` : undefined}
+                >
+                  <span className="truncate" style={{ minWidth: 0 }}>{title(s)}</span>
+                  {overrides[s.id]?.confirmed && (
+                    <span className="st"><Badge tone="ok">확정</Badge></span>
+                  )}
+                </button>
+              ))}
             </div>
+          ))}
+          {(file.missing.length > 0 || file.unmatchedJsps.length > 0) && (
+            <div style={{ marginTop: 8, borderTop: "1px solid var(--color-border-subtle)", paddingTop: 8 }}>
+              {file.unmatchedJsps.length > 0 && (
+                <div className="flex items-center gap-2" style={{ padding: "4px 8px", fontSize: 12 }} title={file.unmatchedJsps.join("\n")}>
+                  <span className="text-text-muted">미매핑 JSP {file.unmatchedJsps.length}건</span>
+                  <span className="ml-auto"><Badge tone="warn">확인</Badge></span>
+                </div>
+              )}
+              {file.missing.length > 0 && (
+                <details style={{ padding: "4px 8px", fontSize: 12 }}>
+                  <summary className="cursor-pointer text-text-muted">도달 실패 보고 {file.missing.length}건</summary>
+                  <ul style={{ marginTop: 4 }} className="space-y-0.5 text-text-muted">
+                    {file.missing.map((m) => (
+                      <li key={m.url + m.reason} className="break-all" style={{ fontSize: 11 }}>
+                        {m.url} — {m.reason}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* 우: 상세 카드 — 제목 + URL + 배지 + 액션 / dmeta / 캡처 + 배지 오버레이 / 범례 표 */}
+        <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 22px" }}>
+          <div className="flex items-center gap-2.5 flex-wrap" style={{ marginBottom: 4 }}>
+            {editing ? (
+              <input
+                value={draftTitle}
+                onChange={(e) => setDraftTitle(e.target.value)}
+                className="bg-elevated border border-border-subtle rounded px-2 py-1 text-text-primary"
+                style={{ fontSize: 15, fontWeight: 700, minWidth: 240 }}
+              />
+            ) : (
+              <b className="text-text-primary" style={{ fontSize: 15 }}>{title(sel)}</b>
+            )}
+            <span className="text-text-muted break-all" style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{sel.url}</span>
+            {selOv?.confirmed ? <TrustBadge confirmedBy={selOv.approver} /> : <Badge tone="info">초안</Badge>}
+            <div className="flex-1" />
+            {saveError && <span style={{ fontSize: 11, color: "var(--color-status-warn)" }}>저장 실패: {saveError}</span>}
             {canWrite && (
-              <div className="flex items-center gap-2 shrink-0">
-                {editing ? (
-                  <>
-                    <button
-                      type="button"
-                      disabled={saving}
-                      onClick={() => save(false)}
-                      className="px-3 py-1 text-xs rounded-md bg-accent/20 text-accent hover:bg-accent/30"
-                    >
-                      {saving ? "저장 중…" : "저장·확정"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditing(false)}
-                      className="px-3 py-1 text-xs rounded-md text-text-muted hover:text-text-secondary"
-                    >
-                      취소
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={startEdit}
-                      className="px-3 py-1 text-xs rounded-md text-text-secondary border border-border-subtle hover:bg-elevated"
-                    >
-                      편집
-                    </button>
-                    {!selOv?.confirmed && (
-                      <button
-                        type="button"
-                        disabled={saving}
-                        onClick={() => save(true)}
-                        className="px-3 py-1 text-xs rounded-md bg-accent/20 text-accent hover:bg-accent/30"
-                      >
-                        확정
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
+              editing ? (
+                <>
+                  <BtnOutline sm onClick={() => setEditing(false)}>취소</BtnOutline>
+                  <BtnAccent sm onClick={() => void save(false)} disabled={saving}>{saving ? "저장 중…" : "저장·확정"}</BtnAccent>
+                </>
+              ) : (
+                <>
+                  <BtnOutline sm onClick={startEdit}>편집</BtnOutline>
+                  {!selOv?.confirmed && (
+                    <BtnAccent sm onClick={() => void save(true)} disabled={saving}>확정</BtnAccent>
+                  )}
+                </>
+              )
             )}
           </div>
-          {saveError && <div className="mt-2 text-xs text-red-400">저장 실패: {saveError}</div>}
+          {/* .dmeta — 렌더 JSP · 시나리오 */}
+          <div className="text-text-muted" style={{ fontSize: 12, marginBottom: 12 }}>
+            {sel.jspFile && <>렌더 JSP: <span style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{sel.jspFile}</span></>}
+            {sel.jspFile && sel.scenario && " · "}
+            {sel.scenario && <>시나리오: {sel.scenario}</>}
+          </div>
           {sel.summary && (
-            <p className="mt-2 text-xs text-text-secondary leading-relaxed">
+            <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 12 }}>
               {sel.summary.text}
-              <span className="ml-1 text-text-muted">[{CONFIDENCE_LABEL[sel.summary.confidence] ?? sel.summary.confidence}]</span>
+              <span style={{ marginLeft: 6 }}>
+                <ConfBadge kind={CONF_KIND[sel.summary.confidence] ?? "est"} label={CONFIDENCE_LABEL[sel.summary.confidence]} />
+              </span>
             </p>
           )}
 
           {/* 배지 색상 키 */}
-          <div className="mt-3 flex items-center gap-4 text-[11px] text-text-muted">
+          <div className="flex items-center gap-4 text-text-muted" style={{ fontSize: 11, marginBottom: 12 }}>
             {KIND_ORDER.filter((k) => k !== "region").map((k) => (
               <span key={k} className="inline-flex items-center gap-1.5">
                 <span
@@ -416,7 +403,7 @@ export default function ScreenSpecView() {
 
           {/* 캡처 + 배지 오버레이 */}
           <div
-            className="mt-4 relative border border-border-subtle rounded-lg overflow-hidden bg-white"
+            className="relative border border-border-medium rounded-lg overflow-hidden bg-white"
             style={{ maxWidth: sel.capture.width }}
           >
             <img
@@ -457,18 +444,18 @@ export default function ScreenSpecView() {
             })}
           </div>
 
-          {/* 범례 표 */}
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-xs border-collapse">
+          {/* 범례 표 — 프로토 .tbl */}
+          <div className="overflow-x-auto" style={{ marginTop: 14 }}>
+            <table className="proto-tbl">
               <thead>
-                <tr className="text-left text-text-muted border-b border-border-subtle">
-                  <th className="py-1.5 pr-2 w-10">번호</th>
-                  <th className="py-1.5 pr-2 w-12">구분</th>
-                  <th className="py-1.5 pr-2">항목</th>
-                  <th className="py-1.5 pr-2 w-14">이벤트</th>
-                  <th className="py-1.5 pr-2">동작(핸들러)</th>
-                  <th className="py-1.5 pr-2">설명</th>
-                  <th className="py-1.5 pr-2 w-16">신뢰도</th>
+                <tr>
+                  <th style={{ width: 40 }}>번호</th>
+                  <th style={{ width: 48 }}>구분</th>
+                  <th>항목</th>
+                  <th style={{ width: 56 }}>이벤트</th>
+                  <th>동작(핸들러)</th>
+                  <th>설명</th>
+                  <th style={{ width: 72 }}>신뢰도</th>
                 </tr>
               </thead>
               <tbody>
@@ -477,9 +464,9 @@ export default function ScreenSpecView() {
                   if (rows.length === 0) return [];
                   const st = kindStyle(kind);
                   const header = (
-                    <tr key={`sec:${kind}`} className="border-b border-border-subtle">
-                      <td colSpan={7} className="pt-3 pb-1">
-                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-text-secondary">
+                    <tr key={`sec:${kind}`}>
+                      <td colSpan={7} style={{ paddingTop: 12, paddingBottom: 4, borderBottom: "none" }}>
+                        <span className="inline-flex items-center gap-1.5 font-semibold text-text-secondary" style={{ fontSize: 11 }}>
                           <span
                             className="inline-block w-2.5 h-2.5 rounded-full"
                             style={{ background: st.swatch }}
@@ -490,86 +477,79 @@ export default function ScreenSpecView() {
                     </tr>
                   );
                   const items = rows.map((a) => {
-                  const key = annKey(a);
-                  const m = merged(a);
-                  const d = draftAnn[key];
-                  return (
-                    <tr
-                      key={key}
-                      onMouseEnter={() => setHoverKey(key)}
-                      onMouseLeave={() => setHoverKey(null)}
-                      className={`border-b border-border-subtle/50 align-top ${
-                        hoverKey === key ? "bg-accent/10" : ""
-                      }`}
-                    >
-                      <td className="py-1.5 pr-2 font-semibold" style={{ color: kindStyle(a.kind).swatch }}>
-                        {badgeGlyph(a.kind, a.no)}
-                      </td>
-                      <td className="py-1.5 pr-2 text-text-muted">{KIND_LABEL[a.kind] ?? a.kind}</td>
-                      <td className="py-1.5 pr-2 text-text-primary break-all">
-                        {m.label}
-                        {a.mechanical.required && <span className="text-red-400 ml-0.5">*</span>}
-                      </td>
-                      <td className="py-1.5 pr-2 text-text-muted">{a.eventType}</td>
-                      <td className="py-1.5 pr-2 text-text-secondary">
-                        {a.handler?.target && <div className="font-mono text-[11px]">{a.handler.target}</div>}
-                        {a.handler && a.handler.chain.length > 0 && (
-                          <div className="text-[10px] text-text-muted break-all">
-                            {a.handler.chain.join(" → ")}
-                          </div>
-                        )}
-                        {a.handler?.evidence.map((ev) => (
-                          <code
-                            key={`${ev.file}:${ev.line}`}
-                            className="inline-block mt-0.5 mr-1 px-1 rounded bg-elevated text-[10px] text-text-muted break-all"
-                          >
-                            {ev.file}:{ev.line}
-                          </code>
-                        ))}
-                      </td>
-                      <td className="py-1.5 pr-2 text-text-secondary">
-                        {editing ? (
-                          <div className="space-y-1">
-                            <textarea
-                              value={d?.description ?? ""}
-                              onChange={(e) =>
-                                setDraftAnn((prev) => ({ ...prev, [key]: { ...prev[key], description: e.target.value } }))
-                              }
-                              rows={2}
-                              className="w-full min-w-40 bg-elevated border border-border-subtle rounded px-1.5 py-1 text-xs text-text-primary"
-                            />
-                            <label className="flex items-center gap-1 text-[10px] text-text-muted">
-                              <input
-                                type="checkbox"
-                                checked={d?.hidden ?? false}
+                    const key = annKey(a);
+                    const m = merged(a);
+                    const d = draftAnn[key];
+                    return (
+                      <tr
+                        key={key}
+                        onMouseEnter={() => setHoverKey(key)}
+                        onMouseLeave={() => setHoverKey(null)}
+                        style={hoverKey === key ? { background: "color-mix(in srgb, var(--color-accent) 7%, transparent)" } : undefined}
+                      >
+                        <td className="font-semibold" style={{ color: kindStyle(a.kind).swatch }}>
+                          {badgeGlyph(a.kind, a.no)}
+                        </td>
+                        <td className="text-text-muted">{KIND_LABEL[a.kind] ?? a.kind}</td>
+                        <td className="break-all">
+                          {m.label}
+                          {a.mechanical.required && <span style={{ color: "var(--color-status-error)", marginLeft: 2 }}>*</span>}
+                        </td>
+                        <td className="text-text-muted">{a.eventType}</td>
+                        <td className="text-text-secondary">
+                          {a.handler?.target && <div style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{a.handler.target}</div>}
+                          {a.handler && a.handler.chain.length > 0 && (
+                            <div className="text-text-muted break-all" style={{ fontSize: 10.5 }}>
+                              {a.handler.chain.join(" → ")}
+                            </div>
+                          )}
+                          {a.handler?.evidence.map((ev) => (
+                            <code
+                              key={`${ev.file}:${ev.line}`}
+                              className="inline-block mt-0.5 mr-1 px-1 rounded bg-elevated text-text-muted break-all"
+                              style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}
+                            >
+                              {ev.file}:{ev.line}
+                            </code>
+                          ))}
+                        </td>
+                        <td className="text-text-secondary">
+                          {editing ? (
+                            <div className="space-y-1">
+                              <textarea
+                                value={d?.description ?? ""}
                                 onChange={(e) =>
-                                  setDraftAnn((prev) => ({ ...prev, [key]: { ...prev[key], hidden: e.target.checked } }))
+                                  setDraftAnn((prev) => ({ ...prev, [key]: { ...prev[key], description: e.target.value } }))
                                 }
+                                rows={2}
+                                className="w-full min-w-40 bg-elevated border border-border-subtle rounded px-1.5 py-1 text-text-primary"
+                                style={{ fontSize: 12 }}
                               />
-                              숨김
-                            </label>
-                          </div>
-                        ) : (
-                          m.description
-                        )}
-                      </td>
-                      <td className="py-1.5 pr-2">
-                        {a.handler && (
-                          <span
-                            className={`text-[10px] ${
-                              a.handler.confidence === "CONFIRMED"
-                                ? "text-accent"
-                                : a.handler.confidence === "UNVERIFIED"
-                                ? "text-red-400"
-                                : "text-text-muted"
-                            }`}
-                          >
-                            [{CONFIDENCE_LABEL[a.handler.confidence] ?? a.handler.confidence}]
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
+                              <label className="flex items-center gap-1 text-text-muted" style={{ fontSize: 10.5 }}>
+                                <input
+                                  type="checkbox"
+                                  checked={d?.hidden ?? false}
+                                  onChange={(e) =>
+                                    setDraftAnn((prev) => ({ ...prev, [key]: { ...prev[key], hidden: e.target.checked } }))
+                                  }
+                                />
+                                숨김
+                              </label>
+                            </div>
+                          ) : (
+                            m.description
+                          )}
+                        </td>
+                        <td>
+                          {a.handler && (
+                            <ConfBadge
+                              kind={CONF_KIND[a.handler.confidence] ?? "est"}
+                              label={CONFIDENCE_LABEL[a.handler.confidence]}
+                            />
+                          )}
+                        </td>
+                      </tr>
+                    );
                   });
                   return [header, ...items];
                 })}
@@ -579,7 +559,7 @@ export default function ScreenSpecView() {
 
           {/* ※ 비고 */}
           {notes.length > 0 && (
-            <ul className="mt-3 space-y-1 text-xs text-text-muted">
+            <ul className="mt-3 space-y-1 text-text-muted" style={{ fontSize: 12 }}>
               {notes.map((a) => (
                 <li key={annKey(a)}>
                   <span className="text-accent font-semibold mr-1">{badgeGlyph(a.kind, a.no)}</span>

@@ -3,6 +3,7 @@ import { Link, useOutletContext } from "react-router";
 import { useDashboardStore } from "../../store";
 import { dataUrl } from "../../shared/api/client";
 import { useI18n } from "../../contexts/I18nContext";
+import { Badge } from "../../components/proto/Proto";
 import type { ShellContext } from "../Root";
 
 interface RtmSummary {
@@ -20,6 +21,7 @@ interface DocEntry {
   confirmed: boolean;
   approver: string | null;
   at: string | null;
+  hasXlsx?: boolean;
 }
 
 interface MetaInfo {
@@ -116,6 +118,17 @@ export default function HomePage() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 4);
   }, [graph]);
+
+  // 산출물 진행 카드 집계 — doc-list 실데이터(확정/초안/xlsx 보유 종수).
+  const docCounts = useMemo(() => {
+    if (!docs || docs.length === 0) return null;
+    return {
+      total: docs.length,
+      confirmed: docs.filter((d) => d.confirmed).length,
+      draft: docs.filter((d) => !d.confirmed).length,
+      xlsx: docs.filter((d) => d.hasXlsx).length,
+    };
+  }, [docs]);
 
   // 최근 활동 — 타임스탬프가 실재하는 이벤트만(문서 확정, 오버레이 생성, 분석 실행).
   const feed = useMemo<FeedItem[]>(() => {
@@ -229,8 +242,8 @@ export default function HomePage() {
             <EntryCard
               to="/domains"
               icon={iconDomain}
-              title="도메인 지도"
-              description={`업무 도메인 ${stats.domains}개와 기능 흐름 ${stats.flows}개로 시스템을 업무 관점에서 탐색합니다.`}
+              title={t.drawer.domain}
+              description={`시스템 구성도에서 도메인 ${stats.domains}개·기능 ${stats.flows}개와 타 시스템 연동을 한눈에 봅니다.`}
             >
               <div className="flex flex-wrap gap-1.5">
                 {domainChips.slice(0, 5).map((d) => (
@@ -294,6 +307,42 @@ export default function HomePage() {
             </EntryCard>
           )}
         </section>
+
+        {/* 2행 — 프로토 grid3 2단: 산출물 진행 + 위키. (이번 주 실적·위험 모듈 카드는
+            보고서/품질·위험 메뉴 신설과 함께 후속.) */}
+        {(docCounts || wikiGraph) && (
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-3.5">
+            {docCounts && (
+              <EntryCard
+                to="/deliverables"
+                icon={iconDocs}
+                title="산출물 진행"
+                description={`SI 표준 산출물 ${docCounts.total}종의 생성·확정 현황입니다.`}
+              >
+                <div className="flex flex-wrap gap-x-3.5 gap-y-1.5 text-[12.5px] text-text-muted items-center">
+                  <Badge tone="ok">확정 {docCounts.confirmed}</Badge>
+                  <Badge tone="info">초안 {docCounts.draft}</Badge>
+                  {docCounts.xlsx > 0 && <span>xlsx {docCounts.xlsx}종</span>}
+                </div>
+              </EntryCard>
+            )}
+            {wikiGraph && (
+              <EntryCard
+                to="/wiki"
+                icon={iconWiki}
+                title="위키 문서"
+                description="세분화 위키 — 도메인·개념 단위 문서를 폴더 트리로 탐색합니다."
+              >
+                <div className="text-[12.5px] text-text-muted">
+                  문서{" "}
+                  <b className="text-text-primary font-semibold">
+                    {wikiGraph.nodes.filter((n) => n.type === "article").length}
+                  </b>
+                </div>
+              </EntryCard>
+            )}
+          </section>
+        )}
 
         {/* 하단: 산출물 + 최근 활동 — 시안 2fr/1.2fr */}
         <section className="grid grid-cols-1 lg:grid-cols-[2fr_1.2fr] gap-3.5">
@@ -360,21 +409,6 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-          )}
-          {wikiGraph && (
-            <EntryCard
-              to="/wiki"
-              icon={iconWiki}
-              title="위키 문서"
-              description="세분화 위키 — 도메인·개념 단위 문서를 폴더 트리로 탐색합니다."
-            >
-              <div className="text-[12.5px] text-text-muted">
-                문서{" "}
-                <b className="text-text-primary font-semibold">
-                  {wikiGraph.nodes.filter((n) => n.type === "article").length}
-                </b>
-              </div>
-            </EntryCard>
           )}
         </section>
       </div>
@@ -467,6 +501,12 @@ const iconRtm = (
   <svg {...svgProps}>
     <path d="M4 5h16M4 12h16M4 19h10" />
     <circle cx="19" cy="19" r="2.4" />
+  </svg>
+);
+const iconDocs = (
+  <svg {...svgProps}>
+    <path d="M6 2.5h9L20 8v13.5H6zM14.5 3v5.5H20" />
+    <path d="M9 13h7M9 17h5" />
   </svg>
 );
 const iconWiki = (

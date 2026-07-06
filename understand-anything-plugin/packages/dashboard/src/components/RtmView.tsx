@@ -76,11 +76,12 @@ const GOLD = "var(--color-accent)";
 const OK = "var(--color-status-ok)", BAD = "var(--color-status-error)", WARN = "var(--color-status-warn)",
   NFR = "var(--color-status-info)", FAINT = "var(--color-border-medium)", GOLD_DIM = "var(--color-accent-dim)";
 
+// pmpl-proto .conf 톤 — 확정=녹색 / 확정·AI=청록 / 추정=주황 / 확인 필요=적색.
 const CONF: Record<Confidence, { label: string; color: string }> = {
-  CONFIRMED: { label: "확정", color: "var(--color-text-muted)" },
-  CONFIRMED_AI: { label: "확정·AI", color: "var(--color-text-muted)" },
+  CONFIRMED: { label: "확정", color: OK },
+  CONFIRMED_AI: { label: "확정·AI", color: "var(--color-conf-ai)" },
   INFERRED: { label: "추정", color: WARN },
-  UNVERIFIED: { label: "확인필요", color: BAD },
+  UNVERIFIED: { label: "확인 필요", color: BAD },
 };
 const STATE_LABEL: Record<FunctionRow["state"], string> = {
   IMPLEMENTED: "✅ 구현", PARTIAL: "🔁 부분", PLANNED: "⚠ 미구현", CHANGED: "~ 변경", ORPHANED: "🚫 고아",
@@ -611,19 +612,27 @@ export default function RtmView() {
   const intakePanelOpen = !!session && !session.discarded && intakeStatus !== "running" && session.producedStep >= 1;
 
   // ── 렌더 조각 ──────────────────────────────────────────────────────────
-  const tabBtn = (k: typeof view, label: string) => (
+  // pmpl-proto .tabs — 하단 보더 탭 + count 보조 표기.
+  const tabBtn = (k: typeof view, label: string, count?: number) => (
     <button type="button" onClick={() => { setView(k); setSelFn(null); setSelReq(null); setSelTs(null); setTsEditing(false); }}
-      className={`rounded-md transition-colors ${view === k ? "bg-accent/20 text-accent" : "text-text-muted hover:text-text-secondary"}`}
-      style={{ padding: "5px 14px", fontSize: 12, fontWeight: view === k ? 600 : 500 }}>{label}</button>
+      className={`transition-colors cursor-pointer ${view === k ? "text-accent" : "text-text-muted hover:text-text-primary"}`}
+      style={{ padding: "8px 14px", fontSize: 13.5, fontWeight: view === k ? 650 : 550, border: "none", background: "none", borderBottom: `2px solid ${view === k ? "var(--color-accent)" : "transparent"}`, marginBottom: -1 }}>
+      {label}
+      {count != null && <span className="text-text-muted tabular-nums" style={{ fontSize: 11, marginLeft: 4 }}>{count}</span>}
+    </button>
   );
+  // pmpl-proto .stat 타일(+진행 바 확장).
   const Tile = ({ lbl, n, d, pct, bar }: { lbl: string; n: number | string; d?: string; pct?: number; bar?: string }) => (
-    <div style={{ flex: 1, background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 13, padding: "13px 15px" }}>
-      <div className="text-text-muted" style={{ fontSize: 10.5, letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 7 }}>{lbl}</div>
-      <div style={{ fontFamily: "var(--font-heading)", fontSize: 24, color: "var(--color-text-primary)", lineHeight: 1 }}>{n}{d && <span className="text-text-muted" style={{ fontSize: 13, fontFamily: "var(--font-body)" }}>{d}</span>}</div>
+    <div className="card-shadow" style={{ flex: 1, background: "var(--color-panel)", border: BORDER, borderRadius: 10, padding: "14px 16px" }}>
+      <div className="text-text-muted" style={{ fontSize: 12, fontWeight: 500, marginBottom: 6 }}>{lbl}</div>
+      <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 650, letterSpacing: "-0.5px", color: "var(--color-text-primary)", lineHeight: 1 }}>{n}{d && <span className="text-text-muted" style={{ fontSize: 12.5, fontWeight: 500, letterSpacing: 0 }}>{d}</span>}</div>
       {pct !== undefined && <div style={{ height: 5, borderRadius: 3, background: "var(--color-elevated)", overflow: "hidden", marginTop: 9 }}><i style={{ display: "block", height: "100%", width: `${pct}%`, background: bar }} /></div>}
     </div>
   );
-  const confChip = (label: string, color: string) => <span style={{ marginLeft: 6, fontSize: 9, fontFamily: "var(--font-mono)", color }}>[{label}]</span>;
+  // pmpl-proto .conf 배지 — 톤 배경(color-mix)을 두른 필.
+  const confChip = (label: string, color: string) => (
+    <span style={{ marginLeft: 6, fontSize: 10.5, fontWeight: 700, borderRadius: 4, padding: "1px 6px", whiteSpace: "nowrap", color, background: "color-mix(in srgb, currentColor 12%, transparent)" }}>{label}</span>
+  );
 
   // 추적 셀 (그리드)
   const TraceTd = ({ f, c }: { f: FunctionRow; c: { key: CellKey; label: string } }) => {
@@ -640,16 +649,13 @@ export default function RtmView() {
 
   return (
     <div className="flex-1 min-h-0 flex flex-col bg-root overflow-hidden relative">
-      {/* 헤더 */}
-      <div className="flex items-center gap-4 shrink-0 bg-panel border-b border-border-subtle" style={{ padding: "12px 24px" }}>
-        <span style={{ fontFamily: "var(--font-heading)", fontSize: 19, color: "var(--color-text-primary)" }}>요구사항 추적표</span>
-        <span className="text-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, letterSpacing: ".16em", border: "1px solid var(--color-border-subtle)", borderRadius: 5, padding: "3px 6px" }}>RTM</span>
-        <div className="flex items-center gap-1 ml-1 rounded-lg" style={{ background: "var(--color-panel)", border: BORDER, padding: 3 }}>
-          {tabBtn("function", "기능 기준")}{tabBtn("requirement", "요청 기준")}{tabBtn("scenario", "시험")}{tabBtn("status", "현황")}
-        </div>
-        <span className="ml-auto flex items-center gap-3">
+      {/* 헤더 — pmpl-proto page-head: h1 + RTM 배지 + 우측 액션(xlsx · 새 요청) */}
+      <div className="flex items-end gap-3.5 shrink-0 flex-wrap" style={{ padding: "20px 24px 0" }}>
+        <h1 className="font-heading text-text-primary font-bold" style={{ fontSize: 22, lineHeight: 1.25, letterSpacing: "-0.3px" }}>요구사항 추적표</h1>
+        <span className="self-center inline-flex items-center whitespace-nowrap font-bold" style={{ fontSize: 11, padding: "2px 7px", borderRadius: 5, color: "var(--color-status-info)", background: "color-mix(in srgb, var(--color-status-info) 12%, transparent)" }}>RTM</span>
+        <span className="ml-auto flex items-center gap-2">
           {intakeStatus === "running" && (
-            <span className="flex items-center gap-1.5 text-amber-400" style={{ fontSize: 11 }} title="요구사항 단계 생성 진행 중">
+            <span className="flex items-center gap-1.5" style={{ fontSize: 11, color: WARN }} title="요구사항 단계 생성 진행 중">
               <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
               {CIRCLED[Math.min(session?.producedStep ?? 0, 4)]} 단계 생성 중…
             </span>
@@ -658,15 +664,15 @@ export default function RtmView() {
             <a
               href={`/doc-xlsx?token=${encodeURIComponent(accessToken ?? "")}&docId=rtm`}
               download="rtm.xlsx"
-              className="rounded-lg border border-border-subtle text-text-secondary hover:text-text-primary transition-colors"
-              style={{ padding: "6px 14px", fontSize: 12 }}
+              className="rounded-lg border border-border-medium bg-panel text-text-secondary hover:bg-elevated transition-colors font-semibold"
+              style={{ padding: "7px 14px", fontSize: 13, textDecoration: "none" }}
               title="RTM xlsx(문서정보·요구/기능 원장·커버리지 현황) — understand-docs 실행 시점 스냅샷. 행단위 확정 오버레이는 미반영(md/탭이 진실)."
             >
               xlsx 다운로드
             </a>
           )}
           <button type="button" onClick={() => { setIntakeOpen(true); setIntakeError(null); setTargetStep(5); }} disabled={intakeStatus === "running"}
-            className="rounded-lg border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-40" style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600 }}
+            className="rounded-lg border border-accent bg-panel text-accent hover:bg-accent/10 transition-colors disabled:opacity-40 font-semibold cursor-pointer" style={{ padding: "7px 14px", fontSize: 13 }}
             title="자연어로 새 요구사항을 요청 → 가이드 5단계로 분해·문서화(전부 [추정])">＋ 새 요청</button>
         </span>
       </div>
@@ -674,15 +680,24 @@ export default function RtmView() {
       {/* P4: 단계 진행 스테퍼 */}
       <IntakeStepper />
 
-      {/* 진단 배너 (#7) */}
+      {/* 진단 배너 (#7) — pmpl-proto .banner(좌측 3px 상태 보더) */}
       {diags.length > 0 && (
-        <button type="button" onClick={() => setView("status")} className="flex items-center gap-3 text-left hover:bg-elevated/30 transition-colors"
-          style={{ margin: "12px 24px 0", padding: "9px 14px", borderRadius: 9, background: errCount > 0 ? "rgba(207,138,134,.08)" : "rgba(216,162,94,.08)", border: `1px solid ${errCount > 0 ? "rgba(207,138,134,.28)" : "rgba(216,162,94,.28)"}` }}>
-          <span style={{ color: errCount > 0 ? BAD : WARN, fontSize: 13 }}>⚠</span>
-          <span className="text-text-secondary" style={{ fontSize: 12 }}><b style={{ color: errCount > 0 ? BAD : WARN }}>무결성 진단 {diags.length}건</b>{errCount > 0 ? ` (error ${errCount})` : ""} — {diags[0].message}{diags.length > 1 ? ` 외 ${diags.length - 1}건` : ""}</span>
-          <span className="text-text-muted ml-auto" style={{ fontSize: 11, fontFamily: "var(--font-mono)" }}>현황 탭에서 보기 ›</span>
+        <button type="button" onClick={() => setView("status")} className="flex items-center gap-2.5 text-left bg-panel hover:bg-elevated transition-colors cursor-pointer"
+          style={{ margin: "12px 24px 0", padding: "10px 14px", borderRadius: 8, border: BORDER, borderLeft: `3px solid ${errCount > 0 ? BAD : WARN}` }}>
+          <span className="inline-flex items-center whitespace-nowrap font-bold" style={{ fontSize: 11, padding: "2px 7px", borderRadius: 5, color: errCount > 0 ? BAD : WARN, background: `color-mix(in srgb, ${errCount > 0 ? BAD : WARN} 12%, transparent)` }}>무결성 {diags.length}건</span>
+          <span style={{ fontSize: 13, fontWeight: 650, color: "var(--color-text-primary)" }}>진단:</span>
+          <span className="text-text-muted" style={{ fontSize: 13 }}>{diags[0].message}{diags.length > 1 ? ` 외 ${diags.length - 1}건` : ""}{errCount > 0 ? ` (error ${errCount})` : ""} — 현황 탭에서 확인</span>
+          <span className="text-text-muted ml-auto" style={{ fontSize: 11 }}>›</span>
         </button>
       )}
+
+      {/* pmpl-proto .tabs — 기능/요청/시험/현황 (count 병기) */}
+      <div className="shrink-0 flex border-b border-border-subtle" style={{ margin: "10px 24px 0", gap: 2 }}>
+        {tabBtn("function", "기능 기준", model?.functions.length)}
+        {tabBtn("requirement", "요청 기준", model?.requirements.length)}
+        {tabBtn("scenario", "시험", model?.testScenarios?.length)}
+        {tabBtn("status", "현황")}
+      </div>
 
       {/* 본문 */}
       <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq || selectedTs) ? "50vh" : intakePanelOpen ? "55vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
@@ -882,25 +897,25 @@ export default function RtmView() {
           const isNew = domain.id.startsWith("to-be:");
           return (
             <section key={domain.id} style={{ marginBottom: 26 }}>
-              <div className="flex items-center gap-3" style={{ padding: "0 4px 11px" }}>
-                <span style={{ color: isNew ? OK : GOLD, fontSize: 11 }}>{isNew ? "✦" : "◆"}</span>
-                <span style={{ fontFamily: "var(--font-heading)", fontSize: 17, color: "var(--color-text-primary)" }}>{domain.name}</span>
-                <span className="text-faint" style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: FAINT }}>{domain.id.replace(/^(domain:|to-be:)/, "")}{isNew ? " · 신규" : ""}</span>
+              {/* pmpl-proto .fl-grp — "주문 (8)" 그룹 라벨 */}
+              <div className="flex items-center gap-2" style={{ padding: "0 4px 8px" }}>
+                <span className="text-text-secondary" style={{ fontSize: 13, fontWeight: 700 }}>{domain.name} ({rows.length})</span>
+                {isNew && <span className="inline-flex items-center whitespace-nowrap font-bold" style={{ fontSize: 11, padding: "2px 7px", borderRadius: 5, color: OK, background: "color-mix(in srgb, var(--color-status-ok) 12%, transparent)" }}>신규</span>}
                 <span className="text-text-muted ml-auto" style={{ fontSize: 11.5 }}>기능 {domain.functionCount} · 확정 {confirmedN}/{rows.length}</span>
               </div>
-              <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 14, overflow: "hidden" }}>
+              <div className="card-shadow" style={{ background: "var(--color-panel)", border: BORDER, borderRadius: 10, overflow: "hidden" }}>
                 <div style={{ overflowX: "auto" }}>
-                  <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 880 }}>
+                  <table style={{ borderCollapse: "collapse", fontSize: 13, width: "100%", minWidth: 880 }}>
                     <thead><tr>
-                      {["기능", ...COLS.map((c) => c.label)].map((h) => <th key={h} style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>{h}</th>)}
+                      {["기능", ...COLS.map((c) => c.label)].map((h) => <th key={h} style={{ padding: "8px 12px", borderBottom: "1px solid var(--color-border-medium)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 11.5, fontWeight: 650 }}>{h}</th>)}
                       {/* R7: 사용자 정의 필드 열 — 헤더 × 로 정의 삭제(값 비파괴 보존). */}
                       {effFields.map((cf) => (
-                        <th key={cf.id} style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: NFR, textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>
+                        <th key={cf.id} style={{ padding: "8px 12px", borderBottom: "1px solid var(--color-border-medium)", color: NFR, textAlign: "left", whiteSpace: "nowrap", fontSize: 11.5, fontWeight: 650 }}>
                           {cf.label}
                           {canWrite && <button type="button" title="필드 삭제(값은 보존 — 재등록 시 복원)" onClick={(e) => { e.stopPropagation(); if (window.confirm(`'${cf.label}' 필드를 삭제할까요? (행 값은 보존)`)) void postField("remove", cf.id); }} className="text-text-muted hover:text-red-400" style={{ marginLeft: 5, fontSize: 10, border: "none", background: "none", cursor: "pointer" }}>×</button>}
                         </th>
                       ))}
-                      <th style={{ padding: "10px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>
+                      <th style={{ padding: "8px 12px", borderBottom: "1px solid var(--color-border-medium)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 11.5, fontWeight: 650 }}>
                         상태
                         {canWrite && <button type="button" title="사용자 정의 필드 추가(전 기능 공통 열, R7)" onClick={(e) => { e.stopPropagation(); addField(); }} className="text-text-muted hover:text-accent" style={{ marginLeft: 7, fontSize: 10.5, border: BORDER, borderRadius: 4, background: "none", cursor: "pointer", padding: "1px 6px" }}>＋필드</button>}
                       </th>
@@ -960,7 +975,7 @@ export default function RtmView() {
     const canWithdraw = !ungrouped && live.length > 0; // 유효 요구가 남은 정식 요청만 철회 가능
     const catCount = live.reduce((acc, r) => { const c = r.id.match(/^[A-Z]+/)?.[0] ?? "?"; acc[c] = (acc[c] ?? 0) + 1; return acc; }, {} as Record<string, number>);
     return (
-      <section style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 14, marginBottom: 14, overflow: "hidden", opacity: allDead ? 0.7 : 1 }}>
+      <section style={{ background: "var(--color-panel)", border: BORDER, borderRadius: 10, marginBottom: 14, overflow: "hidden", opacity: allDead ? 0.7 : 1 }}>
         <div className="flex items-center gap-3" style={{ padding: "15px 20px", cursor: "pointer" }} onClick={() => setExpandedRequests((p) => { const n = new Set(p); if (n.has(reqId)) n.delete(reqId); else n.add(reqId); return n; })}>
           <span style={{ color: "var(--color-text-muted)", fontSize: 10, width: 11, display: "inline-block", transition: "transform .15s", transform: open ? "rotate(90deg)" : "none" }}>▶</span>
           {ungrouped ? <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: FAINT }}>{UNGROUPED}</span>
@@ -990,7 +1005,7 @@ export default function RtmView() {
     const targets = [...new Set([...r.changeset.added, ...r.changeset.modified, ...r.changeset.revived, ...r.changeset.removed])];
     const so = effSignoff(r);
     return (
-      <section style={{ background: nested ? "var(--color-surface)" : "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: nested ? 11 : 14, marginTop: nested ? 10 : 0, marginBottom: nested ? 0 : 14, overflow: "hidden", opacity: dead ? 0.68 : 1 }}>
+      <section style={{ background: nested ? "var(--color-surface)" : "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: nested ? 9 : 10, marginTop: nested ? 10 : 0, marginBottom: nested ? 0 : 14, overflow: "hidden", opacity: dead ? 0.68 : 1 }}>
         <div className="flex items-center gap-3" style={{ padding: "14px 20px", cursor: "pointer" }} onClick={() => setExpandedReqs((p) => { const n = new Set(p); if (n.has(r.id)) n.delete(r.id); else n.add(r.id); return n; })}>
           <span style={{ width: 11, height: 11, borderRadius: "50%", flex: "none", background: dead ? "none" : r.type === "nonfunctional" ? NFR : GOLD, border: dead ? `1.5px solid ${FAINT}` : "none", boxShadow: dead ? "none" : `0 0 0 4px ${r.type === "nonfunctional" ? "color-mix(in srgb, var(--color-status-info) 14%, transparent)" : "color-mix(in srgb, var(--color-accent) 14%, transparent)"}` }} />
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--color-text-muted)", textDecoration: dead ? "line-through" : "none" }}>{r.id}</span>
@@ -1086,10 +1101,10 @@ export default function RtmView() {
                 <span className="text-text-muted" style={{ fontSize: 11 }}>{f.domainName}</span>
                 <span className="text-text-muted ml-auto" style={{ fontSize: 11 }}>확정 {confirmedN}/{list.length}</span>
               </div>
-              <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 12, overflow: "hidden" }}>
+              <div style={{ background: "var(--color-panel)", border: BORDER, borderRadius: 10, overflow: "hidden" }}>
                 <div style={{ overflowX: "auto" }}>
                   <table style={{ borderCollapse: "collapse", fontSize: 12, width: "100%", minWidth: 900 }}>
-                    <thead><tr>{["ID", "구분", "제목", "Given", "When", "Then", "상태"].map((h) => <th key={h} style={{ padding: "9px 12px", borderBottom: BORDER, background: "var(--color-elevated)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 600 }}>{h}</th>)}</tr></thead>
+                    <thead><tr>{["ID", "구분", "제목", "Given", "When", "Then", "상태"].map((h) => <th key={h} style={{ padding: "8px 12px", borderBottom: "1px solid var(--color-border-medium)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 11.5, fontWeight: 650 }}>{h}</th>)}</tr></thead>
                     <tbody>{list.map((s) => (
                       <tr key={s.id} onClick={() => { setSelTs(s.id); setTsEditing(false); setTsSaveError(null); }} style={{ cursor: "pointer", background: s.id === selTs ? "color-mix(in srgb, var(--color-accent) 8%, transparent)" : undefined, boxShadow: tsConfirmed(s) ? `inset 2px 0 0 ${GOLD}` : undefined }} className="hover:bg-accent/[0.045]">
                         <td style={{ borderBottom: BORDER, padding: "9px 12px", whiteSpace: "nowrap", fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-text-muted)", verticalAlign: "top" }}>{s.id.replace(/^TS-/, "")}{s.acId && <div style={{ color: GOLD_DIM, fontSize: 9.5 }}>{s.reqId}·{s.acId}</div>}</td>
@@ -1159,7 +1174,7 @@ export default function RtmView() {
     if (!model) return null;
     if (!cov) return <div className="text-text-muted" style={{ fontSize: 13 }}>커버리지 데이터가 없습니다(rtm.json v2 재생성 필요).</div>;
     const Gap = ({ title, color, ids, render }: { title: string; color: string; ids: string[]; render: (id: string) => React.ReactNode }) => (
-      <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 13, overflow: "hidden" }}>
+      <div style={{ background: "var(--color-panel)", border: BORDER, borderRadius: 10, overflow: "hidden" }}>
         <h3 className="flex items-center gap-2" style={{ fontSize: 12, padding: "12px 16px", borderBottom: BORDER, color }}>{title}<span className="ml-auto" style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>{ids.length}</span></h3>
         {ids.length === 0 ? <div className="text-text-muted" style={{ padding: "12px 16px", fontSize: 12 }}>없음 ✓</div> : ids.map((id) => <div key={id} style={{ padding: "9px 16px", borderBottom: BORDER, fontSize: 12.5, color: "var(--color-text-secondary)" }}>{render(id)}</div>)}
       </div>
@@ -1183,7 +1198,7 @@ export default function RtmView() {
         {diags.length > 0 && (
           <>
             <div style={{ color: errCount > 0 ? BAD : WARN, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", margin: "24px 0 12px" }}>무결성 진단</div>
-            <div style={{ background: "linear-gradient(180deg,var(--color-panel),var(--color-surface))", border: BORDER, borderRadius: 13, overflow: "hidden" }}>
+            <div style={{ background: "var(--color-panel)", border: BORDER, borderRadius: 10, overflow: "hidden" }}>
               {diags.map((d, i) => <div key={i} className="flex items-center gap-3" style={{ padding: "9px 16px", borderBottom: i < diags.length - 1 ? BORDER : "none", fontSize: 12 }}>
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: d.level === "error" ? BAD : WARN, border: `1px solid ${d.level === "error" ? "rgba(207,138,134,.3)" : "rgba(216,162,94,.3)"}`, borderRadius: 4, padding: "1px 6px" }}>{d.level}</span>
                 <span className="text-text-secondary">{d.message}</span>{d.ref && <span className="text-text-muted ml-auto" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}>{d.ref}</span>}

@@ -1,61 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { useDashboardStore } from "../store";
-import TrustBadge from "./TrustBadge";
+import { Badge, BtnAccent, BtnOutline, PageHead } from "./proto/Proto";
 
-/** 표시용 frontmatter(--- ... ---) 제거 — 메타는 헤더/배지로 노출, 본문엔 불필요. */
+/** 표시용 frontmatter(--- ... ---) 제거 — 메타는 헤더/배지로 노출, 본문엔 불필요.
+ *  claims/wiki-links 펜스 주석도 렌더에서 숨긴다(내용은 유지 — 마커는 기계용). */
 function stripFrontmatter(md: string): string {
-  return md.replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+  return md
+    .replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "")
+    .replace(/[ \t]*<!--\s*(?:claims:FENCE:(?:OPEN|CLOSE)|wiki-links[^>]*)\s*-->[ \t]*\r?\n?/g, "");
 }
 
-/** 다크 테마 마크다운 컴포넌트(GFM 표 포함). 인라인 스타일로 테마 변수 사용. */
-const MD_COMPONENTS = {
-  h1: (p: ComponentPropsWithoutRef<"h1">) => (
-    <h1 style={{ fontSize: 19, color: "var(--color-text-primary)", margin: "4px 0 14px", fontFamily: "var(--font-heading)" }} {...p} />
-  ),
-  h2: (p: ComponentPropsWithoutRef<"h2">) => (
-    <h2 style={{ fontSize: 15, color: "var(--color-accent)", margin: "22px 0 10px", paddingBottom: 4, borderBottom: "1px solid var(--color-border-subtle)" }} {...p} />
-  ),
-  h3: (p: ComponentPropsWithoutRef<"h3">) => (
-    <h3 style={{ fontSize: 13, color: "var(--color-text-primary)", margin: "16px 0 8px" }} {...p} />
-  ),
-  p: (p: ComponentPropsWithoutRef<"p">) => (
-    <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.65, margin: "8px 0" }} {...p} />
-  ),
-  ul: (p: ComponentPropsWithoutRef<"ul">) => (
-    <ul style={{ margin: "8px 0", paddingLeft: 20, listStyle: "disc" }} {...p} />
-  ),
-  li: (p: ComponentPropsWithoutRef<"li">) => (
-    <li style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.6, margin: "3px 0" }} {...p} />
-  ),
-  blockquote: (p: ComponentPropsWithoutRef<"blockquote">) => (
-    <blockquote style={{ borderLeft: "3px solid var(--color-border-medium)", margin: "10px 0", padding: "2px 0 2px 12px", color: "var(--color-text-muted)", fontSize: 12.5 }} {...p} />
-  ),
-  code: (p: ComponentPropsWithoutRef<"code">) => (
-    <code style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, background: "var(--color-elevated)", padding: "1px 5px", borderRadius: 4, color: "var(--color-text-primary)" }} {...p} />
-  ),
-  a: (p: ComponentPropsWithoutRef<"a">) => <a style={{ color: "var(--color-accent)" }} {...p} />,
-  table: (p: ComponentPropsWithoutRef<"table">) => (
-    <div style={{ overflowX: "auto", margin: "10px 0" }}>
-      <table style={{ borderCollapse: "collapse", fontSize: 11.5, width: "max-content", minWidth: "100%" }} {...p} />
-    </div>
-  ),
-  th: (p: ComponentPropsWithoutRef<"th">) => (
-    <th style={{ border: "1px solid var(--color-border-subtle)", padding: "5px 9px", background: "var(--color-elevated)", color: "var(--color-text-secondary)", textAlign: "left", whiteSpace: "nowrap", fontWeight: 600 }} {...p} />
-  ),
-  td: (p: ComponentPropsWithoutRef<"td">) => (
-    <td style={{ border: "1px solid var(--color-border-subtle)", padding: "5px 9px", color: "var(--color-text-secondary)", verticalAlign: "top" }} {...p} />
-  ),
-} as const;
 
 /**
  * 산출물 문서 뷰(D3) — 생성된 SI 문서(.md)를 목록·조회·편집·확정한다.
  * node-detail 편집/확정(P3)과 동형: 편집·저장=즉시 **확정(approver)**, 생성물 불변(오버레이 별도).
- * 표 중심 문서라 본문은 원본 마크다운을 monospace 로 노출(원본 .md 가 곧 산출물). 편집은 textarea.
+ * 레이아웃은 pmpl-proto .docs — 좌 트리 카드(fold+상태 배지) + 우 mdoc 카드(.proto-md 렌더). 편집은 textarea.
  *
  * 데이터: dev 서버 GET /doc-list.json · GET /doc-content.json?docId= · POST /doc(토큰 게이트).
  * 읽기전용(데모, accessToken 없음)일 때는 편집 버튼을 숨기고 안내한다.
@@ -206,189 +169,171 @@ export default function DocsView() {
 
   const selectedDoc = docs.find((d) => d.docId === selected) ?? null;
 
+  const confirmedCount = docs.filter((d) => d.confirmed).length;
+
   return (
-    <div className="flex-1 min-h-0 flex overflow-hidden">
-      {/* 좌측 문서 목록 */}
-      <aside className="w-[260px] md:w-[300px] shrink-0 h-full flex flex-col border-r border-border-subtle bg-surface/40">
-        <div
-          className="shrink-0 border-b border-border-subtle uppercase text-text-muted"
-          style={{ padding: "16px 16px 14px", fontSize: 11, letterSpacing: "0.1em" }}
-        >
-          산출물 문서
-        </div>
-        <div className="flex-1 overflow-y-auto" style={{ padding: 12 }}>
+    <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
+      <PageHead
+        title="산출물"
+        meta={
+          docs.length > 0 ? (
+            <>
+              산출물 <b className="text-text-primary tabular-nums">{docs.length}</b>종 · 확정{" "}
+              <b className="text-text-primary tabular-nums">{confirmedCount}</b> · 초안{" "}
+              <b className="text-text-primary tabular-nums">{docs.length - confirmedCount}</b>
+            </>
+          ) : undefined
+        }
+      />
+
+      {/* 프로토 .docs — 좌 270px 트리 카드 + 우 mdoc 카드 */}
+      <div className="grid items-start grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)]" style={{ gap: 14 }}>
+        <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow proto-tree">
           {listError ? (
-            <p className="text-text-muted" style={{ fontSize: 12 }}>{listError}</p>
+            <p className="text-text-muted" style={{ fontSize: 12, padding: "4px 6px" }}>{listError}</p>
           ) : docs.length === 0 ? (
-            <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.5 }}>
+            <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.5, padding: "4px 6px" }}>
               생성된 문서가 없습니다.<br />
               <code>understand-docs</code> 를 먼저 실행하세요.
             </p>
           ) : (
-            <div className="flex flex-col">
-              {FOLDERS.map((folder) => {
-                const items = docs.filter((d) => folderKeyOf(d.methodology) === folder.key);
-                if (items.length === 0) return null;
-                const isOpen = !collapsed.has(folder.key);
-                return (
-                  <div key={folder.key} className="mb-1">
-                    {/* 폴더 헤더 — 접기/펼치기 */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setCollapsed((prev) => {
-                          const next = new Set(prev);
-                          if (next.has(folder.key)) next.delete(folder.key);
-                          else next.add(folder.key);
-                          return next;
-                        })
-                      }
-                      className="flex items-center gap-1.5 w-full text-left rounded-md hover:bg-elevated/60 transition-colors cursor-pointer"
-                      style={{ padding: "5px 6px" }}
-                    >
-                      <span className="text-text-muted" style={{ fontSize: 9, width: 10, display: "inline-block" }}>
-                        {isOpen ? "▾" : "▸"}
-                      </span>
-                      <span style={{ fontSize: 12 }}>{isOpen ? "📂" : "📁"}</span>
-                      <span className="text-text-secondary" style={{ fontSize: 11.5, fontWeight: 600 }}>
-                        {folder.label}
-                      </span>
-                      <span className="text-text-muted ml-auto" style={{ fontSize: 10, fontFamily: "var(--font-mono)" }}>
-                        {items.length}
-                      </span>
-                    </button>
-                    {/* 폴더 내 문서 — 들여쓰기 + 트리 가이드 라인 */}
-                    {isOpen && (
-                      <div className="flex flex-col" style={{ marginLeft: 10, borderLeft: "1px solid var(--color-border-subtle)", paddingLeft: 6 }}>
-                        {items.map((d) => {
-                          const isSel = d.docId === selected;
-                          return (
-                            <button
-                              key={d.docId}
-                              type="button"
-                              onClick={() => navigate(`/deliverables/${encodeURIComponent(d.docId)}`)}
-                              title={d.docId}
-                              className="flex items-center gap-1.5 text-left rounded-md cursor-pointer transition-colors w-full"
-                              style={{
-                                padding: "6px 8px",
-                                background: isSel ? "color-mix(in srgb, var(--color-accent) 10%, transparent)" : "transparent",
-                                color: isSel ? "var(--color-accent)" : undefined,
-                              }}
+            FOLDERS.map((folder) => {
+              const items = docs.filter((d) => folderKeyOf(d.methodology) === folder.key);
+              if (items.length === 0) return null;
+              const isOpen = !collapsed.has(folder.key);
+              return (
+                <div key={folder.key}>
+                  {/* .fold — 접기/펼치기 겸용 그룹 라벨 */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCollapsed((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(folder.key)) next.delete(folder.key);
+                        else next.add(folder.key);
+                        return next;
+                      })
+                    }
+                    className="fold flex items-center gap-1 w-full text-left cursor-pointer bg-transparent border-0"
+                    style={{ font: "inherit", fontSize: 11, fontWeight: 700, color: "var(--color-text-muted)" }}
+                  >
+                    <span style={{ fontSize: 9, width: 10, display: "inline-block" }}>{isOpen ? "▾" : "▸"}</span>
+                    {folder.label}
+                    <span className="ml-auto tabular-nums" style={{ fontWeight: 500 }}>{items.length}</span>
+                  </button>
+                  {isOpen &&
+                    items.map((d) => {
+                      const isSel = d.docId === selected;
+                      return (
+                        <button
+                          key={d.docId}
+                          type="button"
+                          onClick={() => navigate(`/deliverables/${encodeURIComponent(d.docId)}`)}
+                          title={d.docId}
+                          className={`doc ${isSel ? "on" : ""}`}
+                        >
+                          <span className="truncate" style={{ minWidth: 0 }}>{d.title}</span>
+                          <span className="st">
+                            <Badge
+                              tone={d.confirmed ? "ok" : "info"}
+                              title={d.confirmed && d.approver ? `확정 · ${d.approver}` : undefined}
                             >
-                              <span style={{ fontSize: 11, opacity: 0.8 }}>📄</span>
-                              <span
-                                className={isSel ? "" : "text-text-secondary"}
-                                style={{ fontSize: 12, lineHeight: 1.3, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-                              >
-                                {d.title}
-                              </span>
-                              {d.confirmed && <TrustBadge confirmedBy={d.approver} className="ml-auto shrink-0" />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                              {d.confirmed ? "확정" : "초안"}
+                            </Badge>
+                          </span>
+                        </button>
+                      );
+                    })}
+                </div>
+              );
+            })
           )}
         </div>
-      </aside>
 
-      {/* 우측 문서 본문 */}
-      <div className="flex-1 min-w-0 h-full flex flex-col bg-root">
-        {selectedDoc ? (
-          <>
-            <div
-              className="flex items-center gap-3 shrink-0 bg-panel border-b border-border-subtle"
-              style={{ padding: "10px 20px" }}
-            >
-              <span className="text-text-primary" style={{ fontSize: 14 }}>{selectedDoc.title}</span>
-              <TrustBadge confirmedBy={confirmedBy} verdict={null} />
-              <span className="ml-auto flex items-center gap-2">
+        {/* .mdoc — 문서 본문 카드 */}
+        <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "20px 24px" }}>
+          {selectedDoc ? (
+            <>
+              {/* .dh — 제목 + 상태 배지 + 우측 액션 */}
+              <div className="flex items-center gap-2.5 flex-wrap" style={{ marginBottom: 4 }}>
+                <h2 className="text-text-primary" style={{ fontSize: 17, fontWeight: 700 }}>{selectedDoc.title}</h2>
+                <Badge tone={confirmedBy ? "ok" : "info"}>{confirmedBy ? "확정" : "초안"}</Badge>
+                <div className="flex-1" />
                 {saveError && (
-                  <span className="text-amber-400" style={{ fontSize: 11 }}>저장 실패: {saveError}</span>
+                  <span style={{ fontSize: 11, color: "var(--color-status-warn)" }}>저장 실패: {saveError}</span>
                 )}
-                {selectedDoc.hasXlsx && accessToken && (
+                {selectedDoc.hasXlsx && accessToken && !editing && (
                   <a
                     href={`/doc-xlsx?token=${encodeURIComponent(accessToken)}&docId=${encodeURIComponent(selectedDoc.docId)}`}
                     download={`${selectedDoc.docId}.xlsx`}
-                    className={`rounded-md border transition-colors ${
-                      selectedDoc.xlsxStale
-                        ? "border-amber-400/60 text-amber-500 hover:text-amber-400"
-                        : "border-border-subtle text-text-secondary hover:text-text-primary"
-                    }`}
-                    style={{ padding: "4px 12px", fontSize: 12 }}
+                    className="rounded-md border border-border-medium bg-panel text-text-secondary hover:bg-elevated transition-colors font-semibold"
+                    style={{ padding: "4px 10px", fontSize: 12, borderRadius: 6, textDecoration: "none" }}
                     title={
                       selectedDoc.xlsxStale
                         ? "이 xlsx 는 스캔 스냅샷입니다 — 이후의 확정 편집/문서 갱신이 반영되지 않았습니다. 최신화: /understand-docs 재실행."
                         : "정적 스캔 스냅샷(원천 데이터) — 확정 편집은 md 가 진실입니다."
                     }
                   >
-                    {selectedDoc.xlsxStale ? "xlsx(스냅샷 · 미반영 편집 있음)" : "xlsx 다운로드"}
+                    xlsx
                   </a>
                 )}
                 {!canWrite ? (
                   <span className="text-text-muted" style={{ fontSize: 11 }}>읽기전용(라이브 서버 없음)</span>
                 ) : editing ? (
                   <>
-                    <button
-                      type="button"
-                      onClick={() => setEditing(false)}
-                      className="rounded-md border border-border-subtle text-text-secondary hover:text-text-primary transition-colors"
-                      style={{ padding: "4px 12px", fontSize: 12 }}
-                    >
-                      취소
-                    </button>
-                    <button
-                      type="button"
-                      onClick={onSave}
-                      disabled={saving}
-                      className="rounded-md border border-accent text-accent hover:bg-accent/10 transition-colors disabled:opacity-50"
-                      style={{ padding: "4px 12px", fontSize: 12 }}
-                    >
+                    <BtnOutline sm onClick={() => setEditing(false)}>취소</BtnOutline>
+                    <BtnAccent sm onClick={() => void onSave()} disabled={saving}>
                       {saving ? "저장 중…" : "저장 + 확정"}
-                    </button>
+                    </BtnAccent>
                   </>
                 ) : (
-                  <button
-                    type="button"
+                  <BtnOutline
+                    sm
                     onClick={() => {
                       setDraft(content);
                       setEditing(true);
                     }}
-                    className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent transition-colors"
-                    style={{ padding: "4px 12px", fontSize: 12 }}
                   >
                     편집
-                  </button>
+                  </BtnOutline>
                 )}
-              </span>
-            </div>
-            <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 20 }}>
+              </div>
+              {/* .dmeta — 방법론 · 승인자 · 확정일 */}
+              <div className="text-text-muted" style={{ fontSize: 12, marginBottom: 14 }}>
+                {FOLDERS.find((f) => f.key === folderKeyOf(selectedDoc.methodology))?.label ?? "기타"}
+                {confirmedBy ? <> · 승인자 {confirmedBy}</> : <> · 승인자 미지정</>}
+                {selectedDoc.at ? <> · {selectedDoc.at.slice(0, 10)}</> : null}
+              </div>
+              {/* xlsx 스냅샷 주의 배너 — 프로토 .banner.info */}
+              {selectedDoc.hasXlsx && selectedDoc.xlsxStale && !editing && (
+                <div
+                  className="flex items-center gap-2.5 rounded-lg border border-border-subtle bg-panel"
+                  style={{ borderLeft: "3px solid var(--color-status-info)", padding: "10px 14px", fontSize: 13, marginBottom: 14 }}
+                >
+                  <span style={{ fontWeight: 650 }}>xlsx 스냅샷 주의</span>
+                  <span className="text-text-muted">미반영 편집 있음 — 다운로드 전 확정(재생성)을 권장합니다</span>
+                </div>
+              )}
               {editing ? (
                 <textarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   spellCheck={false}
-                  className="w-full h-full bg-elevated text-text-primary rounded-lg border border-border-subtle outline-none focus:border-accent transition-colors"
-                  style={{ fontFamily: "var(--font-mono)", fontSize: 12.5, lineHeight: 1.6, padding: 14, resize: "none" }}
+                  className="w-full bg-elevated text-text-primary rounded-lg border border-border-subtle outline-none focus:border-accent transition-colors"
+                  style={{ fontFamily: "var(--font-mono)", fontSize: 12.5, lineHeight: 1.6, padding: 14, resize: "vertical", minHeight: "60vh" }}
                 />
               ) : (
-                <div style={{ maxWidth: 980 }}>
-                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
-                    {stripFrontmatter(content)}
-                  </ReactMarkdown>
+                <div className="proto-md">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{stripFrontmatter(content)}</ReactMarkdown>
                 </div>
               )}
-            </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center px-8 text-center">
-            <p className="text-text-muted" style={{ fontSize: 13 }}>좌측에서 문서를 선택하세요.</p>
-          </div>
-        )}
+            </>
+          ) : (
+            <p className="text-text-muted" style={{ fontSize: 13, padding: 20, textAlign: "center" }}>
+              좌측에서 문서를 선택하세요.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ interface NavItem {
   to: string;
   label: string;
   icon: ReactNode;
+  /** 프로토 .grp — 이 항목 앞에 붙는 그룹 헤더(이해 / 요구 · 변경 / 정책 · 산출 · 참고) */
+  group?: string;
 }
 
 interface Props {
@@ -26,15 +28,22 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
   const wikiGraph = useDashboardStore((s) => s.wikiGraph);
   const { t } = useI18n();
 
+  // 프로토(pmpl-proto) 그룹·순서 — 이해(업무 지도·구조·화면설계서) / 요구·변경(추적표) /
+  // 정책·산출·참고(산출물·문서). 신설 메뉴(데이터·변경영향·프로그램·품질·보고서·정책서)는 후속.
   const items: NavItem[] = [{ to: "/", label: "홈", icon: iconHome }];
   if (graph && isKnowledgeGraph) {
     items.push({ to: "/knowledge", label: "지식그래프", icon: iconDomain });
   } else if (graph) {
-    if (domainGraph) items.push({ to: "/domains", label: t.drawer.domain, icon: iconDomain });
-    items.push({ to: "/structure", label: t.drawer.structural, icon: iconStructure });
-    items.push({ to: "/rtm", label: "추적표", icon: iconRtm });
+    if (domainGraph) items.push({ to: "/domains", label: t.drawer.domain, icon: iconDomain, group: "이해" });
+    items.push({
+      to: "/structure",
+      label: t.drawer.structural,
+      icon: iconStructure,
+      group: domainGraph ? undefined : "이해",
+    });
     items.push({ to: "/screens", label: "화면설계서", icon: iconScreens });
-    items.push({ to: "/deliverables", label: "산출물", icon: iconDocs });
+    items.push({ to: "/rtm", label: "추적표", icon: iconRtm, group: "요구 · 변경" });
+    items.push({ to: "/deliverables", label: "산출물", icon: iconDocs, group: "정책 · 산출 · 참고" });
     if (wikiGraph) items.push({ to: "/wiki", label: "문서", icon: iconWiki });
   }
 
@@ -44,8 +53,16 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
         <span className="text-[17px] font-bold text-text-primary tracking-[-0.2px]">DS-NAVI</span>
       </div>
       {items.map((item) => (
+        <div key={item.to} className="contents">
+          {item.group && (
+            <div
+              className="text-text-muted font-bold"
+              style={{ fontSize: 10.5, letterSpacing: "0.08em", padding: "12px 12px 4px" }}
+            >
+              {item.group}
+            </div>
+          )}
         <NavLink
-          key={item.to}
           to={item.to}
           end={item.to === "/"}
           className={({ isActive }) =>
@@ -68,6 +85,7 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
             </>
           )}
         </NavLink>
+        </div>
       ))}
       <div className="flex-1" />
       {/* 하단 유틸 — 시안: border-t 위에 테마·단축키 도움말. */}

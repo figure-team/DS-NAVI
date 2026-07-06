@@ -1,0 +1,1373 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DS-NAVI — PM/PL 프론트 프로토타입</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+</head>
+<body>
+<title>DS-NAVI · PM/PL 프로토타입</title>
+<style>
+  /* ─── DS-NAVI 디자인 토큰 (mockup-shell-home.html 그대로, FRONT_REDESIGN §6) ─── */
+  :root {
+    --kt-red: #e60012;
+    --brand-primary: #d81b2c;
+    --brand-primary-hover: #b91525;
+    --brand-tint: #fcedee;
+    --brand-emphasis: #c0461e;
+
+    --bg-root: #f4f5f7;
+    --bg-surface: #fcfcfd;
+    --bg-card: #ffffff;
+    --bg-hover: #eff0f3;
+    --text-primary: #1a1b1f;
+    --text-secondary: #43474e;
+    --text-muted: #6b727b;
+    --border-subtle: #e6e8ec;
+    --border-medium: #d5d8de;
+    --accent: var(--brand-primary);
+    --status-ok: #1a7f37;
+    --status-warn: #b45309;
+    --status-error: #c11322;
+    --status-info: #175cd3;
+    --data-1: #3b6ea5;              /* 단일 색조 데이터 마크(막대·스파크) — 액센트 레드와 분리 */
+
+    --nav-w: 220px;
+    --radius: 10px;
+    --shadow-card: 0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06);
+    --font-sans: "Pretendard", "Pretendard Variable", -apple-system, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg-root); }
+  #app {
+    font-family: var(--font-sans);
+    background: var(--bg-root);
+    color: var(--text-primary);
+    display: grid;
+    grid-template-columns: var(--nav-w) 1fr;
+    height: 100vh; overflow: hidden;
+    font-size: 14px; line-height: 1.5;
+  }
+  #app a { color: inherit; }
+
+  /* ── NavRail ── */
+  .nav { background: var(--bg-surface); border-right: 1px solid var(--border-subtle);
+         display: flex; flex-direction: column; padding: 14px 10px; overflow-y: auto; }
+  .nav .logo { display: flex; align-items: baseline; gap: 7px; padding: 4px 10px 14px; }
+  .nav .logo .prod { font-weight: 700; font-size: 16px; letter-spacing: .2px; }
+  .nav .logo .proto { font-size: 10px; font-weight: 700; color: var(--brand-primary);
+                      background: var(--brand-tint); border-radius: 4px; padding: 1px 6px; }
+  .nav .grp { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: var(--text-muted);
+              padding: 12px 12px 4px; }
+  .nav a { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin: 1px 0;
+           border-radius: 8px; text-decoration: none; color: var(--text-secondary);
+           font-weight: 500; position: relative; font-size: 13.5px; }
+  .nav a svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; flex: none; }
+  .nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .nav a.active { background: var(--bg-hover); color: var(--text-primary); font-weight: 600; }
+  .nav a.active::before { content: ""; position: absolute; left: -10px; top: 7px; bottom: 7px;
+                          width: 3px; border-radius: 0 2px 2px 0; background: var(--brand-primary); }
+  .nav a.active svg { stroke: var(--brand-primary); }
+  .nav .new { margin-left: auto; font-size: 9.5px; font-weight: 700; color: var(--status-info);
+              background: #e9f0fc; border-radius: 4px; padding: 1px 5px; }
+  .nav .re  { margin-left: auto; font-size: 9.5px; font-weight: 700; color: var(--status-warn);
+              background: #fbf1e5; border-radius: 4px; padding: 1px 5px; }
+  .nav .spacer { flex: 1; min-height: 14px; }
+  .nav .util { border-top: 1px solid var(--border-subtle); padding-top: 8px; margin-top: 8px; }
+  .nav .util a { font-size: 12.5px; color: var(--text-muted); padding: 6px 12px; }
+
+  /* ── TopBar ── */
+  .main-col { display: flex; flex-direction: column; min-width: 0; }
+  .topbar { height: 56px; flex: none; background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex; align-items: center; gap: 16px; padding: 0 20px; }
+  .crumb { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+  .crumb svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 1.8; }
+  .crumb .sep { color: var(--text-muted); font-weight: 400; }
+  .crumb .leaf { color: var(--text-secondary); font-weight: 500; }
+  .topbar .grow { flex: 1; }
+  .omni { width: 320px; display: flex; align-items: center; gap: 8px; background: var(--bg-card);
+          border: 1px solid var(--border-medium); border-radius: 8px; padding: 7px 12px;
+          color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: inherit; text-align: left; }
+  .omni svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .omni kbd { margin-left: auto; font-family: var(--font-sans); font-size: 11px;
+              border: 1px solid var(--border-medium); border-radius: 4px; padding: 1px 5px;
+              color: var(--text-muted); background: var(--bg-surface); }
+  .jobdot { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-muted); }
+  .jobdot[hidden] { display: none; }
+  .jobdot .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--status-info);
+                 animation: pulse 1.6s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .jobdot .dot { animation: none; } }
+  .icon-btn { width: 34px; height: 34px; border-radius: 8px; border: none; background: transparent;
+              display: grid; place-items: center; color: var(--text-muted); cursor: pointer; }
+  .icon-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+  /* ── 페이지 공통 ── */
+  .page { flex: 1; overflow: auto; padding: 24px 28px 48px; }
+  .page.fit { overflow: hidden; display: flex; flex-direction: column; padding-bottom: 24px; }
+  .page-head { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .page-head h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .page-head .meta { color: var(--text-muted); font-size: 13px; padding-bottom: 3px; }
+  .page-head .grow { flex: 1; }
+  .eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 3px; }
+  .btn-outline { border: 1px solid var(--border-medium); background: var(--bg-card); border-radius: 8px;
+                 padding: 7px 14px; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+                 cursor: pointer; font-family: inherit; }
+  .btn-outline:hover { background: var(--bg-hover); }
+  .btn-accent { border: 1px solid var(--brand-primary); background: var(--bg-card); color: var(--brand-primary);
+                border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .btn-accent:hover { background: var(--brand-tint); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+  .card { background: var(--bg-card); border: 1px solid var(--border-subtle);
+          border-radius: var(--radius); box-shadow: var(--shadow-card); }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .stat { padding: 14px 16px; }
+  .stat .label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 6px; }
+  .stat .value { font-size: 26px; font-weight: 650; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
+  .stat .value small { font-size: 12.5px; font-weight: 500; color: var(--text-muted); margin-left: 4px; letter-spacing: 0; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
+  .entry { padding: 18px; display: flex; flex-direction: column; gap: 10px; cursor: pointer;
+           transition: border-color .12s; text-decoration: none; }
+  .entry:hover { border-color: var(--brand-primary); }
+  .entry .top { display: flex; align-items: center; gap: 9px; }
+  .entry .top svg { width: 18px; height: 18px; stroke: var(--brand-primary); fill: none; stroke-width: 1.8; }
+  .entry h2 { font-size: 15px; font-weight: 650; }
+  .entry .go { margin-left: auto; color: var(--text-muted); font-size: 13px; }
+  .entry:hover .go { color: var(--brand-primary); }
+  .entry p { color: var(--text-muted); font-size: 13px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 12px; padding: 3px 9px; border-radius: 99px; background: var(--bg-hover);
+          color: var(--text-secondary); font-weight: 500; border: none; font-family: inherit; cursor: default; }
+  button.chip { cursor: pointer; }
+  .chip.on { background: var(--brand-tint); color: var(--brand-primary); font-weight: 600; }
+  .foot { display: flex; align-items: center; gap: 14px; font-size: 12.5px; color: var(--text-muted); margin-top: 2px; flex-wrap: wrap; }
+  .foot b { color: var(--text-primary); font-weight: 650; font-variant-numeric: tabular-nums; }
+  .badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+  .badge.ok   { color: var(--status-ok);   background: #e8f3ec; }
+  .badge.warn { color: var(--status-warn); background: #fbf1e5; }
+  .badge.info { color: var(--status-info); background: #e9f0fc; }
+  .badge.err  { color: var(--status-error); background: #fdecec; }
+  .badge.mut  { color: var(--text-muted); background: var(--bg-hover); }
+
+  .panel { padding: 16px 18px; }
+  .panel h3 { font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px;
+              display: flex; align-items: center; gap: 8px; }
+  .panel h3 .all { margin-left: auto; font-size: 12px; color: var(--text-muted); font-weight: 500; text-decoration: none; cursor: pointer; }
+  .panel h3 .all:hover { color: var(--brand-primary); }
+  .row { display: flex; align-items: center; gap: 10px; padding: 9px 2px; border-top: 1px solid var(--border-subtle); font-size: 13px; }
+  .row:first-of-type { border-top: none; }
+  .row .name { font-weight: 550; }
+  .row .sub { color: var(--text-muted); }
+  .row .right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .feed-item { display: flex; gap: 10px; padding: 9px 2px; border-top: 1px solid var(--border-subtle); font-size: 13px; }
+  .feed-item:first-of-type { border-top: none; }
+  .feed-item .dot { width: 7px; height: 7px; border-radius: 99px; margin-top: 6px; flex: none; }
+  .feed-item .when { color: var(--text-muted); font-size: 12px; }
+
+  /* ── 탭 ── */
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px; }
+  .tabs button { border: none; background: none; font-family: inherit; font-size: 13.5px; font-weight: 550;
+                 color: var(--text-muted); padding: 8px 14px; cursor: pointer; border-bottom: 2px solid transparent;
+                 margin-bottom: -1px; }
+  .tabs button:hover { color: var(--text-primary); }
+  .tabs button.on { color: var(--brand-primary); border-bottom-color: var(--brand-primary); font-weight: 650; }
+  .tabs .count { font-size: 11px; color: var(--text-muted); margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .seg { display: inline-flex; border: 1px solid var(--border-medium); border-radius: 8px; overflow: hidden; background: var(--bg-card); }
+  .seg button { border: none; background: none; font-family: inherit; font-size: 12.5px; font-weight: 550;
+                color: var(--text-muted); padding: 6px 12px; cursor: pointer; border-left: 1px solid var(--border-subtle); }
+  .seg button:first-child { border-left: none; }
+  .seg button.on { background: var(--bg-hover); color: var(--text-primary); font-weight: 650; }
+
+  /* ── 테이블 ── */
+  .tbl-wrap { overflow-x: auto; }
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .tbl th { text-align: left; font-size: 11.5px; font-weight: 650; color: var(--text-muted);
+            padding: 8px 10px; border-bottom: 1px solid var(--border-medium); white-space: nowrap; }
+  .tbl td { padding: 9px 10px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+  .tbl tbody tr:hover { background: var(--bg-hover); }
+  .tbl td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  .tbl th.num { text-align: right; }
+  .mono { font-family: var(--font-mono); font-size: 11.5px; }
+  .ev { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+  .conf { font-size: 10.5px; font-weight: 700; border-radius: 4px; padding: 1px 6px; white-space: nowrap; }
+  .conf.fix  { color: var(--status-ok); background: #e8f3ec; }      /* 확정 */
+  .conf.ai   { color: #0e6e5c; background: #e6f4f1; }               /* 확정·AI */
+  .conf.est  { color: var(--status-warn); background: #fbf1e5; }    /* 추정 */
+  .conf.chk  { color: var(--status-error); background: #fdecec; }   /* 확인 필요 */
+
+  /* ── 진행 바 ── */
+  .bar { height: 8px; border-radius: 4px; background: var(--bg-hover); overflow: hidden; display: flex; }
+  .bar i { display: block; height: 100%; }
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 120px; align-items: center; gap: 12px;
+             padding: 8px 0; font-size: 13px; }
+  .bar-row .pct { text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums; font-size: 12.5px; }
+  .gbar { height: 5px; border-radius: 3px; background: var(--bg-hover); overflow: hidden; }
+  .gbar i { display: block; height: 100%; background: var(--status-ok); }
+
+  /* ── 배너 ── */
+  .banner { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-subtle);
+            border-left: 3px solid var(--status-warn); background: var(--bg-card); border-radius: 8px;
+            padding: 10px 14px; font-size: 13px; margin-bottom: 14px; }
+  .banner.info { border-left-color: var(--status-info); }
+  .banner .t { font-weight: 650; }
+  .banner .sub { color: var(--text-muted); }
+  .protonote { font-size: 12px; color: var(--text-muted); background: var(--bg-surface);
+               border: 1px dashed var(--border-medium); border-radius: 8px; padding: 8px 12px; margin-bottom: 16px; }
+  .protonote b { color: var(--status-info); }
+
+  /* ── 스텝퍼 ── */
+  .stepper { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; }
+  .stepper .st { display: flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 99px;
+                 background: var(--bg-hover); font-weight: 550; }
+  .stepper .st.done { color: var(--status-ok); background: #e8f3ec; }
+  .stepper .st.cur { color: var(--brand-primary); background: var(--brand-tint); font-weight: 650; }
+  .stepper .arr { color: var(--border-medium); }
+
+  /* ── 업무 지도 ── */
+  .work-land { flex: 1; display: grid; grid-template-columns: 1fr 280px; gap: 14px; min-height: 0; }
+  .sysbox { display: flex; flex-direction: column; min-height: 0; }
+  .sysbox .sys-h { padding: 12px 18px; border-bottom: 1px solid var(--border-subtle); font-weight: 650; font-size: 13.5px;
+                   display: flex; align-items: center; gap: 8px; }
+  .sysbox .inner { flex: 1; overflow: auto; padding: 16px 18px;
+                   display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; align-content: start; }
+  .dom { border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 13px 14px;
+         cursor: pointer; background: var(--bg-card); transition: border-color .12s; }
+  .dom:hover { border-color: var(--brand-primary); }
+  .dom .h { display: flex; align-items: center; gap: 8px; font-weight: 650; font-size: 14px; margin-bottom: 4px; }
+  .dom .h .n { margin-left: auto; font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+  .dom .gr { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-muted); margin: 7px 0 9px; }
+  .dom .gr .gbar { flex: 1; }
+  .ext { display: flex; flex-direction: column; min-height: 0; overflow: auto; }
+  .ext section { padding: 13px 16px; border-top: 1px solid var(--border-subtle); }
+  .ext section:first-child { border-top: none; }
+  .ext h4 { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; }
+  .ext .kv { display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 3px 0; color: var(--text-secondary); }
+  .ext .kv b { font-variant-numeric: tabular-nums; }
+  .ext .kv .right { margin-left: auto; }
+
+  /* ── 순서도 ── */
+  .flowchart { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 24px 0 10px; }
+  .fc-node { position: relative; z-index: 1; }
+  .fc-pill { border: 1.5px solid var(--border-medium); background: var(--bg-surface); border-radius: 99px;
+             padding: 6px 22px; font-size: 12.5px; font-weight: 650; color: var(--text-secondary); }
+  .fc-act { border: 1px solid var(--border-subtle); background: var(--bg-card); border-radius: 10px;
+            box-shadow: var(--shadow-card); padding: 10px 18px; font-size: 13px; font-weight: 550;
+            display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .fc-act:hover { border-color: var(--brand-primary); }
+  .fc-act .fref { font-size: 10px; font-weight: 700; color: var(--status-info); background: #e9f0fc;
+                  border-radius: 4px; padding: 1px 6px; font-family: var(--font-mono); }
+  .fc-dec { width: 150px; height: 76px; position: relative; display: grid; place-items: center; }
+  .fc-dec::before { content: ""; position: absolute; inset: 10px 26px; transform: rotate(45deg);
+                    background: var(--bg-card); border: 1px solid var(--status-warn); border-radius: 6px; }
+  .fc-dec span { position: relative; font-size: 12px; font-weight: 650; color: var(--status-warn); text-align: center; }
+  .fc-v { width: 1.5px; height: 26px; background: var(--border-medium); position: relative; }
+  .fc-v::after { content: ""; position: absolute; bottom: -1px; left: -3.2px; border: 4px solid transparent;
+                 border-top-color: var(--border-medium); }
+  .fc-branch { display: flex; gap: 40px; align-items: flex-start; }
+  .fc-col { display: flex; flex-direction: column; align-items: center; }
+  .fc-lab { font-size: 10.5px; font-weight: 700; color: var(--text-muted); background: var(--bg-root);
+            padding: 0 4px; margin: 2px 0; }
+
+  /* ── 스파인/워크스페이스 ── */
+  .ws { display: grid; grid-template-columns: 300px 1fr; gap: 14px; align-items: start; }
+  .fl-list { padding: 10px; }
+  .fl-search { display: flex; align-items: center; gap: 7px; border: 1px solid var(--border-medium);
+               border-radius: 7px; padding: 6px 10px; font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px; }
+  .fl-grp { font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 10px 6px 4px; }
+  .fl-item { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 7px;
+             font-size: 12.5px; cursor: pointer; }
+  .fl-item:hover { background: var(--bg-hover); }
+  .fl-item.on { background: var(--brand-tint); font-weight: 600; }
+  .m { font-size: 9.5px; font-weight: 700; border-radius: 4px; padding: 1px 5px; font-family: var(--font-mono); }
+  .m.get { color: var(--status-info); background: #e9f0fc; }
+  .m.post { color: var(--status-ok); background: #e8f3ec; }
+  .m.del { color: var(--status-error); background: #fdecec; }
+  .lane { display: grid; grid-template-columns: 84px 1fr; gap: 12px; padding: 10px 0; border-top: 1px dashed var(--border-subtle); }
+  .lane:first-child { border-top: none; }
+  .lane .ln { font-size: 11px; font-weight: 700; color: var(--text-muted); padding-top: 12px; }
+  .lane .stepcard { border: 1px solid var(--border-subtle); border-radius: 9px; padding: 10px 13px; background: var(--bg-card); }
+  .lane .stepcard .t { font-weight: 600; font-size: 13px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .lane .stepcard p { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; }
+  .cite { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 10.5px;
+          color: var(--status-info); background: #e9f0fc; border-radius: 4px; padding: 1px 6px; cursor: pointer; }
+
+  /* ── 구조 그래프 목 ── */
+  .gtoolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .gwrap { display: grid; grid-template-columns: 1fr 300px; gap: 14px; flex: 1; min-height: 0; }
+  .gcanvas { position: relative; overflow: hidden; min-height: 420px; }
+  .glayer { position: absolute; left: 16px; right: 16px; border: 1px dashed var(--border-medium);
+            border-radius: 10px; padding: 6px 10px; }
+  .glayer .gl { font-size: 10.5px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; }
+  .gnode { position: absolute; border: 1px solid var(--border-medium); background: var(--bg-card);
+           border-radius: 7px; padding: 4px 10px; font-size: 11.5px; font-weight: 550;
+           box-shadow: var(--shadow-card); cursor: pointer; white-space: nowrap; }
+  .gnode:hover { border-color: var(--brand-primary); }
+  .gnode.sel { border-color: var(--brand-primary); box-shadow: 0 0 0 2px var(--brand-tint); }
+  .gnode .rk { display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 5px; }
+  .gedges { position: absolute; inset: 0; pointer-events: none; }
+  .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border-subtle); }
+  .sidebar-tabs button { flex: 1; border: none; background: none; font-family: inherit; font-size: 12.5px;
+                         font-weight: 600; color: var(--text-muted); padding: 9px; cursor: pointer;
+                         border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .sidebar-tabs button.on { color: var(--brand-primary); border-bottom-color: var(--brand-primary); }
+  .ninfo { padding: 14px 16px; font-size: 13px; }
+  .ninfo h4 { font-size: 14px; font-weight: 650; margin-bottom: 2px; }
+  .ninfo .path { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+  .ninfo dl { display: grid; grid-template-columns: 84px 1fr; gap: 5px 10px; font-size: 12.5px; margin: 10px 0; }
+  .ninfo dt { color: var(--text-muted); }
+  .ninfo dd { font-variant-numeric: tabular-nums; }
+  .ninfo section { border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-top: 10px; }
+  .ninfo section h5 { font-size: 11.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+
+  /* ── 화면설계서 ── */
+  .scr { display: grid; grid-template-columns: 260px 1fr; gap: 14px; align-items: start; }
+  .cap { position: relative; border: 1px solid var(--border-medium); border-radius: 8px;
+         background: repeating-linear-gradient(45deg, var(--bg-hover), var(--bg-hover) 10px, var(--bg-surface) 10px, var(--bg-surface) 20px);
+         height: 300px; display: grid; place-items: center; color: var(--text-muted); font-size: 13px; }
+  .an { position: absolute; width: 22px; height: 22px; border-radius: 99px; display: grid; place-items: center;
+        font-size: 11px; font-weight: 700; box-shadow: var(--shadow-card); }
+  .an.in { background: var(--brand-primary); color: #fff; }
+  .an.ev { background: var(--status-info); color: #fff; border-radius: 6px; }
+
+  /* ── 모달 ── */
+  .overlay { position: fixed; inset: 0; background: rgba(26,27,31,.4); display: none;
+             align-items: flex-start; justify-content: center; padding: 80px 20px 20px; z-index: 50; }
+  .overlay.show { display: flex; }
+  .modal { background: var(--bg-card); border-radius: 12px; box-shadow: 0 12px 40px rgba(26,27,31,.2);
+           width: 640px; max-width: 100%; max-height: 80vh; overflow: auto; }
+  .modal .mh { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--border-subtle);
+               font-weight: 650; font-size: 14px; }
+  .modal .mh .x { margin-left: auto; }
+  .modal .mb { padding: 16px 18px; }
+  .modal .mf { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--border-subtle); }
+  .omni-in { width: 100%; border: none; outline: none; font-family: inherit; font-size: 15px; padding: 14px 18px;
+             border-bottom: 1px solid var(--border-subtle); background: transparent; color: var(--text-primary); }
+  .omni-grp { font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 10px 18px 4px; }
+  .omni-it { display: flex; align-items: center; gap: 10px; padding: 8px 18px; font-size: 13px; cursor: pointer; }
+  .omni-it:hover, .omni-it.on { background: var(--bg-hover); }
+  .omni-it .sub { color: var(--text-muted); font-size: 12px; }
+  .omni-it .right { margin-left: auto; }
+  .kbd-tbl { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 28px; font-size: 13px; }
+  .kbd-tbl .k { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+  .kbd-tbl kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--border-medium);
+                 border-radius: 4px; padding: 1px 7px; background: var(--bg-surface); color: var(--text-secondary); }
+  .kbd-tbl .d { color: var(--text-muted); margin-left: auto; }
+
+  /* ── 차트 목 ── */
+  .spark { display: flex; align-items: flex-end; gap: 6px; height: 72px; padding-top: 8px; }
+  .spark .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .spark .b { width: 100%; max-width: 46px; border-radius: 4px 4px 0 0; background: var(--data-1); opacity: .55; }
+  .spark .col.cur .b { opacity: 1; }
+  .spark .l { font-size: 10.5px; color: var(--text-muted); }
+  .spark .v { font-size: 11px; font-weight: 650; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .hbar { display: grid; grid-template-columns: 90px 1fr 44px; gap: 10px; align-items: center; font-size: 12.5px; padding: 4px 0; }
+  .hbar .t { color: var(--text-secondary); }
+  .hbar .bb { height: 10px; border-radius: 0 4px 4px 0; background: var(--data-1); opacity: .8; }
+  .hbar .n { text-align: right; color: var(--text-muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+
+  /* ── 산출물/위키 ── */
+  .docs { display: grid; grid-template-columns: 270px 1fr; gap: 14px; align-items: start; }
+  .tree { padding: 12px; font-size: 13px; }
+  .tree .fold { font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 10px 6px 4px; }
+  .tree .doc { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 7px; cursor: pointer; }
+  .tree .doc:hover { background: var(--bg-hover); }
+  .tree .doc.on { background: var(--brand-tint); font-weight: 600; }
+  .tree .doc .st { margin-left: auto; font-size: 10px; }
+  .mdoc { padding: 20px 24px; }
+  .mdoc .dh { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .mdoc .dh h2 { font-size: 17px; font-weight: 700; }
+  .mdoc .dmeta { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+  .md { font-size: 13px; color: var(--text-secondary); line-height: 1.7; max-width: 760px; }
+  .md h4 { font-size: 13.5px; color: var(--text-primary); margin: 14px 0 6px; }
+  .md table { border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
+  .md th, .md td { border: 1px solid var(--border-subtle); padding: 5px 10px; }
+  .md th { background: var(--bg-surface); font-weight: 650; }
+  .est-mark { color: var(--status-warn); font-weight: 650; font-size: 11px; }
+  .toc { font-size: 12.5px; color: var(--text-muted); border-left: 2px solid var(--border-subtle); padding-left: 12px; margin: 12px 0; }
+  .toc div { padding: 2px 0; }
+
+  .pg:not(.show) { display: none !important; }
+  .pg.show { display: block; }
+  .pg.show.fitpage { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .two { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; }
+  @media (max-width: 1100px) { .grid3, .two, .work-land, .ws, .scr, .docs, .gwrap { grid-template-columns: 1fr; } }
+</style>
+
+<div id="app">
+<!-- ═══ NavRail ═══ -->
+<nav class="nav">
+  <div class="logo"><span class="prod">DS-NAVI</span><span class="proto">PM/PL PROTO</span></div>
+  <a href="#/home" data-route="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5"/></svg>홈</a>
+  <div class="grp">이해</div>
+  <a href="#/work" data-route="work"><svg viewBox="0 0 24 24"><circle cx="7" cy="7" r="3.2"/><circle cx="17" cy="7" r="3.2"/><circle cx="12" cy="17" r="3.2"/><path d="M9 9.5 11 14M15 9.5 13 14"/></svg>업무 지도<span class="re">개편</span></a>
+  <a href="#/structure" data-route="structure"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="8.5" y="14" width="7" height="7" rx="1.5"/><path d="M6.5 10v2.5h5.5M17.5 10v2.5h-5.5"/></svg>구조</a>
+  <a href="#/screens" data-route="screens"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 21h8"/></svg>화면설계서</a>
+  <div class="grp">요구 · 변경</div>
+  <a href="#/rtm" data-route="rtm"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="19" cy="19" r="2.4"/></svg>추적표</a>
+  <div class="grp">정량 · 보고</div>
+  <a href="#/programs" data-route="programs"><svg viewBox="0 0 24 24"><path d="M4 4h16v5H4zM4 15h7v5H4zM15 15h5v5h-5z"/></svg>프로그램<span class="new">신설</span></a>
+  <a href="#/quality" data-route="quality"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4.5"/></svg>품질·위험<span class="new">신설</span></a>
+  <a href="#/report" data-route="report"><svg viewBox="0 0 24 24"><path d="M5 21V10M12 21V4M19 21v-7"/></svg>보고서<span class="new">신설</span></a>
+  <div class="grp">산출 · 참고</div>
+  <a href="#/deliverables" data-route="deliverables"><svg viewBox="0 0 24 24"><path d="M6 2.5h9L20 8v13.5H6zM14.5 3v5.5H20"/><path d="M9 13h7M9 17h5"/></svg>산출물</a>
+  <a href="#/wiki" data-route="wiki"><svg viewBox="0 0 24 24"><path d="M4 5a2.5 2.5 0 0 1 2.5-2.5H20V19H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19a2.5 2.5 0 0 1 2.5-2.5H20"/></svg>문서</a>
+  <div class="spacer"></div>
+  <div class="util">
+    <a href="#" onclick="return false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>테마</a>
+    <a href="#" data-modal-open="m-kbd"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M8 14h8"/></svg>단축키 도움말</a>
+  </div>
+</nav>
+
+<!-- ═══ 우측 ═══ -->
+<div class="main-col">
+  <header class="topbar">
+    <div class="crumb" id="crumb">
+      <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5"/></svg><span>홈</span>
+    </div>
+    <div class="grow"></div>
+    <div class="jobdot" id="jobdot" hidden><span class="dot"></span>영향도 분석 중 · R-2026-001</div>
+    <button class="omni" data-modal-open="m-omni">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      노드·흐름·문서·요구사항 검색
+      <kbd>⌘K</kbd>
+    </button>
+    <button class="icon-btn" title="도움말" data-modal-open="m-kbd"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9 1-.9 1.7M12 16.5h.01"/></svg></button>
+  </header>
+
+<!-- ════════════════ 홈 ════════════════ -->
+<main class="page pg show" id="pg-home">
+  <div class="page-head">
+    <h1>jPetStore 6</h1>
+    <div class="meta">분석 2026-07-06 · commit 51a0649 · Java / MyBatis / Stripes</div>
+    <div class="grow"></div>
+    <button class="btn-outline">지식그래프 내보내기</button>
+    <a class="btn-accent" href="#/report" style="text-decoration:none">이번 주 보고서</a>
+  </div>
+
+  <section class="stats">
+    <div class="card stat"><div class="label">파일</div><div class="value">92</div></div>
+    <div class="card stat"><div class="label">클래스</div><div class="value">47</div></div>
+    <div class="card stat"><div class="label">도메인</div><div class="value">5</div></div>
+    <div class="card stat"><div class="label">기능 흐름</div><div class="value">28</div></div>
+    <div class="card stat"><div class="label">요구사항</div><div class="value">12<small>AS-IS 10 · TO-BE 2</small></div></div>
+    <div class="card stat"><div class="label">프로그램</div><div class="value">74<small>본</small></div></div>
+  </section>
+
+  <section class="grid3">
+    <a class="card entry" href="#/work">
+      <div class="top"><svg viewBox="0 0 24 24"><circle cx="7" cy="7" r="3.2"/><circle cx="17" cy="7" r="3.2"/><circle cx="12" cy="17" r="3.2"/><path d="M9 9.5 11 14M15 9.5 13 14"/></svg><h2>업무 지도</h2><span class="go">→</span></div>
+      <p>시스템 구성도에서 도메인 5개·기능 28개와 타 시스템 연동을 한눈에 봅니다.</p>
+      <div class="chips"><span class="chip">주문</span><span class="chip">카탈로그</span><span class="chip">계정</span><span class="chip">장바구니</span><span class="chip">+1</span></div>
+    </a>
+    <a class="card entry" href="#/structure">
+      <div class="top"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="8.5" y="14" width="7" height="7" rx="1.5"/><path d="M6.5 10v2.5h5.5M17.5 10v2.5h-5.5"/></svg><h2>코드 구조</h2><span class="go">→</span></div>
+      <p>레이어드 아키텍처 그래프. 영향도·위험 오버레이를 지원합니다.</p>
+      <div class="foot"><span>Presentation <b>24</b></span><span>Service <b>18</b></span><span>Persistence <b>31</b></span><span>Domain <b>19</b></span></div>
+    </a>
+    <a class="card entry" href="#/rtm">
+      <div class="top"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="19" cy="19" r="2.4"/></svg><h2>요구사항 추적표</h2><span class="go">→</span></div>
+      <p>AS-IS 원장과 TO-BE 변경 요청을 행 단위 추정→확정으로 관리합니다.</p>
+      <div class="foot"><span>구현 <b>19</b></span><span>부분 <b>3</b></span><span class="badge warn">미구현 6</span><span class="badge info">인테이크 1</span></div>
+    </a>
+  </section>
+
+  <section class="grid3">
+    <a class="card entry" href="#/report">
+      <div class="top"><svg viewBox="0 0 24 24"><path d="M5 21V10M12 21V4M19 21v-7"/></svg><h2>이번 주 실적</h2><span class="go">→</span></div>
+      <p>6-29 ~ 7-06 · git·원장 수집 사실만 집계합니다.</p>
+      <div class="foot"><span>커밋 <b>13</b></span><span>파일 <b>154</b></span><span>RTM 확정 전환 <b>18</b></span><span>문서 승인 <b>2</b></span></div>
+    </a>
+    <a class="card entry" href="#/quality">
+      <div class="top"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4.5"/></svg><h2>위험 모듈</h2><span class="go">→</span></div>
+      <p>복잡도·팬인·변경 빈도 합산 위험 점수 상위 모듈입니다.</p>
+      <div class="foot"><span class="badge err">상 6</span><span class="badge warn">중 21</span><span>1위 <b>Item.java</b> 0.86</span></div>
+    </a>
+    <a class="card entry" href="#/deliverables">
+      <div class="top"><svg viewBox="0 0 24 24"><path d="M6 2.5h9L20 8v13.5H6zM14.5 3v5.5H20"/><path d="M9 13h7M9 17h5"/></svg><h2>산출물 진행</h2><span class="go">→</span></div>
+      <p>SI 표준 산출물 14종의 생성·확정 현황입니다.</p>
+      <div class="foot"><span class="badge ok">확정 6</span><span class="badge info">초안 5</span><span class="badge mut">미생성 3</span><span>xlsx 4종</span></div>
+    </a>
+  </section>
+
+  <section class="two">
+    <div class="card panel">
+      <h3>산출물 문서<a class="all" href="#/deliverables">전체 →</a></h3>
+      <div class="row"><span class="name">시스템 구성도</span><span class="sub">· 아키텍처</span><div class="right"><span class="badge ok">확정</span><span class="sub">6-28 · 이준경</span></div></div>
+      <div class="row"><span class="name">도메인 정의서</span><span class="sub">· 도메인</span><div class="right"><span class="badge ok">확정</span><span class="sub">6-28 · 이준경</span></div></div>
+      <div class="row"><span class="name">위험 모듈 리포트</span><span class="sub">· 품질</span><div class="right"><span class="badge ok">확정</span><span class="sub">7-04 · 이준경</span></div></div>
+      <div class="row"><span class="name">인터페이스 정의서</span><span class="sub">· 연계</span><div class="right"><span class="badge info">초안</span><span class="sub">6-30</span></div></div>
+      <div class="row"><span class="name">테이블 정의서</span><span class="sub">· 데이터</span><div class="right"><span class="badge info">초안</span><span class="sub">6-30</span></div></div>
+    </div>
+    <div class="card panel">
+      <h3>최근 활동</h3>
+      <div class="feed-item"><span class="dot" style="background:var(--status-ok)"></span><div>영향도 분석 완료 — "주문 취소 정책 변경"<div class="when">32분 전 · 영향 노드 14</div></div></div>
+      <div class="feed-item"><span class="dot" style="background:var(--brand-primary)"></span><div>TO-BE 요구 <b>R-2026-002</b> 3단계 확정<div class="when">2시간 전 · 이준경</div></div></div>
+      <div class="feed-item"><span class="dot" style="background:var(--status-info)"></span><div>주간 실적 요약 생성 (6-29 ~ 7-06)<div class="when">오늘 09:12</div></div></div>
+      <div class="feed-item"><span class="dot" style="background:var(--status-info)"></span><div>「인터페이스 정의서」 초안 생성<div class="when">어제</div></div></div>
+    </div>
+  </section>
+</main>
+
+<!-- ════════════════ 업무 지도 — 화면 A: 시스템 구성도 ════════════════ -->
+<main class="page fit pg fitpage" id="pg-work">
+  <div class="page-head" style="margin-bottom:14px">
+    <div>
+      <div class="eyebrow">업무 지도 · jPetStore 6</div>
+      <h1 style="font-size:20px">시스템 구성도</h1>
+    </div>
+    <div class="meta">도메인 <b>5</b> · 기능 <b>28</b> · 분석 노드 <b>81</b></div>
+    <div class="grow"></div>
+    <button class="btn-outline btn-sm">근거 상세</button>
+  </div>
+  <div class="work-land">
+    <div class="card sysbox">
+      <div class="sys-h"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>jPetStore 시스템</div>
+      <div class="inner">
+        <div class="dom" data-goto="#/work/order">
+          <div class="h">🛒 주문<span class="n">기능 8 · 노드 24</span></div>
+          <div class="gr"><span>근거율</span><div class="gbar"><i style="width:92%"></i></div><span>92%</span></div>
+          <div class="chips"><span class="chip">주문 생성</span><span class="chip">주문 조회</span><span class="chip">주문 확정</span><span class="chip">+5</span></div>
+        </div>
+        <div class="dom" data-goto="#/work/order">
+          <div class="h">📦 카탈로그<span class="n">기능 9 · 노드 21</span></div>
+          <div class="gr"><span>근거율</span><div class="gbar"><i style="width:88%"></i></div><span>88%</span></div>
+          <div class="chips"><span class="chip">카테고리 조회</span><span class="chip">상품 검색</span><span class="chip">+7</span></div>
+        </div>
+        <div class="dom" data-goto="#/work/order">
+          <div class="h">👤 계정/회원<span class="n">기능 6 · 노드 17</span></div>
+          <div class="gr"><span>근거율</span><div class="gbar"><i style="width:95%"></i></div><span>95%</span></div>
+          <div class="chips"><span class="chip">로그인</span><span class="chip">회원 가입</span><span class="chip">정보 수정</span><span class="chip">+3</span></div>
+        </div>
+        <div class="dom" data-goto="#/work/order">
+          <div class="h">🧺 장바구니<span class="n">기능 4 · 노드 12</span></div>
+          <div class="gr"><span>근거율</span><div class="gbar"><i style="width:90%"></i></div><span>90%</span></div>
+          <div class="chips"><span class="chip">담기</span><span class="chip">수량 변경</span><span class="chip">+2</span></div>
+        </div>
+        <div class="dom" data-goto="#/work/order">
+          <div class="h">⚙️ 웹 배포 설정<span class="n">기능 1 · 노드 7</span></div>
+          <div class="gr"><span>근거율</span><div class="gbar"><i style="width:100%"></i></div><span>100%</span></div>
+          <div class="chips"><span class="chip">web.xml</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card ext">
+      <section>
+        <h4>타 시스템 연동 — 인터페이스</h4>
+        <div class="kv">송신 <b>0건</b><span class="right badge ok">스캔 완료 · 없음</span></div>
+        <div class="kv">수신 <b>0건</b><span class="right badge ok">스캔 완료 · 없음</span></div>
+      </section>
+      <section>
+        <h4>데이터베이스</h4>
+        <div class="kv">HSQLDB <span class="sub">(내장)</span><span class="right"><b>13</b>&nbsp;테이블</span></div>
+        <div class="kv"><span class="sub">CRUD 매트릭스</span><a class="right" href="#/deliverables" style="font-size:12px;color:var(--status-info)">보기 →</a></div>
+      </section>
+      <section>
+        <h4>배치 · 스케줄</h4>
+        <div class="kv">잡 <b>0건</b><span class="right badge ok">스캔 완료 · 없음</span></div>
+      </section>
+      <section>
+        <h4>화면</h4>
+        <div class="kv">JSP 화면 <b>25</b><a class="right" href="#/screens" style="font-size:12px;color:var(--status-info)">화면설계서 →</a></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 업무 지도 — 화면 B: 도메인 워크스페이스 ════════════════ -->
+<main class="page pg" id="pg-work-order">
+  <div class="page-head" style="margin-bottom:12px">
+    <div>
+      <div class="eyebrow"><a href="#/work" style="color:inherit;text-decoration:none">업무 지도</a> › 주문</div>
+      <h1 style="font-size:20px">🛒 주문</h1>
+    </div>
+    <div class="meta">장바구니 확정부터 결제·주문 이력까지의 주문 수명주기 처리</div>
+    <div class="grow"></div>
+    <div class="gr" style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted)">근거율 <div class="gbar" style="width:90px"><i style="width:92%"></i></div> 92%</div>
+  </div>
+
+  <div class="tabs" data-tab-group="work-order">
+    <button class="on" data-tab="bflow">업무 흐름도</button>
+    <button data-tab="flows">기능<span class="count">8</span></button>
+  </div>
+
+  <!-- 업무 흐름도 탭 -->
+  <div class="card" data-tab-panel="work-order:bflow" style="padding:10px 20px 24px">
+    <div class="protonote" style="margin:12px 0"><b>신설(WORK_MAP §4-1)</b> — 도메인 단위 업무 프로세스 순서도. LLM fill(businessFlow) 기반, 인용 기계검증 통과분만 표시. 미채움 도메인은 "순차 근사" 배너와 함께 결정론 폴백.</div>
+    <div class="flowchart">
+      <div class="fc-node fc-pill">시작</div>
+      <div class="fc-v"></div>
+      <div class="fc-node fc-act">장바구니 내역 확인 <span class="fref">flow: viewCart</span></div>
+      <div class="fc-v"></div>
+      <div class="fc-node fc-dec"><span>재고<br>충분?</span></div>
+      <div class="fc-branch">
+        <div class="fc-col">
+          <span class="fc-lab">YES</span>
+          <div class="fc-v"></div>
+          <div class="fc-node fc-act">주문 정보 입력 <span class="fref">flow: newOrderForm</span></div>
+          <div class="fc-v"></div>
+          <div class="fc-node fc-dec"><span>결제<br>승인?</span></div>
+          <div class="fc-branch">
+            <div class="fc-col">
+              <span class="fc-lab">YES</span>
+              <div class="fc-v"></div>
+              <div class="fc-node fc-act">주문 확정·재고 차감 <span class="fref">flow: confirmOrder</span></div>
+              <div class="fc-v"></div>
+              <div class="fc-node fc-pill">종료</div>
+            </div>
+            <div class="fc-col">
+              <span class="fc-lab">NO</span>
+              <div class="fc-v"></div>
+              <div class="fc-node fc-act" style="border-color:var(--border-medium)">주문 거절 안내</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-col">
+          <span class="fc-lab">NO</span>
+          <div class="fc-v"></div>
+          <div class="fc-node fc-act" style="border-color:var(--border-medium)">재입고 대기 안내</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text-muted)">선택 노드 근거:</span>
+      <span class="cite">OrderService.java:74</span>
+      <span class="cite">Order.java:112</span>
+      <span class="badge ok" style="align-self:center">검증 통과</span>
+    </div>
+  </div>
+
+  <!-- 기능 탭 -->
+  <div class="ws" data-tab-panel="work-order:flows" hidden>
+    <div class="card fl-list">
+      <div class="fl-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>이름·경로·메소드 검색</div>
+      <div class="chips" style="padding:0 2px 4px"><button class="chip on">전체</button><button class="chip">GET</button><button class="chip">POST</button><button class="chip">근거 확인필요</button></div>
+      <div class="fl-grp">HTTP 엔드포인트 (6)</div>
+      <div class="fl-item on"><span class="m post">POST</span>주문 생성 /order/new</div>
+      <div class="fl-item"><span class="m get">GET</span>주문 조회 /order/view</div>
+      <div class="fl-item"><span class="m post">POST</span>주문 확정 /order/confirm</div>
+      <div class="fl-item"><span class="m get">GET</span>주문 목록 /order/list</div>
+      <div class="fl-item"><span class="m get">GET</span>배송 조회 /order/ship</div>
+      <div class="fl-item"><span class="m post">POST</span>결제 정보 /order/payment</div>
+      <div class="fl-grp">기능 (2)</div>
+      <div class="fl-item">주문 번호 채번</div>
+      <div class="fl-item">재고 차감 처리</div>
+    </div>
+    <div class="card" style="padding:16px 20px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+        <span class="m post">POST</span><b style="font-size:14.5px">주문 생성</b><span class="mono" style="color:var(--text-muted)">/order/new</span>
+        <div class="grow" style="flex:1"></div>
+        <button class="btn-outline btn-sm">편집</button><button class="btn-accent btn-sm">확정</button>
+      </div>
+      <div class="lane"><div class="ln">API</div><div class="stepcard"><div class="t">NewOrderFormAction <span class="cite">NewOrderFormAction.java:41</span> <span class="conf fix">확정</span></div><p>요청 파라미터 검증 후 주문 폼 세션을 생성하고 OrderService로 위임합니다.</p></div></div>
+      <div class="lane"><div class="ln">Service</div><div class="stepcard"><div class="t">OrderService.insertOrder <span class="cite">OrderService.java:74</span> <span class="conf ai">확정·AI</span></div><p>주문 번호를 채번하고 라인아이템별 재고를 차감한 뒤 주문·이력을 저장합니다.</p></div></div>
+      <div class="lane"><div class="ln">DAO</div><div class="stepcard"><div class="t">OrderMapper.insertOrder <span class="cite">OrderMapper.java:22</span> <span class="conf fix">확정</span></div><p>ORDERS·ORDERSTATUS 테이블에 INSERT를 수행합니다.</p></div></div>
+      <div class="lane"><div class="ln">DB</div><div class="stepcard"><div class="t">ORDERS · LINEITEM · INVENTORY <span class="conf est">추정</span></div><p>INVENTORY.QTY 차감은 트랜잭션 경계 내 UPDATE로 수행됩니다. <span class="ev">OrderMapper.xml:88</span></p></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 구조 ════════════════ -->
+<main class="page fit pg fitpage" id="pg-structure">
+  <div class="gtoolbar">
+    <div class="seg"><button class="on">파일</button><button>+클래스</button><button>fn</button></div>
+    <div class="chips"><button class="chip on">코드</button><button class="chip on">설정</button><button class="chip">문서</button><button class="chip on">데이터</button></div>
+    <div class="grow" style="flex:1"></div>
+    <button class="btn-outline btn-sm" id="risk-ovl">위험 오버레이 <span class="new" style="margin-left:4px;font-size:9.5px;font-weight:700;color:var(--status-info);background:#e9f0fc;border-radius:4px;padding:1px 5px">신설</span></button>
+    <button class="btn-outline btn-sm">경로 찾기</button>
+    <button class="btn-outline btn-sm">내보내기</button>
+    <button class="btn-accent btn-sm">영향도 분석</button>
+  </div>
+  <div class="gwrap">
+    <div class="card gcanvas" id="gcanvas">
+      <svg class="gedges" width="100%" height="100%">
+        <line x1="120" y1="78" x2="200" y2="150" stroke="var(--border-medium)" stroke-width="1.2"/>
+        <line x1="300" y1="78" x2="230" y2="150" stroke="var(--border-medium)" stroke-width="1.2"/>
+        <line x1="215" y1="172" x2="150" y2="248" stroke="var(--brand-primary)" stroke-width="1.6" opacity=".55"/>
+        <line x1="215" y1="172" x2="330" y2="248" stroke="var(--border-medium)" stroke-width="1.2"/>
+        <line x1="150" y1="272" x2="185" y2="345" stroke="var(--border-medium)" stroke-width="1.2"/>
+        <line x1="340" y1="272" x2="215" y2="345" stroke="var(--border-medium)" stroke-width="1.2"/>
+        <line x1="470" y1="78" x2="360" y2="150" stroke="var(--border-medium)" stroke-width="1.2"/>
+      </svg>
+      <div class="glayer" style="top:24px; height:78px"><span class="gl">PRESENTATION · 24</span></div>
+      <div class="glayer" style="top:122px; height:78px"><span class="gl">SERVICE · 18</span></div>
+      <div class="glayer" style="top:220px; height:78px"><span class="gl">PERSISTENCE · 31</span></div>
+      <div class="glayer" style="top:318px; height:78px"><span class="gl">DOMAIN · 19</span></div>
+      <div class="gnode" style="top:56px; left:60px"><span class="rk" style="background:var(--status-warn)" hidden></span>OrderAction.java</div>
+      <div class="gnode" style="top:56px; left:250px"><span class="rk" style="background:var(--status-ok)" hidden></span>CartAction.java</div>
+      <div class="gnode" style="top:56px; left:420px"><span class="rk" style="background:var(--status-ok)" hidden></span>CatalogAction.java</div>
+      <div class="gnode sel" style="top:150px; left:160px"><span class="rk" style="background:var(--status-error)" hidden></span>OrderService.java</div>
+      <div class="gnode" style="top:150px; left:320px"><span class="rk" style="background:var(--status-ok)" hidden></span>CatalogService.java</div>
+      <div class="gnode" style="top:248px; left:95px"><span class="rk" style="background:var(--status-warn)" hidden></span>OrderMapper.java</div>
+      <div class="gnode" style="top:248px; left:290px"><span class="rk" style="background:var(--status-ok)" hidden></span>ItemMapper.java</div>
+      <div class="gnode" style="top:345px; left:140px"><span class="rk" style="background:var(--status-error)" hidden></span>Order.java</div>
+      <div class="gnode" style="top:345px; left:300px"><span class="rk" style="background:var(--status-error)" hidden></span>Item.java</div>
+      <div style="position:absolute;right:14px;bottom:12px;font-size:11px;color:var(--text-muted)">그래프 목업 — 실제 화면은 ReactFlow + ELK</div>
+    </div>
+    <div class="card" style="min-height:0;overflow:auto">
+      <div class="sidebar-tabs"><button class="on">정보</button><button>파일</button></div>
+      <div class="ninfo">
+        <h4>OrderService.java</h4>
+        <div class="path">src/main/java/.../service/OrderService.java</div>
+        <div class="chips"><span class="chip">Service</span><span class="chip">주문</span><span class="badge err">위험 상 · 0.81</span></div>
+        <dl>
+          <dt>LOC</dt><dd>167</dd>
+          <dt>복잡도</dt><dd>21</dd>
+          <dt>팬인 / 팬아웃</dt><dd>5 / 4</dd>
+          <dt>변경(90일)</dt><dd>커밋 4 · +212/−96</dd>
+        </dl>
+        <section>
+          <h5>요약</h5>
+          <p style="font-size:12.5px;color:var(--text-secondary)">주문 채번·재고 차감·주문 저장을 하나의 트랜잭션으로 처리하는 핵심 서비스. <span class="cite">OrderService.java:74</span></p>
+        </section>
+        <section>
+          <h5>바로가기</h5>
+          <div class="chips"><a class="chip" href="#/work/order" style="text-decoration:none">업무 흐름: 주문 생성</a><a class="chip" href="#/rtm" style="text-decoration:none">RTM: 주문 기능</a><a class="chip" href="#/quality" style="text-decoration:none">위험 리포트</a></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 화면설계서 ════════════════ -->
+<main class="page pg" id="pg-screens">
+  <div class="page-head">
+    <h1>화면설계서</h1>
+    <div class="meta">JSP 25화면 · 도달 실패 0건 · 미매핑 2건</div>
+    <div class="grow"></div>
+    <button class="btn-outline">xlsx 다운로드</button>
+  </div>
+  <div class="scr">
+    <div class="card tree">
+      <div class="fold">주문 (5)</div>
+      <div class="doc on">주문 정보 입력<span class="st badge ok">확정</span></div>
+      <div class="doc">주문 확인</div>
+      <div class="doc">주문 완료<span class="st badge ok">확정</span></div>
+      <div class="doc">주문 목록</div>
+      <div class="doc">배송 조회</div>
+      <div class="fold">카탈로그 (7)</div>
+      <div class="doc">메인(카테고리)</div>
+      <div class="doc">상품 목록</div>
+      <div class="doc">상품 상세<span class="st badge ok">확정</span></div>
+      <div class="fold">계정 (4) · 장바구니 (3) · 공통 (6)</div>
+      <div class="doc" style="color:var(--text-muted)">…</div>
+      <div class="row" style="margin-top:8px;font-size:12px"><span class="sub">미매핑 JSP 2건</span><span class="right badge warn">확인</span></div>
+    </div>
+    <div class="card" style="padding:18px 22px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+        <b style="font-size:15px">주문 정보 입력</b>
+        <span class="mono" style="color:var(--text-muted)">/order/newOrderForm</span>
+        <span class="badge ok">확정</span>
+        <div style="flex:1"></div>
+        <button class="btn-outline btn-sm">편집</button><button class="btn-accent btn-sm">확정</button>
+      </div>
+      <div class="dmeta" style="font-size:12px;color:var(--text-muted);margin-bottom:12px">렌더 JSP: NewOrderForm.jsp · 시나리오: 장바구니 → 주문 생성</div>
+      <div class="cap">
+        캡처 이미지 (understand-screens 자동 수집)
+        <span class="an in" style="top:36px; left:36px">1</span>
+        <span class="an in" style="top:86px; left:36px">2</span>
+        <span class="an in" style="top:136px; left:36px">3</span>
+        <span class="an ev" style="bottom:30px; right:40px">a</span>
+      </div>
+      <div class="tbl-wrap" style="margin-top:14px">
+        <table class="tbl">
+          <thead><tr><th>#</th><th>항목</th><th>유형</th><th>동작</th><th>근거</th><th>신뢰도</th></tr></thead>
+          <tbody>
+            <tr><td>①</td><td>카드 종류</td><td>입력(select)</td><td>결제 카드 유형 선택</td><td class="ev">NewOrderForm.jsp:31</td><td><span class="conf fix">확정</span></td></tr>
+            <tr><td>②</td><td>카드 번호</td><td>입력(text)</td><td>기본값 마스킹 노출</td><td class="ev">NewOrderForm.jsp:38</td><td><span class="conf fix">확정</span></td></tr>
+            <tr><td>③</td><td>유효 기간</td><td>입력(text)</td><td>MM/YYYY 형식 검증</td><td class="ev">NewOrderForm.jsp:44</td><td><span class="conf est">추정</span></td></tr>
+            <tr><td>ⓐ</td><td>계속 버튼</td><td>이벤트(submit)</td><td>POST /order/new → 주문 확인 화면 이동</td><td class="ev">NewOrderFormAction.java:41</td><td><span class="conf fix">확정</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 추적표 (RTM) ════════════════ -->
+<main class="page pg" id="pg-rtm">
+  <div class="page-head">
+    <h1>요구사항 추적표</h1>
+    <span class="badge info" style="align-self:center">RTM</span>
+    <div class="grow"></div>
+    <div class="stepper">
+      <span class="st done">① 식별</span><span class="arr">›</span>
+      <span class="st done">② 목록표</span><span class="arr">›</span>
+      <span class="st done">③ 정의서</span><span class="arr">›</span>
+      <span class="st cur">④ 명세서</span><span class="arr">›</span>
+      <span class="st">⑤ RTM</span>
+    </div>
+    <button class="btn-outline">xlsx 다운로드</button>
+    <button class="btn-accent" data-modal-open="m-intake">＋ 새 요청</button>
+  </div>
+
+  <div class="banner"><span class="badge warn">무결성 2건</span><span class="t">진단:</span><span class="sub">고아 시나리오 1 · 근거 파일 미존재 1 — 현황 탭에서 확인</span></div>
+
+  <div class="tabs" data-tab-group="rtm">
+    <button class="on" data-tab="fn">기능 기준<span class="count">28</span></button>
+    <button data-tab="req">요청 기준<span class="count">12</span></button>
+    <button data-tab="test">시험<span class="count">57</span></button>
+    <button data-tab="status">현황</button>
+  </div>
+
+  <!-- 기능 기준 -->
+  <div data-tab-panel="rtm:fn">
+    <div class="card" style="padding:6px 14px 14px">
+      <div class="fl-grp" style="padding:12px 4px 6px">주문 (8)</div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th style="width:26%">기능명</th><th>진입점</th><th>구현</th><th>데이터(CRUD)</th><th>테스트</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>주문 생성</b><div class="ev">req: REQ-004</div></td>
+              <td><span class="m post">POST</span> <span class="mono">/order/new</span><div class="ev">NewOrderFormAction.java:41</div></td>
+              <td>✅ 구현 <span class="conf fix">확정</span></td>
+              <td><span class="mono">ORDERS(C) LINEITEM(C) INVENTORY(U)</span> <span class="conf ai">확정·AI</span></td>
+              <td>PASS 3 · <span class="conf fix">확정</span></td>
+            </tr>
+            <tr>
+              <td><b>주문 취소</b><div class="ev">req: R-2026-001 (TO-BE)</div></td>
+              <td><span class="mono" style="font-style:italic;color:var(--text-muted)">(제안) POST /order/cancel</span></td>
+              <td>⚠ 미구현 <span class="conf est">추정</span></td>
+              <td><span class="mono" style="font-style:italic;color:var(--text-muted)">(제안) ORDERS(U) INVENTORY(U)</span> <span class="conf est">추정</span></td>
+              <td>미실행 · <span class="conf chk">확인 필요</span></td>
+            </tr>
+            <tr>
+              <td><b>주문 조회</b><div class="ev">req: REQ-005</div></td>
+              <td><span class="m get">GET</span> <span class="mono">/order/view</span><div class="ev">ViewOrderAction.java:28</div></td>
+              <td>✅ 구현 <span class="conf fix">확정</span></td>
+              <td><span class="mono">ORDERS(R) LINEITEM(R)</span> <span class="conf fix">확정</span></td>
+              <td>PASS 2 · <span class="conf fix">확정</span></td>
+            </tr>
+            <tr>
+              <td><b>재고 차감 처리</b><div class="ev">req: REQ-004</div></td>
+              <td><span class="mono">OrderService.insertOrder</span><div class="ev">OrderService.java:74</div></td>
+              <td>🔁 부분 <span class="conf ai">확정·AI</span></td>
+              <td><span class="mono">INVENTORY(U)</span> <span class="conf fix">확정</span></td>
+              <td>FAIL 1 · <span class="conf chk">확인 필요</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="fl-grp" style="padding:14px 4px 6px">장바구니 (4) · 카탈로그 (9) · 계정 (6) · 공통 (1)</div>
+      <div style="font-size:12.5px;color:var(--text-muted);padding:0 4px 6px">… 프로토타입에서는 주문 도메인만 전개</div>
+    </div>
+  </div>
+
+  <!-- 요청 기준 -->
+  <div data-tab-panel="rtm:req" hidden>
+    <div class="card" style="padding:6px 14px 14px">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>유형</th><th>제목</th><th>구분</th><th>라이프사이클</th><th>변경</th><th>고객 검수</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">REQ-004</td><td><span class="badge info">기능</span></td><td>주문 생성 및 재고 반영</td><td>AS-IS</td><td>현행</td><td>—</td><td><span class="badge ok">승인 · 김고객</span></td></tr>
+            <tr><td class="mono">REQ-005</td><td><span class="badge info">기능</span></td><td>주문 조회·목록</td><td>AS-IS</td><td>현행</td><td>—</td><td><span class="badge ok">승인 · 김고객</span></td></tr>
+            <tr><td class="mono">REQ-010</td><td><span class="badge mut">보안</span></td><td>결제는 카드만 가능 (업무 규칙)</td><td>AS-IS</td><td>현행</td><td>—</td><td><span class="badge mut">아직 검수 전</span></td></tr>
+            <tr><td class="mono">R-2026-001</td><td><span class="badge info">기능</span></td><td>주문 취소 정책 변경 (CR-7)</td><td><b>TO-BE</b></td><td>접수</td><td><span class="badge warn">변경</span></td><td><span class="badge mut">아직 검수 전</span></td></tr>
+            <tr><td class="mono">R-2026-002</td><td><span class="badge mut">보안</span></td><td>비밀번호 정책 강화</td><td><b>TO-BE</b></td><td>분해 중 <span class="conf est">3/5단계</span></td><td><span class="badge info">신규</span></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 시험 -->
+  <div data-tab-panel="rtm:test" hidden>
+    <div class="card" style="padding:6px 14px 14px">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>기능</th><th>분류</th><th>시나리오</th><th>우선순위</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">TS-ORD-001</td><td>주문 생성</td><td><span class="badge ok">정상</span></td><td>재고 충분 시 주문·재고 차감 성공</td><td>HIGH</td><td><span class="badge ok">PASS</span></td></tr>
+            <tr><td class="mono">TS-ORD-002</td><td>주문 생성</td><td><span class="badge warn">예외</span></td><td>재고 부족 시 주문 거절·재고 불변</td><td>HIGH</td><td><span class="badge ok">PASS</span></td></tr>
+            <tr><td class="mono">TS-ORD-003</td><td>주문 생성</td><td><span class="badge info">경계</span></td><td>수량 = 재고 수량 정확히 일치</td><td>MED</td><td><span class="badge mut">미실행</span></td></tr>
+            <tr><td class="mono">TS-ORD-011</td><td>재고 차감</td><td><span class="badge warn">예외</span></td><td>동시 주문 시 음수 재고 방지</td><td>HIGH</td><td><span class="badge err">FAIL</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);padding:10px 4px 0">전체 57건 — PASS 41 · FAIL 3 · 미실행 13 · 전 건 [추정] 생성 후 행 단위 확정</div>
+    </div>
+  </div>
+
+  <!-- 현황 -->
+  <div data-tab-panel="rtm:status" hidden>
+    <div class="two">
+      <div class="card panel">
+        <h3>커버리지</h3>
+        <div class="bar-row"><span>요구사항 구현</span><div class="bar"><i style="width:68%;background:var(--status-ok)"></i></div><span class="pct">68% · 19/28</span></div>
+        <div class="bar-row"><span>요구사항 검증</span><div class="bar"><i style="width:39%;background:var(--status-info)"></i></div><span class="pct">39% · 11/28</span></div>
+        <div class="bar-row"><span>고객 검수</span><div class="bar"><i style="width:18%;background:var(--status-warn)"></i></div><span class="pct">18% · 5/28</span></div>
+        <div class="bar-row"><span>검증 공백</span><div class="bar"><i style="width:29%;background:var(--status-error)"></i></div><span class="pct">8건</span></div>
+      </div>
+      <div class="card panel">
+        <h3>무결성 진단 <span class="badge warn">2건</span></h3>
+        <div class="feed-item"><span class="dot" style="background:var(--status-warn)"></span><div>고아 시나리오 <b>TS-CAT-009</b> — 연결된 기능 삭제됨<div class="when">시험 탭에서 재연결 필요</div></div></div>
+        <div class="feed-item"><span class="dot" style="background:var(--status-error)"></span><div>근거 파일 미존재 — <span class="mono">CartServlet.java:52</span><div class="when">재분석 후 자동 해소 예상</div></div></div>
+        <h3 style="margin-top:16px">변경 요청</h3>
+        <div class="row"><span class="name">CR-7 주문 취소 정책</span><div class="right"><span class="badge warn">영향 노드 14</span><span class="sub">R-2026-001</span></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 프로그램 ════════════════ -->
+<main class="page pg" id="pg-programs">
+  <div class="page-head">
+    <h1>프로그램 목록</h1>
+    <div class="meta">program-inventory · 동일 commit 결정론 · 감리 대응 기초자료</div>
+    <div class="grow"></div>
+    <button class="btn-outline">xlsx 다운로드</button>
+  </div>
+  <div class="protonote"><b>신설 제안</b> — 엔진 산출물 <span class="mono">program-inventory.json</span>·<span class="mono">interfaces.json</span>·<span class="mono">batch-jobs.json</span>은 이미 존재하나 전용 화면이 없어 md 문서로만 노출 중. PM 정량 근거(FP·프로그램 수) 화면으로 승격.</div>
+
+  <div class="tabs" data-tab-group="prog">
+    <button class="on" data-tab="list">프로그램<span class="count">74</span></button>
+    <button data-tab="fp">FP 산정 근거</button>
+    <button data-tab="if">인터페이스<span class="count">0</span></button>
+    <button data-tab="batch">배치<span class="count">0</span></button>
+  </div>
+
+  <div data-tab-panel="prog:list">
+    <section class="stats" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">
+      <div class="card stat"><div class="label">화면</div><div class="value">25</div></div>
+      <div class="card stat"><div class="label">서비스</div><div class="value">3</div></div>
+      <div class="card stat"><div class="label">DAO</div><div class="value">7</div></div>
+      <div class="card stat"><div class="label">Mapper XML</div><div class="value">7</div></div>
+      <div class="card stat"><div class="label">공통</div><div class="value">10</div></div>
+      <div class="card stat"><div class="label">테스트</div><div class="value">18</div></div>
+      <div class="card stat"><div class="label">미분류</div><div class="value">4<small>표면화</small></div></div>
+    </section>
+    <div class="card" style="padding:6px 14px 14px">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>이름</th><th>유형</th><th>도메인</th><th class="num">LOC</th><th>경로</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">PGM-SCR-3f21</td><td>NewOrderForm</td><td><span class="chip">화면</span></td><td>주문</td><td class="num">118</td><td class="ev">webapp/WEB-INF/jsp/order/NewOrderForm.jsp</td></tr>
+            <tr><td class="mono">PGM-SVC-9a02</td><td>OrderService</td><td><span class="chip">서비스</span></td><td>주문</td><td class="num">167</td><td class="ev">service/OrderService.java</td></tr>
+            <tr><td class="mono">PGM-DAO-1b77</td><td>OrderMapper</td><td><span class="chip">DAO</span></td><td>주문</td><td class="num">54</td><td class="ev">mapper/OrderMapper.java</td></tr>
+            <tr><td class="mono">PGM-COM-68a9</td><td>Account</td><td><span class="chip">공통</span></td><td>계정</td><td class="num">196</td><td class="ev">domain/Account.java</td></tr>
+            <tr><td class="mono">PGM-COM-6474</td><td>Item</td><td><span class="chip">공통</span></td><td>복합(4)</td><td class="num">145</td><td class="ev">domain/Item.java</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);padding:10px 4px 0">74본 중 5본 표시 — 검색·유형 필터·도메인 필터는 본 구현에서 제공</div>
+    </div>
+  </div>
+
+  <div data-tab-panel="prog:fp" hidden>
+    <div class="two">
+      <div class="card panel">
+        <h3>데이터 기능 후보</h3>
+        <div class="row"><span class="name">ILF (내부 논리 파일)</span><div class="right"><b>13</b><span class="sub">테이블</span><span class="conf fix">확정</span></div></div>
+        <div class="row"><span class="name">EIF (외부 연계 파일)</span><div class="right"><b>0</b><span class="conf fix">확정</span></div></div>
+        <h3 style="margin-top:16px">트랜잭션 기능 후보</h3>
+        <div class="row"><span class="name">EI (외부 입력)</span><div class="right"><b>12</b><span class="conf est">추정</span></div></div>
+        <div class="row"><span class="name">EO (외부 출력)</span><div class="right"><b>9</b><span class="conf est">추정</span></div></div>
+        <div class="row"><span class="name">EQ (외부 조회)</span><div class="right"><b>7</b><span class="conf est">추정</span></div></div>
+      </div>
+      <div class="card panel">
+        <h3>복잡도 분류 <span class="conf est">추정</span></h3>
+        <div class="hbar"><span class="t">단순</span><div class="bb" style="width:62%"></div><span class="n">26</span></div>
+        <div class="hbar"><span class="t">보통</span><div class="bb" style="width:34%"></div><span class="n">14</span></div>
+        <div class="hbar"><span class="t">복잡</span><div class="bb" style="width:10%"></div><span class="n">2</span></div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:12px">FP 하한 산정치 — 미분류 4건은 집계에서 제외하고 표면화합니다(침묵 누락 금지). 근거 열은 xlsx에 포함.</p>
+      </div>
+    </div>
+  </div>
+
+  <div data-tab-panel="prog:if" hidden>
+    <div class="card panel">
+      <h3>대외/대내 연계 <span class="badge ok">스캔 완료 · 0건</span></h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px">HTTP 클라이언트(RestTemplate·WebClient·HttpClient·feign), DB link, 파일 송수신, MQ(JMS·Kafka), 소켓 신호를 전수 스캔했으며 <b>연계 신호가 발견되지 않았습니다.</b></p>
+      <p style="font-size:12px;color:var(--text-muted)">0건은 "스캔 안 함"과 다릅니다 — 음성 결과도 정직하게 보고합니다. 미해석 항목이 있으면 [미확인]으로 남습니다.</p>
+    </div>
+  </div>
+
+  <div data-tab-panel="prog:batch" hidden>
+    <div class="card panel">
+      <h3>배치 · 스케줄 잡 <span class="badge ok">스캔 완료 · 0건</span></h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px">cron · Quartz · @Scheduled · shell 잡 신호가 발견되지 않았습니다. 배치 진입점은 도달성 분석에 자동 등록되어 "데드코드" 오판을 방지합니다.</p>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 품질·위험 ════════════════ -->
+<main class="page pg" id="pg-quality">
+  <div class="page-head">
+    <h1>품질 · 위험</h1>
+    <div class="meta">risk-report · coverage-matrix · 골든셋 회귀 — PM 주간보고용 정량 지표</div>
+    <div class="grow"></div>
+    <button class="btn-outline">md 리포트</button>
+  </div>
+  <div class="protonote"><b>신설 제안</b> — 위험 Top N·분석 커버리지·LLM 정확도 기준선을 한 화면에. 구조 그래프의 위험 오버레이와 상호 링크.</div>
+
+  <div class="tabs" data-tab-group="qual">
+    <button class="on" data-tab="risk">위험 모듈</button>
+    <button data-tab="cov">분석 커버리지</button>
+    <button data-tab="gold">정확도 기준선</button>
+  </div>
+
+  <div data-tab-panel="qual:risk">
+    <section class="stats" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+      <div class="card stat"><div class="label">등급 상</div><div class="value" style="color:var(--status-error)">6</div></div>
+      <div class="card stat"><div class="label">등급 중</div><div class="value" style="color:var(--status-warn)">21</div></div>
+      <div class="card stat"><div class="label">등급 하</div><div class="value">43</div></div>
+      <div class="card stat"><div class="label">미도달 코드</div><div class="value">4<small>파일</small></div></div>
+    </section>
+    <div class="card" style="padding:6px 14px 14px">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>#</th><th>파일</th><th>점수</th><th>등급</th><th>주요 요인</th><th class="num">복잡도</th><th class="num">팬인</th><th class="num">LOC</th><th class="num">변경(줄)</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><b>Item.java</b><div class="ev">domain/Item.java · 주문+카탈로그+장바구니+계정</div></td><td><div class="bar" style="width:90px"><i style="width:86%;background:var(--status-error)"></i></div><span class="mono">0.856</span></td><td><span class="badge err">상</span></td><td><span class="chip">팬인</span> <span class="chip">복잡도</span></td><td class="num">25</td><td class="num">3</td><td class="num">145</td><td class="num">145</td></tr>
+            <tr><td>2</td><td><b>OrderService.java</b><div class="ev">service/OrderService.java · 주문</div></td><td><div class="bar" style="width:90px"><i style="width:81%;background:var(--status-error)"></i></div><span class="mono">0.812</span></td><td><span class="badge err">상</span></td><td><span class="chip">복잡도</span> <span class="chip">변경 빈도</span></td><td class="num">21</td><td class="num">5</td><td class="num">167</td><td class="num">212</td></tr>
+            <tr><td>3</td><td><b>Order.java</b><div class="ev">domain/Order.java · 주문</div></td><td><div class="bar" style="width:90px"><i style="width:79%;background:var(--status-error)"></i></div><span class="mono">0.788</span></td><td><span class="badge err">상</span></td><td><span class="chip">LOC</span> <span class="chip">복잡도</span></td><td class="num">18</td><td class="num">4</td><td class="num">241</td><td class="num">89</td></tr>
+            <tr><td>4</td><td><b>Cart.java</b><div class="ev">domain/Cart.java · 장바구니</div></td><td><div class="bar" style="width:90px"><i style="width:77%;background:var(--status-warn)"></i></div><span class="mono">0.775</span></td><td><span class="badge warn">중</span></td><td><span class="chip">팬인</span></td><td class="num">14</td><td class="num">6</td><td class="num">98</td><td class="num">32</td></tr>
+            <tr><td>5</td><td><b>AccountAction.java</b><div class="ev">web/action/AccountAction.java · 계정</div></td><td><div class="bar" style="width:90px"><i style="width:75%;background:var(--status-warn)"></i></div><span class="mono">0.749</span></td><td><span class="badge warn">중</span></td><td><span class="chip">복잡도</span></td><td class="num">19</td><td class="num">2</td><td class="num">203</td><td class="num">54</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 4px 0;font-size:12.5px">
+        <a href="#/structure" style="color:var(--status-info)">구조 그래프에서 위험 오버레이로 보기 →</a>
+        <span style="color:var(--text-muted)">· 점수 = 복잡도·LOC·중복·미도달·변경빈도·팬인/아웃 가중 합산(백분위 정규화)</span>
+      </div>
+    </div>
+  </div>
+
+  <div data-tab-panel="qual:cov" hidden>
+    <div class="card" style="padding:6px 14px 14px">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>언어 / 프레임워크</th><th>구조 스캔</th><th>콜체인</th><th>인터페이스</th><th>배치</th><th>화면</th></tr></thead>
+          <tbody>
+            <tr><td>Java (11+)</td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td><td>—</td></tr>
+            <tr><td>Spring MVC / Stripes</td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td></tr>
+            <tr><td>MyBatis XML</td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>JPA</td><td><span class="badge ok">지원</span></td><td><span class="badge warn">부분</span></td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>JSP</td><td><span class="badge ok">지원</span></td><td><span class="badge warn">부분</span></td><td>—</td><td>—</td><td><span class="badge ok">지원</span></td></tr>
+            <tr><td>eGov 3.x</td><td><span class="badge ok">지원</span></td><td><span class="badge ok">지원</span></td><td><span class="badge warn">부분</span></td><td><span class="badge ok">지원</span></td><td><span class="badge warn">부분</span></td></tr>
+            <tr><td>Pro*C</td><td><span class="badge err">미지원</span></td><td><span class="badge err">미지원</span></td><td><span class="badge err">미지원</span></td><td><span class="badge err">미지원</span></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:12.5px;color:var(--text-muted);padding:12px 4px 0">이 프로젝트에서 감지된 미지원 신호: <b style="color:var(--status-warn)">0건</b> — 미지원 신호는 침묵 누락 대신 카운트로 표면화됩니다.</div>
+    </div>
+  </div>
+
+  <div data-tab-panel="qual:gold" hidden>
+    <section class="stats" style="grid-template-columns:repeat(3,1fr)">
+      <div class="card stat"><div class="label">구조 일치율</div><div class="value">92<small>%</small></div></div>
+      <div class="card stat"><div class="label">근거 유효율 (file:line 실존)</div><div class="value">97<small>%</small></div></div>
+      <div class="card stat"><div class="label">핵심 항목 재현율</div><div class="value">88<small>%</small></div></div>
+    </section>
+    <div class="card panel">
+      <h3>골든셋 회귀 (jpetstore 사람 확정본 대비)</h3>
+      <p style="font-size:13px;color:var(--text-secondary)">LLM 보강 산출물(정책서 서술·RTM 분해·도메인 요약)을 사람 확정 골든셋과 채점 비교합니다. 기준선(scorer v2) 대비 하락 시 릴리스 게이트에서 차단됩니다.</p>
+      <div class="feed-item" style="margin-top:8px"><span class="dot" style="background:var(--status-ok)"></span><div>최근 실행: 기준선 대비 회귀 없음<div class="when">7-05 · qa-golden-score</div></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 보고서 ════════════════ -->
+<main class="page pg" id="pg-report">
+  <div class="page-head">
+    <h1>실적 보고서</h1>
+    <div class="meta">work-summary · git + 원장(audit) 수집 사실만 — 날조 0 원칙</div>
+    <div class="grow"></div>
+    <div class="seg"><button class="on">주간</button><button>월간</button><button>직접 범위</button></div>
+    <button class="btn-outline">md</button>
+    <button class="btn-accent">xlsx</button>
+  </div>
+  <div class="protonote"><b>신설 제안</b> — <span class="mono">/understand-report</span>가 만드는 work-summary.json의 전용 화면. 모든 문장은 결정론 템플릿으로 조립(LLM 산문 없음).</div>
+
+  <div class="card panel" style="margin-bottom:14px">
+    <h3>하이라이트 <span class="badge mut">기간 2026-06-29 ~ 07-06 · HEAD 51a0649 앵커</span></h3>
+    <p style="font-size:13.5px;line-height:1.7;color:var(--text-secondary)">
+      기간 내 커밋 <b>13건(1명)</b>, 파일 <b>154개</b> 변경(+12,334 / −1, 생성물 제외 — 생성물 별도 +44,027).
+      변경 상위 모듈: <b>src</b>, <b>order</b>, <b>web-inf</b>.
+      RTM 확정 전환 <b>18건</b>(기능 5 · 시나리오 12 · 요구사항 1), 문서 승인 <b>2건</b>(위험 모듈 리포트 · 도메인 정의서), 반려 0건.
+    </p>
+  </div>
+
+  <section class="stats" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+    <div class="card stat"><div class="label">커밋</div><div class="value">13</div></div>
+    <div class="card stat"><div class="label">작성자</div><div class="value">1</div></div>
+    <div class="card stat"><div class="label">변경 파일</div><div class="value">154</div></div>
+    <div class="card stat"><div class="label">추가 / 삭제</div><div class="value">+12.3k<small>−1</small></div></div>
+    <div class="card stat"><div class="label">RTM 확정 전환</div><div class="value">18</div></div>
+    <div class="card stat"><div class="label">문서 승인</div><div class="value">2</div></div>
+  </section>
+
+  <div class="two">
+    <div class="card panel">
+      <h3>모듈별 변경 <span class="badge mut">program-inventory 조인</span></h3>
+      <div class="hbar"><span class="t">src</span><div class="bb" style="width:84%"></div><span class="n">6,204</span></div>
+      <div class="hbar"><span class="t">order</span><div class="bb" style="width:52%"></div><span class="n">3,811</span></div>
+      <div class="hbar"><span class="t">(root)</span><div class="bb" style="width:24%"></div><span class="n">1,702</span></div>
+      <div class="hbar"><span class="t">web-inf</span><div class="bb" style="width:10%"></div><span class="n">617</span></div>
+      <div class="hbar"><span class="t">[미확인]</span><div class="bb" style="width:1%;background:var(--border-medium)"></div><span class="n">0</span></div>
+      <p style="font-size:11.5px;color:var(--text-muted);margin-top:10px">단위: 변경 줄 수 · 미귀속 파일은 [미확인] 버킷으로 표면화</p>
+    </div>
+    <div class="card panel">
+      <h3>4주 추이 — 주간 커밋</h3>
+      <div class="spark" role="img" aria-label="주간 커밋 추이: 6월 3주 7건, 6월 4주 21건, 7월 1주 16건, 이번 주 13건">
+        <div class="col"><span class="v">7</span><div class="b" style="height:24%"></div><span class="l">6-15</span></div>
+        <div class="col"><span class="v">21</span><div class="b" style="height:72%"></div><span class="l">6-22</span></div>
+        <div class="col"><span class="v">16</span><div class="b" style="height:55%"></div><span class="l">6-29</span></div>
+        <div class="col cur"><span class="v">13</span><div class="b" style="height:45%"></div><span class="l">이번 주</span></div>
+      </div>
+      <h3 style="margin-top:16px">진척 이벤트 (원장 audit)</h3>
+      <div class="row"><span class="name">RTM 기능 확정</span><div class="right"><b>5</b><span class="sub">건</span></div></div>
+      <div class="row"><span class="name">시나리오 확정</span><div class="right"><b>12</b><span class="sub">건</span></div></div>
+      <div class="row"><span class="name">문서 제출 → 승인</span><div class="right"><b>1 → 2</b><span class="sub">건</span></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 산출물 ════════════════ -->
+<main class="page pg" id="pg-deliverables">
+  <div class="page-head">
+    <h1>산출물</h1>
+    <div class="meta">SI 표준 산출물 14종 · 확정 6 · 초안 5 · 미생성 3</div>
+    <div class="grow"></div>
+    <button class="btn-outline">xlsx 일괄 내보내기</button>
+  </div>
+  <div class="docs">
+    <div class="card tree">
+      <div class="fold">현행 분석 (as-built)</div>
+      <div class="doc">시스템 구성도<span class="st badge ok">확정</span></div>
+      <div class="doc">기술 스택 정의서<span class="st badge ok">확정</span></div>
+      <div class="doc">도메인 정의서<span class="st badge ok">확정</span></div>
+      <div class="doc">프로그램 목록<span class="st badge ok">확정</span></div>
+      <div class="doc on">테이블 정의서<span class="st badge info">초안</span></div>
+      <div class="doc">인터페이스 정의서<span class="st badge info">초안</span></div>
+      <div class="doc">배치 정의서<span class="st badge info">초안</span></div>
+      <div class="doc">CRUD 매트릭스<span class="st badge info">초안</span></div>
+      <div class="doc">위험 모듈 리포트<span class="st badge ok">확정</span></div>
+      <div class="doc">단위테스트 시나리오<span class="st badge info">초안</span></div>
+      <div class="doc">실적 요약 보고서<span class="st badge mut">미생성</span></div>
+      <div class="fold">정책서 (policy)</div>
+      <div class="doc">인증·인가 정책<span class="st badge ok">확정</span></div>
+      <div class="doc">데이터 정책<span class="st badge mut">미생성</span></div>
+      <div class="doc">검증 정책 · 용어집<span class="st badge mut">미생성</span></div>
+    </div>
+    <div class="card mdoc">
+      <div class="dh"><h2>테이블 정의서</h2><span class="badge info">초안</span><div style="flex:1"></div>
+        <button class="btn-outline btn-sm">xlsx</button><button class="btn-outline btn-sm">편집</button><button class="btn-accent btn-sm">확정 요청</button></div>
+      <div class="dmeta">생성 6-30 · 방법론: 데이터 · 근거: db-schema.json (HSQLDB 13테이블) · 승인자 미지정</div>
+      <div class="banner info" style="margin-bottom:14px"><span class="t">xlsx 스냅샷 주의</span><span class="sub">미반영 편집 1건 — 다운로드 전 확정을 권장합니다</span></div>
+      <div class="md">
+        <h4>1. 개요</h4>
+        <p>본 문서는 jPetStore 6의 데이터베이스 테이블 13종의 구조와 용도를 정의한다. 스키마는 <span class="ev">jpetstore-hsqldb-schema.sql</span>에서 결정론 추출되었다.</p>
+        <h4>2. 테이블 목록 (발췌)</h4>
+        <table>
+          <thead><tr><th>테이블</th><th>용도</th><th>주요 컬럼</th><th>근거</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">ORDERS</td><td>주문 원장 <span class="est-mark">[추정]</span></td><td class="mono">ORDERID, USERID, TOTALPRICE</td><td class="ev">schema.sql:118</td></tr>
+            <tr><td class="mono">INVENTORY</td><td>상품 재고 수량</td><td class="mono">ITEMID, QTY</td><td class="ev">schema.sql:154</td></tr>
+            <tr><td class="mono">ACCOUNT</td><td>회원 계정</td><td class="mono">USERID, EMAIL, STATUS</td><td class="ev">schema.sql:36</td></tr>
+          </tbody>
+        </table>
+        <p style="color:var(--text-muted);font-size:12px">… 프로토타입 발췌. [추정] 표기는 LLM 보강 서술 — 확정 시 제거됩니다.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ════════════════ 문서(위키) ════════════════ -->
+<main class="page pg" id="pg-wiki">
+  <div class="page-head">
+    <h1>문서</h1>
+    <div class="meta">프로젝트 위키 · 12편</div>
+  </div>
+  <div class="docs">
+    <div class="card tree">
+      <div class="fold">아키텍처</div>
+      <div class="doc on">레이어 구조 개요</div>
+      <div class="doc">트랜잭션 경계</div>
+      <div class="fold">도메인 지식</div>
+      <div class="doc">주문 상태 전이</div>
+      <div class="doc">재고 정책</div>
+      <div class="fold">운영</div>
+      <div class="doc">배포 절차</div>
+    </div>
+    <div class="card mdoc">
+      <div class="dh"><h2>레이어 구조 개요</h2></div>
+      <div class="dmeta">갱신 6-27 · 백링크 4</div>
+      <div class="toc"><div>1. Presentation — Stripes Action</div><div>2. Service — 트랜잭션 경계</div><div>3. Persistence — MyBatis Mapper</div></div>
+      <div class="md">
+        <p>jPetStore는 Stripes 기반 4계층 구조를 따른다. Action은 요청 검증까지만 담당하고, 비즈니스 규칙은 Service 계층의 <span class="mono">@Transactional</span> 경계 안에 응집된다…</p>
+        <h4>연결</h4>
+        <div class="chips"><span class="chip">[[트랜잭션 경계]]</span><span class="chip">[[주문 상태 전이]]</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</div><!-- /main-col -->
+</div><!-- /app -->
+
+<!-- ═══ 모달: 옴니박스 ═══ -->
+<div class="overlay" id="m-omni">
+  <div class="modal" style="width:560px">
+    <input class="omni-in" placeholder="노드 · 흐름 · 문서 · 요구사항 검색  (프로토타입: 결과 고정)" />
+    <div class="omni-grp">구조 노드</div>
+    <div class="omni-it on" data-goto="#/structure">OrderService.java<span class="sub">service · 주문</span><span class="right badge err">위험 상</span></div>
+    <div class="omni-it" data-goto="#/structure">OrderMapper.xml<span class="sub">mapper · 주문</span></div>
+    <div class="omni-grp">도메인 · 흐름</div>
+    <div class="omni-it" data-goto="#/work/order">주문 생성<span class="sub">주문 · POST /order/new</span></div>
+    <div class="omni-grp">산출물</div>
+    <div class="omni-it" data-goto="#/deliverables">테이블 정의서<span class="sub">현행 분석</span><span class="right badge info">초안</span></div>
+    <div class="omni-grp">추적표</div>
+    <div class="omni-it" data-goto="#/rtm">R-2026-001 주문 취소 정책 변경<span class="sub">TO-BE · CR-7</span></div>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- ═══ 모달: 단축키 ═══ -->
+<div class="overlay" id="m-kbd">
+  <div class="modal" style="width:520px">
+    <div class="mh">단축키<button class="icon-btn x" data-modal-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="mb kbd-tbl">
+      <div class="k"><kbd>⌘K</kbd> 전역 검색</div><div class="k"><kbd>?</kbd> 도움말</div>
+      <div class="k"><kbd>/</kbd> 그래프 내 검색</div><div class="k"><kbd>d</kbd> Diff 오버레이</div>
+      <div class="k"><kbd>i</kbd> 영향도 오버레이</div><div class="k"><kbd>r</kbd> 위험 오버레이 <span class="new" style="font-size:9.5px;font-weight:700;color:var(--status-info);background:#e9f0fc;border-radius:4px;padding:1px 5px">신설</span></div>
+      <div class="k"><kbd>f</kbd> 필터</div><div class="k"><kbd>e</kbd> 내보내기</div>
+      <div class="k"><kbd>p</kbd> 경로 찾기</div><div class="k"><kbd>Esc</kbd> 뒤로</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 모달: 새 요청 인테이크 ═══ -->
+<div class="overlay" id="m-intake">
+  <div class="modal">
+    <div class="mh">새 요청 — R-2026-003<button class="icon-btn x" data-modal-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="mb">
+      <div class="stepper" style="margin-bottom:16px">
+        <span class="st done">① 요청 입력</span><span class="arr">›</span>
+        <span class="st done">② 목록표</span><span class="arr">›</span>
+        <span class="st cur">③ 정의서</span><span class="arr">›</span>
+        <span class="st">④ 명세서</span><span class="arr">›</span>
+        <span class="st">⑤ RTM 반영</span>
+      </div>
+      <div class="banner info" style="margin-bottom:14px"><span class="t">자연어 접수</span><span class="sub">"장바구니에 같은 상품을 담으면 수량이 합쳐지게 해주세요" → 3단계 분해 중</span></div>
+      <table class="tbl">
+        <thead><tr><th>항목</th><th>추정 결과</th><th>근거</th></tr></thead>
+        <tbody>
+          <tr><td>요구 유형</td><td><span class="badge info">기능</span> 변경</td><td class="ev">현행: 항상 새 줄 추가 Cart.java:47</td></tr>
+          <tr><td>영향 기능</td><td>장바구니 담기 · 수량 변경</td><td class="ev">CartAction.java:35</td></tr>
+          <tr><td>영향 데이터</td><td><span class="mono">CARTITEM(U)</span> <span class="conf est">추정</span></td><td class="ev">(제안)</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:10px">각 행은 [추정]으로 생성되며, 검토 후 행 단위로 확정합니다.</p>
+    </div>
+    <div class="mf"><button class="btn-outline" data-modal-close>임시 저장</button><button class="btn-accent">다음 단계 →</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var routes = {
+    home:        { page: 'pg-home',        crumb: ['홈'] },
+    work:        { page: 'pg-work',        crumb: ['업무 지도'] },
+    'work/order':{ page: 'pg-work-order',  crumb: ['업무 지도', '주문'] },
+    structure:   { page: 'pg-structure',   crumb: ['구조'] },
+    screens:     { page: 'pg-screens',     crumb: ['화면설계서'] },
+    rtm:         { page: 'pg-rtm',         crumb: ['추적표'] },
+    programs:    { page: 'pg-programs',    crumb: ['프로그램'] },
+    quality:     { page: 'pg-quality',     crumb: ['품질·위험'] },
+    report:      { page: 'pg-report',      crumb: ['보고서'] },
+    deliverables:{ page: 'pg-deliverables',crumb: ['산출물'] },
+    wiki:        { page: 'pg-wiki',        crumb: ['문서'] }
+  };
+
+  function go() {
+    var key = (location.hash || '#/home').replace(/^#\//, '');
+    var r = routes[key] || routes.home;
+    var navKey = key.split('/')[0];
+    document.querySelectorAll('.pg').forEach(function (p) { p.classList.remove('show'); });
+    document.getElementById(r.page).classList.add('show');
+    document.querySelectorAll('.nav a[data-route]').forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('data-route') === navKey);
+    });
+    var c = document.getElementById('crumb');
+    var html = '<svg viewBox="0 0 24 24" width="16" height="16" style="stroke:var(--text-secondary);fill:none;stroke-width:1.8"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5"/></svg>';
+    r.crumb.forEach(function (t, i) {
+      if (i > 0) html += '<span class="sep">›</span>';
+      html += '<span class="' + (i === r.crumb.length - 1 && r.crumb.length > 1 ? 'leaf' : '') + '">' + t + '</span>';
+    });
+    c.innerHTML = html;
+    document.getElementById('jobdot').hidden = (navKey !== 'rtm' && navKey !== 'home');
+  }
+  window.addEventListener('hashchange', go);
+  go();
+
+  /* 탭 */
+  document.querySelectorAll('[data-tab-group]').forEach(function (g) {
+    var group = g.getAttribute('data-tab-group');
+    g.querySelectorAll('button[data-tab]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        g.querySelectorAll('button[data-tab]').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        document.querySelectorAll('[data-tab-panel^="' + group + ':"]').forEach(function (p) {
+          p.hidden = p.getAttribute('data-tab-panel') !== group + ':' + b.getAttribute('data-tab');
+        });
+      });
+    });
+  });
+
+  /* 이동 카드 */
+  document.querySelectorAll('[data-goto]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      location.hash = el.getAttribute('data-goto');
+      document.querySelectorAll('.overlay').forEach(function (o) { o.classList.remove('show'); });
+    });
+  });
+
+  /* 모달 */
+  document.querySelectorAll('[data-modal-open]').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.getElementById(el.getAttribute('data-modal-open')).classList.add('show');
+    });
+  });
+  document.querySelectorAll('[data-modal-close]').forEach(function (el) {
+    el.addEventListener('click', function () { el.closest('.overlay').classList.remove('show'); });
+  });
+  document.querySelectorAll('.overlay').forEach(function (o) {
+    o.addEventListener('click', function (e) { if (e.target === o) o.classList.remove('show'); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault(); document.getElementById('m-omni').classList.add('show');
+      document.querySelector('#m-omni .omni-in').focus();
+    }
+    if (e.key === 'Escape') document.querySelectorAll('.overlay').forEach(function (o) { o.classList.remove('show'); });
+  });
+
+  /* 위험 오버레이 토글 (구조) */
+  var riskBtn = document.getElementById('risk-ovl');
+  if (riskBtn) riskBtn.addEventListener('click', function () {
+    var on = riskBtn.classList.toggle('btn-accent');
+    riskBtn.classList.toggle('btn-outline', !on);
+    document.querySelectorAll('#gcanvas .rk').forEach(function (d) { d.hidden = !on; });
+  });
+
+  /* 세그먼트 컨트롤 시각 토글 */
+  document.querySelectorAll('.seg').forEach(function (s) {
+    s.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        s.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

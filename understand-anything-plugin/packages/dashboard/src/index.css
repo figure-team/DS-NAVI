@@ -112,6 +112,10 @@
 
 .font-heading { font-family: var(--font-heading); }
 
+/* pmpl-proto .conf.ai(확정·AI) 전용 톤 — 프리셋(theme-engine)이 모르는 정적 토큰이라 여기서 관리 */
+:root { --color-conf-ai: #0e6e5c; }
+[data-theme="dark"] { --color-conf-ai: #4cc3a5; }
+
 /* 시안(mockup-shell-home)의 --shadow-card — 라이트 카드 입체감. 다크는 무음. */
 .card-shadow {
   box-shadow: 0 1px 2px rgba(26, 27, 31, 0.04), 0 1px 3px rgba(26, 27, 31, 0.06);
@@ -331,6 +335,121 @@ body {
 [data-theme="dark"] {
   color-scheme: dark;
 }
+
+/* ── pmpl-proto 프리미티브 CSS (front-redesign 후속 메뉴 개편) ──
+   테이블(.proto-tbl)·렌더된 마크다운(.proto-md)·좌측 트리(.proto-tree)는
+   요소 수가 많아 컴포넌트 인라인 대신 클래스로 제공한다. */
+table.proto-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.proto-tbl th {
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--color-text-muted);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--color-border-medium);
+  white-space: nowrap;
+}
+.proto-tbl td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  vertical-align: top;
+  color: var(--color-text-primary);
+}
+.proto-tbl tbody tr:hover {
+  background: var(--color-elevated);
+}
+.proto-tbl td.num,
+.proto-tbl th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 렌더된 마크다운 본문 — 프로토 .md */
+.proto-md {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  max-width: 760px;
+}
+.proto-md h1 { font-size: 16px; font-weight: 700; color: var(--color-text-primary); margin: 18px 0 8px; }
+.proto-md h2 { font-size: 14.5px; font-weight: 700; color: var(--color-text-primary); margin: 16px 0 7px; }
+.proto-md h3,
+.proto-md h4 { font-size: 13.5px; font-weight: 650; color: var(--color-text-primary); margin: 14px 0 6px; }
+.proto-md h1:first-child, .proto-md h2:first-child, .proto-md h3:first-child { margin-top: 0; }
+.proto-md p { margin: 6px 0; }
+.proto-md ul, .proto-md ol { padding-left: 20px; margin: 6px 0; }
+.proto-md li { margin: 2px 0; }
+.proto-md table {
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 12.5px;
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+.proto-md th, .proto-md td {
+  border: 1px solid var(--color-border-subtle);
+  padding: 5px 10px;
+  text-align: left;
+}
+.proto-md th { background: var(--color-surface); font-weight: 650; color: var(--color-text-primary); }
+.proto-md code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  background: var(--color-elevated);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.proto-md pre {
+  background: var(--color-elevated);
+  border-radius: 8px;
+  padding: 10px 14px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.proto-md pre code { background: none; padding: 0; }
+.proto-md a { color: var(--color-status-info); text-decoration: none; }
+.proto-md a:hover { text-decoration: underline; }
+.proto-md hr { border: none; border-top: 1px solid var(--color-border-subtle); margin: 14px 0; }
+.proto-md blockquote {
+  border-left: 3px solid var(--color-border-medium);
+  padding-left: 12px;
+  margin: 8px 0;
+  color: var(--color-text-muted);
+}
+
+/* 좌측 트리 — 프로토 .tree(.fold 그룹 라벨 + .doc 행) */
+.proto-tree { padding: 12px; font-size: 13px; }
+.proto-tree .fold {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  padding: 10px 6px 4px;
+}
+.proto-tree .doc {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font: inherit;
+}
+.proto-tree .doc:hover { background: var(--color-elevated); }
+.proto-tree .doc.on {
+  background: color-mix(in srgb, var(--color-accent) 9%, transparent);
+  font-weight: 600;
+}
+.proto-tree .doc .st { margin-left: auto; flex: none; }
 
 /* ktds-fork: 흐름 스파인 노드 호버/선택 (FIX 2). --node-accent = 노드 계층 색. */
 .spine-node {

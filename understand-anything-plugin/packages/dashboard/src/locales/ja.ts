@@ -130,6 +130,7 @@ export const ja = {
     extTables: "テーブル {count}件",
     extEmbedded: "組み込み",
     moreFlows: "+{count}",
+    extSuspect: "疑わしい信号 {count}件 — 未検出連携の可能性(手動確認)",
   },
   grounding: {
     rate: "根拠率",

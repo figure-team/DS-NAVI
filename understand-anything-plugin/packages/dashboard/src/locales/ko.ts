@@ -130,6 +130,7 @@ export const ko = {
     extTables: "테이블 {count}개",
     extEmbedded: "내장",
     moreFlows: "+{count}",
+    extSuspect: "의심 신호 {count}건 — 미탐지 연계 가능성(수동 확인)",
   },
   grounding: {
     rate: "근거율",

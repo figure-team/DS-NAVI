@@ -130,6 +130,7 @@ export const zhTW = {
     extTables: "{count} 個資料表",
     extEmbedded: "內嵌",
     moreFlows: "+{count}",
+    extSuspect: "可疑訊號 {count} 個 — 可能存在未偵測到的整合(需人工確認)",
   },
   grounding: {
     rate: "依據率",

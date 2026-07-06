@@ -130,6 +130,7 @@ export const zh = {
     extTables: "{count} 个表",
     extEmbedded: "内嵌",
     moreFlows: "+{count}",
+    extSuspect: "可疑信号 {count} 个 — 可能存在未检测到的集成(需人工确认)",
   },
   grounding: {
     rate: "依据率",

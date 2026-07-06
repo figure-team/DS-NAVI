@@ -50,7 +50,8 @@ node ktds-legacy-plugin/scripts/understand-map.mjs examples/jpetstore-6 emit
 node ktds-legacy-plugin/scripts/understand-map.mjs examples/jpetstore-6 templates
 ```
 
-- 산출물: `examples/jpetstore-6/.spec/map/*.json`, `.understand-anything/domain-graph.json`
+- 산출물: `examples/jpetstore-6/.spec/map/*.json`, `.understand-anything/domain-graph.json`,
+  `.understand-anything/system-map.json`(시스템 구성도 연동 패널 — 인터페이스/DB/배치 조인)
 - **점검 포인트(scan 출력)**: 인터페이스 0건이 "스캔했고 없음"으로 명시되는지, 프로그램 70본 + 잠정 FP([추정]) 줄, 위험 랭킹 줄, `◐ 부분 지원 소스 N파일` 줄, `캐시: 재사용/재추출` 줄.
 - 결정론: 같은 명령 2회 → 산출물 byte-diff=0.
 

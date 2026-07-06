@@ -130,6 +130,7 @@ export const en = {
     extTables: "{count} tables",
     extEmbedded: "embedded",
     moreFlows: "+{count}",
+    extSuspect: "{count} suspect signals — possible undetected integrations (manual review)",
   },
   grounding: {
     rate: "Grounding",

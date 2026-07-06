@@ -130,6 +130,7 @@ export const ru = {
     extTables: "таблиц: {count}",
     extEmbedded: "встроенная",
     moreFlows: "+{count}",
+    extSuspect: "Подозрительных сигналов: {count} — возможны необнаруженные интеграции (ручная проверка)",
   },
   grounding: {
     rate: "Обоснованность",

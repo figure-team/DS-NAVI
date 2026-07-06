@@ -106,6 +106,7 @@ async function runScan() {
   }
   reportRisk(riskReport)
   console.log('산출물: .spec/map/{census,routes,edges,slices,candidates,db-schema,interfaces,batch-jobs,program-inventory,risk-report}.json (동일 commit 재실행 byte-diff=0)')
+  console.log('       + .understand-anything/system-map.json (시스템 구성도 연동 패널 — 인터페이스/DB/배치 조인)')
   console.log('다음 단계: plan(경계 확인) → confirm(확정) → map(요약).')
 }
 

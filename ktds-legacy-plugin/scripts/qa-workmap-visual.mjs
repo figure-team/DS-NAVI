@@ -53,9 +53,17 @@ for (const vp of [{ w: 1920, h: 1080 }, { w: 1366, h: 768 }]) {
   const boxes = await page.locator(".domain-card").count();
   check(`도메인 박스 5개 @${vp.w}`, boxes === 5, `실측 ${boxes}`);
 
-  // AC-3: 연동 패널 degrade 문구(system-map 없음)
-  const degrade = await page.getByText("연동 데이터 없음").count();
-  check(`AC-3 연동 패널 degrade @${vp.w}`, degrade >= 1);
+  // AC-3: 연동 패널 — system-map 있으면 실데이터(DB 테이블 수 + 0건 정직 표기),
+  // 없으면 degrade 문구. 어느 쪽이든 "침묵 빈 패널"은 실패.
+  const dataState =
+    (await page.getByText("테이블", { exact: false }).count()) > 0 &&
+    (await page.getByText("없음 — 스캔 완료").count()) >= 1;
+  const degradeState = (await page.getByText("연동 데이터 없음").count()) >= 1;
+  check(
+    `AC-3 연동 패널 @${vp.w}`,
+    dataState || degradeState,
+    dataState ? "실데이터(P2)" : degradeState ? "degrade(P1)" : "빈 패널",
+  );
 
   // AC-2: NavRail 라벨 "업무 지도"
   const navLabel = await page.getByText("업무 지도", { exact: true }).count();

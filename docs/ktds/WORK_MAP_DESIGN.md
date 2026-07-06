@@ -134,7 +134,7 @@ NavRail: "업무 지도" (구 "도메인", t.drawer.domain 라벨만 변경)
 | 단계 | 내용 | 검증 |
 |---|---|---|
 | ✅ P1 | 메뉴 개명 + 랜딩 구성도(화면 A) — system-map 없으면 연동 패널 degrade | 시각 QA 14항목 통과(1920/1366 무스크롤·박스5·degrade·칩 딥링크·모달), 루트 297+대시보드 132 green |
-| ⬜ P2 | system-map.json 산출물 + 연동 패널 실데이터 | jpetstore(0건·DB13)·eGov 실측, byte-diff=0 |
+| ✅ P2 | system-map.json 산출물 + 연동 패널 실데이터 | jpetstore(인터페이스0·hsqldb내장13·배치0)·eGov(0건+suspect1·멀티벤더 비내장) 실측, 재실행 byte-diff=0, 시각 QA "실데이터(P2)" 통과 |
 | ⬜ P3 | 워크스페이스 탭 구조 + 기능 목록 스케일(검색/필터/접기) | eGov급 목록 성능 계측, ?flow= 하위호환 |
 | ⬜ P4 | businessFlow: fill 스키마+emit 검증+결정론 폴백+순서도 뷰 | 스키마/검증 단위테스트, 폴백 시각 QA |
 | ⬜ P5 | jpetstore 데모 fill 재생성(LLM)+벤더링+qa 시각 스모크 | 골든 게이트(citationCount 증가 반영), 재벤더링 커밋 |
@@ -161,3 +161,9 @@ NavRail: "업무 지도" (구 "도메인", t.drawer.domain 라벨만 변경)
   기능 칩 `?flow=` 딥링크·상세보기 모달(기존 DomainCardDetail) 유지. 시각 QA 스크립트
   qa-workmap-p1.mjs 14항목 통과(AC-1/2/3), 긴 도메인명·상세보기 버튼 겹침 수정(paddingRight 72).
   P2(system-map.json 산출물) 대기.
+- 2026-07-06: **P2 완료** — legacy-core `src/system-map/`(buildSystemMap 조인+writeSystemMap,
+  zod 스키마·단위테스트 5건), scanDomainMap 마지막 stage 배선(반환에 systemMap 포함),
+  vite dev 미들웨어 protected endpoint+파일 매핑 분기(누락 시 knowledge-graph 오서빙 함정 —
+  엔드포인트 목록과 fileName 체인 **둘 다** 추가해야 함), sync:demo 9파일. 대시보드 파서에
+  suspectCount 추가 — 0건+의심신호>0 은 "탐지 못함" 가능성 경고(eGov 실증). extSuspect
+  6로케일. 실측: jpetstore 결정론 OK·eGov suspect 1건 표면화.

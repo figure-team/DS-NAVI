@@ -23,7 +23,7 @@ import GroundedBar from "./GroundedBar";
 
 /** system-map.json 소비 형태(P2 산출물 계약) — 알 수 없는 형태는 null로 degrade. */
 interface SystemMapData {
-  interfaces: { outboundCount: number; inboundCount: number; scanned: boolean };
+  interfaces: { outboundCount: number; inboundCount: number; scanned: boolean; suspectCount: number };
   db: { vendor: string | null; tableCount: number; embedded: boolean } | null;
   batch: { jobCount: number; scanned: boolean };
 }
@@ -41,6 +41,7 @@ function parseSystemMap(raw: unknown): SystemMapData | null {
       outboundCount: num(i.outboundCount ?? (Array.isArray(i.outbound) ? i.outbound.length : 0)),
       inboundCount: num(i.inboundCount ?? (Array.isArray(i.inbound) ? i.inbound.length : 0)),
       scanned: i.scanned === true,
+      suspectCount: num(i.suspectCount),
     },
     db: d
       ? {
@@ -299,6 +300,12 @@ export default function DomainMapView() {
                       <ExtRow label={t.domainMap.extOutbound} value={String(systemMap.interfaces.outboundCount)} />
                       <ExtRow label={t.domainMap.extInbound} value={String(systemMap.interfaces.inboundCount)} />
                     </>
+                  )}
+                  {/* 0건이어도 의심 신호가 있으면 "없음" 아닌 "탐지 못함" 가능성 표면화(정직성). */}
+                  {systemMap.interfaces.suspectCount > 0 && (
+                    <p style={{ fontSize: 10.5, lineHeight: 1.5, color: "var(--color-status-warn)" }}>
+                      {t.domainMap.extSuspect.replace("{count}", String(systemMap.interfaces.suspectCount))}
+                    </p>
                   )}
                 </ExtSection>
                 <ExtSection title={t.domainMap.extDb}>

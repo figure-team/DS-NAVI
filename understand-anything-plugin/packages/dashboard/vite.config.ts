@@ -1838,6 +1838,7 @@ export default defineConfig({
             pathname === "/domain-graph.json" ||
             pathname === "/diff-overlay.json" ||
             pathname === "/impact-overlay.json" ||
+            pathname === "/system-map.json" ||
             pathname === "/meta.json" ||
             pathname === "/config.json" ||
             pathname === "/file-content.json" ||
@@ -2122,6 +2123,8 @@ export default defineConfig({
               ? "domain-graph.json"
               : pathname === "/rtm.json"
               ? "rtm.json"
+              : pathname === "/system-map.json"
+              ? "system-map.json"
               : pathname === "/screens.json"
               ? "screens.json"
               : "knowledge-graph.json";

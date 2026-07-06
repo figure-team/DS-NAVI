@@ -28,6 +28,7 @@ const FILES = [
   "meta.json",
   "config.json",
   "impact-overlay.json",
+  "system-map.json",
   "rtm.json",
   "screens.json",
   "screen-overrides.json",

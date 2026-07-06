@@ -497,17 +497,43 @@ export function isFilterActive(f: FlowFilter): boolean {
 
 /** Apply the workspace filter. Preserves input order (graph order). */
 export function filterFlows(flows: DomainFlow[], f: FlowFilter): DomainFlow[] {
-  const q = f.query.trim().toLowerCase();
+  // NFC 정규화 — IME 에 따라 한글이 NFD 로 들어오면 동일 표기가 불일치한다(리뷰 R5).
+  const q = f.query.trim().normalize("NFC").toLowerCase();
   return flows.filter((flow) => {
     if (f.groups.size > 0 && !f.groups.has(flowGroupKey(flow.entryType))) return false;
     if (f.methods.size > 0 && !f.methods.has(flow.method)) return false;
     if (f.verdicts.size > 0 && !f.verdicts.has(flowVerdictKey(flow))) return false;
     if (q) {
-      const hay = `${flow.name}\n${flow.path}\n${flow.method}`.toLowerCase();
+      const hay = `${flow.name}\n${flow.path}\n${flow.method}`.normalize("NFC").toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
   });
+}
+
+const FACET_GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
+const FACET_VERDICT_ORDER: FlowVerdictKey[] = ["GROUNDED", "NEEDS_REVIEW", "none"];
+
+/**
+ * 필터 칩 후보 파셋(§4-2) — 이 도메인에 실존하는 값만, 결정론 순서로.
+ * UI 규칙: 파셋 값이 2종 이상일 때만 칩 노출(값 1종 = 필터 무의미, 빈 칩 금지).
+ * jpetstore·eGov 데모는 세 파셋 모두 균일(http·ANY·GROUNDED)이라 칩이 비노출이
+ * **정상**이다 — 발현 검증은 이 함수의 단위테스트가 담당한다(리뷰 C2).
+ */
+export function flowFacets(flows: DomainFlow[]): {
+  groups: FlowGroupKey[];
+  methods: FlowMethod[];
+  verdicts: FlowVerdictKey[];
+} {
+  const groups = new Set(flows.map((f) => flowGroupKey(f.entryType)));
+  const methods: FlowMethod[] = [];
+  for (const f of flows) if (!methods.includes(f.method)) methods.push(f.method);
+  const verdicts = new Set(flows.map((f) => flowVerdictKey(f)));
+  return {
+    groups: FACET_GROUP_ORDER.filter((k) => groups.has(k)),
+    methods,
+    verdicts: FACET_VERDICT_ORDER.filter((k) => verdicts.has(k)),
+  };
 }
 
 /** Workspace tab (§3): business = 업무 흐름도, code = 기능(코드 흐름). */

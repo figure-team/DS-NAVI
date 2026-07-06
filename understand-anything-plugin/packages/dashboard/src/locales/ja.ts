@@ -163,6 +163,7 @@ export const ja = {
     verdictNone: "未入力",
     noMatches: "条件に合う機能がありません。",
     clearFilters: "フィルターをクリア",
+    numberHint: "全体リスト基準の番号 — フィルター中は不連続になることがあります",
     businessEmpty:
       "業務フローのデータがまだありません — ドメインの入力(businessFlow)後にフローチャートが表示されます。",
   },

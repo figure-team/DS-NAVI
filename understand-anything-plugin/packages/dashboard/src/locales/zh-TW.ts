@@ -163,6 +163,7 @@ export const zhTW = {
     verdictNone: "未填充",
     noMatches: "沒有符合篩選條件的功能。",
     clearFilters: "清除篩選",
+    numberHint: "依完整清單編號 — 篩選時可能不連續",
     businessEmpty: "尚無業務流程資料 — 網域填充(businessFlow)後將顯示流程圖。",
   },
   flowView: {

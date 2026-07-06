@@ -18,12 +18,18 @@ export default function DomainsPage() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
 
+  // ?flow= 복원 1회 게이트 — 아래 세 이펙트가 공유(선언은 사용보다 앞서 둔다).
+  const flowApplied = useRef(false);
+
   // URL(:domainId) → store — 기존 액션을 재사용해 리셋 의미론(흐름/선택 정리) 보존.
   // 딥링크 시 늦게 도착한 setGraph가 activeDomainId를 비울 수 있으므로 그래프 로드에도
   // 반응해 URL을 재적용한다(가드로 멱등).
   useEffect(() => {
     const s = useDashboardStore.getState();
     if (domainId && s.activeDomainId !== domainId) {
+      // 도메인이 바뀌면 ?flow= 복원 1회 게이트를 재무장한다 — /domains/:id 는 단일
+      // 라우트라 A→B 직행(교차 도메인 링크·뒤로가기)에서 remount 가 없다(리뷰 R2).
+      flowApplied.current = false;
       s.navigateToDomain(domainId);
     } else if (!domainId && s.activeDomainId) {
       s.clearActiveDomain();
@@ -31,7 +37,6 @@ export default function DomainsPage() {
   }, [domainId, graph, domainGraph]);
 
   // URL(?flow=) → store — 인라인 스파인 선택 복원. 그래프가 준비된 뒤 1회 적용.
-  const flowApplied = useRef(false);
   useEffect(() => {
     if (flowApplied.current || !domainGraph || !domainId) return;
     flowApplied.current = true;

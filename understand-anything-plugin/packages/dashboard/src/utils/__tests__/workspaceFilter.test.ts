@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   EMPTY_FLOW_FILTER,
   filterFlows,
+  flowFacets,
   flowVerdictKey,
   hasBusinessFlow,
   isFilterActive,
@@ -86,6 +87,29 @@ describe("filterFlows (§4-2 클라이언트 필터)", () => {
     expect(isFilterActive(f({ query: "  " }))).toBe(false);
     expect(isFilterActive(f({ query: "a" }))).toBe(true);
     expect(isFilterActive(f({ groups: new Set(["http"]) }))).toBe(true);
+  });
+
+  it("검색어 NFC 정규화 — NFD 한글 입력도 일치(리뷰 R5)", () => {
+    // "주문" 을 NFD(자모 분해)로 입력해도 NFC 데이터와 일치해야 한다.
+    const nfd = "주문".normalize("NFD");
+    expect(nfd).not.toBe("주문"); // 전제: 실제로 다른 코드포인트
+    expect(filterFlows(FLOWS, f({ query: nfd })).map((x) => x.id)).toEqual(["f1", "f2"]);
+  });
+
+  it("flowFacets — 실존 값만·결정론 순서, 균일 파셋은 1종(칩 비노출 근거, 리뷰 C2)", () => {
+    // 혼합 파셋: 그룹 2종·메소드 3종·verdict 3종이 전부 표면화된다.
+    expect(flowFacets(FLOWS)).toEqual({
+      groups: ["http", "batch"],
+      methods: ["POST", "GET", "BATCH"],
+      verdicts: ["GROUNDED", "NEEDS_REVIEW", "none"],
+    });
+    // 균일 파셋(jpetstore/eGov 데모 실측 상태): 각 1종 → UI 는 칩을 숨긴다.
+    const uniform = [FLOWS[0], flow({ id: "f4", name: "주문 취소", path: "/x", method: "POST" })];
+    expect(flowFacets(uniform)).toEqual({
+      groups: ["http"],
+      methods: ["POST"],
+      verdicts: ["none"],
+    });
   });
 
   it("flowVerdictKey — grounding 없으면 none", () => {

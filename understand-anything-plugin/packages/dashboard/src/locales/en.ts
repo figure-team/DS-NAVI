@@ -163,6 +163,7 @@ export const en = {
     verdictNone: "Unfilled",
     noMatches: "No features match the filters.",
     clearFilters: "Clear filters",
+    numberHint: "Number in the full list — may be non-contiguous while filtering",
     businessEmpty:
       "No business-flow data yet — the flowchart appears once the domain fill (businessFlow) is provided.",
   },

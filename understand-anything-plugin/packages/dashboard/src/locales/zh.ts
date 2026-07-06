@@ -163,6 +163,7 @@ export const zh = {
     verdictNone: "未填充",
     noMatches: "没有符合筛选条件的功能。",
     clearFilters: "清除筛选",
+    numberHint: "按完整列表编号 — 筛选时可能不连续",
     businessEmpty: "暂无业务流程数据 — 域填充(businessFlow)后将显示流程图。",
   },
   flowView: {

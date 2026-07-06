@@ -11,11 +11,10 @@ import {
   buildDomainFlows,
   domainColor,
   domainIcon,
-  EMPTY_FLOW_FILTER,
   filterFlows,
   findDomain,
+  flowFacets,
   flowGroupKey,
-  flowVerdictKey,
   hasBusinessFlow,
   isFilterActive,
   parseDomainClaims,
@@ -66,7 +65,6 @@ const METHOD_STYLE: Record<FlowMethod, { bg: string; color: string }> = {
 };
 
 const GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
-const VERDICT_ORDER: FlowVerdictKey[] = ["GROUNDED", "NEEDS_REVIEW", "none"];
 
 /** 점진 windowing — 최초 렌더 행 수 / 센티널 도달 시 증가 폭 (§4-2 계측 후 채택). */
 const WINDOW_INITIAL = 100;
@@ -162,11 +160,16 @@ export default function FlowListView() {
     hasBusinessFlow(domainNode),
   );
   const switchView = (next: "business" | "code") => {
-    setSearchParams((prev) => {
-      const p = new URLSearchParams(prev);
-      p.set("view", next);
-      return p;
-    });
+    // 탭은 워크스페이스 내부 뷰 토글 — flow 선택 동기화와 동일하게 replace(히스토리
+    // 오염 없음, 리뷰 C1). ?flow= 는 유지: business↔code 왕복 시 선택 보존(의도).
+    setSearchParams(
+      (prev) => {
+        const p = new URLSearchParams(prev);
+        p.set("view", next);
+        return p;
+      },
+      { replace: true },
+    );
   };
 
   // Inline-selection reset on domain switch is handled centrally in the store
@@ -208,20 +211,12 @@ export default function FlowListView() {
     none: t.flowList.verdictNone,
   };
 
-  // 필터 칩 후보 — 이 도메인에 실존하는 값만(빈 칩 노출 금지).
-  const availableGroups = useMemo(() => {
-    const present = new Set(flows.map((f) => flowGroupKey(f.entryType)));
-    return GROUP_ORDER.filter((k) => present.has(k));
-  }, [flows]);
-  const availableMethods = useMemo(() => {
-    const seen: FlowMethod[] = [];
-    for (const f of flows) if (!seen.includes(f.method)) seen.push(f.method);
-    return seen;
-  }, [flows]);
-  const availableVerdicts = useMemo(() => {
-    const present = new Set(flows.map((f) => flowVerdictKey(f)));
-    return VERDICT_ORDER.filter((k) => present.has(k));
-  }, [flows]);
+  // 필터 칩 후보 — 이 도메인에 실존하는 값만(빈 칩 노출 금지). 파셋 계산은
+  // domainData.flowFacets(단위테스트 대상 — 균일 데모에서 칩 비노출이 정상, 리뷰 C2).
+  const facets = useMemo(() => flowFacets(flows), [flows]);
+  const availableGroups = facets.groups;
+  const availableMethods = facets.methods;
+  const availableVerdicts = facets.verdicts;
 
   const selectedFlow = flows.find((f) => f.id === selectedFlowId) ?? null;
   const singleGroup = groups.length <= 1;
@@ -262,34 +257,46 @@ export default function FlowListView() {
   }, [groups, collapsedGroups, singleGroup]);
 
   const [windowSize, setWindowSize] = useState(WINDOW_INITIAL);
-  // 필터/도메인 변경 시 창 리셋 — 검색 결과 최상단부터 다시.
-  const filterKey = `${activeDomainId}|${query}|${[...groupSel].join()}|${[...methodSel].join()}|${[...verdictSel].join()}`;
+  // 필터/도메인 변경 시 창 리셋 — 검색 결과 최상단부터 다시. 키는 JSON 직렬화로
+  // 구분자 충돌 차단(query 에 "|" 포함 케이스, 리뷰 R4).
+  const filterKey = JSON.stringify([activeDomainId, query, [...groupSel], [...methodSel], [...verdictSel]]);
   useEffect(() => {
     setWindowSize(WINDOW_INITIAL);
   }, [filterKey]);
   const visibleItems = renderItems.slice(0, windowSize);
   const hasMore = renderItems.length > windowSize;
+  // 접힘 레일도 동일 창 적용 — 접는 순간 전량 DOM 이 올라가는 우회 차단(리뷰 C3).
+  const visibleRail = orderedFiltered.slice(0, windowSize);
+  const railHasMore = orderedFiltered.length > windowSize;
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const railSentinelRef = useRef<HTMLDivElement | null>(null);
+  const maxWindow = Math.max(renderItems.length, orderedFiltered.length);
+  const anyMore = hasMore || railHasMore;
   useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || !hasMore) return;
+    if (!anyMore) return;
     // jsdom 등 IntersectionObserver 부재 환경에서는 전체 렌더로 강등(기능 보존).
     if (typeof IntersectionObserver === "undefined") {
-      setWindowSize(renderItems.length);
+      setWindowSize(maxWindow);
       return;
     }
+    const els = [sentinelRef.current, railSentinelRef.current].filter(
+      (el): el is HTMLDivElement => el !== null,
+    );
+    if (els.length === 0) return;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
-          setWindowSize((s) => Math.min(s + WINDOW_STEP, renderItems.length));
+          setWindowSize((s) => Math.min(s + WINDOW_STEP, maxWindow));
         }
       },
       { rootMargin: "240px" },
     );
-    io.observe(el);
+    for (const el of els) io.observe(el);
     return () => io.disconnect();
-  }, [hasMore, renderItems.length]);
+    // windowSize 포함 — 창 성장 후 옵저버를 재생성해 초기 교차 상태를 재전달받는다.
+    // (센티널이 뷰포트를 못 벗어난 경우 교차 이벤트가 재발화하지 않는 stall 차단.)
+  }, [anyMore, maxWindow, windowSize]);
 
   const toggleIn = <T,>(set: Set<T>, v: T, apply: (next: Set<T>) => void) => {
     const next = new Set(set);
@@ -347,8 +354,19 @@ export default function FlowListView() {
             </div>
           )}
         </div>
-        {/* 탭바 — view= 가 진실. 활성 탭 밑줄은 도메인 색. */}
-        <div className="flex items-center gap-1 mt-2" role="tablist">
+        {/* 탭바 — view= 가 진실. 활성 탭 밑줄은 도메인 색. WAI-ARIA Tabs: roving
+            tabindex + 화살표 키 + tab↔tabpanel 상호 연결(리뷰 C4). */}
+        <div
+          className="flex items-center gap-1 mt-2"
+          role="tablist"
+          onKeyDown={(e) => {
+            if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+            e.preventDefault();
+            const next = view === "business" ? "code" : "business";
+            switchView(next);
+            document.getElementById(`workspace-tab-${next}`)?.focus();
+          }}
+        >
           {(
             [
               { key: "business" as const, label: t.flowList.tabBusiness },
@@ -359,9 +377,12 @@ export default function FlowListView() {
             return (
               <button
                 key={tab.key}
+                id={`workspace-tab-${tab.key}`}
                 type="button"
                 role="tab"
                 aria-selected={active}
+                aria-controls={`workspace-panel-${tab.key}`}
+                tabIndex={active ? 0 : -1}
                 onClick={() => switchView(tab.key)}
                 className={`cursor-pointer transition-colors border-b-2 ${
                   active ? "text-text-primary" : "text-text-muted hover:text-text-secondary"
@@ -383,7 +404,12 @@ export default function FlowListView() {
       {/* ── 탭 내용 ── */}
       {view === "business" ? (
         /* P3: 탭 골격만 — 순서도 렌더(분기·폴백)는 P4. 데이터 없음을 정직 표기. */
-        <div className="flex-1 min-h-0 flex items-center justify-center px-8 text-center">
+        <div
+          id="workspace-panel-business"
+          role="tabpanel"
+          aria-labelledby="workspace-tab-business"
+          className="flex-1 min-h-0 flex items-center justify-center px-8 text-center"
+        >
           <div>
             <p className="text-text-secondary" style={{ fontSize: 13 }}>
               {t.flowList.businessEmpty}
@@ -391,7 +417,12 @@ export default function FlowListView() {
           </div>
         </div>
       ) : (
-      <div className="flex-1 min-h-0 flex overflow-hidden">
+      <div
+        id="workspace-panel-code"
+        role="tabpanel"
+        aria-labelledby="workspace-tab-code"
+        className="flex-1 min-h-0 flex overflow-hidden"
+      >
       {/* LEFT: collapsed rail — » expand + numbered quick-nav. Replaces the
           old full-screen spine: collapse the list and the inline spine claims
           the full width. */}
@@ -413,7 +444,7 @@ export default function FlowListView() {
         {/* 접힘 상태 번호 선택 — 펼치지 않고도 번호로 기능 전환(선택 번호 강조).
             필터 결과를 따르되 번호는 전체 목록 기준(펼침 행 배지와 동일 매핑). */}
         <div className="mt-3 flex-1 w-full overflow-y-auto flex flex-col items-center gap-1.5 pb-3">
-          {orderedFiltered.map((f) => {
+          {visibleRail.map((f) => {
             const isSel = f.id === selectedFlowId;
             const n = flowNumber.get(f.id);
             return (
@@ -435,6 +466,7 @@ export default function FlowListView() {
               </button>
             );
           })}
+          {railHasMore && <div ref={railSentinelRef} aria-hidden style={{ height: 1 }} />}
         </div>
       </aside>
       ) : (
@@ -568,8 +600,10 @@ export default function FlowListView() {
                       }}
                     >
                       <div className="flex items-center gap-2">
-                        {/* 번호 — 접힘 레일 번호와 동일 매핑(번호로 기능 식별·선택). */}
+                        {/* 번호 — 접힘 레일 번호와 동일 매핑(번호로 기능 식별·선택).
+                            필터 중에도 전체 목록 기준이라 비연속일 수 있다(리뷰 C7 — 툴팁 명시). */}
                         <span
+                          title={t.flowList.numberHint}
                           className="shrink-0 inline-flex items-center justify-center rounded border border-border-subtle text-text-muted"
                           style={{ minWidth: 18, height: 18, fontSize: 10, fontFamily: "var(--font-mono)" }}
                         >

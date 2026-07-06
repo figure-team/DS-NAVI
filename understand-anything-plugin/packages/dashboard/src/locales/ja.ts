@@ -155,6 +155,16 @@ export const ja = {
     groupEvent: "イベント",
     groupOther: "機能",
     layers: "レイヤー",
+    tabBusiness: "業務フロー図",
+    tabCode: "機能 {count}",
+    searchPlaceholder: "検索: 名前・パス・メソッド",
+    verdictGrounded: "根拠あり",
+    verdictReview: "要確認",
+    verdictNone: "未入力",
+    noMatches: "条件に合う機能がありません。",
+    clearFilters: "フィルターをクリア",
+    businessEmpty:
+      "業務フローのデータがまだありません — ドメインの入力(businessFlow)後にフローチャートが表示されます。",
   },
   flowView: {
     selectedFlow: "選択中の機能",

@@ -71,6 +71,10 @@ export default function DomainMapView() {
   const [systemMap, setSystemMap] = useState<SystemMapData | null | undefined>(undefined);
 
   useEffect(() => {
+    // P3 fix: 자식 이펙트가 RootData 의 setAccessToken 이펙트보다 먼저 실행되므로,
+    // 토큰 동기화 전(null)에는 fetch 를 보류한다 — 토큰 없는 transient 403 방지.
+    // (RootData 는 항상 문자열 토큰을 가지므로 null 은 "아직 동기화 전"뿐이다.)
+    if (accessToken === null) return;
     let cancelled = false;
     fetch(dataUrl("system-map.json", accessToken))
       .then((res) => (res.ok ? res.json() : null))

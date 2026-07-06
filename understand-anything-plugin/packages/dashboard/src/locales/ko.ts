@@ -155,6 +155,16 @@ export const ko = {
     groupEvent: "이벤트",
     groupOther: "기능",
     layers: "계층",
+    tabBusiness: "업무 흐름도",
+    tabCode: "기능 {count}",
+    searchPlaceholder: "검색: 이름·경로·메소드",
+    verdictGrounded: "근거 있음",
+    verdictReview: "검토 필요",
+    verdictNone: "미채움",
+    noMatches: "조건에 맞는 기능이 없습니다.",
+    clearFilters: "필터 초기화",
+    businessEmpty:
+      "업무 흐름 데이터가 아직 없습니다 — 도메인 채움(businessFlow) 후 순서도가 제공됩니다.",
   },
   flowView: {
     selectedFlow: "선택된 기능",

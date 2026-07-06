@@ -155,6 +155,16 @@ export const en = {
     groupEvent: "Events",
     groupOther: "Features",
     layers: "Layers",
+    tabBusiness: "Business flow",
+    tabCode: "Features {count}",
+    searchPlaceholder: "Search name · path · method",
+    verdictGrounded: "Grounded",
+    verdictReview: "Needs review",
+    verdictNone: "Unfilled",
+    noMatches: "No features match the filters.",
+    clearFilters: "Clear filters",
+    businessEmpty:
+      "No business-flow data yet — the flowchart appears once the domain fill (businessFlow) is provided.",
   },
   flowView: {
     selectedFlow: "Selected feature",

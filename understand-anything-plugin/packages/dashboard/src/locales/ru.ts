@@ -155,6 +155,16 @@ export const ru = {
     groupEvent: "События",
     groupOther: "Функции",
     layers: "Слои",
+    tabBusiness: "Бизнес-процесс",
+    tabCode: "Функции {count}",
+    searchPlaceholder: "Поиск: имя · путь · метод",
+    verdictGrounded: "Обосновано",
+    verdictReview: "Требует проверки",
+    verdictNone: "Не заполнено",
+    noMatches: "Нет функций, соответствующих фильтрам.",
+    clearFilters: "Сбросить фильтры",
+    businessEmpty:
+      "Данных бизнес-процесса пока нет — блок-схема появится после заполнения домена (businessFlow).",
   },
   flowView: {
     selectedFlow: "Выбранная функция",

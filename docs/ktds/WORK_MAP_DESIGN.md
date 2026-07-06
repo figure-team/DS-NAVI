@@ -135,7 +135,7 @@ NavRail: "업무 지도" (구 "도메인", t.drawer.domain 라벨만 변경)
 |---|---|---|
 | ✅ P1 | 메뉴 개명 + 랜딩 구성도(화면 A) — system-map 없으면 연동 패널 degrade | 시각 QA 14항목 통과(1920/1366 무스크롤·박스5·degrade·칩 딥링크·모달), 루트 297+대시보드 132 green |
 | ✅ P2 | system-map.json 산출물 + 연동 패널 실데이터 | jpetstore(인터페이스0·hsqldb내장13·배치0)·eGov(0건+suspect1·멀티벤더 비내장) 실측, 재실행 byte-diff=0, 시각 QA "실데이터(P2)" 통과 |
-| ⬜ P3 | 워크스페이스 탭 구조 + 기능 목록 스케일(검색/필터/접기) | eGov급 목록 성능 계측, ?flow= 하위호환 |
+| ✅ P3 | 워크스페이스 탭 구조 + 기능 목록 스케일(검색/필터/접기/점진 windowing) | eGov(216기능) 실측: 첫 렌더 437ms·초기 DOM 100행(53% 절감)·스크롤 전량 로드 +326ms·검색 반응 97ms → IntersectionObserver 점진 windowing 채택(§4-2 "계측 후 결정" 이행). 스모크 16항목 통과(?flow= 하위호환 포함) + P1 시각 QA 14항목 재통과. 부수 수정 3건: ?flow= 딥링크 첫 로드 복원 무산(store→URL 동기화가 그래프 도착 전 param 삭제 — 기존 버그), 딥링크 진입 시 랜딩 transient 마운트로 토큰 없는 system-map fetch 403, 라우터 초기 location 이 게이트가 지운 ?token= 재유입. 대시보드 144 green(신규 workspaceFilter 12) |
 | ⬜ P4 | businessFlow: fill 스키마+emit 검증+결정론 폴백+순서도 뷰 | 스키마/검증 단위테스트, 폴백 시각 QA |
 | ⬜ P5 | jpetstore 데모 fill 재생성(LLM)+벤더링+qa 시각 스모크 | 골든 게이트(citationCount 증가 반영), 재벤더링 커밋 |
 

@@ -3,7 +3,7 @@ docId: 09_change-impact
 title: 변경 영향도 분석
 methodology: as-built
 status: DRAFT
-sourceCommit: 650ef6936cafd69dde6bad891a7da83394b6d6f7
+sourceCommit: dfbb9822f7c17f41a39e96704f4ea4f455580278
 evidenceRate: 0.18867924528301888
 ---
 
@@ -127,7 +127,7 @@ host 인용 추출 대상 매퍼 슬라이스 4개 · KG 테이블 카탈로그 
 ## 신규 생성 권장 — 생성 ([생성])
 
 <!-- claims:FENCE:OPEN -->
-- [추정] [생성] src/main/java/org/mybatis/jpetstore/web/actions/KakaoLoginController.java — KakaoLoginController.authenticate() (선례 앵커). 근거: `src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java:159`
+- [추정] [생성] src/main/java/org/mybatis/jpetstore/web/actions/KakaoLoginController.java — KakaoLoginController (선례 앵커). 근거: `src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java:159`
 - [추정] [생성] src/main/java/org/mybatis/jpetstore/service/KakaoLoginService.java — KakaoLoginService (선례 앵커). 근거: `src/main/java/org/mybatis/jpetstore/service/AccountService.java:1`
 - [추정] [생성] src/main/java/org/mybatis/jpetstore/mapper/KakaoLoginMapper.java — KakaoLoginMapper (선례 앵커). 근거: `src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java:1`
 - [추정] [생성] src/main/java/org/mybatis/jpetstore/domain/KakaoLogin.java — KakaoLogin (선례 앵커). 근거: `src/main/java/org/mybatis/jpetstore/domain/Account.java:1`

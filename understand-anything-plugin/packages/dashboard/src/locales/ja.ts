@@ -168,6 +168,9 @@ export const ja = {
     bfStart: "開始",
     bfEnd: "終了",
     bfOpenFlow: "機能を開く →",
+    bfMore: "…ほか {count} 件（機能タブで全件確認）",
+    businessRejectedBanner:
+      "業務フロー図は検証失敗により却下されました — 以下は順次近似です。理由: {reason}",
     businessEmpty:
       "業務フローのデータがまだありません — ドメインの入力(businessFlow)後にフローチャートが表示されます。",
   },

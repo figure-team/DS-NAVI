@@ -38,6 +38,15 @@ export interface BizFlow {
   fallback: boolean;
 }
 
+/**
+ * emit 이 businessFlow 를 그래프 정합 실패로 기각한 사유(domainMeta.businessFlowRejected).
+ * "미채움"과 "작성했으나 기각"을 대시보드가 구별해 배너를 나눈다(리뷰 C2).
+ */
+export function businessFlowRejectedReason(node: GraphNode | undefined): string | null {
+  const meta = node?.domainMeta as { businessFlowRejected?: unknown } | undefined;
+  return typeof meta?.businessFlowRejected === "string" ? meta.businessFlowRejected : null;
+}
+
 /** domainMeta.businessFlow → BizFlow. 형태가 어긋나면 null(폴백 경로로). */
 export function parseBusinessFlow(node: GraphNode | undefined): BizFlow | null {
   const meta = node?.domainMeta as { businessFlow?: unknown } | undefined;
@@ -74,18 +83,26 @@ export function parseBusinessFlow(node: GraphNode | undefined): BizFlow | null {
   return { nodes, edges, fallback: false };
 }
 
+/** 폴백 순차 나열의 activity 상한 — 초과분은 "…외 N건" 집계 노드로 접는다(리뷰 C3). */
+export const FALLBACK_MAX_ACTIVITIES = 30;
+
 /**
  * 결정론 순차 폴백(§4-1) — fill 미작성 도메인: start → 기능(그래프 순서) → end.
  * 분기 없음(창작 금지). 각 activity 는 flowRef 로 코드 탭 드릴다운을 유지한다.
- * start/end 라벨은 호출자(i18n)가 준다 — 유틸은 로케일 무지(순수 함수).
+ * start/end/초과 라벨은 호출자(i18n)가 준다 — 유틸은 로케일 무지(순수 함수).
+ * eGov급(216기능) 도메인에서 판독 불가 체인이 되지 않도록 상한을 두고, 초과분은
+ * "…외 N건" 노드로 정직하게 집계한다(침묵 절단 금지 — 코드 탭이 전수 목록).
  */
 export function buildSequentialFallback(
   flows: DomainFlow[],
-  labels: { start: string; end: string },
+  labels: { start: string; end: string; more: string },
+  maxActivities: number = FALLBACK_MAX_ACTIVITIES,
 ): BizFlow {
+  const shown = flows.slice(0, maxActivities);
+  const overflow = flows.length - shown.length;
   const nodes: BizFlowNode[] = [
     { id: "__start", kind: "start", label: labels.start, citations: [] },
-    ...flows.map(
+    ...shown.map(
       (f): BizFlowNode => ({
         id: `seq:${f.id}`,
         kind: "activity",
@@ -94,6 +111,16 @@ export function buildSequentialFallback(
         citations: [],
       }),
     ),
+    ...(overflow > 0
+      ? [
+          {
+            id: "__more",
+            kind: "activity" as const,
+            label: labels.more.replace("{count}", String(overflow)),
+            citations: [],
+          },
+        ]
+      : []),
     { id: "__end", kind: "end", label: labels.end, citations: [] },
   ];
   const edges: BizFlowEdge[] = [];

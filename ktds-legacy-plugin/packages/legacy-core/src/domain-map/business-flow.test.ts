@@ -136,6 +136,28 @@ describe('businessFlow — 그래프 정합 검증', () => {
       'flowRef-unknown: a1 → flow:GET /members',
     )
   })
+
+  it('decision 은 나가는 엣지 2+ 필수 — 분기 없는 판단 기각(리뷰 C1)', () => {
+    const noBranch = bf()
+    // d1 의 NO 분기 제거 → outgoing 1개
+    noBranch.edges = noBranch.edges.filter((e) => !(e.from === 'd1' && e.to === 'a1'))
+    expect(validateBusinessFlow(noBranch, FLOWS)).toContain(
+      'decision-needs-branches: d1 (outgoing 1)',
+    )
+  })
+
+  it('decision 의 나가는 엣지는 분기 라벨 필수(리뷰 C7)', () => {
+    const unlabeled = bf()
+    unlabeled.edges = unlabeled.edges.map((e) =>
+      e.from === 'd1' && e.to === 'e' ? { from: e.from, to: e.to } : e,
+    )
+    expect(validateBusinessFlow(unlabeled, FLOWS)).toContain('decision-branch-unlabeled: d1')
+  })
+
+  it('사이클(재시도 루프)은 허용 — 정합 그래프로 통과', () => {
+    // bf() 자체가 d1 →NO→ a1 루프를 포함하고 위반 0건(위 테스트) — 명문화용 재확인.
+    expect(validateBusinessFlow(bf(), FLOWS)).toEqual([])
+  })
 })
 
 describe('businessFlow — applyFills 부분 수용', () => {
@@ -148,15 +170,18 @@ describe('businessFlow — applyFills 부분 수용', () => {
     expect(merged.edges).toHaveLength(4)
   })
 
-  it('정합 실패 시 businessFlow 만 기각 — 도메인 fill 나머지는 적용', () => {
+  it('정합 실패 시 businessFlow 만 기각 — 도메인 fill 나머지는 적용, 사유 표면화', () => {
     const bad = bf()
     bad.edges = [{ from: 's', to: 'ghost' }, ...bad.edges]
     const { nodes, rejected } = applyFills(skeleton(), [orderFill(bad)])
     expect(rejected).toHaveLength(1)
     expect(rejected[0].ref).toBe('domain:order#businessFlow')
+    expect(rejected[0].kind).toBe('businessFlow') // 구조적 kind(리뷰 C5)
     expect(rejected[0].reason).toContain('edge-to-unknown: ghost')
     const domain = nodes.find((n) => n.id === 'domain:order')!
     expect(domain.domainMeta?.businessFlow).toBeUndefined()
+    // 기각 사유가 그래프에 실려 대시보드가 "미채움"과 구별한다(리뷰 C2).
+    expect(domain.domainMeta?.businessFlowRejected).toContain('edge-to-unknown: ghost')
     expect(domain.name).toBe('주문') // 부분 수용 — 도메인 채움은 유지
   })
 })

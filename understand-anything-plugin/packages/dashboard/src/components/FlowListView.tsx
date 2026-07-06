@@ -8,7 +8,11 @@ import BusinessFlowView from "./BusinessFlowView";
 import CitationChip from "./CitationChip";
 import VerdictBadge from "./VerdictBadge";
 import GroundedBar from "./GroundedBar";
-import { buildSequentialFallback, parseBusinessFlow } from "../utils/businessFlow";
+import {
+  buildSequentialFallback,
+  businessFlowRejectedReason,
+  parseBusinessFlow,
+} from "../utils/businessFlow";
 import {
   buildDomainFlows,
   domainColor,
@@ -154,6 +158,21 @@ export default function FlowListView() {
     () => (domainNode ? parseDomainClaims(domainNode) : null),
     [domainNode],
   );
+
+  // P4: 업무 흐름도 데이터 — 채움(businessFlow) 우선, 미채움은 순차 폴백. useMemo 로
+  // 참조를 고정한다(매 렌더 재생성 시 BusinessFlowView 의 ELK 레이아웃이 재실행됨).
+  const bizFlow = useMemo(() => {
+    const parsed = parseBusinessFlow(domainNode);
+    if (parsed) return parsed;
+    return flows.length > 0
+      ? buildSequentialFallback(flows, {
+          start: t.flowList.bfStart,
+          end: t.flowList.bfEnd,
+          more: t.flowList.bfMore,
+        })
+      : null;
+  }, [domainNode, flows, t]);
+  const bizRejected = useMemo(() => businessFlowRejectedReason(domainNode), [domainNode]);
 
   // §3 탭 해석 — URL이 진실. ?flow= 딥링크(pre-P3)는 code 탭(하위호환).
   const view = resolveWorkspaceView(
@@ -411,26 +430,15 @@ export default function FlowListView() {
           aria-labelledby="workspace-tab-business"
           className="flex-1 min-h-0"
         >
-          {(() => {
-            const parsed = parseBusinessFlow(domainNode);
-            const biz =
-              parsed ??
-              (flows.length > 0
-                ? buildSequentialFallback(flows, {
-                    start: t.flowList.bfStart,
-                    end: t.flowList.bfEnd,
-                  })
-                : null);
-            return biz && activeDomainId ? (
-              <BusinessFlowView domainId={activeDomainId} biz={biz} />
-            ) : (
-              <div className="h-full flex items-center justify-center px-8 text-center">
-                <p className="text-text-secondary" style={{ fontSize: 13 }}>
-                  {t.flowList.businessEmpty}
-                </p>
-              </div>
-            );
-          })()}
+          {bizFlow && activeDomainId ? (
+            <BusinessFlowView domainId={activeDomainId} biz={bizFlow} rejectedReason={bizRejected} />
+          ) : (
+            <div className="h-full flex items-center justify-center px-8 text-center">
+              <p className="text-text-secondary" style={{ fontSize: 13 }}>
+                {t.flowList.businessEmpty}
+              </p>
+            </div>
+          )}
         </div>
       ) : (
       <div

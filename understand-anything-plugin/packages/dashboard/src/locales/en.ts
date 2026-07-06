@@ -168,6 +168,9 @@ export const en = {
     bfStart: "Start",
     bfEnd: "End",
     bfOpenFlow: "Open feature →",
+    bfMore: "…and {count} more (see the Features tab)",
+    businessRejectedBanner:
+      "The business flow was rejected by validation — showing a sequential approximation. Reason: {reason}",
     businessEmpty:
       "No business-flow data yet — the flowchart appears once the domain fill (businessFlow) is provided.",
   },

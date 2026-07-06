@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { buildSequentialFallback, parseBusinessFlow } from "../businessFlow";
+import {
+  buildSequentialFallback,
+  businessFlowRejectedReason,
+  parseBusinessFlow,
+} from "../businessFlow";
 import type { DomainFlow } from "../domainData";
 import type { GraphNode } from "@understand-anything/core/types";
 
@@ -75,11 +79,10 @@ describe("buildSequentialFallback — 결정론 순차 근사", () => {
     grounding: null,
   });
 
+  const LABELS = { start: "시작", end: "종료", more: "…외 {count}건" };
+
   it("start → 기능(그래프 순서, flowRef 유지) → end, 분기 없음", () => {
-    const biz = buildSequentialFallback([flow("flow:a", "기능A"), flow("flow:b", "기능B")], {
-      start: "시작",
-      end: "종료",
-    });
+    const biz = buildSequentialFallback([flow("flow:a", "기능A"), flow("flow:b", "기능B")], LABELS);
     expect(biz.fallback).toBe(true);
     expect(biz.nodes.map((n) => n.kind)).toEqual(["start", "activity", "activity", "end"]);
     expect(biz.nodes[1].flowRef).toBe("flow:a");
@@ -90,5 +93,27 @@ describe("buildSequentialFallback — 결정론 순차 근사", () => {
       { from: "seq:flow:a", to: "seq:flow:b" },
       { from: "seq:flow:b", to: "__end" },
     ]);
+  });
+
+  it("상한 초과 시 '…외 N건' 집계 노드로 접는다(침묵 절단 금지, 리뷰 C3)", () => {
+    const many = Array.from({ length: 7 }, (_, i) => flow(`flow:f${i}`, `기능${i}`));
+    const biz = buildSequentialFallback(many, LABELS, 3);
+    // start + 3 activity + more + end
+    expect(biz.nodes.map((n) => n.id)).toEqual([
+      "__start", "seq:flow:f0", "seq:flow:f1", "seq:flow:f2", "__more", "__end",
+    ]);
+    expect(biz.nodes[4].label).toBe("…외 4건");
+    expect(biz.nodes[4].flowRef).toBeUndefined();
+    expect(biz.edges).toHaveLength(5);
+  });
+});
+
+describe("businessFlowRejectedReason — 기각 사유 표면화(리뷰 C2)", () => {
+  it("domainMeta.businessFlowRejected 를 읽고, 없으면 null", () => {
+    expect(businessFlowRejectedReason(undefined)).toBeNull();
+    expect(businessFlowRejectedReason(node())).toBeNull();
+    expect(
+      businessFlowRejectedReason(node({ businessFlowRejected: "invalid-business-flow: orphan-node: x" })),
+    ).toContain("orphan-node: x");
   });
 });

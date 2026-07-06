@@ -38,6 +38,24 @@ export function specMapDir(projectRoot: string): string {
   return join(projectRoot, '.spec', 'map')
 }
 
+/**
+ * 커밋의 커미터 시각(ISO, UTC 정규화) — emit envelope 의 analyzedAt 결정론 소스.
+ * 같은 skeleton(=같은 커밋)이면 언제 emit 해도 같은 값(P5 에서 발견한 벽시계
+ * 비결정론 교정 — CLI 의 "재실행 byte-diff=0" 주장과 산출물을 일치시킨다).
+ */
+export function gitCommitDate(projectRoot: string, hash: string): string | null {
+  try {
+    const out = execFileSync('git', ['-C', projectRoot, 'show', '-s', '--format=%cI', hash], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+    const iso = out.trim()
+    return iso.length > 0 ? new Date(iso).toISOString() : null
+  } catch {
+    return null
+  }
+}
+
 /** 현재 git 커밋 해시(HEAD). git 저장소가 아니거나 실패하면 null. */
 export function gitCommitHash(projectRoot: string): string | null {
   try {

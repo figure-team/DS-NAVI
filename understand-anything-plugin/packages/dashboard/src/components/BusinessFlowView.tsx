@@ -105,8 +105,9 @@ function BizNode({ data }: NodeProps) {
           />
         </svg>
         <div
-          className="absolute inset-0 flex items-center justify-center text-center text-text-primary"
-          style={{ fontSize: 11.5, padding: "0 28px", lineHeight: 1.3 }}
+          className="absolute inset-0 flex items-center justify-center text-center text-text-primary overflow-hidden"
+          style={{ fontSize: 11.5, padding: "0 30px", lineHeight: 1.3, wordBreak: "keep-all" }}
+          title={biz.label}
         >
           {review && <span className="mr-1">⚠</span>}
           {biz.label}
@@ -129,7 +130,11 @@ function BizNode({ data }: NodeProps) {
       }}
     >
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
-      <span className="text-center" style={{ fontSize: 12, lineHeight: 1.35 }}>
+      <span
+        className="text-center overflow-hidden"
+        style={{ fontSize: 12, lineHeight: 1.35, maxHeight: 34, wordBreak: "keep-all" }}
+        title={biz.label}
+      >
         {review && <span className="mr-1" title="[확인 필요]">⚠</span>}
         {biz.label}
       </span>
@@ -158,9 +163,12 @@ const EDGE_TYPES = { elk: ElkEdge };
 export default function BusinessFlowView({
   domainId,
   biz,
+  rejectedReason,
 }: {
   domainId: string;
   biz: BizFlow;
+  /** emit 이 businessFlow 를 기각한 사유 — "미채움"과 구별해 배너 분기(리뷰 C2). */
+  rejectedReason?: string | null;
 }) {
   const { t } = useI18n();
   const [, setSearchParams] = useSearchParams();
@@ -261,12 +269,17 @@ export default function BusinessFlowView({
           style={{
             padding: "7px 20px",
             fontSize: 11.5,
-            background: "color-mix(in srgb, #f59e0b 8%, transparent)",
+            background: rejectedReason
+              ? "color-mix(in srgb, #ef4444 8%, transparent)"
+              : "color-mix(in srgb, #f59e0b 8%, transparent)",
           }}
           role="note"
+          title={rejectedReason ?? undefined}
         >
-          <span aria-hidden>ℹ</span>
-          {t.flowList.businessFallbackBanner}
+          <span aria-hidden>{rejectedReason ? "⚠" : "ℹ"}</span>
+          {rejectedReason
+            ? t.flowList.businessRejectedBanner.replace("{reason}", rejectedReason)
+            : t.flowList.businessFallbackBanner}
         </div>
       )}
       <div className="flex-1 min-h-0 relative">

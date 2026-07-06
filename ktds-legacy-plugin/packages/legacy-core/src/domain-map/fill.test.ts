@@ -140,7 +140,7 @@ describe('fill — 채움 계약', () => {
     fill.flows.push({ flowId: 'flow:GET /members', name: '침범', summary: { text: 'x침범', citations: [CITE] } })
     const { nodes, rejected } = applyFills(sk, [fill])
     expect(rejected).toEqual([
-      { domainId: 'domain:order', ref: 'flow:GET /members', reason: 'flow-outside-domain' },
+      { domainId: 'domain:order', ref: 'flow:GET /members', reason: 'flow-outside-domain', kind: 'flow' },
     ])
     expect(nodes.find((n) => n.id === 'flow:GET /members')!.name).toBe(SKELETON_BLANK)
   })
@@ -151,7 +151,7 @@ describe('fill — 채움 계약', () => {
     fill.flows = []
     fill.steps = []
     const { rejected } = applyFills(skeleton(), [fill])
-    expect(rejected).toEqual([{ domainId: 'domain:ghost', ref: 'domain:ghost', reason: 'unknown-domain' }])
+    expect(rejected).toEqual([{ domainId: 'domain:ghost', ref: 'domain:ghost', reason: 'unknown-domain', kind: 'domain' }])
   })
 
   it('unfilledNodes: 빈칸 잔여 노드 식별', () => {

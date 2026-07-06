@@ -189,10 +189,10 @@ export async function verifyFills(
         )
       }
     }
-    // P4: 업무 흐름도 노드 주장(activity/decision — 인용 보유 노드만) 검증.
+    // P4: 업무 흐름도 노드 주장 검증 — **인용을 가진 모든 노드**(kind 무관).
     // ref = `<domainId>#businessFlow[<nodeId>]` — embedVerification 이 이 키로
     // domainMeta.businessFlow 노드에 verdict/인용 상태를 덧입힌다. start/end 는
-    // 구조 마커(인용 면제)라 검증 항목을 만들지 않는다.
+    // 인용이 면제라 보통 항목이 없지만, 인용을 달면 그것도 검증된다(리뷰 C8 정정).
     if (fill.businessFlow && !rejectedBusinessFlows.has(fill.domainId)) {
       for (const n of fill.businessFlow.nodes) {
         if (!n.citations || n.citations.length === 0) continue

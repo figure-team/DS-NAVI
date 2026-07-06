@@ -350,12 +350,44 @@ export function autoFixGraph(data: Record<string, unknown>): {
   return { data: result, issues };
 }
 
+// ktds WORK_MAP P4 — 도메인 업무 흐름도(순서도). 스키마 게이트가 실제로 형태를
+// 검증하도록 명시 필드로 선언한다(passthrough 우회 아님 — 드리프트가 조용한 폴백
+// 대신 검증 배너로 표면화, 리뷰 C9). verdict/citations 는 emit 기계검증의 장식.
+const BusinessFlowMetaSchema = z.object({
+  nodes: z.array(
+    z.object({
+      id: z.string(),
+      kind: z.enum(["start", "end", "activity", "decision"]),
+      label: z.string(),
+      flowRef: z.string().optional(),
+      verdict: z.enum(["GROUNDED", "NEEDS_REVIEW"]).optional(),
+      citations: z.array(
+        z.object({
+          filePath: z.string(),
+          line: z.number(),
+          snippet: z.string(),
+          status: z.string().optional(),
+        }).passthrough(),
+      ).optional(),
+    }).passthrough(),
+  ),
+  edges: z.array(
+    z.object({
+      from: z.string(),
+      to: z.string(),
+      label: z.string().optional(),
+    }).passthrough(),
+  ),
+});
+
 const DomainMetaSchema = z.object({
   entities: z.array(z.string()).optional(),
   businessRules: z.array(z.string()).optional(),
   crossDomainInteractions: z.array(z.string()).optional(),
   entryPoint: z.string().optional(),
   entryType: z.enum(["http", "cli", "event", "cron", "manual"]).optional(),
+  businessFlow: BusinessFlowMetaSchema.optional(),
+  businessFlowRejected: z.string().optional(),
 }).passthrough();
 
 const KnowledgeMetaSchema = z.object({

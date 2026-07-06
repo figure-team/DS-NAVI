@@ -119,6 +119,8 @@ export interface RejectedItem {
   domainId: string
   ref: string
   reason: string
+  /** 기각 대상 종류 — 문자열 ref 접미 파싱 의존 제거(구조적 필터, 리뷰 C5). */
+  kind: 'domain' | 'flow' | 'step' | 'businessFlow'
 }
 
 /**
@@ -127,7 +129,10 @@ export interface RejectedItem {
  * 만 기각한다(도메인 fill 전체 기각 아님).
  *
  * 규칙: 중복 노드 id · 엣지 끝점 실존 · 고아 노드(어느 엣지에도 닿지 않음) ·
- * start/end 각 1개 이상 · flowRef 는 이 도메인의 실존 flow id(유령 참조 거부).
+ * start/end 각 1개 이상 · flowRef 는 이 도메인의 실존 flow id(유령 참조 거부) ·
+ * **decision 은 나가는 엣지 2개 이상 + 나가는 엣지 전부 분기 라벨 필수**(분기 없는
+ * 판단은 AC-4 "분기 포함 순서도"의 약속 위반 — 리뷰 C1/C7). 사이클(재시도 루프)은
+ * 의도적으로 허용한다.
  */
 export function validateBusinessFlow(
   bf: BusinessFlow,
@@ -140,11 +145,15 @@ export function validateBusinessFlow(
     ids.add(n.id)
   }
   const touched = new Set<string>()
+  const outgoing = new Map<string, BusinessFlowEdge[]>()
   for (const e of bf.edges) {
     if (!ids.has(e.from)) errors.push(`edge-from-unknown: ${e.from}`)
     if (!ids.has(e.to)) errors.push(`edge-to-unknown: ${e.to}`)
     touched.add(e.from)
     touched.add(e.to)
+    const list = outgoing.get(e.from) ?? []
+    list.push(e)
+    outgoing.set(e.from, list)
   }
   for (const n of bf.nodes) {
     if (!touched.has(n.id)) errors.push(`orphan-node: ${n.id}`)
@@ -156,6 +165,11 @@ export function validateBusinessFlow(
   for (const n of bf.nodes) {
     if (n.flowRef && !domainFlowIds.has(n.flowRef)) {
       errors.push(`flowRef-unknown: ${n.id} → ${n.flowRef}`)
+    }
+    if (n.kind === 'decision') {
+      const outs = outgoing.get(n.id) ?? []
+      if (outs.length < 2) errors.push(`decision-needs-branches: ${n.id} (outgoing ${outs.length})`)
+      if (outs.some((e) => !e.label)) errors.push(`decision-branch-unlabeled: ${n.id}`)
     }
   }
   return errors.sort(cmp)
@@ -230,7 +244,12 @@ export function applyFills(
   for (const fill of [...fills].sort((a, b) => cmp(a.domainId, b.domainId))) {
     const domainNode = byId.get(fill.domainId)
     if (!domainNode || domainNode.type !== 'domain') {
-      rejected.push({ domainId: fill.domainId, ref: fill.domainId, reason: 'unknown-domain' })
+      rejected.push({
+        domainId: fill.domainId,
+        ref: fill.domainId,
+        reason: 'unknown-domain',
+        kind: 'domain',
+      })
       continue
     }
     const key = fill.domainId.slice('domain:'.length)
@@ -259,11 +278,16 @@ export function applyFills(
       )
       const errors = validateBusinessFlow(fill.businessFlow, domainFlowIds)
       if (errors.length > 0) {
+        const reason = `invalid-business-flow: ${errors.join('; ')}`
         rejected.push({
           domainId: fill.domainId,
           ref: `${fill.domainId}#businessFlow`,
-          reason: `invalid-business-flow: ${errors.join('; ')}`,
+          reason,
+          kind: 'businessFlow',
         })
+        // 기각 사유를 그래프에도 표면화 — 대시보드가 "미채움"과 "작성했으나 기각"을
+        // 구별해 배너를 나눈다(정직성, 리뷰 C2). businessFlow 는 병합하지 않는다.
+        domainNode.domainMeta = { ...domainNode.domainMeta, businessFlowRejected: reason }
       } else {
         domainNode.domainMeta = {
           ...domainNode.domainMeta,
@@ -284,6 +308,7 @@ export function applyFills(
           domainId: fill.domainId,
           ref: f.flowId,
           reason: !node ? 'unknown-flow' : 'flow-outside-domain',
+          kind: 'flow',
         })
         continue
       }
@@ -301,6 +326,7 @@ export function applyFills(
           domainId: fill.domainId,
           ref: s.stepId,
           reason: !node ? 'unknown-step' : 'step-outside-domain',
+          kind: 'step',
         })
         continue
       }

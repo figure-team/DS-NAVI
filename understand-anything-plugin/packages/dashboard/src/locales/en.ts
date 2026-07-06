@@ -164,6 +164,10 @@ export const en = {
     noMatches: "No features match the filters.",
     clearFilters: "Clear filters",
     numberHint: "Number in the full list — may be non-contiguous while filtering",
+    businessFallbackBanner: "Business flow unfilled — this is a sequential approximation (no branches). The real flowchart appears once the domain fill (businessFlow) is provided.",
+    bfStart: "Start",
+    bfEnd: "End",
+    bfOpenFlow: "Open feature →",
     businessEmpty:
       "No business-flow data yet — the flowchart appears once the domain fill (businessFlow) is provided.",
   },

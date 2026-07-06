@@ -196,17 +196,43 @@ export function embedVerification(nodes: UaGraphNode[], report: VerifyReport): U
     if (node.type === 'domain') {
       const dr = domainResultById.get(node.id)
       if (!dr) return node
-      const claims = dr.items.filter((it) => it.kind !== 'flow' && it.kind !== 'step')
-      if (claims.length === 0) return node
+      // 카드 근거율은 도메인 레벨 주장만 — flow/step(화면2/3 소관)과 businessFlow
+      // (P4 순서도 노드별 배지 소관)는 제외해 카드 표시 항목과 지표를 일치시킨다.
+      const claims = dr.items.filter(
+        (it) => it.kind !== 'flow' && it.kind !== 'step' && it.kind !== 'businessFlow',
+      )
+      // P4: 순서도 노드에 검증 결과 덧입힘 — ref `<domainId>#businessFlow[<nodeId>]`.
+      // activity/decision 은 verdict + 검증된 인용(status 포함)으로 교체, start/end
+      // (인용 면제·검증 항목 없음)는 원본 유지. 대시보드는 이 verdict 로 [확인 필요]
+      // 배지를 그린다(설계 §4-1).
+      const bf = node.domainMeta?.businessFlow as
+        | { nodes: Array<Record<string, unknown>>; edges: unknown[] }
+        | undefined
+      const decoratedBf =
+        bf && Array.isArray(bf.nodes)
+          ? {
+              ...bf,
+              nodes: bf.nodes.map((n) => {
+                const it = itemByRef.get(`${node.id}#businessFlow[${String(n.id)}]`)
+                return it ? { ...n, verdict: it.verdict, citations: it.citations } : n
+              }),
+            }
+          : bf
+      if (claims.length === 0 && !decoratedBf) return node
       const grounded = claims.filter((c) => c.verdict === 'GROUNDED').length
       return {
         ...node,
         domainMeta: {
           ...node.domainMeta,
-          ktdsClaims: claims,
-          groundedPct: pct1(grounded, claims.length),
-          groundedCount: grounded,
-          reviewCount: claims.length - grounded,
+          ...(decoratedBf ? { businessFlow: decoratedBf } : {}),
+          ...(claims.length > 0
+            ? {
+                ktdsClaims: claims,
+                groundedPct: pct1(grounded, claims.length),
+                groundedCount: grounded,
+                reviewCount: claims.length - grounded,
+              }
+            : {}),
         },
       }
     }

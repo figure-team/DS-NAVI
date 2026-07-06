@@ -45,7 +45,13 @@ export async function runFillPipeline(
   }
   const { fills, pending, invalid } = await readFills(projectRoot, skeleton)
   const { nodes, rejected } = applyFills(skeleton, fills)
-  const report = await verifyFills(projectRoot, fills, skeleton.gitCommit)
+  // P4: 그래프 정합 실패로 기각된 businessFlow 는 검증·집계에서도 제외(그래프에 안 실림).
+  const rejectedBusinessFlows = new Set(
+    rejected
+      .filter((r) => r.ref.endsWith('#businessFlow'))
+      .map((r) => r.domainId),
+  )
+  const report = await verifyFills(projectRoot, fills, skeleton.gitCommit, rejectedBusinessFlows)
   const verifyReportPath = writeVerifyReport(projectRoot, report)
   const demoted = demoteUnverified(nodes, report)
   // 검증 결과(citation status + verdict + 도메인 근거율)를 노드 domainMeta.ktdsClaims 에

@@ -164,6 +164,10 @@ export const ko = {
     noMatches: "조건에 맞는 기능이 없습니다.",
     clearFilters: "필터 초기화",
     numberHint: "전체 목록 기준 번호 — 필터 중에는 비연속일 수 있습니다",
+    businessFallbackBanner: "업무 흐름 미채움 — 기능 순차 근사(분기 없음)입니다. 도메인 채움(businessFlow) 후 실제 순서도가 표시됩니다.",
+    bfStart: "시작",
+    bfEnd: "종료",
+    bfOpenFlow: "기능 열기 →",
     businessEmpty:
       "업무 흐름 데이터가 아직 없습니다 — 도메인 채움(businessFlow) 후 순서도가 제공됩니다.",
   },

@@ -164,6 +164,10 @@ export const zh = {
     noMatches: "没有符合筛选条件的功能。",
     clearFilters: "清除筛选",
     numberHint: "按完整列表编号 — 筛选时可能不连续",
+    businessFallbackBanner: "业务流程未填充 — 这是功能顺序近似（无分支）。域填充(businessFlow)后将显示实际流程图。",
+    bfStart: "开始",
+    bfEnd: "结束",
+    bfOpenFlow: "打开功能 →",
     businessEmpty: "暂无业务流程数据 — 域填充(businessFlow)后将显示流程图。",
   },
   flowView: {

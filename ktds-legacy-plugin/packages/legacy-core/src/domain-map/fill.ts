@@ -38,6 +38,45 @@ export const ClaimSchema = z.object({
 })
 export type Claim = z.infer<typeof ClaimSchema>
 
+/**
+ * P4(WORK_MAP §5): 업무 흐름도 노드 — work_flow.png 어휘(시작/종료/활동/판단).
+ * activity/decision 은 사실 주장이라 인용 min 1(기존 규약), start/end 는 구조
+ * 마커라 면제. flowRef 는 실존 flow id 검증(유령 참조 거부 — applyFills).
+ */
+export const BusinessFlowNodeSchema = z
+  .object({
+    id: z.string().min(1).max(64),
+    kind: z.enum(['start', 'end', 'activity', 'decision']),
+    /** 업무 언어 라벨(코드 심볼이 아니라 사람 말). */
+    label: z.string().min(1).max(120),
+    /** 선택 — 이 활동이 대응하는 기능(flow) id. 워크스페이스 코드 탭 딥링크 앵커. */
+    flowRef: z.string().regex(/^flow:/).optional(),
+    citations: z.array(CitationSchema).optional(),
+  })
+  .superRefine((n, ctx) => {
+    if ((n.kind === 'activity' || n.kind === 'decision') && (n.citations?.length ?? 0) < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${n.kind} 노드(${n.id})는 citations 최소 1개가 필요합니다`,
+      })
+    }
+  })
+export type BusinessFlowNode = z.infer<typeof BusinessFlowNodeSchema>
+
+export const BusinessFlowEdgeSchema = z.object({
+  from: z.string().min(1),
+  to: z.string().min(1),
+  /** 판단 분기 라벨(예: "YES"/"NO"/"재고 있음"). */
+  label: z.string().min(1).max(40).optional(),
+})
+export type BusinessFlowEdge = z.infer<typeof BusinessFlowEdgeSchema>
+
+export const BusinessFlowSchema = z.object({
+  nodes: z.array(BusinessFlowNodeSchema).min(2),
+  edges: z.array(BusinessFlowEdgeSchema).min(1),
+})
+export type BusinessFlow = z.infer<typeof BusinessFlowSchema>
+
 export const DomainFillSchema = z.object({
   schemaVersion: z.literal(1),
   domainId: z.string().regex(/^domain:/),
@@ -47,6 +86,12 @@ export const DomainFillSchema = z.object({
   entities: z.array(ClaimSchema),
   businessRules: z.array(ClaimSchema),
   crossDomainInteractions: z.array(ClaimSchema),
+  /**
+   * P4: 도메인 업무 프로세스 순서도(선택 — 없으면 대시보드 결정론 순차 폴백).
+   * 그래프 정합·flowRef 실존 검증은 applyFills(validateBusinessFlow)에서 하고,
+   * 실패 시 businessFlow 만 기각(도메인 fill 전체 기각 아님 — 부분 수용).
+   */
+  businessFlow: BusinessFlowSchema.optional(),
   flows: z.array(
     z.object({
       flowId: z.string().regex(/^flow:/),
@@ -74,6 +119,46 @@ export interface RejectedItem {
   domainId: string
   ref: string
   reason: string
+}
+
+/**
+ * P4: businessFlow 그래프 정합 검증(WORK_MAP §5) — 스키마 통과 후의 의미 검증.
+ * 반환 = 위반 사유 목록(빈 배열 = 정합). 하나라도 있으면 해당 도메인의 businessFlow
+ * 만 기각한다(도메인 fill 전체 기각 아님).
+ *
+ * 규칙: 중복 노드 id · 엣지 끝점 실존 · 고아 노드(어느 엣지에도 닿지 않음) ·
+ * start/end 각 1개 이상 · flowRef 는 이 도메인의 실존 flow id(유령 참조 거부).
+ */
+export function validateBusinessFlow(
+  bf: BusinessFlow,
+  domainFlowIds: ReadonlySet<string>,
+): string[] {
+  const errors: string[] = []
+  const ids = new Set<string>()
+  for (const n of bf.nodes) {
+    if (ids.has(n.id)) errors.push(`duplicate-node-id: ${n.id}`)
+    ids.add(n.id)
+  }
+  const touched = new Set<string>()
+  for (const e of bf.edges) {
+    if (!ids.has(e.from)) errors.push(`edge-from-unknown: ${e.from}`)
+    if (!ids.has(e.to)) errors.push(`edge-to-unknown: ${e.to}`)
+    touched.add(e.from)
+    touched.add(e.to)
+  }
+  for (const n of bf.nodes) {
+    if (!touched.has(n.id)) errors.push(`orphan-node: ${n.id}`)
+  }
+  const starts = bf.nodes.filter((n) => n.kind === 'start').length
+  const ends = bf.nodes.filter((n) => n.kind === 'end').length
+  if (starts < 1) errors.push('no-start-node')
+  if (ends < 1) errors.push('no-end-node')
+  for (const n of bf.nodes) {
+    if (n.flowRef && !domainFlowIds.has(n.flowRef)) {
+      errors.push(`flowRef-unknown: ${n.id} → ${n.flowRef}`)
+    }
+  }
+  return errors.sort(cmp)
 }
 
 /** `.spec/map/fill/` 디렉터리 경로. */
@@ -164,6 +249,32 @@ export function applyFills(
         ...fill.businessRules.map((c) => ({ kind: 'businessRule', ...c })),
         ...fill.crossDomainInteractions.map((c) => ({ kind: 'crossDomain', ...c })),
       ],
+    }
+
+    // P4: 업무 흐름도 — 그래프 정합·flowRef 실존 검증 통과 시에만 domainMeta 병합.
+    // 실패는 businessFlow 만 기각(부분 수용) — 사유를 rejected 로 표면화한다.
+    if (fill.businessFlow) {
+      const domainFlowIds = new Set(
+        nodes.filter((n) => n.type === 'flow' && domainKeyOf(n) === key).map((n) => n.id),
+      )
+      const errors = validateBusinessFlow(fill.businessFlow, domainFlowIds)
+      if (errors.length > 0) {
+        rejected.push({
+          domainId: fill.domainId,
+          ref: `${fill.domainId}#businessFlow`,
+          reason: `invalid-business-flow: ${errors.join('; ')}`,
+        })
+      } else {
+        domainNode.domainMeta = {
+          ...domainNode.domainMeta,
+          // 인용은 원본 그대로 동봉 — 검증 상태(verdict/status)는 S9 후
+          // embedVerification 이 노드 단위로 덧입힌다(단일 소스 = domain-graph.json).
+          businessFlow: {
+            nodes: fill.businessFlow.nodes.map((n) => ({ ...n })),
+            edges: fill.businessFlow.edges.map((e) => ({ ...e })),
+          },
+        }
+      }
     }
 
     for (const f of fill.flows) {

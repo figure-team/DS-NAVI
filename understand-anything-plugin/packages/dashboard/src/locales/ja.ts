@@ -164,6 +164,10 @@ export const ja = {
     noMatches: "条件に合う機能がありません。",
     clearFilters: "フィルターをクリア",
     numberHint: "全体リスト基準の番号 — フィルター中は不連続になることがあります",
+    businessFallbackBanner: "業務フロー未入力 — 機能の順次近似（分岐なし）です。ドメイン入力(businessFlow)後に実際のフローチャートが表示されます。",
+    bfStart: "開始",
+    bfEnd: "終了",
+    bfOpenFlow: "機能を開く →",
     businessEmpty:
       "業務フローのデータがまだありません — ドメインの入力(businessFlow)後にフローチャートが表示されます。",
   },

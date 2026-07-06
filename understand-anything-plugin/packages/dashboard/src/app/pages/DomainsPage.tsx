@@ -52,18 +52,16 @@ export default function DomainsPage() {
   // 복원 시도 전에는 삭제를 보류한다(하위호환 파손 0, WORK_MAP AC).
   useEffect(() => {
     if (!domainId) return;
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        if (selectedFlowId) next.set("flow", selectedFlowId);
-        else if (flowApplied.current) next.delete("flow");
-        // 게이트가 history.replaceState 로 지운 ?token= 을 라우터의 초기 location
-        // 스냅샷이 되살리는 것을 차단(토큰은 sessionStorage 가 진실).
-        next.delete("token");
-        return next;
-      },
-      { replace: true },
-    );
+    // 라이브 location 기준으로 쓴다 — react-router 함수형 updater 의 prev 는 렌더
+    // 시점 스냅샷이라, 직전 틱의 navigate(예: 순서도 드릴다운의 view=code)를 스테일
+    // 값으로 덮어쓴다(라이터 경합). history 반영은 동기이므로 window.location 이 진실.
+    const next = new URLSearchParams(window.location.search);
+    if (selectedFlowId) next.set("flow", selectedFlowId);
+    else if (flowApplied.current) next.delete("flow");
+    // 게이트가 history.replaceState 로 지운 ?token= 을 라우터의 초기 location
+    // 스냅샷이 되살리는 것을 차단(토큰은 sessionStorage 가 진실).
+    next.delete("token");
+    setSearchParams(next, { replace: true });
   }, [selectedFlowId, domainId, setSearchParams]);
 
   // P3: :domainId 딥링크는 store 동기화 전 한 프레임 동안 랜딩을 스치지 않는다 —

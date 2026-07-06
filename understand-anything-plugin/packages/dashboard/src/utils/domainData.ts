@@ -85,7 +85,7 @@ export interface DomainCard {
 const CLAIM_KINDS = new Set(["summary", "entity", "businessRule", "crossDomain"]);
 
 /** Parse a raw `citations` array (VerifiedCitation[] shape) into DomainClaimCitation[]. */
-function parseCitations(raw: unknown): DomainClaimCitation[] {
+export function parseCitations(raw: unknown): DomainClaimCitation[] {
   if (!Array.isArray(raw)) return [];
   return (raw as unknown[])
     .map((x): DomainClaimCitation | null => {

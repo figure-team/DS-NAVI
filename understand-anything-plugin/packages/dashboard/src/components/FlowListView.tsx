@@ -4,9 +4,11 @@ import { useDashboardStore } from "../store";
 import { useNavigate, useSearchParams } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import FlowSpineView from "./FlowSpineView";
+import BusinessFlowView from "./BusinessFlowView";
 import CitationChip from "./CitationChip";
 import VerdictBadge from "./VerdictBadge";
 import GroundedBar from "./GroundedBar";
+import { buildSequentialFallback, parseBusinessFlow } from "../utils/businessFlow";
 import {
   buildDomainFlows,
   domainColor,
@@ -162,14 +164,11 @@ export default function FlowListView() {
   const switchView = (next: "business" | "code") => {
     // 탭은 워크스페이스 내부 뷰 토글 — flow 선택 동기화와 동일하게 replace(히스토리
     // 오염 없음, 리뷰 C1). ?flow= 는 유지: business↔code 왕복 시 선택 보존(의도).
-    setSearchParams(
-      (prev) => {
-        const p = new URLSearchParams(prev);
-        p.set("view", next);
-        return p;
-      },
-      { replace: true },
-    );
+    // 라이브 location 기준(함수형 prev 는 렌더 스냅샷 — 라이터 경합 시 스테일).
+    const p = new URLSearchParams(window.location.search);
+    p.set("view", next);
+    p.delete("token");
+    setSearchParams(p, { replace: true });
   };
 
   // Inline-selection reset on domain switch is handled centrally in the store
@@ -334,7 +333,8 @@ export default function FlowListView() {
               <span aria-hidden style={{ fontSize: 15 }}>
                 {domainNode ? domainIcon(domainNode.name, domainNode.id) : ""}
               </span>
-              <h1 className="text-text-primary font-semibold truncate" style={{ fontSize: 18 }}>
+              {/* 도메인명은 짧다 — 요약이 truncate 를 전담하고 이름은 보존(shrink-0). */}
+              <h1 className="text-text-primary font-semibold shrink-0" style={{ fontSize: 18 }}>
                 {domainNode?.name ?? ""}
               </h1>
               {domainNode?.summary && (
@@ -403,18 +403,34 @@ export default function FlowListView() {
 
       {/* ── 탭 내용 ── */}
       {view === "business" ? (
-        /* P3: 탭 골격만 — 순서도 렌더(분기·폴백)는 P4. 데이터 없음을 정직 표기. */
+        /* P4: 순서도 — fill 채움이면 businessFlow, 미채움이면 결정론 순차 폴백(배너).
+           기능 0개 도메인은 그릴 것이 없어 데이터 없음 문구로 degrade. */
         <div
           id="workspace-panel-business"
           role="tabpanel"
           aria-labelledby="workspace-tab-business"
-          className="flex-1 min-h-0 flex items-center justify-center px-8 text-center"
+          className="flex-1 min-h-0"
         >
-          <div>
-            <p className="text-text-secondary" style={{ fontSize: 13 }}>
-              {t.flowList.businessEmpty}
-            </p>
-          </div>
+          {(() => {
+            const parsed = parseBusinessFlow(domainNode);
+            const biz =
+              parsed ??
+              (flows.length > 0
+                ? buildSequentialFallback(flows, {
+                    start: t.flowList.bfStart,
+                    end: t.flowList.bfEnd,
+                  })
+                : null);
+            return biz && activeDomainId ? (
+              <BusinessFlowView domainId={activeDomainId} biz={biz} />
+            ) : (
+              <div className="h-full flex items-center justify-center px-8 text-center">
+                <p className="text-text-secondary" style={{ fontSize: 13 }}>
+                  {t.flowList.businessEmpty}
+                </p>
+              </div>
+            );
+          })()}
         </div>
       ) : (
       <div

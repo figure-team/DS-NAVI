@@ -21,6 +21,14 @@ import GroundedBar from "./GroundedBar";
  * "연동 데이터 없음" degrade — 0건과 미스캔을 구분해 정직 표기(AC-3).
  */
 
+/** screens.json 화면 수 — 배열/{screens:[]} 둘 다 방어 파싱, 이탈은 null(섹션 숨김). */
+function parseScreenCount(raw: unknown): number | null {
+  if (Array.isArray(raw)) return raw.length;
+  const o = raw as { screens?: unknown } | null;
+  if (o && Array.isArray(o.screens)) return o.screens.length;
+  return null;
+}
+
 /** system-map.json 소비 형태(P2 산출물 계약) — 알 수 없는 형태는 null로 degrade. */
 interface SystemMapData {
   interfaces: { outboundCount: number; inboundCount: number; scanned: boolean; suspectCount: number };
@@ -69,6 +77,8 @@ export default function DomainMapView() {
   const [detailId, setDetailId] = useState<string | null>(null);
   // 타 시스템 연동(system-map.json). undefined = 로딩 전, null = 없음(degrade).
   const [systemMap, setSystemMap] = useState<SystemMapData | null | undefined>(undefined);
+  // 화면 수(screens.json, P6 프로토 '화면' 섹션). null = 산출물 없음(섹션 숨김).
+  const [screenCount, setScreenCount] = useState<number | null>(null);
 
   useEffect(() => {
     // P3 fix: 자식 이펙트가 RootData 의 setAccessToken 이펙트보다 먼저 실행되므로,
@@ -83,6 +93,14 @@ export default function DomainMapView() {
       })
       .catch(() => {
         if (!cancelled) setSystemMap(null);
+      });
+    fetch(dataUrl("screens.json", accessToken))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: unknown) => {
+        if (!cancelled) setScreenCount(parseScreenCount(data));
+      })
+      .catch(() => {
+        if (!cancelled) setScreenCount(null);
       });
     return () => {
       cancelled = true;
@@ -126,51 +144,61 @@ export default function DomainMapView() {
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
-      {/* 컴팩트 헤더 1줄 — 타이틀 좌측, 시스템 통계 우측 인라인(AC-1: 세로 공간 다이어트) */}
+      {/* 헤더 — pmpl-proto page-head(P6): eyebrow 브레드크럼 + 타이틀 + 인라인 통계 meta */}
       <header
-        className="shrink-0 flex items-end gap-6 border-b border-border-subtle bg-panel"
-        style={{ padding: "12px 24px 10px" }}
+        className="shrink-0 flex items-end gap-3.5 flex-wrap"
+        style={{ padding: "16px 24px 12px" }}
       >
         <div className="min-w-0">
           <p
-            className="uppercase text-accent"
-            style={{ fontSize: 10, letterSpacing: "0.12em", marginBottom: 2 }}
+            className="text-text-muted font-bold"
+            style={{ fontSize: 11.5, letterSpacing: "0.06em", marginBottom: 3 }}
           >
-            {t.domainMap.eyebrow} — {domainGraph.project.name}
+            {t.domainMap.breadcrumbRoot} · {domainGraph.project.name}
           </p>
-          <h1 className="font-heading text-text-primary truncate" style={{ fontSize: 20, lineHeight: 1.25 }}>
+          <h1 className="font-heading text-text-primary truncate font-bold" style={{ fontSize: 20, lineHeight: 1.25, letterSpacing: "-0.3px" }}>
             {t.domainMap.title}
           </h1>
         </div>
-        <div className="ml-auto flex items-end gap-6 shrink-0">
-          <StatItem value={String(stats.domainCount)} label={t.domainMap.statDomains} />
-          <StatItem value={String(stats.flowCount)} label={t.domainMap.statFlows} />
-          <StatItem value={String(stats.stepCount)} label={t.domainMap.statNodes} />
-          {(stats.language || stats.framework) && (
-            <StatItem value={stats.language || "—"} label={stats.framework || " "} />
+        <div className="text-text-muted" style={{ fontSize: 13, paddingBottom: 3 }}>
+          {t.domainMap.statDomains} <b className="text-text-primary tabular-nums">{stats.domainCount}</b>
+          {" · "}
+          {t.domainMap.statFlows} <b className="text-text-primary tabular-nums">{stats.flowCount}</b>
+          {" · "}
+          {t.domainMap.statNodes} <b className="text-text-primary tabular-nums">{stats.stepCount}</b>
+          {stats.language && (
+            <span className="text-text-muted"> · {stats.language}{stats.framework ? ` / ${stats.framework}` : ""}</span>
           )}
         </div>
       </header>
 
-      {/* 구성도 본문 — 시스템 박스(내부 스크롤) + 연결 화살표 + 타 시스템 연동 패널 */}
-      <div className="flex-1 min-h-0 flex items-stretch" style={{ padding: 16, gap: 10 }}>
+      {/* 구성도 본문 — 프로토 work-land 그리드: 시스템 박스(1fr) + 연동 패널(280px) */}
+      <div
+        className="flex-1 min-h-0 grid items-stretch"
+        style={{ padding: "0 24px 18px", gap: 14, gridTemplateColumns: "1fr 280px" }}
+      >
         {/* 시스템 박스 */}
-        <section className="flex-1 min-w-0 flex flex-col rounded-xl border border-border-subtle bg-panel overflow-hidden">
+        <section
+          className="min-w-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
+          style={{ boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)" }}
+        >
           <div
-            className="shrink-0 flex items-center gap-2 border-b border-border-subtle bg-elevated"
-            style={{ padding: "9px 16px" }}
+            className="shrink-0 flex items-center gap-2 border-b border-border-subtle"
+            style={{ padding: "12px 18px", fontWeight: 650, fontSize: 13.5 }}
           >
-            <span className="rounded-full shrink-0 bg-accent" style={{ width: 6, height: 6 }} />
-            <span className="font-heading text-text-primary" style={{ fontSize: 13 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="1.8" aria-hidden>
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+            </svg>
+            <span className="text-text-primary">
               {domainGraph.project.name} {t.domainMap.systemSuffix}
             </span>
           </div>
           <div
             className="flex-1 min-h-0 overflow-y-auto grid"
             style={{
-              padding: 14,
+              padding: "16px 18px",
               gap: 12,
-              gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
               alignContent: "start",
             }}
           >
@@ -179,90 +207,85 @@ export default function DomainMapView() {
               const shown = flows.slice(0, CHIP_LIMIT);
               const rest = flows.length - shown.length;
               return (
+                /* 프로토 .dom — 카드 전체 클릭 = 워크스페이스 진입, hover 시 accent 테두리 */
                 <div
                   key={card.id}
-                  className="domain-card group relative rounded-xl bg-elevated border border-border-subtle hover:border-border-medium overflow-hidden transition-all"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigate(`/domains/${card.id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      navigate(`/domains/${card.id}`);
+                    }
+                  }}
+                  className="domain-card rounded-[10px] bg-panel border border-border-subtle hover:border-accent cursor-pointer transition-colors"
                   style={{
+                    padding: "13px 14px",
                     animation: `fadeSlideIn 0.35s ease-out ${i * 0.05}s both`,
-                    ["--card-accent" as string]: card.color,
                   }}
                 >
-                  <span
-                    className="absolute top-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ height: 2, background: card.color }}
-                  />
-                  {/* 우측 상단 '상세보기' — 근거 상세 모달(기존 동선 유지) */}
-                  <button
-                    type="button"
-                    onClick={() => setDetailId(card.id)}
-                    aria-haspopup="dialog"
-                    className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 rounded-md border border-border-subtle bg-elevated/80 text-text-muted hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
-                    style={{ padding: "3px 8px", fontSize: 10.5 }}
-                    title={t.domainMap.detail}
-                  >
-                    {t.domainMap.detail}
-                    <span style={{ fontSize: 9, lineHeight: 1 }}>⤢</span>
-                  </button>
-                  {/* 본문 = 도메인 워크스페이스 진입 */}
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/domains/${card.id}`)}
-                    className="w-full text-left cursor-pointer"
-                    style={{ padding: "14px 16px 12px" }}
-                  >
-                    {/* paddingRight — 우상단 절대배치 '상세보기' 버튼과 긴 도메인명 겹침 방지 */}
-                    <div className="flex items-center gap-2.5 mb-2" style={{ paddingRight: 72 }}>
-                      <span
-                        className="flex items-center justify-center rounded-lg select-none shrink-0"
-                        style={{ width: 28, height: 28, background: `${card.color}22`, fontSize: 14, lineHeight: 1 }}
-                        aria-hidden="true"
-                      >
-                        {card.icon}
-                      </span>
-                      <span className="font-heading text-text-primary truncate" style={{ fontSize: 16 }} title={card.name}>
-                        {card.name}
-                      </span>
+                  {/* .h — 아이콘 + 이름, 우측 기능·노드 수 + 상세(근거) 아이콘 */}
+                  <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 4 }}>
+                    <span aria-hidden className="select-none shrink-0" style={{ fontSize: 14, lineHeight: 1 }}>
+                      {card.icon}
+                    </span>
+                    <span className="text-text-primary truncate" title={card.name}>
+                      {card.name}
+                    </span>
+                    <span
+                      className="ml-auto text-text-muted whitespace-nowrap shrink-0"
+                      style={{ fontSize: 11.5, fontWeight: 500 }}
+                    >
+                      {t.domainMap.flowCount.replace("{count}", String(card.flowCount))} ·{" "}
+                      {t.domainMap.nodeCount.replace("{count}", String(card.nodeCount))}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailId(card.id);
+                      }}
+                      aria-haspopup="dialog"
+                      aria-label={t.domainMap.detail}
+                      title={t.domainMap.detail}
+                      className="shrink-0 flex items-center justify-center rounded text-text-muted hover:text-accent transition-colors cursor-pointer"
+                      style={{ width: 18, height: 18, fontSize: 10, lineHeight: 1 }}
+                    >
+                      ⤢
+                    </button>
+                  </div>
+                  {/* .gr — 근거율 바(프로토: label + 녹색 바 + %) */}
+                  {card.filled && card.groundedPct !== null && (
+                    <div style={{ margin: "7px 0 9px" }}>
+                      <GroundedBar pct={card.groundedPct} grounded={card.groundedCount} review={card.reviewCount} />
                     </div>
-                    {card.filled && card.groundedPct !== null && (
-                      <div className="mb-2">
-                        <GroundedBar pct={card.groundedPct} grounded={card.groundedCount} review={card.reviewCount} />
-                      </div>
-                    )}
-                    <div className="flex gap-3 mb-2.5">
-                      <MetaItem
-                        color={card.color}
-                        label={t.domainMap.flowCount.replace("{count}", String(card.flowCount))}
-                      />
-                      <MetaItem
-                        color={`${card.color}55`}
-                        label={t.domainMap.nodeCount.replace("{count}", String(card.nodeCount))}
-                      />
-                    </div>
-                  </button>
-                  {/* 기능 칩 — 상위 N개 + "+N"(도메인 진입). 칩 클릭 = ?flow= 딥링크. */}
-                  <div className="flex flex-wrap gap-1.5" style={{ padding: "0 16px 14px" }}>
+                  )}
+                  {/* 기능 칩 — 프로토 .chip(pill). 클릭 = ?flow= 딥링크, +N = 도메인 진입. */}
+                  <div className="flex flex-wrap gap-1.5" style={{ marginTop: card.filled ? 0 : 8 }}>
                     {shown.map((f) => (
                       <button
                         key={f.id}
                         type="button"
-                        onClick={() => navigate(`/domains/${card.id}?flow=${encodeURIComponent(f.id)}`)}
-                        className="rounded-md border border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer truncate"
-                        style={{ padding: "3px 8px", fontSize: 11, maxWidth: "100%" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/domains/${card.id}?flow=${encodeURIComponent(f.id)}`);
+                        }}
+                        className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer truncate"
+                        style={{ padding: "3px 9px", fontSize: 12, maxWidth: "100%" }}
                         title={f.name}
                       >
                         {f.name}
                       </button>
                     ))}
                     {rest > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/domains/${card.id}`)}
-                        className="rounded-md border border-border-subtle text-text-muted hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
-                        style={{ padding: "3px 8px", fontSize: 11, fontFamily: "var(--font-mono)" }}
+                      <span
+                        className="rounded-full bg-elevated text-text-muted"
+                        style={{ padding: "3px 9px", fontSize: 12 }}
                         title={t.domainMap.viewFeatures}
                       >
                         {t.domainMap.moreFlows.replace("{count}", String(rest))}
-                      </button>
+                      </span>
                     )}
                   </div>
                 </div>
@@ -271,77 +294,89 @@ export default function DomainMapView() {
           </div>
         </section>
 
-        {/* 연결 화살표 — 시스템 ↔ 외부 연동 (구성도 어휘) */}
-        <div className="shrink-0 self-center text-text-muted select-none" aria-hidden="true" style={{ fontSize: 15 }}>
-          ⇄
-        </div>
-
-        {/* 타 시스템 연동 패널 */}
+        {/* 타 시스템 연동 패널 — 프로토 .ext: 섹션 구분선 + kv 행 + 상태 배지/링크 */}
         <aside
-          className="shrink-0 flex flex-col rounded-xl border border-border-subtle bg-panel overflow-hidden"
-          style={{ width: 230 }}
+          className="flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-y-auto"
+          style={{ boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)" }}
         >
-          <div
-            className="shrink-0 flex items-center gap-2 border-b border-border-subtle bg-elevated"
-            style={{ padding: "9px 14px" }}
-          >
-            <span className="font-heading text-text-primary" style={{ fontSize: 13 }}>
-              {t.domainMap.extTitle}
-            </span>
-          </div>
-          <div className="flex-1 min-h-0 overflow-y-auto" style={{ padding: 14 }}>
-            {systemMap === undefined ? null : systemMap === null ? (
-              <p className="text-text-muted" style={{ fontSize: 11.5, lineHeight: 1.55 }}>
-                {t.domainMap.extUnavailable}
-              </p>
-            ) : (
-              <div className="flex flex-col gap-4">
-                <ExtSection title={t.domainMap.extInterfaces}>
-                  {systemMap.interfaces.outboundCount === 0 && systemMap.interfaces.inboundCount === 0 ? (
-                    <ExtNone scanned={systemMap.interfaces.scanned} t={t} />
-                  ) : (
-                    <>
-                      <ExtRow label={t.domainMap.extOutbound} value={String(systemMap.interfaces.outboundCount)} />
-                      <ExtRow label={t.domainMap.extInbound} value={String(systemMap.interfaces.inboundCount)} />
-                    </>
-                  )}
-                  {/* 0건이어도 의심 신호가 있으면 "없음" 아닌 "탐지 못함" 가능성 표면화(정직성). */}
-                  {systemMap.interfaces.suspectCount > 0 && (
-                    <p style={{ fontSize: 10.5, lineHeight: 1.5, color: "var(--color-status-warn)" }}>
-                      {t.domainMap.extSuspect.replace("{count}", String(systemMap.interfaces.suspectCount))}
-                    </p>
-                  )}
-                </ExtSection>
-                <ExtSection title={t.domainMap.extDb}>
-                  {systemMap.db ? (
-                    <>
-                      <div className="text-text-primary" style={{ fontSize: 12 }}>
+          {systemMap === undefined ? null : systemMap === null ? (
+            <p className="text-text-muted" style={{ fontSize: 11.5, lineHeight: 1.55, padding: "13px 16px" }}>
+              {t.domainMap.extUnavailable}
+            </p>
+          ) : (
+            <>
+              <ExtSection title={`${t.domainMap.extTitle} — ${t.domainMap.extInterfaces}`} first>
+                <KvRow label={t.domainMap.extOutbound} value={systemMap.interfaces.outboundCount}
+                  badge={systemMap.interfaces.outboundCount === 0 ? (systemMap.interfaces.scanned ? "ok" : "mut") : undefined}
+                  badgeText={systemMap.interfaces.scanned ? t.domainMap.extScanBadge : t.domainMap.extUnscanned} t={t} />
+                <KvRow label={t.domainMap.extInbound} value={systemMap.interfaces.inboundCount}
+                  badge={systemMap.interfaces.inboundCount === 0 ? (systemMap.interfaces.scanned ? "ok" : "mut") : undefined}
+                  badgeText={systemMap.interfaces.scanned ? t.domainMap.extScanBadge : t.domainMap.extUnscanned} t={t} />
+                {/* 0건이어도 의심 신호가 있으면 "없음" 아닌 "탐지 못함" 가능성 표면화(정직성). */}
+                {systemMap.interfaces.suspectCount > 0 && (
+                  <p style={{ fontSize: 10.5, lineHeight: 1.5, color: "var(--color-status-warn)" }}>
+                    {t.domainMap.extSuspect.replace("{count}", String(systemMap.interfaces.suspectCount))}
+                  </p>
+                )}
+              </ExtSection>
+              <ExtSection title={t.domainMap.extDb}>
+                {systemMap.db ? (
+                  <>
+                    <div className="flex items-center" style={{ fontSize: 12.5, padding: "3px 0" }}>
+                      <span className="text-text-secondary">
                         {systemMap.db.vendor ?? "—"}
                         {systemMap.db.embedded && (
-                          <span className="text-text-muted" style={{ fontSize: 10.5 }}>
-                            {" "}
-                            ({t.domainMap.extEmbedded})
+                          <span className="text-text-muted" style={{ fontSize: 11 }}>
+                            {" "}({t.domainMap.extEmbedded})
                           </span>
                         )}
-                      </div>
-                      <div className="text-text-secondary" style={{ fontSize: 11 }}>
-                        {t.domainMap.extTables.replace("{count}", String(systemMap.db.tableCount))}
-                      </div>
-                    </>
-                  ) : (
-                    <ExtNone scanned t={t} />
-                  )}
+                      </span>
+                      <span className="ml-auto text-text-secondary">
+                        <b className="tabular-nums text-text-primary">{systemMap.db.tableCount}</b>{" "}
+                        {t.domainMap.extTablesUnit}
+                      </span>
+                    </div>
+                    <div className="flex items-center" style={{ fontSize: 12.5, padding: "3px 0" }}>
+                      <span className="text-text-muted">{t.domainMap.extCrud}</span>
+                      <button
+                        type="button"
+                        onClick={() => navigate("/deliverables")}
+                        className="ml-auto cursor-pointer hover:underline"
+                        style={{ fontSize: 12, color: "var(--color-status-info)" }}
+                      >
+                        {t.domainMap.extView}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <ExtNone scanned t={t} />
+                )}
+              </ExtSection>
+              <ExtSection title={t.domainMap.extBatch}>
+                <KvRow label={t.domainMap.extJobs} value={systemMap.batch.jobCount}
+                  badge={systemMap.batch.jobCount === 0 ? (systemMap.batch.scanned ? "ok" : "mut") : undefined}
+                  badgeText={systemMap.batch.scanned ? t.domainMap.extScanBadge : t.domainMap.extUnscanned} t={t} />
+              </ExtSection>
+              {screenCount !== null && (
+                <ExtSection title={t.domainMap.extScreens}>
+                  <div className="flex items-center" style={{ fontSize: 12.5, padding: "3px 0" }}>
+                    <span className="text-text-secondary">
+                      {t.domainMap.extScreenCount}{" "}
+                      <b className="tabular-nums text-text-primary">{screenCount}</b>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/screens")}
+                      className="ml-auto cursor-pointer hover:underline"
+                      style={{ fontSize: 12, color: "var(--color-status-info)" }}
+                    >
+                      {t.domainMap.extScreensLink}
+                    </button>
+                  </div>
                 </ExtSection>
-                <ExtSection title={t.domainMap.extBatch}>
-                  {systemMap.batch.jobCount === 0 ? (
-                    <ExtNone scanned={systemMap.batch.scanned} t={t} />
-                  ) : (
-                    <ExtRow label={t.domainMap.extBatch} value={String(systemMap.batch.jobCount)} />
-                  )}
-                </ExtSection>
-              </div>
-            )}
-          </div>
+              )}
+            </>
+          )}
         </aside>
       </div>
 
@@ -398,53 +433,63 @@ export default function DomainMapView() {
   );
 }
 
-function StatItem({ value, label }: { value: string; label: string }) {
+/** 프로토 .ext section — h4(12px 700) + 상단 구분선(첫 섹션 제외). */
+function ExtSection({ title, first, children }: { title: string; first?: boolean; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-end gap-0.5">
-      <span
-        className="text-accent font-semibold"
-        style={{ fontFamily: "var(--font-mono)", fontSize: 16, lineHeight: 1.1 }}
-      >
-        {value}
-      </span>
-      <span className="uppercase text-text-muted whitespace-nowrap" style={{ fontSize: 9, letterSpacing: "0.08em" }}>
-        {label}
-      </span>
-    </div>
+    <section
+      className={first ? "" : "border-t border-border-subtle"}
+      style={{ padding: "13px 16px" }}
+    >
+      <h4 className="text-text-secondary font-bold" style={{ fontSize: 12, marginBottom: 8 }}>
+        {title}
+      </h4>
+      <div className="flex flex-col">{children}</div>
+    </section>
   );
 }
 
-function MetaItem({ color, label }: { color: string; label: string }) {
+/** 프로토 .badge — ok(녹색)/mut(중립) 상태 배지. */
+function StatusBadge({ kind, text }: { kind: "ok" | "mut"; text: string }) {
   return (
-    <div className="flex items-center gap-1.5 text-text-muted" style={{ fontSize: 11 }}>
-      <span className="rounded-full shrink-0" style={{ width: 6, height: 6, background: color }} />
-      {label}
-    </div>
+    <span
+      className="font-bold whitespace-nowrap rounded"
+      style={{
+        fontSize: 11,
+        padding: "2px 7px",
+        color: kind === "ok" ? "var(--color-status-ok)" : "var(--color-text-muted)",
+        background:
+          kind === "ok"
+            ? "color-mix(in srgb, var(--color-status-ok) 11%, transparent)"
+            : "var(--color-elevated)",
+      }}
+    >
+      {text}
+    </span>
   );
 }
 
-function ExtSection({ title, children }: { title: string; children: React.ReactNode }) {
+/** 프로토 .kv — 라벨 + 굵은 수치, 우측 상태 배지(0건 정직 표기). */
+function KvRow({
+  label,
+  value,
+  badge,
+  badgeText,
+  t,
+}: {
+  label: string;
+  value: number;
+  badge?: "ok" | "mut";
+  badgeText: string;
+  t: ReturnType<typeof useI18n>["t"];
+}) {
   return (
-    <div>
-      <div
-        className="flex items-center gap-2 uppercase text-text-muted mb-1.5"
-        style={{ fontSize: 10, letterSpacing: "0.09em" }}
-      >
-        <span>{title}</span>
-        <span className="flex-1 h-px bg-border-subtle" />
-      </div>
-      <div className="flex flex-col gap-1">{children}</div>
-    </div>
-  );
-}
-
-function ExtRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between" style={{ fontSize: 11.5 }}>
-      <span className="text-text-secondary">{label}</span>
-      <span className="text-text-primary" style={{ fontFamily: "var(--font-mono)" }}>
-        {value}
-      </span>
+    <div className="flex items-center gap-2 text-text-secondary" style={{ fontSize: 12.5, padding: "3px 0" }}>
+      {label} <b className="tabular-nums text-text-primary">{t.domainMap.extCount.replace("{count}", String(value))}</b>
+      {badge && (
+        <span className="ml-auto">
+          <StatusBadge kind={badge} text={badgeText} />
+        </span>
+      )}
     </div>
   );
 }

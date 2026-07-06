@@ -15,7 +15,6 @@ import {
 } from "../utils/businessFlow";
 import {
   buildDomainFlows,
-  domainColor,
   domainIcon,
   filterFlows,
   findDomain,
@@ -76,16 +75,17 @@ const GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
 const WINDOW_INITIAL = 100;
 const WINDOW_STEP = 100;
 
-function MethodBadge({ method }: { method: FlowMethod }) {
+function MethodBadge({ method, size = "md" }: { method: FlowMethod; size?: "sm" | "md" }) {
   const s = METHOD_STYLE[method];
+  // sm = 프로토 .m(목록 행), md = 중앙 헤더용.
   return (
     <span
       className="font-bold text-center shrink-0 rounded"
       style={{
         fontFamily: "var(--font-mono)",
-        fontSize: 10,
-        padding: "2px 7px",
-        minWidth: 44,
+        fontSize: size === "sm" ? 9.5 : 10,
+        padding: size === "sm" ? "1px 5px" : "2px 7px",
+        minWidth: size === "sm" ? undefined : 44,
         background: s.bg,
         color: s.color,
       }}
@@ -95,7 +95,7 @@ function MethodBadge({ method }: { method: FlowMethod }) {
   );
 }
 
-/** 필터 칩 — 다중 토글. 활성 = accent 테두리/틴트(기존 flow-row 선택 언어 재사용). */
+/** 필터 칩 — 프로토 .chip(pill): 기본 회색 배경, 활성 = 브랜드 틴트 + accent 글자. */
 function FilterChip({
   label,
   active,
@@ -110,12 +110,17 @@ function FilterChip({
       type="button"
       onClick={onToggle}
       aria-pressed={active}
-      className={`shrink-0 rounded-full border cursor-pointer transition-colors ${
-        active
-          ? "border-accent text-accent bg-accent/10"
-          : "border-border-subtle text-text-muted hover:border-border-medium hover:text-text-secondary"
-      }`}
-      style={{ fontSize: 10, padding: "2px 9px", lineHeight: 1.6 }}
+      className="shrink-0 rounded-full cursor-pointer transition-colors"
+      style={{
+        fontSize: 12,
+        padding: "3px 9px",
+        lineHeight: 1.5,
+        fontWeight: active ? 600 : 400,
+        color: active ? "var(--color-accent)" : "var(--color-text-secondary)",
+        background: active
+          ? "color-mix(in srgb, var(--color-accent) 9%, transparent)"
+          : "var(--color-elevated)",
+      }}
     >
       {label}
     </button>
@@ -329,42 +334,38 @@ export default function FlowListView() {
     setVerdictSel(new Set());
   };
 
-  const accent = activeDomainId ? domainColor(activeDomainId) : "var(--color-accent)";
-
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
       {/* ── 워크스페이스 헤더(§4 화면 B): 브레드크럼 + 도메인명 + 요약 + GroundedBar + 탭 ── */}
-      <header className="shrink-0 border-b border-border-subtle bg-panel" style={{ padding: "10px 20px 0" }}>
-        <div className="flex items-start justify-between gap-6">
+      {/* 프로토 page-head(P6): eyebrow 브레드크럼 · h1 20px · meta 요약 · 우측 근거율 gbar */}
+      <header className="shrink-0 border-b border-border-subtle bg-panel" style={{ padding: "12px 20px 0" }}>
+        <div className="flex items-end gap-3.5 flex-wrap min-w-0">
           <div className="min-w-0">
-            <p className="uppercase text-text-muted truncate" style={{ fontSize: 11, letterSpacing: "0.1em" }}>
+            <p className="text-text-muted font-bold truncate" style={{ fontSize: 11.5, letterSpacing: "0.06em", marginBottom: 3 }}>
               <button
                 type="button"
                 onClick={() => navigate("/domains")}
-                className="uppercase text-text-muted hover:text-accent transition-colors cursor-pointer"
-                style={{ letterSpacing: "0.1em" }}
+                className="text-text-muted hover:text-accent transition-colors cursor-pointer font-bold"
+                style={{ letterSpacing: "0.06em" }}
               >
                 {t.domainMap.breadcrumbRoot}
               </button>{" "}
               › {domainNode?.name ?? ""}
             </p>
-            <div className="flex items-baseline gap-2.5 mt-0.5 min-w-0">
-              <span aria-hidden style={{ fontSize: 15 }}>
+            <h1 className="text-text-primary font-bold whitespace-nowrap" style={{ fontSize: 20, lineHeight: 1.25 }}>
+              <span aria-hidden style={{ marginRight: 8 }}>
                 {domainNode ? domainIcon(domainNode.name, domainNode.id) : ""}
               </span>
-              {/* 도메인명은 짧다 — 요약이 truncate 를 전담하고 이름은 보존(shrink-0). */}
-              <h1 className="text-text-primary font-semibold shrink-0" style={{ fontSize: 18 }}>
-                {domainNode?.name ?? ""}
-              </h1>
-              {domainNode?.summary && (
-                <span className="text-text-secondary truncate" style={{ fontSize: 12, minWidth: 0 }}>
-                  {domainNode.summary}
-                </span>
-              )}
-            </div>
+              {domainNode?.name ?? ""}
+            </h1>
           </div>
+          {domainNode?.summary && (
+            <span className="text-text-muted truncate" style={{ fontSize: 13, minWidth: 0, paddingBottom: 3, flex: 1 }}>
+              {domainNode.summary}
+            </span>
+          )}
           {domainGrounding?.filled && domainGrounding.groundedPct !== null && (
-            <div className="shrink-0 mt-1" style={{ width: 240 }}>
+            <div className="shrink-0 ml-auto" style={{ width: 170, paddingBottom: 4 }}>
               <GroundedBar
                 pct={domainGrounding.groundedPct}
                 grounded={domainGrounding.groundedCount}
@@ -388,8 +389,12 @@ export default function FlowListView() {
         >
           {(
             [
-              { key: "business" as const, label: t.flowList.tabBusiness },
-              { key: "code" as const, label: t.flowList.tabCode.replace("{count}", String(flows.length)) },
+              { key: "business" as const, label: t.flowList.tabBusiness, count: null },
+              {
+                key: "code" as const,
+                label: t.flowList.tabCode.replace("{count}", "").trim(),
+                count: flows.length,
+              },
             ]
           ).map((tab) => {
             const active = view === tab.key;
@@ -403,17 +408,24 @@ export default function FlowListView() {
                 aria-controls={`workspace-panel-${tab.key}`}
                 tabIndex={active ? 0 : -1}
                 onClick={() => switchView(tab.key)}
-                className={`cursor-pointer transition-colors border-b-2 ${
-                  active ? "text-text-primary" : "text-text-muted hover:text-text-secondary"
-                }`}
+                className="cursor-pointer transition-colors border-b-2"
                 style={{
-                  fontSize: 12.5,
-                  padding: "6px 12px 8px",
-                  borderBottomColor: active ? accent : "transparent",
-                  fontWeight: active ? 600 : 400,
+                  fontSize: 13.5,
+                  padding: "7px 10px 9px",
+                  color: active ? "var(--color-accent)" : "var(--color-text-secondary)",
+                  borderBottomColor: active ? "var(--color-accent)" : "transparent",
+                  fontWeight: active ? 650 : 550,
                 }}
               >
                 {tab.label}
+                {tab.count !== null && (
+                  <span
+                    className="tabular-nums"
+                    style={{ fontSize: 11, color: "var(--color-text-muted)", marginLeft: 4 }}
+                  >
+                    {tab.count}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -509,8 +521,8 @@ export default function FlowListView() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t.flowList.searchPlaceholder}
               aria-label={t.flowList.searchPlaceholder}
-              className="flex-1 min-w-0 rounded-md border border-border-subtle bg-elevated text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
-              style={{ fontSize: 12, padding: "6px 10px" }}
+              className="flex-1 min-w-0 border border-border-medium bg-panel text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+              style={{ fontSize: 12.5, padding: "6px 10px", borderRadius: 7 }}
             />
             <button
               type="button"
@@ -605,58 +617,48 @@ export default function FlowListView() {
                     const flow = item.flow;
                     const isSelected = flow.id === selectedFlowId;
                     return (
+                    /* 프로토 .fl-item — 컴팩트 1.5줄 행: [번호][메소드] 이름 / 경로(mono).
+                       스텝 수는 title 툴팁으로 이동(밀도 우선), 검토필요만 배지 표시. */
                     <button
                       key={flow.id}
                       type="button"
                       onClick={() => setSelectedFlow(flow.id)}
-                      className="flow-row flex flex-col gap-1.5 text-left rounded-lg border cursor-pointer transition-colors w-full"
+                      title={`${flow.name} — ${t.flowList.stepCount.replace("{count}", String(flow.stepCount))}`}
+                      className="flow-row flex flex-col gap-0.5 text-left rounded-[7px] cursor-pointer transition-colors w-full hover:bg-elevated"
                       style={{
-                        padding: "10px 12px",
+                        padding: "7px 8px",
+                        fontWeight: isSelected ? 600 : 400,
                         background: isSelected
-                          ? "color-mix(in srgb, var(--color-accent) 7%, transparent)"
-                          : "var(--color-elevated)",
-                        borderColor: isSelected
-                          ? "var(--color-accent)"
-                          : "var(--color-border-subtle)",
-                        boxShadow: isSelected
-                          ? "0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent) inset"
+                          ? "color-mix(in srgb, var(--color-accent) 8%, transparent)"
                           : undefined,
                       }}
                     >
-                      <div className="flex items-center gap-2">
-                        {/* 번호 — 접힘 레일 번호와 동일 매핑(번호로 기능 식별·선택).
-                            필터 중에도 전체 목록 기준이라 비연속일 수 있다(리뷰 C7 — 툴팁 명시). */}
+                      <span className="flex items-center gap-2 min-w-0">
+                        {/* 번호 — 접힘 레일 번호와 동일 매핑. 필터 중 비연속 가능(툴팁). */}
                         <span
                           title={t.flowList.numberHint}
-                          className="shrink-0 inline-flex items-center justify-center rounded border border-border-subtle text-text-muted"
-                          style={{ minWidth: 18, height: 18, fontSize: 10, fontFamily: "var(--font-mono)" }}
+                          className="shrink-0 text-text-muted tabular-nums text-right"
+                          style={{ minWidth: 16, fontSize: 10, fontFamily: "var(--font-mono)" }}
                         >
                           {flowNumber.get(flow.id)}
                         </span>
-                        <MethodBadge method={flow.method} />
-                        <span className="ml-auto flex items-center gap-1.5 shrink-0">
-                          {flow.grounding && <VerdictBadge verdict={flow.grounding.verdict} />}
-                          <span
-                            className="text-text-muted"
-                            style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}
-                          >
-                            {t.flowList.stepCount.replace("{count}", String(flow.stepCount))}
-                          </span>
+                        <MethodBadge method={flow.method} size="sm" />
+                        <span className="text-text-primary truncate" style={{ fontSize: 12.5 }}>
+                          {flow.name}
                         </span>
-                      </div>
-                      {/* Function label ("어떤 기능인지") first — human-readable name
-                          leads, technical entry signature follows below. */}
-                      <span className="text-text-primary" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
-                        {flow.name}
+                        {flow.grounding?.verdict === "NEEDS_REVIEW" && (
+                          <span className="ml-auto shrink-0">
+                            <VerdictBadge verdict="NEEDS_REVIEW" />
+                          </span>
+                        )}
                       </span>
-                      {/* Full endpoint / entry signature — wraps so every character stays visible. */}
                       <span
-                        className="text-text-secondary"
+                        className="text-text-muted truncate"
                         style={{
                           fontFamily: "var(--font-mono)",
-                          fontSize: 11,
-                          wordBreak: "break-all",
-                          lineHeight: 1.45,
+                          fontSize: 10.5,
+                          paddingLeft: 24,
+                          lineHeight: 1.4,
                         }}
                       >
                         {flow.path}

@@ -34,9 +34,9 @@ import type { BizFlow, BizFlowNode, BizNodeKind } from "../utils/businessFlow";
  */
 
 const SIZE: Record<BizNodeKind, { w: number; h: number }> = {
-  start: { w: 140, h: 40 },
-  end: { w: 140, h: 40 },
-  activity: { w: 210, h: 64 },
+  start: { w: 130, h: 36 },
+  end: { w: 130, h: 36 },
+  activity: { w: 220, h: 72 },
   decision: { w: 180, h: 96 },
 };
 
@@ -47,27 +47,34 @@ interface BizNodeData {
   [key: string]: unknown;
 }
 
+/** flowRef → 짧은 핸들러 표기(프로토 .fref "flow: viewCart") — ?쿼리 우선, 없으면 경로 꼬리. */
+function flowRefShort(flowRef: string): string {
+  const body = flowRef.replace(/^flow:/, "");
+  const q = body.split("?")[1];
+  if (q) return q;
+  const tail = body.trim().split(/[/\s]/).filter(Boolean).pop() ?? body;
+  return tail;
+}
+
 function BizNode({ data }: NodeProps) {
   const { biz, accent, selected } = data as BizNodeData;
   const { w, h } = SIZE[biz.kind];
   const review = biz.verdict === "NEEDS_REVIEW";
-  const borderColor = selected ? accent : review ? "#f59e0b" : "var(--color-border-medium)";
 
+  // 프로토(P6) 노드 어휘 — pill: border-medium/bg-surface, activity: 카드+그림자,
+  // decision: status-warn 윤곽. 선택 = accent, 검토필요 = warn 강조(정직성 유지).
   if (biz.kind === "start" || biz.kind === "end") {
     return (
       <div
-        className="flex items-center justify-center text-text-primary"
+        className="flex items-center justify-center text-text-secondary"
         style={{
           width: w,
           height: h,
           borderRadius: h / 2,
-          border: `1.5px solid ${borderColor}`,
-          background:
-            biz.kind === "start"
-              ? `color-mix(in srgb, ${accent} 12%, var(--color-elevated))`
-              : "var(--color-elevated)",
-          fontSize: 12,
-          fontWeight: 600,
+          border: `1.5px solid ${selected ? accent : "var(--color-border-medium)"}`,
+          background: "var(--color-surface)",
+          fontSize: 12.5,
+          fontWeight: 650,
         }}
       >
         <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
@@ -78,6 +85,7 @@ function BizNode({ data }: NodeProps) {
   }
 
   if (biz.kind === "decision") {
+    const stroke = selected ? accent : "var(--color-status-warn)";
     return (
       <div className="relative" style={{ width: w, height: h }}>
         <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
@@ -85,8 +93,7 @@ function BizNode({ data }: NodeProps) {
           className="absolute inset-0"
           style={{
             clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)",
-            background: `color-mix(in srgb, ${accent} 9%, var(--color-elevated))`,
-            border: "none",
+            background: "var(--color-panel)",
           }}
         />
         {/* clip-path 는 border 를 못 그린다 — SVG 외곽선으로 다이아몬드 윤곽 표시. */}
@@ -100,13 +107,20 @@ function BizNode({ data }: NodeProps) {
           <polygon
             points={`${w / 2},1 ${w - 1},${h / 2} ${w / 2},${h - 1} 1,${h / 2}`}
             fill="none"
-            stroke={borderColor}
-            strokeWidth={1.5}
+            stroke={stroke}
+            strokeWidth={selected ? 1.5 : 1}
           />
         </svg>
         <div
-          className="absolute inset-0 flex items-center justify-center text-center text-text-primary overflow-hidden"
-          style={{ fontSize: 11.5, padding: "0 30px", lineHeight: 1.3, wordBreak: "keep-all" }}
+          className="absolute inset-0 flex items-center justify-center text-center overflow-hidden"
+          style={{
+            fontSize: 12,
+            fontWeight: 650,
+            color: "var(--color-status-warn)",
+            padding: "0 30px",
+            lineHeight: 1.3,
+            wordBreak: "keep-all",
+          }}
           title={biz.label}
         >
           {review && <span className="mr-1">⚠</span>}
@@ -117,22 +131,26 @@ function BizNode({ data }: NodeProps) {
     );
   }
 
-  // activity — rounded rect(기존 카드 토큰).
+  // activity — 프로토 .fc-act: 카드 배경 + 그림자 + hover accent, fref 파란 칩.
   return (
     <div
-      className="flex flex-col items-center justify-center gap-1 rounded-xl text-text-primary"
+      className="flex flex-col items-center justify-center gap-1 text-text-primary"
       style={{
         width: w,
         height: h,
-        border: `1.5px solid ${borderColor}`,
-        background: "var(--color-elevated)",
+        borderRadius: 10,
+        border: `1px solid ${
+          selected ? accent : review ? "var(--color-status-warn)" : "var(--color-border-subtle)"
+        }`,
+        background: "var(--color-panel)",
+        boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
         padding: "6px 12px",
       }}
     >
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
       <span
         className="text-center overflow-hidden"
-        style={{ fontSize: 12, lineHeight: 1.35, maxHeight: 34, wordBreak: "keep-all" }}
+        style={{ fontSize: 13, fontWeight: 550, lineHeight: 1.35, maxHeight: 36, wordBreak: "keep-all" }}
         title={biz.label}
       >
         {review && <span className="mr-1" title="[확인 필요]">⚠</span>}
@@ -140,16 +158,16 @@ function BizNode({ data }: NodeProps) {
       </span>
       {biz.flowRef && (
         <span
-          className="rounded-full border"
+          className="rounded font-bold"
           style={{
-            fontSize: 9.5,
-            padding: "1px 8px",
-            color: accent,
-            borderColor: `color-mix(in srgb, ${accent} 45%, transparent)`,
-            background: `color-mix(in srgb, ${accent} 8%, transparent)`,
+            fontSize: 10,
+            padding: "1px 6px",
+            fontFamily: "var(--font-mono)",
+            color: "var(--color-status-info)",
+            background: "color-mix(in srgb, var(--color-status-info) 10%, transparent)",
           }}
         >
-          ƒ
+          flow: {flowRefShort(biz.flowRef)}
         </span>
       )}
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
@@ -239,7 +257,7 @@ export default function BusinessFlowView({
       target: e.to,
       type: "elk",
       label: e.label,
-      labelStyle: { fontSize: 10, fill: "var(--color-text-secondary)", fontWeight: 600 },
+      labelStyle: { fontSize: 10.5, fill: "var(--color-text-muted)", fontWeight: 700 },
       style: { stroke: "var(--color-border-medium)", strokeWidth: 1.5 },
       data: { points: layout.edgePoints.get(`be${i}`) },
     }));
@@ -305,43 +323,42 @@ export default function BusinessFlowView({
           </ReactFlowProvider>
         )}
       </div>
-      {/* 근거 바 — 선택 노드의 verdict + 인용 칩(기존 규약). */}
+      {/* 근거 바 — 프로토(P6): 중앙 정렬 "선택 노드 근거:" + 인용 칩 + 검증 배지. */}
       {selected && (
         <div
-          className="shrink-0 border-t border-border-subtle bg-panel flex items-center flex-wrap gap-1.5"
-          style={{ padding: "8px 20px" }}
+          className="shrink-0 border-t border-border-subtle bg-panel flex items-center justify-center flex-wrap gap-2"
+          style={{ padding: "10px 20px" }}
         >
+          <span className="text-text-muted" style={{ fontSize: 12 }}>
+            {t.flowList.bfEvidenceSelected}
+          </span>
           <span className="text-text-primary" style={{ fontSize: 12, fontWeight: 600 }}>
             {selected.label}
-          </span>
-          {selected.verdict && <VerdictBadge verdict={selected.verdict} />}
-          {selected.flowRef && (
-            <button
-              type="button"
-              onClick={() => openFlow(selected.flowRef!)}
-              className="rounded-full border cursor-pointer transition-colors hover:opacity-80"
-              style={{
-                fontSize: 10.5,
-                padding: "2px 10px",
-                color: accent,
-                borderColor: `color-mix(in srgb, ${accent} 45%, transparent)`,
-                background: `color-mix(in srgb, ${accent} 8%, transparent)`,
-              }}
-            >
-              {t.flowList.bfOpenFlow}
-            </button>
-          )}
-          <span className="uppercase text-text-muted ml-2" style={{ fontSize: 10, letterSpacing: "0.08em" }}>
-            {t.grounding.evidence}
           </span>
           {selected.citations.length > 0 ? (
             selected.citations.map((c, i) => (
               <CitationChip key={`${c.filePath}:${c.line}:${i}`} filePath={c.filePath} line={c.line} status={c.status} />
             ))
           ) : (
-            <span className="text-text-muted" style={{ fontSize: 10 }}>
+            <span className="text-text-muted" style={{ fontSize: 10.5 }}>
               {t.grounding.noCitations}
             </span>
+          )}
+          {selected.verdict && <VerdictBadge verdict={selected.verdict} />}
+          {selected.flowRef && (
+            <button
+              type="button"
+              onClick={() => openFlow(selected.flowRef!)}
+              className="rounded-full cursor-pointer transition-colors hover:opacity-80 font-semibold"
+              style={{
+                fontSize: 11,
+                padding: "2px 10px",
+                color: accent,
+                background: `color-mix(in srgb, ${accent} 9%, transparent)`,
+              }}
+            >
+              {t.flowList.bfOpenFlow}
+            </button>
           )}
         </div>
       )}

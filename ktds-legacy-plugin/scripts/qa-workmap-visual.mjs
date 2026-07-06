@@ -57,7 +57,10 @@ for (const vp of [{ w: 1920, h: 1080 }, { w: 1366, h: 768 }]) {
   // 없으면 degrade 문구. 어느 쪽이든 "침묵 빈 패널"은 실패.
   const dataState =
     (await page.getByText("테이블", { exact: false }).count()) > 0 &&
-    (await page.getByText("없음 — 스캔 완료").count()) >= 1;
+    // P6 프로토 배지("스캔 완료 · 없음") — 구 문구("없음 — 스캔 완료")도 허용(하위호환)
+    (await page.getByText("스캔 완료 · 없음").count()) +
+      (await page.getByText("없음 — 스캔 완료").count()) >=
+      1;
   const degradeState = (await page.getByText("연동 데이터 없음").count()) >= 1;
   check(
     `AC-3 연동 패널 @${vp.w}`,
@@ -85,8 +88,8 @@ for (const vp of [{ w: 1920, h: 1080 }, { w: 1366, h: 768 }]) {
     // 기존 딥링크 하위호환: /domains/:id?flow= 직접 진입
     await page.goto(`${BASE}/domains?token=${TOKEN}&onboard=skip`, { waitUntil: "networkidle" });
     await page.waitForTimeout(500);
-    // 도메인 박스 본문 클릭 → 워크스페이스
-    await page.locator(".domain-card > button.w-full").first().evaluate((el) => el.click());
+    // 도메인 박스 클릭 → 워크스페이스 (P6 프로토 정합: 카드 자체가 role=button)
+    await page.locator(".domain-card[role='button']").first().evaluate((el) => el.click());
     await page.waitForTimeout(800);
     check("도메인 박스 → 워크스페이스", /\/domains\/[^/?]+/.test(page.url()), page.url().slice(0, 110));
 

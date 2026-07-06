@@ -18,21 +18,29 @@ export default function GroundedBar({ pct, grounded, review }: GroundedBarProps)
   const { t } = useI18n();
   const clamped = Math.max(0, Math.min(100, pct));
   const low = clamped < 50;
+  // pmpl-proto(P6) 디자인: 라벨 + 5px 녹색(status-ok) 바 + %. ✓/⚠ 카운트는 시각
+  // 소음이라 툴팁으로 이동(정보 보존). 50% 미만은 검토 신호로 amber 유지(정직성).
   return (
-    <div className="flex items-center gap-2" title={`${t.grounding.rate} ${clamped}%`}>
-      <span className="text-[10px] uppercase tracking-wider text-text-muted shrink-0">
-        {t.grounding.rate}
-      </span>
-      <div className="flex-1 min-w-[48px] h-1.5 rounded-full bg-elevated overflow-hidden">
+    <div
+      className="flex items-center gap-2 text-text-muted"
+      style={{ fontSize: 11 }}
+      title={`${t.grounding.rate} ${clamped}% — ✓${grounded}${review > 0 ? ` · ⚠${review}` : ""}`}
+    >
+      <span className="shrink-0">{t.grounding.rate}</span>
+      <div
+        className="flex-1 rounded-full bg-elevated overflow-hidden"
+        style={{ minWidth: 48, height: 5 }}
+      >
         <div
-          className={`h-full rounded-full ${low ? "bg-amber-500" : "bg-accent"}`}
-          style={{ width: `${clamped}%` }}
+          className="h-full rounded-full"
+          style={{
+            width: `${clamped}%`,
+            background: low ? "var(--color-status-warn)" : "var(--color-status-ok)",
+          }}
         />
       </div>
-      <span className="text-xs font-medium text-text-secondary tabular-nums shrink-0">{clamped}%</span>
-      <span className="text-[11px] text-text-muted shrink-0 tabular-nums" aria-hidden>
-        <span className="text-accent">✓{grounded}</span>
-        {review > 0 && <span className="ml-1 text-amber-500">⚠{review}</span>}
+      <span className="text-text-secondary tabular-nums shrink-0" style={{ fontSize: 11 }}>
+        {clamped}%
       </span>
     </div>
   );

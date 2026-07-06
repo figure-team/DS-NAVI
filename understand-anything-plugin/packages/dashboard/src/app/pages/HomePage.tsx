@@ -29,6 +29,22 @@ interface MetaInfo {
   gitCommitHash: string | null;
 }
 
+/** 이번 주 실적 카드 — work-summary.json 요약(존재 필드만). */
+interface WorkSummaryLite {
+  fromIso: string;
+  toIso: string;
+  commits: number;
+  files: number;
+}
+
+/** 위험 모듈 카드 — risk-report.json 요약. */
+interface RiskLite {
+  high: number;
+  mid: number;
+  topName: string | null;
+  topScore: number | null;
+}
+
 interface FeedItem {
   at: string; // ISO
   dot: string; // CSS color
@@ -52,6 +68,9 @@ export default function HomePage() {
   const [rtm, setRtm] = useState<RtmSummary | null>(null);
   const [docs, setDocs] = useState<DocEntry[] | null>(null);
   const [meta, setMeta] = useState<MetaInfo | null>(null);
+  const [programTotal, setProgramTotal] = useState<number | null>(null);
+  const [work, setWork] = useState<WorkSummaryLite | null>(null);
+  const [risk, setRisk] = useState<RiskLite | null>(null);
 
   // 홈 전용 요약 데이터 — 없으면(404) 해당 카드/타일만 숨긴다.
   useEffect(() => {
@@ -85,6 +104,44 @@ export default function HomePage() {
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data && Array.isArray(data.docs)) setDocs(data.docs as DocEntry[]);
+      })
+      .catch(() => {});
+    // 신설 메뉴 요약(메뉴 개편 2차) — 프로그램 타일 + 이번 주 실적·위험 모듈 카드.
+    // 부재(404)면 해당 타일/카드만 숨긴다(정직한 degrade).
+    fetch(dataUrl("program-inventory.json", accessToken))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const total = data?.stats?.total;
+        if (typeof total === "number") setProgramTotal(total);
+      })
+      .catch(() => {});
+    fetch(dataUrl("work-summary.json", accessToken))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const t = data?.totals;
+        const range = data?.range;
+        if (
+          typeof t?.commits === "number" &&
+          typeof t?.files === "number" &&
+          typeof range?.fromIso === "string" &&
+          typeof range?.toIso === "string"
+        ) {
+          setWork({ fromIso: range.fromIso, toIso: range.toIso, commits: t.commits, files: t.files });
+        }
+      })
+      .catch(() => {});
+    fetch(dataUrl("risk-report.json", accessToken))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const items = data?.items;
+        if (!Array.isArray(items) || items.length === 0) return;
+        const top = items[0] as { name?: unknown; score?: unknown };
+        setRisk({
+          high: items.filter((it: { grade?: string }) => it.grade === "상").length,
+          mid: items.filter((it: { grade?: string }) => it.grade === "중").length,
+          topName: typeof top.name === "string" ? top.name : null,
+          topScore: typeof top.score === "number" ? top.score : null,
+        });
       })
       .catch(() => {});
   }, [accessToken]);
@@ -210,6 +267,15 @@ export default function HomePage() {
             >
               지식그래프 내보내기
             </a>
+            {/* 프로토 pg-home: 우측 액센트 = 이번 주 보고서 → /report (실적 데이터 있을 때만) */}
+            {work && (
+              <Link
+                to="/report"
+                className="shrink-0 rounded-lg border border-accent bg-panel px-3.5 py-[7px] text-[13px] font-semibold text-accent hover:bg-elevated transition-colors"
+              >
+                이번 주 보고서
+              </Link>
+            )}
           </div>
           {graph.project.description && (
             <div
@@ -221,8 +287,8 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* 스탯 타일 — 시안 5열 */}
-        <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
+        {/* 스탯 타일 — 프로토 pg-home 6열(파일/클래스/도메인/기능 흐름/요구사항/프로그램) */}
+        <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
           <StatTile label="파일" value={stats.files} />
           <StatTile label="클래스" value={stats.classes} />
           {domainGraph && <StatTile label="도메인" value={stats.domains} />}
@@ -234,6 +300,7 @@ export default function HomePage() {
               sub={`추적 기능 ${rtm.functions}`}
             />
           )}
+          {programTotal !== null && <StatTile label="프로그램" value={programTotal} sub="본" />}
         </section>
 
         {/* 여정 진입 카드 — 시안: 아이콘 + 제목 + → / 설명 / 푸터 */}
@@ -266,7 +333,7 @@ export default function HomePage() {
             to="/structure"
             icon={iconStructure}
             title="코드 구조"
-            description="레이어드 아키텍처 그래프. 파일·클래스 상세도와 영향도 오버레이를 지원합니다."
+            description="레이어드 아키텍처 그래프. 영향도·위험 오버레이를 지원합니다."
           >
             <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[12.5px] text-text-muted">
               {layerCounts.map((l) => (
@@ -308,10 +375,45 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* 2행 — 프로토 grid3 2단: 산출물 진행 + 위키. (이번 주 실적·위험 모듈 카드는
-            보고서/품질·위험 메뉴 신설과 함께 후속.) */}
-        {(docCounts || wikiGraph) && (
+        {/* 2행 — 프로토 grid3 2단: 이번 주 실적 + 위험 모듈 + 산출물 진행 (+위키). */}
+        {(work || risk || docCounts || wikiGraph) && (
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-3.5">
+            {work && (
+              <EntryCard
+                to="/report"
+                icon={iconReport}
+                title="이번 주 실적"
+                description={`${work.fromIso.slice(5, 10)} ~ ${work.toIso.slice(5, 10)} · git·원장 수집 사실만 집계합니다.`}
+              >
+                <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[12.5px] text-text-muted">
+                  <span>
+                    커밋 <b className="text-text-primary font-semibold">{work.commits}</b>
+                  </span>
+                  <span>
+                    파일 <b className="text-text-primary font-semibold">{work.files}</b>
+                  </span>
+                </div>
+              </EntryCard>
+            )}
+            {risk && (
+              <EntryCard
+                to="/quality"
+                icon={iconQuality}
+                title="위험 모듈"
+                description="복잡도·팬인·변경 빈도 합산 위험 점수 상위 모듈입니다."
+              >
+                <div className="flex flex-wrap gap-x-3.5 gap-y-1.5 text-[12.5px] text-text-muted items-center">
+                  <Badge tone="err">상 {risk.high}</Badge>
+                  <Badge tone="warn">중 {risk.mid}</Badge>
+                  {risk.topName && (
+                    <span>
+                      1위 <b className="text-text-primary font-semibold">{risk.topName}</b>
+                      {risk.topScore !== null && ` ${risk.topScore.toFixed(2)}`}
+                    </span>
+                  )}
+                </div>
+              </EntryCard>
+            )}
             {docCounts && (
               <EntryCard
                 to="/deliverables"
@@ -513,5 +615,16 @@ const iconWiki = (
   <svg {...svgProps}>
     <path d="M4 5a2.5 2.5 0 0 1 2.5-2.5H20V19H6.5A2.5 2.5 0 0 0 4 21.5z" />
     <path d="M4 19a2.5 2.5 0 0 1 2.5-2.5H20" />
+  </svg>
+);
+const iconReport = (
+  <svg {...svgProps}>
+    <path d="M5 21V10M12 21V4M19 21v-7" />
+  </svg>
+);
+const iconQuality = (
+  <svg {...svgProps}>
+    <path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z" />
+    <path d="M9 12l2 2 4-4.5" />
   </svg>
 );

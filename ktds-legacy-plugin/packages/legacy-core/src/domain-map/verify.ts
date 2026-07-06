@@ -42,7 +42,7 @@ export const VerifiedItemSchema = z.object({
    * (예: 'detail:role') — NodeDetailTemplate 섹션 id 를 접미로 단다.
    */
   kind: z.union([
-    z.enum(['summary', 'entity', 'businessRule', 'crossDomain', 'flow', 'step']),
+    z.enum(['summary', 'entity', 'businessRule', 'crossDomain', 'flow', 'step', 'businessFlow']),
     z.string().regex(/^detail:/),
   ]),
   /** 항목 식별자: domainId/flowId/stepId, "<domainId>#<kind>[i]", "<stepId>#detail:<sectionId>". */
@@ -160,11 +160,17 @@ async function verifyClaim(
   }
 }
 
-/** fill 전체를 실파일과 대조 — 결과 구조를 반환한다(쓰기는 writeVerifyReport). */
+/**
+ * fill 전체를 실파일과 대조 — 결과 구조를 반환한다(쓰기는 writeVerifyReport).
+ * `rejectedBusinessFlows` = applyFills 가 그래프 정합 실패로 기각한 도메인 id 집합 —
+ * 기각된 businessFlow 의 인용은 그래프에 실리지 않으므로 검증·집계에서도 제외한다
+ * (리포트 citation 수와 실림 상태의 정합).
+ */
 export async function verifyFills(
   projectRoot: string,
   fills: DomainFill[],
   gitCommit: string | null,
+  rejectedBusinessFlows: ReadonlySet<string> = new Set(),
 ): Promise<VerifyReport> {
   const cache = new Map<string, FileCache>()
   const domains: DomainVerifyResult[] = []
@@ -180,6 +186,24 @@ export async function verifyFills(
       for (let i = 0; i < claims.length; i++) {
         items.push(
           await verifyClaim(projectRoot, kind, `${fill.domainId}#${kind}[${i}]`, claims[i], cache),
+        )
+      }
+    }
+    // P4: 업무 흐름도 노드 주장 검증 — **인용을 가진 모든 노드**(kind 무관).
+    // ref = `<domainId>#businessFlow[<nodeId>]` — embedVerification 이 이 키로
+    // domainMeta.businessFlow 노드에 verdict/인용 상태를 덧입힌다. start/end 는
+    // 인용이 면제라 보통 항목이 없지만, 인용을 달면 그것도 검증된다(리뷰 C8 정정).
+    if (fill.businessFlow && !rejectedBusinessFlows.has(fill.domainId)) {
+      for (const n of fill.businessFlow.nodes) {
+        if (!n.citations || n.citations.length === 0) continue
+        items.push(
+          await verifyClaim(
+            projectRoot,
+            'businessFlow',
+            `${fill.domainId}#businessFlow[${n.id}]`,
+            { text: n.label, citations: n.citations },
+            cache,
+          ),
         )
       }
     }

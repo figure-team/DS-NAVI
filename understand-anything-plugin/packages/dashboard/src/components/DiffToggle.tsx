@@ -1,13 +1,15 @@
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
 
-// ktds: 오버레이 2채널 토글 — Diff(실측: git 변경, /understand-review·understand-diff)
-// + 영향도(예측: /understand-impact). 동시 표시 없음(store.toggleOverlay가 배타 전환).
+// ktds: 오버레이 3채널 토글 — Diff(실측: git 변경, /understand-review·understand-diff)
+// + 영향도(예측: /understand-impact) + 위험(정적 품질: risk-report 등급 상/중).
+// 동시 표시 없음(store.toggleOverlay가 배타 전환).
 export default function DiffToggle() {
   const diffMode = useDashboardStore((s) => s.diffMode);
   const overlaySource = useDashboardStore((s) => s.overlaySource);
   const diffData = useDashboardStore((s) => s.diffOverlayData);
   const impactData = useDashboardStore((s) => s.impactOverlayData);
+  const riskData = useDashboardStore((s) => s.riskOverlayData);
   const toggleOverlay = useDashboardStore((s) => s.toggleOverlay);
   const { t } = useI18n();
 
@@ -25,6 +27,17 @@ export default function DiffToggle() {
       data: impactData,
       legend: { changed: t.impactToggle.seed, affected: t.impactToggle.affected },
       titles: t.impactToggle,
+    },
+    {
+      source: "risk" as const,
+      label: "위험",
+      data: riskData,
+      legend: { changed: "등급 상", affected: "등급 중" },
+      titles: {
+        showOverlay: "위험 오버레이 표시 (r)",
+        hideOverlay: "위험 오버레이 숨김 (r)",
+        noData: "위험 데이터 없음 — risk-report 미생성",
+      },
     },
   ];
 

@@ -1,12 +1,17 @@
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { useDashboardStore } from "../../store";
-import GraphWorkbench from "./GraphWorkbench";
+import WikiReader from "../../components/WikiReader";
 
-/** 세분화 위키 문서 섹션 (ktds-fork ADR-004). */
+/** 세분화 위키 문서 섹션 (ktds-fork ADR-004) — pmpl-proto .docs 레이아웃(트리+본문 카드).
+ *  워크벤치(그래프+사이드바) 대신 문서 전용 페이지로 직접 렌더한다. */
 export default function WikiPage() {
   useWikiUrlSync();
-  return <GraphWorkbench mode="wiki" />;
+  return (
+    <div className="h-full w-full flex flex-col overflow-hidden">
+      <WikiReader />
+    </div>
+  );
 }
 
 /**

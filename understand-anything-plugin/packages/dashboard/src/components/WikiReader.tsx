@@ -1,45 +1,31 @@
-// ktds-fork (ADR-004): "문서"(wiki) 모드 전용 리더.
-// 그래프 대신 메인 영역에 표시한다 — 상단 메타(태그·카테고리·백링크·연결)만 남기고
-// 그 아래 노트 전체 본문(마크다운)을 렌더. 네비게이션은 Files 폴더 트리(사이드바).
+// ktds-fork (ADR-004): "문서"(wiki) 모드 전용 리더 — pmpl-proto .docs 레이아웃.
+// 좌측 트리 카드(카테고리/계층 fold + 문서 행) + 우측 mdoc 카드(제목 + dmeta + TOC + 본문 +
+// 연결/백링크 칩). 본문 링크는 비활성(이동은 연결/백링크 칩으로) — 임의 외부 URL 클릭 차단.
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 import { useDashboardStore } from "../store";
 import type { GraphNode } from "@understand-anything/core/types";
 import ClaimsContent from "./ClaimsContent";
+import { PageHead } from "./proto/Proto";
 
 const MD_COMPONENTS = {
-  h1: ({ children }: { children?: ReactNode }) => <h1 className="text-xl font-heading text-text-primary mt-4 mb-2">{children}</h1>,
-  h2: ({ children }: { children?: ReactNode }) => <h2 className="text-base font-semibold text-text-primary mt-4 mb-1.5 border-b border-border-subtle pb-1">{children}</h2>,
-  h3: ({ children }: { children?: ReactNode }) => <h3 className="text-sm font-semibold text-text-primary mt-3 mb-1">{children}</h3>,
-  p: ({ children }: { children?: ReactNode }) => <p className="mb-2 leading-relaxed">{children}</p>,
-  strong: ({ children }: { children?: ReactNode }) => <strong className="font-semibold text-text-primary">{children}</strong>,
-  // 본문 링크는 비활성(이동은 상단 연결/백링크로) — 임의 외부 URL 클릭 차단
+  // 본문 링크는 비활성(이동은 연결/백링크로)
   a: ({ children }: { children?: ReactNode }) => <span className="text-accent">{children}</span>,
-  blockquote: ({ children }: { children?: ReactNode }) => <blockquote className="border-l-2 border-accent/40 pl-3 my-2 text-text-muted italic">{children}</blockquote>,
-  code: ({ className, children }: { className?: string; children?: ReactNode }) => {
-    const isBlock = className?.includes("language-");
-    return isBlock ? (
-      <code className="block bg-elevated rounded px-3 py-2 my-2 overflow-x-auto text-[12px] leading-relaxed">{children}</code>
-    ) : (
-      <code className="bg-elevated rounded px-1.5 py-0.5 text-[12px]">{children}</code>
-    );
-  },
-  ul: ({ children }: { children?: ReactNode }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-  ol: ({ children }: { children?: ReactNode }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-  li: ({ children }: { children?: ReactNode }) => <li className="leading-relaxed">{children}</li>,
 };
 
 function LinkChips({ title, nodes, onClick }: { title: string; nodes: GraphNode[]; onClick: (id: string) => void }) {
   if (nodes.length === 0) return null;
   return (
-    <div className="flex items-start gap-2">
-      <span className="text-[10px] uppercase tracking-wider text-text-muted shrink-0 pt-1">{title}</span>
+    <div className="flex items-start gap-2.5" style={{ marginTop: 8 }}>
+      <span className="text-text-muted shrink-0 font-bold" style={{ fontSize: 11, paddingTop: 4 }}>{title}</span>
       <div className="flex flex-wrap gap-1.5">
         {nodes.map((n) => (
           <button
             key={n.id}
             type="button"
             onClick={() => onClick(n.id)}
-            className="px-2 py-0.5 rounded bg-elevated text-[11px] text-text-secondary hover:text-accent hover:bg-accent/10 transition-colors"
+            className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer"
+            style={{ padding: "3px 9px", fontSize: 12, fontWeight: 500 }}
           >
             {n.name}
           </button>
@@ -53,113 +39,182 @@ export default function WikiReader() {
   const wikiGraph = useDashboardStore((s) => s.wikiGraph);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const navigateToNode = useDashboardStore((s) => s.navigateToNode);
-  const selectNode = useDashboardStore((s) => s.selectNode);
 
   const graph = wikiGraph;
   const node = graph?.nodes.find((n) => n.id === selectedNodeId) ?? null;
 
+  // 트리 그룹 — 카테고리(categorized_under)가 있으면 카테고리, 없으면 계층(layers) 기준.
+  const groups = useMemo(() => {
+    if (!graph) return [];
+    const articles = graph.nodes.filter((n) => n.type === "article");
+    const catOf = new Map<string, string>();
+    for (const e of graph.edges) {
+      if (e.type !== "categorized_under") continue;
+      const cat = graph.nodes.find((n) => n.id === e.target);
+      if (cat) catOf.set(e.source, cat.name);
+    }
+    if (catOf.size > 0) {
+      const byCat = new Map<string, GraphNode[]>();
+      for (const a of articles) {
+        const key = catOf.get(a.id) ?? "기타";
+        byCat.set(key, [...(byCat.get(key) ?? []), a]);
+      }
+      return [...byCat.entries()].map(([label, items]) => ({ label, items }));
+    }
+    return graph.layers
+      .map((layer) => ({
+        label: layer.name,
+        items: layer.nodeIds
+          .map((id) => graph.nodes.find((n) => n.id === id))
+          .filter((n): n is GraphNode => !!n && n.type === "article"),
+      }))
+      .filter((g) => g.items.length > 0);
+  }, [graph]);
+
+  const articleCount = useMemo(
+    () => (graph ? graph.nodes.filter((n) => n.type === "article").length : 0),
+    [graph],
+  );
+
+  // 목차(TOC) — 본문 마크다운 h2/h3 헤딩에서 추출(프로토 .toc).
+  const content = node?.knowledgeMeta?.content ?? "";
+  const toc = useMemo(
+    () =>
+      content
+        .split("\n")
+        .filter((l) => /^#{2,3}\s/.test(l))
+        .map((l) => ({
+          depth: (l.match(/^#+/) as RegExpMatchArray)[0].length,
+          text: l.replace(/^#+\s*/, "").trim(),
+        }))
+        .slice(0, 12),
+    [content],
+  );
+
   if (!graph) return null;
 
-  // 목차(인덱스): 계층(layers)별 article 노트 링크 — 선택 전 랜딩 + "목차" 버튼으로 복귀.
-  if (!node) {
-    return (
-      <div className="h-full overflow-auto">
-        <div className="max-w-3xl mx-auto px-6 py-6">
-          <h1 className="font-heading text-2xl text-text-primary mb-1">문서</h1>
-          <p className="text-[12px] text-text-muted mb-5">세분화 위키 — 계층에서 문서를 선택하거나, 문서 안의 연결/백링크로 이동하세요.</p>
-          {graph.layers.map((layer) => {
-            const articles = layer.nodeIds
-              .map((id) => graph.nodes.find((n) => n.id === id))
-              .filter((n): n is GraphNode => !!n && n.type === "article");
-            if (articles.length === 0) return null;
-            return (
-              <div key={layer.id} className="mb-5">
-                <h2 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-2 border-b border-border-subtle pb-1">
-                  {layer.name} <span className="text-text-muted/60">({articles.length})</span>
-                </h2>
-                <div className="flex flex-wrap gap-1.5">
-                  {articles.map((a) => (
-                    <button
-                      key={a.id}
-                      type="button"
-                      onClick={() => navigateToNode(a.id)}
-                      className="px-2.5 py-1 rounded bg-elevated text-[12px] text-text-secondary hover:text-accent hover:bg-accent/10 transition-colors"
-                    >
-                      {a.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
   // 연결(나가는 위키링크) / 백링크(들어오는) / 카테고리(categorized_under)
-  const connections = graph.edges
-    .filter((e) => e.type === "related" && e.source === node.id)
-    .map((e) => graph.nodes.find((n) => n.id === e.target))
-    .filter((n): n is GraphNode => n !== undefined);
-  const backlinks = graph.edges
-    .filter((e) => e.type === "related" && e.target === node.id)
-    .map((e) => graph.nodes.find((n) => n.id === e.source))
-    .filter((n): n is GraphNode => n !== undefined);
-  const categoryEdge = graph.edges.find((e) => e.type === "categorized_under" && e.source === node.id);
+  const connections = node
+    ? graph.edges
+        .filter((e) => e.type === "related" && e.source === node.id)
+        .map((e) => graph.nodes.find((n) => n.id === e.target))
+        .filter((n): n is GraphNode => n !== undefined)
+    : [];
+  const backlinks = node
+    ? graph.edges
+        .filter((e) => e.type === "related" && e.target === node.id)
+        .map((e) => graph.nodes.find((n) => n.id === e.source))
+        .filter((n): n is GraphNode => n !== undefined)
+    : [];
+  const categoryEdge = node ? graph.edges.find((e) => e.type === "categorized_under" && e.source === node.id) : null;
   const categoryNode = categoryEdge ? graph.nodes.find((n) => n.id === categoryEdge.target) ?? null : null;
-  const content = node.knowledgeMeta?.content ?? "";
 
   return (
-    <div className="h-full overflow-auto">
-      <div className="max-w-3xl mx-auto px-6 py-5">
-        {/* 목차로 복귀 */}
-        <button
-          type="button"
-          onClick={() => selectNode(null)}
-          className="text-[11px] text-text-muted hover:text-accent transition-colors mb-2"
-        >
-          ← 목차
-        </button>
-        {/* 제목 */}
-        <h1 className="font-heading text-2xl text-text-primary mb-3">{node.name}</h1>
+    <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
+      <PageHead
+        title="문서"
+        meta={
+          <>
+            프로젝트 위키 · <b className="text-text-primary tabular-nums">{articleCount}</b>편
+          </>
+        }
+      />
 
-        {/* 메타 스트립: 카테고리 · 태그 · 연결 · 백링크 (그 외 정보는 제외) */}
-        <div className="space-y-2 pb-4 mb-4 border-b border-border-subtle">
-          {categoryNode && (
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-wider text-text-muted shrink-0">카테고리</span>
-              <button
-                type="button"
-                onClick={() => navigateToNode(categoryNode.id)}
-                className="px-2 py-0.5 rounded bg-elevated text-[11px] text-accent hover:text-accent-bright transition-colors"
-              >
-                {categoryNode.name}
-              </button>
+      {/* 프로토 .docs — 좌 270px 트리 카드 + 우 mdoc 카드 */}
+      <div className="grid items-start grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)]" style={{ gap: 14 }}>
+        <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow proto-tree">
+          {groups.map((g) => (
+            <div key={g.label}>
+              <div className="fold">{g.label}</div>
+              {g.items.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => navigateToNode(a.id)}
+                  className={`doc ${a.id === selectedNodeId ? "on" : ""}`}
+                  title={a.name}
+                >
+                  <span className="truncate" style={{ minWidth: 0 }}>{a.name}</span>
+                </button>
+              ))}
             </div>
-          )}
-          {node.tags.length > 0 && (
-            <div className="flex items-start gap-2">
-              <span className="text-[10px] uppercase tracking-wider text-text-muted shrink-0 pt-1">태그</span>
-              <div className="flex flex-wrap gap-1.5">
-                {node.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-0.5 rounded bg-elevated text-[11px] text-text-secondary">#{tag}</span>
-                ))}
-              </div>
-            </div>
-          )}
-          <LinkChips title="연결" nodes={connections} onClick={navigateToNode} />
-          <LinkChips title="백링크" nodes={backlinks} onClick={navigateToNode} />
+          ))}
         </div>
 
-        {/* 전체 본문 */}
-        {content ? (
-          <div className="text-sm text-text-secondary tour-markdown">
-            <ClaimsContent content={content} mdComponents={MD_COMPONENTS} />
-          </div>
-        ) : (
-          <p className="text-sm text-text-muted">_(본문 없음)_</p>
-        )}
+        {/* .mdoc — 문서 본문 카드 */}
+        <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "20px 24px" }}>
+          {node ? (
+            <>
+              <div className="flex items-center gap-2.5 flex-wrap" style={{ marginBottom: 4 }}>
+                <h2 className="text-text-primary" style={{ fontSize: 17, fontWeight: 700 }}>{node.name}</h2>
+              </div>
+              {/* .dmeta — 카테고리 · 연결/백링크 수 · 태그 */}
+              <div className="text-text-muted flex items-center gap-1.5 flex-wrap" style={{ fontSize: 12, marginBottom: 14 }}>
+                {categoryNode && (
+                  <button
+                    type="button"
+                    onClick={() => navigateToNode(categoryNode.id)}
+                    className="text-text-secondary hover:text-accent transition-colors cursor-pointer"
+                  >
+                    {categoryNode.name}
+                  </button>
+                )}
+                {categoryNode && <span>·</span>}
+                <span>연결 {connections.length}</span>
+                <span>·</span>
+                <span>백링크 {backlinks.length}</span>
+                {node.tags.length > 0 && (
+                  <>
+                    <span>·</span>
+                    {node.tags.map((tag) => (
+                      <span key={tag}>#{tag}</span>
+                    ))}
+                  </>
+                )}
+              </div>
+
+              {/* .toc — 본문 헤딩 목차 */}
+              {toc.length > 1 && (
+                <div
+                  className="text-text-muted"
+                  style={{
+                    fontSize: 12.5,
+                    borderLeft: "2px solid var(--color-border-subtle)",
+                    paddingLeft: 12,
+                    margin: "12px 0",
+                  }}
+                >
+                  {toc.map((h, i) => (
+                    <div key={i} style={{ padding: "2px 0", paddingLeft: h.depth === 3 ? 12 : 0 }}>
+                      {h.text}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 본문 — proto-md + claims 카드 렌더 */}
+              {content ? (
+                <div className="proto-md">
+                  <ClaimsContent content={content} mdComponents={MD_COMPONENTS} />
+                </div>
+              ) : (
+                <p className="text-text-muted" style={{ fontSize: 13 }}>(본문 없음)</p>
+              )}
+
+              {/* 프로토 "연결" 섹션 — 하단 칩 */}
+              {(connections.length > 0 || backlinks.length > 0) && (
+                <div style={{ marginTop: 18, borderTop: "1px solid var(--color-border-subtle)", paddingTop: 12 }}>
+                  <LinkChips title="연결" nodes={connections} onClick={navigateToNode} />
+                  <LinkChips title="백링크" nodes={backlinks} onClick={navigateToNode} />
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-text-muted" style={{ fontSize: 13, padding: 20, textAlign: "center" }}>
+              좌측에서 문서를 선택하세요.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

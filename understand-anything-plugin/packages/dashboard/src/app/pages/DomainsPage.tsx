@@ -18,12 +18,18 @@ export default function DomainsPage() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
 
+  // ?flow= 복원 1회 게이트 — 아래 세 이펙트가 공유(선언은 사용보다 앞서 둔다).
+  const flowApplied = useRef(false);
+
   // URL(:domainId) → store — 기존 액션을 재사용해 리셋 의미론(흐름/선택 정리) 보존.
   // 딥링크 시 늦게 도착한 setGraph가 activeDomainId를 비울 수 있으므로 그래프 로드에도
   // 반응해 URL을 재적용한다(가드로 멱등).
   useEffect(() => {
     const s = useDashboardStore.getState();
     if (domainId && s.activeDomainId !== domainId) {
+      // 도메인이 바뀌면 ?flow= 복원 1회 게이트를 재무장한다 — /domains/:id 는 단일
+      // 라우트라 A→B 직행(교차 도메인 링크·뒤로가기)에서 remount 가 없다(리뷰 R2).
+      flowApplied.current = false;
       s.navigateToDomain(domainId);
     } else if (!domainId && s.activeDomainId) {
       s.clearActiveDomain();
@@ -31,7 +37,6 @@ export default function DomainsPage() {
   }, [domainId, graph, domainGraph]);
 
   // URL(?flow=) → store — 인라인 스파인 선택 복원. 그래프가 준비된 뒤 1회 적용.
-  const flowApplied = useRef(false);
   useEffect(() => {
     if (flowApplied.current || !domainGraph || !domainId) return;
     flowApplied.current = true;
@@ -42,22 +47,28 @@ export default function DomainsPage() {
   }, [domainGraph, domainId, searchParams]);
 
   // store(selectedFlowId) → URL(?flow=) — 공유 가능한 딥링크(replace, 히스토리 오염 없음).
+  // P3 fix: 첫 로드(그래프 도착 전)에는 selectedFlowId 가 아직 null 이므로, 복원
+  // 효과(flowApplied)가 실행되기 전에 ?flow= 를 지우면 딥링크 복원이 무산된다 —
+  // 복원 시도 전에는 삭제를 보류한다(하위호환 파손 0, WORK_MAP AC).
   useEffect(() => {
     if (!domainId) return;
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        if (selectedFlowId) next.set("flow", selectedFlowId);
-        else next.delete("flow");
-        return next;
-      },
-      { replace: true },
-    );
+    // 라이브 location 기준으로 쓴다 — react-router 함수형 updater 의 prev 는 렌더
+    // 시점 스냅샷이라, 직전 틱의 navigate(예: 순서도 드릴다운의 view=code)를 스테일
+    // 값으로 덮어쓴다(라이터 경합). history 반영은 동기이므로 window.location 이 진실.
+    const next = new URLSearchParams(window.location.search);
+    if (selectedFlowId) next.set("flow", selectedFlowId);
+    else if (flowApplied.current) next.delete("flow");
+    // 게이트가 history.replaceState 로 지운 ?token= 을 라우터의 초기 location
+    // 스냅샷이 되살리는 것을 차단(토큰은 sessionStorage 가 진실).
+    next.delete("token");
+    setSearchParams(next, { replace: true });
   }, [selectedFlowId, domainId, setSearchParams]);
 
+  // P3: :domainId 딥링크는 store 동기화 전 한 프레임 동안 랜딩을 스치지 않는다 —
+  // DomainMapView 의 system-map fetch 가 토큰 해석 전에 발사되는 transient 403 방지.
   return (
     <div className="h-full w-full relative bg-root text-text-primary">
-      {activeDomainId ? <FlowListView /> : <DomainMapView />}
+      {domainId ? (activeDomainId ? <FlowListView /> : null) : <DomainMapView />}
     </div>
   );
 }

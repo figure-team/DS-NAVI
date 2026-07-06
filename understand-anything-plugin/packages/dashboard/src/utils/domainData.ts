@@ -85,7 +85,7 @@ export interface DomainCard {
 const CLAIM_KINDS = new Set(["summary", "entity", "businessRule", "crossDomain"]);
 
 /** Parse a raw `citations` array (VerifiedCitation[] shape) into DomainClaimCitation[]. */
-function parseCitations(raw: unknown): DomainClaimCitation[] {
+export function parseCitations(raw: unknown): DomainClaimCitation[] {
   if (!Array.isArray(raw)) return [];
   return (raw as unknown[])
     .map((x): DomainClaimCitation | null => {
@@ -166,8 +166,12 @@ export function parseStepDetailSections(node: GraphNode): StepDetailSection[] {
     .filter((x): x is StepDetailSection => x !== null);
 }
 
-/** Parse domainMeta.ktdsClaims (+ groundedPct/counts) embedded by emit's embedVerification. */
-function parseDomainClaims(node: GraphNode): {
+/**
+ * Parse domainMeta.ktdsClaims (+ groundedPct/counts) embedded by emit's
+ * embedVerification. Exported for the workspace header GroundedBar (P3) —
+ * same source of truth as the landing cards.
+ */
+export function parseDomainClaims(node: GraphNode): {
   claims: DomainClaim[];
   filled: boolean;
   groundedPct: number | null;
@@ -459,4 +463,105 @@ export function flowGroupKey(entryType: string): FlowGroupKey {
   if (t === "cron" || t === "batch" || t === "schedule") return "batch";
   if (t === "event" || t === "message" || t === "queue") return "event";
   return "other";
+}
+
+/** Flow verdict bucket for the filter chips — "none" = unfilled (no grounding). */
+export type FlowVerdictKey = "GROUNDED" | "NEEDS_REVIEW" | "none";
+
+export function flowVerdictKey(flow: DomainFlow): FlowVerdictKey {
+  return flow.grounding ? flow.grounding.verdict : "none";
+}
+
+/**
+ * Workspace list filter (§4-2) — all-client, deterministic. Empty sets mean
+ * "no restriction" for that facet (the UI treats zero selected chips as All).
+ */
+export interface FlowFilter {
+  /** Case-insensitive substring over name / path / method. */
+  query: string;
+  groups: ReadonlySet<FlowGroupKey>;
+  methods: ReadonlySet<FlowMethod>;
+  verdicts: ReadonlySet<FlowVerdictKey>;
+}
+
+export const EMPTY_FLOW_FILTER: FlowFilter = {
+  query: "",
+  groups: new Set(),
+  methods: new Set(),
+  verdicts: new Set(),
+};
+
+export function isFilterActive(f: FlowFilter): boolean {
+  return f.query.trim() !== "" || f.groups.size > 0 || f.methods.size > 0 || f.verdicts.size > 0;
+}
+
+/** Apply the workspace filter. Preserves input order (graph order). */
+export function filterFlows(flows: DomainFlow[], f: FlowFilter): DomainFlow[] {
+  // NFC 정규화 — IME 에 따라 한글이 NFD 로 들어오면 동일 표기가 불일치한다(리뷰 R5).
+  const q = f.query.trim().normalize("NFC").toLowerCase();
+  return flows.filter((flow) => {
+    if (f.groups.size > 0 && !f.groups.has(flowGroupKey(flow.entryType))) return false;
+    if (f.methods.size > 0 && !f.methods.has(flow.method)) return false;
+    if (f.verdicts.size > 0 && !f.verdicts.has(flowVerdictKey(flow))) return false;
+    if (q) {
+      const hay = `${flow.name}\n${flow.path}\n${flow.method}`.normalize("NFC").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+const FACET_GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
+const FACET_VERDICT_ORDER: FlowVerdictKey[] = ["GROUNDED", "NEEDS_REVIEW", "none"];
+
+/**
+ * 필터 칩 후보 파셋(§4-2) — 이 도메인에 실존하는 값만, 결정론 순서로.
+ * UI 규칙: 파셋 값이 2종 이상일 때만 칩 노출(값 1종 = 필터 무의미, 빈 칩 금지).
+ * jpetstore·eGov 데모는 세 파셋 모두 균일(http·ANY·GROUNDED)이라 칩이 비노출이
+ * **정상**이다 — 발현 검증은 이 함수의 단위테스트가 담당한다(리뷰 C2).
+ */
+export function flowFacets(flows: DomainFlow[]): {
+  groups: FlowGroupKey[];
+  methods: FlowMethod[];
+  verdicts: FlowVerdictKey[];
+} {
+  const groups = new Set(flows.map((f) => flowGroupKey(f.entryType)));
+  const methods: FlowMethod[] = [];
+  for (const f of flows) if (!methods.includes(f.method)) methods.push(f.method);
+  const verdicts = new Set(flows.map((f) => flowVerdictKey(f)));
+  return {
+    groups: FACET_GROUP_ORDER.filter((k) => groups.has(k)),
+    methods,
+    verdicts: FACET_VERDICT_ORDER.filter((k) => verdicts.has(k)),
+  };
+}
+
+/** Workspace tab (§3): business = 업무 흐름도, code = 기능(코드 흐름). */
+export type WorkspaceView = "business" | "code";
+
+/**
+ * True when the domain node carries an LLM-filled business flow
+ * (`domainMeta.businessFlow` — P4 pipeline output). P3 wires the check so the
+ * default-tab rule below is already data-driven when P4 lands.
+ */
+export function hasBusinessFlow(node: GraphNode | undefined): boolean {
+  const meta = node?.domainMeta as { businessFlow?: unknown } | undefined;
+  const bf = meta?.businessFlow as { nodes?: unknown } | undefined;
+  return Array.isArray(bf?.nodes) && (bf!.nodes as unknown[]).length > 0;
+}
+
+/**
+ * Resolve the active workspace tab from the URL (§3, URL is truth):
+ * - explicit `?view=` wins (unknown values fall back like unspecified);
+ * - `?flow=` deep links (pre-P3 URLs) mean the code tab — 하위호환 파손 0;
+ * - otherwise business when the domain has a filled businessFlow, else code.
+ */
+export function resolveWorkspaceView(
+  viewParam: string | null,
+  flowParam: string | null,
+  domainHasBusinessFlow: boolean,
+): WorkspaceView {
+  if (viewParam === "business" || viewParam === "code") return viewParam;
+  if (flowParam) return "code";
+  return domainHasBusinessFlow ? "business" : "code";
 }

@@ -1,31 +1,50 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useDashboardStore } from "../store";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import FlowSpineView from "./FlowSpineView";
+import BusinessFlowView from "./BusinessFlowView";
 import CitationChip from "./CitationChip";
 import VerdictBadge from "./VerdictBadge";
+import GroundedBar from "./GroundedBar";
+import {
+  buildSequentialFallback,
+  businessFlowRejectedReason,
+  parseBusinessFlow,
+} from "../utils/businessFlow";
 import {
   buildDomainFlows,
+  domainIcon,
+  filterFlows,
   findDomain,
+  flowFacets,
   flowGroupKey,
+  hasBusinessFlow,
+  isFilterActive,
+  parseDomainClaims,
+  resolveWorkspaceView,
   type DomainFlow,
+  type FlowFilter,
   type FlowGroupKey,
   type FlowMethod,
+  type FlowVerdictKey,
 } from "../utils/domainData";
 
 /**
- * Screen 2 — Flow list (master-detail). Faithful port of the approved prototype
- * (`#screen-flows`, `renderFlows()` / `openInlineGraph()`): a scrollable top
- * panel with the domain header + grouped flow rows, and a bottom inline panel
- * that renders the selected flow's cross-layer spine.
+ * 화면 B — 도메인 워크스페이스 (WORK_MAP §4).
  *
- * - Back button (← domain map) → `clearActiveDomain()` (→ DomainMapView).
- * - Selecting a flow row shows the spine inline (reuses FlowSpineView with the
- *   `flowId` prop, so `activeFlowId` is NOT committed).
- * - "⤢ Fullscreen" on the inline header → `navigateToFlow(selectedFlowId)`
- *   (→ full-screen FlowSpineView, screen 3, already wired in App.tsx).
+ * P3: 상단 워크스페이스 헤더(브레드크럼 › 도메인명 + 요약 + GroundedBar) + 탭
+ * ([업무 흐름도 view=business] / [기능 N view=code]). URL이 진실 — `?view=` 미지정
+ * 시 businessFlow 데이터가 있으면 business, 없으면 code. 기존 `?flow=` 딥링크는
+ * code 탭으로 해석(하위호환 파손 0, resolveWorkspaceView).
+ *
+ * 기능 목록 스케일(§4-2): 검색(이름/경로/메소드 부분일치) + 필터 칩(그룹·메소드·
+ * verdict, 전부 클라이언트 필터) + 그룹 접기 + 점진 windowing(IntersectionObserver
+ * 센티널, eGov 216기능 실측 후 채택 — 계측치는 설계문서 §6). 번호 배지는 필터와
+ * 무관하게 전체 목록 기준으로 고정되어 접힘 레일 번호와 항상 같은 기능을 가리킨다.
+ *
+ * business 탭 내용물(순서도)은 P4 — P3 는 데이터 없음 상태를 정직하게 표기한다.
  *
  * USECASE GROUPING (documented choice): real domain-graph.json has no "usecase"
  * field, so flows are grouped by `entryType` into honest buckets (HTTP / Batch /
@@ -52,16 +71,21 @@ const METHOD_STYLE: Record<FlowMethod, { bg: string; color: string }> = {
 
 const GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
 
-function MethodBadge({ method }: { method: FlowMethod }) {
+/** 점진 windowing — 최초 렌더 행 수 / 센티널 도달 시 증가 폭 (§4-2 계측 후 채택). */
+const WINDOW_INITIAL = 100;
+const WINDOW_STEP = 100;
+
+function MethodBadge({ method, size = "md" }: { method: FlowMethod; size?: "sm" | "md" }) {
   const s = METHOD_STYLE[method];
+  // sm = 프로토 .m(목록 행), md = 중앙 헤더용.
   return (
     <span
       className="font-bold text-center shrink-0 rounded"
       style={{
         fontFamily: "var(--font-mono)",
-        fontSize: 10,
-        padding: "2px 7px",
-        minWidth: 44,
+        fontSize: size === "sm" ? 9.5 : 10,
+        padding: size === "sm" ? "1px 5px" : "2px 7px",
+        minWidth: size === "sm" ? undefined : 44,
         background: s.bg,
         color: s.color,
       }}
@@ -71,10 +95,43 @@ function MethodBadge({ method }: { method: FlowMethod }) {
   );
 }
 
+/** 필터 칩 — 프로토 .chip(pill): 기본 회색 배경, 활성 = 브랜드 틴트 + accent 글자. */
+function FilterChip({
+  label,
+  active,
+  onToggle,
+}: {
+  label: string;
+  active: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={active}
+      className="shrink-0 rounded-full cursor-pointer transition-colors"
+      style={{
+        fontSize: 12,
+        padding: "3px 9px",
+        lineHeight: 1.5,
+        fontWeight: active ? 600 : 400,
+        color: active ? "var(--color-accent)" : "var(--color-text-secondary)",
+        background: active
+          ? "color-mix(in srgb, var(--color-accent) 9%, transparent)"
+          : "var(--color-elevated)",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function FlowListView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
   const navigate = useNavigate(); // P3: 지도 복귀는 URL로
+  const [searchParams, setSearchParams] = useSearchParams();
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const { t } = useI18n();
@@ -82,6 +139,13 @@ export default function FlowListView() {
   // 좌측 기능 목록 접기/펼치기 — 접으면 인라인 스파인이 폭 전체를 차지(화면3 전체화면 대체).
   // 기본 펼침: 도메인 재진입 시 FlowListView 가 remount 되며 자동으로 펼친 상태로 복귀.
   const [listCollapsed, setListCollapsed] = useState(false);
+
+  // §4-2 검색/필터 — 전부 클라이언트 상태(결정론). 도메인 전환 시 리셋(remount).
+  const [query, setQuery] = useState("");
+  const [groupSel, setGroupSel] = useState<Set<FlowGroupKey>>(new Set());
+  const [methodSel, setMethodSel] = useState<Set<FlowMethod>>(new Set());
+  const [verdictSel, setVerdictSel] = useState<Set<FlowVerdictKey>>(new Set());
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<FlowGroupKey>>(new Set());
 
   const flows = useMemo<DomainFlow[]>(
     () =>
@@ -95,15 +159,58 @@ export default function FlowListView() {
     () => (domainGraph && activeDomainId ? findDomain(domainGraph, activeDomainId) : undefined),
     [domainGraph, activeDomainId],
   );
+  const domainGrounding = useMemo(
+    () => (domainNode ? parseDomainClaims(domainNode) : null),
+    [domainNode],
+  );
+
+  // P4: 업무 흐름도 데이터 — 채움(businessFlow) 우선, 미채움은 순차 폴백. useMemo 로
+  // 참조를 고정한다(매 렌더 재생성 시 BusinessFlowView 의 ELK 레이아웃이 재실행됨).
+  const bizFlow = useMemo(() => {
+    const parsed = parseBusinessFlow(domainNode);
+    if (parsed) return parsed;
+    return flows.length > 0
+      ? buildSequentialFallback(flows, {
+          start: t.flowList.bfStart,
+          end: t.flowList.bfEnd,
+          more: t.flowList.bfMore,
+        })
+      : null;
+  }, [domainNode, flows, t]);
+  const bizRejected = useMemo(() => businessFlowRejectedReason(domainNode), [domainNode]);
+
+  // §3 탭 해석 — URL이 진실. ?flow= 딥링크(pre-P3)는 code 탭(하위호환).
+  const view = resolveWorkspaceView(
+    searchParams.get("view"),
+    searchParams.get("flow"),
+    hasBusinessFlow(domainNode),
+  );
+  const switchView = (next: "business" | "code") => {
+    // 탭은 워크스페이스 내부 뷰 토글 — flow 선택 동기화와 동일하게 replace(히스토리
+    // 오염 없음, 리뷰 C1). ?flow= 는 유지: business↔code 왕복 시 선택 보존(의도).
+    // 라이브 location 기준(함수형 prev 는 렌더 스냅샷 — 라이터 경합 시 스테일).
+    const p = new URLSearchParams(window.location.search);
+    p.set("view", next);
+    p.delete("token");
+    setSearchParams(p, { replace: true });
+  };
 
   // Inline-selection reset on domain switch is handled centrally in the store
   // (navigateToDomain / clearActiveDomain reset selectedFlowId) so the
   // fullscreen round-trip can preserve it — see FIX 3.
 
+  const filter: FlowFilter = useMemo(
+    () => ({ query, groups: groupSel, methods: methodSel, verdicts: verdictSel }),
+    [query, groupSel, methodSel, verdictSel],
+  );
+  const filtered = useMemo(() => filterFlows(flows, filter), [flows, filter]);
+  const filterOn = isFilterActive(filter);
+
   // Group flows by entryType bucket, preserving graph order within a group.
+  // 그룹은 필터 결과 위에서 재구성 — 그룹 접힘은 필터와 독립.
   const groups = useMemo(() => {
     const map = new Map<FlowGroupKey, DomainFlow[]>();
-    for (const f of flows) {
+    for (const f of filtered) {
       const key = flowGroupKey(f.entryType);
       const list = map.get(key) ?? [];
       list.push(f);
@@ -113,7 +220,7 @@ export default function FlowListView() {
       key: k,
       flows: map.get(k)!,
     }));
-  }, [flows]);
+  }, [filtered]);
 
   const groupLabel: Record<FlowGroupKey, string> = {
     http: t.flowList.groupHttp,
@@ -121,21 +228,238 @@ export default function FlowListView() {
     event: t.flowList.groupEvent,
     other: t.flowList.groupOther,
   };
+  const verdictLabel: Record<FlowVerdictKey, string> = {
+    GROUNDED: t.flowList.verdictGrounded,
+    NEEDS_REVIEW: t.flowList.verdictReview,
+    none: t.flowList.verdictNone,
+  };
+
+  // 필터 칩 후보 — 이 도메인에 실존하는 값만(빈 칩 노출 금지). 파셋 계산은
+  // domainData.flowFacets(단위테스트 대상 — 균일 데모에서 칩 비노출이 정상, 리뷰 C2).
+  const facets = useMemo(() => flowFacets(flows), [flows]);
+  const availableGroups = facets.groups;
+  const availableMethods = facets.methods;
+  const availableVerdicts = facets.verdicts;
 
   const selectedFlow = flows.find((f) => f.id === selectedFlowId) ?? null;
   const singleGroup = groups.length <= 1;
 
-  // 표시 순서(그룹 순회) 기준 1..N 번호 — 펼침 행 배지와 접힘 레일 번호 선택이 동일 매핑을 쓴다.
-  const orderedFlows = useMemo(() => groups.flatMap((g) => g.flows), [groups]);
+  // 표시 순서(그룹 순회) 기준 1..N 번호 — **필터와 무관하게 전체 목록 기준**으로
+  // 고정해, 필터 중에도 행 번호·접힘 레일 번호가 같은 기능을 가리킨다.
+  const fullOrdered = useMemo(() => {
+    const map = new Map<FlowGroupKey, DomainFlow[]>();
+    for (const f of flows) {
+      const key = flowGroupKey(f.entryType);
+      const list = map.get(key) ?? [];
+      list.push(f);
+      map.set(key, list);
+    }
+    return GROUP_ORDER.filter((k) => map.has(k)).flatMap((k) => map.get(k)!);
+  }, [flows]);
   const flowNumber = useMemo(() => {
     const m = new Map<string, number>();
-    orderedFlows.forEach((f, i) => m.set(f.id, i + 1));
+    fullOrdered.forEach((f, i) => m.set(f.id, i + 1));
     return m;
-  }, [orderedFlows]);
+  }, [fullOrdered]);
+
+  // 접힘 레일도 필터 결과를 따른다(번호는 전체 기준 유지).
+  const orderedFiltered = useMemo(() => groups.flatMap((g) => g.flows), [groups]);
+
+  // §4-2 점진 windowing — 그룹 헤더+행을 평탄화한 렌더 목록에 센티널 기반 창을 적용.
+  type RenderItem =
+    | { kind: "header"; group: FlowGroupKey; count: number; collapsed: boolean }
+    | { kind: "flow"; flow: DomainFlow };
+  const renderItems = useMemo<RenderItem[]>(() => {
+    const items: RenderItem[] = [];
+    for (const g of groups) {
+      const collapsed = collapsedGroups.has(g.key);
+      if (!singleGroup) items.push({ kind: "header", group: g.key, count: g.flows.length, collapsed });
+      if (!collapsed || singleGroup) for (const f of g.flows) items.push({ kind: "flow", flow: f });
+    }
+    return items;
+  }, [groups, collapsedGroups, singleGroup]);
+
+  const [windowSize, setWindowSize] = useState(WINDOW_INITIAL);
+  // 필터/도메인 변경 시 창 리셋 — 검색 결과 최상단부터 다시. 키는 JSON 직렬화로
+  // 구분자 충돌 차단(query 에 "|" 포함 케이스, 리뷰 R4).
+  const filterKey = JSON.stringify([activeDomainId, query, [...groupSel], [...methodSel], [...verdictSel]]);
+  useEffect(() => {
+    setWindowSize(WINDOW_INITIAL);
+  }, [filterKey]);
+  const visibleItems = renderItems.slice(0, windowSize);
+  const hasMore = renderItems.length > windowSize;
+  // 접힘 레일도 동일 창 적용 — 접는 순간 전량 DOM 이 올라가는 우회 차단(리뷰 C3).
+  const visibleRail = orderedFiltered.slice(0, windowSize);
+  const railHasMore = orderedFiltered.length > windowSize;
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const railSentinelRef = useRef<HTMLDivElement | null>(null);
+  const maxWindow = Math.max(renderItems.length, orderedFiltered.length);
+  const anyMore = hasMore || railHasMore;
+  useEffect(() => {
+    if (!anyMore) return;
+    // jsdom 등 IntersectionObserver 부재 환경에서는 전체 렌더로 강등(기능 보존).
+    if (typeof IntersectionObserver === "undefined") {
+      setWindowSize(maxWindow);
+      return;
+    }
+    const els = [sentinelRef.current, railSentinelRef.current].filter(
+      (el): el is HTMLDivElement => el !== null,
+    );
+    if (els.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setWindowSize((s) => Math.min(s + WINDOW_STEP, maxWindow));
+        }
+      },
+      { rootMargin: "240px" },
+    );
+    for (const el of els) io.observe(el);
+    return () => io.disconnect();
+    // windowSize 포함 — 창 성장 후 옵저버를 재생성해 초기 교차 상태를 재전달받는다.
+    // (센티널이 뷰포트를 못 벗어난 경우 교차 이벤트가 재발화하지 않는 stall 차단.)
+  }, [anyMore, maxWindow, windowSize]);
+
+  const toggleIn = <T,>(set: Set<T>, v: T, apply: (next: Set<T>) => void) => {
+    const next = new Set(set);
+    if (next.has(v)) next.delete(v);
+    else next.add(v);
+    apply(next);
+  };
+  const clearFilters = () => {
+    setQuery("");
+    setGroupSel(new Set());
+    setMethodSel(new Set());
+    setVerdictSel(new Set());
+  };
 
   return (
-    <div className="h-full w-full flex overflow-hidden">
-      {/* LEFT: collapsed rail — » expand + vertical domain label. Replaces the
+    <div className="h-full w-full flex flex-col overflow-hidden">
+      {/* ── 워크스페이스 헤더(§4 화면 B): 브레드크럼 + 도메인명 + 요약 + GroundedBar + 탭 ── */}
+      {/* 프로토 page-head(P6): eyebrow 브레드크럼 · h1 20px · meta 요약 · 우측 근거율 gbar */}
+      <header className="shrink-0 border-b border-border-subtle bg-panel" style={{ padding: "12px 20px 0" }}>
+        <div className="flex items-end gap-3.5 flex-wrap min-w-0">
+          <div className="min-w-0">
+            <p className="text-text-muted font-bold truncate" style={{ fontSize: 11.5, letterSpacing: "0.06em", marginBottom: 3 }}>
+              <button
+                type="button"
+                onClick={() => navigate("/domains")}
+                className="text-text-muted hover:text-accent transition-colors cursor-pointer font-bold"
+                style={{ letterSpacing: "0.06em" }}
+              >
+                {t.domainMap.breadcrumbRoot}
+              </button>{" "}
+              › {domainNode?.name ?? ""}
+            </p>
+            <h1 className="text-text-primary font-bold whitespace-nowrap" style={{ fontSize: 20, lineHeight: 1.25 }}>
+              <span aria-hidden style={{ marginRight: 8 }}>
+                {domainNode ? domainIcon(domainNode.name, domainNode.id) : ""}
+              </span>
+              {domainNode?.name ?? ""}
+            </h1>
+          </div>
+          {domainNode?.summary && (
+            <span className="text-text-muted truncate" style={{ fontSize: 13, minWidth: 0, paddingBottom: 3, flex: 1 }}>
+              {domainNode.summary}
+            </span>
+          )}
+          {domainGrounding?.filled && domainGrounding.groundedPct !== null && (
+            <div className="shrink-0 ml-auto" style={{ width: 170, paddingBottom: 4 }}>
+              <GroundedBar
+                pct={domainGrounding.groundedPct}
+                grounded={domainGrounding.groundedCount}
+                review={domainGrounding.reviewCount}
+              />
+            </div>
+          )}
+        </div>
+        {/* 탭바 — view= 가 진실. 활성 탭 밑줄은 도메인 색. WAI-ARIA Tabs: roving
+            tabindex + 화살표 키 + tab↔tabpanel 상호 연결(리뷰 C4). */}
+        <div
+          className="flex items-center gap-1 mt-2"
+          role="tablist"
+          onKeyDown={(e) => {
+            if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+            e.preventDefault();
+            const next = view === "business" ? "code" : "business";
+            switchView(next);
+            document.getElementById(`workspace-tab-${next}`)?.focus();
+          }}
+        >
+          {(
+            [
+              { key: "business" as const, label: t.flowList.tabBusiness, count: null },
+              {
+                key: "code" as const,
+                label: t.flowList.tabCode.replace("{count}", "").trim(),
+                count: flows.length,
+              },
+            ]
+          ).map((tab) => {
+            const active = view === tab.key;
+            return (
+              <button
+                key={tab.key}
+                id={`workspace-tab-${tab.key}`}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                aria-controls={`workspace-panel-${tab.key}`}
+                tabIndex={active ? 0 : -1}
+                onClick={() => switchView(tab.key)}
+                className="cursor-pointer transition-colors border-b-2"
+                style={{
+                  fontSize: 13.5,
+                  padding: "7px 10px 9px",
+                  color: active ? "var(--color-accent)" : "var(--color-text-secondary)",
+                  borderBottomColor: active ? "var(--color-accent)" : "transparent",
+                  fontWeight: active ? 650 : 550,
+                }}
+              >
+                {tab.label}
+                {tab.count !== null && (
+                  <span
+                    className="tabular-nums"
+                    style={{ fontSize: 11, color: "var(--color-text-muted)", marginLeft: 4 }}
+                  >
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </header>
+
+      {/* ── 탭 내용 ── */}
+      {view === "business" ? (
+        /* P4: 순서도 — fill 채움이면 businessFlow, 미채움이면 결정론 순차 폴백(배너).
+           기능 0개 도메인은 그릴 것이 없어 데이터 없음 문구로 degrade. */
+        <div
+          id="workspace-panel-business"
+          role="tabpanel"
+          aria-labelledby="workspace-tab-business"
+          className="flex-1 min-h-0"
+        >
+          {bizFlow && activeDomainId ? (
+            <BusinessFlowView domainId={activeDomainId} biz={bizFlow} rejectedReason={bizRejected} />
+          ) : (
+            <div className="h-full flex items-center justify-center px-8 text-center">
+              <p className="text-text-secondary" style={{ fontSize: 13 }}>
+                {t.flowList.businessEmpty}
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+      <div
+        id="workspace-panel-code"
+        role="tabpanel"
+        aria-labelledby="workspace-tab-code"
+        className="flex-1 min-h-0 flex overflow-hidden"
+      >
+      {/* LEFT: collapsed rail — » expand + numbered quick-nav. Replaces the
           old full-screen spine: collapse the list and the inline spine claims
           the full width. */}
       {listCollapsed ? (
@@ -153,17 +477,19 @@ export default function FlowListView() {
         >
           »
         </button>
-        {/* 접힘 상태 번호 선택 — 펼치지 않고도 번호로 기능 전환(선택 번호 강조). */}
+        {/* 접힘 상태 번호 선택 — 펼치지 않고도 번호로 기능 전환(선택 번호 강조).
+            필터 결과를 따르되 번호는 전체 목록 기준(펼침 행 배지와 동일 매핑). */}
         <div className="mt-3 flex-1 w-full overflow-y-auto flex flex-col items-center gap-1.5 pb-3">
-          {orderedFlows.map((f, i) => {
+          {visibleRail.map((f) => {
             const isSel = f.id === selectedFlowId;
+            const n = flowNumber.get(f.id);
             return (
               <button
                 key={f.id}
                 type="button"
                 onClick={() => setSelectedFlow(f.id)}
-                title={`${i + 1}. ${f.name}`}
-                aria-label={`${i + 1}. ${f.name}`}
+                title={`${n}. ${f.name}`}
+                aria-label={`${n}. ${f.name}`}
                 aria-current={isSel}
                 className={`shrink-0 flex items-center justify-center rounded-md border font-mono transition-colors cursor-pointer ${
                   isSel
@@ -172,10 +498,11 @@ export default function FlowListView() {
                 }`}
                 style={{ width: 28, height: 26, fontSize: 11 }}
               >
-                {i + 1}
+                {n}
               </button>
             );
           })}
+          {railHasMore && <div ref={railSentinelRef} aria-hidden style={{ height: 1 }} />}
         </div>
       </aside>
       ) : (
@@ -185,23 +512,18 @@ export default function FlowListView() {
         className="shrink-0 h-full flex flex-col border-r border-border-subtle bg-surface/40"
         style={{ width: 320 }}
       >
-        {/* sidebar header — breadcrumb (navigation) + back + collapse */}
-        <div className="shrink-0 border-b border-border-subtle" style={{ padding: "16px 16px 14px" }}>
-          <div className="flex items-center justify-between gap-2">
-            <p
-              className="uppercase text-text-muted truncate"
-              style={{ fontSize: 11, letterSpacing: "0.1em", minWidth: 0 }}
-            >
-              <button
-                type="button"
-                onClick={() => navigate("/domains")}
-                className="uppercase text-text-muted hover:text-accent transition-colors cursor-pointer"
-                style={{ letterSpacing: "0.1em" }}
-              >
-                {t.flowList.eyebrow}
-              </button>{" "}
-              › {domainNode?.name ?? ""}
-            </p>
+        {/* sidebar header — §4-2 검색 + 필터 칩 + 접기 버튼 */}
+        <div className="shrink-0 border-b border-border-subtle" style={{ padding: "12px 12px 10px" }}>
+          <div className="flex items-center gap-2">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t.flowList.searchPlaceholder}
+              aria-label={t.flowList.searchPlaceholder}
+              className="flex-1 min-w-0 border border-border-medium bg-panel text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+              style={{ fontSize: 12.5, padding: "6px 10px", borderRadius: 7 }}
+            />
             <button
               type="button"
               onClick={() => setListCollapsed(true)}
@@ -213,85 +535,143 @@ export default function FlowListView() {
               «
             </button>
           </div>
+          {/* 필터 칩 — 이 도메인에 실존하는 값만. 그룹(버킷 2+일 때만)·메소드(2+)·verdict(2+). */}
+          {(availableGroups.length > 1 || availableMethods.length > 1 || availableVerdicts.length > 1) && (
+            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+              {availableGroups.length > 1 &&
+                availableGroups.map((g) => (
+                  <FilterChip
+                    key={`g:${g}`}
+                    label={groupLabel[g]}
+                    active={groupSel.has(g)}
+                    onToggle={() => toggleIn(groupSel, g, setGroupSel)}
+                  />
+                ))}
+              {availableMethods.length > 1 &&
+                availableMethods.map((m) => (
+                  <FilterChip
+                    key={`m:${m}`}
+                    label={m}
+                    active={methodSel.has(m)}
+                    onToggle={() => toggleIn(methodSel, m, setMethodSel)}
+                  />
+                ))}
+              {availableVerdicts.length > 1 &&
+                availableVerdicts.map((v) => (
+                  <FilterChip
+                    key={`v:${v}`}
+                    label={verdictLabel[v]}
+                    active={verdictSel.has(v)}
+                    onToggle={() => toggleIn(verdictSel, v, setVerdictSel)}
+                  />
+                ))}
+            </div>
+          )}
+          {/* 결과 카운트 + 초기화 — 필터 활성 시에만(정직한 축소 표기). */}
+          {filterOn && (
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-text-muted tabular-nums" style={{ fontSize: 10.5 }}>
+                {filtered.length} / {flows.length}
+              </span>
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-text-muted hover:text-accent transition-colors cursor-pointer"
+                style={{ fontSize: 10.5 }}
+              >
+                {t.flowList.clearFilters}
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* scrollable flow rows */}
+        {/* scrollable flow rows — windowed render list (§4-2) */}
         <div className="flex-1 overflow-y-auto" style={{ padding: "12px" }}>
-          {groups.map((group) => (
-            <div key={group.key} className="mb-5 last:mb-0">
-              {!singleGroup && (
-                <div
-                  className="flex items-center gap-2 uppercase text-text-muted mb-2"
-                  style={{ fontSize: 10, letterSpacing: "0.09em" }}
-                >
-                  <span>{groupLabel[group.key]}</span>
-                  <span className="flex-1 h-px bg-border-subtle" />
-                </div>
-              )}
-              <div className="flex flex-col gap-1.5">
-                {group.flows.map((flow) => {
-                  const isSelected = flow.id === selectedFlowId;
-                  return (
+          {filtered.length === 0 ? (
+            <p className="text-text-muted text-center" style={{ fontSize: 12, padding: "24px 8px" }}>
+              {t.flowList.noMatches}
+            </p>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              {visibleItems.map((item) =>
+                item.kind === "header" ? (
+                  <button
+                    key={`h:${item.group}`}
+                    type="button"
+                    onClick={() =>
+                      toggleIn(collapsedGroups, item.group, setCollapsedGroups)
+                    }
+                    aria-expanded={!item.collapsed}
+                    className="flex items-center gap-2 uppercase text-text-muted mt-3 first:mt-0 mb-0.5 cursor-pointer hover:text-text-secondary transition-colors w-full"
+                    style={{ fontSize: 10, letterSpacing: "0.09em" }}
+                  >
+                    <span aria-hidden style={{ fontSize: 8 }}>
+                      {item.collapsed ? "▶" : "▼"}
+                    </span>
+                    <span>{groupLabel[item.group]}</span>
+                    <span className="tabular-nums">({item.count})</span>
+                    <span className="flex-1 h-px bg-border-subtle" />
+                  </button>
+                ) : (
+                  (() => {
+                    const flow = item.flow;
+                    const isSelected = flow.id === selectedFlowId;
+                    return (
+                    /* 프로토 .fl-item — 컴팩트 1.5줄 행: [번호][메소드] 이름 / 경로(mono).
+                       스텝 수는 title 툴팁으로 이동(밀도 우선), 검토필요만 배지 표시. */
                     <button
                       key={flow.id}
                       type="button"
                       onClick={() => setSelectedFlow(flow.id)}
-                      className="flow-row flex flex-col gap-1.5 text-left rounded-lg border cursor-pointer transition-colors w-full"
+                      title={`${flow.name} — ${t.flowList.stepCount.replace("{count}", String(flow.stepCount))}`}
+                      className="flow-row flex flex-col gap-0.5 text-left rounded-[7px] cursor-pointer transition-colors w-full hover:bg-elevated"
                       style={{
-                        padding: "10px 12px",
+                        padding: "7px 8px",
+                        fontWeight: isSelected ? 600 : 400,
                         background: isSelected
-                          ? "color-mix(in srgb, var(--color-accent) 7%, transparent)"
-                          : "var(--color-elevated)",
-                        borderColor: isSelected
-                          ? "var(--color-accent)"
-                          : "var(--color-border-subtle)",
-                        boxShadow: isSelected
-                          ? "0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent) inset"
+                          ? "color-mix(in srgb, var(--color-accent) 8%, transparent)"
                           : undefined,
                       }}
                     >
-                      <div className="flex items-center gap-2">
-                        {/* 번호 — 접힘 레일 번호와 동일 매핑(번호로 기능 식별·선택). */}
+                      <span className="flex items-center gap-2 min-w-0">
+                        {/* 번호 — 접힘 레일 번호와 동일 매핑. 필터 중 비연속 가능(툴팁). */}
                         <span
-                          className="shrink-0 inline-flex items-center justify-center rounded border border-border-subtle text-text-muted"
-                          style={{ minWidth: 18, height: 18, fontSize: 10, fontFamily: "var(--font-mono)" }}
+                          title={t.flowList.numberHint}
+                          className="shrink-0 text-text-muted tabular-nums text-right"
+                          style={{ minWidth: 16, fontSize: 10, fontFamily: "var(--font-mono)" }}
                         >
                           {flowNumber.get(flow.id)}
                         </span>
-                        <MethodBadge method={flow.method} />
-                        <span className="ml-auto flex items-center gap-1.5 shrink-0">
-                          {flow.grounding && <VerdictBadge verdict={flow.grounding.verdict} />}
-                          <span
-                            className="text-text-muted"
-                            style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}
-                          >
-                            {t.flowList.stepCount.replace("{count}", String(flow.stepCount))}
-                          </span>
+                        <MethodBadge method={flow.method} size="sm" />
+                        <span className="text-text-primary truncate" style={{ fontSize: 12.5 }}>
+                          {flow.name}
                         </span>
-                      </div>
-                      {/* Function label ("어떤 기능인지") first — human-readable name
-                          leads, technical entry signature follows below. */}
-                      <span className="text-text-primary" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
-                        {flow.name}
+                        {flow.grounding?.verdict === "NEEDS_REVIEW" && (
+                          <span className="ml-auto shrink-0">
+                            <VerdictBadge verdict="NEEDS_REVIEW" />
+                          </span>
+                        )}
                       </span>
-                      {/* Full endpoint / entry signature — wraps so every character stays visible. */}
                       <span
-                        className="text-text-secondary"
+                        className="text-text-muted truncate"
                         style={{
                           fontFamily: "var(--font-mono)",
-                          fontSize: 11,
-                          wordBreak: "break-all",
-                          lineHeight: 1.45,
+                          fontSize: 10.5,
+                          paddingLeft: 24,
+                          lineHeight: 1.4,
                         }}
                       >
                         {flow.path}
                       </span>
                     </button>
-                  );
-                })}
-              </div>
+                    );
+                  })()
+                ),
+              )}
+              {/* windowing 센티널 — 근접 시 다음 청크 로드(스크롤 위치 보존). */}
+              {hasMore && <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />}
             </div>
-          ))}
+          )}
         </div>
       </aside>
       )}
@@ -347,6 +727,8 @@ export default function FlowListView() {
           </div>
         )}
       </div>
+      </div>
+      )}
     </div>
   );
 }

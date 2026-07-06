@@ -15,7 +15,21 @@ export type NodeType = "file" | "function" | "class" | "module" | "concept" | "c
 export type Complexity = "simple" | "moderate" | "complex";
 export type EdgeCategory = "structural" | "behavioral" | "data-flow" | "dependencies" | "semantic" | "infrastructure" | "domain" | "knowledge";
 // ktds-fork (ADR-004): "wiki" = 코드그래프 위에 세분화 위키를 "문서" 토글로 오버레이.
-export type ViewMode = "structural" | "domain" | "knowledge" | "wiki" | "docs" | "rtm" | "screenspec";
+// 신설 6메뉴(pmpl-proto 메뉴 개편 2차): data/change/programs/quality/report/policy.
+export type ViewMode =
+  | "structural"
+  | "domain"
+  | "knowledge"
+  | "wiki"
+  | "docs"
+  | "rtm"
+  | "screenspec"
+  | "data"
+  | "change"
+  | "programs"
+  | "quality"
+  | "report"
+  | "policy";
 export type DetailLevel = "file" | "class";
 
 export interface FilterState {
@@ -105,6 +119,9 @@ export interface OverlayChannelData {
   generatedAt: string;
 }
 
+/** 오버레이 채널 식별자 — diff(실측)/impact(예측)/risk(정적 품질, 토글 전용). */
+export type OverlaySource = "diff" | "impact" | "risk";
+
 /** ktds: 구조 탭 "영향도 분석"(claude -p /understand-impact) 실행 상태. */
 export type ImpactJobStatus = "idle" | "running" | "done" | "failed";
 export interface ImpactJobState {
@@ -158,15 +175,17 @@ interface DashboardStore {
 
   persona: Persona;
 
-  // 오버레이 2채널 (ktds): diff=실측(git 변경, /understand-review·understand-diff),
-  // impact=예측(/understand-impact 시드 기반 도달성). diffMode/changedNodeIds/
-  // affectedNodeIds는 "활성 채널"의 뷰 상태 — 모든 뷰가 이것만 읽는다.
+  // 오버레이 3채널 (ktds): diff=실측(git 변경, /understand-review·understand-diff),
+  // impact=예측(/understand-impact 시드 기반 도달성), risk=정적 품질(risk-report
+  // 등급 상→changed / 중→affected 매핑, 자동 활성 없음 — 토글 전용). diffMode/
+  // changedNodeIds/affectedNodeIds는 "활성 채널"의 뷰 상태 — 모든 뷰가 이것만 읽는다.
   diffMode: boolean;
   changedNodeIds: Set<string>;
   affectedNodeIds: Set<string>;
-  overlaySource: "diff" | "impact" | null;
+  overlaySource: OverlaySource | null;
   diffOverlayData: OverlayChannelData | null;
   impactOverlayData: OverlayChannelData | null;
+  riskOverlayData: OverlayChannelData | null;
 
   // Focus mode: isolate a node's 1-hop neighborhood
   focusNodeId: string | null;
@@ -212,10 +231,10 @@ interface DashboardStore {
 
   setDiffOverlay: (changed: string[], affected: string[]) => void;
   toggleDiffMode: () => void;
-  /** 채널 원본 적재 + 자동 활성(시드 보유 && 더 최신이거나 유일할 때). */
-  setOverlayData: (source: "diff" | "impact", data: OverlayChannelData) => void;
+  /** 채널 원본 적재 + 자동 활성(시드 보유 && 더 최신이거나 유일할 때 — risk 채널은 자동 활성 제외). */
+  setOverlayData: (source: OverlaySource, data: OverlayChannelData) => void;
   /** 채널 토글 — 활성 채널 재토글=숨김, 비활성 채널=전환 (동시 표시 없음). */
-  toggleOverlay: (source: "diff" | "impact") => void;
+  toggleOverlay: (source: OverlaySource) => void;
   clearDiffOverlay: () => void;
 
   // ktds: 구조 탭 "영향도 분석" — 자연어 입력 모달 + claude -p 실행 job(전역 상태).
@@ -431,6 +450,7 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   overlaySource: null,
   diffOverlayData: null,
   impactOverlayData: null,
+  riskOverlayData: null,
 
   focusNodeId: null,
   nodeHistory: [],
@@ -702,7 +722,13 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
   setOverlayData: (source, data) =>
     set((state) => {
       const next: Partial<DashboardStore> =
-        source === "diff" ? { diffOverlayData: data } : { impactOverlayData: data };
+        source === "diff"
+          ? { diffOverlayData: data }
+          : source === "impact"
+            ? { impactOverlayData: data }
+            : { riskOverlayData: data };
+      // risk 채널은 분석 이벤트가 아니라 상시 품질 지표 — 자동 활성 경쟁에서 제외(토글 전용).
+      if (source === "risk") return next;
       // 자동 활성: 시드가 있고, (활성 가능한 다른 채널이 없거나 || 이 채널이 더
       // 최신)일 때. 빈 채널(changed=0 — KG 미조인 발행)은 경쟁자가 아니다(리뷰
       // minor: 빈 채널의 최신 generatedAt이 유효 채널의 자동 활성을 막는 순서
@@ -721,7 +747,12 @@ export const useDashboardStore = create<DashboardStore>()((set, get) => ({
 
   toggleOverlay: (source) =>
     set((state) => {
-      const data = source === "diff" ? state.diffOverlayData : state.impactOverlayData;
+      const data =
+        source === "diff"
+          ? state.diffOverlayData
+          : source === "impact"
+            ? state.impactOverlayData
+            : state.riskOverlayData;
       if (!data || data.changed.length === 0) return {};
       if (state.overlaySource === source && state.diffMode) {
         return { diffMode: false }; // 같은 채널 재토글 = 숨김 (채널 기억)

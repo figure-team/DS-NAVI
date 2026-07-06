@@ -53,6 +53,7 @@ export {
 export { extractRoutes, scanRoutes, scanDomainMap, buildMap } from './domain-map/extract.js'
 export * from './interface-scan/index.js'
 export * from './batch-scan/index.js'
+export * from './system-map/index.js'
 export * from './program-inventory/index.js'
 export * from './risk-report/index.js'
 export * from './work-summary/index.js'

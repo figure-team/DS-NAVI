@@ -167,6 +167,38 @@ function RootData({ accessToken }: { accessToken: string }) {
     loadOverlay("impact-overlay.json", "impact");
   }, [setOverlayData]);
 
+  // ktds(메뉴 개편 2차): 위험 오버레이 — risk-report.json(파일 단위 등급)을 그래프 노드에
+  // 조인(상→changed/중→affected). 분석 이벤트가 아니라 상시 지표라 자동 활성 없음(토글 전용).
+  const graph = useDashboardStore((s) => s.graph);
+  useEffect(() => {
+    if (!graph) return;
+    fetch(dataUrl("risk-report.json", accessToken))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: unknown) => {
+        const items = (data as { items?: Array<{ filePath?: unknown; grade?: unknown }> } | null)
+          ?.items;
+        if (!Array.isArray(items)) return;
+        const byPath = new Map<string, string>();
+        for (const it of items) {
+          if (typeof it.filePath === "string" && typeof it.grade === "string") {
+            byPath.set(it.filePath, it.grade);
+          }
+        }
+        if (byPath.size === 0) return;
+        const high: string[] = [];
+        const mid: string[] = [];
+        for (const node of graph.nodes) {
+          if (typeof node.filePath !== "string") continue;
+          const grade = byPath.get(node.filePath);
+          if (grade === "상") high.push(node.id);
+          else if (grade === "중") mid.push(node.id);
+        }
+        if (high.length + mid.length === 0) return;
+        setOverlayData("risk", { changed: high, affected: mid, generatedAt: "" });
+      })
+      .catch(() => {});
+  }, [graph, setOverlayData]);
+
   useEffect(() => {
     fetch(dataUrl("domain-graph.json", accessToken))
       .then((res) => {

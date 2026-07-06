@@ -41,6 +41,9 @@ node ktds-legacy-plugin/scripts/understand-map.mjs examples/jpetstore-6 map
 
 # LLM 채움 파이프라인(번들 조립 → fill/<key>.json 작성 후 → 인용 기계검증 + emit)
 node ktds-legacy-plugin/scripts/understand-map.mjs examples/jpetstore-6 bundle
+# ⚠️ emit 은 .spec/map/fill/ 이 비어 있으면 벤더링된 domain-graph.json(LLM 채움본)을
+#    빈 그래프로 **덮어쓴다**. fill 없이 CLI 만 점검했다면 실행 후 반드시 복원할 것:
+#    git checkout -- examples/jpetstore-6/.understand-anything/domain-graph.json
 node ktds-legacy-plugin/scripts/understand-map.mjs examples/jpetstore-6 emit
 
 # 노드 상세 템플릿(계층별, 프로젝트 override 우선) 조회
@@ -48,7 +51,7 @@ node ktds-legacy-plugin/scripts/understand-map.mjs examples/jpetstore-6 template
 ```
 
 - 산출물: `examples/jpetstore-6/.spec/map/*.json`, `.understand-anything/domain-graph.json`
-- **점검 포인트(scan 출력)**: 인터페이스 0건이 "스캔했고 없음"으로 명시되는지, 프로그램 74본 + 잠정 FP([추정]) 줄, 위험 랭킹 줄, `◐ 부분 지원 소스 N파일` 줄, `캐시: 재사용/재추출` 줄.
+- **점검 포인트(scan 출력)**: 인터페이스 0건이 "스캔했고 없음"으로 명시되는지, 프로그램 70본 + 잠정 FP([추정]) 줄, 위험 랭킹 줄, `◐ 부분 지원 소스 N파일` 줄, `캐시: 재사용/재추출` 줄.
 - 결정론: 같은 명령 2회 → 산출물 byte-diff=0.
 
 ### 1-a. 증분 스캔(P8, scan-cache)

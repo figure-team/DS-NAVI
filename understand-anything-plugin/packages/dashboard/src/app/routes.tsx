@@ -8,6 +8,12 @@ import DomainsPage from "./pages/DomainsPage";
 import RtmPage from "./pages/RtmPage";
 import ScreenspecPage from "./pages/ScreenspecPage";
 import DeliverablesPage from "./pages/DeliverablesPage";
+import DataPage from "./pages/DataPage";
+import ChangePage from "./pages/ChangePage";
+import ProgramsPage from "./pages/ProgramsPage";
+import QualityPage from "./pages/QualityPage";
+import ReportPage from "./pages/ReportPage";
+import PolicyPage from "./pages/PolicyPage";
 
 /**
  * 라우트 맵 (FRONT_REDESIGN §3) — P3: 홈 랜딩 + 도메인 하위 라우트.
@@ -29,6 +35,13 @@ export const router = createBrowserRouter(
         { path: "rtm", element: <RtmPage /> },
         { path: "screens", element: <ScreenspecPage /> },
         { path: "knowledge", element: <KnowledgePage /> },
+        // 신설 6메뉴(pmpl-proto 메뉴 개편 2차)
+        { path: "data", element: <DataPage /> },
+        { path: "change", element: <ChangePage /> },
+        { path: "programs", element: <ProgramsPage /> },
+        { path: "quality", element: <QualityPage /> },
+        { path: "report", element: <ReportPage /> },
+        { path: "policy", element: <PolicyPage /> },
         { path: "*", element: <Navigate to="/" replace /> },
       ],
     },

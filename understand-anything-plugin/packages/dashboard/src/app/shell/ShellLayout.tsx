@@ -186,6 +186,15 @@ export default function ShellLayout(ctx: ShellContext) {
         category: "View",
       },
       {
+        key: "r",
+        description: "위험 오버레이 토글",
+        action: () => {
+          if (currentMode() === "wiki") return; // 문서 모드는 오버레이 비해당
+          useDashboardStore.getState().toggleOverlay("risk");
+        },
+        category: "View",
+      },
+      {
         key: "f",
         description: t.keyboardShortcuts.toggleFilter,
         action: () => {

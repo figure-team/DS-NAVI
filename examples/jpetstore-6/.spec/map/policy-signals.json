@@ -1,0 +1,964 @@
+{
+  "gitCommit": "dfbb9822f7c17f41a39e96704f4ea4f455580278",
+  "schemaVersion": 1,
+  "signals": [
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 17
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (suppid)",
+      "kind": "primary-key",
+      "subject": "SUPPLIER"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 18
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "SUPPLIER.suppid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 20
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "SUPPLIER.status"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 30
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (username)",
+      "kind": "primary-key",
+      "subject": "SIGNON"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 31
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "SIGNON.username"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 32
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "SIGNON.password"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 36
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (userid)",
+      "kind": "primary-key",
+      "subject": "ACCOUNT"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 37
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.userid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 38
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.email"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 39
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.firstname"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 40
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.lastname"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 42
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.addr1"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 44
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.city"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 45
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.state"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 46
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.zip"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 47
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.country"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 48
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ACCOUNT.phone"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 52
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (userid)",
+      "kind": "primary-key",
+      "subject": "PROFILE"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 53
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "PROFILE.userid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 54
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "PROFILE.langpref"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 61
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (favcategory)",
+      "kind": "primary-key",
+      "subject": "BANNERDATA"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 62
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "BANNERDATA.favcategory"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 67
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (orderid)",
+      "kind": "primary-key",
+      "subject": "ORDERS"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 68
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.orderid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 69
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.userid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 70
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.orderdate"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 71
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.shipaddr1"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 73
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.shipcity"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 74
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.shipstate"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 75
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.shipzip"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 76
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.shipcountry"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 77
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.billaddr1"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 79
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.billcity"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 80
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.billstate"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 81
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.billzip"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 82
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.billcountry"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 83
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.courier"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 84
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.totalprice"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 85
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.billtofirstname"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 86
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.billtolastname"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 87
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.shiptofirstname"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 88
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.shiptolastname"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 89
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.creditcard"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 90
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.exprdate"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 91
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.cardtype"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 92
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERS.locale"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 96
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (orderid, linenum)",
+      "kind": "primary-key",
+      "subject": "ORDERSTATUS"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 97
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERSTATUS.orderid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 98
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERSTATUS.linenum"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 99
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERSTATUS.timestamp"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 100
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ORDERSTATUS.status"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 104
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (orderid, linenum)",
+      "kind": "primary-key",
+      "subject": "LINEITEM"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 105
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "LINEITEM.orderid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 106
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "LINEITEM.linenum"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 107
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "LINEITEM.itemid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 108
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "LINEITEM.quantity"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 109
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "LINEITEM.unitprice"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 113
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (catid)",
+      "kind": "primary-key",
+      "subject": "CATEGORY"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 114
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "CATEGORY.catid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 120
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (productid)",
+      "kind": "primary-key",
+      "subject": "PRODUCT"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 121
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "PRODUCT.productid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 122
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "PRODUCT.category"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 126
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "FK → CATEGORY(catid)",
+      "kind": "fk",
+      "subject": "PRODUCT(category)"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 133
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (itemid)",
+      "kind": "primary-key",
+      "subject": "ITEM"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 134
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ITEM.itemid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 135
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "ITEM.productid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 146
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "FK → PRODUCT(productid)",
+      "kind": "fk",
+      "subject": "ITEM(productid)"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 148
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "FK → SUPPLIER(suppid)",
+      "kind": "fk",
+      "subject": "ITEM(supplier)"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 154
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (itemid)",
+      "kind": "primary-key",
+      "subject": "INVENTORY"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 155
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "INVENTORY.itemid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 156
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "INVENTORY.qty"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 160
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "PRIMARY KEY (name)",
+      "kind": "primary-key",
+      "subject": "SEQUENCE"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 162
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "SEQUENCE.name"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 163
+      },
+      "category": "data",
+      "confidence": "CONFIRMED",
+      "detail": "NOT NULL",
+      "kind": "not-null",
+      "subject": "SEQUENCE.nextid"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 17
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "SUPPLIER"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 30
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "SIGNON"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 36
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "ACCOUNT"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 52
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "PROFILE"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 61
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "BANNERDATA"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 67
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "ORDERS"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 96
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "ORDERSTATUS"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 104
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "LINEITEM"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 113
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "CATEGORY"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 120
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "PRODUCT"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 133
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "ITEM"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 154
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "INVENTORY"
+    },
+    {
+      "anchor": {
+        "file": "src/main/resources/database/jpetstore-hsqldb-data.sql",
+        "line": 160
+      },
+      "category": "glossary",
+      "confidence": "INFERRED",
+      "detail": "(주석 없음)",
+      "kind": "table",
+      "subject": "SEQUENCE"
+    }
+  ],
+  "unresolved": []
+}

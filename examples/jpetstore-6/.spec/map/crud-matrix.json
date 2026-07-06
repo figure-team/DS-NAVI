@@ -1,0 +1,588 @@
+{
+  "schemaVersion": 1,
+  "gitCommit": null,
+  "heading": "CRUD 매트릭스",
+  "prose": "CRUD 는 기능 핸들러가 실제 호출하는 매퍼 메서드의 SQL 문 종류(select=R/insert=C/update=U/delete=D)에서 판정한다(메서드 호출그래프 정밀 귀속). 근거=Mapper XML file:line.",
+  "columns": [
+    "기능",
+    "ACCOUNT",
+    "BANNERDATA",
+    "CATEGORY",
+    "INVENTORY",
+    "ITEM",
+    "LINEITEM",
+    "ORDERS",
+    "ORDERSTATUS",
+    "PRODUCT",
+    "PROFILE",
+    "SEQUENCE",
+    "SIGNON"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "*.action 요청 라우팅 흐름",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "계정 기본 진입(로그인 폼)",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "계정 수정 처리",
+        "RU",
+        "R",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "R",
+        "RU",
+        "",
+        "RU"
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 26
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 52
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 79
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 102
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 122
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "cells": [
+        "계정 수정 폼",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "신규 계정 등록 처리",
+        "CR",
+        "R",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "R",
+        "CR",
+        "",
+        "CR"
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 26
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 52
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 95
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 114
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 127
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "cells": [
+        "신규 계정 등록 폼",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "로그아웃",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "로그인 처리",
+        "R",
+        "R",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "R",
+        "R",
+        "",
+        "R"
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 26
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+          "line": 52
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "cells": [
+        "장바구니에 품목 담기",
+        "",
+        "",
+        "",
+        "R",
+        "R",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+          "line": 70
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "cells": [
+        "체크아웃 진입",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "장바구니에서 품목 제거",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "장바구니 수량 갱신",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "장바구니 조회",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "카탈로그 메인 화면",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "상품 검색",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "R",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "cells": [
+        "카테고리 조회",
+        "",
+        "",
+        "R",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "R",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+          "line": 26
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "cells": [
+        "품목 상세 조회",
+        "",
+        "",
+        "",
+        "",
+        "R",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "cells": [
+        "상품 상세 조회",
+        "",
+        "",
+        "",
+        "",
+        "R",
+        "",
+        "",
+        "",
+        "R",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+          "line": 26
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "cells": [
+        "주문 목록 조회",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "R",
+        "R",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/OrderMapper.xml",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "cells": [
+        "주문 생성",
+        "",
+        "",
+        "",
+        "U",
+        "",
+        "C",
+        "C",
+        "C",
+        "",
+        "",
+        "RU",
+        ""
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+          "line": 76
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
+          "line": 37
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/OrderMapper.xml",
+          "line": 93
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/OrderMapper.xml",
+          "line": 104
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/SequenceMapper.xml",
+          "line": 26
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/SequenceMapper.xml",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "cells": [
+        "주문 폼 표시",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "INFERRED",
+      "evidence": []
+    },
+    {
+      "cells": [
+        "주문 상세 조회",
+        "",
+        "",
+        "",
+        "R",
+        "R",
+        "R",
+        "R",
+        "R",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "confidence": "CONFIRMED",
+      "evidence": [
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+          "line": 70
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+          "line": 47
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
+          "line": 26
+        },
+        {
+          "file": "src/main/resources/org/mybatis/jpetstore/mapper/OrderMapper.xml",
+          "line": 26
+        }
+      ]
+    }
+  ]
+}

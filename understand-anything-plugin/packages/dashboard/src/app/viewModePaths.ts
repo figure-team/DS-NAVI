@@ -13,6 +13,12 @@ export const MODE_TO_PATH: Record<ViewMode, string> = {
   rtm: "/rtm",
   screenspec: "/screens",
   knowledge: "/knowledge",
+  data: "/data",
+  change: "/change",
+  programs: "/programs",
+  quality: "/quality",
+  report: "/report",
+  policy: "/policy",
 };
 
 const PATH_TO_MODE = new Map<string, ViewMode>(

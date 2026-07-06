@@ -7,8 +7,38 @@ import GraphWorkbench from "./GraphWorkbench";
 export default function StructurePage() {
   const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   useStructureUrlSync();
+  useOverlayParam();
   if (isKnowledgeGraph) return <Navigate to="/knowledge" replace />;
   return <GraphWorkbench mode="structural" />;
+}
+
+/**
+ * ktds(메뉴 개편 2차): ?overlay=risk|diff|impact — 다른 화면(품질·위험 등)에서 딥링크로
+ * 특정 오버레이를 켠 채 진입. 채널 데이터가 비동기 적재되므로 데이터 도착을 기다렸다가
+ * 1회 활성 후 파라미터를 제거한다(원샷 — 새로고침 시 재강제 없음).
+ */
+function useOverlayParam() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const diffData = useDashboardStore((s) => s.diffOverlayData);
+  const impactData = useDashboardStore((s) => s.impactOverlayData);
+  const riskData = useDashboardStore((s) => s.riskOverlayData);
+
+  useEffect(() => {
+    const want = searchParams.get("overlay");
+    if (want !== "risk" && want !== "diff" && want !== "impact") return;
+    const data = want === "risk" ? riskData : want === "diff" ? diffData : impactData;
+    if (!data || data.changed.length === 0) return; // 데이터 도착 대기(부재 시 no-op — 정직)
+    const s = useDashboardStore.getState();
+    if (!(s.overlaySource === want && s.diffMode)) s.toggleOverlay(want);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("overlay");
+        return next;
+      },
+      { replace: true },
+    );
+  }, [searchParams, diffData, impactData, riskData, setSearchParams]);
 }
 
 /**

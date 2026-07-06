@@ -1,0 +1,1719 @@
+{
+  "gitCommit": "bc3a571ea92c2637cc26389033690b2439fec356",
+  "items": [
+    {
+      "domain": "account+cart+catalog+order",
+      "factors": [
+        "fanIn",
+        "complexity"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+      "grade": "상",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 145,
+        "complexity": 25,
+        "fanIn": 3,
+        "fanOut": 1,
+        "loc": 145,
+        "unreached": false
+      },
+      "name": "Item",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.8696,
+        "fanIn": 0.8824,
+        "fanOut": 0.7745,
+        "loc": 0.8627
+      },
+      "notes": [],
+      "programId": "PGM-COM-6474e19b",
+      "score": 0.8563,
+      "type": "common"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "complexity",
+        "loc"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+      "grade": "상",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 335,
+        "complexity": 58,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 335,
+        "unreached": false
+      },
+      "name": "Order",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 1,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 1
+      },
+      "notes": [],
+      "programId": "PGM-COM-b9d226d6",
+      "score": 0.8115,
+      "type": "common"
+    },
+    {
+      "domain": "catalog",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "grade": "상",
+      "layer": "api",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 219,
+        "complexity": 30,
+        "fanIn": 0,
+        "fanOut": 5,
+        "loc": 219,
+        "unreached": false
+      },
+      "name": "CatalogActionBean",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.913,
+        "fanIn": 0.2451,
+        "fanOut": 1,
+        "loc": 0.9804
+      },
+      "notes": [],
+      "programId": "PGM-SCR-1de6f314",
+      "score": 0.7878,
+      "type": "screen"
+    },
+    {
+      "domain": "account",
+      "factors": [
+        "complexity",
+        "loc"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "grade": "상",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 196,
+        "complexity": 36,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 196,
+        "unreached": false
+      },
+      "name": "Account",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.9565,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.9216
+      },
+      "notes": [],
+      "programId": "PGM-COM-68a9e48b",
+      "score": 0.7766,
+      "type": "common"
+    },
+    {
+      "domain": "cart",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "grade": "상",
+      "layer": "api",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 150,
+        "complexity": 18,
+        "fanIn": 1,
+        "fanOut": 3,
+        "loc": 150,
+        "unreached": false
+      },
+      "name": "CartActionBean",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.7391,
+        "fanIn": 0.6275,
+        "fanOut": 0.9216,
+        "loc": 0.8824
+      },
+      "notes": [],
+      "programId": "PGM-SCR-6c5edc23",
+      "score": 0.7745,
+      "type": "screen"
+    },
+    {
+      "domain": "account+cart+catalog",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "grade": "상",
+      "layer": "service",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 90,
+        "complexity": 10,
+        "fanIn": 4,
+        "fanOut": 3,
+        "loc": 90,
+        "unreached": false
+      },
+      "name": "CatalogService",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.6087,
+        "fanIn": 0.9706,
+        "fanOut": 0.9216,
+        "loc": 0.6471
+      },
+      "notes": [],
+      "programId": "PGM-SVC-2d117c4e",
+      "score": 0.7492,
+      "type": "service"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "grade": "중",
+      "layer": "api",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 197,
+        "complexity": 22,
+        "fanIn": 0,
+        "fanOut": 3,
+        "loc": 197,
+        "unreached": false
+      },
+      "name": "OrderActionBean",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.8261,
+        "fanIn": 0.2451,
+        "fanOut": 0.9216,
+        "loc": 0.9412
+      },
+      "notes": [],
+      "programId": "PGM-SCR-fc9c602d",
+      "score": 0.7333,
+      "type": "screen"
+    },
+    {
+      "domain": "account",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "grade": "중",
+      "layer": "api",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 208,
+        "complexity": 21,
+        "fanIn": 0,
+        "fanOut": 4,
+        "loc": 208,
+        "unreached": false
+      },
+      "name": "AccountActionBean",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.7826,
+        "fanIn": 0.2451,
+        "fanOut": 0.9706,
+        "loc": 0.9608
+      },
+      "notes": [],
+      "programId": "PGM-SCR-03dd742b",
+      "score": 0.7286,
+      "type": "screen"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "grade": "중",
+      "layer": "service",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 132,
+        "complexity": 6,
+        "fanIn": 2,
+        "fanOut": 4,
+        "loc": 132,
+        "unreached": false
+      },
+      "name": "OrderService",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.3696,
+        "fanIn": 0.7843,
+        "fanOut": 0.9706,
+        "loc": 0.8333
+      },
+      "notes": [],
+      "programId": "PGM-SVC-d564b236",
+      "score": 0.6648,
+      "type": "service"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/LineItem.java",
+      "grade": "중",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 118,
+        "complexity": 16,
+        "fanIn": 0,
+        "fanOut": 2,
+        "loc": 118,
+        "unreached": false
+      },
+      "name": "LineItem",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.6957,
+        "fanIn": 0.2451,
+        "fanOut": 0.8824,
+        "loc": 0.7451
+      },
+      "notes": [],
+      "programId": "PGM-COM-b6277a61",
+      "score": 0.6318,
+      "type": "common"
+    },
+    {
+      "domain": "account",
+      "factors": [
+        "loc",
+        "fanIn"
+      ],
+      "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+      "grade": "중",
+      "layer": "db",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 132,
+        "complexity": null,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 132,
+        "unreached": false
+      },
+      "name": "AccountMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.8333
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(xml — java 전용 근사)"
+      ],
+      "programId": "PGM-MAP-19fe2f40",
+      "score": 0.6311,
+      "type": "mapper-xml"
+    },
+    {
+      "domain": "cart",
+      "factors": [
+        "loc",
+        "complexity"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "grade": "중",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 125,
+        "complexity": 12,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 125,
+        "unreached": false
+      },
+      "name": "Cart",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.6522,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.7843
+      },
+      "notes": [],
+      "programId": "PGM-COM-51c62df1",
+      "score": 0.6279,
+      "type": "common"
+    },
+    {
+      "domain": "cart+order",
+      "factors": [
+        "fanOut",
+        "fanIn"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+      "grade": "중",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 76,
+        "complexity": 9,
+        "fanIn": 1,
+        "fanOut": 1,
+        "loc": 76,
+        "unreached": false
+      },
+      "name": "CartItem",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.5435,
+        "fanIn": 0.6275,
+        "fanOut": 0.7745,
+        "loc": 0.5588
+      },
+      "notes": [],
+      "programId": "PGM-COM-9f4f6427",
+      "score": 0.602,
+      "type": "common"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "loc",
+        "fanIn"
+      ],
+      "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/OrderMapper.xml",
+      "grade": "중",
+      "layer": "db",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 109,
+        "complexity": null,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 109,
+        "unreached": false
+      },
+      "name": "OrderMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.7255
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(xml — java 전용 근사)"
+      ],
+      "programId": "PGM-MAP-d1be15e8",
+      "score": 0.5907,
+      "type": "mapper-xml"
+    },
+    {
+      "domain": "account",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+      "grade": "중",
+      "layer": "dao",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 43,
+        "complexity": 8,
+        "fanIn": 3,
+        "fanOut": 1,
+        "loc": 43,
+        "unreached": false
+      },
+      "name": "AccountMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.4783,
+        "fanIn": 0.8824,
+        "fanOut": 0.7745,
+        "loc": 0.2451
+      },
+      "notes": [],
+      "programId": "PGM-DAO-51f037a7",
+      "score": 0.5633,
+      "type": "dao"
+    },
+    {
+      "domain": "account+cart+catalog+order",
+      "factors": [
+        "fanIn",
+        "complexity"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/Product.java",
+      "grade": "중",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 71,
+        "complexity": 9,
+        "fanIn": 2,
+        "fanOut": 0,
+        "loc": 71,
+        "unreached": false
+      },
+      "name": "Product",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.5435,
+        "fanIn": 0.7843,
+        "fanOut": 0.3333,
+        "loc": 0.4902
+      },
+      "notes": [],
+      "programId": "PGM-COM-f9a3f312",
+      "score": 0.5544,
+      "type": "common"
+    },
+    {
+      "domain": "account+cart+catalog+order",
+      "factors": [
+        "fanIn",
+        "loc"
+      ],
+      "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml",
+      "grade": "하",
+      "layer": "db",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 82,
+        "complexity": null,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 82,
+        "unreached": false
+      },
+      "name": "ItemMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.6078
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(xml — java 전용 근사)"
+      ],
+      "programId": "PGM-MAP-81a3e7d5",
+      "score": 0.5466,
+      "type": "mapper-xml"
+    },
+    {
+      "domain": "account",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "grade": "하",
+      "layer": "service",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 75,
+        "complexity": 5,
+        "fanIn": 2,
+        "fanOut": 1,
+        "loc": 75,
+        "unreached": false
+      },
+      "name": "AccountService",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.3043,
+        "fanIn": 0.7843,
+        "fanOut": 0.7745,
+        "loc": 0.5294
+      },
+      "notes": [],
+      "programId": "PGM-SVC-5f5bf3cb",
+      "score": 0.5394,
+      "type": "service"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/order/ViewOrder.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 173,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 173,
+        "unreached": true
+      },
+      "name": "ViewOrder",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.902
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-dbbf9812",
+      "score": 0.5135,
+      "type": "screen"
+    },
+    {
+      "domain": "account+cart+catalog+order",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "grade": "하",
+      "layer": "dao",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 38,
+        "complexity": 4,
+        "fanIn": 5,
+        "fanOut": 1,
+        "loc": 38,
+        "unreached": false
+      },
+      "name": "ItemMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.2391,
+        "fanIn": 1,
+        "fanOut": 0.7745,
+        "loc": 0.1863
+      },
+      "notes": [],
+      "programId": "PGM-DAO-867b6414",
+      "score": 0.4849,
+      "type": "dao"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/common/IncludeTop.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 131,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 131,
+        "unreached": true
+      },
+      "name": "IncludeTop",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.8039
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-9a011004",
+      "score": 0.4767,
+      "type": "screen"
+    },
+    {
+      "domain": "account+cart+catalog",
+      "factors": [
+        "fanIn",
+        "loc"
+      ],
+      "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml",
+      "grade": "하",
+      "layer": "db",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 56,
+        "complexity": null,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 56,
+        "unreached": false
+      },
+      "name": "ProductMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.3824
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(xml — java 전용 근사)"
+      ],
+      "programId": "PGM-MAP-0666fa83",
+      "score": 0.462,
+      "type": "mapper-xml"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/order/ConfirmOrder.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 122,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 122,
+        "unreached": true
+      },
+      "name": "ConfirmOrder",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.7647
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-ed0c6c14",
+      "score": 0.462,
+      "type": "screen"
+    },
+    {
+      "domain": "account+cart+catalog",
+      "factors": [
+        "fanIn",
+        "complexity"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/Category.java",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 62,
+        "complexity": 7,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 62,
+        "unreached": false
+      },
+      "name": "Category",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.4348,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.4216
+      },
+      "notes": [],
+      "programId": "PGM-COM-3eec28c3",
+      "score": 0.4606,
+      "type": "common"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+      "grade": "하",
+      "layer": "dao",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 37,
+        "complexity": 4,
+        "fanIn": 3,
+        "fanOut": 1,
+        "loc": 37,
+        "unreached": false
+      },
+      "name": "OrderMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.2391,
+        "fanIn": 0.8824,
+        "fanOut": 0.7745,
+        "loc": 0.1569
+      },
+      "notes": [],
+      "programId": "PGM-DAO-f30e87dd",
+      "score": 0.451,
+      "type": "dao"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/cart/Cart.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 105,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 105,
+        "unreached": true
+      },
+      "name": "Cart",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.7059
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-3c93f7f6",
+      "score": 0.4399,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/catalog/Main.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 92,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 92,
+        "unreached": true
+      },
+      "name": "Main",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.6863
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-b1ada8ee",
+      "score": 0.4326,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/order/NewOrderForm.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 91,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 91,
+        "unreached": true
+      },
+      "name": "NewOrderForm",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.6667
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-26b9e12b",
+      "score": 0.4253,
+      "type": "screen"
+    },
+    {
+      "domain": "account+cart+catalog+order",
+      "factors": [
+        "fanIn",
+        "loc"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AbstractActionBean.java",
+      "grade": "하",
+      "layer": "api",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 51,
+        "complexity": 3,
+        "fanIn": 4,
+        "fanOut": 0,
+        "loc": 51,
+        "unreached": false
+      },
+      "name": "AbstractActionBean",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.1522,
+        "fanIn": 0.9706,
+        "fanOut": 0.3333,
+        "loc": 0.3529
+      },
+      "notes": [],
+      "programId": "PGM-COM-3bcd71ec",
+      "score": 0.4152,
+      "type": "common"
+    },
+    {
+      "domain": "account+cart+catalog",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
+      "grade": "하",
+      "layer": "db",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 43,
+        "complexity": null,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 43,
+        "unreached": false
+      },
+      "name": "CategoryMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.2451
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(xml — java 전용 근사)"
+      ],
+      "programId": "PGM-MAP-13169477",
+      "score": 0.4105,
+      "type": "mapper-xml"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/account/IncludeAccountFields.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 87,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 87,
+        "unreached": true
+      },
+      "name": "IncludeAccountFields",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.6275
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-17377901",
+      "score": 0.4105,
+      "type": "screen"
+    },
+    {
+      "domain": "account+cart+catalog",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "grade": "하",
+      "layer": "dao",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 35,
+        "complexity": 3,
+        "fanIn": 3,
+        "fanOut": 1,
+        "loc": 35,
+        "unreached": false
+      },
+      "name": "ProductMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.1522,
+        "fanIn": 0.8824,
+        "fanOut": 0.7745,
+        "loc": 0.1176
+      },
+      "notes": [],
+      "programId": "PGM-DAO-dc8fe9e3",
+      "score": 0.4085,
+      "type": "dao"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/LineItemMapper.xml",
+      "grade": "하",
+      "layer": "db",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 42,
+        "complexity": null,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 42,
+        "unreached": false
+      },
+      "name": "LineItemMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.2157
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(xml — java 전용 근사)"
+      ],
+      "programId": "PGM-MAP-26ddb969",
+      "score": 0.3995,
+      "type": "mapper-xml"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/catalog/Product.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 77,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 77,
+        "unreached": true
+      },
+      "name": "Product",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.5882
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-807f6244",
+      "score": 0.3958,
+      "type": "screen"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/SequenceMapper.xml",
+      "grade": "하",
+      "layer": "db",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 38,
+        "complexity": null,
+        "fanIn": 1,
+        "fanOut": 0,
+        "loc": 38,
+        "unreached": false
+      },
+      "name": "SequenceMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.6275,
+        "fanOut": 0.3333,
+        "loc": 0.1863
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(xml — java 전용 근사)"
+      ],
+      "programId": "PGM-MAP-5194eead",
+      "score": 0.3885,
+      "type": "mapper-xml"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/cart/Checkout.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 76,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 76,
+        "unreached": true
+      },
+      "name": "Checkout",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.5588
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-54cf59fc",
+      "score": 0.3848,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/catalog/Item.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 72,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 72,
+        "unreached": true
+      },
+      "name": "Item",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.5098
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-340aa6e6",
+      "score": 0.3664,
+      "type": "screen"
+    },
+    {
+      "domain": "account+cart+catalog",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java",
+      "grade": "하",
+      "layer": "dao",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 33,
+        "complexity": 2,
+        "fanIn": 3,
+        "fanOut": 1,
+        "loc": 33,
+        "unreached": false
+      },
+      "name": "CategoryMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.0435,
+        "fanIn": 0.8824,
+        "fanOut": 0.7745,
+        "loc": 0.0686
+      },
+      "notes": [],
+      "programId": "PGM-DAO-66ca821f",
+      "score": 0.3553,
+      "type": "dao"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+      "grade": "하",
+      "layer": "dao",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 33,
+        "complexity": 2,
+        "fanIn": 3,
+        "fanOut": 1,
+        "loc": 33,
+        "unreached": false
+      },
+      "name": "LineItemMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.0435,
+        "fanIn": 0.8824,
+        "fanOut": 0.7745,
+        "loc": 0.0686
+      },
+      "notes": [],
+      "programId": "PGM-DAO-74737d93",
+      "score": 0.3553,
+      "type": "dao"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/order/ShippingForm.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 68,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 68,
+        "unreached": true
+      },
+      "name": "ShippingForm",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.4706
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-e3e1963d",
+      "score": 0.3517,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/web.xml",
+      "grade": "하",
+      "layer": "api",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 64,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 64,
+        "unreached": false
+      },
+      "name": "web",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.451
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(xml — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-f1c1b2e3",
+      "score": 0.3444,
+      "type": "screen"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "fanIn",
+        "fanOut"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+      "grade": "하",
+      "layer": "dao",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 30,
+        "complexity": 2,
+        "fanIn": 3,
+        "fanOut": 1,
+        "loc": 30,
+        "unreached": false
+      },
+      "name": "SequenceMapper",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.0435,
+        "fanIn": 0.8824,
+        "fanOut": 0.7745,
+        "loc": 0.0196
+      },
+      "notes": [],
+      "programId": "PGM-DAO-6d2e4325",
+      "score": 0.344,
+      "type": "dao"
+    },
+    {
+      "domain": "order",
+      "factors": [
+        "loc",
+        "complexity"
+      ],
+      "filePath": "src/main/java/org/mybatis/jpetstore/domain/Sequence.java",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 56,
+        "complexity": 6,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 56,
+        "unreached": false
+      },
+      "name": "Sequence",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": 0.3696,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.3824
+      },
+      "notes": [],
+      "programId": "PGM-COM-b64dbe20",
+      "score": 0.3382,
+      "type": "common"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "loc",
+        "fanOut"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/catalog/SearchProducts.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 62,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 62,
+        "unreached": true
+      },
+      "name": "SearchProducts",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.4216
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-2fc8e576",
+      "score": 0.3333,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/catalog/Category.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 50,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 50,
+        "unreached": true
+      },
+      "name": "Category",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.3333
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-a2276880",
+      "score": 0.3002,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/account/EditAccountForm.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 48,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 48,
+        "unreached": true
+      },
+      "name": "EditAccountForm",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.3137
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-3b60f781",
+      "score": 0.2929,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/account/NewAccountForm.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 47,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 47,
+        "unreached": true
+      },
+      "name": "NewAccountForm",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.2843
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-4e391b64",
+      "score": 0.2819,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "fanOut",
+        "loc"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/order/ListOrders.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 47,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 47,
+        "unreached": true
+      },
+      "name": "ListOrders",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.2843
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-d0ad3de3",
+      "score": 0.2819,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "fanOut",
+        "fanIn"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/common/IncludeBottom.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 36,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 36,
+        "unreached": true
+      },
+      "name": "IncludeBottom",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.1373
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-699ba88b",
+      "score": 0.2267,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "fanOut",
+        "fanIn"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/account/SignonForm.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 34,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 34,
+        "unreached": true
+      },
+      "name": "SignonForm",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.098
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-42f29104",
+      "score": 0.212,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "fanOut",
+        "fanIn"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/cart/IncludeMyList.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 32,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 32,
+        "unreached": true
+      },
+      "name": "IncludeMyList",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0.0392
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-f9a81dbb",
+      "score": 0.1899,
+      "type": "screen"
+    },
+    {
+      "domain": "web-inf",
+      "factors": [
+        "fanOut",
+        "fanIn"
+      ],
+      "filePath": "src/main/webapp/WEB-INF/jsp/common/Error.jsp",
+      "grade": "하",
+      "layer": "unknown",
+      "metrics": {
+        "churnCommits": 1,
+        "churnLines": 22,
+        "complexity": null,
+        "fanIn": 0,
+        "fanOut": 0,
+        "loc": 22,
+        "unreached": true
+      },
+      "name": "Error",
+      "normalized": {
+        "churn": 0.5,
+        "complexity": null,
+        "fanIn": 0.2451,
+        "fanOut": 0.3333,
+        "loc": 0
+      },
+      "notes": [
+        "[미확인] 복잡도 미측정(jsp — java 전용 근사)"
+      ],
+      "programId": "PGM-SCR-9d95f4c3",
+      "score": 0.1752,
+      "type": "screen"
+    }
+  ],
+  "meta": {
+    "churnAvailable": true,
+    "degenerateMetrics": [
+      "churn"
+    ],
+    "edgeKinds": [
+      "ctor-param",
+      "extends",
+      "field-type",
+      "impl",
+      "implements",
+      "injection",
+      "mapper-xml",
+      "mybatis"
+    ],
+    "topN": 20,
+    "weights": {
+      "churn": 0.25,
+      "complexity": 0.25,
+      "fanIn": 0.15,
+      "fanOut": 0.1,
+      "loc": 0.15
+    }
+  },
+  "schemaVersion": 1,
+  "stats": {
+    "complexityUnmeasured": [
+      {
+        "count": 20,
+        "ext": "jsp"
+      },
+      {
+        "count": 8,
+        "ext": "xml"
+      }
+    ],
+    "excluded": {
+      "test": 18
+    },
+    "measured": {
+      "churn": 52,
+      "complexity": 24
+    },
+    "programs": 52,
+    "unreached": 20
+  }
+}

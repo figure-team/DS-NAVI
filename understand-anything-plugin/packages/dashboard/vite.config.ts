@@ -28,6 +28,37 @@ function findGraphFile(fileName: string): string | null {
   return graphFileCandidates(fileName).find((candidate) => fs.existsSync(candidate)) ?? null;
 }
 
+// 신설 메뉴(데이터·변경영향·프로그램·품질·보고서·정책서)의 엔진 산출은 `.spec/map/` 에 산다
+// (ktds-legacy-plugin understand-map/impact/report/policy 계열이 기록). graphFileCandidates 와
+// 같은 우선순위(GRAPH_DIR → cwd → 모노레포 루트)로 해석한다.
+function specMapFileCandidates(fileName: string): string[] {
+  const graphDir = process.env.GRAPH_DIR;
+  return [
+    ...(graphDir ? [path.resolve(graphDir, `.spec/map/${fileName}`)] : []),
+    path.resolve(process.cwd(), `.spec/map/${fileName}`),
+    path.resolve(process.cwd(), `../../../.spec/map/${fileName}`),
+  ];
+}
+
+function findSpecMapFile(fileName: string): string | null {
+  return specMapFileCandidates(fileName).find((candidate) => fs.existsSync(candidate)) ?? null;
+}
+
+/** `.spec/map/` 읽기 전용 서빙 대상 — pathname(=파일명) 화이트리스트. */
+const SPEC_MAP_ENDPOINTS = new Set([
+  "/db-schema.json",
+  "/crud-matrix.json",
+  "/program-inventory.json",
+  "/interfaces.json",
+  "/batch-jobs.json",
+  "/risk-report.json",
+  "/coverage.json",
+  "/work-summary.json",
+  "/impact.json",
+  "/policy-signals.json",
+  "/policy-reconcile.json",
+]);
+
 function projectRootFromGraphFile(candidate: string): string {
   return path.dirname(path.dirname(candidate));
 }
@@ -1866,7 +1897,9 @@ export default defineConfig({
             pathname === "/screens.json" ||
             pathname === "/screen-overrides.json" ||
             pathname === "/screen-override" ||
-            pathname === "/screen-asset";
+            pathname === "/screen-asset" ||
+            pathname === "/golden-baseline.json" ||
+            SPEC_MAP_ENDPOINTS.has(pathname);
 
           if (!isProtectedEndpoint) {
             next();
@@ -2109,6 +2142,43 @@ export default defineConfig({
               }
             }
             sendJson(res, 200, { autoUpdate: false, outputLanguage: "en" });
+            return;
+          }
+
+          // 신설 메뉴 데이터 — `.spec/map/` 산출 읽기 전용 서빙. relPath 기반(절대경로 없음)이라
+          // 그래프 서빙과 달리 경로 새니타이즈가 필요 없다. 부재는 404(정직한 empty state 유도).
+          if (SPEC_MAP_ENDPOINTS.has(pathname)) {
+            const specFile = findSpecMapFile(pathname.slice(1));
+            if (!specFile) {
+              sendJson(res, 404, { error: `${pathname.slice(1)} not found (.spec/map)` });
+              return;
+            }
+            try {
+              sendJson(res, 200, JSON.parse(fs.readFileSync(specFile, "utf-8")));
+            } catch {
+              sendJson(res, 500, { error: `Failed to read ${pathname.slice(1)}` });
+            }
+            return;
+          }
+          // 골든셋 기준선(품질 화면) — 프로젝트 `.spec/golden/baseline.json` 이 있으면 서빙.
+          if (pathname === "/golden-baseline.json") {
+            const goldenCandidates = [
+              ...(process.env.GRAPH_DIR
+                ? [path.resolve(process.env.GRAPH_DIR, ".spec/golden/baseline.json")]
+                : []),
+              path.resolve(process.cwd(), ".spec/golden/baseline.json"),
+              path.resolve(process.cwd(), "../../../.spec/golden/baseline.json"),
+            ];
+            const goldenFile = goldenCandidates.find((c) => fs.existsSync(c));
+            if (!goldenFile) {
+              sendJson(res, 404, { error: "golden baseline not found" });
+              return;
+            }
+            try {
+              sendJson(res, 200, JSON.parse(fs.readFileSync(goldenFile, "utf-8")));
+            } catch {
+              sendJson(res, 500, { error: "Failed to read golden baseline" });
+            }
             return;
           }
 

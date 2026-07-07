@@ -1,5 +1,5 @@
 {
-  "gitCommit": "bc3a571ea92c2637cc26389033690b2439fec356",
+  "gitCommit": "7c1dc9912eccc6a1700fe6ba881da53f892c2355",
   "liveDbSignals": [
     {
       "detail": "hsqldb",
@@ -39,6 +39,7 @@
   "tables": [
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -246,6 +247,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -355,6 +357,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": "테이블명 패턴 'category'",
       "columns": [
         {
           "comment": null,
@@ -484,6 +487,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -873,6 +877,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -1623,6 +1628,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -1692,6 +1698,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -1960,6 +1967,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -2019,6 +2027,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -2377,6 +2386,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -2486,6 +2496,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -2539,6 +2550,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -2606,6 +2618,7 @@
     },
     {
       "checks": [],
+      "codeTableReason": null,
       "columns": [
         {
           "comment": null,
@@ -2773,56 +2786,69 @@
   "tier": "ddl+data",
   "unresolved": [
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:account"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:account",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:bannerdata"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:bannerdata",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:category"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:category",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:inventory"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:inventory",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:item"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:item",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:lineitem"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:lineitem",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:orders"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:orders",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:orderstatus"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:orderstatus",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:product"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:product",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:profile"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:profile",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:sequence"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:sequence",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:signon"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:signon",
+      "severity": "info"
     },
     {
-      "reason": "중복 CREATE TABLE(첫 정의 유지)",
-      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:supplier"
+      "reason": "중복 CREATE TABLE(동일 정의·첫 정의 유지)",
+      "ref": "src/main/resources/database/jpetstore-hsqldb-schema.sql:supplier",
+      "severity": "info"
     }
   ]
 }

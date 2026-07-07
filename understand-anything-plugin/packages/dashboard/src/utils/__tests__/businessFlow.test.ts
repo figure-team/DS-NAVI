@@ -4,6 +4,7 @@ import {
   buildSequentialFallback,
   businessFlowRejectedReason,
   parseBusinessFlow,
+  parseBusinessFlows,
 } from "../businessFlow";
 import type { DomainFlow } from "../domainData";
 import type { GraphNode } from "@understand-anything/core/types";
@@ -67,6 +68,42 @@ describe("parseBusinessFlow — 방어적 파싱(§4-1)", () => {
   });
 });
 
+describe("parseBusinessFlows — B안 복수 프로세스", () => {
+  it("businessFlows[] 를 title 과 함께 파싱하고, 형태 이탈 장만 제외한다", () => {
+    const procs = parseBusinessFlows(
+      node({
+        businessFlows: [
+          { title: "주문 접수", ...GOOD },
+          { title: "깨진 장", nodes: [{ id: "x", kind: "banana", label: "l" }], edges: [] },
+          { ...GOOD }, // 무제목 장
+        ],
+      }),
+    );
+    expect(procs).toHaveLength(2);
+    expect(procs[0].title).toBe("주문 접수");
+    expect(procs[0].index).toBe(0);
+    expect(procs[0].flow.nodes).toHaveLength(4);
+    expect(procs[1].title).toBeNull();
+    expect(procs[1].index).toBe(1); // 생존분 기준 연속 인덱스(?bf= 매핑)
+  });
+
+  it("신형이 없으면 레거시 단수 businessFlow 를 1건 목록으로(하위호환)", () => {
+    const procs = parseBusinessFlows(node({ businessFlow: GOOD }));
+    expect(procs).toHaveLength(1);
+    expect(procs[0].title).toBeNull();
+    expect(procs[0].flow.nodes).toHaveLength(4);
+    // 둘 다 없으면 빈 목록 → 호출자가 순차 폴백으로.
+    expect(parseBusinessFlows(node())).toEqual([]);
+    // 신형이 있으면(빈 배열이라도) 레거시는 무시된다 — 엔진 정규화와 동일 우선순위.
+    expect(parseBusinessFlows(node({ businessFlows: [], businessFlow: GOOD }))).toEqual([]);
+  });
+
+  it("parseBusinessFlow(레거시 축약)는 첫 프로세스를 돌려준다", () => {
+    const biz = parseBusinessFlow(node({ businessFlows: [{ title: "주문 접수", ...GOOD }] }))!;
+    expect(biz.nodes).toHaveLength(4);
+  });
+});
+
 describe("buildSequentialFallback — 결정론 순차 근사", () => {
   const flow = (id: string, name: string): DomainFlow => ({
     id,
@@ -76,6 +113,7 @@ describe("buildSequentialFallback — 결정론 순차 근사", () => {
     desc: "",
     stepCount: 0,
     entryType: "http",
+    formFlow: null,
     grounding: null,
   });
 

@@ -144,18 +144,14 @@ export default function DomainMapView() {
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
-      {/* 헤더 — pmpl-proto page-head(P6): eyebrow 브레드크럼 + 타이틀 + 인라인 통계 meta */}
+      {/* 헤더 — pmpl-proto page-head(P6): 타이틀 + 인라인 통계 meta.
+          eyebrow(업무 지도 · 프로젝트명)는 TopBar 브레드크럼·시스템 박스 제목과
+          중복이라 제거. */}
       <header
         className="shrink-0 flex items-end gap-3.5 flex-wrap"
         style={{ padding: "16px 24px 12px" }}
       >
         <div className="min-w-0">
-          <p
-            className="text-text-muted font-bold"
-            style={{ fontSize: 11.5, letterSpacing: "0.06em", marginBottom: 3 }}
-          >
-            {t.domainMap.breadcrumbRoot} · {domainGraph.project.name}
-          </p>
           <h1 className="font-heading text-text-primary truncate font-bold" style={{ fontSize: 20, lineHeight: 1.25, letterSpacing: "-0.3px" }}>
             {t.domainMap.title}
           </h1>
@@ -182,17 +178,6 @@ export default function DomainMapView() {
           className="min-w-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
           style={{ boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)" }}
         >
-          <div
-            className="shrink-0 flex items-center gap-2 border-b border-border-subtle"
-            style={{ padding: "12px 18px", fontWeight: 650, fontSize: 13.5 }}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="1.8" aria-hidden>
-              <rect x="3" y="3" width="18" height="18" rx="3" />
-            </svg>
-            <span className="text-text-primary">
-              {domainGraph.project.name} {t.domainMap.systemSuffix}
-            </span>
-          </div>
           <div
             className="flex-1 min-h-0 overflow-y-auto grid"
             style={{

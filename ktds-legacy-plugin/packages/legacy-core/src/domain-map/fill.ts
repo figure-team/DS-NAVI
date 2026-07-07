@@ -77,6 +77,33 @@ export const BusinessFlowSchema = z.object({
 })
 export type BusinessFlow = z.infer<typeof BusinessFlowSchema>
 
+/**
+ * B안(복수화): 단위 업무 프로세스 순서도 1장 — title 필수(프로세스 이름은 업무
+ * 언어, 예: "로그인", "주문 접수"). 명명이라 인용 면제(도메인 name 과 동일 규약).
+ */
+export const BusinessFlowProcessSchema = BusinessFlowSchema.extend({
+  title: z.string().min(1).max(80),
+})
+export type BusinessFlowProcess = z.infer<typeof BusinessFlowProcessSchema>
+
+/**
+ * fill 의 업무 흐름도를 정규화한다 — 신형 `businessFlows[]`(title 필수)가 있으면
+ * 그것을, 없으면 레거시 단수 `businessFlow` 를 title=null 1건 배열로. 반환의
+ * 배열 인덱스가 검증 ref(`#businessFlow[<i>][<nodeId>]`)와 emit fillIndex 의
+ * 기준이다(applyFills/verify/emit 3곳이 동일 기준을 공유해야 한다).
+ */
+export function normalizedBusinessFlows(
+  fill: DomainFill,
+): Array<{ title: string | null; nodes: BusinessFlowNode[]; edges: BusinessFlowEdge[] }> {
+  if (fill.businessFlows && fill.businessFlows.length > 0) {
+    return fill.businessFlows.map((p) => ({ title: p.title, nodes: p.nodes, edges: p.edges }))
+  }
+  if (fill.businessFlow) {
+    return [{ title: null, nodes: fill.businessFlow.nodes, edges: fill.businessFlow.edges }]
+  }
+  return []
+}
+
 export const DomainFillSchema = z.object({
   schemaVersion: z.literal(1),
   domainId: z.string().regex(/^domain:/),
@@ -89,9 +116,16 @@ export const DomainFillSchema = z.object({
   /**
    * P4: 도메인 업무 프로세스 순서도(선택 — 없으면 대시보드 결정론 순차 폴백).
    * 그래프 정합·flowRef 실존 검증은 applyFills(validateBusinessFlow)에서 하고,
-   * 실패 시 businessFlow 만 기각(도메인 fill 전체 기각 아님 — 부분 수용).
+   * 실패 시 해당 순서도만 기각(도메인 fill 전체 기각 아님 — 부분 수용).
+   *
+   * 레거시 단수형 — 신형 `businessFlows[]` 가 있으면 무시된다(normalizedBusinessFlows).
    */
   businessFlow: BusinessFlowSchema.optional(),
+  /**
+   * B안(복수화): 단위 업무 프로세스별 순서도 1..N장(title 필수). 도메인당 1장
+   * 강제였던 businessFlow 의 후속 — 프로세스 단위 기각(부분 수용)이 적용된다.
+   */
+  businessFlows: z.array(BusinessFlowProcessSchema).min(1).max(20).optional(),
   flows: z.array(
     z.object({
       flowId: z.string().regex(/^flow:/),
@@ -270,33 +304,47 @@ export function applyFills(
       ],
     }
 
-    // P4: 업무 흐름도 — 그래프 정합·flowRef 실존 검증 통과 시에만 domainMeta 병합.
-    // 실패는 businessFlow 만 기각(부분 수용) — 사유를 rejected 로 표면화한다.
-    if (fill.businessFlow) {
+    // P4/B안: 업무 흐름도 — 프로세스별로 그래프 정합·flowRef 실존 검증을 통과한
+    // 것만 domainMeta.businessFlows 에 병합한다(프로세스 단위 부분 수용). 기각
+    // 사유는 rejected 로 표면화하고, **전부** 기각됐을 때만 businessFlowRejected
+    // 를 남긴다(생존 프로세스가 있으면 배너 대신 그것을 보여준다 — 정직성 유지).
+    const bfList = normalizedBusinessFlows(fill)
+    if (bfList.length > 0) {
       const domainFlowIds = new Set(
         nodes.filter((n) => n.type === 'flow' && domainKeyOf(n) === key).map((n) => n.id),
       )
-      const errors = validateBusinessFlow(fill.businessFlow, domainFlowIds)
-      if (errors.length > 0) {
-        const reason = `invalid-business-flow: ${errors.join('; ')}`
-        rejected.push({
-          domainId: fill.domainId,
-          ref: `${fill.domainId}#businessFlow`,
-          reason,
-          kind: 'businessFlow',
-        })
-        // 기각 사유를 그래프에도 표면화 — 대시보드가 "미채움"과 "작성했으나 기각"을
-        // 구별해 배너를 나눈다(정직성, 리뷰 C2). businessFlow 는 병합하지 않는다.
-        domainNode.domainMeta = { ...domainNode.domainMeta, businessFlowRejected: reason }
+      const survivors: Array<Record<string, unknown>> = []
+      const reasons: string[] = []
+      bfList.forEach((bf, i) => {
+        const errors = validateBusinessFlow(bf, domainFlowIds)
+        if (errors.length > 0) {
+          const reason = `invalid-business-flow${bf.title ? `(${bf.title})` : ''}: ${errors.join('; ')}`
+          rejected.push({
+            domainId: fill.domainId,
+            ref: `${fill.domainId}#businessFlows[${i}]`,
+            reason,
+            kind: 'businessFlow',
+          })
+          reasons.push(reason)
+        } else {
+          survivors.push({
+            // fillIndex = fill 내 원본 인덱스 — verify ref(#businessFlow[<i>][<nodeId>])
+            // 와 emit 장식이 이 값으로 재결합한다(중간 기각으로 인덱스가 밀려도 안전).
+            fillIndex: i,
+            ...(bf.title !== null ? { title: bf.title } : {}),
+            // 인용은 원본 그대로 동봉 — 검증 상태(verdict/status)는 S9 후
+            // embedVerification 이 노드 단위로 덧입힌다(단일 소스 = domain-graph.json).
+            nodes: bf.nodes.map((n) => ({ ...n })),
+            edges: bf.edges.map((e) => ({ ...e })),
+          })
+        }
+      })
+      if (survivors.length > 0) {
+        domainNode.domainMeta = { ...domainNode.domainMeta, businessFlows: survivors }
       } else {
         domainNode.domainMeta = {
           ...domainNode.domainMeta,
-          // 인용은 원본 그대로 동봉 — 검증 상태(verdict/status)는 S9 후
-          // embedVerification 이 노드 단위로 덧입힌다(단일 소스 = domain-graph.json).
-          businessFlow: {
-            nodes: fill.businessFlow.nodes.map((n) => ({ ...n })),
-            edges: fill.businessFlow.edges.map((e) => ({ ...e })),
-          },
+          businessFlowRejected: reasons.join(' | '),
         }
       }
     }

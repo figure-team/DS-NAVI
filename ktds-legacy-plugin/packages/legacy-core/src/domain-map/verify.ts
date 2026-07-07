@@ -11,7 +11,7 @@ import { resolve, sep } from 'node:path'
 import { z } from 'zod'
 import { writeMapArtifact } from './persist.js'
 import { cmp } from '../utils/cmp.js'
-import type { Citation, DomainFill } from './fill.js'
+import { normalizedBusinessFlows, type Citation, type DomainFill } from './fill.js'
 
 /** 검증 리포트 파일명(`.spec/map/` 하위). */
 export const VERIFY_REPORT_FILENAME = 'verify-report.json'
@@ -162,9 +162,9 @@ async function verifyClaim(
 
 /**
  * fill 전체를 실파일과 대조 — 결과 구조를 반환한다(쓰기는 writeVerifyReport).
- * `rejectedBusinessFlows` = applyFills 가 그래프 정합 실패로 기각한 도메인 id 집합 —
- * 기각된 businessFlow 의 인용은 그래프에 실리지 않으므로 검증·집계에서도 제외한다
- * (리포트 citation 수와 실림 상태의 정합).
+ * `rejectedBusinessFlows` = applyFills 가 그래프 정합 실패로 기각한 프로세스 ref
+ * (`<domainId>#businessFlows[<i>]`) 집합 — 기각된 순서도의 인용은 그래프에 실리지
+ * 않으므로 검증·집계에서도 제외한다(리포트 citation 수와 실림 상태의 정합).
  */
 export async function verifyFills(
   projectRoot: string,
@@ -189,18 +189,21 @@ export async function verifyFills(
         )
       }
     }
-    // P4: 업무 흐름도 노드 주장 검증 — **인용을 가진 모든 노드**(kind 무관).
-    // ref = `<domainId>#businessFlow[<nodeId>]` — embedVerification 이 이 키로
-    // domainMeta.businessFlow 노드에 verdict/인용 상태를 덧입힌다. start/end 는
-    // 인용이 면제라 보통 항목이 없지만, 인용을 달면 그것도 검증된다(리뷰 C8 정정).
-    if (fill.businessFlow && !rejectedBusinessFlows.has(fill.domainId)) {
-      for (const n of fill.businessFlow.nodes) {
+    // P4/B안: 업무 흐름도 노드 주장 검증 — **인용을 가진 모든 노드**(kind 무관).
+    // ref = `<domainId>#businessFlow[<fill 인덱스>][<nodeId>]` — embedVerification 이
+    // 이 키(fillIndex 재결합)로 domainMeta.businessFlows 노드에 verdict/인용 상태를
+    // 덧입힌다. start/end 는 인용이 면제라 보통 항목이 없지만, 인용을 달면 그것도
+    // 검증된다(리뷰 C8 정정). 기각된 프로세스는 인덱스 단위로 건너뛴다(부분 수용).
+    const bfList = normalizedBusinessFlows(fill)
+    for (let i = 0; i < bfList.length; i++) {
+      if (rejectedBusinessFlows.has(`${fill.domainId}#businessFlows[${i}]`)) continue
+      for (const n of bfList[i].nodes) {
         if (!n.citations || n.citations.length === 0) continue
         items.push(
           await verifyClaim(
             projectRoot,
             'businessFlow',
-            `${fill.domainId}#businessFlow[${n.id}]`,
+            `${fill.domainId}#businessFlow[${i}][${n.id}]`,
             { text: n.label, citations: n.citations },
             cache,
           ),

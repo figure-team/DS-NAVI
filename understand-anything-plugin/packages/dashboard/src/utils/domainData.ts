@@ -32,6 +32,12 @@ export interface DomainFlow {
   entryType: string;
   /** Flow-level verification (own ref grounding); null when unfilled/unverified. */
   grounding: FlowGrounding | null;
+  /**
+   * 병합된 폼 표시 흐름(JSP/Stripes `?xxxForm` — 서비스 호출 없이 화면만 forward).
+   * 업무 관점에서 처리 흐름(`?xxx`)의 화면 진입 단계이므로 목록에서 접고 여기로
+   * 승계한다. null = 대응 폼 흐름 없음.
+   */
+  formFlow: { id: string; name: string } | null;
 }
 
 /** A citation backing a domain-level claim (embedded by emit's embedVerification). */
@@ -348,6 +354,44 @@ export function flowBadge(node: GraphNode): { method: FlowMethod; path: string }
   return deriveMethodAndPath(node, entryPoint, entryType);
 }
 
+/**
+ * 폼 표시 흐름 병합 맵 (A안 — 표시 레벨 병합).
+ *
+ * JSP/Stripes 계열에서 `…Form` 핸들러는 서비스 호출 없이 화면(JSP)으로
+ * forward 만 하는 화면 진입 핸들러다. 같은 베이스 URL에 처리 흐름 `?xxx` 가
+ * 실존할 때만 폼 흐름을 그 처리 흐름에 접는다(결정론, 짝이 없으면 독립 유지):
+ * - `?xxxForm` 이벤트 라우트 → `?xxx` (id 형태 `flow:<METHOD> <path>?<event>`)
+ * - 베이스 라우트(@DefaultHandler)인데 entryPoint 핸들러명이 `#xxxForm` 인
+ *   경우 → `?xxx` (예: Account.action 의 signonForm → ?signon 로그인 처리)
+ * 그래프 데이터는 건드리지 않으므로 RTM·영향분석 등 다른 소비처는 무영향.
+ *
+ * @returns formFlowId → primaryFlowId
+ */
+export function buildFormMergeMap(nodes: readonly GraphNode[]): Map<string, string> {
+  const flowNodes = nodes.filter((n) => n.type === "flow");
+  const flowIds = new Set(flowNodes.map((n) => n.id));
+  const map = new Map<string, string>();
+  const RE_EVENT = /^(flow:(?:GET|POST|PUT|DELETE|PATCH|ANY)\s+\/\S*?)\?(\w+)Form$/i;
+  const RE_BASE = /^flow:(?:GET|POST|PUT|DELETE|PATCH|ANY)\s+\/[^?\s]+$/i;
+  for (const node of flowNodes) {
+    const m = node.id.match(RE_EVENT);
+    if (m) {
+      const primary = `${m[1]}?${m[2]}`;
+      if (flowIds.has(primary)) map.set(node.id, primary);
+      continue;
+    }
+    if (RE_BASE.test(node.id)) {
+      const { entryPoint } = readEntryMeta(node);
+      const h = entryPoint?.match(/#(\w+)Form$/);
+      if (h) {
+        const primary = `${node.id}?${h[1]}`;
+        if (flowIds.has(primary)) map.set(node.id, primary);
+      }
+    }
+  }
+  return map;
+}
+
 /** Build the screen-1 stats bar + ordered domain cards from the domain graph. */
 export function buildDomainCards(graph: KnowledgeGraph): {
   stats: DomainStats;
@@ -374,9 +418,27 @@ export function buildDomainCards(graph: KnowledgeGraph): {
     }
   }
 
+  // 폼 표시 흐름 병합(A안) — 기능 수는 병합 후 기준(폼+처리 짝 = 기능 1개).
+  // 분석 노드 수(step)는 실존 노드 그대로 둔다(정직 표기).
+  const formMerge = buildFormMergeMap(flowNodes);
+  // 카드와 동일 기준(짝이 같은 도메인일 때만 병합)으로 전역 통계도 계산한다.
+  const flowDomain = new Map<string, string>();
+  for (const [domainId, ids] of domainFlows) for (const id of ids) flowDomain.set(id, domainId);
+  let mergedCount = 0;
+  for (const [formId, primaryId] of formMerge) {
+    if (flowDomain.get(formId) !== undefined && flowDomain.get(formId) === flowDomain.get(primaryId)) {
+      mergedCount++;
+    }
+  }
+
   const cards: DomainCard[] = domainNodes.map((node) => {
-    const flowIds = domainFlows.get(node.id) ?? [];
-    const nodeCount = flowIds.reduce((sum, fid) => sum + (flowStepCount.get(fid) ?? 0), 0);
+    const allFlowIds = domainFlows.get(node.id) ?? [];
+    const domainIdSet = new Set(allFlowIds);
+    // 짝(primary)이 같은 도메인에 있을 때만 접는다 — 경계가 갈리면 독립 유지.
+    const flowIds = allFlowIds.filter(
+      (fid) => !(formMerge.has(fid) && domainIdSet.has(formMerge.get(fid)!)),
+    );
+    const nodeCount = allFlowIds.reduce((sum, fid) => sum + (flowStepCount.get(fid) ?? 0), 0);
     const meta = node.domainMeta as { entities?: unknown } | undefined;
     const entities = Array.isArray(meta?.entities)
       ? (meta!.entities as unknown[]).filter((x): x is string => typeof x === "string")
@@ -402,7 +464,7 @@ export function buildDomainCards(graph: KnowledgeGraph): {
   const project = graph.project;
   const stats: DomainStats = {
     domainCount: domainNodes.length,
-    flowCount: flowNodes.length,
+    flowCount: flowNodes.length - mergedCount,
     stepCount: stepNodes.length,
     language: (project?.languages ?? [])
       .map((l) => l.charAt(0).toUpperCase() + l.slice(1))
@@ -413,8 +475,17 @@ export function buildDomainCards(graph: KnowledgeGraph): {
   return { stats, cards };
 }
 
-/** Build the screen-2 flow rows for one domain. */
-export function buildDomainFlows(graph: KnowledgeGraph, domainId: string): DomainFlow[] {
+/**
+ * Build the screen-2 flow rows for one domain.
+ * `mergeForms: false` 는 병합 없이 전 흐름을 돌려준다 — 병합으로 목록에서
+ * 접힌 폼 흐름을 배지 클릭으로 선택했을 때의 조회용 인덱스(스파인 헤더).
+ */
+export function buildDomainFlows(
+  graph: KnowledgeGraph,
+  domainId: string,
+  opts: { mergeForms?: boolean } = {},
+): DomainFlow[] {
+  const mergeForms = opts.mergeForms !== false;
   const flowIds = new Set(
     graph.edges
       .filter((e) => e.type === "contains_flow" && e.source === domainId)
@@ -427,11 +498,22 @@ export function buildDomainFlows(graph: KnowledgeGraph, domainId: string): Domai
     }
   }
 
-  return graph.nodes
-    .filter((n) => flowIds.has(n.id))
+  // 폼 표시 흐름 병합(A안) — 이 도메인 안에서 짝이 맞는 `?xxxForm` 은 행에서
+  // 접고, 처리 흐름 행에 formFlow 로 승계한다(카드 flowCount 와 동일 기준).
+  const domainFlowNodes = graph.nodes.filter((n) => flowIds.has(n.id));
+  const formMerge = mergeForms ? buildFormMergeMap(domainFlowNodes) : new Map<string, string>();
+  const formByPrimary = new Map<string, GraphNode>();
+  for (const [formId, primaryId] of formMerge) {
+    const formNode = domainFlowNodes.find((n) => n.id === formId);
+    if (formNode) formByPrimary.set(primaryId, formNode);
+  }
+
+  return domainFlowNodes
+    .filter((n) => !formMerge.has(n.id))
     .map((node): DomainFlow => {
       const { entryPoint, entryType } = readEntryMeta(node);
       const { method, path } = deriveMethodAndPath(node, entryPoint, entryType);
+      const formNode = formByPrimary.get(node.id);
       return {
         id: node.id,
         method,
@@ -441,6 +523,7 @@ export function buildDomainFlows(graph: KnowledgeGraph, domainId: string): Domai
         stepCount: flowStepCount.get(node.id) ?? 0,
         entryType: entryType ?? "",
         grounding: parseFlowStepClaim(node),
+        formFlow: formNode ? { id: formNode.id, name: formNode.name } : null,
       };
     });
 }
@@ -545,7 +628,11 @@ export type WorkspaceView = "business" | "code";
  * default-tab rule below is already data-driven when P4 lands.
  */
 export function hasBusinessFlow(node: GraphNode | undefined): boolean {
-  const meta = node?.domainMeta as { businessFlow?: unknown } | undefined;
+  const meta = node?.domainMeta as { businessFlow?: unknown; businessFlows?: unknown } | undefined;
+  // B안(복수화) — 신형 businessFlows[] 우선, 레거시 단수도 계속 인식(하위호환).
+  if (Array.isArray(meta?.businessFlows) && (meta!.businessFlows as unknown[]).length > 0) {
+    return true;
+  }
   const bf = meta?.businessFlow as { nodes?: unknown } | undefined;
   return Array.isArray(bf?.nodes) && (bf!.nodes as unknown[]).length > 0;
 }

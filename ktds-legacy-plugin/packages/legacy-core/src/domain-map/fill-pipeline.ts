@@ -51,10 +51,12 @@ export async function runFillPipeline(
   }
   const { fills, pending, invalid } = await readFills(projectRoot, skeleton)
   const { nodes, rejected } = applyFills(skeleton, fills)
-  // P4: 그래프 정합 실패로 기각된 businessFlow 는 검증·집계에서도 제외(그래프에 안 실림).
-  // 구조적 kind 필터 — ref 문자열 접미 파싱 의존 제거(리뷰 C5).
+  // P4/B안: 그래프 정합 실패로 기각된 업무 흐름도 프로세스는 검증·집계에서도
+  // 제외(그래프에 안 실림). 구조적 kind 필터 — 집합 원소는 applyFills 가 만든
+  // 프로세스 ref(`<domainId>#businessFlows[<i>]`)로, verify 가 인덱스 단위로
+  // 건너뛴다(부분 수용).
   const rejectedBusinessFlows = new Set(
-    rejected.filter((r) => r.kind === 'businessFlow').map((r) => r.domainId),
+    rejected.filter((r) => r.kind === 'businessFlow').map((r) => r.ref),
   )
   const report = await verifyFills(projectRoot, fills, skeleton.gitCommit, rejectedBusinessFlows)
   const verifyReportPath = writeVerifyReport(projectRoot, report)

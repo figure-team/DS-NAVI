@@ -85,12 +85,13 @@ skeleton 이 있어야 한다(없으면 안내 후 종료). 도메인별로 **LL
 1. `.spec/map/bundle/<key>.json` 을 읽는다.
 2. 그 안의 소스 슬라이스·구조 신호만 근거로, 도메인/흐름/단계의 `name`·`summary`·`entities`·`businessRules`·`crossDomainInteractions` 을 작성한다.
 3. **단계 상세(P2/P4 계층별):** 각 step 의 `layer` 를 보고 `nodeDetailTemplate.byLayer[layer]` 의 섹션들을 그 `promptHint` 지시대로 `steps[].detail[<섹션id>]` 에 채운다. 템플릿은 **계층별 파일**(`templates/node-detail/{api,service,dao,db,other}.md`, 사람 편집 권위·런타임 로드)에서 온다. 기본 시그니처 — api=role+request, service=role+businessLogic, dao=role+persistence, db=role+schema, other(unknown)=role+dataShape. 각 섹션은 step slice 에서 인용. 메서드·호출관계는 채우지 않는다(결정론 — 엔진이 calls 엣지로 보유).
-4. **업무 흐름도(`businessFlow`, WORK_MAP §5 — 선택):** 도메인당 1장의 업무 프로세스 순서도를 `businessFlow: { nodes[], edges[] }` 로 작성한다. 노드 `kind` 는 `start|end|activity|decision`, `label` 은 **업무 언어**(코드 심볼 금지 — "재고 확인" ○, "checkInventory()" ✕)로 **짧게(~30자)** — 노드 상자가 고정 크기라 긴 라벨은 잘린다. 규칙:
+4. **업무 흐름도(`businessFlows[]`, WORK_MAP §5 — 선택):** **단위 업무 프로세스별** 순서도를 `businessFlows: [{ title, nodes[], edges[] }, …]` 로 작성한다(1..N장, 최대 20). **한 도메인에 구별되는 업무 시나리오가 여럿이면 각각 별도 장으로 쪼갠다** — 예: 계정 도메인이면 "로그인" / "회원가입" / "계정 수정"을 한 장에 우겨넣지 말고 3장으로. `title` 은 프로세스 이름(업무 언어, ~20자, 인용 면제). 노드 `kind` 는 `start|end|activity|decision`, `label` 은 **업무 언어**(코드 심볼 금지 — "재고 확인" ○, "checkInventory()" ✕)로 **짧게(~30자)** — 노드 상자가 고정 크기라 긴 라벨은 잘린다. 규칙:
    - `activity`/`decision` 은 `citations` 1개 이상 필수(사실 주장) — **분기(decision)는 코드 근거(if/예외 처리) 또는 businessRules 근거가 있을 때만** 만든다. 근거 없는 분기 창작 금지 — 확신 없으면 순차로 두라.
-   - `start`/`end` 는 구조 마커라 인용 면제, 각각 1개 이상 필수.
+   - `start`/`end` 는 구조 마커라 인용 면제, **각 장마다** 각각 1개 이상 필수. 노드 id 는 장 안에서만 유일하면 된다.
    - `activity` 가 특정 기능에 대응하면 `flowRef` 에 **이 도메인의** flow id 를 단다(유령/타 도메인 참조는 emit 이 기각). 대시보드가 이 앵커로 업무→코드 드릴다운을 연결한다.
-   - `edges` 의 분기 라벨은 `label`("YES"/"NO"/"재고 있음" 등)로. 고아 노드·중복 id·끝점 미실존은 emit 이 **businessFlow 만 기각**한다(도메인 fill 은 유지 — 기각 사유가 rejected 로 보고되니 고쳐서 재emit).
-   - 미작성 시 대시보드는 기능 순차 나열 폴백을 그린다 — **억지로 만들지 말 것**(품질 우선).
+   - `edges` 의 분기 라벨은 `label`("YES"/"NO"/"재고 있음" 등)로. 고아 노드·중복 id·끝점 미실존은 emit 이 **해당 장만 기각**한다(다른 장·도메인 fill 은 유지 — 기각 사유가 rejected 로 보고되니 고쳐서 재emit).
+   - 미작성 시 대시보드는 기능 순차 나열 폴백을 그린다 — **억지로 만들지 말 것**(품질 우선). 프로세스가 진짜 1개뿐인 소형 도메인이면 1장이 정답이다.
+   - (하위호환) 구형 단수 `businessFlow: { nodes, edges }` 도 여전히 수용되지만 신규 작성은 `businessFlows[]` 를 쓴다. 둘 다 있으면 복수형이 우선.
 5. 결과를 `.spec/map/fill/<key>.json` 에 `DomainFill` 스키마로 쓴다.
 
 **계약(반드시 준수):**

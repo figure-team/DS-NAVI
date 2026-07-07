@@ -393,8 +393,9 @@ export default function BusinessFlowView({
               style={{
                 fontSize: 11,
                 padding: "2px 10px",
-                color: accent,
-                background: `color-mix(in srgb, ${accent} 9%, transparent)`,
+                // 노드의 flow: 칩(status-info)과 동일 색 — 기능 연결 표식의 색 언어 통일.
+                color: "var(--color-status-info)",
+                background: "color-mix(in srgb, var(--color-status-info) 10%, transparent)",
               }}
             >
               {t.flowList.bfOpenFlow}

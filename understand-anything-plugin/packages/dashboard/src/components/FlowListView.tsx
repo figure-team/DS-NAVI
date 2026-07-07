@@ -420,7 +420,8 @@ export default function FlowListView() {
               {
                 key: "code" as const,
                 label: t.flowList.tabCode.replace("{count}", "").trim(),
-                count: flows.length,
+                // 탭에는 갯수 비노출(사용자 결정) — 갯수는 목록 그룹 헤더가 담당.
+                count: null,
               },
             ]
           ).map((tab) => {

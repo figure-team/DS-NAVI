@@ -1106,105 +1106,341 @@
     {
       "complexity": "moderate",
       "domainMeta": {
-        "businessFlow": {
-          "edges": [
-            {
-              "from": "s",
-              "to": "a1"
-            },
-            {
-              "from": "a1",
-              "to": "d1"
-            },
-            {
-              "from": "d1",
-              "label": "NO",
-              "to": "a2"
-            },
-            {
-              "from": "a2",
-              "to": "a1"
-            },
-            {
-              "from": "d1",
-              "label": "YES",
-              "to": "a3"
-            },
-            {
-              "from": "a3",
-              "to": "e"
-            }
-          ],
-          "nodes": [
-            {
-              "id": "s",
-              "kind": "start",
-              "label": "시작"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-                  "line": 161,
-                  "snippet": "account = accountService.getAccount(getUsername(), getPassword());",
-                  "status": "ok"
-                }
-              ],
-              "flowRef": "flow:ANY /actions/Account.action?signon",
-              "id": "a1",
-              "kind": "activity",
-              "label": "자격 증명으로 계정 조회",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-                  "line": 163,
-                  "snippet": "if (account == null) {",
-                  "status": "ok"
-                }
-              ],
-              "id": "d1",
-              "kind": "decision",
-              "label": "계정 인증 성공?",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-                  "line": 164,
-                  "snippet": "String value = \"Invalid username or password.  Signon failed.\";",
-                  "status": "ok"
-                }
-              ],
-              "id": "a2",
-              "kind": "activity",
-              "label": "실패 안내 후 재로그인",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-                  "line": 170,
-                  "snippet": "myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());",
-                  "status": "ok"
-                }
-              ],
-              "id": "a3",
-              "kind": "activity",
-              "label": "관심 카테고리 상품 목록 적재",
-              "verdict": "GROUNDED"
-            },
-            {
-              "id": "e",
-              "kind": "end",
-              "label": "종료"
-            }
-          ]
-        },
+        "businessFlows": [
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "인증 실패",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "a1"
+              },
+              {
+                "from": "d1",
+                "label": "인증 성공",
+                "to": "a3"
+              },
+              {
+                "from": "a3",
+                "to": "a4"
+              },
+              {
+                "from": "a4",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 0,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 161,
+                    "snippet": "account = accountService.getAccount(getUsername(), getPassword());",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Account.action?signon",
+                "id": "a1",
+                "kind": "activity",
+                "label": "입력한 아이디·비밀번호로 계정 조회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 163,
+                    "snippet": "if (account == null) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "계정 인증에 성공했는가",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 164,
+                    "snippet": "String value = \"Invalid username or password.  Signon failed.\";",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "실패 안내 후 로그인 화면으로 복귀",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 170,
+                    "snippet": "myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "관심 카테고리 상품 목록 불러오기",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 174,
+                    "snippet": "s.setAttribute(\"accountBean\", this);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a4",
+                "kind": "activity",
+                "label": "로그인 정보를 세션에 저장",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "회원 로그인"
+          },
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "a3"
+              },
+              {
+                "from": "a3",
+                "to": "a4"
+              },
+              {
+                "from": "a4",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 1,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 116,
+                    "snippet": "accountService.insertAccount(account);",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Account.action?newAccount",
+                "id": "a1",
+                "kind": "activity",
+                "label": "계정·프로필·로그인 정보 신규 저장",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 117,
+                    "snippet": "account = accountService.getAccount(account.getUsername());",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "저장된 계정 정보 다시 조회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 118,
+                    "snippet": "myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "관심 카테고리 상품 목록 불러오기",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 119,
+                    "snippet": "authenticated = true;",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a4",
+                "kind": "activity",
+                "label": "가입과 동시에 로그인 상태로 전환",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "신규 계정 등록"
+          },
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "변경함",
+                "to": "a2"
+              },
+              {
+                "from": "d1",
+                "label": "변경 안 함",
+                "to": "a3"
+              },
+              {
+                "from": "a2",
+                "to": "a3"
+              },
+              {
+                "from": "a3",
+                "to": "a4"
+              },
+              {
+                "from": "a4",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 2,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 138,
+                    "snippet": "accountService.updateAccount(account);",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Account.action?editAccount",
+                "id": "a1",
+                "kind": "activity",
+                "label": "계정·프로필 정보 갱신",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                    "line": 71,
+                    "snippet": "Optional.ofNullable(account.getPassword()).filter(password -> password.length() > 0)",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "비밀번호를 새로 입력했는가",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+                    "line": 72,
+                    "snippet": "ifPresent(password -> accountMapper.updateSignon(account));",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "로그인 비밀번호 갱신",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 139,
+                    "snippet": "account = accountService.getAccount(account.getUsername());",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "갱신된 계정 정보 다시 조회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+                    "line": 140,
+                    "snippet": "myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a4",
+                "kind": "activity",
+                "label": "관심 카테고리 상품 목록 불러오기",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "계정 정보 수정"
+          }
+        ],
         "businessRules": [
           "로그인은 AccountService.getAccount(username, password)로 자격증명을 검증하며, 결과가 null이면 인증 실패 메시지를 세팅하고 로그인 폼으로 되돌린다.",
           "로그인 성공 시 password를 null로 비우고 favouriteCategoryId 기준 상품 목록을 MyList로 로딩한 뒤, 인증 플래그를 켜고 accountBean을 세션에 저장한다.",
@@ -2220,172 +2456,535 @@
     {
       "complexity": "simple",
       "domainMeta": {
-        "businessFlow": {
-          "edges": [
-            {
-              "from": "s",
-              "to": "a1"
-            },
-            {
-              "from": "a1",
-              "to": "d1"
-            },
-            {
-              "from": "d1",
-              "label": "무효",
-              "to": "a2"
-            },
-            {
-              "from": "a2",
-              "to": "e"
-            },
-            {
-              "from": "d1",
-              "label": "유효",
-              "to": "d2"
-            },
-            {
-              "from": "d2",
-              "label": "YES",
-              "to": "a3"
-            },
-            {
-              "from": "d2",
-              "label": "NO",
-              "to": "a4"
-            },
-            {
-              "from": "a3",
-              "to": "a5"
-            },
-            {
-              "from": "a4",
-              "to": "a5"
-            },
-            {
-              "from": "a5",
-              "to": "e"
-            }
-          ],
-          "nodes": [
-            {
-              "id": "s",
-              "kind": "start",
-              "label": "시작"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
-                  "line": 68,
-                  "snippet": "public Resolution addItemToCart() {",
-                  "status": "ok"
-                }
-              ],
-              "flowRef": "flow:ANY /actions/Cart.action?addItemToCart",
-              "id": "a1",
-              "kind": "activity",
-              "label": "품목 담기 요청 접수",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
-                  "line": 70,
-                  "snippet": "if (workingItemId == null || workingItemId.trim().isEmpty()) {",
-                  "status": "ok"
-                }
-              ],
-              "id": "d1",
-              "kind": "decision",
-              "label": "품목 ID 유효?",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
-                  "line": 71,
-                  "snippet": "setMessage(\"Invalid item ID: cannot add item to cart.\");",
-                  "status": "ok"
-                }
-              ],
-              "id": "a2",
-              "kind": "activity",
-              "label": "오류 안내",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
-                  "line": 75,
-                  "snippet": "if (cart.containsItemId(workingItemId)) {",
-                  "status": "ok"
-                }
-              ],
-              "id": "d2",
-              "kind": "decision",
-              "label": "이미 담긴 품목?",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
-                  "line": 76,
-                  "snippet": "cart.incrementQuantityByItemId(workingItemId);",
-                  "status": "ok"
-                }
-              ],
-              "id": "a3",
-              "kind": "activity",
-              "label": "수량 증가",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
-                  "line": 81,
-                  "snippet": "boolean isInStock = catalogService.isItemInStock(workingItemId);",
-                  "status": "ok"
-                },
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
-                  "line": 83,
-                  "snippet": "cart.addItem(item, isInStock);",
-                  "status": "ok"
-                }
-              ],
-              "id": "a4",
-              "kind": "activity",
-              "label": "재고 확인 후 신규 담기",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
-                  "line": 86,
-                  "snippet": "return new ForwardResolution(VIEW_CART);",
-                  "status": "ok"
-                }
-              ],
-              "flowRef": "flow:ANY /actions/Cart.action?viewCart",
-              "id": "a5",
-              "kind": "activity",
-              "label": "장바구니 화면 표시",
-              "verdict": "GROUNDED"
-            },
-            {
-              "id": "e",
-              "kind": "end",
-              "label": "종료"
-            }
-          ]
-        },
+        "businessFlows": [
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "무효",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "e"
+              },
+              {
+                "from": "d1",
+                "label": "유효",
+                "to": "d2"
+              },
+              {
+                "from": "d2",
+                "label": "이미 담김",
+                "to": "a3"
+              },
+              {
+                "from": "d2",
+                "label": "신규 품목",
+                "to": "a4"
+              },
+              {
+                "from": "a3",
+                "to": "a5"
+              },
+              {
+                "from": "a4",
+                "to": "a5"
+              },
+              {
+                "from": "a5",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 0,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 68,
+                    "snippet": "public Resolution addItemToCart() {",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Cart.action?addItemToCart",
+                "id": "a1",
+                "kind": "activity",
+                "label": "품목 담기 요청 접수",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 70,
+                    "snippet": "if (workingItemId == null || workingItemId.trim().isEmpty()) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "품목 ID 유효?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 71,
+                    "snippet": "setMessage(\"Invalid item ID: cannot add item to cart.\");",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "오류 안내 후 종료",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 75,
+                    "snippet": "if (cart.containsItemId(workingItemId)) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d2",
+                "kind": "decision",
+                "label": "이미 담긴 품목?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 76,
+                    "snippet": "cart.incrementQuantityByItemId(workingItemId);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "기존 라인 수량 증가",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 81,
+                    "snippet": "boolean isInStock = catalogService.isItemInStock(workingItemId);",
+                    "status": "ok"
+                  },
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 83,
+                    "snippet": "cart.addItem(item, isInStock);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a4",
+                "kind": "activity",
+                "label": "재고 확인 후 신규 담기",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 86,
+                    "snippet": "return new ForwardResolution(VIEW_CART);",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Cart.action?viewCart",
+                "id": "a5",
+                "kind": "activity",
+                "label": "장바구니 화면 표시",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "장바구니에 품목 담기"
+          },
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "a3"
+              },
+              {
+                "from": "a3",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "미만(제거)",
+                "to": "a4"
+              },
+              {
+                "from": "d1",
+                "label": "이상(유지)",
+                "to": "a5"
+              },
+              {
+                "from": "a4",
+                "to": "a5"
+              },
+              {
+                "from": "a5",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 1,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 116,
+                    "snippet": "public Resolution updateCartQuantities() {",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Cart.action?updateCartQuantities",
+                "id": "a1",
+                "kind": "activity",
+                "label": "수량 갱신 요청 접수",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 120,
+                    "snippet": "while (cartItems.hasNext()) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "장바구니 라인 순회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 125,
+                    "snippet": "getCart().setQuantityByItemId(itemId, quantity);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "입력 수량으로 갱신",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 126,
+                    "snippet": "if (quantity < 1) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "수량 1 미만?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 127,
+                    "snippet": "cartItems.remove();",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a4",
+                "kind": "activity",
+                "label": "해당 라인 제거",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 134,
+                    "snippet": "return new ForwardResolution(VIEW_CART);",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Cart.action?viewCart",
+                "id": "a5",
+                "kind": "activity",
+                "label": "장바구니 화면 표시",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "장바구니 수량 갱신"
+          },
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "무효",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "e"
+              },
+              {
+                "from": "d1",
+                "label": "유효",
+                "to": "a3"
+              },
+              {
+                "from": "a3",
+                "to": "d2"
+              },
+              {
+                "from": "d2",
+                "label": "없음",
+                "to": "a4"
+              },
+              {
+                "from": "d2",
+                "label": "있음",
+                "to": "a5"
+              },
+              {
+                "from": "a4",
+                "to": "e"
+              },
+              {
+                "from": "a5",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 2,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 94,
+                    "snippet": "public Resolution removeItemFromCart() {",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Cart.action?removeItemFromCart",
+                "id": "a1",
+                "kind": "activity",
+                "label": "품목 제거 요청 접수",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 96,
+                    "snippet": "if (workingItemId == null || workingItemId.trim().isEmpty()) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "품목 ID 유효?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 97,
+                    "snippet": "setMessage(\"Invalid item ID: cannot remove item from cart.\");",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "오류 안내 후 종료",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 101,
+                    "snippet": "Item item = cart.removeItemById(workingItemId);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "장바구니에서 라인 삭제",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 103,
+                    "snippet": "if (item == null) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d2",
+                "kind": "decision",
+                "label": "삭제 대상 존재?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 104,
+                    "snippet": "setMessage(\"Attempted to remove null CartItem from Cart.\");",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a4",
+                "kind": "activity",
+                "label": "대상 없음 오류 안내",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 107,
+                    "snippet": "return new ForwardResolution(VIEW_CART);",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Cart.action?viewCart",
+                "id": "a5",
+                "kind": "activity",
+                "label": "장바구니 화면 표시",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "장바구니에서 품목 제거"
+          },
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 3,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 141,
+                    "snippet": "public ForwardResolution checkOut() {",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Cart.action?checkOut",
+                "id": "a1",
+                "kind": "activity",
+                "label": "체크아웃 요청 접수",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+                    "line": 142,
+                    "snippet": "return new ForwardResolution(CHECK_OUT);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "체크아웃 화면으로 이동",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "체크아웃 진입"
+          }
+        ],
         "businessRules": [
           "addItemToCart는 이미 담긴 품목이면 수량만 증가시키고, 신규 품목이면 CatalogService.isItemInStock으로 실시간 재고를 조회해 inStock 값과 함께 Cart.addItem으로 추가한다.",
           "updateCartQuantities는 각 품목의 수량을 요청 파라미터로 갱신하되, 수량이 1 미만이면 해당 라인을 장바구니에서 제거한다.",
@@ -3176,105 +3775,291 @@
     {
       "complexity": "simple",
       "domainMeta": {
-        "businessFlow": {
-          "edges": [
-            {
-              "from": "s",
-              "to": "a1"
-            },
-            {
-              "from": "a1",
-              "to": "d1"
-            },
-            {
-              "from": "d1",
-              "label": "NO",
-              "to": "a2"
-            },
-            {
-              "from": "a2",
-              "to": "e"
-            },
-            {
-              "from": "d1",
-              "label": "YES",
-              "to": "a3"
-            },
-            {
-              "from": "a3",
-              "to": "e"
-            }
-          ],
-          "nodes": [
-            {
-              "id": "s",
-              "kind": "start",
-              "label": "시작"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
-                  "line": 190,
-                  "snippet": "public ForwardResolution searchProducts() {",
-                  "status": "ok"
-                }
-              ],
-              "flowRef": "flow:ANY /actions/Catalog.action?searchProducts",
-              "id": "a1",
-              "kind": "activity",
-              "label": "상품 검색 요청",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
-                  "line": 191,
-                  "snippet": "if (keyword == null || keyword.length() < 1) {",
-                  "status": "ok"
-                }
-              ],
-              "id": "d1",
-              "kind": "decision",
-              "label": "검색어 입력됨?",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
-                  "line": 192,
-                  "snippet": "setMessage(\"Please enter a keyword to search for, then press the search button.\");",
-                  "status": "ok"
-                }
-              ],
-              "id": "a2",
-              "kind": "activity",
-              "label": "키워드 입력 안내",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
-                  "line": 195,
-                  "snippet": "productList = catalogService.searchProductList(keyword.toLowerCase());",
-                  "status": "ok"
-                }
-              ],
-              "id": "a3",
-              "kind": "activity",
-              "label": "키워드로 상품 목록 조회·결과 표시",
-              "verdict": "GROUNDED"
-            },
-            {
-              "id": "e",
-              "kind": "end",
-              "label": "종료"
-            }
-          ]
-        },
+        "businessFlows": [
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "지정됨",
+                "to": "a3"
+              },
+              {
+                "from": "d1",
+                "label": "미지정",
+                "to": "e"
+              },
+              {
+                "from": "a3",
+                "to": "a4"
+              },
+              {
+                "from": "a4",
+                "to": "d2"
+              },
+              {
+                "from": "d2",
+                "label": "지정됨",
+                "to": "a5"
+              },
+              {
+                "from": "d2",
+                "label": "미지정",
+                "to": "e"
+              },
+              {
+                "from": "a5",
+                "to": "a6"
+              },
+              {
+                "from": "a6",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 0,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 144,
+                    "snippet": "public ForwardResolution viewMain() {",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Catalog.action",
+                "id": "a1",
+                "kind": "activity",
+                "label": "카탈로그 메인 화면",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 153,
+                    "snippet": "public ForwardResolution viewCategory() {",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Catalog.action?viewCategory",
+                "id": "a2",
+                "kind": "activity",
+                "label": "카테고리 선택",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 154,
+                    "snippet": "if (categoryId != null) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "카테고리 지정됨?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 155,
+                    "snippet": "productList = catalogService.getProductListByCategory(categoryId);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "카테고리별 상품 목록 조회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 166,
+                    "snippet": "public ForwardResolution viewProduct() {",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Catalog.action?viewProduct",
+                "id": "a4",
+                "kind": "activity",
+                "label": "상품 선택",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 167,
+                    "snippet": "if (productId != null) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d2",
+                "kind": "decision",
+                "label": "상품 지정됨?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 168,
+                    "snippet": "itemList = catalogService.getItemListByProduct(productId);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a5",
+                "kind": "activity",
+                "label": "상품별 품목 목록 조회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 180,
+                    "snippet": "item = catalogService.getItem(itemId);",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Catalog.action?viewItem",
+                "id": "a6",
+                "kind": "activity",
+                "label": "품목 상세 조회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "상품 탐색"
+          },
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "미입력",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "e"
+              },
+              {
+                "from": "d1",
+                "label": "입력됨",
+                "to": "a3"
+              },
+              {
+                "from": "a3",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 1,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 190,
+                    "snippet": "public ForwardResolution searchProducts() {",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Catalog.action?searchProducts",
+                "id": "a1",
+                "kind": "activity",
+                "label": "상품 검색 요청",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 191,
+                    "snippet": "if (keyword == null || keyword.length() < 1) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "검색어 입력됨?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 192,
+                    "snippet": "setMessage(\"Please enter a keyword to search for, then press the search button.\");",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "키워드 입력 안내",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+                    "line": 195,
+                    "snippet": "productList = catalogService.searchProductList(keyword.toLowerCase());",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "키워드로 상품 검색·결과 표시",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "상품 검색"
+          }
+        ],
         "businessRules": [
           "CatalogService는 CategoryMapper, ItemMapper, ProductMapper 세 매퍼를 생성자로 주입받아 카테고리·상품·품목 조회를 각 매퍼에 단순 위임한다.",
           "searchProductList는 키워드 문자열을 공백(\\s+)으로 분리해 각 토큰을 소문자로 바꾸고 %로 감싸 productMapper.searchProductList를 반복 호출한 뒤 결과를 누적한다.",
@@ -3997,214 +4782,362 @@
     {
       "complexity": "moderate",
       "domainMeta": {
-        "businessFlow": {
-          "edges": [
-            {
-              "from": "s",
-              "to": "a1"
-            },
-            {
-              "from": "a1",
-              "to": "d1"
-            },
-            {
-              "from": "d1",
-              "label": "NO",
-              "to": "a2"
-            },
-            {
-              "from": "a2",
-              "to": "e"
-            },
-            {
-              "from": "d1",
-              "label": "YES",
-              "to": "a3"
-            },
-            {
-              "from": "a3",
-              "to": "d2"
-            },
-            {
-              "from": "d2",
-              "label": "YES",
-              "to": "a4"
-            },
-            {
-              "from": "a4",
-              "to": "d3"
-            },
-            {
-              "from": "d2",
-              "label": "NO",
-              "to": "d3"
-            },
-            {
-              "from": "d3",
-              "label": "NO",
-              "to": "a5"
-            },
-            {
-              "from": "a5",
-              "to": "d3"
-            },
-            {
-              "from": "d3",
-              "label": "YES",
-              "to": "a6"
-            },
-            {
-              "from": "a6",
-              "to": "e"
-            }
-          ],
-          "nodes": [
-            {
-              "id": "s",
-              "kind": "start",
-              "label": "시작"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 121,
-                  "snippet": "AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");",
-                  "status": "ok"
-                }
-              ],
-              "flowRef": "flow:ANY /actions/Order.action?newOrderForm",
-              "id": "a1",
-              "kind": "activity",
-              "label": "주문 폼 진입(세션 계정·카트 확인)",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 125,
-                  "snippet": "if (accountBean == null || !accountBean.isAuthenticated()) {",
-                  "status": "ok"
-                }
-              ],
-              "id": "d1",
-              "kind": "decision",
-              "label": "로그인 상태?",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 126,
-                  "snippet": "You must sign on before attempting to check out.",
-                  "status": "ok"
-                }
-              ],
-              "id": "a2",
-              "kind": "activity",
-              "label": "로그인 안내 후 계정 화면 이동",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 129,
-                  "snippet": "order.initOrder(accountBean.getAccount(), cartBean.getCart());",
-                  "status": "ok"
-                }
-              ],
-              "id": "a3",
-              "kind": "activity",
-              "label": "카트 기반 주문 초기화",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 145,
-                  "snippet": "if (shippingAddressRequired) {",
-                  "status": "ok"
-                }
-              ],
-              "id": "d2",
-              "kind": "decision",
-              "label": "배송지 별도 입력?",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 147,
-                  "snippet": "return new ForwardResolution(SHIPPING);",
-                  "status": "ok"
-                }
-              ],
-              "id": "a4",
-              "kind": "activity",
-              "label": "배송지 입력 화면",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 148,
-                  "snippet": "} else if (!isConfirmed()) {",
-                  "status": "ok"
-                }
-              ],
-              "id": "d3",
-              "kind": "decision",
-              "label": "주문 확정됨?",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 149,
-                  "snippet": "return new ForwardResolution(CONFIRM_ORDER);",
-                  "status": "ok"
-                }
-              ],
-              "id": "a5",
-              "kind": "activity",
-              "label": "주문 확인 화면 표시",
-              "verdict": "GROUNDED"
-            },
-            {
-              "citations": [
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 152,
-                  "snippet": "orderService.insertOrder(order);",
-                  "status": "ok"
-                },
-                {
-                  "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
-                  "line": 155,
-                  "snippet": "cartBean.clear();",
-                  "status": "ok"
-                }
-              ],
-              "flowRef": "flow:ANY /actions/Order.action?newOrder",
-              "id": "a6",
-              "kind": "activity",
-              "label": "주문 저장·장바구니 비움",
-              "verdict": "GROUNDED"
-            },
-            {
-              "id": "e",
-              "kind": "end",
-              "label": "종료"
-            }
-          ]
-        },
+        "businessFlows": [
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "미로그인",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "e"
+              },
+              {
+                "from": "d1",
+                "label": "로그인됨",
+                "to": "a3"
+              },
+              {
+                "from": "a3",
+                "to": "d2"
+              },
+              {
+                "from": "d2",
+                "label": "배송지 필요",
+                "to": "a4"
+              },
+              {
+                "from": "a4",
+                "to": "d3"
+              },
+              {
+                "from": "d2",
+                "label": "기본 배송지",
+                "to": "d3"
+              },
+              {
+                "from": "d3",
+                "label": "미확정",
+                "to": "a5"
+              },
+              {
+                "from": "a5",
+                "to": "d3"
+              },
+              {
+                "from": "d3",
+                "label": "확정",
+                "to": "a6"
+              },
+              {
+                "from": "a6",
+                "to": "a7"
+              },
+              {
+                "from": "a7",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 0,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 121,
+                    "snippet": "AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Order.action?newOrderForm",
+                "id": "a1",
+                "kind": "activity",
+                "label": "주문 폼 진입(세션 계정·카트 확인)",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 125,
+                    "snippet": "if (accountBean == null || !accountBean.isAuthenticated()) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "로그인 상태?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 126,
+                    "snippet": "You must sign on before attempting to check out.",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a2",
+                "kind": "activity",
+                "label": "로그인 안내 후 계정 화면 이동",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 129,
+                    "snippet": "order.initOrder(accountBean.getAccount(), cartBean.getCart());",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "카트 기반 주문 초기화",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 145,
+                    "snippet": "if (shippingAddressRequired) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d2",
+                "kind": "decision",
+                "label": "배송지 별도 입력?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 147,
+                    "snippet": "return new ForwardResolution(SHIPPING);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a4",
+                "kind": "activity",
+                "label": "배송지 입력 화면",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 148,
+                    "snippet": "} else if (!isConfirmed()) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d3",
+                "kind": "decision",
+                "label": "주문 확정됨?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 149,
+                    "snippet": "return new ForwardResolution(CONFIRM_ORDER);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a5",
+                "kind": "activity",
+                "label": "주문 확인 화면 표시",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 152,
+                    "snippet": "orderService.insertOrder(order);",
+                    "status": "ok"
+                  },
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+                    "line": 68,
+                    "snippet": "itemMapper.updateInventoryQuantity(param);",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Order.action?newOrder",
+                "id": "a6",
+                "kind": "activity",
+                "label": "주문 저장·재고 차감",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 155,
+                    "snippet": "cartBean.clear();",
+                    "status": "ok"
+                  },
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 157,
+                    "snippet": "Thank you, your order has been submitted.",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a7",
+                "kind": "activity",
+                "label": "장바구니 비우고 주문 완료 안내",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "주문 생성"
+          },
+          {
+            "edges": [
+              {
+                "from": "s",
+                "to": "a1"
+              },
+              {
+                "from": "a1",
+                "to": "a2"
+              },
+              {
+                "from": "a2",
+                "to": "d1"
+              },
+              {
+                "from": "d1",
+                "label": "본인 주문",
+                "to": "a3"
+              },
+              {
+                "from": "d1",
+                "label": "타인 주문",
+                "to": "a4"
+              },
+              {
+                "from": "a3",
+                "to": "e"
+              },
+              {
+                "from": "a4",
+                "to": "e"
+              }
+            ],
+            "fillIndex": 1,
+            "nodes": [
+              {
+                "id": "s",
+                "kind": "start",
+                "label": "시작"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 110,
+                    "snippet": "orderList = orderService.getOrdersByUsername(accountBean.getAccount().getUsername());",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Order.action?listOrders",
+                "id": "a1",
+                "kind": "activity",
+                "label": "내 주문 목록 조회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 176,
+                    "snippet": "order = orderService.getOrder(order.getOrderId());",
+                    "status": "ok"
+                  }
+                ],
+                "flowRef": "flow:ANY /actions/Order.action?viewOrder",
+                "id": "a2",
+                "kind": "activity",
+                "label": "선택 주문 상세 조회",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 178,
+                    "snippet": "if (accountBean.getAccount().getUsername().equals(order.getUsername())) {",
+                    "status": "ok"
+                  }
+                ],
+                "id": "d1",
+                "kind": "decision",
+                "label": "본인 주문인가?",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 179,
+                    "snippet": "return new ForwardResolution(VIEW_ORDER);",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a3",
+                "kind": "activity",
+                "label": "주문 상세 화면 표시",
+                "verdict": "GROUNDED"
+              },
+              {
+                "citations": [
+                  {
+                    "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+                    "line": 182,
+                    "snippet": "setMessage(\"You may only view your own orders.\");",
+                    "status": "ok"
+                  }
+                ],
+                "id": "a4",
+                "kind": "activity",
+                "label": "열람 거부 안내",
+                "verdict": "GROUNDED"
+              },
+              {
+                "id": "e",
+                "kind": "end",
+                "label": "종료"
+              }
+            ],
+            "title": "주문 조회"
+          }
+        ],
         "businessRules": [
           "주문 삽입 트랜잭션: OrderService.insertOrder는 @Transactional 경계 안에서 주문 ID 채번 후 각 lineItem의 재고를 차감(updateInventoryQuantity)하고, 주문(insertOrder)·주문 상태(insertOrderStatus)·각 라인 항목(insertLineItem)을 순서대로 저장한다.",
           "주문 ID 채번: orderId는 insertOrder 시작 시 getNextId(\"ordernum\")로 발번되며, getNextId는 SequenceMapper로 현재 시퀀스를 읽고 nextId+1로 갱신한 뒤 기존 값을 반환한다.",

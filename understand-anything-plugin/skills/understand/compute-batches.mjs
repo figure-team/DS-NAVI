@@ -42,6 +42,31 @@ import Graph from 'graphology';
 import louvain from 'graphology-communities-louvain';
 
 /**
+ * Deterministic PRNG (mulberry32) for Louvain community detection.
+ *
+ * graphology-communities-louvain defaults to `rng: Math.random`, which makes
+ * the community partition non-deterministic across runs: the same
+ * scan-result.json can yield a different batchIndex↔files mapping each time.
+ * That breaks the Phase 2 fan-out resume path — the disk-based skip guard
+ * keys its efficiency on stable batch composition (see
+ * docs/ktds/UNDERSTAND_SCALE_WORKFLOW_DESIGN.md §4.2). A fixed seed makes
+ * `batches.json` a pure function of its input. Correctness never depends on
+ * this (the content-verifying guard handles any residual drift); this only
+ * keeps the skip-hit rate high on resume.
+ */
+const LOUVAIN_SEED = 0x9e3779b9;
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
  * For each code file, returns its top-level exported symbol names (functions,
  * classes, exported consts). Per-file errors are swallowed into [] with a
  * visible warning so a single bad file does not abort batching.
@@ -272,7 +297,7 @@ function runLouvain(codeFiles, importMap) {
       g.addEdge(src, tgt);
     }
   }
-  const cs = louvain(g);  // { nodeId: communityId }
+  const cs = louvain(g, { rng: mulberry32(LOUVAIN_SEED) });  // { nodeId: communityId }, deterministic partition
   return new Map(Object.entries(cs));
 }
 

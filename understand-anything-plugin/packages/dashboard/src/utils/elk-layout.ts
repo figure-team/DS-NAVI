@@ -17,6 +17,8 @@ export interface ElkEdge {
   id: string;
   sources: string[];
   targets: string[];
+  /** 엣지 단위 ELK 옵션(예: layered.priority.straightness) — elkjs 로 그대로 전달. */
+  layoutOptions?: Record<string, string>;
 }
 
 export interface ElkPoint {

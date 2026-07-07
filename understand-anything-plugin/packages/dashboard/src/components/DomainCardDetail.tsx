@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useI18n } from "../contexts/I18nContext";
 import type { DomainCard, DomainClaim } from "../utils/domainData";
 import GroundedBar from "./GroundedBar";
-import CitationChip from "./CitationChip";
 import VerdictBadge from "./VerdictBadge";
 
 /**
@@ -27,13 +26,8 @@ function ClaimRow({ claim }: { claim: DomainClaim }) {
         <VerdictBadge verdict={claim.verdict} />
         <span className="text-xs text-text-secondary leading-relaxed">{claim.text}</span>
       </div>
-      {claim.citations.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-1 ml-5">
-          {claim.citations.map((c, i) => (
-            <CitationChip key={`${c.filePath}:${c.line}:${i}`} filePath={c.filePath} line={c.line} status={c.status} />
-          ))}
-        </div>
-      )}
+      {/* 근거(소스 위치) 칩은 카드 팝업에서 비노출(사용자 결정) — 검증 배지·근거율은
+          유지, 소스 단위 근거는 워크스페이스(화면2/3) 소관. */}
     </div>
   );
 }

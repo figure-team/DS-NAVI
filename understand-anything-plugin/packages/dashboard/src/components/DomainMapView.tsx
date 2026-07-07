@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { useDashboardStore } from "../store";
 import { useNavigate } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import { dataUrl } from "../shared/api/client";
-import { buildDomainCards, buildDomainFlows, type DomainFlow } from "../utils/domainData";
+import { buildDomainCards } from "../utils/domainData";
+import { parseBusinessFlows, type BizProcess } from "../utils/businessFlow";
 import DomainCardDetail from "./DomainCardDetail";
 import GroundedBar from "./GroundedBar";
 
@@ -65,8 +66,8 @@ function parseSystemMap(raw: unknown): SystemMapData | null {
   };
 }
 
-/** 도메인 박스에 노출할 기능 칩 수 — 초과분은 "+N" 칩(도메인 진입)으로 접는다. */
-const CHIP_LIMIT = 4;
+/** 접힘 상태에서 업무 칩이 차지하는 최대 줄 수 — 초과분은 "+N" 칩(줄 안에 포함). */
+const CHIP_MAX_ROWS = 2;
 
 export default function DomainMapView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
@@ -122,14 +123,26 @@ export default function DomainMapView() {
     [domainGraph],
   );
 
-  // 도메인별 기능 목록(칩 렌더용) — 화면2와 동일 소스(buildDomainFlows).
-  const flowsByDomain = useMemo(() => {
-    const m = new Map<string, DomainFlow[]>();
-    if (domainGraph && data) {
-      for (const card of data.cards) m.set(card.id, buildDomainFlows(domainGraph, card.id));
+  // 도메인별 업무 프로세스 목록(칩 렌더용) — 업무 흐름도 탭과 동일 소스
+  // (parseBusinessFlows: businessFlows[] + 레거시 단수 하위호환).
+  const processesByDomain = useMemo(() => {
+    const m = new Map<string, BizProcess[]>();
+    if (domainGraph) {
+      for (const n of domainGraph.nodes) {
+        if (n.type === "domain") m.set(n.id, parseBusinessFlows(n));
+      }
     }
     return m;
-  }, [domainGraph, data]);
+  }, [domainGraph]);
+
+  // 전 노드 공통 업무 목록 펼치기/접기 — 헤더 토글(기본 접힘 = 2줄 클램프).
+  const [worksExpanded, setWorksExpanded] = useState(false);
+
+  // 헤더 통계용 업무(프로세스) 총계 — 카드 표기와 동일 소스.
+  const totalWorks = useMemo(
+    () => [...processesByDomain.values()].reduce((sum, list) => sum + list.length, 0),
+    [processesByDomain],
+  );
 
   if (!domainGraph || !data) {
     return (
@@ -159,13 +172,23 @@ export default function DomainMapView() {
         <div className="text-text-muted" style={{ fontSize: 13, paddingBottom: 3 }}>
           {t.domainMap.statDomains} <b className="text-text-primary tabular-nums">{stats.domainCount}</b>
           {" · "}
-          {t.domainMap.statFlows} <b className="text-text-primary tabular-nums">{stats.flowCount}</b>
+          {t.domainMap.statWorks} <b className="text-text-primary tabular-nums">{totalWorks}</b>
           {" · "}
-          {t.domainMap.statNodes} <b className="text-text-primary tabular-nums">{stats.stepCount}</b>
+          {t.domainMap.statFlows} <b className="text-text-primary tabular-nums">{stats.flowCount}</b>
           {stats.language && (
             <span className="text-text-muted"> · {stats.language}{stats.framework ? ` / ${stats.framework}` : ""}</span>
           )}
         </div>
+        {/* 전 노드 업무 목록 펼치기/접기 — 카드별이 아닌 화면 전역 토글. */}
+        <button
+          type="button"
+          onClick={() => setWorksExpanded((v) => !v)}
+          aria-pressed={worksExpanded}
+          className="ml-auto shrink-0 rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+          style={{ fontSize: 11.5, padding: "4px 10px", marginBottom: 2 }}
+        >
+          {worksExpanded ? t.domainMap.collapseAllWorks : t.domainMap.expandAllWorks}
+        </button>
       </header>
 
       {/* 구성도 본문 — 프로토 work-land 그리드: 시스템 박스(1fr) + 연동 패널(280px) */}
@@ -188,9 +211,7 @@ export default function DomainMapView() {
             }}
           >
             {cards.map((card, i) => {
-              const flows = flowsByDomain.get(card.id) ?? [];
-              const shown = flows.slice(0, CHIP_LIMIT);
-              const rest = flows.length - shown.length;
+              const processes = processesByDomain.get(card.id) ?? [];
               return (
                 /* 프로토 .dom — 카드 전체 클릭 = 워크스페이스 진입, hover 시 accent 테두리 */
                 <div
@@ -222,8 +243,8 @@ export default function DomainMapView() {
                       className="ml-auto text-text-muted whitespace-nowrap shrink-0"
                       style={{ fontSize: 11.5, fontWeight: 500 }}
                     >
-                      {t.domainMap.flowCount.replace("{count}", String(card.flowCount))} ·{" "}
-                      {t.domainMap.nodeCount.replace("{count}", String(card.nodeCount))}
+                      {t.domainMap.workCount.replace("{count}", String(processes.length))} ·{" "}
+                      {t.domainMap.flowCount.replace("{count}", String(card.flowCount))}
                     </span>
                     <button
                       type="button"
@@ -246,32 +267,17 @@ export default function DomainMapView() {
                       <GroundedBar pct={card.groundedPct} grounded={card.groundedCount} review={card.reviewCount} />
                     </div>
                   )}
-                  {/* 기능 칩 — 프로토 .chip(pill). 클릭 = ?flow= 딥링크, +N = 도메인 진입. */}
-                  <div className="flex flex-wrap gap-1.5" style={{ marginTop: card.filled ? 0 : 8 }}>
-                    {shown.map((f) => (
-                      <button
-                        key={f.id}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/domains/${card.id}?flow=${encodeURIComponent(f.id)}`);
-                        }}
-                        className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer truncate"
-                        style={{ padding: "3px 9px", fontSize: 12, maxWidth: "100%" }}
-                        title={f.name}
-                      >
-                        {f.name}
-                      </button>
-                    ))}
-                    {rest > 0 && (
-                      <span
-                        className="rounded-full bg-elevated text-text-muted"
-                        style={{ padding: "3px 9px", fontSize: 12 }}
-                        title={t.domainMap.viewFeatures}
-                      >
-                        {t.domainMap.moreFlows.replace("{count}", String(rest))}
-                      </span>
-                    )}
+                  {/* 업무(프로세스) 칩 — 클릭 = 업무 흐름도 탭 딥링크(?view=business&bf=).
+                      접힘: 2줄 클램프(+N 포함), 펼침: 전량(헤더 전역 토글). */}
+                  <div style={{ marginTop: card.filled ? 0 : 8 }}>
+                    <ProcessChips
+                      processes={processes}
+                      expanded={worksExpanded}
+                      defaultTitle={t.flowList.bizProcessDefault}
+                      onOpen={(p) =>
+                        navigate(`/domains/${card.id}?view=business&bf=${p.index}`)
+                      }
+                    />
                   </div>
                 </div>
               );
@@ -290,7 +296,12 @@ export default function DomainMapView() {
             </p>
           ) : (
             <>
-              <ExtSection title={`${t.domainMap.extTitle} — ${t.domainMap.extInterfaces}`} first>
+              <ExtSection
+                title={`${t.domainMap.extTitle} — ${t.domainMap.extInterfaces}`}
+                first
+                onOpen={() => navigate("/programs")}
+                openLabel={t.domainMap.extOpenMenu}
+              >
                 <KvRow label={t.domainMap.extOutbound} value={systemMap.interfaces.outboundCount}
                   badge={systemMap.interfaces.outboundCount === 0 ? (systemMap.interfaces.scanned ? "ok" : "mut") : undefined}
                   badgeText={systemMap.interfaces.scanned ? t.domainMap.extScanBadge : t.domainMap.extUnscanned} t={t} />
@@ -304,59 +315,52 @@ export default function DomainMapView() {
                   </p>
                 )}
               </ExtSection>
-              <ExtSection title={t.domainMap.extDb}>
+              <ExtSection
+                title={t.domainMap.extDb}
+                onOpen={() => navigate("/data")}
+                openLabel={t.domainMap.extOpenMenu}
+              >
                 {systemMap.db ? (
-                  <>
-                    <div className="flex items-center" style={{ fontSize: 12.5, padding: "3px 0" }}>
-                      <span className="text-text-secondary">
-                        {systemMap.db.vendor ?? "—"}
-                        {systemMap.db.embedded && (
-                          <span className="text-text-muted" style={{ fontSize: 11 }}>
-                            {" "}({t.domainMap.extEmbedded})
-                          </span>
-                        )}
-                      </span>
-                      <span className="ml-auto text-text-secondary">
-                        <b className="tabular-nums text-text-primary">{systemMap.db.tableCount}</b>{" "}
-                        {t.domainMap.extTablesUnit}
-                      </span>
-                    </div>
-                    <div className="flex items-center" style={{ fontSize: 12.5, padding: "3px 0" }}>
-                      <span className="text-text-muted">{t.domainMap.extCrud}</span>
-                      <button
-                        type="button"
-                        onClick={() => navigate("/deliverables")}
-                        className="ml-auto cursor-pointer hover:underline"
-                        style={{ fontSize: 12, color: "var(--color-status-info)" }}
-                      >
-                        {t.domainMap.extView}
-                      </button>
-                    </div>
-                  </>
+                  /* CRUD 매트릭스 행은 제거(사용자 결정) — 타이틀 → 버튼이 데이터 메뉴로 안내. */
+                  <div className="flex items-center" style={{ fontSize: 12.5, padding: "3px 0" }}>
+                    <span className="text-text-secondary">
+                      {systemMap.db.vendor ?? "—"}
+                      {systemMap.db.embedded && (
+                        <span className="text-text-muted" style={{ fontSize: 11 }}>
+                          {" "}({t.domainMap.extEmbedded})
+                        </span>
+                      )}
+                    </span>
+                    <span className="ml-auto text-text-secondary">
+                      <b className="tabular-nums text-text-primary">{systemMap.db.tableCount}</b>{" "}
+                      {t.domainMap.extTablesUnit}
+                    </span>
+                  </div>
                 ) : (
                   <ExtNone scanned t={t} />
                 )}
               </ExtSection>
-              <ExtSection title={t.domainMap.extBatch}>
+              <ExtSection
+                title={t.domainMap.extBatch}
+                onOpen={() => navigate("/programs")}
+                openLabel={t.domainMap.extOpenMenu}
+              >
                 <KvRow label={t.domainMap.extJobs} value={systemMap.batch.jobCount}
                   badge={systemMap.batch.jobCount === 0 ? (systemMap.batch.scanned ? "ok" : "mut") : undefined}
                   badgeText={systemMap.batch.scanned ? t.domainMap.extScanBadge : t.domainMap.extUnscanned} t={t} />
               </ExtSection>
               {screenCount !== null && (
-                <ExtSection title={t.domainMap.extScreens}>
+                <ExtSection
+                  title={t.domainMap.extScreens}
+                  onOpen={() => navigate("/screens")}
+                  openLabel={t.domainMap.extOpenMenu}
+                >
+                  {/* 행 내 화면설계서 링크는 타이틀 → 버튼으로 승격(중복 제거). */}
                   <div className="flex items-center" style={{ fontSize: 12.5, padding: "3px 0" }}>
                     <span className="text-text-secondary">
                       {t.domainMap.extScreenCount}{" "}
                       <b className="tabular-nums text-text-primary">{screenCount}</b>
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => navigate("/screens")}
-                      className="ml-auto cursor-pointer hover:underline"
-                      style={{ fontSize: 12, color: "var(--color-status-info)" }}
-                    >
-                      {t.domainMap.extScreensLink}
-                    </button>
                   </div>
                 </ExtSection>
               )}
@@ -419,15 +423,42 @@ export default function DomainMapView() {
 }
 
 /** 프로토 .ext section — h4(12px 700) + 상단 구분선(첫 섹션 제외). */
-function ExtSection({ title, first, children }: { title: string; first?: boolean; children: React.ReactNode }) {
+function ExtSection({
+  title,
+  first,
+  onOpen,
+  openLabel,
+  children,
+}: {
+  title: string;
+  first?: boolean;
+  /** 타이틀 우측 메뉴 이동 버튼(→) — 해당 데이터의 전용 메뉴로 점프. */
+  onOpen?: () => void;
+  openLabel?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section
       className={first ? "" : "border-t border-border-subtle"}
       style={{ padding: "13px 16px" }}
     >
-      <h4 className="text-text-secondary font-bold" style={{ fontSize: 12, marginBottom: 8 }}>
-        {title}
-      </h4>
+      <div className="flex items-center" style={{ marginBottom: 8 }}>
+        <h4 className="text-text-secondary font-bold" style={{ fontSize: 12 }}>
+          {title}
+        </h4>
+        {onOpen && (
+          <button
+            type="button"
+            onClick={onOpen}
+            title={openLabel}
+            aria-label={openLabel}
+            className="ml-auto shrink-0 flex items-center justify-center rounded text-text-muted hover:text-accent transition-colors cursor-pointer"
+            style={{ width: 20, height: 20, fontSize: 12, lineHeight: 1 }}
+          >
+            →
+          </button>
+        )}
+      </div>
       <div className="flex flex-col">{children}</div>
     </section>
   );
@@ -485,5 +516,116 @@ function ExtNone({ scanned, t }: { scanned: boolean; t: ReturnType<typeof useI18
     <p className="text-text-muted" style={{ fontSize: 11.5 }}>
       {scanned ? t.domainMap.extNone : t.domainMap.extUnavailable}
     </p>
+  );
+}
+
+/**
+ * 업무(프로세스) 칩 목록 — 접힘 시 CHIP_MAX_ROWS(2)줄 클램프.
+ * 측정 패스(전량 렌더 → offsetTop 줄 판정)로 2줄에 들어가는 칩 수를 구하고,
+ * 초과가 있으면 "+N" 칩까지 2줄 안에 들어가도록 뒤에서부터 줄인다(요구:
+ * +N 도 2줄 안 포함). useLayoutEffect 라 페인트 전 확정 — 깜빡임 없음.
+ * 카드 폭 변화(반응형 그리드·창 크기)는 ResizeObserver 로 재측정.
+ */
+function ProcessChips({
+  processes,
+  expanded,
+  defaultTitle,
+  onOpen,
+}: {
+  processes: BizProcess[];
+  expanded: boolean;
+  defaultTitle: string;
+  onOpen: (p: BizProcess) => void;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  // null = 측정 패스(전량 렌더 후 클램프 계산 전).
+  const [visible, setVisible] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    setVisible(null);
+  }, [processes, expanded]);
+
+  useLayoutEffect(() => {
+    if (expanded || visible !== null) return;
+    const el = ref.current;
+    if (!el) return;
+    const chips = Array.from(el.children) as HTMLElement[];
+    if (chips.length === 0) {
+      setVisible(0);
+      return;
+    }
+    const rowTops: number[] = [];
+    for (const c of chips) if (!rowTops.includes(c.offsetTop)) rowTops.push(c.offsetTop);
+    rowTops.sort((a, b) => a - b);
+    if (rowTops.length <= CHIP_MAX_ROWS) {
+      setVisible(chips.length);
+      return;
+    }
+    const cutTop = rowTops[CHIP_MAX_ROWS];
+    let k = chips.filter((c) => c.offsetTop < cutTop).length;
+    // "+N" 칩 예약 폭 — 마지막 보이는 칩 뒤(2줄째 끝)에 들어갈 자리를 확보한다.
+    const PLUS_W = 44;
+    const width = el.clientWidth;
+    while (k > 0) {
+      const last = chips[k - 1];
+      if (last.offsetLeft + last.offsetWidth + 6 + PLUS_W <= width) break;
+      k--;
+    }
+    setVisible(Math.max(k, 1)); // 전부 "+N"이 되는 퇴행 방지 — 최소 1개는 노출.
+  }, [expanded, visible, processes]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    let lastW = el.clientWidth;
+    const ro = new ResizeObserver(() => {
+      if (el.clientWidth !== lastW) {
+        lastW = el.clientWidth;
+        setVisible(null);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  if (processes.length === 0) return null;
+  const measuring = !expanded && visible === null;
+  const shown =
+    expanded || measuring ? processes : processes.slice(0, visible ?? processes.length);
+  const rest = processes.length - shown.length;
+  return (
+    <div
+      ref={ref}
+      className="flex flex-wrap"
+      // 측정 패스 동안만 2줄 높이로 클립 — 카드 높이 출렁임 방지(측정엔 무영향).
+      style={{ gap: 6, ...(measuring ? { maxHeight: 58, overflow: "hidden" } : {}) }}
+    >
+      {shown.map((p) => {
+        const label = p.title ?? defaultTitle.replace("{n}", String(p.index + 1));
+        return (
+          <button
+            key={p.index}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpen(p);
+            }}
+            className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer truncate"
+            style={{ padding: "3px 9px", fontSize: 12, maxWidth: "100%" }}
+            title={label}
+          >
+            {label}
+          </button>
+        );
+      })}
+      {!measuring && rest > 0 && (
+        <span
+          className="rounded-full bg-elevated text-text-muted"
+          style={{ padding: "3px 9px", fontSize: 12 }}
+        >
+          +{rest}
+        </span>
+      )}
+    </div>
   );
 }

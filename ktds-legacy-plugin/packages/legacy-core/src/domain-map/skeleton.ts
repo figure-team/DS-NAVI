@@ -390,15 +390,28 @@ function handlerDeclaredIn(
   return facts.classes.some((c) => c.methods.some((m) => m.name === method))
 }
 
-/** 한 root 가 선언한 라우트/배치 진입을 flow 스펙으로 모은다(flowId 정렬). */
+/**
+ * 한 root 가 선언한 라우트/배치 진입을 flow 스펙으로 모은다(flowId 정렬, 자연키 유일).
+ *
+ * 같은 자연키 flow 가 한 파일에서 여러 번 선언되는 경우 — 같은 잡을 두 지점에서
+ * 스케줄(예: BatchScheduler 가 BatchShellScriptJob 을 57·97 라인에서 두 번 등재),
+ * 같은 METHOD+path 라우트 중복 등 — 하나의 flow 로 접는다. flowId 는 skeleton 의
+ * 노드 id 라 유일해야 하며(assertUniqueNodeIds), 중복 진입은 같은 업무 흐름의 복수
+ * 호출지점일 뿐이다. 대표는 **최소 라인**(첫 선언 지점)으로 고정 — 입력 순서와
+ * 무관하게 결정론(재실행 byte-diff=0).
+ */
 function collectFlows(
   root: string,
   routesByFile: Map<string, RoutesReport['routes']>,
   batchByFile: Map<string, RoutesReport['batchEntries']>,
 ): FlowSpec[] {
-  const flows: FlowSpec[] = []
+  const byId = new Map<string, FlowSpec>()
+  const consider = (f: FlowSpec): void => {
+    const prev = byId.get(f.flowId)
+    if (!prev || f.line < prev.line) byId.set(f.flowId, f)
+  }
   for (const r of routesByFile.get(root) ?? []) {
-    flows.push({
+    consider({
       flowId: `flow:${stripPrefix(r.routeId, 'route:')}`,
       entryPoint: r.handler ?? `${r.method} ${r.path}`,
       entryType: 'http',
@@ -407,7 +420,7 @@ function collectFlows(
     })
   }
   for (const b of batchByFile.get(root) ?? []) {
-    flows.push({
+    consider({
       flowId: `flow:${b.entryId}`,
       entryPoint: b.handler ?? b.entryId,
       entryType: b.trigger === 'main' ? 'cli' : 'cron',
@@ -415,7 +428,7 @@ function collectFlows(
       handlerMethod: bareMethod(b.handler),
     })
   }
-  return flows.sort((a, b) => cmp(a.flowId, b.flowId))
+  return [...byId.values()].sort((a, b) => cmp(a.flowId, b.flowId))
 }
 
 /** census 의 java 파일을 1회씩 파싱해 relPath→facts 맵을 만든다(파싱 실패는 제외). */

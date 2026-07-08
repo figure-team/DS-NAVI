@@ -1,0 +1,133 @@
+{
+  "key": "cop",
+  "chunkIndex": 6,
+  "isHeaderChunk": false,
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/smt/djm/updateDeptJob.do",
+      "name": "부서별 업무 수정",
+      "summary": { "text": "부서별 업무(DeptJob) 정보를 수정 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/djm/web/EgovDeptJobController.java", "line": 613, "snippet": "@RequestMapping(\"/cop/smt/djm/updateDeptJob.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/djm/updateDeptJobBx.do",
+      "name": "부서별 업무함 수정",
+      "summary": { "text": "부서별 업무함(DeptJobBx) 항목을 수정 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/djm/web/EgovDeptJobController.java", "line": 365, "snippet": "@RequestMapping(\"/cop/smt/djm/updateDeptJobBx.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/djm/updateDeptJobBxOrdr.do",
+      "name": "부서별 업무함 순서 변경",
+      "summary": { "text": "부서별 업무함(DeptJobBx) 항목의 정렬 순서를 변경 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/djm/web/EgovDeptJobController.java", "line": 391, "snippet": "@RequestMapping(\"/cop/smt/djm/updateDeptJobBxOrdr.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageDetail.do",
+      "name": "업무 일지 상세 조회",
+      "summary": { "text": "업무 일지(Diary) 1건의 상세 내용을 조회하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java", "line": 141, "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageList.do",
+      "name": "업무 일지 목록 조회",
+      "summary": { "text": "업무 일지(Diary) 목록을 검색 조건과 페이징으로 조회하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java", "line": 91, "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageModify.do",
+      "name": "업무 일지 수정 화면 이동",
+      "summary": { "text": "업무 일지(Diary) 수정을 위한 화면으로 이동하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java", "line": 171, "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageModify.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do",
+      "name": "업무 일지 수정 처리",
+      "summary": { "text": "업무 일지(Diary) 수정 요청을 실제로 반영 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java", "line": 214, "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageModifyActor.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageRegist.do",
+      "name": "업무 일지 등록 화면 이동",
+      "summary": { "text": "업무 일지(Diary) 등록을 위한 화면으로 이동하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java", "line": 302, "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageRegist.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/dsm/EgovDiaryManageRegistActor.do",
+      "name": "업무 일지 등록 처리",
+      "summary": { "text": "업무 일지(Diary) 등록 요청과 첨부파일을 실제로 저장 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java", "line": 341, "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageRegistActor.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/addLeaderSchdul.do",
+      "name": "리더 일정 등록 화면 이동",
+      "summary": { "text": "부서장(리더) 일정 등록을 위한 화면으로 이동하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 504, "snippet": "@RequestMapping(value = \"/cop/smt/lsm/mng/addLeaderSchdul.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/addLeaderSttus.do",
+      "name": "리더 근태 등록 화면 이동",
+      "summary": { "text": "부서장(리더) 근태 현황 등록을 위한 화면으로 이동하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 780, "snippet": "@RequestMapping(\"/cop/smt/lsm/mng/addLeaderSttus.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/deleteLeaderSchdul.do",
+      "name": "리더 일정 삭제",
+      "summary": { "text": "부서장(리더) 일정 1건을 삭제 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 676, "snippet": "@RequestMapping(value = \"/cop/smt/lsm/mng/deleteLeaderSchdul.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/deleteLeaderSttus.do",
+      "name": "리더 근태 삭제",
+      "summary": { "text": "부서장(리더) 근태 현황 1건을 삭제 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 916, "snippet": "@RequestMapping(\"/cop/smt/lsm/mng/deleteLeaderSttus.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/insertLeaderSchdul.do",
+      "name": "리더 일정 등록 처리",
+      "summary": { "text": "부서장(리더) 일정 등록 요청을 실제로 저장 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 568, "snippet": "@RequestMapping(value = \"/cop/smt/lsm/mng/insertLeaderSchdul.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/insertLeaderSttus.do",
+      "name": "리더 근태 등록 처리",
+      "summary": { "text": "부서장(리더) 근태 현황 등록 요청을 실제로 저장 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 875, "snippet": "@RequestMapping(\"/cop/smt/lsm/mng/insertLeaderSttus.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/modifyLeaderSchdul.do",
+      "name": "리더 일정 수정",
+      "summary": { "text": "부서장(리더) 일정 1건을 수정 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 435, "snippet": "@RequestMapping(value = \"/cop/smt/lsm/mng/modifyLeaderSchdul.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/modifyLeaderSttus.do",
+      "name": "리더 근태 수정",
+      "summary": { "text": "부서장(리더) 근태 현황 1건을 수정 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 813, "snippet": "@RequestMapping(\"/cop/smt/lsm/mng/modifyLeaderSttus.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/selectLeaderSttusList.do",
+      "name": "리더 근태 목록 조회",
+      "summary": { "text": "부서장(리더) 근태 현황 목록을 조회하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 745, "snippet": "@RequestMapping(\"/cop/smt/lsm/mng/selectLeaderSttusList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/updateLeaderSchdul.do",
+      "name": "리더 일정 갱신",
+      "summary": { "text": "부서장(리더) 일정 정보를 갱신 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 624, "snippet": "@RequestMapping(value = \"/cop/smt/lsm/mng/updateLeaderSchdul.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /cop/smt/lsm/mng/updateLeaderSttus.do",
+      "name": "리더 근태 갱신",
+      "summary": { "text": "부서장(리더) 근태 현황 정보를 갱신 처리하는 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 849, "snippet": "@RequestMapping(\"/cop/smt/lsm/mng/updateLeaderSttus.do\")" } ] }
+    }
+  ],
+  "steps": [
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJob.do:src/main/java/egovframework/com/cop/smt/djm/web/EgovDeptJobController.java", "name": "부서별 업무 컨트롤러", "summary": { "text": "부서별 업무(DeptJob) 요청 매핑을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/djm/web/EgovDeptJobController.java", "line": 528, "snippet": "@RequestMapping(\"/cop/smt/djm/addDeptJob.do\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJob.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "name": "인증 사용자 정보 조회 헬퍼", "summary": { "text": "인증된 사용자 정보와 권한을 조회하는 정적 헬퍼이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJob.do:src/main/java/egovframework/com/cop/smt/djm/service/EgovDeptJobService.java", "name": "부서별 업무 서비스 계약", "summary": { "text": "부서별 업무(DeptJob) 관리 비즈니스 메서드를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/djm/service/EgovDeptJobService.java", "line": 25, "snippet": "public interface EgovDeptJobService {" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJob.do:src/main/java/egovframework/com/cop/smt/djm/service/DeptJobVO.java", "name": "부서별 업무 데이터 객체", "summary": { "text": "부서별 업무 조회 조건과 데이터를 담는 값 객체(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/djm/service/DeptJobVO.java", "line": 27, "snippet": "@SuppressWarnings(\"serial\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJob.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "name": "첨부파일 업로드/다운로드 처리", "summary": { "text": "첨부파일 업로드 파싱과 저장, 다운로드 스트리밍을 담당하는 공통 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java", "line": 60, "snippet": "@Component(\"EgovFileMngUtil\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJob.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "name": "첨부파일 관리 서비스 계약", "summary": { "text": "첨부파일 정보의 조회·등록·수정·삭제를 정의하는 파일관리 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java", "line": 21, "snippet": "public interface EgovFileMngService {" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJob.do:src/main/java/egovframework/com/cmm/service/FileVO.java", "name": "첨부파일 데이터 객체", "summary": { "text": "첨부파일 1건의 속성을 담는 값 객체(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java", "line": 20, "snippet": "@SuppressWarnings(\"serial\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJob.do:src/main/java/egovframework/com/cmm/LoginVO.java", "name": "로그인 세션 정보 객체", "summary": { "text": "인증된 사용자의 로그인 정보를 담는 세션용 값 객체(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJobBx.do:src/main/java/egovframework/com/cop/smt/djm/service/DeptJobBxVO.java", "name": "부서별 업무함 데이터 객체", "summary": { "text": "부서별 업무함(DeptJobBx) 조회 조건과 데이터를 담는 값 객체(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/djm/service/DeptJobBxVO.java", "line": 27, "snippet": "@SuppressWarnings(\"serial\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJobBx.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "name": "문자열 처리 유틸", "summary": { "text": "문자열 자르기·치환·인코딩·HTML 변환 등을 제공하는 공통 문자열 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" } ] } },
+    { "stepId": "step:ANY /cop/smt/djm/updateDeptJobBx.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java", "name": "인증 사용자 서비스 계약", "summary": { "text": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java", "line": 5, "snippet": "public interface EgovUserDetailsService {" } ] } },
+    { "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageDetail.do:src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java", "name": "업무 일지 컨트롤러", "summary": { "text": "업무 일지(Diary) 목록·상세·등록·수정과 첨부파일 처리를 담당하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/web/EgovDiaryManageController.java", "line": 141, "snippet": "@RequestMapping(value = \"/cop/smt/dsm/EgovDiaryManageDetail.do\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageDetail.do:src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java", "name": "업무 일지 서비스 계약", "summary": { "text": "업무 일지(Diary) CRUD를 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/EgovDiaryManageService.java", "line": 24, "snippet": "public interface EgovDiaryManageService {" } ] } },
+    { "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageList.do:src/main/java/egovframework/com/cmm/ComDefaultVO.java", "name": "공통 검색·페이징 기반 객체", "summary": { "text": "검색조건과 페이징 정보를 담는 공통 최상위 기반 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java", "line": 22, "snippet": "@SuppressWarnings(\"serial\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java", "name": "다국어 메시지 조회", "summary": { "text": "코드/Locale 기반 메시지를 조회하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] } },
+    { "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java", "name": "공통 프로퍼티 설정 조회", "summary": { "text": "프로퍼티 파일을 로드해 설정 값을 키 기준으로 조회하는 공통 유틸이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java", "line": 49, "snippet": "public class EgovProperties {" } ] } },
+    { "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModify.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java", "name": "웹 보안 필터링 유틸", "summary": { "text": "XSS·경로조작·SQL 인젝션 등을 방어하는 공통 웹 보안 필터링 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java", "line": 25, "snippet": "public class EgovWebUtil {" } ] } },
+    { "stepId": "step:ANY /cop/smt/dsm/EgovDiaryManageModifyActor.do:src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java", "name": "업무 일지 데이터 객체", "summary": { "text": "업무 일지(Diary)의 내용·일정연계·첨부파일 등을 담는 값 객체(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/dsm/service/DiaryManageVO.java", "line": 29, "snippet": "@SuppressWarnings(\"serial\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/lsm/mng/addLeaderSchdul.do:src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "name": "리더 일정 컨트롤러", "summary": { "text": "부서장(리더) 일정 관리 요청 매핑을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/web/EgovLeaderSchdulController.java", "line": 504, "snippet": "@RequestMapping(value = \"/cop/smt/lsm/mng/addLeaderSchdul.do\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/lsm/mng/addLeaderSchdul.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "name": "공통코드 데이터 객체", "summary": { "text": "공통코드·XSS 관련 조회 조건과 데이터를 담는 값 객체(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "line": 28, "snippet": "@SuppressWarnings(\"serial\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/lsm/mng/addLeaderSchdul.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "name": "공통코드 서비스 계약", "summary": { "text": "공통코드·XSS 관련 비즈니스 메서드를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "line": 26, "snippet": "public interface EgovCmmUseService {" } ] } },
+    { "stepId": "step:ANY /cop/smt/lsm/mng/addLeaderSchdul.do:src/main/java/egovframework/com/cop/smt/lsm/service/LeaderSchdulVO.java", "name": "리더 일정 데이터 객체", "summary": { "text": "부서장(리더) 일정 조회 조건과 데이터를 담는 값 객체(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/service/LeaderSchdulVO.java", "line": 27, "snippet": "@SuppressWarnings(\"serial\")" } ] } },
+    { "stepId": "step:ANY /cop/smt/lsm/mng/deleteLeaderSchdul.do:src/main/java/egovframework/com/cop/smt/lsm/service/EgovLeaderSchdulService.java", "name": "리더 일정 서비스 계약", "summary": { "text": "부서장(리더) 일정 관리 비즈니스 메서드를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/service/EgovLeaderSchdulService.java", "line": 25, "snippet": "public interface EgovLeaderSchdulService {" } ] } },
+    { "stepId": "step:ANY /cop/smt/lsm/mng/insertLeaderSttus.do:src/main/java/egovframework/com/cop/smt/lsm/service/LeaderSttusVO.java", "name": "리더 근태 데이터 객체", "summary": { "text": "부서장(리더) 근태 현황 조회 조건과 데이터를 담는 값 객체(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cop/smt/lsm/service/LeaderSttusVO.java", "line": 27, "snippet": "@SuppressWarnings(\"serial\")" } ] } }
+  ]
+}

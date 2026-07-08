@@ -1,0 +1,181 @@
+{
+  "domainId": "domain:json",
+  "files": [
+    {
+      "className": "ObjectMapper",
+      "kgHint": {
+        "summary": "Spring LDAP DirContextAdapter를 리플렉션으로 순회하며 대상 VO에 속성을 매핑하는 ContextMapper 구현이다.",
+        "tags": [
+          "ldap",
+          "mapper",
+          "reflection",
+          "serialization"
+        ]
+      },
+      "line": 57,
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "slice": {
+        "endLine": 126,
+        "startLine": 47,
+        "text": " *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2014.10.12  전우성          최초 생성\n *   2017-02-13  이정은          시큐어코딩(ES) - 시큐어코딩 부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n *   2025.06.21  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-ImmutableField(불변필드), UselessParentheses(쓸모없는 괄호)\n *\n *      </pre>\n */\npublic class ObjectMapper<T> implements ContextMapper<Object> {\n\n\tprivate final Class<T> type;\n\n\tpublic ObjectMapper(Class<T> class1) {\n\t\tthis.type = class1;\n\t}\n\n\t/**\n\t * ContextAdapter에서 받아온 객체를 vo로 변환한다.\n\t */\n\t@Override\n\tpublic Object mapFromContext(Object arg0) throws NamingException {\n\t\tDirContextAdapter adapter = (DirContextAdapter) arg0;\n\t\tAttributes attrs = adapter.getAttributes();\n\n\t\tLdapObject vo = null;\n\n\t\ttry {\n\t\t\tvo = (LdapObject) type.newInstance();\n\t\t\t// 2017-02-13 이정은 시큐어코딩(ES) - 시큐어코딩 부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t} catch (InstantiationException e2) {\n\t\t\tthrow new RuntimeException(e2);\n\t\t} catch (IllegalAccessException e2) {\n\t\t\tthrow new RuntimeException(e2);\n\t\t}\n\n\t\tvo.setDn(adapter.getDn().toString());\n\n\t\tBeanInfo beanInfo;\n\t\ttry {\n\t\t\tbeanInfo = Introspector.getBeanInfo(type);\n\t\t} catch (IntrospectionException e1) {\n\t\t\tthrow new RuntimeException(e1);\n\t\t}\n\n\t\tPropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();\n\n\t\tif (propertyDescriptors != null) {\n\t\t\tfor (PropertyDescriptor descriptor : propertyDescriptors) {\n\t\t\t\tif (attrs.get(descriptor.getName()) != null) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\tClass<?> o = descriptor.getPropertyType();\n\t\t\t\t\t\tif (o == int.class) {\n\t\t\t\t\t\t\t// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\t\tPropertyUtils.setProperty(vo, descriptor.getName(), Integer\n\t\t\t\t\t\t\t\t\t.valueOf(EgovStringUtil.isNullToString(attrs.get(descriptor.getName()).get())));\n\t\t\t\t\t\t}\n\t\t\t\t\t\tif (o == String.class) {\n\t\t\t\t\t\t\t// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\t\tPropertyUtils.setProperty(vo, descriptor.getName(),\n\t\t\t\t\t\t\t\t\tattrs.get(EgovStringUtil.isNullToString(descriptor.getName())).get());\n\t\t\t\t\t\t}\n\t\t\t\t\t\tif (o == Boolean.class) {\n\t\t\t\t\t\t\t// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\t\tPropertyUtils.setProperty(vo, descriptor.getName(),\n\t\t\t\t\t\t\t\t\t\"Y\".equals(attrs.get(descriptor.getName()).get()));\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\t// 2017-02-13 이정은 시큐어코딩(ES) - 시큐어코딩 부적절한 예외 처리[CWE-253, CWE-440, CWE-754]\n\t\t\t\t\t} catch (IllegalAccessException e) {\n\t\t\t\t\t\tthrow new RuntimeException(e);\n\t\t\t\t\t} catch (InvocationTargetException e) {\n\t\t\t\t\t\tthrow new RuntimeException(e);\n\t\t\t\t\t} catch (NoSuchMethodException e) {\n\t\t\t\t\t\tthrow new RuntimeException(e);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TestJson2ListMap",
+      "kgHint": {
+        "summary": "Jackson ObjectMapper로 JSON을 List<Map>으로 역직렬화하는 방식을 검증하는 main 기반 수동 테스트.",
+        "tags": [
+          "test",
+          "json",
+          "jackson",
+          "manual-test"
+        ]
+      },
+      "line": 15,
+      "relPath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+      "slice": {
+        "endLine": 41,
+        "startLine": 5,
+        "text": "import java.util.Map;\n\nimport org.apache.commons.collections.MapUtils;\n\nimport com.fasterxml.jackson.core.JsonParseException;\nimport com.fasterxml.jackson.core.type.TypeReference;\nimport com.fasterxml.jackson.databind.*;\n\npublic class TestJson2ListMap {\n\n\t@SuppressWarnings(\"unchecked\")\n\tpublic static void main(String[] args) {\n\t\tString jsonStr = \"[{\\\"name\\\":\\\"김씨\\\", \\\"friends\\\":[\\\"a\\\", \\\"b\\\"]},{\\\"name\\\":\\\"최씨\\\", \\\"friends\\\":[\\\"c\\\", \\\"d\\\"]}]\";\n\n\t\tObjectMapper objectMapper = new ObjectMapper();\n\t\ttry {\n\t\t\tList<Map<String, Object>> readValue = objectMapper.readValue(jsonStr,\n\t\t\t\t\tnew TypeReference<List<Map<String, Object>>>() {\n\t\t\t\t\t});\n\n\t\t\tfor (Map<String, Object> map : readValue) {\n\t\t\t\tMapUtils.debugPrint(System.out, \"map\", map);\n\t\t\t\tList<String> friends = (List<String>) map.get(\"friends\");\n\t\t\t\tfor (String friend : friends) {\n\t\t\t\t\tSystem.out.println(friend);\n\t\t\t\t}\n\t\t\t}\n\t\t} catch (JsonParseException e) {\n\t\t\te.printStackTrace();\n\t\t} catch (JsonMappingException e) {\n\t\t\te.printStackTrace();\n\t\t} catch (IOException e) {\n\t\t\te.printStackTrace();\n\t\t}\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TestJson2ListVO",
+      "kgHint": {
+        "summary": "파일에서 JSON을 읽어 List<DataSetInfo> VO로 역직렬화하는 방식을 검증하는 main 기반 수동 테스트.",
+        "tags": [
+          "test",
+          "json",
+          "jackson",
+          "serialization"
+        ]
+      },
+      "line": 15,
+      "relPath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+      "slice": {
+        "endLine": 84,
+        "startLine": 5,
+        "text": "import java.io.IOException;\nimport java.util.List;\n\nimport com.fasterxml.jackson.core.JsonParseException;\nimport com.fasterxml.jackson.core.type.TypeReference;\nimport com.fasterxml.jackson.databind.*;\n\npublic class TestJson2ListVO {\n\n\t//@SuppressWarnings(\"unchecked\")\n\tpublic static void main(String[] args) {\n\t\t/*\n\t\tString jsonStr = \"[\"\n\t\t\t\t+ \"\t{\"\n\t\t\t\t+ \"\t\t\\\"title\\\":\\\"squat1\\\",\"\n\t\t\t\t+ \"\t\t\\\"description\\\":\\\"this is squat1\\\",\"\n\t\t\t\t+ \"\t\t\\\"trainClass\\\":\\\"squat1 class\\\",\"\n\t\t\t\t+ \"\t\t\\\"dataSetFile\\\":\\\"/squat1.csv\\\"\"\n\t\t\t\t+ \"\t},\"\n\t\t\t\t+ \"\t{\"\n\t\t\t\t+ \"\t\t\\\"title\\\":\\\"squat2\\\",\"\n\t\t\t\t+ \"\t\t\\\"description\\\":\\\"this is squat2\\\",\"\n\t\t\t\t+ \"\t\t\\\"trainClass\\\":\\\"squat2 class\\\",\"\n\t\t\t\t+ \"\t\t\\\"dataSetFile\\\":\\\"/squat2.csv\\\"\"\n\t\t\t\t+ \"\t},\"\n\t\t\t\t+ \"\t{\"\n\t\t\t\t+ \"\t\t\\\"title\\\":\\\"squat3\\\",\"\n\t\t\t\t+ \"\t\t\\\"description\\\":\\\"this is squat3\\\",\"\n\t\t\t\t+ \"\t\t\\\"trainClass\\\":\\\"squat3 class\\\",\"\n\t\t\t\t+ \"\t\t\\\"dataSetFile\\\":\\\"/squat3.csv\\\"\"\n\t\t\t\t+ \"\t},\"\n\t\t\t\t+ \"\t{\"\n\t\t\t\t+ \"\t\t\\\"title\\\":\\\"squat4\\\",\"\n\t\t\t\t+ \"\t\t\\\"description\\\":\\\"this is squat34\\\",\"\n\t\t\t\t+ \"\t\t\\\"trainClass\\\":\\\"squat4 class\\\",\"\n\t\t\t\t+ \"\t\t\\\"dataSetFile\\\":\\\"/squat4.csv\\\"\"\n\t\t\t\t+ \"\t},\"\n\t\t\t\t+ \"\t{\"\n\t\t\t\t+ \"\t\t\\\"title\\\":\\\"squat5\\\",\"\n\t\t\t\t+ \"\t\t\\\"description\\\":\\\"this is squat5\\\",\"\n\t\t\t\t+ \"\t\t\\\"trainClass\\\":\\\"squat5 class\\\",\"\n\t\t\t\t+ \"\t\t\\\"dataSetFile\\\":\\\"/squat5.csv\\\"\"\n\t\t\t\t+ \"\t}\"\n\t\t\t\t+ \"]\"\n\t\t\t\t+ \"\";\n\t\t*/\n\t\t\n\t\tBufferedReader reader = null;\n\t\tString jsonStr = \"\";\n\t\tString path = TestJson2ListVO.class.getResource(\"\").getPath();\n\t\t\n\t\ttry {\n\t\t\t//reader = new BufferedReader(new FileReader(\"C:\\\\eGovFrameDev-4.0.0-64bit\\\\workspace\\\\egovframework-all-in-one-AllNew\\\\src\\\\test\\\\java\\\\egovframework\\\\com\\\\json\\\\list.json\"));\n\t\t\treader = new BufferedReader(new FileReader(path + \"list.json\"));\n\t\t\tString str;\n\t\t\t\n\t\t\twhile ((str = reader.readLine()) != null) {\n\t\t\t\tSystem.out.println(str);\n\t\t\t\tjsonStr += str;\n\t\t\t}\n\t\t} catch (IOException e1) {\n\t\t\t// TODO Auto-generated catch block\n\t\t\te1.printStackTrace();\n\t\t} finally {\n\t\t\ttry {\n\t\t\t\treader.close();\n\t\t\t} catch (IOException e) {\n\t\t\t\t// TODO Auto-generated catch block\n\t\t\t\te.printStackTrace();\n\t\t\t}\n\t\t}\n\n\t\tObjectMapper objectMapper = new ObjectMapper();\n\t\ttry {\n\t\t\tList<DataSetInfo> readValue = objectMapper.readValue(jsonStr,\n\t\t\t\t\tnew TypeReference<List<DataSetInfo>>() {\n\t\t\t\t\t});\n\n\t\t\tfor (DataSetInfo vo : readValue) {\n\t\t\t\t//MapUtils.debugPrint(System.out, \"map\", vo);",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "TestJson2ListMap#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main",
+      "line": 15,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main:src/test/java/egovframework/com/json/TestJson2ListMap.java",
+        "step:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java"
+      ]
+    },
+    {
+      "entryPoint": "TestJson2ListVO#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main",
+      "line": 15,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main:src/test/java/egovframework/com/json/TestJson2ListVO.java",
+        "step:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "json",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main:src/test/java/egovframework/com/json/TestJson2ListMap.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main:src/test/java/egovframework/com/json/TestJson2ListVO.java"
+    }
+  ]
+}

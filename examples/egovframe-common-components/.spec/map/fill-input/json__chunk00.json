@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "key": "json",
+  "domainId": "domain:json",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:json",
+    "key": "json",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "className": "ObjectMapper",
+        "summary": "Spring LDAP DirContextAdapter를 리플렉션으로 순회하며 대상 VO에 속성을 매핑하는 ContextMapper 구현이다.",
+        "tags": [
+          "ldap",
+          "mapper",
+          "reflection",
+          "serialization"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+          "line": 57,
+          "snippet": "public class ObjectMapper<T> implements ContextMapper<Object> {"
+        }
+      },
+      {
+        "relPath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+        "className": "TestJson2ListMap",
+        "summary": "Jackson ObjectMapper로 JSON을 List<Map>으로 역직렬화하는 방식을 검증하는 main 기반 수동 테스트.",
+        "tags": [
+          "test",
+          "json",
+          "jackson",
+          "manual-test"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+          "line": 15,
+          "snippet": "@SuppressWarnings(\"unchecked\")"
+        }
+      },
+      {
+        "relPath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+        "className": "TestJson2ListVO",
+        "summary": "파일에서 JSON을 읽어 List<DataSetInfo> VO로 역직렬화하는 방식을 검증하는 main 기반 수동 테스트.",
+        "tags": [
+          "test",
+          "json",
+          "jackson",
+          "serialization"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+          "line": 15,
+          "snippet": "public static void main(String[] args) {"
+        }
+      }
+    ],
+    "cross": [],
+    "flowCount": 2,
+    "stepCount": 4
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main",
+      "entryPoint": "TestJson2ListMap#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main:src/test/java/egovframework/com/json/TestJson2ListMap.java",
+        "step:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+        "line": 15,
+        "snippet": "@SuppressWarnings(\"unchecked\")"
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main",
+      "entryPoint": "TestJson2ListVO#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main:src/test/java/egovframework/com/json/TestJson2ListVO.java",
+        "step:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+        "line": 15,
+        "snippet": "public static void main(String[] args) {"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main:src/test/java/egovframework/com/json/TestJson2ListMap.java",
+      "relPath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+      "layer": "api",
+      "className": "TestJson2ListMap",
+      "kgSummary": "Jackson ObjectMapper로 JSON을 List<Map>으로 역직렬화하는 방식을 검증하는 main 기반 수동 테스트.",
+      "kgTags": [
+        "test",
+        "json",
+        "jackson",
+        "manual-test"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/json/TestJson2ListMap.java",
+        "line": 15,
+        "snippet": "@SuppressWarnings(\"unchecked\")"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/json/TestJson2ListMap.java#main:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "layer": "dao",
+      "className": "ObjectMapper",
+      "kgSummary": "Spring LDAP DirContextAdapter를 리플렉션으로 순회하며 대상 VO에 속성을 매핑하는 ContextMapper 구현이다.",
+      "kgTags": [
+        "ldap",
+        "mapper",
+        "reflection",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "line": 57,
+        "snippet": "public class ObjectMapper<T> implements ContextMapper<Object> {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main:src/test/java/egovframework/com/json/TestJson2ListVO.java",
+      "relPath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+      "layer": "api",
+      "className": "TestJson2ListVO",
+      "kgSummary": "파일에서 JSON을 읽어 List<DataSetInfo> VO로 역직렬화하는 방식을 검증하는 main 기반 수동 테스트.",
+      "kgTags": [
+        "test",
+        "json",
+        "jackson",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/json/TestJson2ListVO.java",
+        "line": 15,
+        "snippet": "public static void main(String[] args) {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/json/TestJson2ListVO.java#main:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "layer": "dao",
+      "className": "ObjectMapper",
+      "kgSummary": "Spring LDAP DirContextAdapter를 리플렉션으로 순회하며 대상 VO에 속성을 매핑하는 ContextMapper 구현이다.",
+      "kgTags": [
+        "ldap",
+        "mapper",
+        "reflection",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "line": 57,
+        "snippet": "public class ObjectMapper<T> implements ContextMapper<Object> {"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1345 @@
+{
+  "schemaVersion": 1,
+  "key": "sym",
+  "domainId": "domain:sym",
+  "chunkIndex": 1,
+  "chunkTotal": 11,
+  "isHeaderChunk": false,
+  "domainHeader": {
+    "domainId": "domain:sym",
+    "key": "sym"
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /sym/bat/updateBatchSchdul.do",
+      "entryPoint": "EgovBatchSchdulController#updateBatchSchdul",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/bat/web/EgovBatchSchdulController.java",
+      "stepIds": [
+        "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/sym/bat/web/EgovBatchSchdulController.java",
+        "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+        "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+        "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/web/EgovBatchSchdulController.java",
+        "line": 300,
+        "snippet": "@RequestMapping(\"/sym/bat/updateBatchSchdul.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovAdministCalPopup.do",
+      "entryPoint": "EgovCalRestdeManageController#callAdministCalPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovAdministDayCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectAdministDayCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 823,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministDayCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovAdministMonthCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectAdministMonthCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1067,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministMonthCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovAdministWeekCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectAdministWeekCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 898,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministWeekCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovAdministYearCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectAdministYearCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1130,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministYearCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovNormalCalPopup.do",
+      "entryPoint": "EgovCalRestdeManageController#callNormalCalPopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 188,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalCalPopup.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovNormalDayCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectNormalDayCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 332,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalDayCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovNormalMonthCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectNormalMonthCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 574,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalMonthCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovNormalWeekCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectNormalWeekCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 405,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalWeekCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovNormalYearCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectNormalYearCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 637,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovNormalYearCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovRestdeDetail.do",
+      "entryPoint": "EgovCalRestdeManageController#selectRestdeDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovRestdeDetail.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovRestdeDetail.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1380,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeDetail.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovRestdeList.do",
+      "entryPoint": "EgovCalRestdeManageController#selectRestdeList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/service/RestdeVO.java",
+        "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1399,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovRestdeRemove.do",
+      "entryPoint": "EgovCalRestdeManageController#deleteRestde",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovRestdeRemove.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovRestdeRemove.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 1316,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovRestdeRemove.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovselectAdministCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectAdministRestdePopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 272,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovselectAdministCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/EgovselectNormalCalendar.do",
+      "entryPoint": "EgovCalRestdeManageController#selectNormalRestdePopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 201,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovselectNormalCalendar.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/callCal.do",
+      "entryPoint": "EgovCalRestdeManageController#callCal",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/callCal.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "step:ANY /sym/cal/callCal.do:src/main/java/egovframework/com/sym/cal/service/Restde.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/sym/cal/callCal.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/cal/callCalPopup.do",
+      "entryPoint": "EgovCalRestdeManageController#callCalendar",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "stepIds": [
+        "step:ANY /sym/cal/callCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 76,
+        "snippet": "@RequestMapping(value = \"/sym/cal/callCalPopup.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/acr/addAdministCode.do",
+      "entryPoint": "EgovAdministCodeRecptnController#insertAdministCodeRecptn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "stepIds": [
+        "step:ANY /sym/ccm/acr/addAdministCode.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "step:ANY /sym/ccm/acr/addAdministCode.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sym/ccm/acr/getAdministCodeDetail.do",
+      "entryPoint": "EgovAdministCodeRecptnController#selectAdministCodeDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "stepIds": [
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 94,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/getAdministCodeDetail.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/sym/bat/web/EgovBatchSchdulController.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/web/EgovBatchSchdulController.java",
+      "layer": "api",
+      "className": "EgovBatchSchdulController",
+      "kgSummary": "배치 스케줄 등록/수정/삭제/조회 화면을 담당하는 Spring MVC Controller. 서비스 DB 저장과 Quartz 스케줄러 등록을 함께 조율한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "batch"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/web/EgovBatchSchdulController.java",
+        "line": 116,
+        "snippet": "@RequestMapping(\"/sym/bat/addBatchSchdul.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+      "layer": "unknown",
+      "className": "BatchSchdul",
+      "kgSummary": "배치 스케줄 VO. 실행 주기·일시 필드를 보관하고 이를 Quartz cron 표현식으로 변환하는 로직을 포함한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "batch",
+        "cron",
+        "scheduling"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+      "layer": "service",
+      "className": "EgovBatchSchdulService",
+      "kgSummary": "배치 스케줄 CRUD 및 배치 실행 결과 등록/갱신 기능을 정의하는 Service 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "batch"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+        "line": 21,
+        "snippet": "public interface EgovBatchSchdulService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/bat/updateBatchSchdul.do:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "layer": "api",
+      "className": "BatchScheduler",
+      "kgSummary": "Quartz Scheduler를 감싸 배치 스케줄을 등록/수정/삭제하고, 애플리케이션 기동 시 저장된 스케줄을 초기 적재하는 스케줄링 서비스.",
+      "kgTags": [
+        "service",
+        "scheduler",
+        "quartz",
+        "batch"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+        "line": 34,
+        "snippet": "public class BatchScheduler {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovAdministYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalDayCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalMonthCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalWeekCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovNormalYearCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovRestdeDetail.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovRestdeDetail.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/service/RestdeVO.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/RestdeVO.java",
+      "layer": "unknown",
+      "className": "RestdeVO",
+      "kgSummary": "달력·휴일(Restde) 관리의 조회 조건/전달용 VO(RestdeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/RestdeVO.java",
+        "line": 29,
+        "snippet": "public class RestdeVO extends Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovRestdeList.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovRestdeRemove.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovRestdeRemove.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovselectAdministCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/EgovselectNormalCalendar.do:src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+      "layer": "service",
+      "className": "EgovCalRestdeManageService",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 서비스 인터페이스(EgovCalRestdeManageService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/EgovCalRestdeManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovCalRestdeManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/callCal.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/callCal.do:src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+      "layer": "unknown",
+      "className": "Restde",
+      "kgSummary": "달력·휴일(Restde) 관리의 도메인 모델 클래스(Restde). 테이블 컬럼에 대응하는 속성과 getter/setter를 가진 데이터 객체다.",
+      "kgTags": [
+        "data-model",
+        "domain-model",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/service/Restde.java",
+        "line": 25,
+        "snippet": "public class Restde implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/cal/callCalPopup.do:src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "relPath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+      "layer": "api",
+      "className": "EgovCalRestdeManageController",
+      "kgSummary": "달력·휴일(Restde) 관리 기능의 Spring MVC 컨트롤러(EgovCalRestdeManageController). 목록·상세·등록·수정·삭제 등 요청 매핑 핸들러 21개를 제공하며 서비스 계층을 호출해 JSP 뷰로 연결한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "cal"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/cal/web/EgovCalRestdeManageController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(value = \"/sym/cal/EgovAdministCalPopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/acr/addAdministCode.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "layer": "api",
+      "className": "EgovAdministCodeRecptnController",
+      "kgSummary": "행정구역 코드 수신 Spring MVC 컨트롤러. 수신 등록, 상세, 목록/메인목록 화면 요청을 처리하고 페이징·공통코드를 모델에 바인딩.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "web"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/acr/addAdministCode.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "layer": "service",
+      "className": "EgovAdministCodeRecptnService",
+      "kgSummary": "행정구역 코드 수신 서비스 인터페이스. 코드 수신 등록, 상세 조회, 목록/카운트 조회 등 6개 메서드 계약을 정의.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+        "line": 25,
+        "snippet": "public interface EgovAdministCodeRecptnService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+      "layer": "api",
+      "className": "EgovAdministCodeRecptnController",
+      "kgSummary": "행정구역 코드 수신 Spring MVC 컨트롤러. 수신 등록, 상세, 목록/메인목록 화면 요청을 처리하고 페이징·공통코드를 모델에 바인딩.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "web"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/web/EgovAdministCodeRecptnController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(value = \"/sym/ccm/acr/addAdministCode.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+      "layer": "service",
+      "className": "EgovAdministCodeRecptnService",
+      "kgSummary": "행정구역 코드 수신 서비스 인터페이스. 코드 수신 등록, 상세 조회, 목록/카운트 조회 등 6개 메서드 계약을 정의.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/EgovAdministCodeRecptnService.java",
+        "line": 25,
+        "snippet": "public interface EgovAdministCodeRecptnService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+      "relPath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+      "layer": "unknown",
+      "className": "AdministCodeRecptnVO",
+      "kgSummary": "행정구역 코드 수신 목록 조회용 검색 VO. 검색조건/키워드와 페이징(pageIndex/pageUnit/firstIndex 등) 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/ccm/acr/service/AdministCodeRecptnVO.java",
+        "line": 28,
+        "snippet": "public class AdministCodeRecptnVO extends AdministCodeRecptn implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sym/ccm/acr/getAdministCodeDetail.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "domainId": "domain:http",
+  "files": [
+    {
+      "className": "TestHttpTimeoutStatus1",
+      "kgHint": {
+        "summary": "시스템 프로퍼티 기반 HTTP 연결 타임아웃 설정으로 URL 스트림 열기 동작과 소요 시간을 확인하는 진단용 main 테스트다.",
+        "tags": [
+          "test",
+          "diagnostic",
+          "http",
+          "timeout"
+        ]
+      },
+      "line": 23,
+      "relPath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java",
+      "slice": {
+        "endLine": 54,
+        "startLine": 13,
+        "text": " *\n *  수정일              수정자          수정내용\n *  ----------  --------  ---------------------------\n *  2021.08.31  신용호          최초 생성\n *\n * </pre>\n */\n\npublic class TestHttpTimeoutStatus1 {\n\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Start Chceck URL\");\n\t\tString httpSttusCd = null;\n\t\tString siteUrl = \"http://googlezzz.com:81\";\n\t\tlong start = System.currentTimeMillis();\n\n\t\tSystem.out.println(\"sun.net.client.defaultConnectTimeout = \"+System.getProperty(\"sun.net.client.defaultConnectTimeout\"));\n\t\tSystem.out.println(\"sun.net.client.defaultReadTimeout = \"+System.getProperty(\"sun.net.client.defaultReadTimeout\"));\n\t\t\n\t\tSystem.setProperty(\"sun.net.client.defaultConnectTimeout\", \"10000\");\n\t\tSystem.setProperty(\"sun.net.client.defaultReadTimeout\", \"10000\");\n\n\t\ttry {\n\t\t\tURL url = new URL(siteUrl);\n\t\t\turl.openStream();\n\n\t\t\thttpSttusCd = \"01\";\n\n\t\t} catch (IOException e) {\n\t\t\thttpSttusCd = \"02\";\n\t\t}\n\n\t\tSystem.out.println(\"실행 결과 : \" + httpSttusCd );\n\n\t\tlong end = System.currentTimeMillis();\n\t\tSystem.out.println(\"실행 시간 : \" + ( end - start ) / 1000.0 + \"초\" );\n\t\tSystem.out.println(\"Finish Chceck URL\");\n\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TestHttpTimeoutStatus2",
+      "kgHint": {
+        "summary": "URLConnection.setConnectTimeout으로 연결 타임아웃을 설정해 접속 동작과 소요 시간을 확인하는 진단용 main 테스트다.",
+        "tags": [
+          "test",
+          "diagnostic",
+          "http",
+          "timeout"
+        ]
+      },
+      "line": 24,
+      "relPath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java",
+      "slice": {
+        "endLine": 50,
+        "startLine": 14,
+        "text": " *\n *  수정일              수정자          수정내용\n *  ----------  --------  ---------------------------\n *  2021.08.31  신용호          최초 생성\n *\n * </pre>\n */\n\npublic class TestHttpTimeoutStatus2 {\n\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Start Chceck URL\");\n\t\tString httpSttusCd = null;\n\t\tString siteUrl = \"http://googlezzz.com:81\";\n\t\tlong start = System.currentTimeMillis();\n\n\t\ttry {\n\t\t\tURL url = new URL(siteUrl);\n\t\t\tURLConnection connection = url.openConnection();\n\t\t\tconnection.setConnectTimeout(1000);\n\t\t\tconnection.getInputStream();\n\t\t\thttpSttusCd = \"01\";\n\n\t\t} catch (IOException e) {\n\t\t\thttpSttusCd = \"02\";\n\t\t}\n\t\t\n\t\tSystem.out.println(\"실행 결과 : \" + httpSttusCd );\n\t\t\n\t\tlong end = System.currentTimeMillis();\n\t\tSystem.out.println(\"실행 시간 : \" + ( end - start ) / 1000.0 + \"초\" );\n\t\tSystem.out.println(\"Finish Chceck URL\");\n\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "TestHttpTimeoutStatus1#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java#main",
+      "line": 23,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java#main:src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java"
+      ]
+    },
+    {
+      "entryPoint": "TestHttpTimeoutStatus2#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java#main",
+      "line": 24,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java#main:src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "http",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java#main:src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java#main:src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java"
+    }
+  ]
+}

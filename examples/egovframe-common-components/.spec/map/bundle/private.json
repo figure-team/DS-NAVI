@@ -1,0 +1,140 @@
+{
+  "domainId": "domain:private",
+  "files": [
+    {
+      "className": "MyUserVO",
+      "kgHint": {
+        "summary": "시큐어코딩 테스트에서 사용하는 사용자 VO로 name과 myColor 속성 및 getter/setter를 제공한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "test-fixture",
+          "secure-coding"
+        ]
+      },
+      "line": 3,
+      "relPath": "src/test/java/egovframework/com/secure/coding/MyUserVO.java",
+      "slice": {
+        "endLine": 26,
+        "startLine": 1,
+        "text": "package egovframework.com.secure.coding;\n\npublic class MyUserVO {\n\n\tpublic String[] getMyColor() {\n\t\treturn myColor;\n\t}\n\n\tpublic void setMyColor(String[] myColor) {\n\t\tthis.myColor = myColor;\n\t}\n\n\tprivate String[] myColor;\n\t\n\tpublic String getName() {\n\t\treturn name;\n\t}\n\n\tpublic void setName(String name) {\n\t\tthis.name = name;\n\t}\n\n\tprivate String name;\n\t\n}\n",
+        "truncated": false
+      }
+    },
+    {
+      "className": "PrivateTest",
+      "kgHint": {
+        "summary": "MyUserVO의 private 필드 접근/캡슐화 동작을 확인하는 시큐어코딩 관련 main 기반 수동 테스트.",
+        "tags": [
+          "test",
+          "secure-coding",
+          "manual-test",
+          "encapsulation"
+        ]
+      },
+      "line": 20,
+      "relPath": "src/test/java/egovframework/com/secure/coding/PrivateTest.java",
+      "slice": {
+        "endLine": 49,
+        "startLine": 10,
+        "text": " *\n *  수정일              수정자          수정내용\n *  ----------  --------  ---------------------------\n *  2020.08.24  신용호          시큐어코딩 테스트 (Private 배열에 Public 데이터 할당)\n *\n * </pre>\n */\n\npublic class PrivateTest {\n\n\tpublic static void main(String[] args) {\n\t\t// TODO Auto-generated method stub\n\n\t\tMyUserVO myUser = new MyUserVO();\n\t\t\n\t\t// Private String TEST\n\t\tString myName = \"SYH\";\n\t\tmyUser.setName(myName);\n\t\tSystem.out.println(myName);\n\t\tSystem.out.println(myUser.getName());\n\n\t\tmyName = \"Change Name\";\n\t\tSystem.out.println(myUser.getName());\n\t\t\n\t\t\n\t\t// Private Array TEST\n\t\tString[] myColor = {\"red\",\"green\",\"blue\"};\n\t\t\n\t\tmyUser.setMyColor(myColor);\n\t\t\n\t\tSystem.out.println(myColor[0]);\n\t\tSystem.out.println(myUser.getMyColor()[0]);\n\n\t\tmyColor[0] = \"direct access\";\n\t\tSystem.out.println(myUser.getMyColor()[0]); //<=== 직접 접근 가능\n\t\t\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "PrivateTest#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/secure/coding/PrivateTest.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/secure/coding/PrivateTest.java#main",
+      "line": 20,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/secure/coding/PrivateTest.java#main:src/test/java/egovframework/com/secure/coding/PrivateTest.java",
+        "step:batch:src/test/java/egovframework/com/secure/coding/PrivateTest.java#main:src/test/java/egovframework/com/secure/coding/MyUserVO.java"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "private",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/test/java/egovframework/com/secure/coding/MyUserVO.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/secure/coding/PrivateTest.java#main:src/test/java/egovframework/com/secure/coding/MyUserVO.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/secure/coding/PrivateTest.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/secure/coding/PrivateTest.java#main:src/test/java/egovframework/com/secure/coding/PrivateTest.java"
+    }
+  ]
+}

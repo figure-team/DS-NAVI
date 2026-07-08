@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:copy",
+  "name": "객체 방어적 복사 검증",
+  "summary": {
+    "text": "Date 객체의 clone 기반 방어적 복사가 올바르게 동작하는지 확인하는 보안 테스트 도메인이다.",
+    "citations": [
+      {
+        "filePath": "src/test/java/egovframework/code/security/copyobj/TestCopyDate.java",
+        "line": 13,
+        "snippet": "public static void main(String[] args) {"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "text": "Date 객체와 그 clone 복사본 간의 독립성이 핵심 검증 대상 엔티티이다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/code/security/copyobj/TestCopyDate.java",
+          "line": 13,
+          "snippet": "public static void main(String[] args) {"
+        }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "복사본을 수정해도 원본 Date 객체 값은 변경되지 않아야 한다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/code/security/copyobj/TestCopyDate.java",
+          "line": 13,
+          "snippet": "public static void main(String[] args) {"
+        }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [],
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/code/security/copyobj/TestCopyDate.java#main",
+      "name": "날짜 방어적 복사 검증",
+      "summary": {
+        "text": "Date 객체를 clone 하여 방어적 복사본을 만들고, 복사본 수정이 원본에 영향을 주지 않음을 로그로 확인하는 실행형 테스트 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/code/security/copyobj/TestCopyDate.java",
+            "line": 13,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/code/security/copyobj/TestCopyDate.java#main:src/test/java/egovframework/code/security/copyobj/TestCopyDate.java",
+      "name": "날짜 방어적 복사 실행 및 검증",
+      "summary": {
+        "text": "TestCopyDate 클래스가 Date 객체의 clone 기반 방어적 복사 동작을 실행하고 결과를 로그로 검증한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/code/security/copyobj/TestCopyDate.java",
+            "line": 13,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ]
+}

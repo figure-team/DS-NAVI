@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:batch",
+  "name": "배치 스케줄 관리",
+  "summary": {
+    "text": "Quartz 기반으로 배치 작업의 스케줄을 등록·수정·삭제하고 실행 결과를 기록·조회하는 도메인이다.",
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+        "line": 57,
+        "snippet": "JobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "text": "BatchSchdul은 배치 스케줄의 실행 주기·일시를 담고 이를 Quartz cron 표현식으로 변환한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+          "line": 26,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      ]
+    },
+    {
+      "text": "BatchSchdulDfk는 배치 스케줄 1건당 다수의 실행 요일 정보를 매핑하는 보조 엔티티이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+          "line": 19,
+          "snippet": "public class BatchSchdulDfk implements Serializable {"
+        }
+      ]
+    },
+    {
+      "text": "BatchResult는 배치 실행 결과의 상태·시작/종료시각·오류정보를 담으며 ComDefaultVO를 상속해 페이징 검색 필드도 제공한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+          "line": 23,
+          "snippet": "public class BatchResult extends ComDefaultVO implements Serializable {"
+        }
+      ]
+    },
+    {
+      "text": "ComDefaultVO는 공통 컴포넌트 전반의 검색조건·페이징 정보를 담는 최상위 기반 VO로 대부분의 도메인 VO가 상속한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 22,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "BatchScheduler는 애플리케이션 기동 시 저장된 배치 스케줄을 초기 적재하고 등록/수정/삭제를 관리한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+          "line": 57,
+          "snippet": "JobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();"
+        }
+      ]
+    },
+    {
+      "text": "배치 관련 DAO는 EgovComAbstractDAO를 상속해 MyBatis SqlSession 기반으로 CRUD SQL을 호출한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+          "line": 38,
+          "snippet": "public abstract class EgovComAbstractDAO extends EgovAbstractMapper {"
+        }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [],
+  "flows": [
+    {
+      "flowId": "flow:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob",
+      "name": "배치 스케줄 등록 및 실행",
+      "summary": {
+        "text": "Quartz 스케줄러가 등록된 배치 스케줄에 따라 BatchShellScriptJob을 실행하고, 실행 결과와 스케줄 정보를 관련 VO·DAO를 통해 관리한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+            "line": 57,
+            "snippet": "JobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "name": "공통 검색·페이징 기반 제공",
+      "summary": {
+        "text": "ComDefaultVO는 검색조건과 페이징 정보를 담는 공통 기반 VO로 배치 관련 VO들이 상속한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+            "line": 22,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+      "name": "공통 DAO 기반 제공",
+      "summary": {
+        "text": "EgovComAbstractDAO는 MyBatis SqlSession을 주입받아 하위 배치 DAO들이 상속하는 공통 추상 DAO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+            "line": 38,
+            "snippet": "public abstract class EgovComAbstractDAO extends EgovAbstractMapper {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+      "name": "배치 실행 결과 보관",
+      "summary": {
+        "text": "BatchResult는 배치 실행 결과의 상태·시작/종료시각·오류정보를 담는 VO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+            "line": 23,
+            "snippet": "public class BatchResult extends ComDefaultVO implements Serializable {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+      "name": "배치 스케줄 정보 보관",
+      "summary": {
+        "text": "BatchSchdul은 배치 스케줄의 실행 주기·일시 정보를 보관하고 Quartz cron 표현식으로 변환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+            "line": 26,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+      "name": "배치 스케줄 실행 요일 보관",
+      "summary": {
+        "text": "BatchSchdulDfk는 배치 스케줄의 정기 실행 요일 정보를 담는 보조 VO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+            "line": 19,
+            "snippet": "public class BatchSchdulDfk implements Serializable {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "name": "배치 스케줄 등록·해지 처리",
+      "summary": {
+        "text": "BatchScheduler는 Quartz Scheduler를 감싸 배치 스케줄을 등록·수정·삭제하고 기동 시 저장된 스케줄을 초기 적재한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+            "line": 57,
+            "snippet": "JobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+      "name": "배치 스케줄 서비스 정의",
+      "summary": {
+        "text": "EgovBatchSchdulService는 배치 스케줄 CRUD 및 배치 실행 결과 등록/갱신 기능을 정의하는 Service 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+            "line": 21,
+            "snippet": "public interface EgovBatchSchdulService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+      "name": "배치 실행 결과 영속화",
+      "summary": {
+        "text": "BatchResultDao는 배치 실행 결과에 대한 MyBatis DAO로 EgovComAbstractDAO를 상속해 CRUD SQL 매핑을 호출한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+            "line": 26,
+            "snippet": "@Repository(\"batchResultDao\")"
+          }
+        ]
+      }
+    }
+  ]
+}

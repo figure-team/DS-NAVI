@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "key": "security",
+  "domainId": "domain:security",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:security",
+    "key": "security",
+    "kgHints": [
+      {
+        "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "className": "CategoryController",
+        "summary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+        "tags": [
+          "test",
+          "api-handler",
+          "controller",
+          "spring-mvc"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+          "line": 23,
+          "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+        }
+      }
+    ],
+    "cross": [],
+    "flowCount": 7,
+    "stepCount": 7
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /sale/addCategory.do",
+      "entryPoint": "CategoryController#addCategory",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepIds": [
+        "step:ANY /sale/addCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 23,
+        "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sale/addCategoryView.do",
+      "entryPoint": "CategoryController#addCategoryView",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepIds": [
+        "step:ANY /sale/addCategoryView.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 18,
+        "snippet": "@RequestMapping(\"/sale/addCategoryView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sale/deleteCategory.do",
+      "entryPoint": "CategoryController#deleteCategory",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepIds": [
+        "step:ANY /sale/deleteCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 38,
+        "snippet": "@RequestMapping(\"/sale/deleteCategory.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sale/listCategory.do",
+      "entryPoint": "CategoryController#selectCategoryList",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepIds": [
+        "step:ANY /sale/listCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 13,
+        "snippet": "@RequestMapping(\"/sale/listCategory.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sale/updateCategory.do",
+      "entryPoint": "CategoryController#updateCategory",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepIds": [
+        "step:ANY /sale/updateCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 33,
+        "snippet": "@RequestMapping(\"/sale/updateCategory.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sale/updateCategoryView.do",
+      "entryPoint": "CategoryController#updateCategoryView",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepIds": [
+        "step:ANY /sale/updateCategoryView.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 28,
+        "snippet": "@RequestMapping(\"/sale/updateCategoryView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /system/accessDenied.do",
+      "entryPoint": "CategoryController#accessDenyView",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepIds": [
+        "step:ANY /system/accessDenied.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 43,
+        "snippet": "@RequestMapping(\"/system/accessDenied.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /sale/addCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "layer": "api",
+      "className": "CategoryController",
+      "kgSummary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+      "kgTags": [
+        "test",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 23,
+        "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sale/addCategoryView.do:src/test/java/egovframework/com/security/web/CategoryController.java",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "layer": "api",
+      "className": "CategoryController",
+      "kgSummary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+      "kgTags": [
+        "test",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 23,
+        "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sale/deleteCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "layer": "api",
+      "className": "CategoryController",
+      "kgSummary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+      "kgTags": [
+        "test",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 23,
+        "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sale/listCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "layer": "api",
+      "className": "CategoryController",
+      "kgSummary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+      "kgTags": [
+        "test",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 23,
+        "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sale/updateCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "layer": "api",
+      "className": "CategoryController",
+      "kgSummary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+      "kgTags": [
+        "test",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 23,
+        "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sale/updateCategoryView.do:src/test/java/egovframework/com/security/web/CategoryController.java",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "layer": "api",
+      "className": "CategoryController",
+      "kgSummary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+      "kgTags": [
+        "test",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 23,
+        "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /system/accessDenied.do:src/test/java/egovframework/com/security/web/CategoryController.java",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "layer": "api",
+      "className": "CategoryController",
+      "kgSummary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+      "kgTags": [
+        "test",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+        "line": 23,
+        "snippet": "@RequestMapping(\"/sale/addCategory.do\")"
+      }
+    }
+  ]
+}

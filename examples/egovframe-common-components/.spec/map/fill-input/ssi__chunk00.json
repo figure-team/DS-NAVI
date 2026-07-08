@@ -1,0 +1,2414 @@
+{
+  "schemaVersion": 1,
+  "key": "ssi",
+  "domainId": "domain:ssi",
+  "chunkIndex": 0,
+  "chunkTotal": 2,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:ssi",
+    "key": "ssi",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "className": "EgovMessageSource",
+        "summary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+        "tags": [
+          "service",
+          "i18n",
+          "message-source",
+          "spring",
+          "utility"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "className": "LoginVO",
+        "summary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "authentication",
+          "session",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "className": "EgovUserDetailsService",
+        "summary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+        "tags": [
+          "type-definition",
+          "service-interface",
+          "authentication",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "className": "EgovUserDetailsHelper",
+        "summary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+        "tags": [
+          "utility",
+          "authentication",
+          "security"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+        "className": "CntcInstt",
+        "summary": "연계 기관(CntcInstt) 도메인 model 클래스로, 기관 ID·기관명·등록자·수정자 필드와 getter/setter를 정의한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "domain",
+          "ssi-syi",
+          "iis"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+          "line": 25,
+          "snippet": "public class CntcInstt implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "className": "CntcInsttVO",
+        "summary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+        "tags": [
+          "vo",
+          "search-condition",
+          "pagination",
+          "iis"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+          "line": 29,
+          "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "className": "CntcService",
+        "summary": "연계 서비스(CntcService) 도메인 model 클래스로, 기관·시스템·서비스 ID와 요청/응답 메시지 ID 등 연계 서비스 메타데이터를 정의한다.",
+        "tags": [
+          "data-model",
+          "domain",
+          "ssi-syi",
+          "iis"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+          "line": 25,
+          "snippet": "public class CntcService implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcServiceVO.java",
+        "className": "CntcServiceVO",
+        "summary": "연계 서비스 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+        "tags": [
+          "vo",
+          "search-condition",
+          "pagination",
+          "iis"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcServiceVO.java",
+          "line": 29,
+          "snippet": "public class CntcServiceVO extends CntcService implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+        "className": "CntcSystem",
+        "summary": "연계 시스템(CntcSystem) 도메인 model 클래스로, 기관 ID·시스템 ID·시스템명·시스템 IP 등 연계 대상 시스템 정보를 정의한다.",
+        "tags": [
+          "data-model",
+          "domain",
+          "ssi-syi",
+          "iis"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+          "line": 25,
+          "snippet": "public class CntcSystem implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "className": "CntcSystemVO",
+        "summary": "연계 시스템 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+        "tags": [
+          "vo",
+          "search-condition",
+          "pagination",
+          "iis"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+          "line": 29,
+          "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "className": "EgovCntcInsttService",
+        "summary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+        "tags": [
+          "service",
+          "interface",
+          "api-contract",
+          "iis"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+          "line": 25,
+          "snippet": "public interface EgovCntcInsttService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "className": "EgovCntcInsttController",
+        "summary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+        "tags": [
+          "api-handler",
+          "controller",
+          "spring-mvc",
+          "iis"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+          "line": 149,
+          "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessage.java",
+        "className": "CntcMessage",
+        "summary": "연계 메시지(전문, CntcMessage) 도메인 model 클래스로, 메시지 ID·메시지명 등 연계 전문 헤더 정보를 정의한다.",
+        "tags": [
+          "data-model",
+          "domain",
+          "ssi-syi",
+          "ims"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessage.java",
+          "line": 25,
+          "snippet": "public class CntcMessage implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageItem.java",
+        "className": "CntcMessageItem",
+        "summary": "연계 메시지 항목(CntcMessageItem) 도메인 model 클래스로, 메시지 전문 내 개별 항목의 상세 속성 8개를 정의한다.",
+        "tags": [
+          "data-model",
+          "domain",
+          "ssi-syi",
+          "ims"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageItem.java",
+          "line": 26,
+          "snippet": "public class CntcMessageItem implements Serializable {"
+        }
+      }
+    ],
+    "cross": [
+      {
+        "to": "cop",
+        "weight": 11,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "target": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.ssi.syi.iis.web;"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "target": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.ssi.syi.iis.web;"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+            "target": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.ssi.syi.iis.web;"
+            }
+          }
+        ]
+      }
+    ],
+    "flowCount": 40,
+    "stepCount": 202
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "entryPoint": "EgovCntcInsttController#insertCntcInsttView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166",
+      "entryPoint": "EgovCntcInsttController#insertCntcInstt",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+        "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 166,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"cmd=Regist\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "entryPoint": "EgovCntcInsttController#insertCntcServiceView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 263,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcService.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314",
+      "entryPoint": "EgovCntcInsttController#insertCntcService",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 314,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcService.do\", params = \"cmd=Regist\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "entryPoint": "EgovCntcInsttController#insertCntcSystemView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 198,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcSystem.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224",
+      "entryPoint": "EgovCntcInsttController#insertCntcSystem",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+        "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 224,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcSystem.do\", params = \"cmd=Regist\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/getCntcInsttDetail.do",
+      "entryPoint": "EgovCntcInsttController#selectCntcInsttDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcServiceVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 379,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/getCntcInsttDetail.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/getCntcInsttList.do",
+      "entryPoint": "EgovCntcInsttController#selectCntcInsttList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 424,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/getCntcInsttList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/removeCntcInstt.do",
+      "entryPoint": "EgovCntcInsttController#deleteCntcInstt",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/removeCntcInstt.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/removeCntcInstt.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcInstt.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/removeCntcService.do",
+      "entryPoint": "EgovCntcInsttController#deleteCntcService",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/removeCntcService.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/removeCntcService.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 134,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcService.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/removeCntcSystem.do",
+      "entryPoint": "EgovCntcInsttController#deleteCntcSystem",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/removeCntcSystem.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/removeCntcSystem.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 119,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/removeCntcSystem.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "entryPoint": "EgovCntcInsttController#updateCntcInsttView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 461,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481",
+      "entryPoint": "EgovCntcInsttController#updateCntcInstt",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 481,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcInstt.do\", params = \"cmd=Modify\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "entryPoint": "EgovCntcInsttController#updateCntcServiceView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 574,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcService.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628",
+      "entryPoint": "EgovCntcInsttController#updateCntcService",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 628,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcService.do\", params = \"cmd=Modify\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "entryPoint": "EgovCntcInsttController#updateCntcSystemView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 508,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcSystem.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538",
+      "entryPoint": "EgovCntcInsttController#updateCntcSystem",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+        "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 538,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/updateCntcSystem.do\", params = \"cmd=Modify\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "entryPoint": "EgovCntcMessageController#insertCntcMessageView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "line": 122,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ims/addCntcMessage.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147",
+      "entryPoint": "EgovCntcMessageController#insertCntcMessage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessage.java",
+        "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "line": 147,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ims/addCntcMessage.do\", params = \"cmd=Regist\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ssi/syi/ims/addCntcMessageItem.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "entryPoint": "EgovCntcMessageController#insertCntcMessageItemView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "stepIds": [
+        "step:ANY /ssi/syi/ims/addCntcMessageItem.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "step:ANY /ssi/syi/ims/addCntcMessageItem.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "step:ANY /ssi/syi/ims/addCntcMessageItem.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "line": 186,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ims/addCntcMessageItem.do\", params = \"!cmd\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+      "layer": "unknown",
+      "className": "CntcInstt",
+      "kgSummary": "연계 기관(CntcInstt) 도메인 model 클래스로, 기관 ID·기관명·등록자·수정자 필드와 getter/setter를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain",
+        "ssi-syi",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+        "line": 25,
+        "snippet": "public class CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:166:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "layer": "unknown",
+      "className": "CntcSystemVO",
+      "kgSummary": "연계 시스템 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "line": 29,
+        "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "layer": "service",
+      "className": "CntcService",
+      "kgSummary": "연계 서비스(CntcService) 도메인 model 클래스로, 기관·시스템·서비스 ID와 요청/응답 메시지 ID 등 연계 서비스 메타데이터를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "domain",
+        "ssi-syi",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "line": 25,
+        "snippet": "public class CntcService implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "layer": "unknown",
+      "className": "CntcMessageVO",
+      "kgSummary": "연계 메시지 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "line": 29,
+        "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "layer": "service",
+      "className": "EgovCntcMessageService",
+      "kgSummary": "연계 메시지와 메시지 항목에 대한 CRUD/목록 조회 연산을 선언하는 service interface. ims 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcMessageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "layer": "unknown",
+      "className": "CntcSystemVO",
+      "kgSummary": "연계 시스템 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "line": 29,
+        "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "layer": "service",
+      "className": "CntcService",
+      "kgSummary": "연계 서비스(CntcService) 도메인 model 클래스로, 기관·시스템·서비스 ID와 요청/응답 메시지 ID 등 연계 서비스 메타데이터를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "domain",
+        "ssi-syi",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "line": 25,
+        "snippet": "public class CntcService implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "layer": "unknown",
+      "className": "CntcMessageVO",
+      "kgSummary": "연계 메시지 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "line": 29,
+        "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "layer": "service",
+      "className": "EgovCntcMessageService",
+      "kgSummary": "연계 메시지와 메시지 항목에 대한 CRUD/목록 조회 연산을 선언하는 service interface. ims 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcMessageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:314:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+      "layer": "unknown",
+      "className": "CntcSystem",
+      "kgSummary": "연계 시스템(CntcSystem) 도메인 model 클래스로, 기관 ID·시스템 ID·시스템명·시스템 IP 등 연계 대상 시스템 정보를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "domain",
+        "ssi-syi",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+        "line": 25,
+        "snippet": "public class CntcSystem implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/addCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:224:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "layer": "unknown",
+      "className": "CntcMessageVO",
+      "kgSummary": "연계 메시지 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "line": 29,
+        "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "layer": "service",
+      "className": "EgovCntcMessageService",
+      "kgSummary": "연계 메시지와 메시지 항목에 대한 CRUD/목록 조회 연산을 선언하는 service interface. ims 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcMessageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "layer": "unknown",
+      "className": "CntcSystemVO",
+      "kgSummary": "연계 시스템 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "line": 29,
+        "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttDetail.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcServiceVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcServiceVO.java",
+      "layer": "unknown",
+      "className": "CntcServiceVO",
+      "kgSummary": "연계 서비스 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcServiceVO.java",
+        "line": 29,
+        "snippet": "public class CntcServiceVO extends CntcService implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/getCntcInsttList.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcInstt.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcInstt.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcService.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcService.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcSystem.do:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/removeCntcSystem.do:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+      "layer": "unknown",
+      "className": "CntcInstt",
+      "kgSummary": "연계 기관(CntcInstt) 도메인 model 클래스로, 기관 ID·기관명·등록자·수정자 필드와 getter/setter를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain",
+        "ssi-syi",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInstt.java",
+        "line": 25,
+        "snippet": "public class CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcInstt.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:481:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "layer": "unknown",
+      "className": "CntcSystemVO",
+      "kgSummary": "연계 시스템 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "line": 29,
+        "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "layer": "service",
+      "className": "CntcService",
+      "kgSummary": "연계 서비스(CntcService) 도메인 model 클래스로, 기관·시스템·서비스 ID와 요청/응답 메시지 ID 등 연계 서비스 메타데이터를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "domain",
+        "ssi-syi",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "line": 25,
+        "snippet": "public class CntcService implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "layer": "unknown",
+      "className": "CntcMessageVO",
+      "kgSummary": "연계 메시지 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "line": 29,
+        "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "layer": "service",
+      "className": "EgovCntcMessageService",
+      "kgSummary": "연계 메시지와 메시지 항목에 대한 CRUD/목록 조회 연산을 선언하는 service interface. ims 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcMessageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+      "layer": "unknown",
+      "className": "CntcSystemVO",
+      "kgSummary": "연계 시스템 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystemVO.java",
+        "line": 29,
+        "snippet": "public class CntcSystemVO extends CntcSystem implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+      "layer": "service",
+      "className": "CntcService",
+      "kgSummary": "연계 서비스(CntcService) 도메인 model 클래스로, 기관·시스템·서비스 ID와 요청/응답 메시지 ID 등 연계 서비스 메타데이터를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "domain",
+        "ssi-syi",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcService.java",
+        "line": 25,
+        "snippet": "public class CntcService implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "layer": "unknown",
+      "className": "CntcMessageVO",
+      "kgSummary": "연계 메시지 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "line": 29,
+        "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "layer": "service",
+      "className": "EgovCntcMessageService",
+      "kgSummary": "연계 메시지와 메시지 항목에 대한 CRUD/목록 조회 연산을 선언하는 service interface. ims 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcMessageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcService.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:628:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+      "layer": "api",
+      "className": "EgovCntcInsttController",
+      "kgSummary": "연계 기관/시스템/서비스의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. ID 채번(idgenService)과 인증(EgovUserDetailsHelper)을 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java",
+        "line": 149,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/iis/addCntcInstt.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+      "layer": "unknown",
+      "className": "CntcInsttVO",
+      "kgSummary": "연계 기관 목록 조회용 검색/페이징 조건을 담는 VO. searchCondition·searchKeyword·pageIndex 등 표준 검색 필드를 보유한다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcInsttVO.java",
+        "line": 29,
+        "snippet": "public class CntcInsttVO extends CntcInstt implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+      "layer": "service",
+      "className": "EgovCntcInsttService",
+      "kgSummary": "연계 기관·시스템·서비스에 대한 CRUD/목록/카운트 연산을 선언하는 service interface. 18개 메서드로 iis 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/EgovCntcInsttService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcInsttService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+      "layer": "unknown",
+      "className": "CntcSystem",
+      "kgSummary": "연계 시스템(CntcSystem) 도메인 model 클래스로, 기관 ID·시스템 ID·시스템명·시스템 IP 등 연계 대상 시스템 정보를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "domain",
+        "ssi-syi",
+        "iis"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/iis/service/CntcSystem.java",
+        "line": 25,
+        "snippet": "public class CntcSystem implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/iis/updateCntcSystem.do@src/main/java/egovframework/com/ssi/syi/iis/web/EgovCntcInsttController.java:538:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "layer": "api",
+      "className": "EgovCntcMessageController",
+      "kgSummary": "연계 메시지/메시지 항목의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. 인증 및 문자열 유틸과 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "line": 122,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ims/addCntcMessage.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "layer": "unknown",
+      "className": "CntcMessageVO",
+      "kgSummary": "연계 메시지 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "line": 29,
+        "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "layer": "service",
+      "className": "EgovCntcMessageService",
+      "kgSummary": "연계 메시지와 메시지 항목에 대한 CRUD/목록 조회 연산을 선언하는 service interface. ims 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcMessageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "layer": "api",
+      "className": "EgovCntcMessageController",
+      "kgSummary": "연계 메시지/메시지 항목의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. 인증 및 문자열 유틸과 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "line": 122,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ims/addCntcMessage.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "layer": "unknown",
+      "className": "CntcMessageVO",
+      "kgSummary": "연계 메시지 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "line": 29,
+        "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "layer": "service",
+      "className": "EgovCntcMessageService",
+      "kgSummary": "연계 메시지와 메시지 항목에 대한 CRUD/목록 조회 연산을 선언하는 service interface. ims 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcMessageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessage.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessage.java",
+      "layer": "unknown",
+      "className": "CntcMessage",
+      "kgSummary": "연계 메시지(전문, CntcMessage) 도메인 model 클래스로, 메시지 ID·메시지명 등 연계 전문 헤더 정보를 정의한다.",
+      "kgTags": [
+        "data-model",
+        "domain",
+        "ssi-syi",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessage.java",
+        "line": 25,
+        "snippet": "public class CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessage.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:147:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessageItem.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+      "layer": "api",
+      "className": "EgovCntcMessageController",
+      "kgSummary": "연계 메시지/메시지 항목의 등록·수정·삭제·목록·상세 화면을 처리하는 Spring MVC controller. 인증 및 문자열 유틸과 연동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java",
+        "line": 122,
+        "snippet": "@RequestMapping(value = \"/ssi/syi/ims/addCntcMessage.do\", params = \"!cmd\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessageItem.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+      "layer": "unknown",
+      "className": "CntcMessageVO",
+      "kgSummary": "연계 메시지 목록 조회용 검색/페이징 조건 VO. 표준 검색어와 페이징 필드를 담는다.",
+      "kgTags": [
+        "vo",
+        "search-condition",
+        "pagination",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/CntcMessageVO.java",
+        "line": 29,
+        "snippet": "public class CntcMessageVO extends CntcMessage implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ssi/syi/ims/addCntcMessageItem.do@src/main/java/egovframework/com/ssi/syi/ims/web/EgovCntcMessageController.java:src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "relPath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+      "layer": "service",
+      "className": "EgovCntcMessageService",
+      "kgSummary": "연계 메시지와 메시지 항목에 대한 CRUD/목록 조회 연산을 선언하는 service interface. ims 모듈의 비즈니스 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "api-contract",
+        "ims"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ssi/syi/ims/service/EgovCntcMessageService.java",
+        "line": 25,
+        "snippet": "public interface EgovCntcMessageService {"
+      }
+    }
+  ]
+}

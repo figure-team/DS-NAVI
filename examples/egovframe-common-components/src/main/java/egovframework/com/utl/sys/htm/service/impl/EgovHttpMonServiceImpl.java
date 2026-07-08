@@ -1,0 +1,207 @@
+package egovframework.com.utl.sys.htm.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
+import org.egovframe.rte.fdl.idgnr.EgovIdGnrService;
+import org.springframework.stereotype.Service;
+
+import egovframework.com.utl.sys.htm.service.EgovHttpMonService;
+import egovframework.com.utl.sys.htm.service.HttpMon;
+import egovframework.com.utl.sys.htm.service.HttpMonLog;
+import egovframework.com.utl.sys.htm.service.HttpMonLogVO;
+import egovframework.com.utl.sys.htm.service.HttpMonVO;
+import jakarta.annotation.Resource;
+
+/**
+ * <pre>
+ * 개요 - HTTP서비스모니터링에 대한 ServiceImpl 클래스를 정의한다.
+ *
+ * 상세내용 - HTTP서비스모니터링에 대한 등록, 수정, 삭제, 조회 기능을 제공한다. - HTTP서비스모니터링의 조회기능은 목록조회,
+ * 상세조회로 구분된다.
+ * </pre>
+ * 
+ * @author 박종선
+ * @since 2010.06.17
+ * @version 1.0
+ * @see
+ *
+ *      <pre>
+ *  == 개정이력(Modification Information) ==
+ *
+ *   수정일      수정자           수정내용
+ *  -------    --------    ---------------------------
+ *   2010.06.17  박종선          최초 생성
+ *   2025.09.13  이백행          2025년 컨트리뷰션 PMD로 소프트웨어 보안약점 진단하고 제거하기-FieldNamingConventions(변수명에 밑줄 사용)
+ *
+ *      </pre>
+ */
+@Service("EgovHttpMonService")
+public class EgovHttpMonServiceImpl extends EgovAbstractServiceImpl implements EgovHttpMonService {
+
+	@Resource(name = "HttpMonDAO")
+	private HttpMonDAO httpMonDAO;
+
+	/** ID Generation */
+	@Resource(name = "egovHttpManageIdGnrService")
+	private EgovIdGnrService idgenService;
+
+	/** ID Generation */
+	@Resource(name = "egovHttpLogManageIdGnrService")
+	private EgovIdGnrService idgenServiceLog;
+
+	/**
+	 * 등록된 HTTP서비스모니터링 목록을 조회한다.
+	 * 
+	 * @param HttpMonVO - HTTP서비스모니터링 Vo
+	 * @return List - HTTP서비스모니터링 목록
+	 *
+	 * @param httpMonVO
+	 */
+	@Override
+	public List<HttpMonVO> selectHttpMonList(HttpMonVO searchVO) throws Exception {
+		return httpMonDAO.selectHttpMonList(searchVO);
+	}
+
+	/**
+	 * HTTP서비스모니터링 목록 총 개수를 조회한다.
+	 * 
+	 * @param HttpMonVO - HTTP서비스모니터링 Vo
+	 * @return int - HTTP서비스 토탈 카운트 수
+	 *
+	 * @param httpMonVO
+	 */
+	@Override
+	public int selectHttpMonTotCnt(HttpMonVO searchVO) throws Exception {
+		return httpMonDAO.selectHttpMonTotCnt(searchVO);
+	}
+
+	/**
+	 * 등록된 HTTP서비스모니터링의 상세정보를 조회한다.
+	 * 
+	 * @param httpMonVO - HTTP서비스모니터링 Vo
+	 * @return httpMonVO - HTTP서비스모니터링 Vo
+	 *
+	 * @param httpMonVO
+	 */
+	@Override
+	public HttpMon selectHttpMonDetail(HttpMon httpMon) throws Exception {
+		HttpMon ret = httpMonDAO.selectHttpMonDetail(httpMon);
+		return ret;
+	}
+
+	/**
+	 * HTTP서비스모니터링 정보를 신규로 등록한다.
+	 * 
+	 * @param siteUrl - HTTP서비스모니터링 model
+	 *
+	 * @param siteUrl
+	 */
+	@Override
+	public void insertHttpMon(HttpMon httpMon) throws Exception {
+		httpMon.setSysId(idgenService.getNextStringId());
+		httpMonDAO.insertHttpMon(httpMon);
+	}
+
+	/**
+	 * 기 등록된 HTTP서비스모니터링 정보를 수정한다.
+	 * 
+	 * @param siteUrl - HTTP서비스모니터링 model
+	 *
+	 * @param siteUrl
+	 */
+	@Override
+	public void updateHttpMon(HttpMon httpMon) throws Exception {
+		httpMonDAO.updateHttpMon(httpMon);
+	}
+
+	/**
+	 * 기 등록된 HTTP서비스모니터링 정보를 삭제한다.
+	 * 
+	 * @param siteUrl - HTTP서비스모니터링 model
+	 *
+	 * @param siteUrl
+	 */
+	@Override
+	public void deleteHttpMon(HttpMon httpMon) throws Exception {
+		httpMonDAO.deleteHttpMon(httpMon);
+	}
+
+	/**
+	 * 등록된 HTTP서비스모니터링로그 목록을 조회한다.
+	 * 
+	 * @param HttpMonVO - HTTP서비스모니터링 Vo
+	 * @return List - HTTP서비스모니터링 목록
+	 *
+	 * @param httpMonVO
+	 */
+	@Override
+	public Map<String, Object> selectHttpMonLogList(HttpMonLogVO httpMonLogVO) throws Exception {
+
+		List<HttpMonLogVO> result = httpMonDAO.selectHttpMonLogList(httpMonLogVO);
+		int cnt = httpMonDAO.selectHttpMonLogTotCnt(httpMonLogVO);
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		map.put("resultList", result);
+		map.put("resultCnt", Integer.toString(cnt));
+
+		return map;
+
+	}
+
+	/**
+	 * 등록된 HTTP서비스모니터링로그의 상세정보를 조회한다.
+	 * 
+	 * @param httpMonVO - HTTP서비스모니터링 Vo
+	 * @return httpMonVO - HTTP서비스모니터링 Vo
+	 *
+	 * @param httpMonVO
+	 */
+	@Override
+	public HttpMonLog selectHttpMonDetailLog(HttpMonLog httpMonLog) throws Exception {
+		return httpMonDAO.selectHttpMonDetailLog(httpMonLog);
+	}
+
+	/**
+	 * HTTP서비스모니터링로그 정보를 등록한다.
+	 * 
+	 * @param siteUrl - HTTP서비스모니터링 model
+	 *
+	 * @param siteUrl
+	 */
+	@Override
+	public void insertHttpMonLog(HttpMonLog httpMonLog) throws Exception {
+		httpMonDAO.insertHttpMonLog(httpMonLog);
+	}
+
+	/**
+	 * HTTP서비스 모니터링 결과를 수정한다.
+	 * 
+	 * @param httpMonLog - HTTP서비스 모니터링대상 model
+	 *
+	 * @param httpMonLog
+	 */
+	@Override
+	public void updateHttpMonSttus(HttpMon httpMon) throws Exception {
+		httpMonDAO.updateHttpMonSttus(httpMon);
+
+		HttpMonLog httpMonLog = new HttpMonLog();
+		httpMonLog.setSysId(httpMon.getSysId());
+		httpMonLog.setLogId(idgenServiceLog.getNextStringId());
+		httpMonLog.setWebKind(httpMon.getWebKind());
+		httpMonLog.setSiteUrl(httpMon.getSiteUrl());
+		httpMonLog.setHttpSttusCd(httpMon.getHttpSttusCd());
+		httpMonLog.setCreatDt(httpMon.getCreatDt());
+		httpMonLog.setLogInfo(httpMon.getLogInfo());
+		httpMonLog.setMngrNm(httpMon.getMngrNm());
+		httpMonLog.setMngrEmailAddr(httpMon.getMngrEmailAddr());
+		httpMonLog.setFrstRegisterId(httpMon.getFrstRegisterId());
+		httpMonLog.setFrstRegisterPnttm(httpMon.getFrstRegisterPnttm());
+		httpMonLog.setLastUpdusrId(httpMon.getLastUpdusrId());
+		insertHttpMonLog(httpMonLog);
+	}
+
+}

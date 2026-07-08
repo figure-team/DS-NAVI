@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "key": "ip",
+  "domainId": "domain:ip",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:ip",
+    "key": "ip",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "className": "EgovWebUtil",
+        "summary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+        "tags": [
+          "utility",
+          "security",
+          "validation",
+          "xss",
+          "sanitization",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        }
+      },
+      {
+        "relPath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+        "className": "IpAddressTest",
+        "summary": "EgovWebUtil의 IP 주소 검증(isIPAddress) 로직을 main으로 확인하는 유효성 테스트 스텁.",
+        "tags": [
+          "test",
+          "validation",
+          "ip-address"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+          "line": 23,
+          "snippet": "public static void main(String[] args) {"
+        }
+      }
+    ],
+    "cross": [
+      {
+        "to": "cop",
+        "weight": 1,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "citation": {
+              "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+              "line": 1,
+              "snippet": "package egovframework.com.validation.ipaddress;"
+            }
+          }
+        ]
+      }
+    ],
+    "flowCount": 1,
+    "stepCount": 2
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java#main",
+      "entryPoint": "IpAddressTest#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java#main:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+        "step:batch:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+        "line": 23,
+        "snippet": "public static void main(String[] args) {"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java#main:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+      "relPath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+      "layer": "api",
+      "className": "IpAddressTest",
+      "kgSummary": "EgovWebUtil의 IP 주소 검증(isIPAddress) 로직을 main으로 확인하는 유효성 테스트 스텁.",
+      "kgTags": [
+        "test",
+        "validation",
+        "ip-address"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+        "line": 23,
+        "snippet": "public static void main(String[] args) {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "domainId": "domain:pdf",
+  "files": [
+    {
+      "className": "TestPdfConverter",
+      "kgHint": {
+        "summary": "OpenOffice 소켓 연결을 통해 문서를 PDF로 변환하는 동작을 수동 실행(main)으로 확인하는 개발용 테스트 드라이버.",
+        "tags": [
+          "test",
+          "manual-test",
+          "pdf-conversion",
+          "entry-point"
+        ]
+      },
+      "line": 38,
+      "relPath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+      "slice": {
+        "endLine": 71,
+        "startLine": 28,
+        "text": " *   xls는 잘되지만 xlsx, 이미지파일은 지원되지 않는다.\n * @ eGov WIKI\n *   http://www.egovframe.go.kr/wiki/doku.php?id=egovframework:%ED%8C%8C%EC%9D%BC%EB%B3%80%ED%99%98\n * @ 참고 URL\n *   https://wiki.openoffice.org/wiki/Documentation/DevGuide/ProUNO/Starting_OpenOffice.org_in_Listening_Mode\n * </pre>\n */\n\npublic class TestPdfConverter {\n\n\tpublic static void main(String[] args) {\n\n\t\tString sourcePath = \"C:/egovframework/\";\n\t\t//String sourceFileName = \"test1.xls\";\n\t\t//String sourceFileName = \"test2.png\";\n\t\tString sourceFileName = \"test3.hwp\";\n\t\tString targetPath = \"targetPdf/\";\n\t\t//String targetFileName = \"convert1.pdf\";\n\t\t//String targetFileName = \"convert2.pdf\";\n\t\tString targetFileName = \"convert3.pdf\";\n\n\t\tFile inputFile = new File(sourcePath + sourceFileName);\n\n\t\tif (inputFile.exists()) {\n\t\t\t// connect to an OpenOffice.org instance running on port 8100\n\t\t\tSocketOpenOfficeConnection connection = new SocketOpenOfficeConnection(8100);\n\t\t\ttry {\n\t\t\t\tconnection.connect();\n\t\t\t} catch (ConnectException e) {\n\t\t\t\te.printStackTrace();\n\t\t\t}\n\t\t\t//원본 디렉토리에 targetPdf 명칭지정\n\t\t\tFile outputFile = new File(sourcePath + targetPath + targetFileName);\n\t\t\t// convert\n\t\t\tDocumentConverter converter = new OpenOfficeDocumentConverter(connection);\n\t\t\tconverter.convert(inputFile, outputFile);\n\t\t\t// close the connection\n\t\t\tconnection.disconnect();\n\n\t\t}\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TestPdfConverter2",
+      "kgHint": {
+        "summary": "PDF 변환 시나리오의 변형(2번) 수동 실행 테스트 드라이버로, main에서 OpenOffice 변환 흐름을 확인한다.",
+        "tags": [
+          "test",
+          "manual-test",
+          "pdf-conversion",
+          "entry-point"
+        ]
+      },
+      "line": 38,
+      "relPath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+      "slice": {
+        "endLine": 69,
+        "startLine": 28,
+        "text": "\t  <version>4.2.2</version>\n\t</dependency>\n\t테스트시 pom.xml 추가 및 주석 해제후 사용\n\t@ 참고 사이트\n\thttps://github.com/sbraconnier/jodconverter/wiki/Java-Library\n * </pre>\n */\n\npublic class TestPdfConverter2 {\n\n\tpublic static void main(String[] args) {\n\n//\t\tFile inputFile = new File(\"C:/egovframework/test1.xls\");\n//\t\tFile outputFile = new File(\"C:/egovframework/result1.pdf\");\n\n\t\t// Create an office manager using the default configuration.\n\t\t// The default port is 2002. Note that when an office manager\n\t\t// is installed, it will be the one used by default when\n\t\t// a converter is created.\n\t\t/*\n\t\tfinal LocalOfficeManager officeManager = LocalOfficeManager.install(); \n\t\ttry {\n\n\t\t    // Start an office process and connect to the started instance (on port 2002).\n\t\t    officeManager.start();\n\n\t\t    // Convert\n\t\t    JodConverter\n\t\t             .convert(inputFile)\n\t\t             .to(outputFile)\n\t\t             .execute();\n\t\t} catch (OfficeException e) {\n\t\t\t// TODO Auto-generated catch block\n\t\t\te.printStackTrace();\n\t\t} finally {\n\t\t    // Stop the office process\n\t\t    OfficeUtils.stopQuietly(officeManager);\n\t\t}*/\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "TestPdfConverter#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java#main",
+      "line": 38,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java"
+      ]
+    },
+    {
+      "entryPoint": "TestPdfConverter2#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java#main",
+      "line": 38,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java"
+      ]
+    }
+  ],
+  "gitCommit": "9591ae21d1431dc1b8e32430c6218b55f33d8ed2",
+  "key": "pdf",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java"
+    }
+  ]
+}

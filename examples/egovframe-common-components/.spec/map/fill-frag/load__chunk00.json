@@ -1,0 +1,192 @@
+{
+  "key": "load",
+  "chunkIndex": 0,
+  "isHeaderChunk": true,
+  "domain": {
+    "name": "공통 기반·화이트리스트 로딩 검증",
+    "summary": {
+      "text": "공통 웹 보안 필터링, 프로퍼티 설정 조회, 문자열 처리 유틸리티와 이를 활용한 화이트리스트 기반 입력 검증 로직을 진단용 테스트로 확인하는 도메인이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "EgovWebUtil은 XSS·파일경로·SQL/OS/LDAP injection 등을 막는 공통 웹 보안 필터링 static 유틸리티다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      {
+        "text": "EgovProperties는 프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      },
+      {
+        "text": "EgovStringUtil은 자르기·치환·인코딩·null 처리·HTML/특수문자 변환 등 문자열 처리 정적 유틸리티다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      },
+      {
+        "text": "EgovWhiteList는 EgovWebUtil을 활용해 허용 값 목록을 로드하고 신규/기존 검사 로직을 제공하는 화이트리스트 검증 헬퍼다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/cmm/service/EgovWhiteList.java",
+            "line": 18,
+            "snippet": "public class EgovWhiteList {"
+          }
+        ]
+      },
+      {
+        "text": "TestLoadFile은 리소스 경로 로딩과 EgovWhiteList의 URL 허용여부(check/checkNew)를 로그로 확인하는 진단용 main 테스트다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/cmm/service/TestLoadFile.java",
+            "line": 10,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "입력값 정화는 EgovWebUtil의 static 유틸리티를 통해 프레임워크 전반에서 공통 적용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      {
+        "text": "화이트리스트 검증은 신규(checkNew)와 기존(check) 두 경로로 URL 허용여부를 판단한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/cmm/service/EgovWhiteList.java",
+            "line": 18,
+            "snippet": "public class EgovWhiteList {"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "이 도메인이 cop 도메인과 EgovWhiteList의 패키지 임포트를 통해 연계된다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/cmm/service/EgovWhiteList.java",
+            "line": 1,
+            "snippet": "package egovframework.com.cmm.service;"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main",
+      "name": "화이트리스트 로딩 진단 배치",
+      "summary": {
+        "text": "리소스 경로에서 화이트리스트 설정을 로드하고 EgovWhiteList의 URL 허용여부(check/checkNew)를 로그로 확인하는 진단용 배치 실행이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/cmm/service/TestLoadFile.java",
+            "line": 10,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/test/java/egovframework/com/cmm/service/TestLoadFile.java",
+      "name": "진단 배치 진입점",
+      "summary": {
+        "text": "리소스 경로 로딩과 화이트리스트 URL 허용여부를 로그로 확인하는 main 진입점 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/cmm/service/TestLoadFile.java",
+            "line": 10,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/test/java/egovframework/com/cmm/service/EgovWhiteList.java",
+      "name": "화이트리스트 검증 처리",
+      "summary": {
+        "text": "EgovWebUtil을 활용해 허용 값 목록을 로드하고 신규/기존 검사 로직을 제공하는 화이트리스트 검증 단계다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/cmm/service/EgovWhiteList.java",
+            "line": 18,
+            "snippet": "public class EgovWhiteList {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "프로퍼티 설정 조회",
+      "summary": {
+        "text": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 설정 접근 단계다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "웹 보안 입력값 필터링",
+      "summary": {
+        "text": "XSS·파일경로·SQL/OS/LDAP injection 등을 막는 공통 웹 보안 필터링을 수행하는 단계다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 보조",
+      "summary": {
+        "text": "자르기·치환·인코딩·null 처리·HTML/특수문자 변환 등 문자열 처리를 보조하는 단계다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      }
+    }
+  ]
+}

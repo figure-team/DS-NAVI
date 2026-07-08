@@ -1,0 +1,103 @@
+{
+  "key": "idgen",
+  "chunkIndex": 0,
+  "isHeaderChunk": true,
+  "domain": {
+    "name": "ID 채번 진단·테스트",
+    "summary": {
+      "text": "ID 생성 서비스 빈을 스프링 컨텍스트에서 로드해 연속 ID 발급을 확인하는 진단·수동 테스트 기능을 담당하는 도메인이다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/com/idgen/TestIDGen.java",
+          "line": 27,
+          "snippet": "@SuppressWarnings(\"resource\")"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "ID 생성 서비스(idgenService) 빈을 통해 문자열 ID를 순차 발급한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/idgen/TestIDGenDev.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"resource\")"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "getNextStringId 호출을 반복하여 ID 값의 연속성·중복 여부를 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/idgen/TestIDGen.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"resource\")"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": []
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/idgen/TestIDGen.java#main",
+      "name": "ID 생성 서비스 진단 테스트",
+      "summary": {
+        "text": "스프링 컨텍스트에서 ID 생성 서비스 빈을 로드해 getNextStringId로 연속 ID 발급을 진단하는 배치성 테스트를 실행한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/idgen/TestIDGen.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"resource\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/idgen/TestIDGenDev.java#main",
+      "name": "ID 생성 서비스 수동 실행 테스트",
+      "summary": {
+        "text": "ID 생성 서비스(idgenService)를 스프링 컨텍스트에서 로드해 getNextStringId를 호출하는 수동 실행 테스트를 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/idgen/TestIDGenDev.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"resource\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/idgen/TestIDGen.java#main:src/test/java/egovframework/com/idgen/TestIDGen.java",
+      "name": "ID 생성 진단 실행",
+      "summary": {
+        "text": "TestIDGen이 ID 생성 서비스 빈을 로드해 연속 ID 발급을 확인하는 진단용 main 진입점 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/idgen/TestIDGen.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"resource\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/idgen/TestIDGenDev.java#main:src/test/java/egovframework/com/idgen/TestIDGenDev.java",
+      "name": "ID 생성 수동 실행",
+      "summary": {
+        "text": "TestIDGenDev가 idgenService를 로드해 getNextStringId를 호출하는 수동 실행 테스트 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/idgen/TestIDGenDev.java",
+            "line": 27,
+            "snippet": "@SuppressWarnings(\"resource\")"
+          }
+        ]
+      }
+    }
+  ]
+}

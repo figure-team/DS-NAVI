@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"> 
+     
+	<!-- 로그인인증설정 -->
+	<bean id="egovLoginConfig" class="egovframework.com.cmm.config.EgovLoginConfig">
+		<!-- 로그인 인증 제한 여부 -->
+		<property name="lock" value="${Globals.login.Lock}"/>
+		<!-- 로그인 인증 제한 횟수 -->
+		<property name="lockCount" value="${Globals.login.LockCount}"/>
+	</bean>
+
+</beans>

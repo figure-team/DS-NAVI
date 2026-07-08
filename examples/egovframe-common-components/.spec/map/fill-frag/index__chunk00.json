@@ -1,0 +1,53 @@
+{
+  "key": "index",
+  "chunkIndex": 0,
+  "isHeaderChunk": true,
+  "domain": {
+    "name": "공통 기반·화면 라우팅",
+    "summary": {
+      "text": "웹 애플리케이션의 루트 진입점을 담당하는 도메인으로, 최초 요청을 메인 컨트롤러 URL로 포워딩/리다이렉트하는 라우팅 역할을 수행한다.",
+      "citations": [
+        {
+          "filePath": "src/main/webapp/index.jsp",
+          "line": 1,
+          "snippet": "<%@ page language=\"java\" contentType=\"text/html; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+        }
+      ]
+    },
+    "entities": [],
+    "businessRules": [],
+    "crossDomainInteractions": []
+  },
+  "flows": [
+    {
+      "flowId": "flow:GET /index.jsp",
+      "name": "루트 페이지 진입 라우팅",
+      "summary": {
+        "text": "사용자가 애플리케이션 루트(index.jsp)에 접근하면 메인 컨트롤러 URL로 요청을 전달하는 진입 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/main/webapp/index.jsp",
+            "line": 1,
+            "snippet": "<%@ page language=\"java\" contentType=\"text/html; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:GET /index.jsp:src/main/webapp/index.jsp",
+      "name": "루트 진입점 포워딩 처리",
+      "summary": {
+        "text": "index.jsp가 웹 애플리케이션의 루트 진입점 역할을 하며 초기 요청을 메인 컨트롤러 URL로 포워딩/리다이렉트한다.",
+        "citations": [
+          {
+            "filePath": "src/main/webapp/index.jsp",
+            "line": 1,
+            "snippet": "<%@ page language=\"java\" contentType=\"text/html; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+          }
+        ]
+      }
+    }
+  ]
+}

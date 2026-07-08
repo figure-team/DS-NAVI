@@ -1,0 +1,986 @@
+{
+  "key": "egov",
+  "chunkIndex": 0,
+  "isHeaderChunk": true,
+  "domain": {
+    "name": "공통 기반·화면 라우팅",
+    "summary": {
+      "text": "메인/상단/하단/좌측메뉴 라우팅, 로그인·인증 사용자 정보, 첨부파일 업로드·다운로드·이미지 처리, 공통 보안(XSS·경로 화이트리스트) 유틸을 제공하는 프레임워크 공통 기반 모듈이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+          "line": 81,
+          "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "LoginVO는 인증된 사용자의 ID·이름·이메일·기관·고유ID·GPKI DN 등 세션 로그인 정보를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      },
+      {
+        "text": "FileVO는 첨부파일 1건의 파일ID·확장자·저장경로·원본명 등 속성을 담는 값 객체이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      },
+      {
+        "text": "IncludedCompInfoVO는 메인 화면 좌측 메뉴 구성을 위한 컴포넌트 이름·목록 URL·정렬순서·그룹ID를 담는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+            "line": 29,
+            "snippet": "public class IncludedCompInfoVO {"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "파일 작업의 기준 경로(basePath)는 허용 화이트리스트 안에 있어야 하며, 그렇지 않으면 AOP 검증기가 디렉터리 트래버설을 차단한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/aop/EgovFileBasePathSecurityValidator.java",
+            "line": 42,
+            "snippet": "public class EgovFileBasePathSecurityValidator {"
+          }
+        ]
+      },
+      {
+        "text": "모든 입력값은 EgovWebUtil을 통해 XSS·SQL/OS/LDAP injection 등에 대한 공통 보안 필터링을 거친다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      {
+        "text": "좌측 메뉴는 @IncludedInfo 애노테이션이 붙은 빈을 스캔하여 동적으로 구성된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "이 도메인이 cop 도메인과 파일 기준경로 보안검증(EgovFileBasePathSecurityValidator)에서 EgovProperties 설정 조회를 통해 연동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/aop/EgovFileBasePathSecurityValidator.java",
+            "line": 1,
+            "snippet": "package egovframework.com.cmm.aop;"
+          }
+        ]
+      },
+      {
+        "text": "이 도메인이 cop 도메인과 공통 인덱스 컨트롤러(EgovComIndexController)에서 LoginVO 세션 정보 조회를 통해 연동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 1,
+            "snippet": "package egovframework.com.cmm.web;"
+          }
+        ]
+      },
+      {
+        "text": "이 도메인이 decompress 도메인과 파일 다운로드 컨트롤러(EgovFileDownloadController)에서 EgovBasicLogger 로깅 유틸 사용을 통해 연동한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 1,
+            "snippet": "package egovframework.com.cmm.web;"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /EgovBottom.do",
+      "name": "하단 화면 표시",
+      "summary": {
+        "text": "메인 페이지의 하단 영역 화면을 반환하는 라우팅 진입점이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovContent.do",
+      "name": "메인 콘텐츠 화면 조회",
+      "summary": {
+        "text": "로그인 세션 정보와 사용자 상세 정보를 조회해 인증 사용자 기반의 메인 콘텐츠 화면을 구성한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 86,
+            "snippet": "@RequestMapping(\"/EgovContent.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovLeft.do",
+      "name": "좌측 메뉴 조회",
+      "summary": {
+        "text": "IncludedCompInfoVO 기반으로 구성된 좌측 메뉴 목록을 조회해 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 120,
+            "snippet": "@RequestMapping(\"/EgovLeft.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovModal.do",
+      "name": "공통 모달 JSON 조회",
+      "summary": {
+        "text": "공통 유틸 컨트롤러가 모달 화면용 JSON 데이터를 조회해 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 100,
+            "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovPageLink.do",
+      "name": "페이지 이동",
+      "summary": {
+        "text": "화이트리스트 기반으로 대상 페이지 경로를 검증한 뒤 해당 페이지로 이동시킨다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 68,
+            "snippet": "@RequestMapping(value = \"/EgovPageLink.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /EgovTop.do",
+      "name": "상단 화면 표시",
+      "summary": {
+        "text": "메인 페이지의 상단 영역 화면을 반환하는 라우팅 진입점이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 76,
+            "snippet": "@RequestMapping(\"/EgovTop.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/FileDown.do",
+      "name": "첨부파일 다운로드",
+      "summary": {
+        "text": "인증 및 파일 경로 검증 후 브라우저별 Content-Disposition 헤더를 적용해 첨부파일을 전송한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 70,
+            "snippet": "@RequestMapping(value = \"/cmm/fms/FileDown.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/deleteFileInfs.do",
+      "name": "첨부파일 삭제",
+      "summary": {
+        "text": "인증 사용자 확인 후 첨부파일 정보를 삭제한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/getImage.do",
+      "name": "이미지 파일 조회",
+      "summary": {
+        "text": "저장된 이미지 파일 정보를 조회해 브라우저에 스트리밍 출력한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 74,
+            "snippet": "@RequestMapping(\"/cmm/fms/getImage.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/selectFileInfs.do",
+      "name": "첨부파일 목록 조회",
+      "summary": {
+        "text": "지정된 조건으로 첨부파일 정보 목록을 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 70,
+            "snippet": "@RequestMapping(\"/cmm/fms/selectFileInfs.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cmm/fms/selectFileInfsForUpdate.do",
+      "name": "수정용 첨부파일 목록 조회",
+      "summary": {
+        "text": "수정 화면에 표시할 첨부파일 정보 목록을 조회한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 109,
+            "snippet": "@RequestMapping(\"/cmm/fms/selectFileInfsForUpdate.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /egovCSRFAccessDenied.do",
+      "name": "CSRF 접근 거부 처리",
+      "summary": {
+        "text": "CSRF 토큰 검증 실패 시 접근 거부 안내 화면으로 라우팅한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 171,
+            "snippet": "@RequestMapping(\"/egovCSRFAccessDenied.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /index.do",
+      "name": "메인 화면 진입",
+      "summary": {
+        "text": "애플리케이션 최초 진입 시 메인 화면으로 라우팅한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 71,
+            "snippet": "@RequestMapping(\"/index.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /validator.do",
+      "name": "공통 입력값 검증",
+      "summary": {
+        "text": "공통 유틸 컨트롤러가 요청 데이터의 유효성을 검증한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 108,
+            "snippet": "@RequestMapping(\"/validator.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java#main",
+      "name": "파일 기준경로 보안검증 테스트 실행",
+      "summary": {
+        "text": "EgovFileBasePathSecurityValidator의 기준 경로 검증 로직을 main으로 직접 실행해 확인하는 보안 테스트이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java",
+            "line": 11,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /EgovBottom.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "공통 인덱스 라우팅 처리",
+      "summary": {
+        "text": "메인·상단·하단 화면 라우팅과 좌측 메뉴 동적 구성을 담당하는 공통 인덱스 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "메인 콘텐츠 라우팅 처리",
+      "summary": {
+        "text": "메인 콘텐츠 화면 요청을 받아 인증 사용자 정보를 조회하는 공통 인덱스 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "설정값 조회",
+      "summary": {
+        "text": "프로퍼티 파일에서 Globals·경로 등 설정 값을 키 기준으로 조회하는 공통 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 조회",
+      "summary": {
+        "text": "EgovUserDetailsService에 위임해 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 보관",
+      "summary": {
+        "text": "인증된 사용자의 로그인 정보를 담아 세션에서 사용하는 값 객체이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "name": "로그인 인증 서비스 정의",
+      "summary": {
+        "text": "일반 로그인·인증서 로그인·아이디/비밀번호 찾기 등 사용자 인증 기능을 정의하는 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+            "line": 31,
+            "snippet": "public interface EgovLoginService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 가공",
+      "summary": {
+        "text": "자르기·치환·인코딩·null 처리·HTML 변환 등 문자열 가공 기능을 제공하는 공통 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 상세 서비스 정의",
+      "summary": {
+        "text": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovContent.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "입력값 보안 필터링",
+      "summary": {
+        "text": "XSS·파일경로·SQL/OS/LDAP injection 등을 방지하는 공통 웹 보안 필터링 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovLeft.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "좌측 메뉴 라우팅 처리",
+      "summary": {
+        "text": "좌측 메뉴 조회 요청을 처리하는 공통 인덱스 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovLeft.do:src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+      "name": "좌측 메뉴 구성정보 보관",
+      "summary": {
+        "text": "메인 화면 좌측 메뉴 구성을 위한 컴포넌트 이름·목록 URL·정렬순서·그룹ID를 담는 VO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/IncludedCompInfoVO.java",
+            "line": 29,
+            "snippet": "public class IncludedCompInfoVO {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovModal.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "name": "공통 유틸 컨트롤러 처리",
+      "summary": {
+        "text": "화이트리스트 기반 페이지 이동, JSON 조회, ID 암복호화를 제공하는 공통 유틸 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 100,
+            "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovPageLink.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "name": "페이지 이동 처리",
+      "summary": {
+        "text": "화이트리스트 기반 페이지 이동을 처리하는 공통 유틸 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 100,
+            "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovPageLink.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "이동 경로 보안 검증",
+      "summary": {
+        "text": "페이지 이동 대상 경로에 대해 XSS·경로 등 보안 필터링을 수행하는 공통 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /EgovTop.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "상단 화면 라우팅 처리",
+      "summary": {
+        "text": "상단 화면 조회 요청을 처리하는 공통 인덱스 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+      "name": "첨부파일 다운로드 처리",
+      "summary": {
+        "text": "인증·경로 화이트리스트 검증 후 브라우저별 헤더로 파일을 전송하는 다운로드 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileDownloadController.java",
+            "line": 70,
+            "snippet": "@RequestMapping(value = \"/cmm/fms/FileDown.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "다운로드 요청자 인증 확인",
+      "summary": {
+        "text": "다운로드 요청자의 인증 사용자 정보·권한을 조회하는 정적 헬퍼이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "다운로드 대상 파일정보 보관",
+      "summary": {
+        "text": "다운로드 대상 첨부파일의 파일ID·확장자·저장경로·원본명을 담는 값 객체이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "파일 정보 조회 서비스 정의",
+      "summary": {
+        "text": "다운로드 대상 첨부파일 정보를 조회하는 파일관리 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+      "name": "브라우저별 다운로드 헤더 생성",
+      "summary": {
+        "text": "User-Agent를 파싱해 브라우저 종류·버전을 판별하고 브라우저별 Content-Disposition 헤더를 생성하는 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovBrowserUtil.java",
+            "line": 21,
+            "snippet": "public class EgovBrowserUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "name": "다운로드 처리 로깅",
+      "summary": {
+        "text": "다운로드 처리 중 발생하는 무시 가능한 예외를 로깅하는 공통 로거 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+            "line": 24,
+            "snippet": "public class EgovBasicLogger {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "다운로드 입력값 보안 필터링",
+      "summary": {
+        "text": "다운로드 요청 파라미터의 XSS·경로 등 보안 필터링을 수행하는 공통 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/FileDown.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "다운로드 사용자 상세 서비스 정의",
+      "summary": {
+        "text": "다운로드 요청자에 대한 인증 사용자 조회·권한 조회를 정의하는 공통 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/deleteFileInfs.do:src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+      "name": "첨부파일 관리 컨트롤러 처리",
+      "summary": {
+        "text": "첨부파일 목록 조회·삭제 및 파일ID 암복호화를 담당하는 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/deleteFileInfs.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "삭제 요청자 인증 확인",
+      "summary": {
+        "text": "삭제 요청자의 인증 사용자 정보·권한을 조회하는 정적 헬퍼이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/deleteFileInfs.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "파일 삭제 서비스 정의",
+      "summary": {
+        "text": "첨부파일 정보의 삭제를 포함한 조회·등록·수정을 정의하는 파일관리 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/deleteFileInfs.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "삭제 사용자 상세 서비스 정의",
+      "summary": {
+        "text": "삭제 요청자에 대한 인증 사용자 조회·권한 조회를 정의하는 공통 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+            "line": 5,
+            "snippet": "public interface EgovUserDetailsService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+      "name": "이미지 처리 컨트롤러",
+      "summary": {
+        "text": "저장된 이미지 파일을 조회해 브라우저에 스트리밍 출력하는 이미지 처리 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovImageProcessController.java",
+            "line": 74,
+            "snippet": "@RequestMapping(\"/cmm/fms/getImage.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "이미지 파일정보 보관",
+      "summary": {
+        "text": "조회 대상 이미지 파일의 파일ID·확장자·저장경로·원본명을 담는 값 객체이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "이미지 파일정보 조회 서비스 정의",
+      "summary": {
+        "text": "조회 대상 이미지 파일 정보를 조회하는 파일관리 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "이미지 요청 보안 필터링",
+      "summary": {
+        "text": "이미지 조회 요청 파라미터의 XSS 등 보안 필터링을 수행하는 공통 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "name": "이미지 스트림 자원 정리",
+      "summary": {
+        "text": "이미지 스트리밍에 사용된 Closeable·IO 자원을 예외를 삼키며 안전하게 닫는 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+            "line": 31,
+            "snippet": "public class EgovResourceCloseHelper {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/getImage.do:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "name": "이미지 처리 로깅",
+      "summary": {
+        "text": "이미지 처리 중 발생하는 무시 가능한 예외를 로깅하는 공통 로거 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+            "line": 24,
+            "snippet": "public class EgovBasicLogger {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfs.do:src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+      "name": "첨부파일 목록조회 컨트롤러 처리",
+      "summary": {
+        "text": "첨부파일 목록 조회 요청을 처리하는 파일관리 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfs.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "목록조회 파일정보 보관",
+      "summary": {
+        "text": "목록 조회 결과로 반환되는 첨부파일의 파일ID·확장자·저장경로·원본명을 담는 값 객체이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfs.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "첨부파일 목록조회 서비스 정의",
+      "summary": {
+        "text": "첨부파일 정보 목록 조회를 정의하는 파일관리 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfsForUpdate.do:src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+      "name": "수정용 첨부파일 조회 컨트롤러 처리",
+      "summary": {
+        "text": "수정 화면용 첨부파일 목록 조회 요청을 처리하는 파일관리 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovFileMngController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(\"/cmm/fms/deleteFileInfs.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfsForUpdate.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "name": "수정용 파일정보 보관",
+      "summary": {
+        "text": "수정 화면에 표시되는 첨부파일의 파일ID·확장자·저장경로·원본명을 담는 값 객체이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+            "line": 20,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /cmm/fms/selectFileInfsForUpdate.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "수정용 파일목록 조회 서비스 정의",
+      "summary": {
+        "text": "수정 화면용 첨부파일 정보 목록 조회를 정의하는 파일관리 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /egovCSRFAccessDenied.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "CSRF 거부 라우팅 처리",
+      "summary": {
+        "text": "CSRF 검증 실패 시 접근 거부 안내 화면을 반환하는 공통 인덱스 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /index.do:src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+      "name": "메인 진입 라우팅 처리",
+      "summary": {
+        "text": "애플리케이션 최초 진입 요청을 메인 화면으로 라우팅하는 공통 인덱스 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComIndexController.java",
+            "line": 81,
+            "snippet": "@RequestMapping(\"/EgovBottom.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /validator.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "name": "입력값 검증 컨트롤러 처리",
+      "summary": {
+        "text": "요청 데이터의 유효성 검증을 처리하는 공통 유틸 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+            "line": 100,
+            "snippet": "@RequestMapping(value = \"/EgovModal.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java#main:src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java",
+      "name": "보안검증 테스트 실행 진입점",
+      "summary": {
+        "text": "EgovFileBasePathSecurityValidator의 검증 로직을 main으로 실행 확인하는 보안 테스트 스텁이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java",
+            "line": 11,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java#main:src/main/java/egovframework/com/cmm/aop/EgovFileBasePathSecurityValidator.java",
+      "name": "기준경로 화이트리스트 검증",
+      "summary": {
+        "text": "파일 작업의 기준 경로가 허용 화이트리스트 안에 있는지 검증해 디렉터리 트래버설을 차단하는 AOP 검증기이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/aop/EgovFileBasePathSecurityValidator.java",
+            "line": 42,
+            "snippet": "public class EgovFileBasePathSecurityValidator {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java#main:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "테스트용 설정값 조회",
+      "summary": {
+        "text": "보안검증 테스트에 필요한 설정 값을 키 기준으로 조회하는 공통 프로퍼티 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java#main:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "테스트용 문자열 가공",
+      "summary": {
+        "text": "보안검증 테스트에서 경로 문자열 등을 가공하는 공통 문자열 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/secure/path/EgovFileBasePathSecurityValidatorTest.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "테스트용 입력값 보안 필터링",
+      "summary": {
+        "text": "보안검증 테스트 경로에서 XSS·경로 등 보안 필터링을 수행하는 공통 유틸이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    }
+  ]
+}

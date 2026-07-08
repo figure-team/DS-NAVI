@@ -1,0 +1,296 @@
+{
+  "domainId": "domain:batch",
+  "files": [
+    {
+      "className": "ComDefaultVO",
+      "kgHint": {
+        "summary": "공통 컴포넌트 전반에서 검색조건과 페이징 정보를 담는 최상위 기반 VO로, 대부분의 도메인 VO가 상속하는 공통 부모 클래스이다.",
+        "tags": [
+          "data-model",
+          "base-vo",
+          "pagination",
+          "common",
+          "spring-mvc"
+        ]
+      },
+      "line": 22,
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 12,
+        "text": " * @  수정일         수정자                   수정내용\n * @ -------    --------    ---------------------------\n * @ 2009.02.01    조재영         최초 생성\n *\n *  @author 공통서비스 개발팀 조재영\n *  @since 2009.02.01\n *  @version 1.0\n *  @see \n *  \n */\n@SuppressWarnings(\"serial\")\npublic class ComDefaultVO implements Serializable {\n\t\n\t/** 검색조건 */\n    private String searchCondition = \"\";\n    \n    /** 검색Keyword */\n    private String searchKeyword = \"\";\n    \n    /** 검색사용여부 */\n    private String searchUseYn = \"\";\n    \n    /** 현재페이지 */\n    private Integer pageIndex = 1;\n    \n    /** 페이지개수 */\n    private Integer pageUnit = 10;\n    \n    /** 페이지사이즈 */\n    private Integer pageSize = 10;\n\n    /** firstIndex */\n    private Integer firstIndex = 1;\n\n    /** lastIndex */\n    private Integer lastIndex = 1;\n\n    /** recordCountPerPage */\n    private Integer recordCountPerPage = 10;\n    \n    /** 검색KeywordFrom */\n    private String searchKeywordFrom = \"\";    \n\n\t/** 검색KeywordTo */\n    private String searchKeywordTo = \"\";  \n    \n\tpublic Integer getFirstIndex() {\n\t\treturn firstIndex == null ? 1 : firstIndex;\n\t}\n\n\tpublic void setFirstIndex(Integer firstIndex) {\n\t\tthis.firstIndex = firstIndex == null ? 1 : firstIndex;\n\t}\n\n\tpublic Integer getLastIndex() {\n\t\treturn lastIndex == null ? 1 : lastIndex;\n\t}\n\n\tpublic void setLastIndex(Integer lastIndex) {\n\t\tthis.lastIndex = lastIndex == null ? 1 : lastIndex;\n\t}\n\n\tpublic Integer getRecordCountPerPage() {\n\t\treturn recordCountPerPage == null ? 10 : recordCountPerPage;\n\t}\n\n\tpublic void setRecordCountPerPage(Integer recordCountPerPage) {\n\t\tthis.recordCountPerPage = recordCountPerPage == null ? 10 : recordCountPerPage;\n\t}\n\n\tpublic String getSearchCondition() {\n        return searchCondition;\n    }\n\n    public void setSearchCondition(String searchCondition) {\n        this.searchCondition = searchCondition;\n    }\n\n    public String getSearchKeyword() {\n        return searchKeyword;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovComAbstractDAO",
+      "kgHint": {
+        "summary": "MyBatis SqlSession을 주입받아 하위 DAO들이 상속하는 공통 추상 DAO 기반 클래스이다.",
+        "tags": [
+          "dao",
+          "mybatis",
+          "abstract",
+          "base-class"
+        ]
+      },
+      "line": 38,
+      "relPath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+      "slice": {
+        "endLine": 47,
+        "startLine": 28,
+        "text": " *      </pre>\n * \n *      <pre>\n * << 개정이력(Modification Information) >>\n *\n *   수정일      수정자           수정내용\n *  -------    -------------    ----------------------\n * \n *      </pre>\n */\npublic abstract class EgovComAbstractDAO extends EgovAbstractMapper {\n\n\t@Override\n\t@Resource(name = \"egov.sqlSession\")\n\tpublic void setSqlSessionFactory(SqlSessionFactory sqlSession) {\n\t\tsuper.setSqlSessionFactory(sqlSession);\n\t}\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "BatchResult",
+      "kgHint": {
+        "summary": "배치 실행 결과(상태·시작/종료시각·오류정보 등)를 담는 VO. ComDefaultVO를 상속해 페이징 검색 필드를 함께 제공한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "batch",
+          "serialization"
+        ]
+      },
+      "line": 23,
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 13,
+        "text": " * @updated 17-6-2010 오전 10:27:13\n * @see\n * <pre>\n * == 개정이력(Modification Information) ==\n *\n *   수정일       수정자           수정내용\n *  -------     --------    ---------------------------\n *  2010.06.17   김진만     최초 생성\n * </pre>\n */\npublic class BatchResult extends ComDefaultVO implements Serializable {\n\n\tprivate static final long serialVersionUID = 8673713935753272633L;\n\t/**\n\t * 배치결과ID\n\t */\n\tprivate String batchResultId;\n\t/**\n\t * 배치스케줄ID\n\t */\n\tprivate String batchSchdulId;\n\n\t/**\n\t * 배치작업ID\n\t */\n\tprivate String batchOpertId;\n\t/**\n\t * 파라미터\n\t */\n\tprivate String paramtr;\n\t/**\n\t * 상태\n\t */\n\tprivate String sttus;\n\t/**\n\t * 실행시작시각\n\t */\n\tprivate String executBeginTime;\n\t/**\n\t * 실행종료시각\n\t */\n\tprivate String executEndTime;\n\t/**\n\t * 최종수정자 아이디\n\t */\n\tprivate String lastUpdusrId;\n\t/**\n\t * 최종수정시점\n\t */\n\tprivate String lastUpdusrPnttm;\n\t/**\n\t * 최초등록자 아이디\n\t */\n\tprivate String frstRegisterId;\n\t/**\n\t * 최초등록시점\n\t */\n\tprivate String frstRegisterPnttm;\n\t/**\n\t * 에러정보\n\t */\n\tprivate String errorInfo;\n\n\t/**\n\t * 배치작업명\n\t */\n\tprivate String batchOpertNm;\n\t/**\n\t * 배치프로그램\n\t */\n\tprivate String batchProgrm;\n\t/**\n\t * 상태명\n\t */\n\tprivate String sttusNm;\n\n\t/**\n\t * @return the batchResultId\n\t */\n\tpublic String getBatchResultId() {",
+        "truncated": true
+      }
+    },
+    {
+      "className": "BatchSchdul",
+      "kgHint": {
+        "summary": "배치 스케줄 VO. 실행 주기·일시 필드를 보관하고 이를 Quartz cron 표현식으로 변환하는 로직을 포함한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "batch",
+          "cron",
+          "scheduling"
+        ]
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+      "slice": {
+        "endLine": 95,
+        "startLine": 16,
+        "text": " * @updated 17-6-2010 오전 10:27:13\n * @see\n * <pre>\n * == 개정이력(Modification Information) ==\n *\n *   수정일       수정자           수정내용\n *  -------     --------    ---------------------------\n *  2010.06.17   김진만     최초 생성\n * </pre>\n */\n@SuppressWarnings(\"serial\")\npublic class BatchSchdul extends ComDefaultVO implements Serializable {\n\n\t/**\n\t * 배치스케줄ID\n\t */\n\tprivate String batchSchdulId;\n\n\t/**\n\t * 배치작업ID\n\t */\n\t@EgovNullCheck\n\tprivate String batchOpertId;\n\n\t/**\n\t * 실행주기\n\t */\n\t@EgovNullCheck\n\tprivate String executCycle;\n\t/**\n\t * 실행스케줄일자\n\t */\n\tprivate String executSchdulDe;\n\t/**\n\t * 실행스케줄시\n\t */\n\t@EgovNullCheck\n\tprivate String executSchdulHour;\n\t/**\n\t * 실행스케줄분\n\t */\n\t@EgovNullCheck\n\tprivate String executSchdulMnt;\n\t/**\n\t * 실행스케줄초\n\t */\n\t@EgovNullCheck\n\tprivate String executSchdulSecnd;\n\t/**\n\t * 실행스케줄요일\n\t */\n\tprivate String[] executSchdulDfkSes;\n\n\t/**\n\t * 최종수정자 아이디\n\t */\n\tprivate String lastUpdusrId;\n\t/**\n\t * 최종수정시점\n\t */\n\tprivate String lastUpdusrPnttm;\n\t/**\n\t * 최초등록자 아이디\n\t */\n\tprivate String frstRegisterId;\n\t/**\n\t * 최초등록시점\n\t */\n\tprivate String frstRegisterPnttm;\n\n\t/**\n\t * 배치작업명\n\t */\n\tprivate String batchOpertNm;\n\t/**\n\t * 배치프로그램\n\t */\n\tprivate String batchProgrm;\n\t/**\n\t * 파라미터",
+        "truncated": true
+      }
+    },
+    {
+      "className": "BatchSchdulDfk",
+      "kgHint": {
+        "summary": "배치 스케줄의 실행 요일(정기) 정보를 담는 보조 VO. 스케줄 1건당 다수의 요일 항목으로 매핑된다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "batch"
+        ]
+      },
+      "line": 19,
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+      "slice": {
+        "endLine": 78,
+        "startLine": 9,
+        "text": " * @version 1.0\n * @see\n * <pre>\n * == 개정이력(Modification Information) ==\n *\n *   수정일       수정자           수정내용\n *  -------     --------    ---------------------------\n *  2010.08.23   김진만     최초 생성\n * </pre>\n */\npublic class BatchSchdulDfk implements Serializable {\n\n\tprivate static final long serialVersionUID = -4152071306992470303L;\n\n\t/**\n\t * 배치스케줄ID\n\t */\n\tprivate String batchSchdulId;\n\n\t/**\n\t * 실행스케줄요일\n\t */\n\tprivate String executSchdulDfkSe;\n\n\t/**\n\t * 실행스케줄요일명\n\t */\n\tprivate String executSchdulDfkSeNm;\n\n\n\t/**\n\t * @return the batchSchdulId\n\t */\n\tpublic String getBatchSchdulId() {\n\t\treturn batchSchdulId;\n\t}\n\t/**\n\t * @return the executSchdulDfkSe\n\t */\n\tpublic String getExecutSchdulDfkSe() {\n\t\treturn executSchdulDfkSe;\n\t}\n\t/**\n\t * @param batchSchdulId the batchSchdulId to set\n\t */\n\tpublic void setBatchSchdulId(String batchSchdulId) {\n\t\tthis.batchSchdulId = batchSchdulId;\n\t}\n\t/**\n\t * @param executSchdulDfkSe the executSchdulDfkSe to set\n\t */\n\tpublic void setExecutSchdulDfkSe(String executSchdulDfkSe) {\n\t\tthis.executSchdulDfkSe = executSchdulDfkSe;\n\t}\n\t/**\n\t * @return the executSchdulDfkSeNm\n\t */\n\tpublic String getExecutSchdulDfkSeNm() {\n\t\treturn executSchdulDfkSeNm;\n\t}\n\t/**\n\t * @param executSchdulDfkSeNm the executSchdulDfkSeNm to set\n\t */\n\tpublic void setExecutSchdulDfkSeNm(String executSchdulDfkSeNm) {\n\t\tthis.executSchdulDfkSeNm = executSchdulDfkSeNm;\n\t}\n\n\n\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "BatchScheduler",
+      "kgHint": {
+        "summary": "Quartz Scheduler를 감싸 배치 스케줄을 등록/수정/삭제하고, 애플리케이션 기동 시 저장된 스케줄을 초기 적재하는 스케줄링 서비스.",
+        "tags": [
+          "service",
+          "scheduler",
+          "quartz",
+          "batch"
+        ]
+      },
+      "line": 57,
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "slice": {
+        "endLine": 126,
+        "startLine": 47,
+        "text": "\tprivate static final int RECORD_COUNT_PER_PAGE = 10000;\n\n\t/**\n\t * 배치스케줄러에 batchSchdul 파라미터를 이용하여 Job , Trigger를 Add 한다.\n\t *\n\t * @param batchSchdul  배치스케줄러에 등록할 스케줄정보\n\t * @exception Exception Exception\n\t */\n\tpublic void insertBatchSchdul(BatchSchdul batchSchdul) throws Exception {\n\t\t// Job 만들기\n\t\tJobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();\n\n\t\t// Trigger 만들기\n\t\tCronTrigger trigger = newTrigger().withIdentity(batchSchdul.getBatchSchdulId()).withSchedule(cronSchedule(batchSchdul.toCronExpression())).forJob(jobDetail.getKey().getName()).build();\n\n\t\tLOGGER.debug(\"배치스케줄을 등록합니다. 배치스케줄ID : {}\", batchSchdul.getBatchSchdulId());\n\t\tLOGGER.debug(\"{} - cronexpression : {}\", batchSchdul.getBatchSchdulId(), trigger.getCronExpression());\n\t\tBatchJobListener listener = new BatchJobListener();\n\n\t\tlistener.setEgovBatchSchdulService(egovBatchSchdulService);\n\t\tlistener.setIdgenService(idgenService);\n\n\t\tsched.getListenerManager().addJobListener(listener);\n\n\t\t// 데이터 전달\n\t\tjobDetail.getJobDataMap().put(\"batchOpertId\", batchSchdul.getBatchOpertId());\n\t\tjobDetail.getJobDataMap().put(\"batchSchdulId\", batchSchdul.getBatchSchdulId());\n\t\tjobDetail.getJobDataMap().put(\"batchProgrm\", batchSchdul.getBatchProgrm());\n\t\tjobDetail.getJobDataMap().put(\"paramtr\", batchSchdul.getParamtr());\n\n\t\ttry {\n\t\t\t// 스케줄러에 추가하기\n\t\t\tsched.scheduleJob(jobDetail, trigger);\n\t\t} catch (SchedulerException e) {\n\t\t\t// SchedulerException 이 발생하면 로그를 출력하고 다음 배치작업으로 넘어간다.\n\t\t\t// 트리거의 실행시각이 현재 시각보다 이전이면 SchedulerException이 발생한다.\n\t\t\tLOGGER.error(\"스케줄러에 배치작업추가할때 에러가 발생했습니다. 배치스케줄ID : {}, 배치작업ID : {}\", batchSchdul.getBatchSchdulId(), batchSchdul.getBatchOpertId());\n\t\t\tLOGGER.error(\"에러내용 : {}\", e.getMessage());\n\t\t\t//LOGGER.debug(e.getMessage(), e);\n\t\t}\n\t}\n\n\t/**\n\t * 배치스케줄러에 batchSchdul 파라미터를 이용하여 Job , Trigger를 갱신 한다.\n\t *\n\t * @param batchSchdul  배치스케줄러에 갱신할 스케줄정보\n\t * @exception Exception Exception\n\t */\n\tpublic void updateBatchSchdul(BatchSchdul batchSchdul) throws Exception {\n\t\t// Job 만들기\n\t\tJobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();\n\t\t// Trigger 만들기\n\t\tCronTrigger trigger = newTrigger().withIdentity(batchSchdul.getBatchSchdulId()).withSchedule(cronSchedule(batchSchdul.toCronExpression())).forJob(jobDetail.getKey().getName()).build();\n\n\t\tLOGGER.debug(\"배치스케줄을 갱신합니다. 배치스케줄ID : {}\", batchSchdul.getBatchSchdulId());\n\t\tLOGGER.debug(\"{} - cronexpression : {}\", batchSchdul.getBatchSchdulId(), trigger.getCronExpression());\n\n\t\tBatchJobListener listener = new BatchJobListener();\n\n\t\tlistener.setEgovBatchSchdulService(egovBatchSchdulService);\n\t\tlistener.setIdgenService(idgenService);\n\n\t\tsched.getListenerManager().addJobListener(listener);\n\n\t\t// 데이터 전달\n\t\tjobDetail.getJobDataMap().put(\"batchOpertId\", batchSchdul.getBatchOpertId());\n\t\tjobDetail.getJobDataMap().put(\"batchSchdulId\", batchSchdul.getBatchSchdulId());\n\t\tjobDetail.getJobDataMap().put(\"batchProgrm\", batchSchdul.getBatchProgrm());\n\t\tjobDetail.getJobDataMap().put(\"paramtr\", batchSchdul.getParamtr());\n\n\t\ttry {\n\t\t\t// 스케줄러에서 기존Job, Trigger 삭제하기\n\t\t\tsched.deleteJob(JobKey.jobKey(batchSchdul.getBatchSchdulId()));\n\t\t\t// 스케줄러에 추가하기\n\t\t\tsched.scheduleJob(jobDetail, trigger);\n\t\t} catch (SchedulerException e) {\n\t\t\t// SchedulerException 이 발생하면 로그를 출력하고 다음 배치작업으로 넘어간다.\n\t\t\t// 트리거의 실행시각이 현재 시각보다 이전이면 SchedulerException이 발생한다.\n\t\t\tLOGGER.error(\"스케줄러에 배치작업갱신할때 에러가 발생했습니다. 배치스케줄ID : {}, 배치작업ID : {}\", batchSchdul.getBatchSchdulId(), batchSchdul.getBatchOpertId());\n\t\t\tLOGGER.error(\"에러내용 : {}\", e.getMessage());",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovBatchSchdulService",
+      "kgHint": {
+        "summary": "배치 스케줄 CRUD 및 배치 실행 결과 등록/갱신 기능을 정의하는 Service 인터페이스.",
+        "tags": [
+          "service",
+          "interface",
+          "batch"
+        ]
+      },
+      "line": 21,
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+      "slice": {
+        "endLine": 89,
+        "startLine": 11,
+        "text": " * @updated 17-6-2010 오전 10:27:13\n * @see\n * <pre>\n * == 개정이력(Modification Information) ==\n *\n *   수정일       수정자           수정내용\n *  -------     --------    ---------------------------\n *  2010.06.17   김진만     최초 생성\n * </pre>\n */\npublic interface EgovBatchSchdulService {\n\n\t/**\n\t * 배치스케줄을  삭제한다.\n\t *\n\t * @param batchSchdul    삭제대상 배치스케줄model\n\t * @exception Exception Exception\n\t */\n\tpublic void deleteBatchSchdul(BatchSchdul batchSchdul) throws Exception;\n\n\t/**\n\t * 배치스케줄을 등록한다.\n\t *\n\t * @param batchSchdul    등록대상 배치스케줄model\n\t * @exception Exception Exception\n\t */\n\tpublic void insertBatchSchdul(BatchSchdul batchSchdul) throws Exception;\n\n\t/**\n\t * 배치스케줄을  상세조회 한다.\n\t * @return 배치스케줄정보\n\t *\n\t * @param batchSchdul    조회대상 배치스케줄model\n\t * @exception Exception Exception\n\t */\n\tpublic BatchSchdul selectBatchSchdul(BatchSchdul batchSchdul) throws Exception;\n\n\t/**\n\t * 배치스케줄 목록을 조회한다.\n\t * @return 배치스케줄목록\n\t *\n\t * @param searchVO    조회조건VO\n\t * @exception Exception Exception\n\t */\n\tpublic List<BatchSchdul> selectBatchSchdulList(BatchSchdul searchVO) throws Exception;\n\n\t/**\n\t * 배치스케줄 목록 전체 건수를(을) 조회한다.\n\t * @return 목록건수\n\t *\n\t * @param searchVO    조회할 정보가 담긴 VO\n\t * @exception Exception Exception\n\t */\n\tpublic int selectBatchSchdulListCnt(BatchSchdul searchVO) throws Exception;\n\n\t/**\n\t * 배치스케줄을 수정한다.\n\t *\n\t * @param batchSchdul    수정대상 배치스케줄model\n\t * @exception Exception Exception\n\t */\n\tpublic void updateBatchSchdul(BatchSchdul batchSchdul) throws Exception;\n\n\t/**\n\t * 배치결과를 등록한다.\n\t * @param batchResult    등록대상 배치결과model\n\t * @exception Exception Exception\n\t */\n\tpublic void insertBatchResult(BatchResult batchResult) throws Exception;\n\n\t/**\n\t * 배치결과정보를 수정한다.\n\t *\n\t * @param batchResult    수정대상 배치결과model\n\t * @exception Exception Exception\n\t */\n\tpublic void updateBatchResult(BatchResult batchResult) throws Exception;\n\n}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "BatchResultDao",
+      "kgHint": {
+        "summary": "배치 실행 결과에 대한 MyBatis DAO. EgovComAbstractDAO를 상속해 CRUD SQL 매핑을 호출한다.",
+        "tags": [
+          "dao",
+          "mybatis",
+          "batch",
+          "persistence"
+        ]
+      },
+      "line": 26,
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 16,
+        "text": " * @updated 17-6-2010 오전 10:27:13\n * @see\n * <pre>\n * == 개정이력(Modification Information) ==\n *\n *   수정일       수정자           수정내용\n *  -------     --------    ---------------------------\n *  2010.06.17   김진만     최초 생성\n * </pre>\n */\n@Repository(\"batchResultDao\")\npublic class BatchResultDao extends EgovComAbstractDAO {\n\n\t/**\n\t * 배치결과을 삭제한다.\n\t *\n\t * @param batchResult    삭제할 배치결과 VO\n\t * @exception Exception Exception\n\t */\n\tpublic void deleteBatchResult(BatchResult batchResult) {\n\t\tdelete(\"BatchResultDao.deleteBatchResult\", batchResult);\n\t}\n\n\t/**\n\t * 배치결과을 등록한다.\n\t *\n\t * @param batchResult 저장할 배치결과 VO\n\t * @exception Exception Exception\n\t */\n\tpublic void insertBatchResult(BatchResult batchResult) {\n\t\tinsert(\"BatchResultDao.insertBatchResult\", batchResult);\n\t}\n\n\t/**\n\t * 배치결과정보를 상세조회 한다.\n\t * @return 배치결과정보\n\t *\n\t * @param batchResult    조회할 KEY가 있는 배치결과 VO\n\t * @exception Exception Exception\n\t */\n\tpublic BatchResult selectBatchResult(BatchResult batchResult) {\n\t\treturn (BatchResult) selectOne(\"BatchResultDao.selectBatchResult\", batchResult);\n\t}\n\n\t/**\n\t * 배치결과정보목록을  조회한다.\n\t * @return 배치결과목록\n\t *\n\t * @param searchVO    조회조건이 저장된 VO\n\t * @exception Exception Exception\n\t */\n\tpublic List<BatchResult> selectBatchResultList(BatchResult searchVO) {\n\t\treturn selectList(\"BatchResultDao.selectBatchResultList\", searchVO);\n\t}\n\n\t/**\n\t * 배치결과 목록 전체 건수를(을) 조회한다.\n\t * @return 목록건수\n\t *\n\t * @param searchVO    조회할 정보가 담긴 VO\n\t * @exception Exception Exception\n\t */\n\tpublic int selectBatchResultListCnt(BatchResult searchVO) {\n\t\treturn (Integer) selectOne(\"BatchResultDao.selectBatchResultListCnt\", searchVO);\n\t}\n\n\t/**\n\t * 배치결과정보를 수정한다.\n\t *\n\t * @param batchResult    수정대상 배치결과 VO\n\t * @exception Exception Exception\n\t */\n\tpublic void updateBatchResult(BatchResult batchResult) {\n\t\tupdate(\"BatchResultDao.updateBatchResult\", batchResult);\n\t}\n\n}",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "BatchShellScriptJob",
+      "entryType": "cron",
+      "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "flowId": "flow:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob",
+      "line": 57,
+      "stepIds": [
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java"
+      ]
+    }
+  ],
+  "gitCommit": "9591ae21d1431dc1b8e32430c6218b55f33d8ed2",
+  "key": "batch",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/ComDefaultVO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchResult.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java"
+    }
+  ]
+}

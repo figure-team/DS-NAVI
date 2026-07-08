@@ -1,0 +1,114 @@
+{
+  "domainId": "domain:user",
+  "files": [
+    {
+      "className": null,
+      "kgHint": {
+        "summary": "LDAP 사용자 관리 화면을 렌더링하는 JSP 페이지로, jsTree로 사용자 계층을 표시하고 선택 이벤트를 처리한다.",
+        "tags": [
+          "jsp",
+          "ldap",
+          "user-tree",
+          "component"
+        ]
+      },
+      "line": 1,
+      "relPath": "src/main/webapp/html/egovframework/com/ext/ldapumt/user_html.jsp",
+      "slice": {
+        "endLine": 80,
+        "startLine": 1,
+        "text": "<%@ page contentType=\"text/html; charset=utf-8\" pageEncoding=\"utf-8\"%>\n<%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/core\" %>\n<%@ taglib prefix=\"ui\" uri=\"http://egovframework.gov/ctl/ui\"%>\n<%@ taglib uri=\"http://java.sun.com/jsp/jstl/functions\" prefix=\"fn\" %>\n<%@ taglib prefix=\"spring\" uri=\"http://www.springframework.org/tags\"%>\n<%@ taglib prefix=\"form\" uri=\"http://www.springframework.org/tags/form\" %>\n<html>\n\t<body>\n\t<form name='form1' id='form1'>\n\t<input type='hidden' name='dn' id='dn'>\t\t\t\n\t<table border='1px' style='border:1px solid #E7E7E7'>\n\t\t<tr id='line1'>\n\t\t\t<td style='background-color: #F6F6F6'>\n\t\t\t\tID\n\t\t\t</td>\n\t\t\t<td>\n\t\t\t\t<input type='text' name='cn' id='cn' style='border:1px solid #ffffff' readonly>\n\t\t\t</td>\n\t\t\t<!-- 이름 -->\n\t\t\t<td style='background-color: #F6F6F6'>\n\t\t\t\t<spring:message code=\"extLdapumtDpt.user.name\" />\n\t\t\t</td>\n\t\t\t<td>\n\t\t\t\t<input type='text' name='displayName' id='displayName' style='border:1px solid #ffffff'>\t\n\t\t\t</td>\n\t\t</tr>\n\t\t<tr id='line2'>\n\t\t\t<!-- 소속부서 -->\n\t\t\t<td>\n\t\t\t\t<spring:message code=\"extLdapumtDpt.user.dept\" />\n\t\t\t</td>\n\t\t\t<td style='background-color: #F6F6F6'>\n\t\t\t\t<input type='text' name='ou' id='ou' style='border:1px solid #ffffff'>\n\t\t\t</td>\n\t\t\t<!-- 부서코드 -->\n\t\t\t<td>\n\t\t\t\t<spring:message code=\"extLdapumtDpt.user.deptCode\" />\n\t\t\t</td>\n\t\t\t<td style='background-color: #F6F6F6'>\n\t\t\t\t<input type='text' name='ouCode' id='ouCode' style='border:1px solid #ffffff'>\n\t\t\t</td>\n\t\t</tr>\n\t\t<tr id='line3'>\n\t\t\t<!-- 소속기관 -->\n\t\t\t<td style='background-color: #F6F6F6'>\n\t\t\t\t<spring:message code=\"extLdapumtDpt.user.deptOrg\" />\n\t\t\t</td>\n\t\t\t<td>\n\t\t\t\t<input type='text' name='companyName' id='companyName' style='border:1px solid #ffffff'>\n\t\t\t</td>\n\t\t\t<!-- 기관코드 -->\n\t\t\t<td style='background-color: #F6F6F6'>\n\t\t\t\t<spring:message code=\"extLdapumtDpt.user.deptOrgCode\" /> \n\t\t\t</td>\n\t\t\t<td>\n\t\t\t\t<input type='text' name='topouCode' id='topouCode' style='border:1px solid #ffffff'>\n\t\t\t</td>\n\t\t</tr>\n\t\t<tr id='line4'>\n\t\t\t<!-- 사용자전체이름 -->\n\t\t\t<td>\n\t\t\t\t<spring:message code=\"extLdapumtDpt.user.userFullName\" />\n\t\t\t</td>\n\t\t\t<td colspan='3'  style='background-color: #F6F6F6'>\n\t\t\t\t<input type='text' name='userFullName' width='100%' id='userFullName' style='border:1px solid #ffffff;width:100%'>\n\t\t\t</td>\n\t\t</tr>\t\t\n\t\t<tr>\t\n\t\t\t<!-- 조직전체이름 -->\t\n\t\t\t<td style='background-color: #F6F6F6'>\n\t\t\t\t<spring:message code=\"extLdapumtDpt.user.orgFullName\" />\t\t\t\n\t\t\t</td>\n\t\t\t<td colspan='3'>\n\t\t\t\t<input type='text' name='ucOrgFullName' width='100%' id='ucOrgFullName' style='border:1px solid #ffffff;width:100%'>\n\t\t\t</td>\n\t\t</tr>\n\t</table>\n\t</form>\n\t<table style='width:100%'>\n\t\t<tr>",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "GET /html/egovframework/com/ext/ldapumt/user_html.jsp",
+      "entryType": "http",
+      "filePath": "src/main/webapp/html/egovframework/com/ext/ldapumt/user_html.jsp",
+      "flowId": "flow:GET /html/egovframework/com/ext/ldapumt/user_html.jsp",
+      "line": 1,
+      "stepIds": [
+        "step:GET /html/egovframework/com/ext/ldapumt/user_html.jsp:src/main/webapp/html/egovframework/com/ext/ldapumt/user_html.jsp"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "user",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/main/webapp/html/egovframework/com/ext/ldapumt/user_html.jsp",
+      "stepId": "step:GET /html/egovframework/com/ext/ldapumt/user_html.jsp:src/main/webapp/html/egovframework/com/ext/ldapumt/user_html.jsp"
+    }
+  ]
+}

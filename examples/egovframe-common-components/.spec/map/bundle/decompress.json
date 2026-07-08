@@ -1,0 +1,240 @@
+{
+  "domainId": "domain:decompress",
+  "files": [
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+        "tags": [
+          "utility",
+          "security",
+          "validation",
+          "xss",
+          "sanitization",
+          "tested"
+        ]
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovBasicLogger",
+      "kgHint": {
+        "summary": "ignore/debug/info 레벨별 SLF4J 로거를 감싸 공통 로깅 진입점을 제공하는 유틸. 특히 무시 가능한 예외 로깅에 사용된다.",
+        "tags": [
+          "utility",
+          "logging"
+        ]
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 14,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2014.09.18  표준프레임워크센터 최초 생성\n *   2025.05.27  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-FieldNamingConventions(필드 명명 규칙)\n *\n *      </pre>\n */\npublic class EgovBasicLogger {\n\tprivate static final Level IGNORE_INFO_LEVEL = Level.OFF;\n\tprivate static final Level DEBUG_INFO_LEVEL = Level.FINEST;\n\tprivate static final Level INFO_INFO_LEVEL = Level.INFO;\n\n\tprivate static final Logger IGNORE_LOGGER = Logger.getLogger(\"ignore\");\n\tprivate static final Logger DEBUG_LOGGER = Logger.getLogger(\"debug\");\n\tprivate static final Logger INFO_LOGGER = Logger.getLogger(\"info\");\n\n\t/**\n\t * 기록이나 처리가 불필요한 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void ignore(String message, Exception exception) {\n\t\tif (exception == null) {\n\t\t\tIGNORE_LOGGER.log(IGNORE_INFO_LEVEL, message);\n\t\t} else {\n\t\t\tIGNORE_LOGGER.log(IGNORE_INFO_LEVEL, message, exception);\n\t\t}\n\t}\n\n\t/**\n\t * 기록이나 처리가 불필요한 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void ignore(String message) {\n\t\tignore(message, null);\n\t}\n\n\t/**\n\t * 디버그 정보를 기록하는 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void debug(String message, Exception exception) {\n\t\tif (exception == null) {\n\t\t\tDEBUG_LOGGER.log(DEBUG_INFO_LEVEL, message);\n\t\t} else {\n\t\t\tDEBUG_LOGGER.log(DEBUG_INFO_LEVEL, message, exception);\n\t\t}\n\t}\n\n\t/**\n\t * 디버그 정보를 기록하는 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void debug(String message) {\n\t\tdebug(message, null);\n\t}\n\n\t/**\n\t * 일반적이 정보를 기록하는 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void info(String message) {\n\t\tINFO_LOGGER.log(INFO_INFO_LEVEL, message);\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovResourceCloseHelper",
+      "kgHint": {
+        "summary": "Closeable·DB(ResultSet/Statement/Connection)·소켓 자원을 예외를 삼키며 안전하게 닫는 리소스 정리 유틸.",
+        "tags": [
+          "utility",
+          "resource-management",
+          "io"
+        ]
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "slice": {
+        "endLine": 100,
+        "startLine": 21,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2014.09.18  표준프레임워크센터  최초 생성\n *   2025.05.28  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-CloseResource(리소스 닫기)\n *\n *      </pre>\n */\npublic class EgovResourceCloseHelper {\n\t/**\n\t * Resource close 처리.\n\t * \n\t * @param resources\n\t */\n\tpublic static void close(Closeable... resources) {\n\t\tfor (Closeable resource : resources) { // NOPMD - CloseResource\n\t\t\tif (resource != null) {\n\t\t\t\ttry {\n\t\t\t\t\tresource.close();\n\t\t\t\t} catch (IOException ignore) {// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred IOException to close resource is ingored!!\");\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\t/**\n\t * JDBC 관련 resource 객체 close 처리\n\t * \n\t * @param objects\n\t */\n\tpublic static void closeDBObjects(Wrapper... objects) {\n\t\tfor (Object object : objects) {\n\t\t\tif (object != null) {\n\t\t\t\tif (object instanceof ResultSet) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\t((ResultSet) object).close();\n\t\t\t\t\t} catch (SQLException ignore) {// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred SQLException to close resource is ingored!!\");\n\t\t\t\t\t}\n\t\t\t\t} else if (object instanceof Statement) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\t((Statement) object).close();\n\t\t\t\t\t} catch (SQLException ignore) {// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred SQLException to close resource is ingored!!\");\n\t\t\t\t\t}\n\t\t\t\t} else if (object instanceof Connection) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\t((Connection) object).close();\n\t\t\t\t\t} catch (SQLException ignore) {\n\t\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred SQLException to close resource is ingored!!\");\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tthrow new IllegalArgumentException(\"Wrapper type is not found : \" + object.toString());\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\t/**\n\t * Socket 관련 resource 객체 close 처리\n\t * \n\t * @param objects\n\t */\n\tpublic static void closeSocketObjects(Socket socket, ServerSocket server) {\n\t\tif (socket != null) {\n\t\t\ttry {\n\t\t\t\tsocket.shutdownOutput();\n\t\t\t} catch (IOException ignore) {\n\t\t\t\tEgovBasicLogger.ignore(\"Occurred IOException to close resource is ingored!!\");\n\t\t\t}\n\n\t\t\ttry {\n\t\t\t\tsocket.close();\n\t\t\t} catch (IOException ignore) {\n\t\t\t\tEgovBasicLogger.ignore(\"Occurred IOException to close resource is ingored!!\");\n\t\t\t}\n\t\t}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFileCmprs",
+      "kgHint": {
+        "summary": "압축 파일(zip/tar 등)을 지정 경로에 해제하는 파일 압축 해제 유틸리티.",
+        "tags": [
+          "utility",
+          "compression",
+          "file-io"
+        ]
+      },
+      "line": 34,
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+      "slice": {
+        "endLine": 103,
+        "startLine": 24,
+        "text": "\nimport java.io.File;\nimport java.io.FileInputStream;\nimport java.io.FileOutputStream;\nimport java.util.zip.ZipEntry;\nimport java.util.zip.ZipInputStream;\n\nimport egovframework.com.cmm.EgovWebUtil;\nimport egovframework.com.cmm.util.EgovResourceCloseHelper;\n\npublic class EgovFileCmprs {\n\n\tfinal static int BUFFER_SIZE = 64 * 1024;\n\tfinal static char FILE_SEPARATOR = File.separatorChar;\n\n\t/**\n\t * 파일(디렉토리)을 압축해제하는 기능\n\t * @param source 압축파일명\n\t * @param target 압출이 풀릴 디렉토리\n\t * @return boolean result 압축해제성공여부 True / False\n\t */\n\tpublic static boolean decmprsFile(String source, String target) throws Exception {\n\n\t\t// 압축해제성공여부\n\t\tboolean result = false;\n\t\tint cnt = 0;\n\t\t// 읽어들일 byte 버퍼\n\t\tbyte[] buffer = new byte[BUFFER_SIZE];\n\n\t\tFileInputStream finput = null;\n\t\tFileOutputStream foutput = null;\n\t\tZipInputStream zinput = null;\n\n\t\tString source1 = source.replace('\\\\', FILE_SEPARATOR).replace('/', FILE_SEPARATOR);\n\t\tString target1 = target.replace('\\\\', FILE_SEPARATOR).replace('/', FILE_SEPARATOR);\n\t\tFile srcFile = new File(source1);\n\n\t\tif (srcFile.exists() && srcFile.isFile()) {\n\n\t\t\t// 절대 경로인 경우 직접 디렉토리 생성, 상대 경로인 경우 EgovFileTool 사용\n\t\t\tString target2;\n\t\t\tFile targetFile = new File(target1);\n\t\t\tif (targetFile.isAbsolute()) {\n\t\t\t\t// 절대 경로인 경우 직접 생성\n\t\t\t\ttargetFile = new File(EgovWebUtil.filePathBlackList(target1));\n\t\t\t\tif (!targetFile.exists()) {\n\t\t\t\t\ttargetFile.mkdirs();\n\t\t\t\t}\n\t\t\t\ttarget2 = targetFile.getAbsolutePath();\n\t\t\t} else {\n\t\t\t\t// 상대 경로인 경우 EgovFileTool 사용\n\t\t\t\ttarget2 = EgovFileTool.createNewDirectory(target1);\n\t\t\t}\n\t\t\t\n\t\t\tif (target2 == null || target2.isEmpty()) {\n\t\t\t\tthrow new Exception(\"Failed to create target directory: \" + target1);\n\t\t\t}\n\t\t\t\n\t\t\tFile tarFile = new File(target2);\n\t\t\tfinput = new FileInputStream(srcFile);\n\t\t\tzinput = new ZipInputStream(finput);\n\n\t\t\tZipEntry entry;\n\n\t\t\ttry {\n\n\t\t\t\tFile efile;\n\t\t\t\twhile ((entry = zinput.getNextEntry()) != null) {\n\n\t\t\t\t\tString filename = entry.getName();\n\t\t\t\t\tString entryFilePath = tarFile.getAbsolutePath() + FILE_SEPARATOR + filename;\n\t\t\t\t\tentryFilePath = EgovWebUtil.filePathBlackList(entryFilePath);\n\t\t\t\t\tefile = new File(entryFilePath);\n\t\t\t\t\tif (entry.isDirectory()) {\n\t\t\t\t\t\tEgovFileTool.createDirectories(efile.getAbsolutePath());\n\t\t\t\t\t} else {\n\t\t\t\t\t\t// 상위 디렉토리가 없으면 생성\n\t\t\t\t\t\tFile parentDir = efile.getParentFile();\n\t\t\t\t\t\tif (parentDir != null && !parentDir.exists()) {\n\t\t\t\t\t\t\tparentDir.mkdirs();",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovFileTool",
+      "kgHint": {
+        "summary": "디렉터리/파일 생성·삭제·순회·파싱을 제공하는 파일 시스템 조작 static 유틸리티. 경로 보안 검증을 적용.",
+        "tags": [
+          "utility",
+          "file-io",
+          "security"
+        ]
+      },
+      "line": 59,
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+      "slice": {
+        "endLine": 128,
+        "startLine": 49,
+        "text": " *  수정일                수정자           수정내용\n *  ----------   --------   ---------------------------\n *  2020.12.07   신용호       KISA 보안약점 조치\n *  2022.11.11   김혜준       시큐어코딩 처리\n *  2024.10.29   win777\t    디렉토리 생성 성공 시 생성된 절대경로를 리턴하도록 변경\n *  2025.02.06   신용호       deleteFile() KISA 시큐어코딩 처리\n *\n * </pre>\n */\n\npublic class EgovFileTool {\n\n\t// 파일구분자\n\tstatic final char FILE_SEPARATOR = File.separatorChar;\n\n\t// 최대 문자길이\n\tstatic final int MAX_STR_LEN = 1024;\n\n\t// LOGGER\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovFileTool.class);\n\n\tprivate static final String FILE_STORE_PATH = EgovProperties.getProperty(\"Globals.fileStorePath\");\n\n\n\t/**\n\t * <pre>\n\t * Comment : 디렉토리(파일)를 삭제한다. (파일,디렉토리 구분없이 존재하는 경우 무조건 삭제한다)\n\t * </pre>\n\t *\n\t * @param filePath 삭제하고자 하는 파일의 절대경로 + 파일명\n\t * @return 성공하면 삭제된 절대경로, 아니면블랭크\n\t */\n\tpublic static String deletePath(String filePath) {\n\t\treturn deletePath(FILE_STORE_PATH, filePath);\n\t}\n\n\t/**\n\t * <pre>\n\t * Comment : 디렉토리(파일)를 삭제한다. (파일,디렉토리 구분없이 존재하는 경우 무조건 삭제한다)\n\t * </pre>\n\t *\n\t * @param basePath 기본 경로\n\t * @param filePath 삭제하고자 하는 파일의 절대경로 + 파일명\n\t * @return 성공하면 삭제된 절대경로, 아니면블랭크\n\t */\n\tpublic static String deletePath(String basePath, String filePath) {\n\n\t\t// 인자 값이 없는 경우 \"Globals.fileStorePath\" 기본 경로를 지정한다.\n\t\tif (basePath == null || basePath.equals(\"\")) {\n\t\t\tbasePath = FILE_STORE_PATH;\n\t\t}\n\n\t\tString result = \"\";\n\n\t\tFile file = new File(EgovWebUtil.filePathBlackList(basePath + filePath));\n\t\tif (file.exists()) {\n\t\t\tresult = file.getAbsolutePath();\n\t\t\tif (!file.delete()) {\n\t\t\t\tresult = \"\";\n\t\t\t}\n\t\t}\n\n\t\treturn result;\n\t}\n\n\t/**\n\t * <pre>\n\t * Comment : 디렉토리를 생성한다. (여러 레벨의 경로를 동시에 생성)\n\t * </pre>\n\t *\n\t * @param basePath 기본 경로\n\t * @param dirPath 생성하고자 하는 절대경로\n\t * @return 성공하면 생성된 절대경로, 아니면 블랭크\n\t */\n\tpublic static String createDirectories(String dirPath) {\n\t\treturn createDirectories(FILE_STORE_PATH, dirPath);\n\t}\n\n\t/**\n\t * <pre>",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TestDecompress",
+      "kgHint": {
+        "summary": "EgovFileCmprs의 압축 해제(decmprsFile) 기능을 main으로 실행 검증하는 테스트 스텁.",
+        "tags": [
+          "test",
+          "file",
+          "compression"
+        ]
+      },
+      "line": 13,
+      "relPath": "src/test/java/egovframework/com/file/TestDecompress.java",
+      "slice": {
+        "endLine": 54,
+        "startLine": 3,
+        "text": "import java.io.File;\nimport java.io.IOException;\nimport java.nio.file.Files;\nimport java.nio.file.Path;\nimport java.nio.file.Paths;\n\nimport egovframework.com.utl.sim.service.EgovFileCmprs;\n\npublic class TestDecompress {\n\n\tpublic static void main(String[] args) {\n\t\t\n\t\t// 프로젝트 ROOT\n\t\t//String strDirPath = \"C:\\\\eGovFrameDev-4.0.0-64bit\\\\workspace\\\\test.simple_homepage\";\n\t    String strDirPath = \"\";\n\t\tstrDirPath = System.getProperty(\"user.dir\");\n\t    System.out.println(\"Working Directory = \" + strDirPath);\n\n\t    //Path relativePath = Paths.get(\"\");\n\t    //strDirPath = relativePath.toAbsolutePath().toString();\n\t    //System.out.println(\"Working Directory = \" + strDirPath);\n\n\t    String source = strDirPath + File.separator + \"src\" + File.separator + \"test\" + File.separator + \"resources\" + File.separator + \"egovframework\" + File.separator + \"file\" + File.separator + \"sample.zip\";\n\t    String target = strDirPath + File.separator + \"target\" + File.separator + \"result\";\n\t    String moved = target + File.separator + \"sample.zip.bak\";\n\t    System.out.println(\"source = \" + source);\n\t    System.out.println(\"target = \" + target);\n\t    boolean result = false;\n\t    try {\n\t    \tresult = EgovFileCmprs.decmprsFile(source, target);\n\t\t} catch (Exception e) {\n\t\t\te.printStackTrace();\n\t\t}\n\t    \n\t    System.out.println(\"result = \" + result);\n\n\t    // source => target 파일 이동\n\t    // sample.zip => sample.zip.bak\n\t    /*\n\t    try {\n\t        Path filePath = Paths.get(source);\n\t        Path filePathToMove = Paths.get(moved);\n\t        Files.move(filePath, filePathToMove);\n\t    } catch (IOException e) {\n\t        e.printStackTrace();\n\t    }\n\t    */\n\t\t\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "TestDecompress#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/file/TestDecompress.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/file/TestDecompress.java#main",
+      "line": 13,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/test/java/egovframework/com/file/TestDecompress.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "decompress",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/file/TestDecompress.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/test/java/egovframework/com/file/TestDecompress.java"
+    }
+  ]
+}

@@ -1,0 +1,2560 @@
+{
+  "schemaVersion": 1,
+  "key": "cop",
+  "domainId": "domain:cop",
+  "chunkIndex": 1,
+  "chunkTotal": 11,
+  "isHeaderChunk": false,
+  "domainHeader": {
+    "domainId": "domain:cop",
+    "key": "cop"
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/bbs/insertBlogMasterView.do",
+      "entryPoint": "EgovBBSMasterController#insertBlogMasterView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/insertBlogMasterView.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 249,
+        "snippet": "@RequestMapping(\"/cop/bbs/insertBlogMasterView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/insertGuestArticle.do",
+      "entryPoint": "EgovArticleController#insertGuestList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 796,
+        "snippet": "@RequestMapping(\"/cop/bbs/insertGuestArticle.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/previewBlogMainPage.do",
+      "entryPoint": "EgovArticleController#previewBlogMainPage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+        "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 1335,
+        "snippet": "@RequestMapping(\"/cop/bbs/previewBlogMainPage.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/previewBoardList.do",
+      "entryPoint": "EgovArticleController#previewBoardArticles",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/previewBoardList.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/previewBoardList.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/previewBoardList.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/previewBoardList.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 1251,
+        "snippet": "@RequestMapping(\"/cop/bbs/previewBoardList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/replyArticle.do",
+      "entryPoint": "EgovArticleController#replyBoardArticle",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 457,
+        "snippet": "@RequestMapping(\"/cop/bbs/replyArticle.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/replyArticleView.do",
+      "entryPoint": "EgovArticleController#addReplyBoardArticle",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 408,
+        "snippet": "@RequestMapping(\"/cop/bbs/replyArticleView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleBlogDetail.do",
+      "entryPoint": "EgovArticleController#selectArticleBlogDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 1071,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectArticleBlogDetail.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleBlogDetailCn.do",
+      "entryPoint": "EgovArticleController#selectArticleBlogDetailCn",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/cmt/service/CommentVO.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/cmt/service/EgovArticleCommentService.java",
+        "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 1131,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectArticleBlogDetailCn.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleBlogList.do",
+      "entryPoint": "EgovArticleController#selectArticleBlogList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+        "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 1026,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectArticleBlogList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleDetail.do",
+      "entryPoint": "EgovArticleController#selectArticleDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 220,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectArticleDetail.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleList.do",
+      "entryPoint": "EgovArticleController#selectArticleList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 148,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectArticleList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBBSListPortlet.do",
+      "entryPoint": "EgovBBSMasterController#selectBBSListPortlet",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectBBSListPortlet.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "step:ANY /cop/bbs/selectBBSListPortlet.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 480,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectBBSListPortlet.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBBSMasterDetail.do",
+      "entryPoint": "EgovBBSMasterController#selectBBSMasterDetail",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectBBSMasterDetail.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "step:ANY /cop/bbs/selectBBSMasterDetail.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/selectBBSMasterDetail.do:src/main/java/egovframework/com/cmm/EgovComponentChecker.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 333,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectBBSMasterDetail.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBBSMasterInfs.do",
+      "entryPoint": "EgovBBSMasterController#selectBBSMasterInfs",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectBBSMasterInfs.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "step:ANY /cop/bbs/selectBBSMasterInfs.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/selectBBSMasterInfs.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 168,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectBBSMasterInfs.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBlogList.do",
+      "entryPoint": "EgovBBSMasterController#selectBlogMasterList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 204,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectBlogList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBlogListManager.do",
+      "entryPoint": "EgovArticleController#selectBlogMasterList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 1211,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectBlogListManager.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBlogListPortlet.do",
+      "entryPoint": "EgovBBSMasterController#selectBlogListPortlet",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectBlogListPortlet.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "step:ANY /cop/bbs/selectBlogListPortlet.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 463,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectBlogListPortlet.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectChkBloguser.do",
+      "entryPoint": "EgovBBSMasterController#chkBlogUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+        "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 263,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectChkBloguser.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectGuestArticleList.do",
+      "entryPoint": "EgovArticleController#selectGuestArticleList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 731,
+        "snippet": "@RequestMapping(\"/cop/bbs/selectGuestArticleList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/updateArticle.do",
+      "entryPoint": "EgovArticleController#updateBoardArticle",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "stepIds": [
+        "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+        "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 600,
+        "snippet": "@RequestMapping(\"/cop/bbs/updateArticle.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /cop/bbs/insertBlogMasterView.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "layer": "api",
+      "className": "EgovBBSMasterController",
+      "kgSummary": "게시판 마스터(BBS 설정)와 블로그 마스터의 등록·수정·삭제·조회 및 포틀릿 목록을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 440,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteBBSMaster.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+      "layer": "unknown",
+      "className": "BlogVO",
+      "kgSummary": "블로그 조회·검색·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "relPath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "layer": "service",
+      "className": "EgovTemplateManageService",
+      "kgSummary": "게시판/블로그 템플릿 정보의 CRUD·미리보기·화이트리스트 조회를 선언하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "type-definition",
+        "template"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovTemplateManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBoardList.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBoardList.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBoardList.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBoardList.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticleView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetail.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/cmt/service/CommentVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/cmt/service/CommentVO.java",
+      "layer": "unknown",
+      "className": "CommentVO",
+      "kgSummary": "댓글 목록 조회와 페이징에 사용되는 VO로 Comment를 확장한 조회 파라미터 컨테이너.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "comment",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/cmt/service/CommentVO.java",
+        "line": 24,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/cmt/service/EgovArticleCommentService.java",
+      "relPath": "src/main/java/egovframework/com/cop/cmt/service/EgovArticleCommentService.java",
+      "layer": "service",
+      "className": "EgovArticleCommentService",
+      "kgSummary": "게시글 댓글의 조회·등록·수정·삭제 오퍼레이션을 선언하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "type-definition",
+        "comment"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/cmt/service/EgovArticleCommentService.java",
+        "line": 7,
+        "snippet": "public interface EgovArticleCommentService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+      "layer": "unknown",
+      "className": "BlogVO",
+      "kgSummary": "블로그 조회·검색·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleDetail.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSListPortlet.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "layer": "api",
+      "className": "EgovBBSMasterController",
+      "kgSummary": "게시판 마스터(BBS 설정)와 블로그 마스터의 등록·수정·삭제·조회 및 포틀릿 목록을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 440,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteBBSMaster.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSListPortlet.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSMasterDetail.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "layer": "api",
+      "className": "EgovBBSMasterController",
+      "kgSummary": "게시판 마스터(BBS 설정)와 블로그 마스터의 등록·수정·삭제·조회 및 포틀릿 목록을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 440,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteBBSMaster.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSMasterDetail.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSMasterDetail.do:src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+      "layer": "service",
+      "className": "EgovComponentChecker",
+      "kgSummary": "Spring ApplicationContext를 주입받아 특정 컴포넌트(bean)의 존재 여부를 조회하는 정적 유틸리티. 선택적 기능 활성화 판단에 사용된다.",
+      "kgTags": [
+        "utility",
+        "spring",
+        "component-check",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+        "line": 29,
+        "snippet": "@Service(\"egovUtil\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSMasterInfs.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "layer": "api",
+      "className": "EgovBBSMasterController",
+      "kgSummary": "게시판 마스터(BBS 설정)와 블로그 마스터의 등록·수정·삭제·조회 및 포틀릿 목록을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 440,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteBBSMaster.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSMasterInfs.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSMasterInfs.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "layer": "api",
+      "className": "EgovBBSMasterController",
+      "kgSummary": "게시판 마스터(BBS 설정)와 블로그 마스터의 등록·수정·삭제·조회 및 포틀릿 목록을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 440,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteBBSMaster.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogListManager.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogListPortlet.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "layer": "api",
+      "className": "EgovBBSMasterController",
+      "kgSummary": "게시판 마스터(BBS 설정)와 블로그 마스터의 등록·수정·삭제·조회 및 포틀릿 목록을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 440,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteBBSMaster.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBlogListPortlet.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "layer": "api",
+      "className": "EgovBBSMasterController",
+      "kgSummary": "게시판 마스터(BBS 설정)와 블로그 마스터의 등록·수정·삭제·조회 및 포틀릿 목록을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+        "line": 440,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteBBSMaster.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+      "layer": "unknown",
+      "className": "BlogVO",
+      "kgSummary": "블로그 조회·검색·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectChkBloguser.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectGuestArticleList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "layer": "api",
+      "className": "EgovArticleController",
+      "kgSummary": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 Spring MVC 컨트롤러로, 이 배치에서 가장 큰 게시판 프론트 진입점이다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "bbs",
+        "controller",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+        "line": 674,
+        "snippet": "@RequestMapping(\"/cop/bbs/deleteArticle.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "layer": "service",
+      "className": "EgovArticleService",
+      "kgSummary": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+        "line": 18,
+        "snippet": "public interface EgovArticleService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+      "layer": "unknown",
+      "className": "EgovXssChecker",
+      "kgSummary": "공통 XSS 방지 검증 유틸(EgovXssChecker). 요청 파라미터의 위험 스크립트 패턴을 검사한다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+        "line": 28,
+        "snippet": "public class EgovXssChecker {"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "layer": "unknown",
+      "className": "BoardVO",
+      "kgSummary": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+        "line": 29,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "layer": "unknown",
+      "className": "BoardMasterVO",
+      "kgSummary": "게시판 마스터 조회·페이징 조건을 담는 VO.",
+      "kgTags": [
+        "type-definition",
+        "vo",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "relPath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "layer": "service",
+      "className": "EgovBBSMasterService",
+      "kgSummary": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "contract"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+        "line": 20,
+        "snippet": "public interface EgovBBSMasterService {"
+      }
+    }
+  ]
+}

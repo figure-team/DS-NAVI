@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "key": "white",
+  "domainId": "domain:white",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:white",
+    "key": "white",
+    "kgHints": [
+      {
+        "relPath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+        "className": "TestWhiteListTag",
+        "summary": "허용 태그(whiteList) 기반으로 입력 문자열을 안전하게 정제하는 알고리즘을 main으로 실행 검증하는 XSS 필터 실험용 테스트다.",
+        "tags": [
+          "test",
+          "security",
+          "xss-filter",
+          "sanitization"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+          "line": 23,
+          "snippet": "public static void main(String[] args) {"
+        }
+      },
+      {
+        "relPath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+        "className": "TestWhiteListTagV2",
+        "summary": "TestWhiteListTag의 개선판으로 태그 전방·후방 탐색(searchTagForward/Backward)을 분리해 화이트리스트 정제를 검증하는 실험용 테스트다.",
+        "tags": [
+          "test",
+          "security",
+          "xss-filter",
+          "sanitization"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+          "line": 23,
+          "snippet": "public static void main(String[] args) {"
+        }
+      }
+    ],
+    "cross": [],
+    "flowCount": 2,
+    "stepCount": 2
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java#main",
+      "entryPoint": "TestWhiteListTag#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java#main:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+        "line": 23,
+        "snippet": "public static void main(String[] args) {"
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java#main",
+      "entryPoint": "TestWhiteListTagV2#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java#main:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+        "line": 23,
+        "snippet": "public static void main(String[] args) {"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java#main:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+      "relPath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+      "layer": "api",
+      "className": "TestWhiteListTag",
+      "kgSummary": "허용 태그(whiteList) 기반으로 입력 문자열을 안전하게 정제하는 알고리즘을 main으로 실행 검증하는 XSS 필터 실험용 테스트다.",
+      "kgTags": [
+        "test",
+        "security",
+        "xss-filter",
+        "sanitization"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+        "line": 23,
+        "snippet": "public static void main(String[] args) {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java#main:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+      "relPath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+      "layer": "api",
+      "className": "TestWhiteListTagV2",
+      "kgSummary": "TestWhiteListTag의 개선판으로 태그 전방·후방 탐색(searchTagForward/Backward)을 분리해 화이트리스트 정제를 검증하는 실험용 테스트다.",
+      "kgTags": [
+        "test",
+        "security",
+        "xss-filter",
+        "sanitization"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+        "line": 23,
+        "snippet": "public static void main(String[] args) {"
+      }
+    }
+  ]
+}

@@ -1,0 +1,305 @@
+{
+  "key": "cop",
+  "chunkIndex": 1,
+  "isHeaderChunk": false,
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/bbs/insertBlogMasterView.do",
+      "name": "블로그 마스터 등록 화면 진입",
+      "summary": {
+        "text": "블로그 마스터(게시판 설정) 등록을 위한 입력 화면으로 진입하는 요청을 처리한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java","line":249,"snippet":"@RequestMapping(\"/cop/bbs/insertBlogMasterView.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/insertGuestArticle.do",
+      "name": "방명록 게시글 등록",
+      "summary": {
+        "text": "비회원(방명록) 게시글을 등록하고 인증 정보와 게시판 마스터 정보를 조회하여 처리한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":796,"snippet":"@RequestMapping(\"/cop/bbs/insertGuestArticle.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/previewBlogMainPage.do",
+      "name": "블로그 메인 페이지 미리보기",
+      "summary": {
+        "text": "블로그 템플릿을 적용한 블로그 메인 화면을 미리보기 형태로 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":1335,"snippet":"@RequestMapping(\"/cop/bbs/previewBlogMainPage.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/previewBoardList.do",
+      "name": "게시판 목록 미리보기",
+      "summary": {
+        "text": "게시판 마스터 설정에 따른 게시글 목록을 미리보기 형태로 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":1251,"snippet":"@RequestMapping(\"/cop/bbs/previewBoardList.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/replyArticle.do",
+      "name": "게시글 답글 등록",
+      "summary": {
+        "text": "기존 게시글에 대한 답글을 등록 처리한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":457,"snippet":"@RequestMapping(\"/cop/bbs/replyArticle.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/replyArticleView.do",
+      "name": "게시글 답글 작성 화면 진입",
+      "summary": {
+        "text": "게시글에 대한 답글 작성 화면으로 진입하는 요청을 처리한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":408,"snippet":"@RequestMapping(\"/cop/bbs/replyArticleView.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleBlogDetail.do",
+      "name": "블로그 게시글 상세 조회",
+      "summary": {
+        "text": "블로그 형태 게시글의 상세 내용을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":1071,"snippet":"@RequestMapping(\"/cop/bbs/selectArticleBlogDetail.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleBlogDetailCn.do",
+      "name": "블로그 게시글 상세 및 댓글 조회",
+      "summary": {
+        "text": "블로그 게시글 상세 내용과 함께 해당 게시글의 댓글 목록을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":1131,"snippet":"@RequestMapping(\"/cop/bbs/selectArticleBlogDetailCn.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleBlogList.do",
+      "name": "블로그 게시글 목록 조회",
+      "summary": {
+        "text": "블로그 형태 게시글의 목록을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":1026,"snippet":"@RequestMapping(\"/cop/bbs/selectArticleBlogList.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleDetail.do",
+      "name": "게시글 상세 조회",
+      "summary": {
+        "text": "일반 게시판 게시글의 상세 내용을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":220,"snippet":"@RequestMapping(\"/cop/bbs/selectArticleDetail.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectArticleList.do",
+      "name": "게시글 목록 조회",
+      "summary": {
+        "text": "일반 게시판의 게시글 목록을 조건에 따라 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":148,"snippet":"@RequestMapping(\"/cop/bbs/selectArticleList.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBBSListPortlet.do",
+      "name": "게시판 포틀릿 목록 조회",
+      "summary": {
+        "text": "포틀릿 화면에 노출할 게시판 마스터 목록을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java","line":480,"snippet":"@RequestMapping(\"/cop/bbs/selectBBSListPortlet.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBBSMasterDetail.do",
+      "name": "게시판 마스터 상세 조회",
+      "summary": {
+        "text": "게시판 마스터(설정) 상세 정보를 조회하며 관련 컴포넌트 활성화 여부도 확인한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java","line":333,"snippet":"@RequestMapping(\"/cop/bbs/selectBBSMasterDetail.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBBSMasterInfs.do",
+      "name": "게시판 마스터 목록 조회",
+      "summary": {
+        "text": "게시판 마스터 정보 목록을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java","line":168,"snippet":"@RequestMapping(\"/cop/bbs/selectBBSMasterInfs.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBlogList.do",
+      "name": "블로그 마스터 목록 조회",
+      "summary": {
+        "text": "블로그 마스터 목록을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java","line":204,"snippet":"@RequestMapping(\"/cop/bbs/selectBlogList.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBlogListManager.do",
+      "name": "블로그 관리자 목록 조회",
+      "summary": {
+        "text": "관리자 화면에서 블로그 마스터 목록을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":1211,"snippet":"@RequestMapping(\"/cop/bbs/selectBlogListManager.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectBlogListPortlet.do",
+      "name": "블로그 포틀릿 목록 조회",
+      "summary": {
+        "text": "포틀릿 화면에 노출할 블로그 마스터 목록을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java","line":463,"snippet":"@RequestMapping(\"/cop/bbs/selectBlogListPortlet.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectChkBloguser.do",
+      "name": "블로그 사용자 여부 확인",
+      "summary": {
+        "text": "요청 사용자가 해당 블로그의 소유자인지 여부를 확인한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java","line":263,"snippet":"@RequestMapping(\"/cop/bbs/selectChkBloguser.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/selectGuestArticleList.do",
+      "name": "방명록 게시글 목록 조회",
+      "summary": {
+        "text": "비회원(방명록) 게시글 목록을 조회한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":731,"snippet":"@RequestMapping(\"/cop/bbs/selectGuestArticleList.do\")"}]
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/bbs/updateArticle.do",
+      "name": "게시글 수정",
+      "summary": {
+        "text": "기존 게시글 내용을 수정하며 XSS 검증을 거쳐 처리한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":600,"snippet":"@RequestMapping(\"/cop/bbs/updateArticle.do\")"}]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /cop/bbs/insertBlogMasterView.do:src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java",
+      "name": "게시판/블로그 마스터 관리 컨트롤러",
+      "summary": {
+        "text": "게시판 마스터(BBS 설정)와 블로그 마스터의 등록·수정·삭제·조회 및 포틀릿 목록을 처리하는 Spring MVC 컨트롤러이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovBBSMasterController.java","line":440,"snippet":"@RequestMapping(\"/cop/bbs/deleteBBSMaster.do\")"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java",
+      "name": "게시글 관리 컨트롤러",
+      "summary": {
+        "text": "BBS 게시글의 목록·상세·등록·답글·수정·삭제와 방명록/블로그/미리보기까지 처리하는 게시판 프론트 진입점 컨트롤러이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/web/EgovArticleController.java","line":674,"snippet":"@RequestMapping(\"/cop/bbs/deleteArticle.do\")"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 조회 헬퍼",
+      "summary": {
+        "text": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java","line":25,"snippet":"public class EgovUserDetailsHelper {"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardVO.java",
+      "name": "게시글 조회 조건 VO",
+      "summary": {
+        "text": "게시글 조회·검색·페이징 조건 및 파생 속성을 담는 VO이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/service/BoardVO.java","line":29,"snippet":"@SuppressWarnings(\"serial\")"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 사용자 정보 VO",
+      "summary": {
+        "text": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO로 공통 인증 전반에서 사용된다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cmm/LoginVO.java","line":33,"snippet":"public class LoginVO implements Serializable{"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 유틸리티",
+      "summary": {
+        "text": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java","line":43,"snippet":"public class EgovStringUtil {"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java",
+      "name": "게시판 마스터 조회 조건 VO",
+      "summary": {
+        "text": "게시판 마스터 조회·페이징 조건을 담는 VO이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/service/BoardMasterVO.java","line":27,"snippet":"@SuppressWarnings(\"serial\")"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java",
+      "name": "게시판 마스터 서비스 인터페이스",
+      "summary": {
+        "text": "게시판 마스터 및 블로그 마스터 관리 오퍼레이션을 정의하는 서비스 인터페이스이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/service/EgovBBSMasterService.java","line":20,"snippet":"public interface EgovBBSMasterService {"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/insertGuestArticle.do:src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java",
+      "name": "게시글 서비스 인터페이스",
+      "summary": {
+        "text": "게시글 등록·수정·삭제·목록/상세 조회 오퍼레이션을 정의하는 서비스 인터페이스이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/service/EgovArticleService.java","line":18,"snippet":"public interface EgovArticleService {"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/bbs/service/BlogVO.java",
+      "name": "블로그 조회 조건 VO",
+      "summary": {
+        "text": "블로그 조회·검색·페이징 조건을 담는 VO이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/bbs/service/BlogVO.java","line":28,"snippet":"@SuppressWarnings(\"serial\")"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "공통 웹 보안 필터링 유틸리티",
+      "summary": {
+        "text": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링을 제공하는 static 유틸리티이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cmm/EgovWebUtil.java","line":25,"snippet":"public class EgovWebUtil {"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/previewBlogMainPage.do:src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java",
+      "name": "템플릿 관리 서비스 인터페이스",
+      "summary": {
+        "text": "게시판/블로그 템플릿 정보의 CRUD·미리보기·화이트리스트 조회를 선언하는 서비스 인터페이스이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/tpl/service/EgovTemplateManageService.java","line":24,"snippet":"public interface EgovTemplateManageService {"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/replyArticle.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "공통 사용자 상세 서비스 인터페이스",
+      "summary": {
+        "text": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 인터페이스이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java","line":5,"snippet":"public interface EgovUserDetailsService {"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/cmt/service/CommentVO.java",
+      "name": "댓글 조회 조건 VO",
+      "summary": {
+        "text": "댓글 목록 조회와 페이징에 사용되는 VO로 Comment를 확장한 조회 파라미터 컨테이너이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/cmt/service/CommentVO.java","line":24,"snippet":"@SuppressWarnings(\"serial\")"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectArticleBlogDetailCn.do:src/main/java/egovframework/com/cop/cmt/service/EgovArticleCommentService.java",
+      "name": "게시글 댓글 서비스 인터페이스",
+      "summary": {
+        "text": "게시글 댓글의 조회·등록·수정·삭제 오퍼레이션을 선언하는 서비스 인터페이스이다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cop/cmt/service/EgovArticleCommentService.java","line":7,"snippet":"public interface EgovArticleCommentService {"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/selectBBSMasterDetail.do:src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+      "name": "컴포넌트 활성화 확인 유틸리티",
+      "summary": {
+        "text": "Spring ApplicationContext를 주입받아 특정 컴포넌트(bean)의 존재 여부를 조회하는 정적 유틸리티로 선택적 기능 활성화 판단에 사용된다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cmm/EgovComponentChecker.java","line":29,"snippet":"@Service(\"egovUtil\")"}]
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/bbs/updateArticle.do:src/main/java/egovframework/com/cmm/util/EgovXssChecker.java",
+      "name": "XSS 방지 검증 유틸리티",
+      "summary": {
+        "text": "공통 XSS 방지 검증 유틸(EgovXssChecker)로 요청 파라미터의 위험 스크립트 패턴을 검사한다.",
+        "citations": [{"filePath":"src/main/java/egovframework/com/cmm/util/EgovXssChecker.java","line":28,"snippet":"public class EgovXssChecker {"}]
+      }
+    }
+  ]
+}

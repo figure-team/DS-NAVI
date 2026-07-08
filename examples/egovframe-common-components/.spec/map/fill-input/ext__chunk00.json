@@ -1,0 +1,1826 @@
+{
+  "schemaVersion": 1,
+  "key": "ext",
+  "domainId": "domain:ext",
+  "chunkIndex": 0,
+  "chunkTotal": 2,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:ext",
+    "key": "ext",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "className": "EgovMessageSource",
+        "summary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+        "tags": [
+          "service",
+          "i18n",
+          "message-source",
+          "spring",
+          "utility"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "className": "EgovWebUtil",
+        "summary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+        "tags": [
+          "utility",
+          "security",
+          "validation",
+          "xss",
+          "sanitization",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "className": "EgovProperties",
+        "summary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+        "tags": [
+          "utility",
+          "config",
+          "properties"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+          "line": 49,
+          "snippet": "public class EgovProperties {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+        "className": "EgovCaptchaController",
+        "summary": "CAPTCHA 이미지 생성 및 입력값 검증 요청을 처리하는 Spring MVC controller로, 봇 방지 기능을 제공한다.",
+        "tags": [
+          "controller",
+          "spring-mvc",
+          "captcha",
+          "security",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+          "line": 69,
+          "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "className": "EgovOrgManageLdapService",
+        "summary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+        "tags": [
+          "service-interface",
+          "ldap",
+          "조직관리",
+          "type-definition"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+          "line": 44,
+          "snippet": "public interface EgovOrgManageLdapService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "className": "ObjectMapper",
+        "summary": "Spring LDAP DirContextAdapter를 리플렉션으로 순회하며 대상 VO에 속성을 매핑하는 ContextMapper 구현이다.",
+        "tags": [
+          "ldap",
+          "mapper",
+          "reflection",
+          "serialization"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+          "line": 57,
+          "snippet": "public class ObjectMapper<T> implements ContextMapper<Object> {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "className": "EgovOrgManageLdapController",
+        "summary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+        "tags": [
+          "controller",
+          "spring-mvc",
+          "ldap",
+          "조직관리"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+          "line": 293,
+          "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+        "className": "EgovWebSocketMessengerController",
+        "summary": "WebSocket 기반 실시간 메신저 진입 화면 및 세션 처리를 담당하는 Spring MVC controller.",
+        "tags": [
+          "controller",
+          "spring-mvc",
+          "websocket",
+          "messenger"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+          "line": 75,
+          "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "className": "OAuthLogin",
+        "summary": "ScribeJava OAuth 서비스로 인증 URL 생성·액세스 토큰 발급·프로필 조회를 수행하고, 제공자별 JSON 응답을 OAuthUniversalUser로 파싱하는 OAuth 로그인 처리기.",
+        "tags": [
+          "oauth",
+          "service",
+          "authentication",
+          "serialization"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+          "line": 33,
+          "snippet": "public class OAuthLogin {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+        "className": "OAuthUniversalUser",
+        "summary": "OAuth 제공자 응답을 표준화해 담는 사용자 VO. uid·email·userId·userName·nickName·serviceName·loginIp·lastLogin 필드와 getter/setter를 제공한다.",
+        "tags": [
+          "oauth",
+          "data-model",
+          "vo"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+          "line": 5,
+          "snippet": "public class OAuthUniversalUser {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "className": "OAuthVO",
+        "summary": "OAuth 제공자별 클라이언트 ID/시크릿·리다이렉트 URL·scope·프로필 URL과 origin에 맞는 ScribeJava API20 인스턴스를 담는 설정 VO.",
+        "tags": [
+          "oauth",
+          "data-model",
+          "vo",
+          "config"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+          "line": 31,
+          "snippet": "public class OAuthVO implements OAuthConfig {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "className": "EgovSignupController",
+        "summary": "네이버·구글·카카오 OAuth 로그인 진입 화면과 콜백을 처리하는 Spring MVC 컨트롤러. 인증 URL을 모델에 전달하고 콜백에서 사용자 프로필을 조회한다.",
+        "tags": [
+          "oauth",
+          "api-handler",
+          "controller",
+          "spring-mvc"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+          "line": 89,
+          "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "className": "EgovStringUtil",
+        "summary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+        "tags": [
+          "utility",
+          "string",
+          "helper",
+          "static",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+          "line": 43,
+          "snippet": "public class EgovStringUtil {"
+        }
+      }
+    ],
+    "cross": [
+      {
+        "to": "cop",
+        "weight": 4,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+            "target": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+              "line": 2,
+              "snippet": "* eGovFrame LDAP조직도관리"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 2,
+              "snippet": "* eGovFrame LDAP조직도관리"
+            }
+          },
+          {
+            "kind": "injection",
+            "line": 50,
+            "source": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+              "line": 50,
+              "snippet": "@Resource(name=\"egovMessageSource\")"
+            }
+          }
+        ]
+      }
+    ],
+    "flowCount": 22,
+    "stepCount": 79
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /cop/msg/websocketMessengePopup.do",
+      "entryPoint": "EgovWebSocketMessengerController#websocketMessengePopup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "stepIds": [
+        "step:ANY /cop/msg/websocketMessengePopup.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+        "line": 75,
+        "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/msg/websocketMessengerMain.do",
+      "entryPoint": "EgovWebSocketMessengerController#websocketMessengerMain",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "stepIds": [
+        "step:ANY /cop/msg/websocketMessengerMain.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+        "line": 61,
+        "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerMain.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /cop/msg/websocketMessengerView.do",
+      "entryPoint": "EgovWebSocketMessengerController#websocketMessengerView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "stepIds": [
+        "step:ANY /cop/msg/websocketMessengerView.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+        "line": 49,
+        "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengerView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ext/captcha/input.do",
+      "entryPoint": "EgovCaptchaController#input",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "stepIds": [
+        "step:ANY /ext/captcha/input.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ext/ldapumt/dpt/selectDeptManageOrgChartView.do",
+      "entryPoint": "EgovOrgManageLdapController#selectDeptManageOrgChartView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:ANY /ext/ldapumt/dpt/selectDeptManageOrgChartView.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do",
+      "entryPoint": "EgovOrgManageLdapController#selectDeptManageTreeView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 280,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageTreeView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:GET /auth/{oauthService}/callback",
+      "entryPoint": "EgovSignupController#oauthLoginCallback",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "stepIds": [
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      }
+    },
+    {
+      "flowId": "flow:GET /ext/captcha/generate.do",
+      "entryPoint": "EgovCaptchaController#generate",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "stepIds": [
+        "step:GET /ext/captcha/generate.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+        "line": 107,
+        "snippet": "@GetMapping(\"/ext/captcha/generate.do\")"
+      }
+    },
+    {
+      "flowId": "flow:GET /uat/uia/oauthLoginUsr",
+      "entryPoint": "EgovSignupController#login",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "stepIds": [
+        "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 70,
+        "snippet": "@RequestMapping(value = \"/uat/uia/oauthLoginUsr\", method = RequestMethod.GET)"
+      }
+    },
+    {
+      "flowId": "flow:POST /auth/{oauthService}/callback",
+      "entryPoint": "EgovSignupController#oauthLoginCallback",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "stepIds": [
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/captcha/result.do",
+      "entryPoint": "EgovCaptchaController#result",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "stepIds": [
+        "step:POST /ext/captcha/result.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+        "line": 83,
+        "snippet": "@PostMapping(\"/ext/captcha/result.do\")"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/createNode.do",
+      "entryPoint": "EgovOrgManageLdapController#createDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 112,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/createNode.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/createUserNode.do",
+      "entryPoint": "EgovOrgManageLdapController#createUserManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 134,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/createUserNode.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/deleteNode.do",
+      "entryPoint": "EgovOrgManageLdapController#removeDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 156,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/deleteNode.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/getDeptManage.do",
+      "entryPoint": "EgovOrgManageLdapController#selectDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 77,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getDeptManage.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/getDeptManageSublist.do",
+      "entryPoint": "EgovOrgManageLdapController#selectDeptManageSublist",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 60,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getDeptManageSublist.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/getUserManage.do",
+      "entryPoint": "EgovOrgManageLdapController#selectUserManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 94,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/getUserManage.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/modifyDeptManage.do",
+      "entryPoint": "EgovOrgManageLdapController#modifyDeptManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 242,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/modifyDeptManage.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/modifyUserManage.do",
+      "entryPoint": "EgovOrgManageLdapController#modifyUserManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 262,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/modifyUserManage.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/moveOrgNode.do",
+      "entryPoint": "EgovOrgManageLdapController#moveOrgManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "stepIds": [
+        "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 221,
+        "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/moveOrgNode.do\", method = RequestMethod.POST)"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /cop/msg/websocketMessengePopup.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "relPath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "layer": "api",
+      "className": "EgovWebSocketMessengerController",
+      "kgSummary": "WebSocket 기반 실시간 메신저 진입 화면 및 세션 처리를 담당하는 Spring MVC controller.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "websocket",
+        "messenger"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+        "line": 75,
+        "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/msg/websocketMessengerMain.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "relPath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "layer": "api",
+      "className": "EgovWebSocketMessengerController",
+      "kgSummary": "WebSocket 기반 실시간 메신저 진입 화면 및 세션 처리를 담당하는 Spring MVC controller.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "websocket",
+        "messenger"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+        "line": 75,
+        "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /cop/msg/websocketMessengerView.do:src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "relPath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+      "layer": "api",
+      "className": "EgovWebSocketMessengerController",
+      "kgSummary": "WebSocket 기반 실시간 메신저 진입 화면 및 세션 처리를 담당하는 Spring MVC controller.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "websocket",
+        "messenger"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/msg/web/EgovWebSocketMessengerController.java",
+        "line": 75,
+        "snippet": "@RequestMapping(value = \"/cop/msg/websocketMessengePopup.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ext/captcha/input.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "relPath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "layer": "api",
+      "className": "EgovCaptchaController",
+      "kgSummary": "CAPTCHA 이미지 생성 및 입력값 검증 요청을 처리하는 Spring MVC controller로, 봇 방지 기능을 제공한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "captcha",
+        "security",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageOrgChartView.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /ext/ldapumt/dpt/selectDeptManageTreeView.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "layer": "api",
+      "className": "EgovSignupController",
+      "kgSummary": "네이버·구글·카카오 OAuth 로그인 진입 화면과 콜백을 처리하는 Spring MVC 컨트롤러. 인증 URL을 모델에 전달하고 콜백에서 사용자 프로필을 조회한다.",
+      "kgTags": [
+        "oauth",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      }
+    },
+    {
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "layer": "unknown",
+      "className": "OAuthLogin",
+      "kgSummary": "ScribeJava OAuth 서비스로 인증 URL 생성·액세스 토큰 발급·프로필 조회를 수행하고, 제공자별 JSON 응답을 OAuthUniversalUser로 파싱하는 OAuth 로그인 처리기.",
+      "kgTags": [
+        "oauth",
+        "service",
+        "authentication",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "line": 33,
+        "snippet": "public class OAuthLogin {"
+      }
+    },
+    {
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "layer": "service",
+      "className": "OAuthVO",
+      "kgSummary": "OAuth 제공자별 클라이언트 ID/시크릿·리다이렉트 URL·scope·프로필 URL과 origin에 맞는 ScribeJava API20 인스턴스를 담는 설정 VO.",
+      "kgTags": [
+        "oauth",
+        "data-model",
+        "vo",
+        "config"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "line": 31,
+        "snippet": "public class OAuthVO implements OAuthConfig {"
+      }
+    },
+    {
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "layer": "dao",
+      "className": "ObjectMapper",
+      "kgSummary": "Spring LDAP DirContextAdapter를 리플렉션으로 순회하며 대상 VO에 속성을 매핑하는 ContextMapper 구현이다.",
+      "kgTags": [
+        "ldap",
+        "mapper",
+        "reflection",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "line": 57,
+        "snippet": "public class ObjectMapper<T> implements ContextMapper<Object> {"
+      }
+    },
+    {
+      "stepId": "step:GET /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+      "layer": "unknown",
+      "className": "OAuthUniversalUser",
+      "kgSummary": "OAuth 제공자 응답을 표준화해 담는 사용자 VO. uid·email·userId·userName·nickName·serviceName·loginIp·lastLogin 필드와 getter/setter를 제공한다.",
+      "kgTags": [
+        "oauth",
+        "data-model",
+        "vo"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+        "line": 5,
+        "snippet": "public class OAuthUniversalUser {"
+      }
+    },
+    {
+      "stepId": "step:GET /ext/captcha/generate.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "relPath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "layer": "api",
+      "className": "EgovCaptchaController",
+      "kgSummary": "CAPTCHA 이미지 생성 및 입력값 검증 요청을 처리하는 Spring MVC controller로, 봇 방지 기능을 제공한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "captcha",
+        "security",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+      }
+    },
+    {
+      "stepId": "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "layer": "api",
+      "className": "EgovSignupController",
+      "kgSummary": "네이버·구글·카카오 OAuth 로그인 진입 화면과 콜백을 처리하는 Spring MVC 컨트롤러. 인증 URL을 모델에 전달하고 콜백에서 사용자 프로필을 조회한다.",
+      "kgTags": [
+        "oauth",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      }
+    },
+    {
+      "stepId": "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "layer": "unknown",
+      "className": "OAuthLogin",
+      "kgSummary": "ScribeJava OAuth 서비스로 인증 URL 생성·액세스 토큰 발급·프로필 조회를 수행하고, 제공자별 JSON 응답을 OAuthUniversalUser로 파싱하는 OAuth 로그인 처리기.",
+      "kgTags": [
+        "oauth",
+        "service",
+        "authentication",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "line": 33,
+        "snippet": "public class OAuthLogin {"
+      }
+    },
+    {
+      "stepId": "step:GET /uat/uia/oauthLoginUsr:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "layer": "service",
+      "className": "OAuthVO",
+      "kgSummary": "OAuth 제공자별 클라이언트 ID/시크릿·리다이렉트 URL·scope·프로필 URL과 origin에 맞는 ScribeJava API20 인스턴스를 담는 설정 VO.",
+      "kgTags": [
+        "oauth",
+        "data-model",
+        "vo",
+        "config"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "line": 31,
+        "snippet": "public class OAuthVO implements OAuthConfig {"
+      }
+    },
+    {
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+      "layer": "api",
+      "className": "EgovSignupController",
+      "kgSummary": "네이버·구글·카카오 OAuth 로그인 진입 화면과 콜백을 처리하는 Spring MVC 컨트롤러. 인증 URL을 모델에 전달하고 콜백에서 사용자 프로필을 조회한다.",
+      "kgTags": [
+        "oauth",
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/web/EgovSignupController.java",
+        "line": 89,
+        "snippet": "@RequestMapping(value = \"/auth/{oauthService}/callback\", method = { RequestMethod.GET, RequestMethod.POST })"
+      }
+    },
+    {
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+      "layer": "unknown",
+      "className": "OAuthLogin",
+      "kgSummary": "ScribeJava OAuth 서비스로 인증 URL 생성·액세스 토큰 발급·프로필 조회를 수행하고, 제공자별 JSON 응답을 OAuthUniversalUser로 파싱하는 OAuth 로그인 처리기.",
+      "kgTags": [
+        "oauth",
+        "service",
+        "authentication",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthLogin.java",
+        "line": 33,
+        "snippet": "public class OAuthLogin {"
+      }
+    },
+    {
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+      "layer": "service",
+      "className": "OAuthVO",
+      "kgSummary": "OAuth 제공자별 클라이언트 ID/시크릿·리다이렉트 URL·scope·프로필 URL과 origin에 맞는 ScribeJava API20 인스턴스를 담는 설정 VO.",
+      "kgTags": [
+        "oauth",
+        "data-model",
+        "vo",
+        "config"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthVO.java",
+        "line": 31,
+        "snippet": "public class OAuthVO implements OAuthConfig {"
+      }
+    },
+    {
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+      "layer": "dao",
+      "className": "ObjectMapper",
+      "kgSummary": "Spring LDAP DirContextAdapter를 리플렉션으로 순회하며 대상 VO에 속성을 매핑하는 ContextMapper 구현이다.",
+      "kgTags": [
+        "ldap",
+        "mapper",
+        "reflection",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/impl/ObjectMapper.java",
+        "line": 57,
+        "snippet": "public class ObjectMapper<T> implements ContextMapper<Object> {"
+      }
+    },
+    {
+      "stepId": "step:POST /auth/{oauthService}/callback:src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+      "relPath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+      "layer": "unknown",
+      "className": "OAuthUniversalUser",
+      "kgSummary": "OAuth 제공자 응답을 표준화해 담는 사용자 VO. uid·email·userId·userName·nickName·serviceName·loginIp·lastLogin 필드와 getter/setter를 제공한다.",
+      "kgTags": [
+        "oauth",
+        "data-model",
+        "vo"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/oauth/service/OAuthUniversalUser.java",
+        "line": 5,
+        "snippet": "public class OAuthUniversalUser {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/captcha/result.do:src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "relPath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+      "layer": "api",
+      "className": "EgovCaptchaController",
+      "kgSummary": "CAPTCHA 이미지 생성 및 입력값 검증 요청을 처리하는 Spring MVC controller로, 봇 방지 기능을 제공한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "captcha",
+        "security",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/captcha/EgovCaptchaController.java",
+        "line": 69,
+        "snippet": "@RequestMapping(\"/ext/captcha/input.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/createUserNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/deleteNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getDeptManageSublist.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/getUserManage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyDeptManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/modifyUserManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "layer": "api",
+      "className": "EgovOrgManageLdapController",
+      "kgSummary": "LDAP 조직/사용자 관리 화면을 담당하는 Spring MVC 컨트롤러로, 트리/조직도 뷰와 부서·사용자 CRUD 및 DN 검증을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "ldap",
+        "조직관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "relPath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "layer": "service",
+      "className": "EgovOrgManageLdapService",
+      "kgSummary": "LDAP 기반 조직/사용자 관리 기능을 정의하는 service 인터페이스로, 부서·사용자 조회/등록/이동/이름변경 계약을 선언한다.",
+      "kgTags": [
+        "service-interface",
+        "ldap",
+        "조직관리",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+        "line": 44,
+        "snippet": "public interface EgovOrgManageLdapService {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/moveOrgNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    }
+  ]
+}

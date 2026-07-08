@@ -1,0 +1,1622 @@
+{
+  "schemaVersion": 1,
+  "key": "utl",
+  "domainId": "domain:utl",
+  "chunkIndex": 4,
+  "chunkTotal": 6,
+  "isHeaderChunk": false,
+  "domainHeader": {
+    "domainId": "domain:utl",
+    "key": "utl"
+  },
+  "flows": [
+    {
+      "flowId": "flow:GET /utl/jso/EgovUtlJsonMultiInquire.do",
+      "entryPoint": "EgovUtlJsonController#selectUtlJsonMultiInquire",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "stepIds": [
+        "step:GET /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 87,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "flowId": "flow:GET /utl/web/imageSrc.do",
+      "entryPoint": "EgovWebEditorImageController#download",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "stepIds": [
+        "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+        "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 161,
+        "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "flowId": "flow:GET /utl/wed/insertImage.do",
+      "entryPoint": "EgovWebEditorImageController#goInsertImage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "stepIds": [
+        "step:GET /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 82,
+        "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.GET)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/jso/EgovUtlJsonInquire.do",
+      "entryPoint": "EgovUtlJsonController#selectUtlJsonInquirePost",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "stepIds": [
+        "step:POST /utl/jso/EgovUtlJsonInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 64,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/jso/EgovUtlJsonMultiInquire.do",
+      "entryPoint": "EgovUtlJsonController#selectUtlJsonMultiInquirePost",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "stepIds": [
+        "step:POST /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonMultiInquire.do\",method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/pxy/addProxySvc.do",
+      "entryPoint": "EgovProxySvcController#insertProxySvc",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+        "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 157,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addProxySvc.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/pxy/addViewProxySvc.do",
+      "entryPoint": "EgovProxySvcController#insertViewProxySvc",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 141,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/addViewProxySvc.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/pxy/removeProxySvc.do",
+      "entryPoint": "EgovProxySvcController#deleteProxySvc",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 237,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/removeProxySvc.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/pxy/updtProxySvc.do",
+      "entryPoint": "EgovProxySvcController#updateProxySvc",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+        "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 206,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/updtProxySvc.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/ssy/addSynchrnServer.do",
+      "entryPoint": "EgovSynchrnServerController#insertSynchrnServer",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "stepIds": [
+        "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+        "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 240,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/addSynchrnServer.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/ssy/addViewSynchrnServer.do",
+      "entryPoint": "EgovSynchrnServerController#insertViewSynchrnServer",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "stepIds": [
+        "step:POST /utl/sys/ssy/addViewSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 228,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/addViewSynchrnServer.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/ssy/deleteFile.do",
+      "entryPoint": "EgovSynchrnServerController#deleteFile",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "stepIds": [
+        "step:POST /utl/sys/ssy/deleteFile.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "step:POST /utl/sys/ssy/deleteFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+        "step:POST /utl/sys/ssy/deleteFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 397,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/deleteFile.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/ssy/getSynchrnServerFile.do",
+      "entryPoint": "EgovSynchrnServerController#downloadFtpFile",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "stepIds": [
+        "step:POST /utl/sys/ssy/getSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "step:POST /utl/sys/ssy/getSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "step:POST /utl/sys/ssy/getSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 210,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/getSynchrnServerFile.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/ssy/removeSynchrnServer.do",
+      "entryPoint": "EgovSynchrnServerController#deleteSynchrnServer",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "stepIds": [
+        "step:POST /utl/sys/ssy/removeSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "step:POST /utl/sys/ssy/removeSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "step:POST /utl/sys/ssy/removeSynchrnServer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 320,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/removeSynchrnServer.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/ssy/removeSynchrnServerFile.do",
+      "entryPoint": "EgovSynchrnServerController#deleteSynchrnServerFile",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "stepIds": [
+        "step:POST /utl/sys/ssy/removeSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "step:POST /utl/sys/ssy/removeSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 192,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/removeSynchrnServerFile.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/sys/ssy/updtSynchrnServer.do",
+      "entryPoint": "EgovSynchrnServerController#updateSynchrnServer",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "stepIds": [
+        "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+        "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 288,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/updtSynchrnServer.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/wed/insertImage.do",
+      "entryPoint": "EgovWebEditorImageController#imageUpload",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "stepIds": [
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 97,
+        "snippet": "@RequestMapping(value = \"/utl/wed/insertImage.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /utl/wed/insertImageCk.do",
+      "entryPoint": "EgovWebEditorImageController#imageUploadCk",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "stepIds": [
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 114,
+        "snippet": "@RequestMapping(value = \"/utl/wed/insertImageCk.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java#main",
+      "entryPoint": "TestPdfConverter#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+        "line": 38,
+        "snippet": "public static void main(String[] args) {"
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java#main",
+      "entryPoint": "TestPdfConverter2#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+        "line": 38,
+        "snippet": "public static void main(String[] args) {"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:GET /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "layer": "api",
+      "className": "EgovUtlJsonController",
+      "kgSummary": "공통 코드를 JSON으로 반환하는 유틸리티 Spring MVC 컨트롤러. 단일·다중 코드 조회 API를 제공한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "json"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 59,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "layer": "api",
+      "className": "EgovWebEditorImageController",
+      "kgSummary": "웹 에디터 이미지 삽입·업로드·다운로드 요청을 처리하는 Spring MVC controller로, 업로드 파일 검증과 파일명 암복호화를 담당한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "ckeditor",
+        "upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 161,
+        "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+      "layer": "unknown",
+      "className": "EgovFormBasedFileUtil",
+      "kgSummary": "폼 기반 파일의 저장·다운로드·미리보기와 물리 파일명 생성을 담당하는 파일 처리 static 유틸리티.",
+      "kgTags": [
+        "utility",
+        "file-upload",
+        "download",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+        "line": 45,
+        "snippet": "public class EgovFormBasedFileUtil {"
+      }
+    },
+    {
+      "stepId": "step:GET /utl/web/imageSrc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:GET /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "layer": "api",
+      "className": "EgovWebEditorImageController",
+      "kgSummary": "웹 에디터 이미지 삽입·업로드·다운로드 요청을 처리하는 Spring MVC controller로, 업로드 파일 검증과 파일명 암복호화를 담당한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "ckeditor",
+        "upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 161,
+        "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/jso/EgovUtlJsonInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "layer": "api",
+      "className": "EgovUtlJsonController",
+      "kgSummary": "공통 코드를 JSON으로 반환하는 유틸리티 Spring MVC 컨트롤러. 단일·다중 코드 조회 API를 제공한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "json"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 59,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/jso/EgovUtlJsonMultiInquire.do:src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+      "layer": "api",
+      "className": "EgovUtlJsonController",
+      "kgSummary": "공통 코드를 JSON으로 반환하는 유틸리티 Spring MVC 컨트롤러. 단일·다중 코드 조회 API를 제공한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "json"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+        "line": 59,
+        "snippet": "@RequestMapping(value = \"/utl/jso/EgovUtlJsonInquire.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "layer": "unknown",
+      "className": "ProxySvc",
+      "kgSummary": "프록시 서비스 정의(프록시 IP/포트·대상 서비스·상태 등)를 담는 VO. ComDefaultVO 상속.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+        "line": 19,
+        "snippet": "public class ProxySvc extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "layer": "service",
+      "className": "EgovProxySvcService",
+      "kgSummary": "프록시 서비스 관리(목록·상세·등록·수정·삭제·로그·서버구동)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "proxy",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "line": 15,
+        "snippet": "public interface EgovProxySvcService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/addViewProxySvc.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "layer": "service",
+      "className": "EgovProxySvcService",
+      "kgSummary": "프록시 서비스 관리(목록·상세·등록·수정·삭제·로그·서버구동)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "proxy",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "line": 15,
+        "snippet": "public interface EgovProxySvcService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/removeProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "layer": "unknown",
+      "className": "ProxySvc",
+      "kgSummary": "프록시 서비스 정의(프록시 IP/포트·대상 서비스·상태 등)를 담는 VO. ComDefaultVO 상속.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+        "line": 19,
+        "snippet": "public class ProxySvc extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "layer": "service",
+      "className": "EgovProxySvcService",
+      "kgSummary": "프록시 서비스 관리(목록·상세·등록·수정·삭제·로그·서버구동)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "proxy",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "line": 15,
+        "snippet": "public interface EgovProxySvcService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/pxy/updtProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "layer": "api",
+      "className": "EgovSynchrnServerController",
+      "kgSummary": "동기화 서버 관리 화면의 Spring MVC controller로, 목록·상세·등록·수정·삭제 및 파일 업로드/다운로드/동기화 실행 요청을 처리한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-sync"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 172,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/getSynchrnServer.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+      "layer": "unknown",
+      "className": "SynchrnServer",
+      "kgSummary": "동기화 서버 설정(서버 IP/포트·FTP 계정·동기화 경로·반영여부 등)을 담는 VO. ComDefaultVO 상속.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "synchronization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+        "line": 22,
+        "snippet": "public class SynchrnServer extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "layer": "service",
+      "className": "EgovSynchrnServerService",
+      "kgSummary": "동기화 서버 관리(목록·상세·FTP 파일 다운로드·등록·수정·삭제·동기화 실행)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "synchronization",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "line": 19,
+        "snippet": "public interface EgovSynchrnServerService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addSynchrnServer.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/addViewSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "layer": "api",
+      "className": "EgovSynchrnServerController",
+      "kgSummary": "동기화 서버 관리 화면의 Spring MVC controller로, 목록·상세·등록·수정·삭제 및 파일 업로드/다운로드/동기화 실행 요청을 처리한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-sync"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 172,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/getSynchrnServer.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/deleteFile.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "layer": "api",
+      "className": "EgovSynchrnServerController",
+      "kgSummary": "동기화 서버 관리 화면의 Spring MVC controller로, 목록·상세·등록·수정·삭제 및 파일 업로드/다운로드/동기화 실행 요청을 처리한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-sync"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 172,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/getSynchrnServer.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/deleteFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+      "layer": "unknown",
+      "className": "SynchrnServer",
+      "kgSummary": "동기화 서버 설정(서버 IP/포트·FTP 계정·동기화 경로·반영여부 등)을 담는 VO. ComDefaultVO 상속.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "synchronization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+        "line": 22,
+        "snippet": "public class SynchrnServer extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/deleteFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "layer": "service",
+      "className": "EgovSynchrnServerService",
+      "kgSummary": "동기화 서버 관리(목록·상세·FTP 파일 다운로드·등록·수정·삭제·동기화 실행)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "synchronization",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "line": 19,
+        "snippet": "public interface EgovSynchrnServerService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/getSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "layer": "api",
+      "className": "EgovSynchrnServerController",
+      "kgSummary": "동기화 서버 관리 화면의 Spring MVC controller로, 목록·상세·등록·수정·삭제 및 파일 업로드/다운로드/동기화 실행 요청을 처리한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-sync"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 172,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/getSynchrnServer.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/getSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "layer": "service",
+      "className": "EgovSynchrnServerService",
+      "kgSummary": "동기화 서버 관리(목록·상세·FTP 파일 다운로드·등록·수정·삭제·동기화 실행)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "synchronization",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "line": 19,
+        "snippet": "public interface EgovSynchrnServerService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/getSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+      "layer": "unknown",
+      "className": "SynchrnServer",
+      "kgSummary": "동기화 서버 설정(서버 IP/포트·FTP 계정·동기화 경로·반영여부 등)을 담는 VO. ComDefaultVO 상속.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "synchronization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+        "line": 22,
+        "snippet": "public class SynchrnServer extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/removeSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "layer": "api",
+      "className": "EgovSynchrnServerController",
+      "kgSummary": "동기화 서버 관리 화면의 Spring MVC controller로, 목록·상세·등록·수정·삭제 및 파일 업로드/다운로드/동기화 실행 요청을 처리한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-sync"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 172,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/getSynchrnServer.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/removeSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "layer": "service",
+      "className": "EgovSynchrnServerService",
+      "kgSummary": "동기화 서버 관리(목록·상세·FTP 파일 다운로드·등록·수정·삭제·동기화 실행)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "synchronization",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "line": 19,
+        "snippet": "public interface EgovSynchrnServerService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/removeSynchrnServer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/removeSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "layer": "api",
+      "className": "EgovSynchrnServerController",
+      "kgSummary": "동기화 서버 관리 화면의 Spring MVC controller로, 목록·상세·등록·수정·삭제 및 파일 업로드/다운로드/동기화 실행 요청을 처리한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-sync"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 172,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/getSynchrnServer.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/removeSynchrnServerFile.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "layer": "service",
+      "className": "EgovSynchrnServerService",
+      "kgSummary": "동기화 서버 관리(목록·상세·FTP 파일 다운로드·등록·수정·삭제·동기화 실행)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "synchronization",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "line": 19,
+        "snippet": "public interface EgovSynchrnServerService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+      "layer": "api",
+      "className": "EgovSynchrnServerController",
+      "kgSummary": "동기화 서버 관리 화면의 Spring MVC controller로, 목록·상세·등록·수정·삭제 및 파일 업로드/다운로드/동기화 실행 요청을 처리한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-sync"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+        "line": 172,
+        "snippet": "@RequestMapping(value = \"/utl/sys/ssy/getSynchrnServer.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+      "layer": "unknown",
+      "className": "SynchrnServer",
+      "kgSummary": "동기화 서버 설정(서버 IP/포트·FTP 계정·동기화 경로·반영여부 등)을 담는 VO. ComDefaultVO 상속.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "synchronization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/SynchrnServer.java",
+        "line": 22,
+        "snippet": "public class SynchrnServer extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+      "layer": "service",
+      "className": "EgovSynchrnServerService",
+      "kgSummary": "동기화 서버 관리(목록·상세·FTP 파일 다운로드·등록·수정·삭제·동기화 실행)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "synchronization",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/ssy/service/EgovSynchrnServerService.java",
+        "line": 19,
+        "snippet": "public interface EgovSynchrnServerService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/sys/ssy/updtSynchrnServer.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "layer": "api",
+      "className": "EgovWebEditorImageController",
+      "kgSummary": "웹 에디터 이미지 삽입·업로드·다운로드 요청을 처리하는 Spring MVC controller로, 업로드 파일 검증과 파일명 암복호화를 담당한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "ckeditor",
+        "upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 161,
+        "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "layer": "unknown",
+      "className": "EgovFileUploadUtil",
+      "kgSummary": "멀티파트 요청의 파일을 서버 디스크에 저장하고 확장자·크기를 검증하는 파일 업로드 static 유틸리티.",
+      "kgTags": [
+        "utility",
+        "file-upload",
+        "validation",
+        "security",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "line": 36,
+        "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "layer": "unknown",
+      "className": "EgovFormBasedFileVo",
+      "kgSummary": "폼 기반 파일 업로드 처리에 사용되는 파일 메타데이터(이름·경로·타입 등)를 담는 VO.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "file-upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImage.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "relPath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+      "layer": "api",
+      "className": "EgovWebEditorImageController",
+      "kgSummary": "웹 에디터 이미지 삽입·업로드·다운로드 요청을 처리하는 Spring MVC controller로, 업로드 파일 검증과 파일명 암복호화를 담당한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "ckeditor",
+        "upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+        "line": 161,
+        "snippet": "@RequestMapping(value = \"/utl/web/imageSrc.do\",method = RequestMethod.GET)"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "layer": "unknown",
+      "className": "EgovFileUploadUtil",
+      "kgSummary": "멀티파트 요청의 파일을 서버 디스크에 저장하고 확장자·크기를 검증하는 파일 업로드 static 유틸리티.",
+      "kgTags": [
+        "utility",
+        "file-upload",
+        "validation",
+        "security",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "line": 36,
+        "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+      "layer": "unknown",
+      "className": "EgovFormBasedFileVo",
+      "kgSummary": "폼 기반 파일 업로드 처리에 사용되는 파일 메타데이터(이름·경로·타입 등)를 담는 VO.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "file-upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileVo.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /utl/wed/insertImageCk.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+      "relPath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+      "layer": "api",
+      "className": "TestPdfConverter",
+      "kgSummary": "OpenOffice 소켓 연결을 통해 문서를 PDF로 변환하는 동작을 수동 실행(main)으로 확인하는 개발용 테스트 드라이버.",
+      "kgTags": [
+        "test",
+        "manual-test",
+        "pdf-conversion",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+        "line": 38,
+        "snippet": "public static void main(String[] args) {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+      "relPath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+      "layer": "api",
+      "className": "TestPdfConverter2",
+      "kgSummary": "PDF 변환 시나리오의 변형(2번) 수동 실행 테스트 드라이버로, main에서 OpenOffice 변환 흐름을 확인한다.",
+      "kgTags": [
+        "test",
+        "manual-test",
+        "pdf-conversion",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+        "line": 38,
+        "snippet": "public static void main(String[] args) {"
+      }
+    }
+  ]
+}

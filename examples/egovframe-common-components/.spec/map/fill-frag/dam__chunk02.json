@@ -1,0 +1,219 @@
+{
+  "key": "dam",
+  "chunkIndex": 2,
+  "isHeaderChunk": false,
+  "flows": [
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalModifyView.do",
+      "name": "개인지식 수정화면 조회",
+      "summary": {
+        "text": "개인지식 항목의 수정을 위해 상세 정보를 조회하여 수정용 화면을 반환하는 기능이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 254,
+            "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalModifyView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalRegist.do",
+      "name": "개인지식 등록",
+      "summary": {
+        "text": "로그인 사용자 정보와 첨부파일 업로드를 결합해 개인지식 항목을 신규 등록하는 기능이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 203,
+            "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRegist.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalRemove.do",
+      "name": "개인지식 삭제",
+      "summary": {
+        "text": "지정된 개인지식 항목을 서비스 계층을 통해 삭제 처리하는 기능이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 354,
+            "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRemove.do\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModifyView.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 컨트롤러 진입",
+      "summary": {
+        "text": "개인지식 목록·등록·수정·삭제와 첨부파일 업로드를 처리하는 Spring MVC 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModifyView.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "name": "개인지식 서비스 처리",
+      "summary": {
+        "text": "개인지식의 목록·카운트·상세·등록·수정·삭제를 정의하는 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+            "line": 17,
+            "snippet": "public interface EgovKnoPersonalService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 컨트롤러 진입",
+      "summary": {
+        "text": "개인지식 목록·등록·수정·삭제와 첨부파일 업로드를 처리하는 Spring MVC 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 조회",
+      "summary": {
+        "text": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한·인증 여부를 조회하는 정적 헬퍼이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+            "line": 25,
+            "snippet": "public class EgovUserDetailsHelper {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 조회",
+      "summary": {
+        "text": "공통 다국어 메시지 소스 컴포넌트로 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "첨부파일 업로드 처리",
+      "summary": {
+        "text": "MultipartFile 업로드 파싱과 물리 파일 저장, 경로 필터링을 담당하는 공통 파일 처리 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "name": "첨부파일 정보 관리",
+      "summary": {
+        "text": "첨부파일 정보의 조회·등록·수정·삭제를 정의하는 파일관리 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+            "line": 21,
+            "snippet": "public interface EgovFileMngService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+      "name": "개인지식 검색조건 담기",
+      "summary": {
+        "text": "개인지식 목록 조회용 검색조건·페이징 파라미터를 담는 VO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+            "line": 18,
+            "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 정보 보관",
+      "summary": {
+        "text": "인증된 사용자의 로그인 정보를 담아 공통 인증 전반에서 사용되는 세션용 VO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "name": "개인지식 서비스 처리",
+      "summary": {
+        "text": "개인지식의 목록·카운트·상세·등록·수정·삭제를 정의하는 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+            "line": 17,
+            "snippet": "public interface EgovKnoPersonalService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRemove.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "name": "개인지식 컨트롤러 진입",
+      "summary": {
+        "text": "개인지식 목록·등록·수정·삭제와 첨부파일 업로드를 처리하는 Spring MVC 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+            "line": 151,
+            "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRemove.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "name": "개인지식 서비스 처리",
+      "summary": {
+        "text": "개인지식의 목록·카운트·상세·등록·수정·삭제를 정의하는 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+            "line": 17,
+            "snippet": "public interface EgovKnoPersonalService {"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "key": "dam",
+  "domainId": "domain:dam",
+  "chunkIndex": 2,
+  "chunkTotal": 3,
+  "isHeaderChunk": false,
+  "domainHeader": {
+    "domainId": "domain:dam",
+    "key": "dam"
+  },
+  "flows": [
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalModifyView.do",
+      "entryPoint": "EgovKnoPersonalController#updateKnoPersonalView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "stepIds": [
+        "step:POST /dam/per/EgovComDamPersonalModifyView.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "step:POST /dam/per/EgovComDamPersonalModifyView.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "line": 254,
+        "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalModifyView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalRegist.do",
+      "entryPoint": "EgovKnoPersonalController#insertKnoPersonal",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "stepIds": [
+        "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+        "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "line": 203,
+        "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRegist.do\")"
+      }
+    },
+    {
+      "flowId": "flow:POST /dam/per/EgovComDamPersonalRemove.do",
+      "entryPoint": "EgovKnoPersonalController#deleteKnoPersonal",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "stepIds": [
+        "step:POST /dam/per/EgovComDamPersonalRemove.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "step:POST /dam/per/EgovComDamPersonalRemove.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "line": 354,
+        "snippet": "@PostMapping(value = \"/dam/per/EgovComDamPersonalRemove.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModifyView.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "relPath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "layer": "api",
+      "className": "EgovKnoPersonalController",
+      "kgSummary": "개인지식 Spring MVC 컨트롤러 — 목록 페이징, 등록/수정/삭제, 첨부파일 업로드(EgovFileMngUtil) 연동 및 JSP 뷰 반환을 처리.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "file-upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "line": 151,
+        "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalModifyView.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "relPath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "layer": "service",
+      "className": "EgovKnoPersonalService",
+      "kgSummary": "개인지식(Personal Knowledge)의 목록·카운트·상세·등록·수정·삭제를 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "crud",
+        "지식관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+        "line": 17,
+        "snippet": "public interface EgovKnoPersonalService {"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "relPath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "layer": "api",
+      "className": "EgovKnoPersonalController",
+      "kgSummary": "개인지식 Spring MVC 컨트롤러 — 목록 페이징, 등록/수정/삭제, 첨부파일 업로드(EgovFileMngUtil) 연동 및 JSP 뷰 반환을 처리.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "file-upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "line": 151,
+        "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "layer": "service",
+      "className": "EgovFileMngUtil",
+      "kgSummary": "MultipartFile 업로드 파싱, 물리 파일 저장, 다운로드 스트리밍을 담당하는 공통 파일 처리 유틸리티. XSS·경로 조작 방어를 위해 EgovWebUtil로 경로를 필터링한다.",
+      "kgTags": [
+        "utility",
+        "file-management",
+        "upload",
+        "download"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "line": 60,
+        "snippet": "@Component(\"EgovFileMngUtil\")"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "layer": "service",
+      "className": "EgovFileMngService",
+      "kgSummary": "첨부파일 정보의 조회·등록·수정·삭제를 정의하는 파일관리 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "file-management",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "line": 21,
+        "snippet": "public interface EgovFileMngService {"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+      "relPath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+      "layer": "unknown",
+      "className": "KnoPersonalVO",
+      "kgSummary": "개인지식 목록 조회용 검색조건·페이징 파라미터를 담는 VO(ComDefaultVO 상속).",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "pagination",
+        "search"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/service/KnoPersonalVO.java",
+        "line": 18,
+        "snippet": "public class KnoPersonalVO extends KnoPersonal {"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRegist.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "relPath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "layer": "service",
+      "className": "EgovKnoPersonalService",
+      "kgSummary": "개인지식(Personal Knowledge)의 목록·카운트·상세·등록·수정·삭제를 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "crud",
+        "지식관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+        "line": 17,
+        "snippet": "public interface EgovKnoPersonalService {"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRemove.do:src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "relPath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+      "layer": "api",
+      "className": "EgovKnoPersonalController",
+      "kgSummary": "개인지식 Spring MVC 컨트롤러 — 목록 페이징, 등록/수정/삭제, 첨부파일 업로드(EgovFileMngUtil) 연동 및 JSP 뷰 반환을 처리.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "file-upload"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/web/EgovKnoPersonalController.java",
+        "line": 151,
+        "snippet": "@RequestMapping(value = \"/dam/per/EgovComDamPersonal.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /dam/per/EgovComDamPersonalRemove.do:src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "relPath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+      "layer": "service",
+      "className": "EgovKnoPersonalService",
+      "kgSummary": "개인지식(Personal Knowledge)의 목록·카운트·상세·등록·수정·삭제를 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "crud",
+        "지식관리"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/dam/per/service/EgovKnoPersonalService.java",
+        "line": 17,
+        "snippet": "public interface EgovKnoPersonalService {"
+      }
+    }
+  ]
+}

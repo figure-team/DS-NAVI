@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:risk",
+  "name": "보안 위험문자 검증",
+  "summary": {
+    "text": "OS 커맨드 인젝션에 악용될 수 있는 위험 문자를 정규식으로 치환·제거하는 보안 로직을 검증하는 도메인이다.",
+    "citations": [
+      {
+        "filePath": "src/test/java/egovframework/code/security/risk/chr/TestRiskOSChar.java",
+        "line": 23,
+        "snippet": "public static void main(String[] args) {"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "text": "OS 명령 인젝션에 사용될 수 있는 위험 문자 패턴",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/code/security/risk/chr/TestRiskOSChar.java",
+          "line": 23,
+          "snippet": "public static void main(String[] args) {"
+        }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "위험 문자는 정규식을 통해 치환·제거되어야 한다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/code/security/risk/chr/TestRiskOSChar.java",
+          "line": 23,
+          "snippet": "public static void main(String[] args) {"
+        }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [],
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/code/security/risk/chr/TestRiskOSChar.java#main",
+      "name": "OS 위험문자 치환 검증",
+      "summary": {
+        "text": "OS 커맨드 인젝션 위험 문자를 정규식으로 치환·제거하는 로직을 실행형으로 검증하는 배치성 테스트 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/code/security/risk/chr/TestRiskOSChar.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/code/security/risk/chr/TestRiskOSChar.java#main:src/test/java/egovframework/code/security/risk/chr/TestRiskOSChar.java",
+      "name": "위험문자 치환 로직 실행",
+      "summary": {
+        "text": "TestRiskOSChar 클래스가 OS 커맨드 인젝션 위험 문자를 정규식으로 치환·제거하는 로직을 실행하여 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/code/security/risk/chr/TestRiskOSChar.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ]
+}

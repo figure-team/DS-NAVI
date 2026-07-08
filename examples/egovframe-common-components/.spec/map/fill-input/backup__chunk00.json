@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "key": "backup",
+  "domainId": "domain:backup",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:backup",
+    "key": "backup",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "className": "ComDefaultVO",
+        "summary": "공통 컴포넌트 전반에서 검색조건과 페이징 정보를 담는 최상위 기반 VO로, 대부분의 도메인 VO가 상속하는 공통 부모 클래스이다.",
+        "tags": [
+          "data-model",
+          "base-vo",
+          "pagination",
+          "common",
+          "spring-mvc"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 22,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+        "className": "EgovComAbstractDAO",
+        "summary": "MyBatis SqlSession을 주입받아 하위 DAO들이 상속하는 공통 추상 DAO 기반 클래스이다.",
+        "tags": [
+          "dao",
+          "mybatis",
+          "abstract",
+          "base-class"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+          "line": 38,
+          "snippet": "public abstract class EgovComAbstractDAO extends EgovAbstractMapper {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupOpert.java",
+        "className": "BackupOpert",
+        "summary": "백업 작업(오퍼레이션) 정보를 담는 VO로, 실행 주기·요일·시분초 스케줄 필드와 이를 Quartz cron 표현식으로 변환하는 로직을 포함한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "backup",
+          "scheduler",
+          "cron"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupOpert.java",
+          "line": 27,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupResult.java",
+        "className": "BackupResult",
+        "summary": "백업 실행 결과를 담는 VO로, 백업 파일·상태·실행 시작/종료 시각·오류 정보 필드를 보유한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "backup"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupResult.java",
+          "line": 29,
+          "snippet": "public class BackupResult extends ComDefaultVO implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupSchdulDfk.java",
+        "className": "BackupSchdulDfk",
+        "summary": "백업 작업의 실행 요일 구분을 저장하는 소형 VO로, 백업 작업 ID와 요일 코드·명칭을 담는다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "backup"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupSchdulDfk.java",
+          "line": 25,
+          "snippet": "public class BackupSchdulDfk implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java",
+        "className": "BackupScheduler",
+        "summary": "Quartz 스케줄러를 감싸 백업 작업의 등록·수정·삭제 및 애플리케이션 기동 시 기존 작업 스케줄 초기화를 담당한다.",
+        "tags": [
+          "scheduler",
+          "service",
+          "backup",
+          "quartz"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java",
+          "line": 59,
+          "snippet": "JobDetail jobDetail = newJob(BackupJob.class)"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/EgovBackupOpertService.java",
+        "className": "EgovBackupOpertService",
+        "summary": "백업 작업 및 백업 결과에 대한 CRUD·조회 연산을 정의하는 서비스 인터페이스.",
+        "tags": [
+          "service",
+          "interface",
+          "backup",
+          "type-definition"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/EgovBackupOpertService.java",
+          "line": 21,
+          "snippet": "public interface EgovBackupOpertService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/impl/BackupOpertDao.java",
+        "className": "BackupOpertDao",
+        "summary": "백업 작업 및 요일 구분에 대한 MyBatis 기반 DAO로, 조회 시 요일 리스트를 조합해 VO에 채워 넣는다.",
+        "tags": [
+          "dao",
+          "persistence",
+          "mybatis",
+          "backup"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/impl/BackupOpertDao.java",
+          "line": 26,
+          "snippet": "@Repository(\"backupOpertDao\")"
+        }
+      }
+    ],
+    "cross": [],
+    "flowCount": 1,
+    "stepCount": 8
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob",
+      "entryPoint": "BackupJob",
+      "entryType": "cron",
+      "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java",
+      "stepIds": [
+        "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java",
+        "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+        "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/BackupOpert.java",
+        "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/BackupResult.java",
+        "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/BackupSchdulDfk.java",
+        "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/EgovBackupOpertService.java",
+        "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/impl/BackupOpertDao.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java",
+        "line": 59,
+        "snippet": "JobDetail jobDetail = newJob(BackupJob.class)"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java",
+      "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java",
+      "layer": "api",
+      "className": "BackupScheduler",
+      "kgSummary": "Quartz 스케줄러를 감싸 백업 작업의 등록·수정·삭제 및 애플리케이션 기동 시 기존 작업 스케줄 초기화를 담당한다.",
+      "kgTags": [
+        "scheduler",
+        "service",
+        "backup",
+        "quartz"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java",
+        "line": 59,
+        "snippet": "JobDetail jobDetail = newJob(BackupJob.class)"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultVO",
+      "kgSummary": "공통 컴포넌트 전반에서 검색조건과 페이징 정보를 담는 최상위 기반 VO로, 대부분의 도메인 VO가 상속하는 공통 부모 클래스이다.",
+      "kgTags": [
+        "data-model",
+        "base-vo",
+        "pagination",
+        "common",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "line": 22,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+      "layer": "unknown",
+      "className": "EgovComAbstractDAO",
+      "kgSummary": "MyBatis SqlSession을 주입받아 하위 DAO들이 상속하는 공통 추상 DAO 기반 클래스이다.",
+      "kgTags": [
+        "dao",
+        "mybatis",
+        "abstract",
+        "base-class"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+        "line": 38,
+        "snippet": "public abstract class EgovComAbstractDAO extends EgovAbstractMapper {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/BackupOpert.java",
+      "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupOpert.java",
+      "layer": "unknown",
+      "className": "BackupOpert",
+      "kgSummary": "백업 작업(오퍼레이션) 정보를 담는 VO로, 실행 주기·요일·시분초 스케줄 필드와 이를 Quartz cron 표현식으로 변환하는 로직을 포함한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "backup",
+        "scheduler",
+        "cron"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupOpert.java",
+        "line": 27,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/BackupResult.java",
+      "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupResult.java",
+      "layer": "unknown",
+      "className": "BackupResult",
+      "kgSummary": "백업 실행 결과를 담는 VO로, 백업 파일·상태·실행 시작/종료 시각·오류 정보 필드를 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "backup"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupResult.java",
+        "line": 29,
+        "snippet": "public class BackupResult extends ComDefaultVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/BackupSchdulDfk.java",
+      "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupSchdulDfk.java",
+      "layer": "unknown",
+      "className": "BackupSchdulDfk",
+      "kgSummary": "백업 작업의 실행 요일 구분을 저장하는 소형 VO로, 백업 작업 ID와 요일 코드·명칭을 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "backup"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/BackupSchdulDfk.java",
+        "line": 25,
+        "snippet": "public class BackupSchdulDfk implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/EgovBackupOpertService.java",
+      "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/EgovBackupOpertService.java",
+      "layer": "service",
+      "className": "EgovBackupOpertService",
+      "kgSummary": "백업 작업 및 백업 결과에 대한 CRUD·조회 연산을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "backup",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/EgovBackupOpertService.java",
+        "line": 21,
+        "snippet": "public interface EgovBackupOpertService {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/sym/bak/service/BackupScheduler.java#BackupJob:src/main/java/egovframework/com/sym/sym/bak/service/impl/BackupOpertDao.java",
+      "relPath": "src/main/java/egovframework/com/sym/sym/bak/service/impl/BackupOpertDao.java",
+      "layer": "dao",
+      "className": "BackupOpertDao",
+      "kgSummary": "백업 작업 및 요일 구분에 대한 MyBatis 기반 DAO로, 조회 시 요일 리스트를 조합해 VO에 채워 넣는다.",
+      "kgTags": [
+        "dao",
+        "persistence",
+        "mybatis",
+        "backup"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/sym/bak/service/impl/BackupOpertDao.java",
+        "line": 26,
+        "snippet": "@Repository(\"backupOpertDao\")"
+      }
+    }
+  ]
+}

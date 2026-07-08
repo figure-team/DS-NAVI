@@ -1,0 +1,2319 @@
+{
+  "schemaVersion": 1,
+  "key": "utl",
+  "domainId": "domain:utl",
+  "chunkIndex": 0,
+  "chunkTotal": 6,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:utl",
+    "key": "utl",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "className": "ComDefaultCodeVO",
+        "summary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 28,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "className": "EgovMessageSource",
+        "summary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+        "tags": [
+          "service",
+          "i18n",
+          "message-source",
+          "spring",
+          "utility"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "className": "EgovWebUtil",
+        "summary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+        "tags": [
+          "utility",
+          "security",
+          "validation",
+          "xss",
+          "sanitization",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "className": "LoginVO",
+        "summary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "authentication",
+          "session",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "className": "EgovCmmUseService",
+        "summary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+        "tags": [
+          "service",
+          "interface",
+          "type-definition",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 26,
+          "snippet": "public interface EgovCmmUseService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "className": "EgovProperties",
+        "summary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+        "tags": [
+          "utility",
+          "config",
+          "properties"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+          "line": 49,
+          "snippet": "public class EgovProperties {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "className": "EgovUserDetailsService",
+        "summary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+        "tags": [
+          "type-definition",
+          "service-interface",
+          "authentication",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+        "className": "FileSystemUtils",
+        "summary": "OS별(df/dir) 명령을 실행해 디스크 여유 공간을 계산하고, 화이트리스트 기반으로 배치 셸 프로세스를 안전하게 기동하는 파일시스템 유틸.",
+        "tags": [
+          "utility",
+          "filesystem",
+          "process",
+          "security"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+          "line": 56,
+          "snippet": "public class FileSystemUtils {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+        "className": "EgovBasicLogger",
+        "summary": "ignore/debug/info 레벨별 SLF4J 로거를 감싸 공통 로깅 진입점을 제공하는 유틸. 특히 무시 가능한 예외 로깅에 사용된다.",
+        "tags": [
+          "utility",
+          "logging"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+          "line": 24,
+          "snippet": "public class EgovBasicLogger {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+        "className": "EgovResourceCloseHelper",
+        "summary": "Closeable·DB(ResultSet/Statement/Connection)·소켓 자원을 예외를 삼키며 안전하게 닫는 리소스 정리 유틸.",
+        "tags": [
+          "utility",
+          "resource-management",
+          "io"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+          "line": 31,
+          "snippet": "public class EgovResourceCloseHelper {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "className": "EgovUserDetailsHelper",
+        "summary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+        "tags": [
+          "utility",
+          "authentication",
+          "security"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "className": "EgovDateUtil",
+        "summary": "날짜/시간 처리 정적 유틸리티로, 날짜 연산·포맷·검증·음양력 변환 등 폭넓은 헬퍼를 제공한다.",
+        "tags": [
+          "utility",
+          "date",
+          "helper",
+          "static"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+          "line": 36,
+          "snippet": "public class EgovDateUtil {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "className": "EgovFileUploadUtil",
+        "summary": "멀티파트 요청의 파일을 서버 디스크에 저장하고 확장자·크기를 검증하는 파일 업로드 static 유틸리티.",
+        "tags": [
+          "utility",
+          "file-upload",
+          "validation",
+          "security",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+          "line": 36,
+          "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+        "className": "EgovFormBasedFileUtil",
+        "summary": "폼 기반 파일의 저장·다운로드·미리보기와 물리 파일명 생성을 담당하는 파일 처리 static 유틸리티.",
+        "tags": [
+          "utility",
+          "file-upload",
+          "download",
+          "serialization"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+          "line": 45,
+          "snippet": "public class EgovFormBasedFileUtil {"
+        }
+      }
+    ],
+    "cross": [
+      {
+        "to": "cop",
+        "weight": 94,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+              "line": 1,
+              "snippet": "package egovframework.com.cmm.service;"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFormBasedFileUtil.java",
+              "line": 1,
+              "snippet": "package egovframework.com.utl.fcc.service;"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/jso/web/EgovUtlJsonController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.utl.jso.web;"
+            }
+          }
+        ]
+      },
+      {
+        "to": "decompress",
+        "weight": 2,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sim/service/EgovNetworkState.java",
+            "target": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovNetworkState.java",
+              "line": 2,
+              "snippet": "* Class Name : EgovNetworkState.java"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+            "target": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+              "line": 1,
+              "snippet": "package egovframework.com.utl.sys.fsm.service;"
+            }
+          }
+        ]
+      },
+      {
+        "to": "sts",
+        "weight": 2,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+            "target": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.utl.sys.pxy.web;"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+            "target": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.utl.sys.srm.web;"
+            }
+          }
+        ]
+      },
+      {
+        "to": "uss",
+        "weight": 2,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+            "target": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sys/ssy/web/EgovSynchrnServerController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.utl.sys.ssy.web;"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+            "target": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/wed/web/EgovWebEditorImageController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.utl.wed.web;"
+            }
+          }
+        ]
+      }
+    ],
+    "flowCount": 101,
+    "stepCount": 424
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /utl/pao/EgovErncsl.do",
+      "entryPoint": "EgovErncslController#doGet",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+      "stepIds": [
+        "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+        "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java",
+        "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+        "line": 66,
+        "snippet": "@RequestMapping(value = \"/utl/pao/EgovErncsl.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/pao/EgovPrntngOutpt.do",
+      "entryPoint": "EgovPrntngOutptController#handleRequest",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java",
+      "stepIds": [
+        "step:ANY /utl/pao/EgovPrntngOutpt.do:src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java",
+        "line": 47,
+        "snippet": "@RequestMapping(value = \"/utl/pao/EgovPrntngOutpt.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/addDbMntrng.do",
+      "entryPoint": "EgovDbMntrngController#insertDbMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+        "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/deleteDbMntrng.do",
+      "entryPoint": "EgovDbMntrngController#deleteDbMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 80,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/deleteDbMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrng.do",
+      "entryPoint": "EgovDbMntrngController#selectDbMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/getDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/getDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 142,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngForRegist.do",
+      "entryPoint": "EgovDbMntrngController#selectDbMntrngForRegist",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 181,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngForRegist.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngForUpdate.do",
+      "entryPoint": "EgovDbMntrngController#selectDbMntrngForUpdate",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 212,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngForUpdate.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngList.do",
+      "entryPoint": "EgovDbMntrngController#selectDbMntrngList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 236,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngLog.do",
+      "entryPoint": "EgovDbMntrngController#selectDbMntrngLog",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/getDbMntrngLog.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngLog.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 162,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngLog.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/getDbMntrngLogList.do",
+      "entryPoint": "EgovDbMntrngController#selectDbMntrngLogList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 275,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/getDbMntrngLogList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/dbm/updateDbMntrng.do",
+      "entryPoint": "EgovDbMntrngController#updateDbMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+        "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 318,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/updateDbMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/addFileSysMntrng.do",
+      "entryPoint": "EgovFileSysMntrngController#addFileSysMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/deleteFileSysMntrng.do",
+      "entryPoint": "EgovFileSysMntrngController#deleteFileSysMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 259,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/deleteFileSysMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/insertFileSysMntrng.do",
+      "entryPoint": "EgovFileSysMntrngController#insertFileSysMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+        "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 216,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/insertFileSysMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/modifyFileSysMntrng.do",
+      "entryPoint": "EgovFileSysMntrngController#modifyFileSysMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+        "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 129,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/modifyFileSysMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMg.do",
+      "entryPoint": "EgovFileSysMntrngController#selectFileSysMg",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 278,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMg.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMntrng.do",
+      "entryPoint": "EgovFileSysMntrngController#selectFileSysMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 162,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMntrngList.do",
+      "entryPoint": "EgovFileSysMntrngController#selectFileSysMntrngList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 73,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMntrngList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMntrngLog.do",
+      "entryPoint": "EgovFileSysMntrngController#selectFileSysMntrngLog",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 366,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMntrngLog.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do",
+      "entryPoint": "EgovFileSysMntrngController#selectFileSysMntrngLogList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 303,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/selectFileSysMntrngLogList.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+      "relPath": "src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+      "layer": "api",
+      "className": "EgovErncslController",
+      "kgSummary": "인쇄 출력물(봉투) 처리 Spring MVC 컨트롤러로, 출력 대상 조회 및 인쇄 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "printing"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/pao/web/EgovErncslController.java",
+        "line": 66,
+        "snippet": "@RequestMapping(value = \"/utl/pao/EgovErncsl.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java",
+      "layer": "unknown",
+      "className": "PrntngOutptVO",
+      "kgSummary": "인쇄 출력물 처리용 VO로, 출력 대상 데이터 필드와 접근자를 제공한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "printing",
+        "serializable"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/pao/service/PrntngOutptVO.java",
+        "line": 27,
+        "snippet": "public class PrntngOutptVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/pao/EgovErncsl.do:src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java",
+      "relPath": "src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java",
+      "layer": "service",
+      "className": "EgovPrntngOutpt",
+      "kgSummary": "인쇄 출력물(EMS 봉투 등) 처리 서비스 interface로, 출력물 조회 메서드를 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "data-access",
+        "printing"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/pao/service/EgovPrntngOutpt.java",
+        "line": 20,
+        "snippet": "public interface EgovPrntngOutpt {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/pao/EgovPrntngOutpt.do:src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java",
+      "relPath": "src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java",
+      "layer": "api",
+      "className": "EgovPrntngOutptController",
+      "kgSummary": "인쇄출력물 요청을 처리하는 Spring Controller로, handleRequest에서 요청을 받아 출력 흐름을 제어한다.",
+      "kgTags": [
+        "controller",
+        "api-handler"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/pao/web/EgovPrntngOutptController.java",
+        "line": 47,
+        "snippet": "@RequestMapping(value = \"/utl/pao/EgovPrntngOutpt.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "layer": "unknown",
+      "className": "DbMntrng",
+      "kgSummary": "DB 모니터링 대상(데이터소스·서버·체크 SQL) 정보를 담는 VO. ComDefaultVO를 상속한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "db-monitoring",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+        "line": 26,
+        "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "layer": "service",
+      "className": "EgovDbMntrngService",
+      "kgSummary": "DB 모니터링 기능의 서비스 인터페이스. 모니터링 대상·로그의 목록·상세·등록/수정/삭제 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "db-monitoring",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "line": 21,
+        "snippet": "public interface EgovDbMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/addDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "layer": "service",
+      "className": "EgovDbMntrngService",
+      "kgSummary": "DB 모니터링 기능의 서비스 인터페이스. 모니터링 대상·로그의 목록·상세·등록/수정/삭제 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "db-monitoring",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "line": 21,
+        "snippet": "public interface EgovDbMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/deleteDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "layer": "service",
+      "className": "EgovDbMntrngService",
+      "kgSummary": "DB 모니터링 기능의 서비스 인터페이스. 모니터링 대상·로그의 목록·상세·등록/수정/삭제 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "db-monitoring",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "line": 21,
+        "snippet": "public interface EgovDbMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "layer": "service",
+      "className": "EgovDbMntrngService",
+      "kgSummary": "DB 모니터링 기능의 서비스 인터페이스. 모니터링 대상·로그의 목록·상세·등록/수정/삭제 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "db-monitoring",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "line": 21,
+        "snippet": "public interface EgovDbMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngForUpdate.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "layer": "unknown",
+      "className": "DbMntrng",
+      "kgSummary": "DB 모니터링 대상(데이터소스·서버·체크 SQL) 정보를 담는 VO. ComDefaultVO를 상속한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "db-monitoring",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+        "line": 26,
+        "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "layer": "service",
+      "className": "EgovDbMntrngService",
+      "kgSummary": "DB 모니터링 기능의 서비스 인터페이스. 모니터링 대상·로그의 목록·상세·등록/수정/삭제 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "db-monitoring",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "line": 21,
+        "snippet": "public interface EgovDbMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLog.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLog.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "layer": "service",
+      "className": "EgovDbMntrngService",
+      "kgSummary": "DB 모니터링 기능의 서비스 인터페이스. 모니터링 대상·로그의 목록·상세·등록/수정/삭제 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "db-monitoring",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "line": 21,
+        "snippet": "public interface EgovDbMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+      "layer": "unknown",
+      "className": "DbMntrngLog",
+      "kgSummary": "DB 모니터링 실행 로그(로그 ID·내용·상태) 정보를 담는 VO. ComDefaultVO를 상속한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "db-monitoring",
+        "logging"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrngLog.java",
+        "line": 22,
+        "snippet": "public class DbMntrngLog extends ComDefaultVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "layer": "service",
+      "className": "EgovDbMntrngService",
+      "kgSummary": "DB 모니터링 기능의 서비스 인터페이스. 모니터링 대상·로그의 목록·상세·등록/수정/삭제 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "db-monitoring",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "line": 21,
+        "snippet": "public interface EgovDbMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/getDbMntrngLogList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+      "layer": "api",
+      "className": "EgovDbMntrngController",
+      "kgSummary": "DB 모니터링 관리 Spring MVC 컨트롤러. 모니터링 대상·로그의 CRUD와 중복 확인 요청을 JSP 뷰로 라우팅한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "db-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/web/EgovDbMntrngController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/dbm/addDbMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+      "layer": "unknown",
+      "className": "DbMntrng",
+      "kgSummary": "DB 모니터링 대상(데이터소스·서버·체크 SQL) 정보를 담는 VO. ComDefaultVO를 상속한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "db-monitoring",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/DbMntrng.java",
+        "line": 26,
+        "snippet": "public class DbMntrng extends ComDefaultVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+      "layer": "service",
+      "className": "EgovDbMntrngService",
+      "kgSummary": "DB 모니터링 기능의 서비스 인터페이스. 모니터링 대상·로그의 목록·상세·등록/수정/삭제 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "db-monitoring",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/dbm/service/EgovDbMntrngService.java",
+        "line": 21,
+        "snippet": "public interface EgovDbMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/dbm/updateDbMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/addFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "layer": "service",
+      "className": "EgovFileSysMntrngService",
+      "kgSummary": "파일시스템 모니터링(FSM) 비즈니스 로직의 계약을 정의하는 service interface로, 모니터링 대상 조회·등록·수정·삭제 및 로그 관리 메서드 10종을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "line": 16,
+        "snippet": "public interface EgovFileSysMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/deleteFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "layer": "unknown",
+      "className": "FileSysMntrngVO",
+      "kgSummary": "모니터링 대상 목록 조회용 검색 조건 VO. 검색 구분·키워드와 페이징 파라미터를 담는 경량 데이터 홀더.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+        "line": 18,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/insertFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "layer": "service",
+      "className": "EgovFileSysMntrngService",
+      "kgSummary": "파일시스템 모니터링(FSM) 비즈니스 로직의 계약을 정의하는 service interface로, 모니터링 대상 조회·등록·수정·삭제 및 로그 관리 메서드 10종을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "line": 16,
+        "snippet": "public interface EgovFileSysMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "layer": "service",
+      "className": "EgovFileSysMntrngService",
+      "kgSummary": "파일시스템 모니터링(FSM) 비즈니스 로직의 계약을 정의하는 service interface로, 모니터링 대상 조회·등록·수정·삭제 및 로그 관리 메서드 10종을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "line": 16,
+        "snippet": "public interface EgovFileSysMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "layer": "unknown",
+      "className": "FileSysMntrngVO",
+      "kgSummary": "모니터링 대상 목록 조회용 검색 조건 VO. 검색 구분·키워드와 페이징 파라미터를 담는 경량 데이터 홀더.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+        "line": 18,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/modifyFileSysMntrng.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "layer": "unknown",
+      "className": "FileSysMntrngVO",
+      "kgSummary": "모니터링 대상 목록 조회용 검색 조건 VO. 검색 구분·키워드와 페이징 파라미터를 담는 경량 데이터 홀더.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+        "line": 18,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+      "layer": "unknown",
+      "className": "FileSystemChecker",
+      "kgSummary": "OS별 명령을 실행해 파일시스템 전체/여유 디스크 용량을 계산하는 시스템 점검 유틸리티.",
+      "kgTags": [
+        "utility",
+        "filesystem",
+        "monitoring",
+        "system"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSystemChecker.java",
+        "line": 35,
+        "snippet": "public class FileSystemChecker {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "layer": "unknown",
+      "className": "EgovResourceCloseHelper",
+      "kgSummary": "Closeable·DB(ResultSet/Statement/Connection)·소켓 자원을 예외를 삼키며 안전하게 닫는 리소스 정리 유틸.",
+      "kgTags": [
+        "utility",
+        "resource-management",
+        "io"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+        "line": 31,
+        "snippet": "public class EgovResourceCloseHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMg.do:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "layer": "unknown",
+      "className": "EgovBasicLogger",
+      "kgSummary": "ignore/debug/info 레벨별 SLF4J 로거를 감싸 공통 로깅 진입점을 제공하는 유틸. 특히 무시 가능한 예외 로깅에 사용된다.",
+      "kgTags": [
+        "utility",
+        "logging"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+        "line": 24,
+        "snippet": "public class EgovBasicLogger {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "layer": "service",
+      "className": "EgovFileSysMntrngService",
+      "kgSummary": "파일시스템 모니터링(FSM) 비즈니스 로직의 계약을 정의하는 service interface로, 모니터링 대상 조회·등록·수정·삭제 및 로그 관리 메서드 10종을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "line": 16,
+        "snippet": "public interface EgovFileSysMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrng.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+      "layer": "unknown",
+      "className": "FileSysMntrng",
+      "kgSummary": "파일시스템 모니터링 대상 도메인 모델(VO). 파일시스템 ID·명·용량·임계치·사용률·관리자 정보 등 17개 속성과 접근자를 담는 데이터 홀더.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrng.java",
+        "line": 19,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+      "layer": "unknown",
+      "className": "FileSysMntrngVO",
+      "kgSummary": "모니터링 대상 목록 조회용 검색 조건 VO. 검색 구분·키워드와 페이징 파라미터를 담는 경량 데이터 홀더.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngVO.java",
+        "line": 18,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngList.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "layer": "service",
+      "className": "EgovFileSysMntrngService",
+      "kgSummary": "파일시스템 모니터링(FSM) 비즈니스 로직의 계약을 정의하는 service interface로, 모니터링 대상 조회·등록·수정·삭제 및 로그 관리 메서드 10종을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "line": 16,
+        "snippet": "public interface EgovFileSysMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "layer": "service",
+      "className": "EgovFileSysMntrngService",
+      "kgSummary": "파일시스템 모니터링(FSM) 비즈니스 로직의 계약을 정의하는 service interface로, 모니터링 대상 조회·등록·수정·삭제 및 로그 관리 메서드 10종을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "line": 16,
+        "snippet": "public interface EgovFileSysMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLog.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+      "layer": "unknown",
+      "className": "FileSysMntrngLogVO",
+      "kgSummary": "모니터링 로그 목록 조회용 검색 조건 VO. 검색 키워드·기간(시작/종료 일시)·페이징 파라미터를 담아 로그 조회에 전달된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+        "line": 18,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+      "layer": "api",
+      "className": "EgovFileSysMntrngController",
+      "kgSummary": "FSM 화면 요청을 처리하는 Spring MVC controller. 모니터링 대상 목록/등록/수정/삭제, 디스크 사용량 조회, 로그 조회 화면을 라우팅하며 인증 확인·페이징·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/web/EgovFileSysMntrngController.java",
+        "line": 108,
+        "snippet": "@RequestMapping(\"/utl/sys/fsm/addFileSysMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+      "layer": "unknown",
+      "className": "FileSysMntrngLogVO",
+      "kgSummary": "모니터링 로그 목록 조회용 검색 조건 VO. 검색 키워드·기간(시작/종료 일시)·페이징 파라미터를 담아 로그 조회에 전달된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/FileSysMntrngLogVO.java",
+        "line": 18,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+      "layer": "service",
+      "className": "EgovFileSysMntrngService",
+      "kgSummary": "파일시스템 모니터링(FSM) 비즈니스 로직의 계약을 정의하는 service interface로, 모니터링 대상 조회·등록·수정·삭제 및 로그 관리 메서드 10종을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "file-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/fsm/service/EgovFileSysMntrngService.java",
+        "line": 16,
+        "snippet": "public interface EgovFileSysMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/fsm/selectFileSysMntrngLogList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    }
+  ]
+}

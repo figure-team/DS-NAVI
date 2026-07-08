@@ -1,0 +1,102 @@
+{
+  "key": "http",
+  "chunkIndex": 0,
+  "isHeaderChunk": true,
+  "domain": {
+    "name": "HTTP 연결 타임아웃 진단",
+    "summary": {
+      "text": "HTTP 연결 시 타임아웃을 설정하고 접속 소요 시간을 확인하는 진단용 테스트 도구를 다루는 도메인이다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java",
+          "line": 23,
+          "snippet": "public static void main(String[] args) {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "시스템 프로퍼티 기반 URL 연결 타임아웃 설정값",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      },
+      {
+        "text": "URLConnection.setConnectTimeout 기반 연결 타임아웃 설정값",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java",
+            "line": 24,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    ],
+    "businessRules": [],
+    "crossDomainInteractions": []
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java#main",
+      "name": "HTTP 연결 타임아웃 진단(시스템 프로퍼티 방식)",
+      "summary": {
+        "text": "시스템 프로퍼티로 HTTP 연결 타임아웃을 설정한 뒤 URL 스트림을 열어 접속 동작과 소요 시간을 확인하는 진단용 실행이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java#main",
+      "name": "HTTP 연결 타임아웃 진단(URLConnection 방식)",
+      "summary": {
+        "text": "URLConnection의 연결 타임아웃 속성을 직접 설정해 접속 동작과 소요 시간을 확인하는 진단용 실행이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java",
+            "line": 24,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java#main:src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java",
+      "name": "시스템 프로퍼티 기반 타임아웃 진단 실행",
+      "summary": {
+        "text": "TestHttpTimeoutStatus1은 시스템 프로퍼티로 HTTP 연결 타임아웃을 설정하고 URL 스트림 열기 동작과 소요 시간을 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus1.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java#main:src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java",
+      "name": "URLConnection 기반 타임아웃 진단 실행",
+      "summary": {
+        "text": "TestHttpTimeoutStatus2는 URLConnection.setConnectTimeout으로 연결 타임아웃을 설정해 접속 동작과 소요 시간을 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/http/TestHttpTimeoutStatus2.java",
+            "line": 24,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "key": "ip",
+  "chunkIndex": 0,
+  "isHeaderChunk": true,
+  "domain": {
+    "name": "IP 주소·입력값 보안 검증",
+    "summary": {
+      "text": "XSS·SQL/OS/LDAP injection·파일경로 조작 등으로부터 시스템을 보호하기 위한 공통 웹 보안 필터링 유틸리티와 그 검증 테스트로 구성된 도메인이다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        }
+      ]
+    },
+    "entities": [
+      {
+        "text": "EgovWebUtil은 XSS·파일경로·SQL/OS/LDAP injection 등을 필터링하는 공통 보안 유틸리티 클래스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      },
+      {
+        "text": "IpAddressTest는 EgovWebUtil의 IP 주소 검증(isIPAddress) 로직을 확인하는 테스트 스텁이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    ],
+    "businessRules": [
+      {
+        "text": "입력값에 대한 IP 주소 형식 검증은 EgovWebUtil의 isIPAddress 로직을 통해 수행된다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    ],
+    "crossDomainInteractions": [
+      {
+        "text": "이 도메인이 cop 도메인과 EgovWebUtil 클래스 참조를 통해 연계된다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+            "line": 1,
+            "snippet": "package egovframework.com.validation.ipaddress;"
+          }
+        ]
+      }
+    ]
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java#main",
+      "name": "IP 주소 검증 테스트 실행",
+      "summary": {
+        "text": "EgovWebUtil의 IP 주소 검증 기능을 배치성 main 메서드로 직접 호출하여 동작을 확인하는 테스트 흐름이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java#main:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+      "name": "IP 주소 검증 테스트 스텁 실행",
+      "summary": {
+        "text": "IpAddressTest가 main 메서드를 통해 IP 주소 검증 로직을 호출하는 진입 단계이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/validation/ipaddress/IpAddressTest.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "공통 웹 보안 필터링 유틸리티 호출",
+      "summary": {
+        "text": "EgovWebUtil이 XSS·파일경로·SQL/OS/LDAP injection 등에 대한 공통 웹 보안 필터링과 IP 주소 검증을 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    }
+  ]
+}

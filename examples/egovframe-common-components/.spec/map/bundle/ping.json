@@ -1,0 +1,294 @@
+{
+  "domainId": "domain:ping",
+  "files": [
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+        "tags": [
+          "utility",
+          "security",
+          "validation",
+          "xss",
+          "sanitization",
+          "tested"
+        ]
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovProperties",
+      "kgHint": {
+        "summary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+        "tags": [
+          "utility",
+          "config",
+          "properties"
+        ]
+      },
+      "line": 49,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "slice": {
+        "endLine": 118,
+        "startLine": 39,
+        "text": " *   수정일              수정자          수정내용\n *   ----------  --------  ---------------------------\n *   2009.01.19  박지욱          최초 생성\n *   2011.07.20    서준식     Globals파일의 상대경로를 읽은 메서드 추가\n *   2014.10.13    이기하     Globals.properties 값이 null일 경우 오류처리\n *   2019.04.26    신용호     RELATIVE_PATH_PREFIX Path 적용 방식 개선\n *   2022.01.21    윤주호     Try-catch-resource 조치 및 Method Refactoring\n *</pre>\n */\n\npublic class EgovProperties {\n\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovProperties.class);\n\n\t//파일구분자\n\tfinal static String FILE_SEPARATOR = System.getProperty(\"file.separator\");\n\n\t//프로퍼티 파일의 물리적 위치\n\t//public static final String GLOBALS_PROPERTIES_FILE = System.getProperty(\"user.home\") + FILE_SEPARATOR + \"egovProps\" +FILE_SEPARATOR + \"globals.properties\";\n\n\tpublic static final String RELATIVE_PATH_PREFIX = EgovProperties.class.getResource(\"\") == null ? \"\"\n\t\t: EgovProperties.class.getResource(\"\").getPath().substring(0,\n\t\t\tEgovProperties.class.getResource(\"\").getPath().lastIndexOf(\"com\"));\n\t//public static final String RELATIVE_PATH_PREFIX = EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(0,EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().indexOf(\"WEB-INF/classes/\")+\"WEB-INF/classes/\".length())+\"egovframework/\";\n\n\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR\n\t\t+ \"globals.properties\";\n\n\t/**\n\t * 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 값을 반환한다(Globals.java 전용)\n\t * @param keyName String\n\t * @return String\n\t */\n\tpublic static String getProperty(String keyName) {\n\t\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\t\tLOGGER.debug(\"===>>> getProperty\" + EgovStringUtil.isNullToString(EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath()));\n\t\tLOGGER.debug(\"getProperty : {} = {}\", GLOBALS_PROPERTIES_FILE, keyName);\n\n\t\treturn getPropertyValueByKey(keyName);\n\t}\n\n\t/**\n\t * 인자로 주어진 문자열을 Key값으로 하는 상대경로 프로퍼티 값을 절대경로로 반환한다(Globals.java 전용)\n\t * @param keyName String\n\t * @return String\n\t */\n\tpublic static String getPathProperty(String keyName) {\n\t\tLOGGER.debug(\"getPathProperty : {} = {}\", GLOBALS_PROPERTIES_FILE, keyName);\n\n\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);\n\t}\n\n\t/**\n\t * 주어진 파일에서 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 값을 반환한다\n\t * @param fileName String\n\t * @param key String\n\t * @return String\n\t */\n\tpublic static String getProperty(String fileName, String keyName) {\n\t\treturn getPropertyValueByKey(fileName, keyName);\n\t}\n\n\t/**\n\t * 주어진 파일에서 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 상대 경로값을 절대 경로값으로 반환한다\n\t * @param fileName String\n\t * @param key String\n\t * @return String\n\t */\n\tpublic static String getPathProperty(String fileName, String keyName) {\n\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(fileName, keyName);\n\t}\n\n\t/**\n\t * 주어진 프로파일의 내용을 파싱하여 (key-value) 형태의 구조체 배열을 반환한다.\n\t * @param property String\n\t * @return ArrayList\n\t */\n\tpublic static ArrayList<Map<String, String>> loadPropertyFile(String propertyPath) {\n\n\t\t// key - value 형태로 된 배열 결과",
+        "truncated": true
+      }
+    },
+    {
+      "className": "FileSystemUtils",
+      "kgHint": {
+        "summary": "OS별(df/dir) 명령을 실행해 디스크 여유 공간을 계산하고, 화이트리스트 기반으로 배치 셸 프로세스를 안전하게 기동하는 파일시스템 유틸.",
+        "tags": [
+          "utility",
+          "filesystem",
+          "process",
+          "security"
+        ]
+      },
+      "line": 56,
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+      "slice": {
+        "endLine": 125,
+        "startLine": 46,
+        "text": " *\n * @author Frank W. Zammetti\n * @author Stephen Colebourne\n * @author Thomas Ledoux\n * @author James Urie\n * @author Magnus Grimsell\n * @author Thomas Ledoux\n * @version $Id: FileSystemUtils.java 453889 2006-10-07 11:56:25Z scolebourne $\n * @since Commons IO 1.1\n */\npublic class FileSystemUtils {\n\n\t/** Singleton instance, used mainly for testing. */\n\tprivate static final FileSystemUtils INSTANCE = new FileSystemUtils();\n\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(FileSystemUtils.class);\n\n\t/** Operating system state flag for error. */\n\tprivate static final int INIT_PROBLEM = -1;\n\t/** Operating system state flag for neither Unix nor Windows. */\n\tprivate static final int OTHER = 0;\n\t/** Operating system state flag for Windows. */\n\tprivate static final int WINDOWS = 1;\n\t/** Operating system state flag for Unix. */\n\tprivate static final int UNIX = 2;\n\t/** Operating system state flag for Posix flavour Unix. */\n\tprivate static final int POSIX_UNIX = 3;\n\n\t/** The operating system flag. */\n\tprivate static final int OS;\n\tstatic {\n\t\tint os = OTHER;\n\t\ttry {\n\t\t\tString osName = System.getProperty(\"os.name\");\n\t\t\tif (osName == null) {\n\t\t\t\tthrow new IOException(\"os.name not found\");\n\t\t\t}\n\t\t\tosName = osName.toLowerCase();\n\t\t\t// match\n\t\t\tif (osName.indexOf(\"windows\") != -1) {\n\t\t\t\tos = WINDOWS;\n\t\t\t} else if (osName.indexOf(\"linux\") != -1 || osName.indexOf(\"sun os\") != -1 || osName.indexOf(\"sunos\") != -1 || osName.indexOf(\"solaris\") != -1\n\t\t\t\t\t|| osName.indexOf(\"mpe/ix\") != -1 || osName.indexOf(\"freebsd\") != -1 || osName.indexOf(\"irix\") != -1 || osName.indexOf(\"digital unix\") != -1\n\t\t\t\t\t|| osName.indexOf(\"unix\") != -1 || osName.indexOf(\"mac os x\") != -1) {\n\t\t\t\tos = UNIX;\n\t\t\t} else if (osName.indexOf(\"hp-ux\") != -1 || osName.indexOf(\"aix\") != -1) {\n\t\t\t\tos = POSIX_UNIX;\n\t\t\t} else {\n\t\t\t\tos = OTHER;\n\t\t\t}\n\n\t\t} catch (IOException ex) {\n\t\t\tos = INIT_PROBLEM;\n\t\t}\n\t\tOS = os;\n\t}\n\n\t/**\n\t * Instances should NOT be constructed in standard programming.\n\t */\n\tpublic FileSystemUtils() {\n\t\tsuper();\n\t}\n\n\t//-----------------------------------------------------------------------\n\t/**\n\t * Returns the free space on a drive or volume by invoking\n\t * the command line.\n\t * This method does not normalize the result, and typically returns\n\t * bytes on Windows, 512 byte units on OS X and kilobytes on Unix.\n\t * As this is not very useful, this method is deprecated in favour\n\t * of {@link #freeSpaceKb(String)} which returns a result in kilobytes.\n\t * <p>\n\t * Note that some OS's are NOT currently supported, including OS/390,\n\t * OpenVMS and and SunOS 5. (SunOS is supported by <code>freeSpaceKb</code>.)\n\t * <pre>\n\t * FileSystemUtils.freeSpace(\"C:\");       // Windows\n\t * FileSystemUtils.freeSpace(\"/volume\");  // *nix\n\t * </pre>\n\t * The free space is calculated via the command line.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovBasicLogger",
+      "kgHint": {
+        "summary": "ignore/debug/info 레벨별 SLF4J 로거를 감싸 공통 로깅 진입점을 제공하는 유틸. 특히 무시 가능한 예외 로깅에 사용된다.",
+        "tags": [
+          "utility",
+          "logging"
+        ]
+      },
+      "line": 24,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 14,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2014.09.18  표준프레임워크센터 최초 생성\n *   2025.05.27  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-FieldNamingConventions(필드 명명 규칙)\n *\n *      </pre>\n */\npublic class EgovBasicLogger {\n\tprivate static final Level IGNORE_INFO_LEVEL = Level.OFF;\n\tprivate static final Level DEBUG_INFO_LEVEL = Level.FINEST;\n\tprivate static final Level INFO_INFO_LEVEL = Level.INFO;\n\n\tprivate static final Logger IGNORE_LOGGER = Logger.getLogger(\"ignore\");\n\tprivate static final Logger DEBUG_LOGGER = Logger.getLogger(\"debug\");\n\tprivate static final Logger INFO_LOGGER = Logger.getLogger(\"info\");\n\n\t/**\n\t * 기록이나 처리가 불필요한 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void ignore(String message, Exception exception) {\n\t\tif (exception == null) {\n\t\t\tIGNORE_LOGGER.log(IGNORE_INFO_LEVEL, message);\n\t\t} else {\n\t\t\tIGNORE_LOGGER.log(IGNORE_INFO_LEVEL, message, exception);\n\t\t}\n\t}\n\n\t/**\n\t * 기록이나 처리가 불필요한 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void ignore(String message) {\n\t\tignore(message, null);\n\t}\n\n\t/**\n\t * 디버그 정보를 기록하는 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void debug(String message, Exception exception) {\n\t\tif (exception == null) {\n\t\t\tDEBUG_LOGGER.log(DEBUG_INFO_LEVEL, message);\n\t\t} else {\n\t\t\tDEBUG_LOGGER.log(DEBUG_INFO_LEVEL, message, exception);\n\t\t}\n\t}\n\n\t/**\n\t * 디버그 정보를 기록하는 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void debug(String message) {\n\t\tdebug(message, null);\n\t}\n\n\t/**\n\t * 일반적이 정보를 기록하는 경우 사용.\n\t * \n\t * @param message\n\t * @param exception\n\t */\n\tpublic static void info(String message) {\n\t\tINFO_LOGGER.log(INFO_INFO_LEVEL, message);\n\t}\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovResourceCloseHelper",
+      "kgHint": {
+        "summary": "Closeable·DB(ResultSet/Statement/Connection)·소켓 자원을 예외를 삼키며 안전하게 닫는 리소스 정리 유틸.",
+        "tags": [
+          "utility",
+          "resource-management",
+          "io"
+        ]
+      },
+      "line": 31,
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "slice": {
+        "endLine": 100,
+        "startLine": 21,
+        "text": " *      <pre>\n *  == 개정이력(Modification Information) ==\n *\n *   수정일      수정자           수정내용\n *  -------    --------    ---------------------------\n *   2014.09.18  표준프레임워크센터  최초 생성\n *   2025.05.28  이백행          PMD로 소프트웨어 보안약점 진단하고 제거하기-CloseResource(리소스 닫기)\n *\n *      </pre>\n */\npublic class EgovResourceCloseHelper {\n\t/**\n\t * Resource close 처리.\n\t * \n\t * @param resources\n\t */\n\tpublic static void close(Closeable... resources) {\n\t\tfor (Closeable resource : resources) { // NOPMD - CloseResource\n\t\t\tif (resource != null) {\n\t\t\t\ttry {\n\t\t\t\t\tresource.close();\n\t\t\t\t} catch (IOException ignore) {// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred IOException to close resource is ingored!!\");\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\t/**\n\t * JDBC 관련 resource 객체 close 처리\n\t * \n\t * @param objects\n\t */\n\tpublic static void closeDBObjects(Wrapper... objects) {\n\t\tfor (Object object : objects) {\n\t\t\tif (object != null) {\n\t\t\t\tif (object instanceof ResultSet) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\t((ResultSet) object).close();\n\t\t\t\t\t} catch (SQLException ignore) {// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred SQLException to close resource is ingored!!\");\n\t\t\t\t\t}\n\t\t\t\t} else if (object instanceof Statement) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\t((Statement) object).close();\n\t\t\t\t\t} catch (SQLException ignore) {// KISA 보안약점 조치 (2018-10-29, 윤창원)\n\t\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred SQLException to close resource is ingored!!\");\n\t\t\t\t\t}\n\t\t\t\t} else if (object instanceof Connection) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\t((Connection) object).close();\n\t\t\t\t\t} catch (SQLException ignore) {\n\t\t\t\t\t\tEgovBasicLogger.ignore(\"Occurred SQLException to close resource is ingored!!\");\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tthrow new IllegalArgumentException(\"Wrapper type is not found : \" + object.toString());\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\n\t/**\n\t * Socket 관련 resource 객체 close 처리\n\t * \n\t * @param objects\n\t */\n\tpublic static void closeSocketObjects(Socket socket, ServerSocket server) {\n\t\tif (socket != null) {\n\t\t\ttry {\n\t\t\t\tsocket.shutdownOutput();\n\t\t\t} catch (IOException ignore) {\n\t\t\t\tEgovBasicLogger.ignore(\"Occurred IOException to close resource is ingored!!\");\n\t\t\t}\n\n\t\t\ttry {\n\t\t\t\tsocket.close();\n\t\t\t} catch (IOException ignore) {\n\t\t\t\tEgovBasicLogger.ignore(\"Occurred IOException to close resource is ingored!!\");\n\t\t\t}\n\t\t}",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+        "tags": [
+          "utility",
+          "string",
+          "helper",
+          "static",
+          "tested"
+        ]
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovNetworkState",
+      "kgHint": {
+        "summary": "MAC 주소·IP·포트 스캔·ping 등 네트워크 상태를 조회하는 시스템 진단 static 유틸리티.",
+        "tags": [
+          "utility",
+          "network",
+          "diagnostics",
+          "system"
+        ]
+      },
+      "line": 52,
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovNetworkState.java",
+      "slice": {
+        "endLine": 121,
+        "startLine": 42,
+        "text": " *\n *  수정일\t\t수정자\t\t수정내용\n *  ----------\t--------\t---------------------------\n *  2020.12.07\t신용호\t\tKISA 보안약점 조치\n *  2022.11.11\t김혜준\t\t시큐어코딩 처리\n *  2023.06.09\t김신해\t\tNSR 보안조치 (SCAN 기능 구현 추가)\n *\n * </pre>\n */\n\npublic class EgovNetworkState {\n\tpublic static String addrIP = \"\";\n\tstatic final char FILE_SEPARATOR = File.separatorChar;\n\t// 최대 문자길이\n\tstatic final int MAX_STR_LEN = 1024;\n\n\tpublic static final int BUFF_SIZE = 2048;\n\t// Log\n\t// protected static final Log log = LogFactory.getLog(EgovNetworkState.class);\n\n\t/**\n\t * <pre>\n\t * Comment : Local MAC Address를 확인한다.\n\t * </pre>\n\t * @param String localIP  로컬 IP주소\n\t * @return String mac        MAC Address를 리턴한다.\n\t * @version 1.0 (2009.02.03.)\n\t * @see\n\t */\n\tpublic static String getMyMACAddress(String localIP) {\n\t\t//log.debug(\"getMyMACAddress Start!! : \");\n\t\tString mac = null;\n\t\ttry {\n\t\t\tif (\"WINDOWS\".equals(Globals.OS_TYPE)) {\n\t\t\t\t// 2020-12-07 KISA 보안코드 검증 조치\n\t\t\t\tif (!EgovWebUtil.isIPAddress(localIP)) {\n\t\t\t\t\tthrow new SecurityException(\"IP Address is Not Valid~~~!\");\n\t\t\t\t}\n\n\t\t\t\tString execStr = \"nbtstat -A \" + localIP;\n\t\t\t\t// 2022.11.11 시큐어코딩 처리\n\t\t\t\tFileSystemUtils util = new FileSystemUtils();\n\t\t\t\tProcess p = util.processOperate(\"EgovNetworkState\", execStr);\n\t\t\t\tInputStream in = p.getInputStream();\n\t\t\t\tString out = null;\n\t\t\t\tint c;\n\t\t\t\twhile ((c = in.read()) != -1) {\n\t\t\t\t\tout = out + new String(new Character((char) c).toString());\n\t\t\t\t}\n\t\t\t\tin.close();\n\t\t\t\tif (out == null || out.indexOf(\"MAC Address = \") == -1) {\n\t\t\t\t\tthrow new IllegalArgumentException(\"String Split Error!\");\n\t\t\t\t}\n\t\t\t\tmac = out.substring(out.indexOf(\"MAC Address = \") + 14, out.indexOf(\"MAC Address = \") + 31);\n\n\t\t\t} else if (\"UNIX\".equals(Globals.OS_TYPE)) {\n\t\t\t\t//log.debug(\"getMyMACAddress IP : \" + localIP);\n\t\t\t\tmac = getNetWorkInfo(\"MAC\");\n\t\t\t}\n\t\t} catch (IOException e) {\n\t\t\tthrow new RuntimeException(e);\n\t\t}\n\t\treturn mac;\n\t}\n\n\t/**\n\t * <pre>\n\t * Comment : Local Port를 확인한다.\n\t * </pre>\n\n\t * @return String port       port를 리턴한다.\n\t * @version 1.0 (2009.02.03.)\n\t * @see\n\t */\n\tpublic static List<String> getMyPortScan() {\n\n\t\tList<String> processes = new ArrayList<>();\n\t\tBufferedReader input = null;\n\n\t\ttry {",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TestPingNetwork",
+      "kgHint": {
+        "summary": "EgovNetworkState의 핑·네트워크 상태 조회 기능을 main으로 실행 검증하는 테스트 스텁.",
+        "tags": [
+          "test",
+          "network",
+          "utility"
+        ]
+      },
+      "line": 37,
+      "relPath": "src/test/java/egovframework/com/utl/sim/TestPingNetwork.java",
+      "slice": {
+        "endLine": 57,
+        "startLine": 27,
+        "text": "   Globals.OsType = WINDOWS\n   @ eGov WIKI : 네트워크 상태체크\n   http://www.egovframe.go.kr/wiki/doku.php?id=egovframework:%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC%EC%83%81%ED%83%9C%EC%B2%B4%ED%81%AC\n * </pre>\n */\n\npublic class TestPingNetwork {\n\n\tprotected static Logger egovLogger = LoggerFactory.getLogger(TestPingNetwork.class);\n\t\n\tpublic static void main(String[] args) {\n\n\t\ttry {\n\t\t\tString myIpaddress = EgovNetworkState.getMyIPaddress();\n\t\t\tegovLogger.debug(\"1. My IP Address = \"+myIpaddress);\n\t\t\tegovLogger.debug(\"2. Ping Test = \"+EgovNetworkState.getPingTest(myIpaddress));\n\t\t\t//egovLogger.debug(\"1. My MAC Address = \"+networkState.getMyMACAddress(myIpaddress));//getNetWorkInfo.sh\n\t\t\tList<String> myPortInfoList = EgovNetworkState.getMyPortScan();\n\t\t\tfor (String portInfo : myPortInfoList) {\n\t\t\t\tegovLogger.debug(\"3. My Port Info. = \"+portInfo);\n\t\t\t}\n\t\t} catch (IOException e) {\n\t\t\tegovLogger.error(\"IOException\");\n\t\t} catch (Exception e) {\n\t\t\tegovLogger.error(\"Exception\");\n\t\t}\n\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "TestPingNetwork#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/utl/sim/TestPingNetwork.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main",
+      "line": 37,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java",
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/utl/sim/service/EgovNetworkState.java",
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+        "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    }
+  ],
+  "gitCommit": "9591ae21d1431dc1b8e32430c6218b55f33d8ed2",
+  "key": "ping",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/service/EgovProperties.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/service/FileSystemUtils.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovNetworkState.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/utl/sim/service/EgovNetworkState.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/utl/sim/TestPingNetwork.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java"
+    }
+  ]
+}

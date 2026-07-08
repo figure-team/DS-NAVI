@@ -1,0 +1,149 @@
+{
+  "domainId": "domain:white",
+  "files": [
+    {
+      "className": "TestWhiteListTag",
+      "kgHint": {
+        "summary": "허용 태그(whiteList) 기반으로 입력 문자열을 안전하게 정제하는 알고리즘을 main으로 실행 검증하는 XSS 필터 실험용 테스트다.",
+        "tags": [
+          "test",
+          "security",
+          "xss-filter",
+          "sanitization"
+        ]
+      },
+      "line": 23,
+      "relPath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 13,
+        "text": " *  2019.01.31  신용호          최초 생성\n *\n * </pre>\n */\n\npublic class TestWhiteListTag {\n\n\t// Tag 화이트 리스트 ( 허용할 태그 등록 )\n\tstatic private String[] whiteListTag = { \"<p>\",\"</p>\" };\n\t\n\tpublic static void main(String[] args) {\n\t\t// TODO Auto-generated method stub\n\t\t\n\t\tString paramData = \">Hello world <p>test</p>. <script>alert('OK');</script> <br> Good day~!<\";\n\t\tSystem.out.println(\"paramData = \"+paramData);\n\t\tString safeParamData = getSafeParamData(paramData);\n\t\tSystem.out.println(\"safeParamData = \"+safeParamData);\n\t\t\n\t}\n\n\tstatic private String getSafeParamData(String value) {\n\t\tStringBuffer strBuff = new StringBuffer();\n\n\t\tfor (int i = 0; i < value.length(); i++) {\n\t\t\tchar c = value.charAt(i);\n\t\t\tswitch (c) {\n\t\t\tcase '<':\n\t\t\t\tif ( checkNextWhiteListTag(i, value) == false )\n\t\t\t\t\tstrBuff.append(\"&lt;\");\n\t\t\t\telse \n\t\t\t\t\tstrBuff.append(c);\n\t\t\t\tSystem.out.println(\"checkNextWhiteListTag = \"+checkNextWhiteListTag(i, value));\n\t\t\t\tbreak;\n\t\t\tcase '>':\n\t\t\t\tif ( checkPrevWhiteListTag(i, value) == false )\n\t\t\t\t\tstrBuff.append(\"&gt;\");\n\t\t\t\telse \n\t\t\t\t\tstrBuff.append(c);\n\t\t\t\tSystem.out.println(\"checkPrevWhiteListTag = \"+checkPrevWhiteListTag(i, value));\n\t\t\t\tbreak;\n\t\t\t//case '&':\n\t\t\t//\tstrBuff.append(\"&amp;\");\n\t\t\t//\tbreak;\n\t\t\tcase '\"':\n\t\t\t\tstrBuff.append(\"&quot;\");\n\t\t\t\tbreak;\n\t\t\tcase '\\'':\n\t\t\t\tstrBuff.append(\"&apos;\");\n\t\t\t\tbreak;\t\n\t\t\tdefault:\n\t\t\t\tstrBuff.append(c);\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\t\n\t\tvalue = strBuff.toString();\n\t\treturn value;\n\t}\n\n\tstatic private boolean checkNextWhiteListTag(int index, String data) {\n\t\tSystem.out.println(\"[checkNextWhiteListTag]---------------------------------------------\");\n\t\tString extractData = \"\";\n\t\t//int beginIndex = 0;\n\t\tint endIndex = 0;\n\t\tfor(String whiteListData: whiteListTag) {\n\t\t    System.out.println(\"===>>> whiteListData=\"+whiteListData);\n\t\t\tendIndex = index+whiteListData.length();\n\t\t    if ( data.length() > endIndex )\n\t\t    \textractData = data.substring(index, endIndex);\n\t\t    else\n\t\t    \textractData = \"\";\n\t\t    System.out.println(\"extractData=\"+extractData);\n\t\t    if ( whiteListData.equals(extractData) ) return true; // whiteList 대상으로 판정\n\t\t}\n\t\t\n\t\treturn false;\n\t}\n\t\n\tstatic private boolean checkPrevWhiteListTag(int index, String data) {\n\t\tSystem.out.println(\"[checkPrevWhiteListTag]---------------------------------------------\");",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TestWhiteListTagV2",
+      "kgHint": {
+        "summary": "TestWhiteListTag의 개선판으로 태그 전방·후방 탐색(searchTagForward/Backward)을 분리해 화이트리스트 정제를 검증하는 실험용 테스트다.",
+        "tags": [
+          "test",
+          "security",
+          "xss-filter",
+          "sanitization"
+        ]
+      },
+      "line": 23,
+      "relPath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+      "slice": {
+        "endLine": 92,
+        "startLine": 13,
+        "text": " *  2019.01.31  신용호          최초 생성\n *\n * </pre>\n */\n\npublic class TestWhiteListTagV2 {\n\n\t// Tag 화이트 리스트 ( 허용할 태그 등록 )\n\tstatic private String[] whiteListTag = { \"<p>\",\"</p>\",\"<script>\",\"</script>\",\"<a>\",\"</a>\" };\n\t\n\tpublic static void main(String[] args) {\n\t\t// TODO Auto-generated method stub\n\t\t\n\t\tString paramData = \">Hello world<p>test</p>\"\n\t\t\t\t\t\t+\"<script type='javascript'>alert('OK');</script>\"\n\t\t\t\t\t\t+\"<a href='http://www.abc.com'>mypage</a><br>\"\n\t\t\t\t\t\t+\"<a href='http://www.img.com'><img src='http://test.img.com'></a>\"\n\t\t\t\t\t\t+ \"Good day~!<\";\n\t\tSystem.out.println(\"paramData = \"+paramData);\n\t\tString safeParamData = getSafeParamData(paramData);\n\t\tSystem.out.println(\"safeParamData = \"+safeParamData);\n\t\t\n\t}\n\n\tstatic private String getSafeParamData(String value) {\n\t\tStringBuffer strBuff = new StringBuffer();\n\n\t\tfor (int i = 0; i < value.length(); i++) {\n\t\t\tchar c = value.charAt(i);\n\t\t\tswitch (c) {\n\t\t\tcase '<':\n\t\t\t\tif ( checkNextWhiteListTag(i, value) == false )\n\t\t\t\t\tstrBuff.append(\"&lt;\");\n\t\t\t\telse \n\t\t\t\t\tstrBuff.append(c);\n\t\t\t\tSystem.out.println(\"checkNextWhiteListTag = \"+checkNextWhiteListTag(i, value));\n\t\t\t\tbreak;\n\t\t\tcase '>':\n\t\t\t\tif ( checkPrevWhiteListTag(i, value) == false )\n\t\t\t\t\tstrBuff.append(\"&gt;\");\n\t\t\t\telse \n\t\t\t\t\tstrBuff.append(c);\n\t\t\t\tSystem.out.println(\"checkPrevWhiteListTag = \"+checkPrevWhiteListTag(i, value));\n\t\t\t\tbreak;\n\t\t\t//case '&':\n\t\t\t//\tstrBuff.append(\"&amp;\");\n\t\t\t//\tbreak;\n\t\t\tcase '\"':\n\t\t\t\tstrBuff.append(\"&quot;\");\n\t\t\t\tbreak;\n\t\t\tcase '\\'':\n\t\t\t\tstrBuff.append(\"&apos;\");\n\t\t\t\tbreak;\t\n\t\t\tdefault:\n\t\t\t\tstrBuff.append(c);\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\t\n\t\tvalue = strBuff.toString();\n\t\treturn value;\n\t}\n\n\tstatic private boolean checkNextWhiteListTag(int index, String data) {\n\t\tSystem.out.println(\"[checkNextWhiteListTag]---------------------------------------------\");\n\t\tString extractData = searchTagForward(index, data);\n\t\tSystem.out.println(\"checkNextWhiteListTag FIND = \"+extractData);\n\t\t\n\t\tint resultIndex = 0;\n\t\tString compareString = \"\";\n\t\tfor(String whiteListData: whiteListTag) {\n\t\t    System.out.println(\"===>>> whiteListData=\"+whiteListData);\n\t\t    compareString = whiteListData.substring(0, whiteListData.length()-1);\n\t\t    System.out.println(\"===>>> whiteListData compare String =\"+compareString);\n\t\t    resultIndex = extractData.indexOf(compareString);\n\t\t    System.out.println(\"===>>> resultIndex =\"+resultIndex);\n\t\t\tif ( resultIndex == 0 )\n\t\t    \treturn true;\n\t\t}\n\t\t",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "TestWhiteListTag#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java#main",
+      "line": 23,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java#main:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java"
+      ]
+    },
+    {
+      "entryPoint": "TestWhiteListTagV2#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java#main",
+      "line": 23,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java#main:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "white",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java#main:src/test/java/egovframework/com/cmm/filter/TestWhiteListTag.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java#main:src/test/java/egovframework/com/cmm/filter/TestWhiteListTagV2.java"
+    }
+  ]
+}

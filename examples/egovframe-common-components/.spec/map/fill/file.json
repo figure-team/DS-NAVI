@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:file",
+  "name": "파일 처리·공통 보안 유틸리티",
+  "summary": {
+    "text": "MultipartFile 업로드·다운로드 스트리밍과 문자열·프로퍼티 처리를 지원하는 공통 유틸리티 집합으로, XSS·경로 조작 등 보안 위협에 대한 입력값 정화 기능을 포함한다.",
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "line": 60,
+        "snippet": "@Component(\"EgovFileMngUtil\")"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "text": "업로드된 MultipartFile 및 물리 저장 파일",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+          "line": 60,
+          "snippet": "@Component(\"EgovFileMngUtil\")"
+        }
+      ]
+    },
+    {
+      "text": "프레임워크 전역 설정 프로퍼티(Globals·경로)",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+          "line": 49,
+          "snippet": "public class EgovProperties {"
+        }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "파일 다운로드·업로드 시 EgovWebUtil을 통해 경로·입력값에 대한 XSS 및 경로 조작(path traversal) 방어 검증을 거친다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "text": "이 도메인이 cop 도메인과 파일 설정 조회 및 파일 다운로드 유틸리티 호출로 연관된다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/com/file/TestFile.java",
+          "line": 1,
+          "snippet": "package egovframework.com.file;"
+        },
+        {
+          "filePath": "src/test/java/egovframework/com/secure/path/FileDownloadController.java",
+          "line": 1,
+          "snippet": "package egovframework.com.secure.path;"
+        }
+      ]
+    },
+    {
+      "text": "이 도메인이 testexception 도메인과 파일명 보안 검증 테스트에서 예외 유틸리티 사용으로 연관된다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/code/security/file/TestFileName.java",
+          "line": 1,
+          "snippet": "package egovframework.code.security.file;"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:GET /downFile.do",
+      "name": "파일 다운로드",
+      "summary": {
+        "text": "클라이언트 요청 경로의 파일을 EgovFileMngUtil을 통해 다운로드 스트리밍하며, EgovWebUtil로 경로 조작 등 보안 위협을 검증한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/secure/path/FileDownloadController.java",
+            "line": 14,
+            "snippet": "@GetMapping(\"/downFile.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/code/security/file/TestFileName.java#main",
+      "name": "파일명 보안 검증 배치",
+      "summary": {
+        "text": "파일명 관련 보안 취약점을 점검하기 위한 배치성 테스트 실행 진입점이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/code/security/file/TestFileName.java",
+            "line": 33,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/file/TestFile.java#main",
+      "name": "파일 경로 설정 점검 배치",
+      "summary": {
+        "text": "EgovProperties·EgovStringUtil·EgovWebUtil을 활용해 파일 경로 관련 설정과 처리 동작을 점검하는 배치성 테스트 진입점이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/file/TestFile.java",
+            "line": 11,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:GET /downFile.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "다운로드 경로 보안 검증",
+      "summary": {
+        "text": "다운로드 경로 및 입력값에 대해 XSS·경로 조작 등 보안 위협을 필터링하는 공통 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:GET /downFile.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "name": "파일 다운로드 처리",
+      "summary": {
+        "text": "실제 파일을 물리 경로에서 읽어 다운로드 스트림으로 전달하는 서비스 컴포넌트이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+            "line": 60,
+            "snippet": "@Component(\"EgovFileMngUtil\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:GET /downFile.do:src/test/java/egovframework/com/secure/path/FileDownloadController.java",
+      "name": "파일 다운로드 요청 접수",
+      "summary": {
+        "text": "다운로드 URL 요청을 받아 EgovFileMngUtil의 다운로드 처리를 호출하는 컨트롤러 역할을 한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/secure/path/FileDownloadController.java",
+            "line": 14,
+            "snippet": "@GetMapping(\"/downFile.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/code/security/file/TestFileName.java#main:src/test/java/egovframework/code/security/file/TestFileName.java",
+      "name": "파일명 보안 테스트 실행",
+      "summary": {
+        "text": "TestException 유틸을 활용해 파일명 관련 보안 검증을 수행하는 테스트 스텁이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/code/security/file/TestFileName.java",
+            "line": 33,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestFile.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "경로 보안 검증",
+      "summary": {
+        "text": "파일 경로 및 입력값에 대한 XSS·경로 조작 등 보안 위협을 필터링하는 공통 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestFile.java#main:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "설정 프로퍼티 조회",
+      "summary": {
+        "text": "프로퍼티 파일을 로드해 키 기준으로 Globals·경로 설정 값을 조회하는 공통 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestFile.java#main:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리",
+      "summary": {
+        "text": "문자열 자르기·치환·인코딩·HTML 변환 등을 제공하는 공통 문자열 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestFile.java#main:src/test/java/egovframework/com/file/TestFile.java",
+      "name": "파일 경로 테스트 실행",
+      "summary": {
+        "text": "EgovProperties·Globals 설정값을 사용해 파일 경로 관련 동작을 점검하는 테스트 스텁이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/file/TestFile.java",
+            "line": 11,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ]
+}

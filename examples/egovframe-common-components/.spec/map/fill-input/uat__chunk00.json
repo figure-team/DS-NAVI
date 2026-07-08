@@ -1,0 +1,2204 @@
+{
+  "schemaVersion": 1,
+  "key": "uat",
+  "domainId": "domain:uat",
+  "chunkIndex": 0,
+  "chunkTotal": 2,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:uat",
+    "key": "uat",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "className": "ComDefaultCodeVO",
+        "summary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 28,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+        "className": "EgovComponentChecker",
+        "summary": "Spring ApplicationContext를 주입받아 특정 컴포넌트(bean)의 존재 여부를 조회하는 정적 유틸리티. 선택적 기능 활성화 판단에 사용된다.",
+        "tags": [
+          "utility",
+          "spring",
+          "component-check",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+          "line": 29,
+          "snippet": "@Service(\"egovUtil\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "className": "EgovMessageSource",
+        "summary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+        "tags": [
+          "service",
+          "i18n",
+          "message-source",
+          "spring",
+          "utility"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "className": "EgovWebUtil",
+        "summary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+        "tags": [
+          "utility",
+          "security",
+          "validation",
+          "xss",
+          "sanitization",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/LoginRequestVO.java",
+        "className": "LoginRequestVO",
+        "summary": "로그인 요청 파라미터(id, password)를 담는 요청 VO. Spring Security 로그인 필터/컨트롤러에서 사용된다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "authentication"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginRequestVO.java",
+          "line": 29,
+          "snippet": "public class LoginRequestVO extends BaseRequestVO{"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "className": "LoginVO",
+        "summary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "authentication",
+          "session",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/SearchIdRequestVO.java",
+        "className": "SearchIdRequestVO",
+        "summary": "아이디 찾기 요청 파라미터(name, email)를 담는 요청 VO.",
+        "tags": [
+          "data-model",
+          "vo",
+          "authentication"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/SearchIdRequestVO.java",
+          "line": 30,
+          "snippet": "public class SearchIdRequestVO extends BaseRequestVO{"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/SearchPasswordRequestVO.java",
+        "className": "SearchPasswordRequestVO",
+        "summary": "비밀번호 찾기 요청 파라미터(id, name, email, passwordHint, passwordCnsr)를 담는 요청 VO.",
+        "tags": [
+          "data-model",
+          "vo",
+          "authentication"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/SearchPasswordRequestVO.java",
+          "line": 30,
+          "snippet": "public class SearchPasswordRequestVO extends BaseRequestVO{"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/config/EgovLoginConfig.java",
+        "className": "EgovLoginConfig",
+        "summary": "로그인 잠금(lock)·잠금 임계치(lockCount) 설정 값을 담는 로그인 정책 설정 VO.",
+        "tags": [
+          "config",
+          "data-model",
+          "authentication"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/config/EgovLoginConfig.java",
+          "line": 25,
+          "snippet": "public class EgovLoginConfig {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "className": "EgovCmmUseService",
+        "summary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+        "tags": [
+          "service",
+          "interface",
+          "type-definition",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 26,
+          "snippet": "public interface EgovCmmUseService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "className": "EgovProperties",
+        "summary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+        "tags": [
+          "utility",
+          "config",
+          "properties"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+          "line": 49,
+          "snippet": "public class EgovProperties {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "className": "EgovUserDetailsService",
+        "summary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+        "tags": [
+          "type-definition",
+          "service-interface",
+          "authentication",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+          "line": 5,
+          "snippet": "public interface EgovUserDetailsService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "className": "EgovUserDetailsHelper",
+        "summary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+        "tags": [
+          "utility",
+          "authentication",
+          "security"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "className": "EgovLoginPolicyService",
+        "summary": "로그인 정책 CRUD 기능을 정의하는 Service 인터페이스.",
+        "tags": [
+          "service",
+          "interface",
+          "security",
+          "login-policy"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+          "line": 26,
+          "snippet": "public interface EgovLoginPolicyService {"
+        }
+      }
+    ],
+    "cross": [
+      {
+        "to": "cop",
+        "weight": 18,
+        "evidence": [
+          {
+            "kind": "extends",
+            "line": 26,
+            "source": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+            "target": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+              "line": 26,
+              "snippet": "public class LoginPolicy extends ComDefaultVO {"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+            "target": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+              "line": 3,
+              "snippet": "* - 로그인정책에 대한 model 클래스를 정의한다."
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+              "line": 3,
+              "snippet": "* - 로그인정책에 대한 controller 클래스를 정의한다."
+            }
+          }
+        ]
+      },
+      {
+        "to": "egov",
+        "weight": 2,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+            "target": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.uat.uia.web;"
+            }
+          },
+          {
+            "kind": "injection",
+            "line": 75,
+            "source": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+            "target": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+              "line": 75,
+              "snippet": "@Resource(name = \"loginService\")"
+            }
+          }
+        ]
+      }
+    ],
+    "flowCount": 21,
+    "stepCount": 91
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uat/uap/addLoginPolicy.do",
+      "entryPoint": "EgovLoginPolicyController#insertLoginPolicy",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "stepIds": [
+        "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+        "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicy.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uap/addLoginPolicyView.do",
+      "entryPoint": "EgovLoginPolicyController#insertLoginPolicyView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "stepIds": [
+        "step:ANY /uat/uap/addLoginPolicyView.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "step:ANY /uat/uap/addLoginPolicyView.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+        "step:ANY /uat/uap/addLoginPolicyView.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "step:ANY /uat/uap/addLoginPolicyView.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 121,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicyView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uap/getLoginPolicy.do",
+      "entryPoint": "EgovLoginPolicyController#selectLoginPolicy",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "stepIds": [
+        "step:ANY /uat/uap/getLoginPolicy.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "step:ANY /uat/uap/getLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+        "step:ANY /uat/uap/getLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "step:ANY /uat/uap/getLoginPolicy.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 97,
+        "snippet": "@RequestMapping(\"/uat/uap/getLoginPolicy.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uap/removeLoginPolicy.do",
+      "entryPoint": "EgovLoginPolicyController#deleteLoginPolicy",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "stepIds": [
+        "step:ANY /uat/uap/removeLoginPolicy.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "step:ANY /uat/uap/removeLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "step:ANY /uat/uap/removeLoginPolicy.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uat/uap/removeLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 197,
+        "snippet": "@RequestMapping(\"/uat/uap/removeLoginPolicy.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uap/selectLoginPolicyList.do",
+      "entryPoint": "EgovLoginPolicyController#selectLoginPolicyList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "stepIds": [
+        "step:ANY /uat/uap/selectLoginPolicyList.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "step:ANY /uat/uap/selectLoginPolicyList.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+        "step:ANY /uat/uap/selectLoginPolicyList.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "step:ANY /uat/uap/selectLoginPolicyList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 67,
+        "snippet": "@RequestMapping(\"/uat/uap/selectLoginPolicyList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uap/selectLoginPolicyListView.do",
+      "entryPoint": "EgovLoginPolicyController#selectLoginPolicyListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "stepIds": [
+        "step:ANY /uat/uap/selectLoginPolicyListView.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 56,
+        "snippet": "@RequestMapping(\"/uat/uap/selectLoginPolicyListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uap/updtLoginPolicy.do",
+      "entryPoint": "EgovLoginPolicyController#updateLoginPolicy",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "stepIds": [
+        "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+        "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 169,
+        "snippet": "@RequestMapping(\"/uat/uap/updtLoginPolicy.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/EgovGpkiRegist.do",
+      "entryPoint": "EgovLoginController#gpkiRegistView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/EgovGpkiRegist.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/actionCrtfctLogin.do",
+      "entryPoint": "EgovLoginController#actionCrtfctLogin",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/actionCrtfctLogin.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/actionCrtfctLogin.do:src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+        "step:ANY /uat/uia/actionCrtfctLogin.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 221,
+        "snippet": "@RequestMapping(value = \"/uat/uia/actionCrtfctLogin.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/actionGpkiRegist.do",
+      "entryPoint": "EgovLoginController#actionGpkiRegist",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/actionGpkiRegist.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/actionGpkiRegist.do:src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 540,
+        "snippet": "@RequestMapping(value = \"/uat/uia/actionGpkiRegist.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/actionLogin.do",
+      "entryPoint": "EgovLoginController#actionLogin",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+        "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/LoginRequestVO.java",
+        "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/config/EgovLoginConfig.java",
+        "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 147,
+        "snippet": "@RequestMapping(value = \"/uat/uia/actionLogin.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/actionLogout.do",
+      "entryPoint": "EgovLoginController#actionLogout",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/actionLogout.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/actionLogout.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:ANY /uat/uia/actionLogout.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uat/uia/actionLogout.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 345,
+        "snippet": "@RequestMapping(value = \"/uat/uia/actionLogout.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/actionMain.do",
+      "entryPoint": "EgovLoginController#actionMain",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+        "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 284,
+        "snippet": "@RequestMapping(value = \"/uat/uia/actionMain.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/egovGpkiIssu.do",
+      "entryPoint": "EgovLoginController#gpkiIssuView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/egovGpkiIssu.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 386,
+        "snippet": "@RequestMapping(value = \"/uat/uia/egovGpkiIssu.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/egovIdPasswordSearch.do",
+      "entryPoint": "EgovLoginController#idPasswordSearchView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/egovIdPasswordSearch.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/egovIdPasswordSearch.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uat/uia/egovIdPasswordSearch.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 368,
+        "snippet": "@RequestMapping(value = \"/uat/uia/egovIdPasswordSearch.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/egovLoginUsr.do",
+      "entryPoint": "EgovLoginController#loginUsrView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+        "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 100,
+        "snippet": "@RequestMapping(value = \"/uat/uia/egovLoginUsr.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/getEncodingData.do",
+      "entryPoint": "EgovLoginController#getEncodingData",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/getEncodingData.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 483,
+        "snippet": "@RequestMapping(value = \"/uat/uia/getEncodingData.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/noticeExpirePwd.do",
+      "entryPoint": "EgovLoginController#noticeExpirePwd",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+        "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 599,
+        "snippet": "@RequestMapping(value = \"/uat/uia/noticeExpirePwd.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/refreshSessionTimeout.do",
+      "entryPoint": "EgovLoginController#refreshSessionTimeout",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/refreshSessionTimeout.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 583,
+        "snippet": "@RequestMapping(value = \"/uat/uia/refreshSessionTimeout.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uat/uia/searchId.do",
+      "entryPoint": "EgovLoginController#searchId",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "stepIds": [
+        "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/SearchIdRequestVO.java",
+        "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+        "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 398,
+        "snippet": "@RequestMapping(value = \"/uat/uia/searchId.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "layer": "api",
+      "className": "EgovLoginPolicyController",
+      "kgSummary": "로그인정책 기능의 Spring MVC Controller로, 목록 조회·상세·등록·수정·삭제 요청을 매핑하고 화면(JSP)으로 결과를 전달한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicy.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+      "layer": "unknown",
+      "className": "LoginPolicy",
+      "kgSummary": "로그인 정책 VO. 사용자 ID·IP 정보·중복허용·제한 여부 등 정책 항목을 담으며 ComDefaultVO를 상속한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+        "line": 26,
+        "snippet": "public class LoginPolicy extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "layer": "service",
+      "className": "EgovLoginPolicyService",
+      "kgSummary": "로그인 정책 CRUD 기능을 정의하는 Service 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "line": 26,
+        "snippet": "public interface EgovLoginPolicyService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicy.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicyView.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "layer": "api",
+      "className": "EgovLoginPolicyController",
+      "kgSummary": "로그인정책 기능의 Spring MVC Controller로, 목록 조회·상세·등록·수정·삭제 요청을 매핑하고 화면(JSP)으로 결과를 전달한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicy.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicyView.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+      "layer": "unknown",
+      "className": "LoginPolicyVO",
+      "kgSummary": "로그인정책 도메인 데이터를 담는 VO로, 조회 조건·페이징·엔티티 필드를 보관한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "dto",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+        "line": 36,
+        "snippet": "public class LoginPolicyVO extends LoginPolicy {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicyView.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "layer": "service",
+      "className": "EgovLoginPolicyService",
+      "kgSummary": "로그인 정책 CRUD 기능을 정의하는 Service 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "line": 26,
+        "snippet": "public interface EgovLoginPolicyService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/addLoginPolicyView.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/getLoginPolicy.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "layer": "api",
+      "className": "EgovLoginPolicyController",
+      "kgSummary": "로그인정책 기능의 Spring MVC Controller로, 목록 조회·상세·등록·수정·삭제 요청을 매핑하고 화면(JSP)으로 결과를 전달한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicy.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/getLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+      "layer": "unknown",
+      "className": "LoginPolicyVO",
+      "kgSummary": "로그인정책 도메인 데이터를 담는 VO로, 조회 조건·페이징·엔티티 필드를 보관한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "dto",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+        "line": 36,
+        "snippet": "public class LoginPolicyVO extends LoginPolicy {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/getLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "layer": "service",
+      "className": "EgovLoginPolicyService",
+      "kgSummary": "로그인 정책 CRUD 기능을 정의하는 Service 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "line": 26,
+        "snippet": "public interface EgovLoginPolicyService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/getLoginPolicy.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/removeLoginPolicy.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "layer": "api",
+      "className": "EgovLoginPolicyController",
+      "kgSummary": "로그인정책 기능의 Spring MVC Controller로, 목록 조회·상세·등록·수정·삭제 요청을 매핑하고 화면(JSP)으로 결과를 전달한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicy.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/removeLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "layer": "service",
+      "className": "EgovLoginPolicyService",
+      "kgSummary": "로그인 정책 CRUD 기능을 정의하는 Service 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "line": 26,
+        "snippet": "public interface EgovLoginPolicyService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/removeLoginPolicy.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/removeLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+      "layer": "unknown",
+      "className": "LoginPolicy",
+      "kgSummary": "로그인 정책 VO. 사용자 ID·IP 정보·중복허용·제한 여부 등 정책 항목을 담으며 ComDefaultVO를 상속한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+        "line": 26,
+        "snippet": "public class LoginPolicy extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/selectLoginPolicyList.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "layer": "api",
+      "className": "EgovLoginPolicyController",
+      "kgSummary": "로그인정책 기능의 Spring MVC Controller로, 목록 조회·상세·등록·수정·삭제 요청을 매핑하고 화면(JSP)으로 결과를 전달한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicy.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/selectLoginPolicyList.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+      "layer": "unknown",
+      "className": "LoginPolicyVO",
+      "kgSummary": "로그인정책 도메인 데이터를 담는 VO로, 조회 조건·페이징·엔티티 필드를 보관한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "dto",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicyVO.java",
+        "line": 36,
+        "snippet": "public class LoginPolicyVO extends LoginPolicy {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/selectLoginPolicyList.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "layer": "service",
+      "className": "EgovLoginPolicyService",
+      "kgSummary": "로그인 정책 CRUD 기능을 정의하는 Service 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "line": 26,
+        "snippet": "public interface EgovLoginPolicyService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/selectLoginPolicyList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/selectLoginPolicyListView.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "layer": "api",
+      "className": "EgovLoginPolicyController",
+      "kgSummary": "로그인정책 기능의 Spring MVC Controller로, 목록 조회·상세·등록·수정·삭제 요청을 매핑하고 화면(JSP)으로 결과를 전달한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicy.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+      "layer": "api",
+      "className": "EgovLoginPolicyController",
+      "kgSummary": "로그인정책 기능의 Spring MVC Controller로, 목록 조회·상세·등록·수정·삭제 요청을 매핑하고 화면(JSP)으로 결과를 전달한다.",
+      "kgTags": [
+        "spring-mvc",
+        "api-handler",
+        "controller",
+        "uap",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/web/EgovLoginPolicyController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/uat/uap/addLoginPolicy.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+      "layer": "unknown",
+      "className": "LoginPolicy",
+      "kgSummary": "로그인 정책 VO. 사용자 ID·IP 정보·중복허용·제한 여부 등 정책 항목을 담으며 ComDefaultVO를 상속한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/LoginPolicy.java",
+        "line": 26,
+        "snippet": "public class LoginPolicy extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+      "layer": "service",
+      "className": "EgovLoginPolicyService",
+      "kgSummary": "로그인 정책 CRUD 기능을 정의하는 Service 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "security",
+        "login-policy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uap/service/EgovLoginPolicyService.java",
+        "line": 26,
+        "snippet": "public interface EgovLoginPolicyService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uap/updtLoginPolicy.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/EgovGpkiRegist.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionCrtfctLogin.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionCrtfctLogin.do:src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+      "layer": "unknown",
+      "className": "EgovClntInfo",
+      "kgSummary": "HTTP 요청에서 클라이언트 IP·OS·브라우저 종류/버전을 추출하는 클라이언트 정보 static 유틸리티.",
+      "kgTags": [
+        "utility",
+        "client-info",
+        "web",
+        "user-agent"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+        "line": 28,
+        "snippet": "public class EgovClntInfo {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionCrtfctLogin.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionGpkiRegist.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionGpkiRegist.do:src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+      "layer": "unknown",
+      "className": "EgovClntInfo",
+      "kgSummary": "HTTP 요청에서 클라이언트 IP·OS·브라우저 종류/버전을 추출하는 클라이언트 정보 static 유틸리티.",
+      "kgTags": [
+        "utility",
+        "client-info",
+        "web",
+        "user-agent"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+        "line": 28,
+        "snippet": "public class EgovClntInfo {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+      "layer": "service",
+      "className": "EgovComponentChecker",
+      "kgSummary": "Spring ApplicationContext를 주입받아 특정 컴포넌트(bean)의 존재 여부를 조회하는 정적 유틸리티. 선택적 기능 활성화 판단에 사용된다.",
+      "kgTags": [
+        "utility",
+        "spring",
+        "component-check",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+        "line": 29,
+        "snippet": "@Service(\"egovUtil\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/LoginRequestVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginRequestVO.java",
+      "layer": "unknown",
+      "className": "LoginRequestVO",
+      "kgSummary": "로그인 요청 파라미터(id, password)를 담는 요청 VO. Spring Security 로그인 필터/컨트롤러에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginRequestVO.java",
+        "line": 29,
+        "snippet": "public class LoginRequestVO extends BaseRequestVO{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/cmm/config/EgovLoginConfig.java",
+      "relPath": "src/main/java/egovframework/com/cmm/config/EgovLoginConfig.java",
+      "layer": "service",
+      "className": "EgovLoginConfig",
+      "kgSummary": "로그인 잠금(lock)·잠금 임계치(lockCount) 설정 값을 담는 로그인 정책 설정 VO.",
+      "kgTags": [
+        "config",
+        "data-model",
+        "authentication"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/config/EgovLoginConfig.java",
+        "line": 25,
+        "snippet": "public class EgovLoginConfig {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogin.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "layer": "service",
+      "className": "EgovLoginService",
+      "kgSummary": "일반 로그인·인증서 로그인·아이디/비밀번호 찾기 등 사용자 인증 기능을 정의하는 service interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "authentication",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+        "line": 31,
+        "snippet": "public interface EgovLoginService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogout.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogout.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogout.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionLogout.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+      "layer": "unknown",
+      "className": "EgovClntInfo",
+      "kgSummary": "HTTP 요청에서 클라이언트 IP·OS·브라우저 종류/버전을 추출하는 클라이언트 정보 static 유틸리티.",
+      "kgTags": [
+        "utility",
+        "client-info",
+        "web",
+        "user-agent"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovClntInfo.java",
+        "line": 28,
+        "snippet": "public class EgovClntInfo {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/actionMain.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovGpkiIssu.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovIdPasswordSearch.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovIdPasswordSearch.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovIdPasswordSearch.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+      "layer": "service",
+      "className": "EgovComponentChecker",
+      "kgSummary": "Spring ApplicationContext를 주입받아 특정 컴포넌트(bean)의 존재 여부를 조회하는 정적 유틸리티. 선택적 기능 활성화 판단에 사용된다.",
+      "kgTags": [
+        "utility",
+        "spring",
+        "component-check",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovComponentChecker.java",
+        "line": 29,
+        "snippet": "@Service(\"egovUtil\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/egovLoginUsr.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/getEncodingData.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "layer": "service",
+      "className": "EgovLoginService",
+      "kgSummary": "일반 로그인·인증서 로그인·아이디/비밀번호 찾기 등 사용자 인증 기능을 정의하는 service interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "authentication",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+        "line": 31,
+        "snippet": "public interface EgovLoginService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/noticeExpirePwd.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/refreshSessionTimeout.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "layer": "api",
+      "className": "EgovLoginController",
+      "kgSummary": "일반/인증서(GPKI) 로그인, 로그아웃, ID/비밀번호 찾기, 세션 연장 등 인증 전반을 처리하는 Spring MVC 로그인 컨트롤러로 인증 흐름의 진입점이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "인증",
+        "로그인",
+        "entry-point"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+        "line": 503,
+        "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/SearchIdRequestVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/SearchIdRequestVO.java",
+      "layer": "unknown",
+      "className": "SearchIdRequestVO",
+      "kgSummary": "아이디 찾기 요청 파라미터(name, email)를 담는 요청 VO.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/SearchIdRequestVO.java",
+        "line": 30,
+        "snippet": "public class SearchIdRequestVO extends BaseRequestVO{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "relPath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "layer": "service",
+      "className": "EgovLoginService",
+      "kgSummary": "일반 로그인·인증서 로그인·아이디/비밀번호 찾기 등 사용자 인증 기능을 정의하는 service interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "authentication",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+        "line": 31,
+        "snippet": "public interface EgovLoginService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchId.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    }
+  ]
+}

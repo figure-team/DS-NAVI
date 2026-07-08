@@ -1,0 +1,114 @@
+{
+  "domainId": "domain:class",
+  "files": [
+    {
+      "className": "TestClassPath",
+      "kgHint": {
+        "summary": "EgovProperties 클래스의 리소스·코드소스 위치를 여러 방식으로 출력해 클래스패스 경로 해석을 확인하는 진단용 main 테스트다.",
+        "tags": [
+          "test",
+          "diagnostic",
+          "classpath",
+          "main-runner"
+        ]
+      },
+      "line": 19,
+      "relPath": "src/test/java/egovframework/com/cmm/service/TestClassPath.java",
+      "slice": {
+        "endLine": 54,
+        "startLine": 9,
+        "text": " * <pre>\n *\n *  수정일              수정자          수정내용\n *  ----------  --------  ---------------------------\n *  2019.04.25  신용호          최초 생성\n *\n */\n\npublic class TestClassPath {\n\n\tpublic static void main(String[] args) {\n\t\t// TODO Auto-generated method stub\n\n\t\t// classpath 가져오기 - 기본 방식 (AS IS)\n\t\tSystem.out.println(\">>> TEST CLASS PATH1 = \"+EgovProperties.class.getResource(\"\"));\n\t\t// classpath 가져오기 - 새로운 방법 (TO BE)\n\t\tSystem.out.println(\">>> TEST CLASS PATH2 = \"+EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath());\n\t\t// * 주의 항상 동일한 Path를 반환하지는 않음.\n\t\t// ex)\n\t\t//  /C:/eGovFrameDev-3.7.0-64bit_dev/workspace/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/egovframework-all-in-one-AllNew/WEB-INF/classes/\n\t\t//  /C:/eGovFrameDev-3.6.0-64bit/workspace/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/egovframework-all-in-one-AllNew/WEB-INF/classes/egovframework/com/cmm/service/EgovProperties.class\n\t\t\n\t\tString path1 = EgovProperties.class.getResource(\"\").getPath().substring(0, EgovProperties.class.getResource(\"\").getPath().lastIndexOf(\"com\"));\n\t\tSystem.out.println(\">>> TEST CLASS PATH3 = \"+path1);\n\t\t\n\t\tSystem.out.println(\">>> TEST CLASS PATH4 = \"+EgovProperties.class.getResource(\"\").getPath().lastIndexOf(\"com\"));\n\t\tSystem.out.println(\">>> TEST CLASS PATH5 = \"+EgovProperties.class.getResource(\"/\").getPath());\n\t\t\n\t\tSystem.out.println(\">>> TEST CLASS PATH6 = \"+EgovProperties.class.getResource(\"\").getPath());\n\t\t\n\t\t// 개선된 방법\n\t\tSystem.out.println(\">>> TEST CLASS PATH7 = \"+\n\t\t\t\tEgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath()+\n\t\t\t\tEgovProperties.class.getResource(\"\").getPath().substring(0, EgovProperties.class.getResource(\"\").getPath().lastIndexOf(\"com\"))\n\t\t\t\t.replace(EgovProperties.class.getResource(\"/\").getPath(), \"\")\n\t\t\t\t);\n\t\t\n\t\t//String path2 = EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(0, EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().lastIndexOf(\"com\"));\n\t\t//System.out.println(\">>> TEST RELATIVE_PATH_PREFIX3 = \"+path);\n\t\t\n\t\t//String txt = \"/C:/eGovFrameDev-3.6.0-64bit/workspace/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/egovframework-all-in-one-AllNew/WEB-INF/classes/egovframework/com/cmm/service/EgovProperties.class\";\n\t\t//System.out.println(\"===>>> \"+EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(0,EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().indexOf(\"WEB-INF/classes/\")+\"WEB-INF/classes/\".length())+\"egovframework/\");\n\t}\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "TestClassPath#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/cmm/service/TestClassPath.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/cmm/service/TestClassPath.java#main",
+      "line": 19,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/cmm/service/TestClassPath.java#main:src/test/java/egovframework/com/cmm/service/TestClassPath.java"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "class",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/cmm/service/TestClassPath.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestClassPath.java#main:src/test/java/egovframework/com/cmm/service/TestClassPath.java"
+    }
+  ]
+}

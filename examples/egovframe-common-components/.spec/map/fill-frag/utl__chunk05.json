@@ -1,0 +1,135 @@
+{
+  "key": "utl",
+  "chunkIndex": 5,
+  "isHeaderChunk": false,
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main",
+      "name": "네트워크 상태 점검 테스트 실행",
+      "summary": {
+        "text": "TestPingNetwork의 main 메서드를 통해 EgovNetworkState가 제공하는 MAC 주소·IP·포트 스캔·ping 등 네트워크 상태 조회 기능을 실행 검증한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/utl/sim/TestPingNetwork.java",
+            "line": 37,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java",
+      "name": "네트워크 상태 조회 테스트 진입점",
+      "summary": {
+        "text": "EgovNetworkState의 핑·네트워크 상태 조회 기능을 main으로 실행 검증하는 테스트 스텁이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/utl/sim/TestPingNetwork.java",
+            "line": 37,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/utl/sim/service/EgovNetworkState.java",
+      "name": "네트워크 상태 진단",
+      "summary": {
+        "text": "MAC 주소·IP·포트 스캔·ping 등 네트워크 상태를 조회하는 시스템 진단 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovNetworkState.java",
+            "line": 52,
+            "snippet": "public class EgovNetworkState {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "웹 입력값 보안 필터링",
+      "summary": {
+        "text": "XSS·파일경로·SQL/OS/LDAP injection 등을 걸러내는 공통 웹 보안 필터링 유틸리티로 프레임워크 전반의 입력값 정화에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+      "name": "디스크 여유공간 및 배치 프로세스 관리",
+      "summary": {
+        "text": "OS별 명령을 실행해 디스크 여유 공간을 계산하고, 화이트리스트 기반으로 배치 셸 프로세스를 안전하게 기동하는 파일시스템 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+            "line": 56,
+            "snippet": "public class FileSystemUtils {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "공통 설정값 조회",
+      "summary": {
+        "text": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "name": "자원 안전 종료 처리",
+      "summary": {
+        "text": "Closeable·DB(ResultSet/Statement/Connection)·소켓 자원을 예외를 삼키며 안전하게 닫는 리소스 정리 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+            "line": 31,
+            "snippet": "public class EgovResourceCloseHelper {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "name": "공통 로깅 처리",
+      "summary": {
+        "text": "ignore/debug/info 레벨별 SLF4J 로거를 감싸 공통 로깅 진입점을 제공하며, 특히 무시 가능한 예외 로깅에 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+            "line": 24,
+            "snippet": "public class EgovBasicLogger {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPingNetwork.java#main:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 유틸리티",
+      "summary": {
+        "text": "자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등 문자열 관련 공통 기능을 제공하는 정적 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1931 @@
+{
+  "schemaVersion": 1,
+  "key": "uss",
+  "domainId": "domain:uss",
+  "chunkIndex": 1,
+  "chunkTotal": 25,
+  "isHeaderChunk": false,
+  "domainHeader": {
+    "domainId": "domain:uss",
+    "key": "uss"
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/ans/selectAnnvrsryManageListView.do",
+      "entryPoint": "EgovAnnvrsryManageController#selectAnnvrsryManageListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/ans/selectAnnvrsryManageListView.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+        "line": 83,
+        "snippet": "@RequestMapping(\"/uss/ion/ans/selectAnnvrsryManageListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/ans/updateAnnvrsryManage.do",
+      "entryPoint": "EgovAnnvrsryManageController#updateAnnvrsryManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+        "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+        "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+        "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+        "line": 275,
+        "snippet": "@RequestMapping(value = \"/uss/ion/ans/updateAnnvrsryManage.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/addBanner.do",
+      "entryPoint": "EgovBannerController#insertBanner",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+        "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/addViewBanner.do",
+      "entryPoint": "EgovBannerController#insertViewBanner",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/addViewBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 140,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addViewBanner.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/getBanner.do",
+      "entryPoint": "EgovBannerController#selectBanner",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 123,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/getBanner.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/getBannerImage.do",
+      "entryPoint": "EgovBannerController#selectBannerResult",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 317,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/getBannerImage.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/removeBanner.do",
+      "entryPoint": "EgovBannerController#deleteBanner",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 270,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/removeBanner.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/removeBannerList.do",
+      "entryPoint": "EgovBannerController#deleteBannerList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 290,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/removeBannerList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/selectBannerList.do",
+      "entryPoint": "EgovBannerController#selectBannerList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/selectBannerList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/selectBannerListView.do",
+      "entryPoint": "EgovBannerController#selectBannerListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/selectBannerListView.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 78,
+        "snippet": "@RequestMapping(\"/uss/ion/bnr/selectBannerListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/selectBannerMainList.do",
+      "entryPoint": "EgovBannerController#selectBannerMainList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 335,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/selectBannerMainList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnr/updtBanner.do",
+      "entryPoint": "EgovBannerController#updateBanner",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+        "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 209,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/updtBanner.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnt/EgovBndtCeckManage.do",
+      "entryPoint": "EgovBndtManageController#selectBndtCeckManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManage.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManage.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnt/EgovBndtCeckManageList.do",
+      "entryPoint": "EgovBndtManageController#selectBndtCeckManageList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/uss/ion/bnt/service/BndtCeckManageVO.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 307,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManageList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do",
+      "entryPoint": "EgovBndtManageController#insertViewBndtCeckManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/uss/ion/bnt/service/BndtCeckManageVO.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 366,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManageRegist.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnt/EgovBndtManageDetail.do",
+      "entryPoint": "EgovBndtManageController#selectBndtManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnt/EgovBndtManageDetail.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageDetail.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 195,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtManageDetail.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnt/EgovBndtManageList.do",
+      "entryPoint": "EgovBndtManageController#selectBndtManageListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnt/EgovBndtManageList.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageList.do:src/main/java/egovframework/com/uss/ion/bnt/service/BndtManageVO.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageList.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(\"/uss/ion/bnt/EgovBndtManageList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnt/EgovBndtManageListPop.do",
+      "entryPoint": "EgovBndtManageController#selectBndtManageBnde",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPop.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPop.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPop.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPop.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 615,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtManageListPop.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do",
+      "entryPoint": "EgovBndtManageController#selectBndtManageBndeAction",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 631,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtManageListPopAction.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/bnt/EgovBndtManageRegist.do",
+      "entryPoint": "EgovBndtManageController#insertViewBndtManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "stepIds": [
+        "step:ANY /uss/ion/bnt/EgovBndtManageRegist.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageRegist.do:src/main/java/egovframework/com/uss/ion/bnt/service/BndtManageVO.java",
+        "step:ANY /uss/ion/bnt/EgovBndtManageRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 218,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtManageRegist.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/ion/ans/selectAnnvrsryManageListView.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "layer": "api",
+      "className": "EgovAnnvrsryManageController",
+      "kgSummary": "기념일 관리 화면 요청을 처리하는 Spring MVC controller로 기념일 목록/상세/등록/수정 및 메인 목록·안내·배너 요청을 매핑한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "ans"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+        "line": 445,
+        "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+      "layer": "api",
+      "className": "EgovAnnvrsryManageController",
+      "kgSummary": "기념일 관리 화면 요청을 처리하는 Spring MVC controller로 기념일 목록/상세/등록/수정 및 메인 목록·안내·배너 요청을 매핑한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "ans"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ans/web/EgovAnnvrsryManageController.java",
+        "line": 445,
+        "snippet": "@RequestMapping(value = \"/uss/ion/ans/EgovAnnvrsryManageListPop.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+      "layer": "unknown",
+      "className": "AnnvrsryManage",
+      "kgSummary": "기념일 관리(AnnvrsryManage) 도메인 모델 VO로 ComDefaultVO를 상속하며 기념일 항목 15개 속성을 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain",
+        "ans"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/AnnvrsryManage.java",
+        "line": 24,
+        "snippet": "public class AnnvrsryManage extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+      "layer": "service",
+      "className": "EgovAnnvrsryManageService",
+      "kgSummary": "기념일 관리 서비스 interface로 기념일 목록·상세 조회, 안내(gdcc), 배너 CRUD 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-logic",
+        "ans"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/ans/service/EgovAnnvrsryManageService.java",
+        "line": 18,
+        "snippet": "public interface EgovAnnvrsryManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/ans/updateAnnvrsryManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "layer": "service",
+      "className": "EgovFileMngUtil",
+      "kgSummary": "MultipartFile 업로드 파싱, 물리 파일 저장, 다운로드 스트리밍을 담당하는 공통 파일 처리 유틸리티. XSS·경로 조작 방어를 위해 EgovWebUtil로 경로를 필터링한다.",
+      "kgTags": [
+        "utility",
+        "file-management",
+        "upload",
+        "download"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "line": 60,
+        "snippet": "@Component(\"EgovFileMngUtil\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "layer": "service",
+      "className": "EgovFileMngService",
+      "kgSummary": "첨부파일 정보의 조회·등록·수정·삭제를 정의하는 파일관리 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "file-management",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "line": 21,
+        "snippet": "public interface EgovFileMngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "layer": "unknown",
+      "className": "FileVO",
+      "kgSummary": "첨부파일 1건의 속성(파일ID·확장자·저장경로·원본명 등)을 담는 값 객체(VO).",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "file-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+        "line": 20,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "layer": "unknown",
+      "className": "BannerVO",
+      "kgSummary": "배너 관리 화면의 데이터 전송 및 검색조건을 담는 VO. ComDefaultVO를 상속해 페이징·검색 필드를 재사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "line": 40,
+        "snippet": "public class BannerVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addBanner.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/addViewBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "layer": "unknown",
+      "className": "BannerVO",
+      "kgSummary": "배너 관리 화면의 데이터 전송 및 검색조건을 담는 VO. ComDefaultVO를 상속해 페이징·검색 필드를 재사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "line": 40,
+        "snippet": "public class BannerVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "layer": "service",
+      "className": "EgovBannerService",
+      "kgSummary": "배너 업무의 서비스 계약(interface). 목록/상세/등록/수정/삭제 등 CRUD 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "line": 17,
+        "snippet": "public interface EgovBannerService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBanner.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "layer": "service",
+      "className": "EgovBannerService",
+      "kgSummary": "배너 업무의 서비스 계약(interface). 목록/상세/등록/수정/삭제 등 CRUD 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "line": 17,
+        "snippet": "public interface EgovBannerService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/getBannerImage.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "layer": "unknown",
+      "className": "BannerVO",
+      "kgSummary": "배너 관리 화면의 데이터 전송 및 검색조건을 담는 VO. ComDefaultVO를 상속해 페이징·검색 필드를 재사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "line": 40,
+        "snippet": "public class BannerVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "layer": "unknown",
+      "className": "BannerVO",
+      "kgSummary": "배너 관리 화면의 데이터 전송 및 검색조건을 담는 VO. ComDefaultVO를 상속해 페이징·검색 필드를 재사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "line": 40,
+        "snippet": "public class BannerVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "layer": "service",
+      "className": "EgovBannerService",
+      "kgSummary": "배너 업무의 서비스 계약(interface). 목록/상세/등록/수정/삭제 등 CRUD 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "line": 17,
+        "snippet": "public interface EgovBannerService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBanner.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "layer": "unknown",
+      "className": "BannerVO",
+      "kgSummary": "배너 관리 화면의 데이터 전송 및 검색조건을 담는 VO. ComDefaultVO를 상속해 페이징·검색 필드를 재사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "line": 40,
+        "snippet": "public class BannerVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/removeBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "layer": "service",
+      "className": "EgovBannerService",
+      "kgSummary": "배너 업무의 서비스 계약(interface). 목록/상세/등록/수정/삭제 등 CRUD 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "line": 17,
+        "snippet": "public interface EgovBannerService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "layer": "unknown",
+      "className": "BannerVO",
+      "kgSummary": "배너 관리 화면의 데이터 전송 및 검색조건을 담는 VO. ComDefaultVO를 상속해 페이징·검색 필드를 재사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "line": 40,
+        "snippet": "public class BannerVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "layer": "service",
+      "className": "EgovBannerService",
+      "kgSummary": "배너 업무의 서비스 계약(interface). 목록/상세/등록/수정/삭제 등 CRUD 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "line": 17,
+        "snippet": "public interface EgovBannerService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerListView.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "layer": "unknown",
+      "className": "BannerVO",
+      "kgSummary": "배너 관리 화면의 데이터 전송 및 검색조건을 담는 VO. ComDefaultVO를 상속해 페이징·검색 필드를 재사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "line": 40,
+        "snippet": "public class BannerVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+      "layer": "service",
+      "className": "EgovBannerService",
+      "kgSummary": "배너 업무의 서비스 계약(interface). 목록/상세/등록/수정/삭제 등 CRUD 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/EgovBannerService.java",
+        "line": 17,
+        "snippet": "public interface EgovBannerService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/selectBannerMainList.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+      "layer": "api",
+      "className": "EgovBannerController",
+      "kgSummary": "배너 관리 Spring MVC 컨트롤러. 목록/상세/등록/수정/삭제 요청을 처리하고 파일 업로드·페이징·권한 확인을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/web/EgovBannerController.java",
+        "line": 154,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnr/addBanner.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+      "layer": "service",
+      "className": "EgovFileMngUtil",
+      "kgSummary": "MultipartFile 업로드 파싱, 물리 파일 저장, 다운로드 스트리밍을 담당하는 공통 파일 처리 유틸리티. XSS·경로 조작 방어를 위해 EgovWebUtil로 경로를 필터링한다.",
+      "kgTags": [
+        "utility",
+        "file-management",
+        "upload",
+        "download"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngUtil.java",
+        "line": 60,
+        "snippet": "@Component(\"EgovFileMngUtil\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+      "layer": "service",
+      "className": "EgovFileMngService",
+      "kgSummary": "첨부파일 정보의 조회·등록·수정·삭제를 정의하는 파일관리 서비스 interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "file-management",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovFileMngService.java",
+        "line": 21,
+        "snippet": "public interface EgovFileMngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+      "layer": "unknown",
+      "className": "FileVO",
+      "kgSummary": "첨부파일 1건의 속성(파일ID·확장자·저장경로·원본명 등)을 담는 값 객체(VO).",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "file-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/FileVO.java",
+        "line": 20,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+      "layer": "unknown",
+      "className": "BannerVO",
+      "kgSummary": "배너 관리 화면의 데이터 전송 및 검색조건을 담는 VO. ComDefaultVO를 상속해 페이징·검색 필드를 재사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnr/service/BannerVO.java",
+        "line": 40,
+        "snippet": "public class BannerVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnr/updtBanner.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManage.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "layer": "api",
+      "className": "EgovBndtManageController",
+      "kgSummary": "출장관리 Spring MVC 컨트롤러. 출장 목록/상세/등록/수정/삭제와 점검·일지·엑셀 일괄등록 화면 및 액션을 매핑하는 771라인 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "business-trip"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManage.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "layer": "service",
+      "className": "EgovBndtManageService",
+      "kgSummary": "출장관리 서비스 인터페이스. 출장 등록·점검(BndtCeck)·출장일지(BndtDiary)·엑셀 일괄등록 등 22개 비즈니스 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-trip",
+        "data-model"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "line": 18,
+        "snippet": "public interface EgovBndtManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "layer": "api",
+      "className": "EgovBndtManageController",
+      "kgSummary": "출장관리 Spring MVC 컨트롤러. 출장 목록/상세/등록/수정/삭제와 점검·일지·엑셀 일괄등록 화면 및 액션을 매핑하는 771라인 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "business-trip"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/uss/ion/bnt/service/BndtCeckManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/BndtCeckManageVO.java",
+      "layer": "unknown",
+      "className": "BndtCeckManageVO",
+      "kgSummary": "편익체크 관리(BndtCeckManage) 조회용 VO로 ComDefaultVO를 상속하며 체크 항목·검색조건 속성을 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain",
+        "bnt"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/BndtCeckManageVO.java",
+        "line": 24,
+        "snippet": "public class BndtCeckManageVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "layer": "service",
+      "className": "EgovBndtManageService",
+      "kgSummary": "출장관리 서비스 인터페이스. 출장 등록·점검(BndtCeck)·출장일지(BndtDiary)·엑셀 일괄등록 등 22개 비즈니스 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-trip",
+        "data-model"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "line": 18,
+        "snippet": "public interface EgovBndtManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "layer": "api",
+      "className": "EgovBndtManageController",
+      "kgSummary": "출장관리 Spring MVC 컨트롤러. 출장 목록/상세/등록/수정/삭제와 점검·일지·엑셀 일괄등록 화면 및 액션을 매핑하는 771라인 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "business-trip"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/uss/ion/bnt/service/BndtCeckManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/BndtCeckManageVO.java",
+      "layer": "unknown",
+      "className": "BndtCeckManageVO",
+      "kgSummary": "편익체크 관리(BndtCeckManage) 조회용 VO로 ComDefaultVO를 상속하며 체크 항목·검색조건 속성을 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain",
+        "bnt"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/BndtCeckManageVO.java",
+        "line": 24,
+        "snippet": "public class BndtCeckManageVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtCeckManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageDetail.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "layer": "api",
+      "className": "EgovBndtManageController",
+      "kgSummary": "출장관리 Spring MVC 컨트롤러. 출장 목록/상세/등록/수정/삭제와 점검·일지·엑셀 일괄등록 화면 및 액션을 매핑하는 771라인 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "business-trip"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageDetail.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "layer": "service",
+      "className": "EgovBndtManageService",
+      "kgSummary": "출장관리 서비스 인터페이스. 출장 등록·점검(BndtCeck)·출장일지(BndtDiary)·엑셀 일괄등록 등 22개 비즈니스 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-trip",
+        "data-model"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "line": 18,
+        "snippet": "public interface EgovBndtManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageList.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "layer": "api",
+      "className": "EgovBndtManageController",
+      "kgSummary": "출장관리 Spring MVC 컨트롤러. 출장 목록/상세/등록/수정/삭제와 점검·일지·엑셀 일괄등록 화면 및 액션을 매핑하는 771라인 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "business-trip"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageList.do:src/main/java/egovframework/com/uss/ion/bnt/service/BndtManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/BndtManageVO.java",
+      "layer": "unknown",
+      "className": "BndtManageVO",
+      "kgSummary": "편익 관리(BndtManage) 조회용 VO로 ComDefaultVO를 상속하며 편익 항목·검색조건 속성을 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain",
+        "bnt"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/BndtManageVO.java",
+        "line": 24,
+        "snippet": "public class BndtManageVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageList.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "layer": "service",
+      "className": "EgovBndtManageService",
+      "kgSummary": "출장관리 서비스 인터페이스. 출장 등록·점검(BndtCeck)·출장일지(BndtDiary)·엑셀 일괄등록 등 22개 비즈니스 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-trip",
+        "data-model"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "line": 18,
+        "snippet": "public interface EgovBndtManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPop.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "layer": "api",
+      "className": "EgovBndtManageController",
+      "kgSummary": "출장관리 Spring MVC 컨트롤러. 출장 목록/상세/등록/수정/삭제와 점검·일지·엑셀 일괄등록 화면 및 액션을 매핑하는 771라인 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "business-trip"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPop.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPop.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPop.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "layer": "api",
+      "className": "EgovBndtManageController",
+      "kgSummary": "출장관리 Spring MVC 컨트롤러. 출장 목록/상세/등록/수정/삭제와 점검·일지·엑셀 일괄등록 화면 및 액션을 매핑하는 771라인 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "business-trip"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+      "layer": "unknown",
+      "className": "EgovFileUploadUtil",
+      "kgSummary": "멀티파트 요청의 파일을 서버 디스크에 저장하고 확장자·크기를 검증하는 파일 업로드 static 유틸리티.",
+      "kgTags": [
+        "utility",
+        "file-upload",
+        "validation",
+        "security",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovFileUploadUtil.java",
+        "line": 36,
+        "snippet": "public class EgovFileUploadUtil extends EgovFormBasedFileUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+      "layer": "service",
+      "className": "EgovBndtManageService",
+      "kgSummary": "출장관리 서비스 인터페이스. 출장 등록·점검(BndtCeck)·출장일지(BndtDiary)·엑셀 일괄등록 등 22개 비즈니스 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-trip",
+        "data-model"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/EgovBndtManageService.java",
+        "line": 18,
+        "snippet": "public interface EgovBndtManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageListPopAction.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageRegist.do:src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+      "layer": "api",
+      "className": "EgovBndtManageController",
+      "kgSummary": "출장관리 Spring MVC 컨트롤러. 출장 목록/상세/등록/수정/삭제와 점검·일지·엑셀 일괄등록 화면 및 액션을 매핑하는 771라인 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "spring-mvc",
+        "business-trip"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/web/EgovBndtManageController.java",
+        "line": 342,
+        "snippet": "@RequestMapping(value = \"/uss/ion/bnt/EgovBndtCeckManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "layer": "unknown",
+      "className": "EgovDateUtil",
+      "kgSummary": "날짜/시간 처리 정적 유틸리티로, 날짜 연산·포맷·검증·음양력 변환 등 폭넓은 헬퍼를 제공한다.",
+      "kgTags": [
+        "utility",
+        "date",
+        "helper",
+        "static"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "line": 36,
+        "snippet": "public class EgovDateUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageRegist.do:src/main/java/egovframework/com/uss/ion/bnt/service/BndtManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/bnt/service/BndtManageVO.java",
+      "layer": "unknown",
+      "className": "BndtManageVO",
+      "kgSummary": "편익 관리(BndtManage) 조회용 VO로 ComDefaultVO를 상속하며 편익 항목·검색조건 속성을 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain",
+        "bnt"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/bnt/service/BndtManageVO.java",
+        "line": 24,
+        "snippet": "public class BndtManageVO extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/bnt/EgovBndtManageRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    }
+  ]
+}

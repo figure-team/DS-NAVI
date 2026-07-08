@@ -1,0 +1,121 @@
+{
+  "key": "uat",
+  "chunkIndex": 1,
+  "isHeaderChunk": false,
+  "flows": [
+    {
+      "flowId": "flow:ANY /uat/uia/searchPassword.do",
+      "name": "비밀번호 찾기",
+      "summary": {
+        "text": "사용자가 아이디·이름·이메일 등을 입력하면 비밀번호 힌트를 조회해 제공하는 인증 지원 기능이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+            "line": 439,
+            "snippet": "@RequestMapping(value = \"/uat/uia/searchPassword.do\")"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uat/uia/searchPassword.do:src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+      "name": "로그인·인증 처리 컨트롤러",
+      "summary": {
+        "text": "일반/인증서(GPKI) 로그인, 로그아웃, 아이디·비밀번호 찾기 등 인증 전반을 처리하는 진입점 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uat/uia/web/EgovLoginController.java",
+            "line": 503,
+            "snippet": "@RequestMapping(value = \"/uat/uia/EgovGpkiRegist.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchPassword.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통 조회조건 데이터 객체",
+      "summary": {
+        "text": "페이징·검색 조건 등 화면과 서비스 간 조회 파라미터를 담는 공통 VO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "line": 28,
+            "snippet": "@SuppressWarnings(\"serial\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchPassword.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드·XSS 서비스 계약",
+      "summary": {
+        "text": "공통코드·XSS 처리 등 공통 기능의 서비스 메서드 계약을 정의하는 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "line": 26,
+            "snippet": "public interface EgovCmmUseService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchPassword.do:src/main/java/egovframework/com/cmm/SearchPasswordRequestVO.java",
+      "name": "비밀번호 찾기 요청 데이터 객체",
+      "summary": {
+        "text": "아이디·이름·이메일·비밀번호 힌트 등 비밀번호 찾기 요청 파라미터를 담는 VO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/SearchPasswordRequestVO.java",
+            "line": 30,
+            "snippet": "public class SearchPasswordRequestVO extends BaseRequestVO{"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchPassword.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 데이터 객체",
+      "summary": {
+        "text": "인증된 사용자의 아이디·이름·이메일·기관·GPKI DN 등 세션용 로그인 정보를 담는 VO이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchPassword.do:src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+      "name": "로그인·인증 서비스 계약",
+      "summary": {
+        "text": "일반 로그인, 인증서 로그인, 아이디·비밀번호 찾기 등 사용자 인증 기능을 정의하는 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/uat/uia/service/EgovLoginService.java",
+            "line": 31,
+            "snippet": "public interface EgovLoginService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:ANY /uat/uia/searchPassword.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 조회 컴포넌트",
+      "summary": {
+        "text": "코드와 로케일 기반으로 다국어 메시지를 조회하는 공통 메시지 소스 컴포넌트이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      }
+    }
+  ]
+}

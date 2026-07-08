@@ -1,0 +1,2476 @@
+{
+  "schemaVersion": 1,
+  "key": "uss",
+  "domainId": "domain:uss",
+  "chunkIndex": 22,
+  "chunkTotal": 25,
+  "isHeaderChunk": false,
+  "domainHeader": {
+    "domainId": "domain:uss",
+    "key": "uss"
+  },
+  "flows": [
+    {
+      "flowId": "flow:POST /twitter/login.do",
+      "entryPoint": "EgovXAuthController#loginSubmit",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "stepIds": [
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+        "line": 66,
+        "snippet": "@PostMapping(\"/login.do\")"
+      }
+    },
+    {
+      "flowId": "flow:POST /twitter/tweet",
+      "entryPoint": "EgovXController#writeTweet",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "stepIds": [
+        "step:POST /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+        "step:POST /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+        "line": 53,
+        "snippet": "@PostMapping(\"/tweet\")"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/ion/fbk/feed.do",
+      "entryPoint": "EgovFacebookController#showFeed",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/fbk/web/EgovFacebookController.java",
+      "stepIds": [
+        "step:POST /uss/ion/fbk/feed.do:src/main/java/egovframework/com/uss/ion/fbk/web/EgovFacebookController.java",
+        "step:POST /uss/ion/fbk/feed.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:POST /uss/ion/fbk/feed.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /uss/ion/fbk/feed.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/fbk/web/EgovFacebookController.java",
+        "line": 83,
+        "snippet": "@RequestMapping(value = \"/uss/ion/fbk/feed.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do",
+      "entryPoint": "EgovIndvdlYrycManageController#insertIndvdlYrycManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+      "stepIds": [
+        "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+        "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/uss/ion/yrc/service/IndvdlYrycManage.java",
+        "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/uss/ion/yrc/service/EgovIndvdlYrycManageService.java",
+        "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+        "line": 103,
+        "snippet": "@RequestMapping(value = \"/uss/ion/yrc/EgovIndvdlYrycRegist.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/ion/yrc/deleteIndvdlYryc.do",
+      "entryPoint": "EgovIndvdlYrycManageController#deleteIndvdlYrycManage",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+      "stepIds": [
+        "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+        "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/uss/ion/yrc/service/IndvdlYrycManage.java",
+        "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/uss/ion/yrc/service/EgovIndvdlYrycManageService.java",
+        "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+        "line": 150,
+        "snippet": "@RequestMapping(value = \"/uss/ion/yrc/deleteIndvdlYryc.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/olp/mgt/EgovMeetingManageRegist.do",
+      "entryPoint": "EgovMeetingManageController#meetingManageRegist",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/mgt/web/EgovMeetingManageController.java",
+      "stepIds": [
+        "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/uss/olp/mgt/web/EgovMeetingManageController.java",
+        "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/uss/olp/mgt/service/MeetingManageVO.java",
+        "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/uss/olp/mgt/service/EgovMeetingManageService.java",
+        "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/mgt/web/EgovMeetingManageController.java",
+        "line": 324,
+        "snippet": "@RequestMapping(value = \"/uss/olp/mgt/EgovMeetingManageRegist.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do",
+      "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageModifySave",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepIds": [
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 336,
+        "snippet": "@PostMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageModify.do\")"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do",
+      "entryPoint": "EgovQustnrQestnManageController#qustnrQestnManageRegistSubmit",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "stepIds": [
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 468,
+        "snippet": "@PostMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageRegist.do\")"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEmplyrDelete.do",
+      "entryPoint": "EgovEmplyrManageController#deleteUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 374,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrDelete.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEmplyrInsert.do",
+      "entryPoint": "EgovEmplyrManageController#insertUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java",
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 192,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrInsert.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEmplyrInsertView.do",
+      "entryPoint": "EgovEmplyrManageController#insertUserView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 141,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrInsertView.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEmplyrLockIncorrect.do",
+      "entryPoint": "EgovEmplyrManageController#updateLockIncorrect",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 293,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrLockIncorrect.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEmplyrPasswordUpdt.do",
+      "entryPoint": "EgovEmplyrManageController#updatePassword",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 483,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrPasswordUpdt.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEmplyrPasswordUpdtView.do",
+      "entryPoint": "EgovEmplyrManageController#updatePasswordView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 542,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrPasswordUpdtView.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEmplyrSelectUpdt.do",
+      "entryPoint": "EgovEmplyrManageController#updateUser",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 316,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrSelectUpdt.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEmplyrSelectUpdtView.do",
+      "entryPoint": "EgovEmplyrManageController#updateUserView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 229,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrSelectUpdtView.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEntrprsDelete.do",
+      "entryPoint": "EgovEntrprsManageController#deleteEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 316,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsDelete.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEntrprsInsert.do",
+      "entryPoint": "EgovEntrprsManageController#insertEntrprsMber",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 164,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsInsert.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEntrprsInsertView.do",
+      "entryPoint": "EgovEntrprsManageController#insertEntrprsMberView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 139,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsInsertView.do\", method = RequestMethod.POST)"
+      }
+    },
+    {
+      "flowId": "flow:POST /uss/umt/EgovEntrprsLockIncorrect.do",
+      "entryPoint": "EgovEntrprsManageController#updateLockIncorrect",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "stepIds": [
+        "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 249,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsLockIncorrect.do\", method = RequestMethod.POST)"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+      "layer": "api",
+      "className": "EgovXAuthController",
+      "kgSummary": "X(Twitter) OAuth 로그인 화면·제출·콜백을 처리하는 Controller로 EgovXOAuthService를 호출해 인가/토큰 흐름을 구동한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "oauth",
+        "authentication"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXAuthController.java",
+        "line": 142,
+        "snippet": "@GetMapping(\"/callback.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+      "layer": "service",
+      "className": "EgovXOAuthService",
+      "kgSummary": "X(Twitter) OAuth 2.0 PKCE 인증 흐름을 구현하는 서비스로, 인가 URL 생성과 access token 교환을 RestTemplate으로 처리한다.",
+      "kgTags": [
+        "service",
+        "oauth",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXOAuthService.java",
+        "line": 27,
+        "snippet": "@Service"
+      }
+    },
+    {
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /twitter/login.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+      "layer": "api",
+      "className": "EgovXController",
+      "kgSummary": "X(Twitter) 연동 REST 컨트롤러로, 세션의 액세스 토큰을 사용해 계정 조회·트윗 작성/삭제·타임라인 조회 엔드포인트를 제공한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "integration"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/tir/web/EgovXController.java",
+        "line": 73,
+        "snippet": "@DeleteMapping(\"/tweet\")"
+      }
+    },
+    {
+      "stepId": "step:POST /twitter/tweet:src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+      "layer": "service",
+      "className": "EgovXService",
+      "kgSummary": "X(Twitter) 연동 기능의 서비스 계약을 정의하는 인터페이스로, 계정 조회·트윗 작성/삭제·타임라인 조회 메서드를 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "integration"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/tir/service/EgovXService.java",
+        "line": 6,
+        "snippet": "public interface EgovXService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/fbk/feed.do:src/main/java/egovframework/com/uss/ion/fbk/web/EgovFacebookController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/fbk/web/EgovFacebookController.java",
+      "layer": "api",
+      "className": "EgovFacebookController",
+      "kgSummary": "페이스북 연계 화면을 처리하는 Spring MVC controller로, 홈·피드·앨범·프로필 뷰에 앱 ID 등 설정값을 전달한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "social-integration"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/fbk/web/EgovFacebookController.java",
+        "line": 59,
+        "snippet": "@RequestMapping(value = \"/uss/ion/fbk/EgovFacebookSignin.do\", method = RequestMethod.GET)"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/fbk/feed.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/fbk/feed.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/fbk/feed.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+      "layer": "api",
+      "className": "EgovIndvdlYrycManageController",
+      "kgSummary": "인증 사용자의 개인 연차 조회·등록/수정·삭제를 처리하는 Spring MVC Controller로, 잔여연차 계산과 검증을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "leave",
+        "validation"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+        "line": 57,
+        "snippet": "@RequestMapping(value = \"/uss/ion/yrc/EgovIndvdlYrycManageList.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/uss/ion/yrc/service/IndvdlYrycManage.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/yrc/service/IndvdlYrycManage.java",
+      "layer": "unknown",
+      "className": "IndvdlYrycManage",
+      "kgSummary": "개인 연차 발생/사용/잔여 일수와 회원 정보를 담는 VO로, ComDefaultVO를 상속하고 잔여연차 유효성 검사 로직을 포함한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "leave",
+        "validation"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/yrc/service/IndvdlYrycManage.java",
+        "line": 21,
+        "snippet": "public class IndvdlYrycManage extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/uss/ion/yrc/service/EgovIndvdlYrycManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/yrc/service/EgovIndvdlYrycManageService.java",
+      "layer": "service",
+      "className": "EgovIndvdlYrycManageService",
+      "kgSummary": "개인 연차(연가) 관리의 목록·건수·등록·수정·삭제 기능을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "leave"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/yrc/service/EgovIndvdlYrycManageService.java",
+        "line": 16,
+        "snippet": "public interface EgovIndvdlYrycManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/EgovIndvdlYrycRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+      "layer": "api",
+      "className": "EgovIndvdlYrycManageController",
+      "kgSummary": "인증 사용자의 개인 연차 조회·등록/수정·삭제를 처리하는 Spring MVC Controller로, 잔여연차 계산과 검증을 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "leave",
+        "validation"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/yrc/web/EgovIndvdlYrycManageController.java",
+        "line": 57,
+        "snippet": "@RequestMapping(value = \"/uss/ion/yrc/EgovIndvdlYrycManageList.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/uss/ion/yrc/service/IndvdlYrycManage.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/yrc/service/IndvdlYrycManage.java",
+      "layer": "unknown",
+      "className": "IndvdlYrycManage",
+      "kgSummary": "개인 연차 발생/사용/잔여 일수와 회원 정보를 담는 VO로, ComDefaultVO를 상속하고 잔여연차 유효성 검사 로직을 포함한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "leave",
+        "validation"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/yrc/service/IndvdlYrycManage.java",
+        "line": 21,
+        "snippet": "public class IndvdlYrycManage extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/uss/ion/yrc/service/EgovIndvdlYrycManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/ion/yrc/service/EgovIndvdlYrycManageService.java",
+      "layer": "service",
+      "className": "EgovIndvdlYrycManageService",
+      "kgSummary": "개인 연차(연가) 관리의 목록·건수·등록·수정·삭제 기능을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "leave"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/ion/yrc/service/EgovIndvdlYrycManageService.java",
+        "line": 16,
+        "snippet": "public interface EgovIndvdlYrycManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/ion/yrc/deleteIndvdlYryc.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/uss/olp/mgt/web/EgovMeetingManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/mgt/web/EgovMeetingManageController.java",
+      "layer": "api",
+      "className": "EgovMeetingManageController",
+      "kgSummary": "회의 관리 화면을 처리하는 Spring MVC controller로, 메인/좌측 프레임·목록·상세·등록/수정 및 권한그룹·직원 팝업을 제공한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "meeting",
+        "crud"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/mgt/web/EgovMeetingManageController.java",
+        "line": 95,
+        "snippet": "@RequestMapping(value = \"/uss/olp/mgt/EgovLeft.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/uss/olp/mgt/service/MeetingManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/mgt/service/MeetingManageVO.java",
+      "layer": "unknown",
+      "className": "MeetingManageVO",
+      "kgSummary": "회의 관리 데이터를 담는 VO로, 회의 ID·일시·장소·참석/불참 인원 등 회의 관련 필드를 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "meeting",
+        "online-participation"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/mgt/service/MeetingManageVO.java",
+        "line": 30,
+        "snippet": "public class MeetingManageVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/uss/olp/mgt/service/EgovMeetingManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/mgt/service/EgovMeetingManageService.java",
+      "layer": "service",
+      "className": "EgovMeetingManageService",
+      "kgSummary": "회의(Meeting) 관리 기능을 정의하는 service interface로, 회의 목록/상세 조회와 CRUD 및 권한그룹·직원 팝업 조회 계약을 제공한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "meeting",
+        "online-participation"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/mgt/service/EgovMeetingManageService.java",
+        "line": 24,
+        "snippet": "public interface EgovMeetingManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/mgt/EgovMeetingManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "layer": "api",
+      "className": "EgovQustnrQestnManageController",
+      "kgSummary": "설문 문항 관리 Spring MVC 컨트롤러 `EgovQustnrQestnManageController` — 목록·상세·등록·수정·삭제 화면 요청을 처리하고 서비스 계층에 위임한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "crud"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "layer": "unknown",
+      "className": "QustnrQestnManageVO",
+      "kgSummary": "설문 문항 관리 도메인의 VO/데이터 모델 클래스 `QustnrQestnManageVO` — 검색조건·항목 필드와 getter/setter를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "layer": "service",
+      "className": "EgovQustnrQestnManageService",
+      "kgSummary": "설문 문항 관리 서비스 인터페이스 `EgovQustnrQestnManageService` — 조회·등록·수정·삭제 등 비즈니스 오퍼레이션 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-logic"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+      "layer": "api",
+      "className": "EgovQustnrQestnManageController",
+      "kgSummary": "설문 문항 관리 Spring MVC 컨트롤러 `EgovQustnrQestnManageController` — 목록·상세·등록·수정·삭제 화면 요청을 처리하고 서비스 계층에 위임한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "crud"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/web/EgovQustnrQestnManageController.java",
+        "line": 246,
+        "snippet": "@RequestMapping(value = \"/uss/olp/qqm/EgovQustnrQestnManageDetail.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+      "layer": "service",
+      "className": "EgovQustnrQestnManageService",
+      "kgSummary": "설문 문항 관리 서비스 인터페이스 `EgovQustnrQestnManageService` — 조회·등록·수정·삭제 등 비즈니스 오퍼레이션 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-logic"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/EgovQustnrQestnManageService.java",
+        "line": 25,
+        "snippet": "public interface EgovQustnrQestnManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+      "layer": "unknown",
+      "className": "QustnrQestnManageVO",
+      "kgSummary": "설문 문항 관리 도메인의 VO/데이터 모델 클래스 `QustnrQestnManageVO` — 검색조건·항목 필드와 getter/setter를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/olp/qqm/service/QustnrQestnManageVO.java",
+        "line": 30,
+        "snippet": "public class QustnrQestnManageVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/olp/qqm/EgovQustnrQestnManageRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "layer": "api",
+      "className": "EgovEmplyrManageController",
+      "kgSummary": "업무담당자(공무원) 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "업무담당자(공무원)",
+        "spring-mvc",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "layer": "service",
+      "className": "EgovEmplyrManageService",
+      "kgSummary": "업무 사용자(직원) 관리 서비스 인터페이스로, ID 중복확인·등록·조회·수정·삭제·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovEmplyrManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "layer": "api",
+      "className": "EgovEmplyrManageController",
+      "kgSummary": "업무담당자(공무원) 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "업무담당자(공무원)",
+        "spring-mvc",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java",
+      "layer": "unknown",
+      "className": "EmplyrManageInsertVO",
+      "kgSummary": "직원 등록용 VO로, EmplyrManageVO를 확장해 비밀번호 확인(password2) 필드를 추가한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageInsertVO.java",
+        "line": 19,
+        "snippet": "public class EmplyrManageInsertVO extends EmplyrManageVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "layer": "service",
+      "className": "EgovEmplyrManageService",
+      "kgSummary": "업무 사용자(직원) 관리 서비스 인터페이스로, ID 중복확인·등록·조회·수정·삭제·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovEmplyrManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "layer": "api",
+      "className": "EgovEmplyrManageController",
+      "kgSummary": "업무담당자(공무원) 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "업무담당자(공무원)",
+        "spring-mvc",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "layer": "api",
+      "className": "EgovEmplyrManageController",
+      "kgSummary": "업무담당자(공무원) 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "업무담당자(공무원)",
+        "spring-mvc",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "layer": "service",
+      "className": "EgovEmplyrManageService",
+      "kgSummary": "업무 사용자(직원) 관리 서비스 인터페이스로, ID 중복확인·등록·조회·수정·삭제·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovEmplyrManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "layer": "api",
+      "className": "EgovEmplyrManageController",
+      "kgSummary": "업무담당자(공무원) 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "업무담당자(공무원)",
+        "spring-mvc",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "layer": "service",
+      "className": "EgovEmplyrManageService",
+      "kgSummary": "업무 사용자(직원) 관리 서비스 인터페이스로, ID 중복확인·등록·조회·수정·삭제·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovEmplyrManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+      "layer": "unknown",
+      "className": "EgovFileScrty",
+      "kgSummary": "파일 및 비밀번호 암호화 유틸리티. SEED/Base64 파일 암복호화와 SHA-256 기반 단방향 비밀번호 암호화·검증을 제공한다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "encryption",
+        "password"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileScrty.java",
+        "line": 49,
+        "snippet": "public class EgovFileScrty {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+      "layer": "unknown",
+      "className": "EmplyrPasswordManageVO",
+      "kgSummary": "직원 비밀번호 관리용 VO로, 직원 ID와 비밀번호 필드만 담는 경량 데이터 객체이다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "user-management",
+        "password"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+        "line": 28,
+        "snippet": "public class EmplyrPasswordManageVO extends PasswordManageVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdt.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "layer": "unknown",
+      "className": "PasswordManageVO",
+      "kgSummary": "비밀번호 변경 화면 공통 VO. 기존/신규/확인 비밀번호와 사용자 유형·고유ID를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "password",
+        "validation"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+        "line": 10,
+        "snippet": "public class PasswordManageVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "layer": "api",
+      "className": "EgovEmplyrManageController",
+      "kgSummary": "업무담당자(공무원) 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "업무담당자(공무원)",
+        "spring-mvc",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+      "layer": "unknown",
+      "className": "EmplyrPasswordManageVO",
+      "kgSummary": "직원 비밀번호 관리용 VO로, 직원 ID와 비밀번호 필드만 담는 경량 데이터 객체이다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "user-management",
+        "password"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EmplyrPasswordManageVO.java",
+        "line": 28,
+        "snippet": "public class EmplyrPasswordManageVO extends PasswordManageVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrPasswordUpdtView.do:src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+      "layer": "unknown",
+      "className": "PasswordManageVO",
+      "kgSummary": "비밀번호 변경 화면 공통 VO. 기존/신규/확인 비밀번호와 사용자 유형·고유ID를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "password",
+        "validation"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/PasswordManageVO.java",
+        "line": 10,
+        "snippet": "public class PasswordManageVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "layer": "api",
+      "className": "EgovEmplyrManageController",
+      "kgSummary": "업무담당자(공무원) 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "업무담당자(공무원)",
+        "spring-mvc",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java",
+      "layer": "unknown",
+      "className": "EmplyrManageVO",
+      "kgSummary": "직원 관리 도메인 VO로, 고유 ID·사용자 유형·주소·연락처·주민번호·비밀번호·상태코드·잠금여부 등 사용자 상세 필드를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EmplyrManageVO.java",
+        "line": 30,
+        "snippet": "public class EmplyrManageVO extends UserDefaultVO{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "layer": "service",
+      "className": "EgovEmplyrManageService",
+      "kgSummary": "업무 사용자(직원) 관리 서비스 인터페이스로, ID 중복확인·등록·조회·수정·삭제·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovEmplyrManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdt.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+      "layer": "api",
+      "className": "EgovEmplyrManageController",
+      "kgSummary": "업무담당자(공무원) 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "업무담당자(공무원)",
+        "spring-mvc",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEmplyrManageController.java",
+        "line": 92,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEmplyrManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+      "layer": "service",
+      "className": "EgovEmplyrManageService",
+      "kgSummary": "업무 사용자(직원) 관리 서비스 인터페이스로, ID 중복확인·등록·조회·수정·삭제·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEmplyrManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovEmplyrManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "relPath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+      "layer": "api",
+      "className": "EgovComUtlController",
+      "kgSummary": "공통 유틸 Controller로, 화이트리스트 기반 페이지 이동(moveToPage), JSON 조회, 그리고 crypto service를 이용한 ID 암·복호화(encryptId/decryptId)를 제공한다.",
+      "kgTags": [
+        "api-handler",
+        "security",
+        "utility",
+        "encryption",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/web/EgovComUtlController.java",
+        "line": 40,
+        "snippet": "@Controller"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEmplyrSelectUpdtView.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "layer": "api",
+      "className": "EgovEntrprsManageController",
+      "kgSummary": "기업회원 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "기업회원",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "layer": "service",
+      "className": "EgovEntrprsManageService",
+      "kgSummary": "기업 회원 관리 서비스 인터페이스로, 등록·조회·수정·삭제·약관조회·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovEntrprsManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsDelete.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "layer": "api",
+      "className": "EgovEntrprsManageController",
+      "kgSummary": "기업회원 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "기업회원",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+      "layer": "unknown",
+      "className": "EntrprsManageInsertVO",
+      "kgSummary": "기업 회원 등록용 VO로, 비밀번호 확인(password2) 필드를 추가한 등록 폼 데이터 객체이다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EntrprsManageInsertVO.java",
+        "line": 19,
+        "snippet": "public class EntrprsManageInsertVO extends EntrprsManageVO {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "layer": "service",
+      "className": "EgovEntrprsManageService",
+      "kgSummary": "기업 회원 관리 서비스 인터페이스로, 등록·조회·수정·삭제·약관조회·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovEntrprsManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsert.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "layer": "api",
+      "className": "EgovEntrprsManageController",
+      "kgSummary": "기업회원 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "기업회원",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+      "layer": "api",
+      "className": "EgovEntrprsManageController",
+      "kgSummary": "기업회원 관리 Spring MVC 컨트롤러. 목록·등록·수정·삭제·비밀번호 변경 등 사용자 관리 요청을 처리한다.",
+      "kgTags": [
+        "controller",
+        "api-handler",
+        "기업회원",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/web/EgovEntrprsManageController.java",
+        "line": 90,
+        "snippet": "@RequestMapping(value = \"/uss/umt/EgovEntrprsManage.do\")"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "relPath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+      "layer": "service",
+      "className": "EgovEntrprsManageService",
+      "kgSummary": "기업 회원 관리 서비스 인터페이스로, 등록·조회·수정·삭제·약관조회·비밀번호 관리·잠금 처리 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "user-management"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/uss/umt/service/EgovEntrprsManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovEntrprsManageService {"
+      }
+    },
+    {
+      "stepId": "step:POST /uss/umt/EgovEntrprsLockIncorrect.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:css",
+  "name": "공통 스타일시트 서빙",
+  "summary": {
+    "text": "공통 컴포넌트의 구버전 공통 스타일시트를 JSP로 동적 서빙하며, 전역 레이아웃·폰트·색상 스타일을 정의하는 도메인이다.",
+    "citations": [
+      {
+        "filePath": "src/main/webapp/css/egovframework/com/com.css_old.jsp",
+        "line": 1,
+        "snippet": "<%@ page contentType=\"text/css; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "text": "구버전 공통 스타일시트 파일(com.css_old.jsp)이 전역 레이아웃·폰트·색상 스타일 정의를 담당한다.",
+      "citations": [
+        {
+          "filePath": "src/main/webapp/css/egovframework/com/com.css_old.jsp",
+          "line": 1,
+          "snippet": "<%@ page contentType=\"text/css; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+        }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "스타일시트는 JSP 페이지로 처리되어 contentType이 text/css, 인코딩이 utf-8로 지정된 채 응답된다.",
+      "citations": [
+        {
+          "filePath": "src/main/webapp/css/egovframework/com/com.css_old.jsp",
+          "line": 1,
+          "snippet": "<%@ page contentType=\"text/css; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+        }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [],
+  "flows": [
+    {
+      "flowId": "flow:GET /css/egovframework/com/com.css_old.jsp",
+      "name": "공통 스타일시트 조회",
+      "summary": {
+        "text": "GET 요청으로 구버전 공통 스타일시트 JSP를 호출하여 전역 레이아웃·폰트·색상 스타일을 텍스트/CSS로 응답한다.",
+        "citations": [
+          {
+            "filePath": "src/main/webapp/css/egovframework/com/com.css_old.jsp",
+            "line": 1,
+            "snippet": "<%@ page contentType=\"text/css; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:GET /css/egovframework/com/com.css_old.jsp:src/main/webapp/css/egovframework/com/com.css_old.jsp",
+      "name": "공통 스타일시트 동적 응답",
+      "summary": {
+        "text": "com.css_old.jsp가 contentType을 text/css, 인코딩을 utf-8로 지정하여 구버전 공통 스타일을 동적으로 응답한다.",
+        "citations": [
+          {
+            "filePath": "src/main/webapp/css/egovframework/com/com.css_old.jsp",
+            "line": 1,
+            "snippet": "<%@ page contentType=\"text/css; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+package egovframework.com.uss.mpe.service;
+
+import egovframework.com.cmm.ComDefaultVO;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.egovframe.rte.ptl.reactive.validation.EgovNullCheck;
+import jakarta.validation.constraints.Size;
+
+/**
+ * 개요 - 마이페이지에 대한 model 클래스를 정의한다.
+ *
+ * 상세내용 - 마이페이지의 컨텐츠아이디, 컨텐츠 명, 컨텐츠 URL, 컨텐츠 사용 여부 항목을 관리한다.
+ *
+ * @author 이창원
+ * @version 1.0
+ * @created 05-8-2009 오후 2:20:27
+ */
+@Getter
+@Setter
+public class IndvdlPgeVO extends ComDefaultVO {
+
+	/**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 컨텐츠 아이디
+	 */
+	private String cntntsId;
+
+	/**
+	 * 컨텐츠 명
+	 */
+	@EgovNullCheck
+	@Size(max = 100)
+	private String cntntsNm;
+
+	/**
+	 * 컨텐츠 미리보기 URL
+	 */
+	@EgovNullCheck
+	@Size(max = 1000)
+	private String cntntsLinkUrl;
+
+	/**
+	 * 컨텐츠 URL
+	 */
+	@EgovNullCheck
+	@Size(max = 255)
+	private String cntcUrl;
+
+	/**
+	 * 컨텐츠 설명
+	 */
+	@EgovNullCheck
+	@Size(max = 250)
+	private String cntntsDc;
+
+	/**
+	 * 컨텐츠 사용 여부
+	 */
+	@EgovNullCheck
+	private String cntntsUseAt;
+
+}

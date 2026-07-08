@@ -1,0 +1,205 @@
+{
+  "key": "ext",
+  "chunkIndex": 1,
+  "isHeaderChunk": false,
+  "flows": [
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/renameNode.do",
+      "name": "LDAP 부서명 변경",
+      "summary": {
+        "text": "LDAP 조직 트리에서 부서 노드의 이름을 변경하는 요청을 처리하는 컨트롤러 엔드포인트이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 177,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/renameNode.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:POST /ext/ldapumt/dpt/renameUserNode.do",
+      "name": "LDAP 사용자명 변경",
+      "summary": {
+        "text": "LDAP 조직 트리에서 사용자 노드의 이름을 변경하는 요청을 처리하는 컨트롤러 엔드포인트이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 199,
+            "snippet": "@RequestMapping(value = \"/ext/ldapumt/dpt/renameUserNode.do\", method = RequestMethod.POST)"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "name": "LDAP 조직관리 화면 요청 처리",
+      "summary": {
+        "text": "LDAP 조직/사용자 관리 화면과 부서·사용자 CRUD, DN 검증을 담당하는 Spring MVC 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "name": "LDAP 조직관리 서비스 계약 정의",
+      "summary": {
+        "text": "LDAP 기반 부서·사용자 조회/등록/이동/이름변경 기능을 선언하는 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 조회",
+      "summary": {
+        "text": "코드와 Locale 기반으로 다국어 메시지를 조회하는 공통 메시지 소스 컴포넌트이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "공통 설정값 조회",
+      "summary": {
+        "text": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 지원",
+      "summary": {
+        "text": "자르기·치환·인코딩·HTML 변환 등 문자열 처리를 제공하는 정적 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "입력값 보안 정화",
+      "summary": {
+        "text": "XSS·SQL/OS/LDAP injection 등을 방지하기 위한 공통 웹 보안 필터링 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+      "name": "LDAP 조직관리 화면 요청 처리",
+      "summary": {
+        "text": "LDAP 조직/사용자 관리 화면과 부서·사용자 CRUD, DN 검증을 담당하는 Spring MVC 컨트롤러이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/web/EgovOrgManageLdapController.java",
+            "line": 293,
+            "snippet": "@RequestMapping(\"/ext/ldapumt/dpt/selectDeptManageOrgChartView.do\")"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+      "name": "LDAP 조직관리 서비스 계약 정의",
+      "summary": {
+        "text": "LDAP 기반 부서·사용자 조회/등록/이동/이름변경 기능을 선언하는 서비스 인터페이스이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/ext/ldapumt/service/EgovOrgManageLdapService.java",
+            "line": 44,
+            "snippet": "public interface EgovOrgManageLdapService {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "다국어 메시지 조회",
+      "summary": {
+        "text": "코드와 Locale 기반으로 다국어 메시지를 조회하는 공통 메시지 소스 컴포넌트이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+            "line": 26,
+            "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "name": "공통 설정값 조회",
+      "summary": {
+        "text": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "line": 49,
+            "snippet": "public class EgovProperties {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 지원",
+      "summary": {
+        "text": "자르기·치환·인코딩·HTML 변환 등 문자열 처리를 제공하는 정적 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+            "line": 43,
+            "snippet": "public class EgovStringUtil {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:POST /ext/ldapumt/dpt/renameUserNode.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "name": "입력값 보안 정화",
+      "summary": {
+        "text": "XSS·SQL/OS/LDAP injection 등을 방지하기 위한 공통 웹 보안 필터링 유틸리티이다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "line": 25,
+            "snippet": "public class EgovWebUtil {"
+          }
+        ]
+      }
+    }
+  ]
+}

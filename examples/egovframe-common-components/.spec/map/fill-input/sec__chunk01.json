@@ -1,0 +1,1773 @@
+{
+  "schemaVersion": 1,
+  "key": "sec",
+  "domainId": "domain:sec",
+  "chunkIndex": 1,
+  "chunkTotal": 2,
+  "isHeaderChunk": false,
+  "domainHeader": {
+    "domainId": "domain:sec",
+    "key": "sec"
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorInsertView.do",
+      "entryPoint": "EgovAuthorManageController#insertAuthorView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "stepIds": [
+        "step:ANY /sec/ram/EgovAuthorInsertView.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 119,
+        "snippet": "@RequestMapping(\"/sec/ram/EgovAuthorInsertView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorList.do",
+      "entryPoint": "EgovAuthorManageController#selectAuthorList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "stepIds": [
+        "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 65,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorListDelete.do",
+      "entryPoint": "EgovAuthorManageController#deleteAuthorList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "stepIds": [
+        "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+        "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 203,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorListDelete.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorRoleInsert.do",
+      "entryPoint": "EgovAuthorRoleController#insertAuthorRole",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "stepIds": [
+        "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+        "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+        "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+        "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+        "line": 118,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorRoleList.do",
+      "entryPoint": "EgovAuthorRoleController#selectAuthorRoleList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "stepIds": [
+        "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+        "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+        "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+        "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+        "line": 82,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorRoleListView.do",
+      "entryPoint": "EgovAuthorRoleController#selectAuthorRoleListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "stepIds": [
+        "step:ANY /sec/ram/EgovAuthorRoleListView.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+        "line": 70,
+        "snippet": "@RequestMapping(\"/sec/ram/EgovAuthorRoleListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/EgovAuthorUpdate.do",
+      "entryPoint": "EgovAuthorManageController#updateAuthor",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "stepIds": [
+        "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/service/AuthorManage.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 158,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorUpdate.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/ram/accessDenied.do",
+      "entryPoint": "EgovAuthorManageController#accessDenied",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "stepIds": [
+        "step:ANY /sec/ram/accessDenied.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 232,
+        "snippet": "@RequestMapping(\"/sec/ram/accessDenied.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rgm/EgovAuthorGroupDelete.do",
+      "entryPoint": "EgovAuthorGroupController#deleteAuthorGroup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "stepIds": [
+        "step:ANY /sec/rgm/EgovAuthorGroupDelete.do:src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupDelete.do:src/main/java/egovframework/com/sec/rgm/service/AuthorGroup.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupDelete.do:src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "line": 150,
+        "snippet": "@RequestMapping(value = \"/sec/rgm/EgovAuthorGroupDelete.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rgm/EgovAuthorGroupInsert.do",
+      "entryPoint": "EgovAuthorGroupController#insertAuthorGroup",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "stepIds": [
+        "step:ANY /sec/rgm/EgovAuthorGroupInsert.do:src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupInsert.do:src/main/java/egovframework/com/sec/rgm/service/AuthorGroup.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupInsert.do:src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "line": 115,
+        "snippet": "@RequestMapping(value = \"/sec/rgm/EgovAuthorGroupInsert.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rgm/EgovAuthorGroupList.do",
+      "entryPoint": "EgovAuthorGroupController#selectAuthorGroupList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "stepIds": [
+        "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/rgm/service/AuthorGroupVO.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "line": 76,
+        "snippet": "@RequestMapping(value = \"/sec/rgm/EgovAuthorGroupList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rgm/EgovAuthorGroupListView.do",
+      "entryPoint": "EgovAuthorGroupController#selectAuthorGroupListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "stepIds": [
+        "step:ANY /sec/rgm/EgovAuthorGroupListView.do:src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "line": 62,
+        "snippet": "@RequestMapping(\"/sec/rgm/EgovAuthorGroupListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rmt/EgovRole.do",
+      "entryPoint": "EgovRoleManageController#selectRole",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "stepIds": [
+        "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+        "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rmt/EgovRoleDelete.do",
+      "entryPoint": "EgovRoleManageController#deleteRole",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "stepIds": [
+        "step:ANY /sec/rmt/EgovRoleDelete.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "step:ANY /sec/rmt/EgovRoleDelete.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "step:ANY /sec/rmt/EgovRoleDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 238,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRoleDelete.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rmt/EgovRoleInsert.do",
+      "entryPoint": "EgovRoleManageController#insertRole",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "stepIds": [
+        "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/sec/rmt/service/RoleManage.java",
+        "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+        "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 178,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRoleInsert.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rmt/EgovRoleInsertView.do",
+      "entryPoint": "EgovRoleManageController#insertRoleView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "stepIds": [
+        "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 147,
+        "snippet": "@RequestMapping(\"/sec/rmt/EgovRoleInsertView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rmt/EgovRoleList.do",
+      "entryPoint": "EgovRoleManageController#selectRoleList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "stepIds": [
+        "step:ANY /sec/rmt/EgovRoleList.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "step:ANY /sec/rmt/EgovRoleList.do:src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+        "step:ANY /sec/rmt/EgovRoleList.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "step:ANY /sec/rmt/EgovRoleList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRoleList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rmt/EgovRoleListDelete.do",
+      "entryPoint": "EgovRoleManageController#deleteRoleList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "stepIds": [
+        "step:ANY /sec/rmt/EgovRoleListDelete.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "step:ANY /sec/rmt/EgovRoleListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/rmt/EgovRoleListDelete.do:src/main/java/egovframework/com/sec/rmt/service/RoleManage.java",
+        "step:ANY /sec/rmt/EgovRoleListDelete.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 254,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRoleListDelete.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rmt/EgovRoleListView.do",
+      "entryPoint": "EgovRoleManageController#selectRoleListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "stepIds": [
+        "step:ANY /sec/rmt/EgovRoleListView.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 78,
+        "snippet": "@RequestMapping(\"/sec/rmt/EgovRoleListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sec/rmt/EgovRoleUpdate.do",
+      "entryPoint": "EgovRoleManageController#updateRole",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "stepIds": [
+        "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 216,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRoleUpdate.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorInsertView.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "layer": "api",
+      "className": "EgovAuthorManageController",
+      "kgSummary": "권한 목록/단건 조회 및 권한 등록·수정·삭제 요청과 접근거부 처리를 담당하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 102,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "layer": "api",
+      "className": "EgovAuthorManageController",
+      "kgSummary": "권한 목록/단건 조회 및 권한 등록·수정·삭제 요청과 접근거부 처리를 담당하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 102,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "layer": "unknown",
+      "className": "AuthorManageVO",
+      "kgSummary": "권한 목록 조회 결과를 담는 권한관리 조회용 VO.",
+      "kgTags": [
+        "VO",
+        "데이터모델",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "line": 26,
+        "snippet": "public class AuthorManageVO extends AuthorManage {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "layer": "service",
+      "className": "EgovAuthorManageService",
+      "kgSummary": "권한관리(RAM) 조회·등록·수정·삭제 및 전체 권한 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovAuthorManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "layer": "api",
+      "className": "EgovAuthorManageController",
+      "kgSummary": "권한 목록/단건 조회 및 권한 등록·수정·삭제 요청과 접근거부 처리를 담당하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 102,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+      "layer": "unknown",
+      "className": "AuthorManage",
+      "kgSummary": "권한(롤/권한코드) 정보와 암호화 코드·설명을 담는 권한관리(RAM) 도메인 model.",
+      "kgTags": [
+        "model",
+        "데이터모델",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+        "line": 29,
+        "snippet": "public class AuthorManage extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorListDelete.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "layer": "service",
+      "className": "EgovAuthorManageService",
+      "kgSummary": "권한관리(RAM) 조회·등록·수정·삭제 및 전체 권한 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovAuthorManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "layer": "api",
+      "className": "EgovAuthorRoleController",
+      "kgSummary": "권한 역할 관리 화면 요청을 처리하는 Spring MVC controller로, 목록 조회 페이징과 다건 권한-역할 매핑 등록/삭제 후 보안 메타데이터 reload를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "authorization",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+        "line": 118,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+      "layer": "unknown",
+      "className": "AuthorRoleManage",
+      "kgSummary": "권한과 role 매핑 정보를 담는 도메인 VO로, authorCode·roleCode·roleNm 등 권한 역할 속성을 보관한다. ComDefaultVO를 상속하여 페이징·검색 조건을 함께 갖는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "security",
+        "authorization",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManage.java",
+        "line": 26,
+        "snippet": "public class AuthorRoleManage extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+      "layer": "service",
+      "className": "EgovAuthorRoleManageService",
+      "kgSummary": "권한 역할 관리 비즈니스 계약을 정의하는 service interface로 목록 조회·등록·삭제·총건수 조회 4개 메서드를 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "authorization",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovAuthorRoleManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleInsert.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "layer": "api",
+      "className": "EgovAuthorRoleController",
+      "kgSummary": "권한 역할 관리 화면 요청을 처리하는 Spring MVC controller로, 목록 조회 페이징과 다건 권한-역할 매핑 등록/삭제 후 보안 메타데이터 reload를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "authorization",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+        "line": 118,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+      "layer": "unknown",
+      "className": "AuthorRoleManageVO",
+      "kgSummary": "권한 역할 목록을 담는 컬렉션 VO로, authorRoleList 필드를 통해 조회 결과 리스트를 화면과 서비스 계층에 전달한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authorization",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorRoleManageVO.java",
+        "line": 26,
+        "snippet": "public class AuthorRoleManageVO extends AuthorRoleManage {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+      "layer": "service",
+      "className": "EgovAuthorRoleManageService",
+      "kgSummary": "권한 역할 관리 비즈니스 계약을 정의하는 service interface로 목록 조회·등록·삭제·총건수 조회 4개 메서드를 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "authorization",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorRoleManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovAuthorRoleManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorRoleListView.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+      "layer": "api",
+      "className": "EgovAuthorRoleController",
+      "kgSummary": "권한 역할 관리 화면 요청을 처리하는 Spring MVC controller로, 목록 조회 페이징과 다건 권한-역할 매핑 등록/삭제 후 보안 메타데이터 reload를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "authorization",
+        "egovframe"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorRoleController.java",
+        "line": 118,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthorRoleInsert.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "layer": "api",
+      "className": "EgovAuthorManageController",
+      "kgSummary": "권한 목록/단건 조회 및 권한 등록·수정·삭제 요청과 접근거부 처리를 담당하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 102,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "layer": "service",
+      "className": "EgovAuthorManageService",
+      "kgSummary": "권한관리(RAM) 조회·등록·수정·삭제 및 전체 권한 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovAuthorManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/EgovAuthorUpdate.do:src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+      "layer": "unknown",
+      "className": "AuthorManage",
+      "kgSummary": "권한(롤/권한코드) 정보와 암호화 코드·설명을 담는 권한관리(RAM) 도메인 model.",
+      "kgTags": [
+        "model",
+        "데이터모델",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManage.java",
+        "line": 29,
+        "snippet": "public class AuthorManage extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/ram/accessDenied.do:src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+      "layer": "api",
+      "className": "EgovAuthorManageController",
+      "kgSummary": "권한 목록/단건 조회 및 권한 등록·수정·삭제 요청과 접근거부 처리를 담당하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/web/EgovAuthorManageController.java",
+        "line": 102,
+        "snippet": "@RequestMapping(value = \"/sec/ram/EgovAuthor.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupDelete.do:src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "layer": "api",
+      "className": "EgovAuthorGroupController",
+      "kgSummary": "권한그룹 목록 조회 및 사용자-권한 매핑 등록·삭제 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한그룹",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "line": 150,
+        "snippet": "@RequestMapping(value = \"/sec/rgm/EgovAuthorGroupDelete.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupDelete.do:src/main/java/egovframework/com/sec/rgm/service/AuthorGroup.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/service/AuthorGroup.java",
+      "layer": "unknown",
+      "className": "AuthorGroup",
+      "kgSummary": "권한그룹(RGM) 대상 사용자·그룹·권한 코드를 담는 도메인 model.",
+      "kgTags": [
+        "model",
+        "데이터모델",
+        "권한그룹",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/service/AuthorGroup.java",
+        "line": 26,
+        "snippet": "public class AuthorGroup extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupDelete.do:src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+      "layer": "service",
+      "className": "EgovAuthorGroupService",
+      "kgSummary": "권한그룹(RGM) 목록 조회·등록·수정·삭제 비즈니스 로직 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한그룹",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+        "line": 23,
+        "snippet": "public interface EgovAuthorGroupService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupInsert.do:src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "layer": "api",
+      "className": "EgovAuthorGroupController",
+      "kgSummary": "권한그룹 목록 조회 및 사용자-권한 매핑 등록·삭제 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한그룹",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "line": 150,
+        "snippet": "@RequestMapping(value = \"/sec/rgm/EgovAuthorGroupDelete.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupInsert.do:src/main/java/egovframework/com/sec/rgm/service/AuthorGroup.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/service/AuthorGroup.java",
+      "layer": "unknown",
+      "className": "AuthorGroup",
+      "kgSummary": "권한그룹(RGM) 대상 사용자·그룹·권한 코드를 담는 도메인 model.",
+      "kgTags": [
+        "model",
+        "데이터모델",
+        "권한그룹",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/service/AuthorGroup.java",
+        "line": 26,
+        "snippet": "public class AuthorGroup extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupInsert.do:src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+      "layer": "service",
+      "className": "EgovAuthorGroupService",
+      "kgSummary": "권한그룹(RGM) 목록 조회·등록·수정·삭제 비즈니스 로직 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한그룹",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+        "line": 23,
+        "snippet": "public interface EgovAuthorGroupService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "layer": "api",
+      "className": "EgovAuthorGroupController",
+      "kgSummary": "권한그룹 목록 조회 및 사용자-권한 매핑 등록·삭제 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한그룹",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "line": 150,
+        "snippet": "@RequestMapping(value = \"/sec/rgm/EgovAuthorGroupDelete.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/rgm/service/AuthorGroupVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/service/AuthorGroupVO.java",
+      "layer": "unknown",
+      "className": "AuthorGroupVO",
+      "kgSummary": "권한그룹 목록 조회 결과를 담는 권한그룹 조회용 VO.",
+      "kgTags": [
+        "VO",
+        "데이터모델",
+        "권한그룹",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/service/AuthorGroupVO.java",
+        "line": 26,
+        "snippet": "public class AuthorGroupVO extends AuthorGroup {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+      "layer": "service",
+      "className": "EgovAuthorGroupService",
+      "kgSummary": "권한그룹(RGM) 목록 조회·등록·수정·삭제 비즈니스 로직 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한그룹",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/service/EgovAuthorGroupService.java",
+        "line": 23,
+        "snippet": "public interface EgovAuthorGroupService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "layer": "service",
+      "className": "EgovAuthorManageService",
+      "kgSummary": "권한관리(RAM) 조회·등록·수정·삭제 및 전체 권한 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovAuthorManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "layer": "unknown",
+      "className": "AuthorManageVO",
+      "kgSummary": "권한 목록 조회 결과를 담는 권한관리 조회용 VO.",
+      "kgTags": [
+        "VO",
+        "데이터모델",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "line": 26,
+        "snippet": "public class AuthorManageVO extends AuthorManage {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rgm/EgovAuthorGroupListView.do:src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+      "layer": "api",
+      "className": "EgovAuthorGroupController",
+      "kgSummary": "권한그룹 목록 조회 및 사용자-권한 매핑 등록·삭제 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "권한그룹",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rgm/web/EgovAuthorGroupController.java",
+        "line": 150,
+        "snippet": "@RequestMapping(value = \"/sec/rgm/EgovAuthorGroupDelete.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "layer": "api",
+      "className": "EgovRoleManageController",
+      "kgSummary": "롤 목록/단건 조회 및 롤 등록·수정·삭제와 공통코드 조회를 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+      "layer": "unknown",
+      "className": "RoleManageVO",
+      "kgSummary": "롤 목록 조회 결과와 삭제여부 플래그를 담는 롤관리 조회용 VO.",
+      "kgTags": [
+        "VO",
+        "데이터모델",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+        "line": 28,
+        "snippet": "public class RoleManageVO extends RoleManage {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "layer": "service",
+      "className": "EgovAuthorManageService",
+      "kgSummary": "권한관리(RAM) 조회·등록·수정·삭제 및 전체 권한 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovAuthorManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "layer": "unknown",
+      "className": "AuthorManageVO",
+      "kgSummary": "권한 목록 조회 결과를 담는 권한관리 조회용 VO.",
+      "kgTags": [
+        "VO",
+        "데이터모델",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "line": 26,
+        "snippet": "public class AuthorManageVO extends AuthorManage {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "layer": "service",
+      "className": "EgovRoleManageService",
+      "kgSummary": "롤관리(RMT) 조회·등록·수정·삭제 및 전체 롤 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "롤관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovRoleManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRole.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleDelete.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "layer": "api",
+      "className": "EgovRoleManageController",
+      "kgSummary": "롤 목록/단건 조회 및 롤 등록·수정·삭제와 공통코드 조회를 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleDelete.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "layer": "service",
+      "className": "EgovRoleManageService",
+      "kgSummary": "롤관리(RMT) 조회·등록·수정·삭제 및 전체 롤 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "롤관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovRoleManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "layer": "api",
+      "className": "EgovRoleManageController",
+      "kgSummary": "롤 목록/단건 조회 및 롤 등록·수정·삭제와 공통코드 조회를 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/sec/rmt/service/RoleManage.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/RoleManage.java",
+      "layer": "unknown",
+      "className": "RoleManage",
+      "kgSummary": "롤 정보(롤코드·명·패턴·유형·정렬·설명·권한코드)를 담는 롤관리 도메인 model.",
+      "kgTags": [
+        "model",
+        "데이터모델",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/RoleManage.java",
+        "line": 26,
+        "snippet": "public class RoleManage extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+      "layer": "unknown",
+      "className": "RoleManageVO",
+      "kgSummary": "롤 목록 조회 결과와 삭제여부 플래그를 담는 롤관리 조회용 VO.",
+      "kgTags": [
+        "VO",
+        "데이터모델",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+        "line": 28,
+        "snippet": "public class RoleManageVO extends RoleManage {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "layer": "service",
+      "className": "EgovRoleManageService",
+      "kgSummary": "롤관리(RMT) 조회·등록·수정·삭제 및 전체 롤 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "롤관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovRoleManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsert.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "layer": "api",
+      "className": "EgovRoleManageController",
+      "kgSummary": "롤 목록/단건 조회 및 롤 등록·수정·삭제와 공통코드 조회를 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+      "layer": "service",
+      "className": "EgovAuthorManageService",
+      "kgSummary": "권한관리(RAM) 조회·등록·수정·삭제 및 전체 권한 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "권한관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/EgovAuthorManageService.java",
+        "line": 22,
+        "snippet": "public interface EgovAuthorManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+      "layer": "unknown",
+      "className": "AuthorManageVO",
+      "kgSummary": "권한 목록 조회 결과를 담는 권한관리 조회용 VO.",
+      "kgTags": [
+        "VO",
+        "데이터모델",
+        "권한관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/ram/service/AuthorManageVO.java",
+        "line": 26,
+        "snippet": "public class AuthorManageVO extends AuthorManage {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleInsertView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleList.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "layer": "api",
+      "className": "EgovRoleManageController",
+      "kgSummary": "롤 목록/단건 조회 및 롤 등록·수정·삭제와 공통코드 조회를 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleList.do:src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+      "layer": "unknown",
+      "className": "RoleManageVO",
+      "kgSummary": "롤 목록 조회 결과와 삭제여부 플래그를 담는 롤관리 조회용 VO.",
+      "kgTags": [
+        "VO",
+        "데이터모델",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/RoleManageVO.java",
+        "line": 28,
+        "snippet": "public class RoleManageVO extends RoleManage {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleList.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "layer": "service",
+      "className": "EgovRoleManageService",
+      "kgSummary": "롤관리(RMT) 조회·등록·수정·삭제 및 전체 롤 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "롤관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovRoleManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleListDelete.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "layer": "api",
+      "className": "EgovRoleManageController",
+      "kgSummary": "롤 목록/단건 조회 및 롤 등록·수정·삭제와 공통코드 조회를 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleListDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleListDelete.do:src/main/java/egovframework/com/sec/rmt/service/RoleManage.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/RoleManage.java",
+      "layer": "unknown",
+      "className": "RoleManage",
+      "kgSummary": "롤 정보(롤코드·명·패턴·유형·정렬·설명·권한코드)를 담는 롤관리 도메인 model.",
+      "kgTags": [
+        "model",
+        "데이터모델",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/RoleManage.java",
+        "line": 26,
+        "snippet": "public class RoleManage extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleListDelete.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "layer": "service",
+      "className": "EgovRoleManageService",
+      "kgSummary": "롤관리(RMT) 조회·등록·수정·삭제 및 전체 롤 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "롤관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovRoleManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleListView.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "layer": "api",
+      "className": "EgovRoleManageController",
+      "kgSummary": "롤 목록/단건 조회 및 롤 등록·수정·삭제와 공통코드 조회를 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+      "layer": "api",
+      "className": "EgovRoleManageController",
+      "kgSummary": "롤 목록/단건 조회 및 롤 등록·수정·삭제와 공통코드 조회를 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "롤관리",
+        "보안"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/web/EgovRoleManageController.java",
+        "line": 124,
+        "snippet": "@RequestMapping(value = \"/sec/rmt/EgovRole.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "relPath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+      "layer": "service",
+      "className": "EgovRoleManageService",
+      "kgSummary": "롤관리(RMT) 조회·등록·수정·삭제 및 전체 롤 목록 조회 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service-interface",
+        "롤관리",
+        "보안",
+        "비즈니스로직"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sec/rmt/service/EgovRoleManageService.java",
+        "line": 23,
+        "snippet": "public interface EgovRoleManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sec/rmt/EgovRoleUpdate.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    }
+  ]
+}

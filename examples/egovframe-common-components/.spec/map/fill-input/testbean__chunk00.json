@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "key": "testbean",
+  "domainId": "domain:testbean",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:testbean",
+    "key": "testbean",
+    "kgHints": [
+      {
+        "relPath": "src/test/java/egovframework/com/bean/MyBean.java",
+        "className": "MyBean",
+        "summary": "현재 시각 밀리초 속성에 대한 getter/setter를 가진 최소 테스트용 스프링 빈 클래스이다.",
+        "tags": [
+          "test",
+          "bean",
+          "spring",
+          "fixture"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/bean/MyBean.java",
+          "line": 3,
+          "snippet": "public class MyBean {"
+        }
+      },
+      {
+        "relPath": "src/test/java/egovframework/com/bean/TestBean.java",
+        "className": "TestBean",
+        "summary": "Spring ApplicationContext에서 빈을 조회하고 스코프/생성 동작을 확인하는 실행형 테스트로, MyBean 빈을 로드해 시각 값을 출력한다.",
+        "tags": [
+          "test",
+          "spring",
+          "application-context",
+          "bean",
+          "main"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/bean/TestBean.java",
+          "line": 32,
+          "snippet": "public static void main(String[] args) {"
+        }
+      }
+    ],
+    "cross": [],
+    "flowCount": 1,
+    "stepCount": 2
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/bean/TestBean.java#main",
+      "entryPoint": "TestBean#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/bean/TestBean.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/bean/TestBean.java#main:src/test/java/egovframework/com/bean/TestBean.java",
+        "step:batch:src/test/java/egovframework/com/bean/TestBean.java#main:src/test/java/egovframework/com/bean/MyBean.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/bean/TestBean.java",
+        "line": 32,
+        "snippet": "public static void main(String[] args) {"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/bean/TestBean.java#main:src/test/java/egovframework/com/bean/TestBean.java",
+      "relPath": "src/test/java/egovframework/com/bean/TestBean.java",
+      "layer": "api",
+      "className": "TestBean",
+      "kgSummary": "Spring ApplicationContext에서 빈을 조회하고 스코프/생성 동작을 확인하는 실행형 테스트로, MyBean 빈을 로드해 시각 값을 출력한다.",
+      "kgTags": [
+        "test",
+        "spring",
+        "application-context",
+        "bean",
+        "main"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/bean/TestBean.java",
+        "line": 32,
+        "snippet": "public static void main(String[] args) {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/bean/TestBean.java#main:src/test/java/egovframework/com/bean/MyBean.java",
+      "relPath": "src/test/java/egovframework/com/bean/MyBean.java",
+      "layer": "unknown",
+      "className": "MyBean",
+      "kgSummary": "현재 시각 밀리초 속성에 대한 getter/setter를 가진 최소 테스트용 스프링 빈 클래스이다.",
+      "kgTags": [
+        "test",
+        "bean",
+        "spring",
+        "fixture"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/bean/MyBean.java",
+        "line": 3,
+        "snippet": "public class MyBean {"
+      }
+    }
+  ]
+}

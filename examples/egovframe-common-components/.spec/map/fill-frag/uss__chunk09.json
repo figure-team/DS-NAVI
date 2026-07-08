@@ -1,0 +1,130 @@
+{
+  "key": "uss",
+  "chunkIndex": 9,
+  "isHeaderChunk": false,
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/detailRecentSrchwrd.do",
+      "name": "최근 검색어 상세 조회",
+      "summary": { "text": "최근 검색어 관리 화면에서 특정 검색어 항목의 상세 정보를 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 121, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/detailRecentSrchwrd.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/listRecentSrchwrd.do",
+      "name": "최근 검색어 목록 조회",
+      "summary": { "text": "등록된 최근 검색어 관리 대상 목록을 조회하여 화면에 보여주는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 83, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/listRecentSrchwrd.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/listRecentSrchwrdResult.do",
+      "name": "인기(최근) 검색어 결과 조회",
+      "summary": { "text": "AJAX/XML 방식으로 실제 노출되는 인기 검색어 결과 목록을 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 272, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/listRecentSrchwrdResult.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/listRecentSrchwrdResultSerach.do",
+      "name": "인기 검색어 결과 재검색",
+      "summary": { "text": "검색 조건을 반영해 인기 검색어 결과를 다시 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 327, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/listRecentSrchwrdResultSerach.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/registRecentSrchwrd.do",
+      "name": "최근 검색어 등록 처리",
+      "summary": { "text": "사용자 인증 정보를 확인한 뒤 새로운 최근 검색어 항목을 등록 처리하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 233, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/registRecentSrchwrd.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/registRecentSrchwrdResult.do",
+      "name": "최근 검색어 등록 결과 처리",
+      "summary": { "text": "최근 검색어 등록 처리 후 그 결과를 반환하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 377, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/registRecentSrchwrdResult.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/registRecentSrchwrdView.do",
+      "name": "최근 검색어 등록 화면 조회",
+      "summary": { "text": "최근 검색어를 신규 등록하기 위한 입력 화면을 제공하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 210, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/registRecentSrchwrdView.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/updtRecentSrchwrd.do",
+      "name": "최근 검색어 수정 처리",
+      "summary": { "text": "기존 최근 검색어 항목의 정보를 수정 처리하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 174, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/updtRecentSrchwrd.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsm/updtRecentSrchwrdView.do",
+      "name": "최근 검색어 수정 화면 조회",
+      "summary": { "text": "최근 검색어 항목을 수정하기 위한 화면 정보를 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 149, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/updtRecentSrchwrdView.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsn/detailRssTagService.do",
+      "name": "RSS 태그 서비스 상세 조회",
+      "summary": { "text": "SQL 인젝션 방어 처리를 거쳐 특정 RSS 태그 서비스의 상세 정보를 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java", "line": 108, "snippet": "@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rsn/listRssTagService.do",
+      "name": "RSS 태그 서비스 목록 조회",
+      "summary": { "text": "페이징 처리를 적용해 RSS 태그 서비스 목록을 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java", "line": 59, "snippet": "@RequestMapping(value = \"/uss/ion/rsn/listRssTagService.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rss/detailRssTagManage.do",
+      "name": "RSS 태그 관리 상세 조회",
+      "summary": { "text": "특정 RSS 태그 관리 항목의 상세 정보를 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/web/EgovRssTagManageController.java", "line": 170, "snippet": "@RequestMapping(value = \"/uss/ion/rss/detailRssTagManage.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rss/insertRssTagManage.do",
+      "name": "RSS 태그 관리 등록 처리",
+      "summary": { "text": "사용자 인증 정보를 확인한 뒤 새로운 RSS 태그 관리 항목을 등록 처리하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/web/EgovRssTagManageController.java", "line": 282, "snippet": "@RequestMapping(value = \"/uss/ion/rss/insertRssTagManage.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rss/insertRssTagManageView.do",
+      "name": "RSS 태그 관리 등록 화면 조회",
+      "summary": { "text": "RSS 태그 관리 항목을 신규 등록하기 위한 입력 화면을 제공하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/web/EgovRssTagManageController.java", "line": 255, "snippet": "@RequestMapping(value = \"/uss/ion/rss/insertRssTagManageView.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rss/listRssTagManage.do",
+      "name": "RSS 태그 관리 목록 조회",
+      "summary": { "text": "사용자 인증 정보를 확인하며 RSS 태그 관리 대상 목록을 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/web/EgovRssTagManageController.java", "line": 92, "snippet": "@RequestMapping(value = \"/uss/ion/rss/listRssTagManage.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rss/listRssTagManageTableColumnList.do",
+      "name": "RSS 태그 대상 테이블·컬럼 목록 조회",
+      "summary": { "text": "RSS 태그 매핑에 사용할 대상 테이블과 컬럼 목록을 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/web/EgovRssTagManageController.java", "line": 65, "snippet": "@RequestMapping(value = \"/uss/ion/rss/listRssTagManageTableColumnList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rss/updtRssTagManage.do",
+      "name": "RSS 태그 관리 수정 처리",
+      "summary": { "text": "기존 RSS 태그 관리 항목의 매핑 정보를 수정 처리하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/web/EgovRssTagManageController.java", "line": 201, "snippet": "@RequestMapping(value = \"/uss/ion/rss/updtRssTagManage.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rwd/EgovRwardConfm.do",
+      "name": "포상 결재 확인 처리",
+      "summary": { "text": "포상 관리 항목에 대한 결재 확인 처리를 수행하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java", "line": 371, "snippet": "@RequestMapping(value = \"/uss/ion/rwd/EgovRwardConfm.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rwd/EgovRwardConfmList.do",
+      "name": "포상 결재 확인 목록 조회",
+      "summary": { "text": "결재 확인 대상 포상 관리 항목의 목록을 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java", "line": 326, "snippet": "@RequestMapping(value = \"/uss/ion/rwd/EgovRwardConfmList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/rwd/EgovRwardManageDetail.do",
+      "name": "포상 관리 상세 조회",
+      "summary": { "text": "특정 포상 관리 항목의 상세 정보를 조회하는 기능이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java", "line": 144, "snippet": "@RequestMapping(value = \"/uss/ion/rwd/EgovRwardManageDetail.do\")" } ] }
+    }
+  ],
+  "steps": [
+    { "stepId": "step:ANY /uss/ion/rsm/detailRecentSrchwrd.do:src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "name": "최근 검색어 관리 컨트롤러", "summary": { "text": "최근 검색어 관리 화면 요청을 받아 목록·상세·등록·수정을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/web/EgovRecentSrchwrdController.java", "line": 121, "snippet": "@RequestMapping(value = \"/uss/ion/rsm/detailRecentSrchwrd.do\")" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsm/detailRecentSrchwrd.do:src/main/java/egovframework/com/uss/ion/rsm/service/EgovRecentSrchwrdService.java", "name": "최근 검색어 서비스 계약", "summary": { "text": "최근 검색어의 CRUD 및 조회 메서드를 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/service/EgovRecentSrchwrdService.java", "line": 23, "snippet": "public interface EgovRecentSrchwrdService {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsm/listRecentSrchwrd.do:src/main/java/egovframework/com/uss/ion/rsm/service/RecentSrchwrd.java", "name": "최근 검색어 데이터 모델", "summary": { "text": "최근 검색어의 ID·명칭·URL·건수 등 도메인 필드를 담는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsm/service/RecentSrchwrd.java", "line": 22, "snippet": "public class RecentSrchwrd extends ComDefaultVO {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsm/registRecentSrchwrd.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "name": "인증 사용자 정보 조회 헬퍼", "summary": { "text": "인증된 사용자 정보와 권한을 조회하는 정적 헬퍼 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsm/registRecentSrchwrd.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java", "name": "공통 다국어 메시지 조회", "summary": { "text": "코드와 Locale 기반으로 다국어 메시지를 조회하는 공통 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsm/registRecentSrchwrd.do:src/main/java/egovframework/com/cmm/LoginVO.java", "name": "로그인 사용자 정보 보관", "summary": { "text": "인증된 사용자의 로그인 정보를 세션에서 담아 전달하는 공통 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsm/registRecentSrchwrd.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "name": "문자열 처리 유틸리티", "summary": { "text": "문자열 자르기·치환·인코딩·HTML 변환 등을 제공하는 공통 정적 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsm/registRecentSrchwrd.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java", "name": "사용자 상세 서비스 계약", "summary": { "text": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java", "line": 5, "snippet": "public interface EgovUserDetailsService {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java", "name": "RSS 태그 서비스 컨트롤러", "summary": { "text": "RSS 태그 서비스 목록/상세 조회를 처리하며 SQL 인젝션을 방어하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsn/web/EgovRssController.java", "line": 108, "snippet": "@RequestMapping(value = \"/uss/ion/rsn/detailRssTagService.do\")" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java", "name": "RSS 서비스 계약", "summary": { "text": "RSS 서비스 관련 업무 메서드 시그니처를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/EgovRssService.java", "line": 21, "snippet": "public interface EgovRssService {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsn/detailRssTagService.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java", "name": "웹 보안 필터링 유틸리티", "summary": { "text": "XSS·SQL/OS/LDAP 인젝션 등 입력값을 정화하는 공통 웹 보안 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java", "line": 25, "snippet": "public class EgovWebUtil {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rsn/listRssTagService.do:src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java", "name": "RSS 서비스 데이터 모델", "summary": { "text": "RSS 서비스 조회 조건과 페이징 정보를 담는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rsn/service/RssInfo.java", "line": 19, "snippet": "public class RssInfo extends ComDefaultVO {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rss/detailRssTagManage.do:src/main/java/egovframework/com/uss/ion/rss/web/EgovRssTagManageController.java", "name": "RSS 태그 관리 컨트롤러", "summary": { "text": "RSS 태그 관리 화면의 테이블/컬럼 선택·목록·상세·수정·등록 요청을 처리하는 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/web/EgovRssTagManageController.java", "line": 170, "snippet": "@RequestMapping(value = \"/uss/ion/rss/detailRssTagManage.do\")" } ] } },
+    { "stepId": "step:ANY /uss/ion/rss/detailRssTagManage.do:src/main/java/egovframework/com/uss/ion/rss/service/EgovRssTagManageService.java", "name": "RSS 태그 관리 서비스 계약", "summary": { "text": "대상 서비스·컬럼 조회와 RSS 태그 CRUD를 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/service/EgovRssTagManageService.java", "line": 21, "snippet": "public interface EgovRssTagManageService {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rss/insertRssTagManage.do:src/main/java/egovframework/com/uss/ion/rss/service/RssManage.java", "name": "RSS 태그 데이터 모델", "summary": { "text": "대상 서비스와 헤더/본문 태그 매핑 정보를 담는 RSS 태그 데이터 객체이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rss/service/RssManage.java", "line": 25, "snippet": "public class RssManage extends ComDefaultVO {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java", "name": "포상 관리 컨트롤러", "summary": { "text": "포상 관리 화면의 목록·상세·등록·수정·삭제·결재 요청을 처리하는 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rwd/web/EgovRwardManageController.java", "line": 371, "snippet": "@RequestMapping(value = \"/uss/ion/rwd/EgovRwardConfm.do\")" } ] } },
+    { "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java", "name": "포상 관리 검색용 데이터 모델", "summary": { "text": "포상 관리 검색/목록 처리를 위해 RwardManage를 확장한 화면 전달 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManageVO.java", "line": 21, "snippet": "public class RwardManageVO extends RwardManage implements Serializable {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java", "name": "포상 관리 서비스 계약", "summary": { "text": "포상(상벌) 관리 비즈니스 로직 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rwd/service/EgovRwardManageService.java", "line": 16, "snippet": "public interface EgovRwardManageService {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfm.do:src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java", "name": "포상 관리 데이터 모델", "summary": { "text": "포상 항목의 전 속성을 보유하는 포상 관리 도메인 모델(VO)이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/rwd/service/RwardManage.java", "line": 29, "snippet": "public class RwardManage extends ComDefaultVO {" } ] } },
+    { "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "name": "공통코드 조회 조건 모델", "summary": { "text": "페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는 공통 조회 조건 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "line": 28, "snippet": "@SuppressWarnings(\"serial\")" } ] } },
+    { "stepId": "step:ANY /uss/ion/rwd/EgovRwardConfmList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "name": "공통코드·XSS 서비스 계약", "summary": { "text": "공통코드·XSS 관련 비즈니스 메서드 계약을 선언하는 공통 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "line": 26, "snippet": "public interface EgovCmmUseService {" } ] } }
+  ]
+}

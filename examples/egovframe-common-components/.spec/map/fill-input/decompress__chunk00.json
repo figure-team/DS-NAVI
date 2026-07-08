@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "key": "decompress",
+  "domainId": "domain:decompress",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:decompress",
+    "key": "decompress",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "className": "EgovWebUtil",
+        "summary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+        "tags": [
+          "utility",
+          "security",
+          "validation",
+          "xss",
+          "sanitization",
+          "tested"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+          "line": 25,
+          "snippet": "public class EgovWebUtil {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+        "className": "EgovBasicLogger",
+        "summary": "ignore/debug/info 레벨별 SLF4J 로거를 감싸 공통 로깅 진입점을 제공하는 유틸. 특히 무시 가능한 예외 로깅에 사용된다.",
+        "tags": [
+          "utility",
+          "logging"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+          "line": 24,
+          "snippet": "public class EgovBasicLogger {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+        "className": "EgovResourceCloseHelper",
+        "summary": "Closeable·DB(ResultSet/Statement/Connection)·소켓 자원을 예외를 삼키며 안전하게 닫는 리소스 정리 유틸.",
+        "tags": [
+          "utility",
+          "resource-management",
+          "io"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+          "line": 31,
+          "snippet": "public class EgovResourceCloseHelper {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+        "className": "EgovFileCmprs",
+        "summary": "압축 파일(zip/tar 등)을 지정 경로에 해제하는 파일 압축 해제 유틸리티.",
+        "tags": [
+          "utility",
+          "compression",
+          "file-io"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+          "line": 34,
+          "snippet": "public class EgovFileCmprs {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+        "className": "EgovFileTool",
+        "summary": "디렉터리/파일 생성·삭제·순회·파싱을 제공하는 파일 시스템 조작 static 유틸리티. 경로 보안 검증을 적용.",
+        "tags": [
+          "utility",
+          "file-io",
+          "security"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+          "line": 59,
+          "snippet": "public class EgovFileTool {"
+        }
+      },
+      {
+        "relPath": "src/test/java/egovframework/com/file/TestDecompress.java",
+        "className": "TestDecompress",
+        "summary": "EgovFileCmprs의 압축 해제(decmprsFile) 기능을 main으로 실행 검증하는 테스트 스텁.",
+        "tags": [
+          "test",
+          "file",
+          "compression"
+        ],
+        "citation": {
+          "filePath": "src/test/java/egovframework/com/file/TestDecompress.java",
+          "line": 13,
+          "snippet": "public static void main(String[] args) {"
+        }
+      }
+    ],
+    "cross": [
+      {
+        "to": "cop",
+        "weight": 4,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+              "line": 2,
+              "snippet": "* Class Name : EgovFileCmprs.java"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+            "target": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+              "line": 2,
+              "snippet": "* Class Name : EgovFileTool.java"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+            "target": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+              "line": 2,
+              "snippet": "* Class Name : EgovFileTool.java"
+            }
+          }
+        ]
+      },
+      {
+        "to": "egov",
+        "weight": 1,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+            "target": "src/main/java/egovframework/com/cmm/aop/EgovFileBasePathSecurityValidator.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+              "line": 2,
+              "snippet": "* Class Name : EgovFileTool.java"
+            }
+          }
+        ]
+      }
+    ],
+    "flowCount": 1,
+    "stepCount": 6
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/file/TestDecompress.java#main",
+      "entryPoint": "TestDecompress#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/file/TestDecompress.java",
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/test/java/egovframework/com/file/TestDecompress.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+        "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/file/TestDecompress.java",
+        "line": 13,
+        "snippet": "public static void main(String[] args) {"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/test/java/egovframework/com/file/TestDecompress.java",
+      "relPath": "src/test/java/egovframework/com/file/TestDecompress.java",
+      "layer": "api",
+      "className": "TestDecompress",
+      "kgSummary": "EgovFileCmprs의 압축 해제(decmprsFile) 기능을 main으로 실행 검증하는 테스트 스텁.",
+      "kgTags": [
+        "test",
+        "file",
+        "compression"
+      ],
+      "citation": {
+        "filePath": "src/test/java/egovframework/com/file/TestDecompress.java",
+        "line": 13,
+        "snippet": "public static void main(String[] args) {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+      "layer": "unknown",
+      "className": "EgovFileCmprs",
+      "kgSummary": "압축 파일(zip/tar 등)을 지정 경로에 해제하는 파일 압축 해제 유틸리티.",
+      "kgTags": [
+        "utility",
+        "compression",
+        "file-io"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileCmprs.java",
+        "line": 34,
+        "snippet": "public class EgovFileCmprs {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+      "relPath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+      "layer": "unknown",
+      "className": "EgovFileTool",
+      "kgSummary": "디렉터리/파일 생성·삭제·순회·파싱을 제공하는 파일 시스템 조작 static 유틸리티. 경로 보안 검증을 적용.",
+      "kgTags": [
+        "utility",
+        "file-io",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sim/service/EgovFileTool.java",
+        "line": 59,
+        "snippet": "public class EgovFileTool {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+      "layer": "unknown",
+      "className": "EgovResourceCloseHelper",
+      "kgSummary": "Closeable·DB(ResultSet/Statement/Connection)·소켓 자원을 예외를 삼키며 안전하게 닫는 리소스 정리 유틸.",
+      "kgTags": [
+        "utility",
+        "resource-management",
+        "io"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovResourceCloseHelper.java",
+        "line": 31,
+        "snippet": "public class EgovResourceCloseHelper {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/file/TestDecompress.java#main:src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+      "layer": "unknown",
+      "className": "EgovBasicLogger",
+      "kgSummary": "ignore/debug/info 레벨별 SLF4J 로거를 감싸 공통 로깅 진입점을 제공하는 유틸. 특히 무시 가능한 예외 로깅에 사용된다.",
+      "kgTags": [
+        "utility",
+        "logging"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovBasicLogger.java",
+        "line": 24,
+        "snippet": "public class EgovBasicLogger {"
+      }
+    }
+  ]
+}

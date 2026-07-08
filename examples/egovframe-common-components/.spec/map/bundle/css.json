@@ -1,0 +1,114 @@
+{
+  "domainId": "domain:css",
+  "files": [
+    {
+      "className": null,
+      "kgHint": {
+        "summary": "공통 컴포넌트의 구버전 공통 스타일시트를 JSP로 동적 서빙하는 파일로, 전역 레이아웃·폰트·색상 스타일을 정의한다.",
+        "tags": [
+          "jsp",
+          "stylesheet",
+          "legacy",
+          "web"
+        ]
+      },
+      "line": 1,
+      "relPath": "src/main/webapp/css/egovframework/com/com.css_old.jsp",
+      "slice": {
+        "endLine": 80,
+        "startLine": 1,
+        "text": "<%@ page contentType=\"text/css; charset=utf-8\" pageEncoding=\"utf-8\"%>\n<%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/core\" %>\n/*\n  Css Name : com.css\n  Description : 공통 CSS\n  Modification Information\n\n      수정일        수정자         수정내용\n     ----------    --------    ---------------------------\n     2016.06.08     서민영        최초 생성\n\n    author   : 공통컴포넌트 개발팀 서민영\n    since    : 2016.06.08\n*/\n@charset \"utf-8\";\n\nbody{ \n\tmargin-top:0px;\n\tmargin-left:5px;\n\tmargin-bottom: 0;\n\tmargin-right:: 0;\n\tfont-family:'돋움', '굴림', 'Arial', 'AppleGothic', 'sans-serif'; \n\tfont-size: 12px;\n}\n\ndiv,h1,h2,h3,h4,h5,form,fieldset,p,button,table,th,td { margin: 0; padding: 0;}\ndiv,table,em,strong,h1,h2,h3,h4,h5,h6,form,fieldset,p,th,td,input,textarea,select,button { color: #666; }\n\nfieldset, img { border: 0; }\ntextarea { width: 100%; }\nselect, input, img, button, label { vertical-align: middle; }\nul, ol { list-style : none; } \ncaption span, .hide, legend { position: absolute; left: -1000%; top: 0; }\ntable { border-collapse: collapse; border-spacing: 0; width: 100%; }\na { color: #666; text-decoration: none; vertical-align: middle; }\na:hover { color: #000; text-decoration: none; }\nbutton { border: none; }\ntextarea,\ninput[type=\"file\"],\ninput[type=\"password\"],\ninput[type=\"text\"] { color: #727272; height: 20px; border: 1px solid #dedede; padding-left: 5px; }\ntextarea[readonly=\"readonly\"],\nbutton[readonly=\"readonly\"],\nselect[readonly=\"readonly\"],\ninput[readonly=\"readonly\"],\ntextarea[disabled=\"disabled\"],\nbutton[disabled=\"disabled\"],\nselect[disabled=\"disabled\"],\ninput[disabled=\"disabled\"] { color: #999; background: #f7f7f7; }\ninput[type=\"password\"],\ninput[type=\"file\"],\ninput[type=\"text\"] { /*height:15px;*/ vertical-align: middle; }\ninput[type=\"file\"] { width: 100%; }\ninput[type=\"radio\"] { vertical-align: text-bottom; }\n\n.board { position: relative; width: 730px; }\n.board h1, .board h2 { float: left; color: #333; font-size: 16px; font-weight: 600; }\n.board h1 { margin-top: 15px; }\n.board h2 { margin: 15px 0 10px 0; }\n.board h3 { color: #333;  font-size: 14px; font-weight: 600; margin: 50px 0 10px 0; }\n.board h3 b { color: #2277d7; }\n.search_box { float: right; margin-bottom: 7px; }\n.search_box ul li { float: left; margin-left: 5px; }\n.search_box select { padding: 3px 3px 3px 4px; border: 1px solid #dedede; }\n.search_box input.s_input { width: 140px; padding-left: 5px; margin-right: 3px; }\n.search_box input.s_btn { height: 24px; padding: 0 10px; border: none; color: #fff; background: #4688d2; border-radius: 2px; cursor: pointer; }\n.search_box input.s_btn:hover { background: #7dabdf; }\n\n\n/* table style */\n.board_list { width: 100%; border-top: 2px solid #4688d2; }\n.board_list caption { display: none; }\n.board_list thead th,\n.board_list tbody th { color: #222 ; font-size: 13px; font-weight: 600; background: #f4f4f4; padding: 12px 0; border-bottom: 1px solid #d9d9d9; }\n.board_list tbody tr.odd {  }\n.board_list tbody.ov tr:hover { background: #f9f9f9; }\n.board_list tbody th { text-align: left; padding-left: 14px; }\n.board_list tbody th.vtop { vertical-align: top; }\n.board_list tbody th span.pilsu { color: #d0270b; font-weight: 500; margin-left: 3px; }\n.board_list tbody td { text-align: center; padding: 11px 5px; border-bottom: 1px solid #d9d9d9; }",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "GET /css/egovframework/com/com.css_old.jsp",
+      "entryType": "http",
+      "filePath": "src/main/webapp/css/egovframework/com/com.css_old.jsp",
+      "flowId": "flow:GET /css/egovframework/com/com.css_old.jsp",
+      "line": 1,
+      "stepIds": [
+        "step:GET /css/egovframework/com/com.css_old.jsp:src/main/webapp/css/egovframework/com/com.css_old.jsp"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "css",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/main/webapp/css/egovframework/com/com.css_old.jsp",
+      "stepId": "step:GET /css/egovframework/com/com.css_old.jsp:src/main/webapp/css/egovframework/com/com.css_old.jsp"
+    }
+  ]
+}

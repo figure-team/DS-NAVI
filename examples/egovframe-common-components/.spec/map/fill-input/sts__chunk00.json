@@ -1,0 +1,1568 @@
+{
+  "schemaVersion": 1,
+  "key": "sts",
+  "domainId": "domain:sts",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:sts",
+    "key": "sts",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "className": "ComDefaultCodeVO",
+        "summary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+          "line": 28,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "className": "EgovMessageSource",
+        "summary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+        "tags": [
+          "service",
+          "i18n",
+          "message-source",
+          "spring",
+          "utility"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+          "line": 26,
+          "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "className": "LoginVO",
+        "summary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "authentication",
+          "session",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "className": "EgovCmmUseService",
+        "summary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+        "tags": [
+          "service",
+          "interface",
+          "type-definition",
+          "common"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+          "line": 26,
+          "snippet": "public interface EgovCmmUseService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "className": "EgovUserDetailsHelper",
+        "summary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+        "tags": [
+          "utility",
+          "authentication",
+          "security"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+          "line": 25,
+          "snippet": "public class EgovUserDetailsHelper {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/bst/service/EgovBbsStatsService.java",
+        "className": "EgovBbsStatsService",
+        "summary": "게시판 통계(생성·조회·평균·최대·최소·최다 사용자·요약) 조회 기능을 정의하는 서비스 인터페이스이다.",
+        "tags": [
+          "service-interface",
+          "statistics",
+          "bbs"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/bst/service/EgovBbsStatsService.java",
+          "line": 24,
+          "snippet": "public interface EgovBbsStatsService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+        "className": "EgovBbsStatsController",
+        "summary": "탭(tab1~tab5)별 게시판 통계를 조회·가공하고 공통코드와 함께 뷰에 바인딩하는 Spring MVC 컨트롤러이다.",
+        "tags": [
+          "controller",
+          "spring-mvc",
+          "statistics",
+          "bbs"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+          "line": 61,
+          "snippet": "@RequestMapping(value = \"/sts/bst/selectBbsStats.do\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "className": "StatsVO",
+        "summary": "게시판·접속·화면 통계 전반에서 공유되는 통계 집계 필드를 담는 공통 값 객체(VO)이다.",
+        "tags": [
+          "vo",
+          "data-model",
+          "statistics"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+          "line": 26,
+          "snippet": "public class StatsVO {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/cst/service/EgovConectStatsService.java",
+        "className": "EgovConectStatsService",
+        "summary": "접속 통계 조회 기능을 정의하는 서비스 인터페이스이다.",
+        "tags": [
+          "service-interface",
+          "statistics",
+          "connection"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/cst/service/EgovConectStatsService.java",
+          "line": 24,
+          "snippet": "public interface EgovConectStatsService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/cst/web/EgovConectStatsController.java",
+        "className": "EgovConectStatsController",
+        "summary": "접속 통계를 조회해 최대 단위 산정·날짜 포맷 후 뷰에 바인딩하는 Spring MVC 컨트롤러이다.",
+        "tags": [
+          "controller",
+          "spring-mvc",
+          "statistics",
+          "connection"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/cst/web/EgovConectStatsController.java",
+          "line": 56,
+          "snippet": "@RequestMapping(value = \"/sts/cst/selectConectStats.do\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+        "className": "DtaUseStatsVO",
+        "summary": "데이터 이용 통계 조회용 VO. 기간(일/월) 구분·시작·종료일과 리스트/막대그래프용 통계 목록, 최대 단위 값을 담아 화면 렌더링에 사용한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "statistics",
+          "view-model"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+          "line": 30,
+          "snippet": "public class DtaUseStatsVO extends DtaUseStats {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+        "className": "EgovDtaUseStatsService",
+        "summary": "데이터 이용 통계 서비스 인터페이스. 목록·건수·막대그래프 데이터 조회와 통계 등록 등 비즈니스 오퍼레이션 계약을 정의한다.",
+        "tags": [
+          "service",
+          "interface",
+          "statistics",
+          "type-definition"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+          "line": 19,
+          "snippet": "public interface EgovDtaUseStatsService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "className": "EgovDtaUseStatsContoller",
+        "summary": "데이터 이용 통계 화면 Controller. 통계 조회 조건 초기화, 목록·막대그래프 데이터 조회, 페이징 처리 후 JSP 뷰로 모델을 전달한다.",
+        "tags": [
+          "api-handler",
+          "controller",
+          "spring-mvc",
+          "statistics"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+          "line": 139,
+          "snippet": "@RequestMapping(\"/sts/dst/getDtaUseStats.do\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+        "className": "EgovReprtStatsService",
+        "summary": "보고서 통계(ReprtStats) 서비스 interface로 통계 목록·상세 조회 및 등록 오퍼레이션을 정의한다.",
+        "tags": [
+          "service",
+          "interface",
+          "business-logic",
+          "rst"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+          "line": 27,
+          "snippet": "public interface EgovReprtStatsService {"
+        }
+      }
+    ],
+    "cross": [
+      {
+        "to": "cop",
+        "weight": 22,
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+            "target": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.sts.bst.web;"
+            }
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+            "target": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+              "line": 1,
+              "snippet": "package egovframework.com.sts.bst.web;"
+            }
+          },
+          {
+            "kind": "injection",
+            "line": 50,
+            "source": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+            "target": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+            "citation": {
+              "filePath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+              "line": 50,
+              "snippet": "@Resource(name = \"EgovCmmUseService\")"
+            }
+          }
+        ]
+      }
+    ],
+    "flowCount": 12,
+    "stepCount": 60
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /sts/bst/selectBbsStats.do",
+      "entryPoint": "EgovBbsStatsController#selectBbsStats",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+        "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/sts/bst/service/EgovBbsStatsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+        "line": 61,
+        "snippet": "@RequestMapping(value = \"/sts/bst/selectBbsStats.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/cst/selectConectStats.do",
+      "entryPoint": "EgovConectStatsController#selectUserStats",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/cst/web/EgovConectStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/cst/selectConectStats.do:src/main/java/egovframework/com/sts/cst/web/EgovConectStatsController.java",
+        "step:ANY /sts/cst/selectConectStats.do:src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "step:ANY /sts/cst/selectConectStats.do:src/main/java/egovframework/com/sts/cst/service/EgovConectStatsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/cst/web/EgovConectStatsController.java",
+        "line": 56,
+        "snippet": "@RequestMapping(value = \"/sts/cst/selectConectStats.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/dst/getDtaUseStats.do",
+      "entryPoint": "EgovDtaUseStatsContoller#selectDtaUseStats",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "stepIds": [
+        "step:ANY /sts/dst/getDtaUseStats.do:src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "step:ANY /sts/dst/getDtaUseStats.do:src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+        "step:ANY /sts/dst/getDtaUseStats.do:src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+        "step:ANY /sts/dst/getDtaUseStats.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/sts/dst/getDtaUseStats.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/dst/selectDtaUseStatsList.do",
+      "entryPoint": "EgovDtaUseStatsContoller#selectDtaUseStatsList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "stepIds": [
+        "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+        "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+        "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "line": 77,
+        "snippet": "@RequestMapping(\"/sts/dst/selectDtaUseStatsList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/dst/selectDtaUseStatsListView.do",
+      "entryPoint": "EgovDtaUseStatsContoller#selectDtaUseStatsListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "stepIds": [
+        "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+        "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "line": 56,
+        "snippet": "@RequestMapping(\"/sts/dst/selectDtaUseStatsListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/rst/addReprtStats.do",
+      "entryPoint": "EgovReprtStatsController#insertReprtStats",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/sts/rst/service/ReprtStats.java",
+        "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 202,
+        "snippet": "@RequestMapping(\"/sts/rst/addReprtStats.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/rst/addViewReprtStats.do",
+      "entryPoint": "EgovReprtStatsController#insertViewReprtStats",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/rst/addViewReprtStats.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "step:ANY /sts/rst/addViewReprtStats.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sts/rst/addViewReprtStats.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 183,
+        "snippet": "@RequestMapping(\"/sts/rst/addViewReprtStats.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/rst/getReprtStats.do",
+      "entryPoint": "EgovReprtStatsController#selectReprtStats",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/rst/getReprtStats.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "step:ANY /sts/rst/getReprtStats.do:src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+        "step:ANY /sts/rst/getReprtStats.do:src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+        "step:ANY /sts/rst/getReprtStats.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 163,
+        "snippet": "@RequestMapping(\"/sts/rst/getReprtStats.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/rst/selectReprtStatsList.do",
+      "entryPoint": "EgovReprtStatsController#selectReprtStatsList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+        "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+        "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 91,
+        "snippet": "@RequestMapping(\"/sts/rst/selectReprtStatsList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/rst/selectReprtStatsListView.do",
+      "entryPoint": "EgovReprtStatsController#selectReprtStatsListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+        "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 68,
+        "snippet": "@RequestMapping(\"/sts/rst/selectReprtStatsListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/sst/selectScrinStats.do",
+      "entryPoint": "EgovScrinStatsController#selectUserStats",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/sst/web/EgovScrinStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/sst/selectScrinStats.do:src/main/java/egovframework/com/sts/sst/web/EgovScrinStatsController.java",
+        "step:ANY /sts/sst/selectScrinStats.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "step:ANY /sts/sst/selectScrinStats.do:src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "step:ANY /sts/sst/selectScrinStats.do:src/main/java/egovframework/com/sts/sst/service/EgovScrinStatsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/sst/web/EgovScrinStatsController.java",
+        "line": 56,
+        "snippet": "@RequestMapping(value = \"/sts/sst/selectScrinStats.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /sts/ust/selectUserStats.do",
+      "entryPoint": "EgovUserStatsController#selectUserStats",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/sts/ust/web/EgovUserStatsController.java",
+      "stepIds": [
+        "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/sts/ust/web/EgovUserStatsController.java",
+        "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/sts/ust/service/EgovUserStatsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/ust/web/EgovUserStatsController.java",
+        "line": 61,
+        "snippet": "@RequestMapping(value = \"/sts/ust/selectUserStats.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+      "layer": "api",
+      "className": "EgovBbsStatsController",
+      "kgSummary": "탭(tab1~tab5)별 게시판 통계를 조회·가공하고 공통코드와 함께 뷰에 바인딩하는 Spring MVC 컨트롤러이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "statistics",
+        "bbs"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/bst/web/EgovBbsStatsController.java",
+        "line": 61,
+        "snippet": "@RequestMapping(value = \"/sts/bst/selectBbsStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/sts/com/StatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+      "layer": "unknown",
+      "className": "StatsVO",
+      "kgSummary": "게시판·접속·화면 통계 전반에서 공유되는 통계 집계 필드를 담는 공통 값 객체(VO)이다.",
+      "kgTags": [
+        "vo",
+        "data-model",
+        "statistics"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "line": 26,
+        "snippet": "public class StatsVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/bst/selectBbsStats.do:src/main/java/egovframework/com/sts/bst/service/EgovBbsStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/bst/service/EgovBbsStatsService.java",
+      "layer": "service",
+      "className": "EgovBbsStatsService",
+      "kgSummary": "게시판 통계(생성·조회·평균·최대·최소·최다 사용자·요약) 조회 기능을 정의하는 서비스 인터페이스이다.",
+      "kgTags": [
+        "service-interface",
+        "statistics",
+        "bbs"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/bst/service/EgovBbsStatsService.java",
+        "line": 24,
+        "snippet": "public interface EgovBbsStatsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/cst/selectConectStats.do:src/main/java/egovframework/com/sts/cst/web/EgovConectStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/cst/web/EgovConectStatsController.java",
+      "layer": "api",
+      "className": "EgovConectStatsController",
+      "kgSummary": "접속 통계를 조회해 최대 단위 산정·날짜 포맷 후 뷰에 바인딩하는 Spring MVC 컨트롤러이다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "statistics",
+        "connection"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/cst/web/EgovConectStatsController.java",
+        "line": 56,
+        "snippet": "@RequestMapping(value = \"/sts/cst/selectConectStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/cst/selectConectStats.do:src/main/java/egovframework/com/sts/com/StatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+      "layer": "unknown",
+      "className": "StatsVO",
+      "kgSummary": "게시판·접속·화면 통계 전반에서 공유되는 통계 집계 필드를 담는 공통 값 객체(VO)이다.",
+      "kgTags": [
+        "vo",
+        "data-model",
+        "statistics"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "line": 26,
+        "snippet": "public class StatsVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/cst/selectConectStats.do:src/main/java/egovframework/com/sts/cst/service/EgovConectStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/cst/service/EgovConectStatsService.java",
+      "layer": "service",
+      "className": "EgovConectStatsService",
+      "kgSummary": "접속 통계 조회 기능을 정의하는 서비스 인터페이스이다.",
+      "kgTags": [
+        "service-interface",
+        "statistics",
+        "connection"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/cst/service/EgovConectStatsService.java",
+        "line": 24,
+        "snippet": "public interface EgovConectStatsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/getDtaUseStats.do:src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "relPath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "layer": "api",
+      "className": "EgovDtaUseStatsContoller",
+      "kgSummary": "데이터 이용 통계 화면 Controller. 통계 조회 조건 초기화, 목록·막대그래프 데이터 조회, 페이징 처리 후 JSP 뷰로 모델을 전달한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "statistics"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/sts/dst/getDtaUseStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/getDtaUseStats.do:src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+      "layer": "unknown",
+      "className": "DtaUseStatsVO",
+      "kgSummary": "데이터 이용 통계 조회용 VO. 기간(일/월) 구분·시작·종료일과 리스트/막대그래프용 통계 목록, 최대 단위 값을 담아 화면 렌더링에 사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "statistics",
+        "view-model"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+        "line": 30,
+        "snippet": "public class DtaUseStatsVO extends DtaUseStats {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/getDtaUseStats.do:src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+      "layer": "service",
+      "className": "EgovDtaUseStatsService",
+      "kgSummary": "데이터 이용 통계 서비스 인터페이스. 목록·건수·막대그래프 데이터 조회와 통계 등록 등 비즈니스 오퍼레이션 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "statistics",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+        "line": 19,
+        "snippet": "public interface EgovDtaUseStatsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/getDtaUseStats.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "relPath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "layer": "api",
+      "className": "EgovDtaUseStatsContoller",
+      "kgSummary": "데이터 이용 통계 화면 Controller. 통계 조회 조건 초기화, 목록·막대그래프 데이터 조회, 페이징 처리 후 JSP 뷰로 모델을 전달한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "statistics"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/sts/dst/getDtaUseStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+      "layer": "unknown",
+      "className": "DtaUseStatsVO",
+      "kgSummary": "데이터 이용 통계 조회용 VO. 기간(일/월) 구분·시작·종료일과 리스트/막대그래프용 통계 목록, 최대 단위 값을 담아 화면 렌더링에 사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "statistics",
+        "view-model"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+        "line": 30,
+        "snippet": "public class DtaUseStatsVO extends DtaUseStats {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+      "layer": "service",
+      "className": "EgovDtaUseStatsService",
+      "kgSummary": "데이터 이용 통계 서비스 인터페이스. 목록·건수·막대그래프 데이터 조회와 통계 등록 등 비즈니스 오퍼레이션 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "statistics",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/service/EgovDtaUseStatsService.java",
+        "line": 19,
+        "snippet": "public interface EgovDtaUseStatsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "relPath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+      "layer": "api",
+      "className": "EgovDtaUseStatsContoller",
+      "kgSummary": "데이터 이용 통계 화면 Controller. 통계 조회 조건 초기화, 목록·막대그래프 데이터 조회, 페이징 처리 후 JSP 뷰로 모델을 전달한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "statistics"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/web/EgovDtaUseStatsContoller.java",
+        "line": 139,
+        "snippet": "@RequestMapping(\"/sts/dst/getDtaUseStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "layer": "unknown",
+      "className": "EgovDateUtil",
+      "kgSummary": "날짜/시간 처리 정적 유틸리티로, 날짜 연산·포맷·검증·음양력 변환 등 폭넓은 헬퍼를 제공한다.",
+      "kgTags": [
+        "utility",
+        "date",
+        "helper",
+        "static"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "line": 36,
+        "snippet": "public class EgovDateUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+      "layer": "unknown",
+      "className": "DtaUseStatsVO",
+      "kgSummary": "데이터 이용 통계 조회용 VO. 기간(일/월) 구분·시작·종료일과 리스트/막대그래프용 통계 목록, 최대 단위 값을 담아 화면 렌더링에 사용한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "statistics",
+        "view-model"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/dst/service/DtaUseStatsVO.java",
+        "line": 30,
+        "snippet": "public class DtaUseStatsVO extends DtaUseStats {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/dst/selectDtaUseStatsListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "layer": "api",
+      "className": "EgovReprtStatsController",
+      "kgSummary": "보고서 통계 화면 요청을 처리하는 Spring MVC controller로 통계 목록/상세 조회 및 등록 요청을 매핑한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 202,
+        "snippet": "@RequestMapping(\"/sts/rst/addReprtStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/sts/rst/service/ReprtStats.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/service/ReprtStats.java",
+      "layer": "unknown",
+      "className": "ReprtStats",
+      "kgSummary": "보고서 통계 도메인 모델 VO로 ComDefaultVO를 상속하며 통계 항목·건수 등 18개 속성과 getter/setter를 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "domain",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/service/ReprtStats.java",
+        "line": 28,
+        "snippet": "public class ReprtStats extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addReprtStats.do:src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+      "layer": "service",
+      "className": "EgovReprtStatsService",
+      "kgSummary": "보고서 통계(ReprtStats) 서비스 interface로 통계 목록·상세 조회 및 등록 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-logic",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+        "line": 27,
+        "snippet": "public interface EgovReprtStatsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addViewReprtStats.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "layer": "api",
+      "className": "EgovReprtStatsController",
+      "kgSummary": "보고서 통계 화면 요청을 처리하는 Spring MVC controller로 통계 목록/상세 조회 및 등록 요청을 매핑한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 202,
+        "snippet": "@RequestMapping(\"/sts/rst/addReprtStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addViewReprtStats.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/addViewReprtStats.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/getReprtStats.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "layer": "api",
+      "className": "EgovReprtStatsController",
+      "kgSummary": "보고서 통계 화면 요청을 처리하는 Spring MVC controller로 통계 목록/상세 조회 및 등록 요청을 매핑한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 202,
+        "snippet": "@RequestMapping(\"/sts/rst/addReprtStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/getReprtStats.do:src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+      "layer": "unknown",
+      "className": "ReprtStatsVO",
+      "kgSummary": "보고서 통계 목록 조회용 검색조건·페이징 파라미터 VO.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search-condition",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+        "line": 48,
+        "snippet": "public class ReprtStatsVO extends ReprtStats {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/getReprtStats.do:src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+      "layer": "service",
+      "className": "EgovReprtStatsService",
+      "kgSummary": "보고서 통계(ReprtStats) 서비스 interface로 통계 목록·상세 조회 및 등록 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-logic",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+        "line": 27,
+        "snippet": "public interface EgovReprtStatsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/getReprtStats.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "layer": "api",
+      "className": "EgovReprtStatsController",
+      "kgSummary": "보고서 통계 화면 요청을 처리하는 Spring MVC controller로 통계 목록/상세 조회 및 등록 요청을 매핑한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 202,
+        "snippet": "@RequestMapping(\"/sts/rst/addReprtStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+      "layer": "unknown",
+      "className": "ReprtStatsVO",
+      "kgSummary": "보고서 통계 목록 조회용 검색조건·페이징 파라미터 VO.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search-condition",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+        "line": 48,
+        "snippet": "public class ReprtStatsVO extends ReprtStats {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+      "layer": "service",
+      "className": "EgovReprtStatsService",
+      "kgSummary": "보고서 통계(ReprtStats) 서비스 interface로 통계 목록·상세 조회 및 등록 오퍼레이션을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "business-logic",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/service/EgovReprtStatsService.java",
+        "line": 27,
+        "snippet": "public interface EgovReprtStatsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+      "layer": "api",
+      "className": "EgovReprtStatsController",
+      "kgSummary": "보고서 통계 화면 요청을 처리하는 Spring MVC controller로 통계 목록/상세 조회 및 등록 요청을 매핑한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/web/EgovReprtStatsController.java",
+        "line": 202,
+        "snippet": "@RequestMapping(\"/sts/rst/addReprtStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "layer": "unknown",
+      "className": "EgovDateUtil",
+      "kgSummary": "날짜/시간 처리 정적 유틸리티로, 날짜 연산·포맷·검증·음양력 변환 등 폭넓은 헬퍼를 제공한다.",
+      "kgTags": [
+        "utility",
+        "date",
+        "helper",
+        "static"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "line": 36,
+        "snippet": "public class EgovDateUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+      "layer": "unknown",
+      "className": "ReprtStatsVO",
+      "kgSummary": "보고서 통계 목록 조회용 검색조건·페이징 파라미터 VO.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search-condition",
+        "rst"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/rst/service/ReprtStatsVO.java",
+        "line": 48,
+        "snippet": "public class ReprtStatsVO extends ReprtStats {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/rst/selectReprtStatsListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/sst/selectScrinStats.do:src/main/java/egovframework/com/sts/sst/web/EgovScrinStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/sst/web/EgovScrinStatsController.java",
+      "layer": "api",
+      "className": "EgovScrinStatsController",
+      "kgSummary": "화면 접속 통계 기능의 Controller 파일 — EgovScrinStatsController 클래스를 정의한다.",
+      "kgTags": [
+        "api-handler",
+        "spring-mvc",
+        "controller"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/sst/web/EgovScrinStatsController.java",
+        "line": 56,
+        "snippet": "@RequestMapping(value = \"/sts/sst/selectScrinStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/sst/selectScrinStats.do:src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "relPath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+      "layer": "service",
+      "className": "EgovMenuManageService",
+      "kgSummary": "메뉴 관리 기능의 Service 인터페이스 파일 — EgovMenuManageService 클래스를 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/mnu/mpm/service/EgovMenuManageService.java",
+        "line": 29,
+        "snippet": "public interface EgovMenuManageService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/sst/selectScrinStats.do:src/main/java/egovframework/com/sts/com/StatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+      "layer": "unknown",
+      "className": "StatsVO",
+      "kgSummary": "게시판·접속·화면 통계 전반에서 공유되는 통계 집계 필드를 담는 공통 값 객체(VO)이다.",
+      "kgTags": [
+        "vo",
+        "data-model",
+        "statistics"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "line": 26,
+        "snippet": "public class StatsVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/sst/selectScrinStats.do:src/main/java/egovframework/com/sts/sst/service/EgovScrinStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/sst/service/EgovScrinStatsService.java",
+      "layer": "service",
+      "className": "EgovScrinStatsService",
+      "kgSummary": "화면 통계 조회 기능을 정의하는 서비스 인터페이스이다.",
+      "kgTags": [
+        "service-interface",
+        "statistics",
+        "screen"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/sst/service/EgovScrinStatsService.java",
+        "line": 24,
+        "snippet": "public interface EgovScrinStatsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/sts/ust/web/EgovUserStatsController.java",
+      "relPath": "src/main/java/egovframework/com/sts/ust/web/EgovUserStatsController.java",
+      "layer": "api",
+      "className": "EgovUserStatsController",
+      "kgSummary": "사용자 통계 화면 요청을 처리하는 Spring MVC controller. 공통코드(구분/조건)를 조회한 뒤 통계를 집계해 최대 단위와 함께 화면에 전달한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "api-handler",
+        "statistics"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/ust/web/EgovUserStatsController.java",
+        "line": 61,
+        "snippet": "@RequestMapping(value = \"/sts/ust/selectUserStats.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/sts/com/StatsVO.java",
+      "relPath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+      "layer": "unknown",
+      "className": "StatsVO",
+      "kgSummary": "게시판·접속·화면 통계 전반에서 공유되는 통계 집계 필드를 담는 공통 값 객체(VO)이다.",
+      "kgTags": [
+        "vo",
+        "data-model",
+        "statistics"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/com/StatsVO.java",
+        "line": 26,
+        "snippet": "public class StatsVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /sts/ust/selectUserStats.do:src/main/java/egovframework/com/sts/ust/service/EgovUserStatsService.java",
+      "relPath": "src/main/java/egovframework/com/sts/ust/service/EgovUserStatsService.java",
+      "layer": "service",
+      "className": "EgovUserStatsService",
+      "kgSummary": "사용자 접속 통계 조회 및 집계를 정의하는 service interface.",
+      "kgTags": [
+        "service",
+        "interface",
+        "statistics",
+        "type-definition"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sts/ust/service/EgovUserStatsService.java",
+        "line": 24,
+        "snippet": "public interface EgovUserStatsService {"
+      }
+    }
+  ]
+}

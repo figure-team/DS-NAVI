@@ -1,0 +1,584 @@
+{
+  "key": "uss",
+  "chunkIndex": 4,
+  "isHeaderChunk": false,
+  "flows": [
+    {
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventRcrptManageList.do",
+      "name": "행사 접수 관리 목록 조회",
+      "summary": { "text": "행사 접수(참가신청) 관리 목록을 조회하는 화면 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 271, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRcrptManageList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do",
+      "name": "행사 참가신청 목록 조회",
+      "summary": { "text": "특정 행사에 대한 참가신청 목록을 조회하는 화면 진입점이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 537, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventReqstAtdrnList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstDelete.do",
+      "name": "행사 삭제",
+      "summary": { "text": "등록된 행사 정보를 삭제 처리한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 253, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventReqstDelete.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstDetail.do",
+      "name": "행사 상세 조회",
+      "summary": { "text": "행사 한 건의 상세 정보를 조회하여 화면에 표시한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 132, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventReqstDetail.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstManageList.do",
+      "name": "행사 관리 목록 조회",
+      "summary": { "text": "등록된 행사 목록을 검색 조건에 따라 조회한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 87, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventReqstManageList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstManageListView.do",
+      "name": "행사 관리 목록 화면 진입",
+      "summary": { "text": "행사 관리 목록 화면으로 진입하는 초기 요청을 처리한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 74, "snippet": "@RequestMapping(\"/uss/ion/evt/EgovEventReqstManageListView.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstRegist.do",
+      "name": "행사 등록 화면 진입",
+      "summary": { "text": "신규 행사 등록 화면으로 진입하는 요청을 처리한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 179, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventReqstRegist.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/EgovEventReqstSave.do",
+      "name": "행사 등록/수정 저장",
+      "summary": { "text": "행사 정보를 신규 등록하거나 기존 행사를 수정하여 저장한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 225, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventReqstSave.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/deleteEventAtdrn.do",
+      "name": "행사 참가신청 삭제",
+      "summary": { "text": "특정 행사에 대한 참가신청 내역을 삭제한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 440, "snippet": "@RequestMapping(value = \"/uss/ion/evt/deleteEventAtdrn.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/insertEventAtdrn.do",
+      "name": "행사 참가신청 등록",
+      "summary": { "text": "사용자가 행사에 참가신청을 등록하는 처리를 수행한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 375, "snippet": "@RequestMapping(value = \"/uss/ion/evt/insertEventAtdrn.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/insertEventManage.do",
+      "name": "행사 신규 등록",
+      "summary": { "text": "신규 행사 정보를 저장소에 등록한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 197, "snippet": "@RequestMapping(value = \"/uss/ion/evt/insertEventManage.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/selectEventRceptConfmList.do",
+      "name": "행사 접수확인 목록 조회",
+      "summary": { "text": "행사 참가신청에 대한 접수확인 목록을 조회한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 457, "snippet": "@RequestMapping(value = \"/uss/ion/evt/selectEventRceptConfmList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/evt/updtEventAtdrn.do",
+      "name": "행사 참가신청 수정",
+      "summary": { "text": "기존 행사 참가신청 정보를 수정 처리한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 510, "snippet": "@RequestMapping(value = \"/uss/ion/evt/updtEventAtdrn.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/isg/addIntnetSvcGuidance.do",
+      "name": "인터넷서비스안내 등록",
+      "summary": { "text": "인터넷서비스안내 정보를 신규로 등록하는 처리를 수행한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 136, "snippet": "@RequestMapping(\"/uss/ion/isg/addIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/isg/addViewIntnetSvcGuidance.do",
+      "name": "인터넷서비스안내 등록 화면 진입",
+      "summary": { "text": "인터넷서비스안내 신규 등록 화면으로 진입하는 요청을 처리한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 125, "snippet": "@RequestMapping(\"/uss/ion/isg/addViewIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/isg/getIntnetSvcGuidance.do",
+      "name": "인터넷서비스안내 상세 조회",
+      "summary": { "text": "인터넷서비스안내 한 건의 상세 정보를 조회한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 109, "snippet": "@RequestMapping(\"/uss/ion/isg/getIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/isg/removeIntnetSvcGuidance.do",
+      "name": "인터넷서비스안내 삭제",
+      "summary": { "text": "등록된 인터넷서비스안내 정보를 삭제 처리한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 184, "snippet": "@RequestMapping(\"/uss/ion/isg/removeIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/isg/selectIntnetSvcGuidanceList.do",
+      "name": "인터넷서비스안내 목록 조회",
+      "summary": { "text": "인터넷서비스안내 목록을 검색 조건에 따라 조회한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 77, "snippet": "@RequestMapping(\"/uss/ion/isg/selectIntnetSvcGuidanceList.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/isg/selectIntnetSvcGuidanceListView.do",
+      "name": "인터넷서비스안내 목록 화면 진입",
+      "summary": { "text": "인터넷서비스안내 목록 화면으로 진입하는 초기 요청을 처리한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 65, "snippet": "@RequestMapping(\"/uss/ion/isg/selectIntnetSvcGuidanceListView.do\")" } ] }
+    },
+    {
+      "flowId": "flow:ANY /uss/ion/isg/selectIntnetSvcGuidanceResultList.do",
+      "name": "인터넷서비스안내 결과 목록 조회",
+      "summary": { "text": "인터넷서비스안내 처리 결과 목록을 조회한다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 200, "snippet": "@RequestMapping(\"/uss/ion/isg/selectIntnetSvcGuidanceResultList.do\")" } ] }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통 조회조건 VO",
+      "summary": { "text": "화면과 서비스 간 페이징·검색 조건을 전달하는 공통 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "line": 28, "snippet": "@SuppressWarnings(\"serial\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 공통코드·XSS 관련 비즈니스 메서드 계약을 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "line": 26, "snippet": "public interface EgovCmmUseService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "name": "행사관리 조회 VO",
+      "summary": { "text": "행사 목록/검색 화면 바인딩을 위한 데이터를 담는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java", "line": 22, "snippet": "public class EventManageVO extends EventManage implements Serializable {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 헬퍼",
+      "summary": { "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 조회하는 정적 헬퍼이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 VO",
+      "summary": { "text": "인증된 사용자의 로그인 정보를 담는 세션용 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventRcrptManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "name": "행사관리 조회 VO",
+      "summary": { "text": "행사 목록/검색 화면 바인딩을 위한 데이터를 담는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java", "line": 22, "snippet": "public class EventManageVO extends EventManage implements Serializable {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstAtdrnList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDelete.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "name": "날짜 처리 유틸리티",
+      "summary": { "text": "날짜 연산·포맷·검증 등을 제공하는 정적 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java", "line": 36, "snippet": "public class EgovDateUtil {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "name": "행사관리 조회 VO",
+      "summary": { "text": "행사 목록/검색 화면 바인딩을 위한 데이터를 담는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java", "line": 22, "snippet": "public class EventManageVO extends EventManage implements Serializable {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstDetail.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 유틸리티",
+      "summary": { "text": "문자열 자르기·치환·인코딩·HTML 특수문자 변환 등을 제공하는 정적 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통 조회조건 VO",
+      "summary": { "text": "화면과 서비스 간 페이징·검색 조건을 전달하는 공통 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "line": 28, "snippet": "@SuppressWarnings(\"serial\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 공통코드·XSS 관련 비즈니스 메서드 계약을 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "line": 26, "snippet": "public interface EgovCmmUseService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "name": "행사관리 조회 VO",
+      "summary": { "text": "행사 목록/검색 화면 바인딩을 위한 데이터를 담는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java", "line": 22, "snippet": "public class EventManageVO extends EventManage implements Serializable {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstManageListView.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통 조회조건 VO",
+      "summary": { "text": "화면과 서비스 간 페이징·검색 조건을 전달하는 공통 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "line": 28, "snippet": "@SuppressWarnings(\"serial\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstRegist.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 공통코드·XSS 관련 비즈니스 메서드 계약을 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "line": 26, "snippet": "public interface EgovCmmUseService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통 조회조건 VO",
+      "summary": { "text": "화면과 서비스 간 페이징·검색 조건을 전달하는 공통 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "line": 28, "snippet": "@SuppressWarnings(\"serial\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 공통코드·XSS 관련 비즈니스 메서드 계약을 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "line": 26, "snippet": "public interface EgovCmmUseService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 헬퍼",
+      "summary": { "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 조회하는 정적 헬퍼이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 VO",
+      "summary": { "text": "인증된 사용자의 로그인 정보를 담는 세션용 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java",
+      "name": "행사 데이터 모델",
+      "summary": { "text": "행사명·기간·장소·접수기간 등을 담는 행사(Event) 데이터 모델이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java", "line": 23, "snippet": "public class EventManage extends ComDefaultVO {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/EgovEventReqstSave.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 상세 서비스 인터페이스",
+      "summary": { "text": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java", "line": 5, "snippet": "public interface EgovUserDetailsService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/deleteEventAtdrn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 헬퍼",
+      "summary": { "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 조회하는 정적 헬퍼이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 VO",
+      "summary": { "text": "인증된 사용자의 로그인 정보를 담는 세션용 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "name": "행사관리 조회 VO",
+      "summary": { "text": "행사 목록/검색 화면 바인딩을 위한 데이터를 담는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java", "line": 22, "snippet": "public class EventManageVO extends EventManage implements Serializable {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+      "name": "행사 참가신청 데이터 모델",
+      "summary": { "text": "신청자·행사·결재 관련 필드를 담는 행사 참가신청 데이터 객체이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java", "line": 18, "snippet": "public class EventAtdrn extends ComDefaultVO {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventAtdrn.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "name": "날짜 처리 유틸리티",
+      "summary": { "text": "날짜 연산·포맷·검증 등을 제공하는 정적 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java", "line": 36, "snippet": "public class EgovDateUtil {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통 조회조건 VO",
+      "summary": { "text": "화면과 서비스 간 페이징·검색 조건을 전달하는 공통 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "line": 28, "snippet": "@SuppressWarnings(\"serial\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 공통코드·XSS 관련 비즈니스 메서드 계약을 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "line": 26, "snippet": "public interface EgovCmmUseService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 헬퍼",
+      "summary": { "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 조회하는 정적 헬퍼이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 VO",
+      "summary": { "text": "인증된 사용자의 로그인 정보를 담는 세션용 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java",
+      "name": "행사 데이터 모델",
+      "summary": { "text": "행사명·기간·장소·접수기간 등을 담는 행사(Event) 데이터 모델이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManage.java", "line": 23, "snippet": "public class EventManage extends ComDefaultVO {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/insertEventManage.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "name": "공통 조회조건 VO",
+      "summary": { "text": "화면과 서비스 간 페이징·검색 조건을 전달하는 공통 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java", "line": 28, "snippet": "@SuppressWarnings(\"serial\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "name": "공통코드 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 공통코드·XSS 관련 비즈니스 메서드 계약을 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java", "line": 26, "snippet": "public interface EgovCmmUseService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java",
+      "name": "행사관리 조회 VO",
+      "summary": { "text": "행사 목록/검색 화면 바인딩을 위한 데이터를 담는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventManageVO.java", "line": 22, "snippet": "public class EventManageVO extends EventManage implements Serializable {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 헬퍼",
+      "summary": { "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 조회하는 정적 헬퍼이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 VO",
+      "summary": { "text": "인증된 사용자의 로그인 정보를 담는 세션용 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/selectEventRceptConfmList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java",
+      "name": "행사관리 컨트롤러",
+      "summary": { "text": "행사 및 참가신청의 목록/상세/등록/수정/삭제와 접수확인 화면 요청을 처리하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/web/EgovEventManageController.java", "line": 346, "snippet": "@RequestMapping(value = \"/uss/ion/evt/EgovEventRceptRegist.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 헬퍼",
+      "summary": { "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 조회하는 정적 헬퍼이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java",
+      "name": "행사 참가신청 데이터 모델",
+      "summary": { "text": "신청자·행사·결재 관련 필드를 담는 행사 참가신청 데이터 객체이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EventAtdrn.java", "line": 18, "snippet": "public class EventAtdrn extends ComDefaultVO {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 VO",
+      "summary": { "text": "인증된 사용자의 로그인 정보를 담는 세션용 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java",
+      "name": "행사관리 서비스 인터페이스",
+      "summary": { "text": "행사 CRUD와 참가신청·접수확인 관련 오퍼레이션 계약을 정의하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/evt/service/EgovEventManageService.java", "line": 17, "snippet": "public interface EgovEventManageService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/evt/updtEventAtdrn.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 상세 서비스 인터페이스",
+      "summary": { "text": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java", "line": 5, "snippet": "public interface EgovUserDetailsService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java",
+      "name": "인터넷서비스안내 컨트롤러",
+      "summary": { "text": "인터넷서비스안내의 목록/상세/등록/수정/삭제 요청을 처리하고 화면(JSP)으로 결과를 전달하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 136, "snippet": "@RequestMapping(\"/uss/ion/isg/addIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addIntnetSvcGuidance.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "name": "인증 사용자 정보 헬퍼",
+      "summary": { "text": "인증된 사용자 정보와 권한 목록, 인증 여부를 조회하는 정적 헬퍼이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java", "line": 25, "snippet": "public class EgovUserDetailsHelper {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/service/IntnetSvcGuidanceVO.java",
+      "name": "인터넷서비스안내 조회 VO",
+      "summary": { "text": "인터넷서비스안내의 조회 조건·페이징·엔티티 필드를 보관하는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/service/IntnetSvcGuidanceVO.java", "line": 39, "snippet": "public class IntnetSvcGuidanceVO extends ComDefaultVO {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addIntnetSvcGuidance.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 VO",
+      "summary": { "text": "인증된 사용자의 로그인 정보를 담는 세션용 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java", "line": 33, "snippet": "public class LoginVO implements Serializable{" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addIntnetSvcGuidance.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "name": "문자열 처리 유틸리티",
+      "summary": { "text": "문자열 자르기·치환·인코딩·HTML 특수문자 변환 등을 제공하는 정적 유틸리티이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java", "line": 43, "snippet": "public class EgovStringUtil {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java",
+      "name": "인터넷서비스안내 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 인터넷서비스안내 업무 메서드 시그니처를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java", "line": 17, "snippet": "public interface EgovIntnetSvcGuidanceService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addIntnetSvcGuidance.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addIntnetSvcGuidance.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "name": "사용자 상세 서비스 인터페이스",
+      "summary": { "text": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java", "line": 5, "snippet": "public interface EgovUserDetailsService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/addViewIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java",
+      "name": "인터넷서비스안내 컨트롤러",
+      "summary": { "text": "인터넷서비스안내의 목록/상세/등록/수정/삭제 요청을 처리하고 화면(JSP)으로 결과를 전달하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 136, "snippet": "@RequestMapping(\"/uss/ion/isg/addIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/getIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java",
+      "name": "인터넷서비스안내 컨트롤러",
+      "summary": { "text": "인터넷서비스안내의 목록/상세/등록/수정/삭제 요청을 처리하고 화면(JSP)으로 결과를 전달하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 136, "snippet": "@RequestMapping(\"/uss/ion/isg/addIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/getIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/service/IntnetSvcGuidanceVO.java",
+      "name": "인터넷서비스안내 조회 VO",
+      "summary": { "text": "인터넷서비스안내의 조회 조건·페이징·엔티티 필드를 보관하는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/service/IntnetSvcGuidanceVO.java", "line": 39, "snippet": "public class IntnetSvcGuidanceVO extends ComDefaultVO {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/getIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java",
+      "name": "인터넷서비스안내 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 인터넷서비스안내 업무 메서드 시그니처를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java", "line": 17, "snippet": "public interface EgovIntnetSvcGuidanceService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/getIntnetSvcGuidance.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/removeIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java",
+      "name": "인터넷서비스안내 컨트롤러",
+      "summary": { "text": "인터넷서비스안내의 목록/상세/등록/수정/삭제 요청을 처리하고 화면(JSP)으로 결과를 전달하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 136, "snippet": "@RequestMapping(\"/uss/ion/isg/addIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/removeIntnetSvcGuidance.do:src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java",
+      "name": "인터넷서비스안내 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 인터넷서비스안내 업무 메서드 시그니처를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java", "line": 17, "snippet": "public interface EgovIntnetSvcGuidanceService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/removeIntnetSvcGuidance.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/selectIntnetSvcGuidanceList.do:src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java",
+      "name": "인터넷서비스안내 컨트롤러",
+      "summary": { "text": "인터넷서비스안내의 목록/상세/등록/수정/삭제 요청을 처리하고 화면(JSP)으로 결과를 전달하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 136, "snippet": "@RequestMapping(\"/uss/ion/isg/addIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/selectIntnetSvcGuidanceList.do:src/main/java/egovframework/com/uss/ion/isg/service/IntnetSvcGuidanceVO.java",
+      "name": "인터넷서비스안내 조회 VO",
+      "summary": { "text": "인터넷서비스안내의 조회 조건·페이징·엔티티 필드를 보관하는 VO이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/service/IntnetSvcGuidanceVO.java", "line": 39, "snippet": "public class IntnetSvcGuidanceVO extends ComDefaultVO {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/selectIntnetSvcGuidanceList.do:src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java",
+      "name": "인터넷서비스안내 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 인터넷서비스안내 업무 메서드 시그니처를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java", "line": 17, "snippet": "public interface EgovIntnetSvcGuidanceService {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/selectIntnetSvcGuidanceList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "name": "공통 다국어 메시지 소스",
+      "summary": { "text": "코드/Locale 기반 메시지 조회를 제공하는 공통 다국어 메시지 소스 컴포넌트이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java", "line": 26, "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/selectIntnetSvcGuidanceListView.do:src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java",
+      "name": "인터넷서비스안내 컨트롤러",
+      "summary": { "text": "인터넷서비스안내의 목록/상세/등록/수정/삭제 요청을 처리하고 화면(JSP)으로 결과를 전달하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 136, "snippet": "@RequestMapping(\"/uss/ion/isg/addIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/selectIntnetSvcGuidanceResultList.do:src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java",
+      "name": "인터넷서비스안내 컨트롤러",
+      "summary": { "text": "인터넷서비스안내의 목록/상세/등록/수정/삭제 요청을 처리하고 화면(JSP)으로 결과를 전달하는 Spring MVC 컨트롤러이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/web/EgovIntnetSvcGuidanceController.java", "line": 136, "snippet": "@RequestMapping(\"/uss/ion/isg/addIntnetSvcGuidance.do\")" } ] }
+    },
+    {
+      "stepId": "step:ANY /uss/ion/isg/selectIntnetSvcGuidanceResultList.do:src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java",
+      "name": "인터넷서비스안내 서비스 인터페이스",
+      "summary": { "text": "컨트롤러가 의존하는 인터넷서비스안내 업무 메서드 시그니처를 선언하는 서비스 인터페이스이다.", "citations": [ { "filePath": "src/main/java/egovframework/com/uss/ion/isg/service/EgovIntnetSvcGuidanceService.java", "line": 17, "snippet": "public interface EgovIntnetSvcGuidanceService {" } ] }
+    }
+  ]
+}

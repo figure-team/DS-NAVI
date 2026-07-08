@@ -1,0 +1,46 @@
+package egovframework.com.sym.mnu.stm.service.impl;
+
+import org.springframework.stereotype.Repository;
+
+import egovframework.com.cmm.ComDefaultVO;
+import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
+import egovframework.com.sym.mnu.stm.service.SiteMapngVO;
+/**
+ * 사이트맵 조회에 대한 DAO 클래스를 정의한다.
+ * @author 개발환경 개발팀 이용
+ * @since 2009.06.01
+ * @version 1.0
+ * @see
+ *
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *   
+ *   수정일      수정자           수정내용
+ *  -------    --------    ---------------------------
+ *   2009.03.20  이  용          최초 생성
+ *   2026.06.17  이백행           [2026년 컨트리뷰션] 불필요한 예외 제거
+ *
+ * </pre>
+ */
+@Repository("siteMapngDAO")
+public class SiteMapngDAO extends EgovComAbstractDAO{
+
+	/**
+	 * 사이트맵 조회
+	 * @param vo ComDefaultVO 
+	 * @return SiteMapngVO
+	 */
+	public SiteMapngVO selectSiteMapng(ComDefaultVO vo) {
+		return (SiteMapngVO)selectOne("siteMapngDAO.selectSiteMapng_D", vo); 
+	}
+
+	/**
+	 * MapCreatId 조회
+	 * @param vo ComDefaultVO
+	 * @return String
+	 */
+	public String selectSiteMapngByMapCreatID(ComDefaultVO vo) {
+		return (String)selectOne("siteMapngDAO.selectSiteMapngByMapCreatID", vo); 
+	}	
+	
+}

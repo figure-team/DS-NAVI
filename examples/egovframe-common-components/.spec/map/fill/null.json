@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:null",
+  "name": "공통 인증 정보 null 검증",
+  "summary": {
+    "text": "로그인 세션 VO(LoginVO)를 대상으로 null 처리 동작을 확인하는 검증 스크립트 영역이다.",
+    "citations": [
+      {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "text": "LoginVO는 ID·이름·이메일·기관·고유ID·GPKI DN 등 인증된 사용자의 로그인 정보를 담는 세션용 값 객체다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+          "line": 33,
+          "snippet": "public class LoginVO implements Serializable{"
+        }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "NullCheckTest는 LoginVO 값이 비어있을 때의 동작을 main 메서드로 직접 실행해 검증한다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java",
+          "line": 23,
+          "snippet": "public static void main(String[] args) {"
+        }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "text": "이 도메인이 cop 도메인과 LoginVO 클래스 임포트를 통해 연계된다.",
+      "citations": [
+        {
+          "filePath": "src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java",
+          "line": 1,
+          "snippet": "package egovframework.com.validation.nullcheck;"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java#main",
+      "name": "로그인 정보 null 처리 검증",
+      "summary": {
+        "text": "NullCheckTest의 main 메서드가 LoginVO를 이용해 로그인 정보의 null 처리 동작을 확인하는 배치성 검증을 수행한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java#main:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "name": "로그인 세션 정보 보관",
+      "summary": {
+        "text": "LoginVO가 인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 세션용으로 담아 공통 인증 전반에서 사용된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+            "line": 33,
+            "snippet": "public class LoginVO implements Serializable{"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java#main:src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java",
+      "name": "null 검증 스크립트 실행",
+      "summary": {
+        "text": "NullCheckTest가 LoginVO를 이용한 null 처리 동작을 확인하는 간단한 main 기반 검증 스크립트를 실행한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java",
+            "line": 23,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ]
+}

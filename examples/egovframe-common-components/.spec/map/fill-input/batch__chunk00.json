@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "key": "batch",
+  "domainId": "domain:batch",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:batch",
+    "key": "batch",
+    "kgHints": [
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "className": "ComDefaultVO",
+        "summary": "공통 컴포넌트 전반에서 검색조건과 페이징 정보를 담는 최상위 기반 VO로, 대부분의 도메인 VO가 상속하는 공통 부모 클래스이다.",
+        "tags": [
+          "data-model",
+          "base-vo",
+          "pagination",
+          "common",
+          "spring-mvc"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+          "line": 22,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+        "className": "EgovComAbstractDAO",
+        "summary": "MyBatis SqlSession을 주입받아 하위 DAO들이 상속하는 공통 추상 DAO 기반 클래스이다.",
+        "tags": [
+          "dao",
+          "mybatis",
+          "abstract",
+          "base-class"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+          "line": 38,
+          "snippet": "public abstract class EgovComAbstractDAO extends EgovAbstractMapper {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+        "className": "BatchResult",
+        "summary": "배치 실행 결과(상태·시작/종료시각·오류정보 등)를 담는 VO. ComDefaultVO를 상속해 페이징 검색 필드를 함께 제공한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "batch",
+          "serialization"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+          "line": 23,
+          "snippet": "public class BatchResult extends ComDefaultVO implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+        "className": "BatchSchdul",
+        "summary": "배치 스케줄 VO. 실행 주기·일시 필드를 보관하고 이를 Quartz cron 표현식으로 변환하는 로직을 포함한다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "batch",
+          "cron",
+          "scheduling"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+          "line": 26,
+          "snippet": "@SuppressWarnings(\"serial\")"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+        "className": "BatchSchdulDfk",
+        "summary": "배치 스케줄의 실행 요일(정기) 정보를 담는 보조 VO. 스케줄 1건당 다수의 요일 항목으로 매핑된다.",
+        "tags": [
+          "data-model",
+          "vo",
+          "batch"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+          "line": 19,
+          "snippet": "public class BatchSchdulDfk implements Serializable {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+        "className": "BatchScheduler",
+        "summary": "Quartz Scheduler를 감싸 배치 스케줄을 등록/수정/삭제하고, 애플리케이션 기동 시 저장된 스케줄을 초기 적재하는 스케줄링 서비스.",
+        "tags": [
+          "service",
+          "scheduler",
+          "quartz",
+          "batch"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+          "line": 57,
+          "snippet": "JobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+        "className": "EgovBatchSchdulService",
+        "summary": "배치 스케줄 CRUD 및 배치 실행 결과 등록/갱신 기능을 정의하는 Service 인터페이스.",
+        "tags": [
+          "service",
+          "interface",
+          "batch"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+          "line": 21,
+          "snippet": "public interface EgovBatchSchdulService {"
+        }
+      },
+      {
+        "relPath": "src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+        "className": "BatchResultDao",
+        "summary": "배치 실행 결과에 대한 MyBatis DAO. EgovComAbstractDAO를 상속해 CRUD SQL 매핑을 호출한다.",
+        "tags": [
+          "dao",
+          "mybatis",
+          "batch",
+          "persistence"
+        ],
+        "citation": {
+          "filePath": "src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+          "line": 26,
+          "snippet": "@Repository(\"batchResultDao\")"
+        }
+      }
+    ],
+    "cross": [],
+    "flowCount": 1,
+    "stepCount": 8
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob",
+      "entryPoint": "BatchShellScriptJob",
+      "entryType": "cron",
+      "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "stepIds": [
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+        "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+        "line": 57,
+        "snippet": "JobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+      "layer": "api",
+      "className": "BatchScheduler",
+      "kgSummary": "Quartz Scheduler를 감싸 배치 스케줄을 등록/수정/삭제하고, 애플리케이션 기동 시 저장된 스케줄을 초기 적재하는 스케줄링 서비스.",
+      "kgTags": [
+        "service",
+        "scheduler",
+        "quartz",
+        "batch"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java",
+        "line": 57,
+        "snippet": "JobDetail jobDetail = newJob(BatchShellScriptJob.class).withIdentity(batchSchdul.getBatchSchdulId()).build();"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultVO",
+      "kgSummary": "공통 컴포넌트 전반에서 검색조건과 페이징 정보를 담는 최상위 기반 VO로, 대부분의 도메인 VO가 상속하는 공통 부모 클래스이다.",
+      "kgTags": [
+        "data-model",
+        "base-vo",
+        "pagination",
+        "common",
+        "spring-mvc"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultVO.java",
+        "line": 22,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+      "layer": "unknown",
+      "className": "EgovComAbstractDAO",
+      "kgSummary": "MyBatis SqlSession을 주입받아 하위 DAO들이 상속하는 공통 추상 DAO 기반 클래스이다.",
+      "kgTags": [
+        "dao",
+        "mybatis",
+        "abstract",
+        "base-class"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/impl/EgovComAbstractDAO.java",
+        "line": 38,
+        "snippet": "public abstract class EgovComAbstractDAO extends EgovAbstractMapper {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+      "layer": "unknown",
+      "className": "BatchResult",
+      "kgSummary": "배치 실행 결과(상태·시작/종료시각·오류정보 등)를 담는 VO. ComDefaultVO를 상속해 페이징 검색 필드를 함께 제공한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "batch",
+        "serialization"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchResult.java",
+        "line": 23,
+        "snippet": "public class BatchResult extends ComDefaultVO implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+      "layer": "unknown",
+      "className": "BatchSchdul",
+      "kgSummary": "배치 스케줄 VO. 실행 주기·일시 필드를 보관하고 이를 Quartz cron 표현식으로 변환하는 로직을 포함한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "batch",
+        "cron",
+        "scheduling"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdul.java",
+        "line": 26,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+      "layer": "unknown",
+      "className": "BatchSchdulDfk",
+      "kgSummary": "배치 스케줄의 실행 요일(정기) 정보를 담는 보조 VO. 스케줄 1건당 다수의 요일 항목으로 매핑된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "batch"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/BatchSchdulDfk.java",
+        "line": 19,
+        "snippet": "public class BatchSchdulDfk implements Serializable {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+      "layer": "service",
+      "className": "EgovBatchSchdulService",
+      "kgSummary": "배치 스케줄 CRUD 및 배치 실행 결과 등록/갱신 기능을 정의하는 Service 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "batch"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/EgovBatchSchdulService.java",
+        "line": 21,
+        "snippet": "public interface EgovBatchSchdulService {"
+      }
+    },
+    {
+      "stepId": "step:batch:src/main/java/egovframework/com/sym/bat/service/BatchScheduler.java#BatchShellScriptJob:src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+      "relPath": "src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+      "layer": "dao",
+      "className": "BatchResultDao",
+      "kgSummary": "배치 실행 결과에 대한 MyBatis DAO. EgovComAbstractDAO를 상속해 CRUD SQL 매핑을 호출한다.",
+      "kgTags": [
+        "dao",
+        "mybatis",
+        "batch",
+        "persistence"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/sym/bat/service/impl/BatchResultDao.java",
+        "line": 26,
+        "snippet": "@Repository(\"batchResultDao\")"
+      }
+    }
+  ]
+}

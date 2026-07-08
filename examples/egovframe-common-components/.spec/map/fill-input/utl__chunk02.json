@@ -1,0 +1,1928 @@
+{
+  "schemaVersion": 1,
+  "key": "utl",
+  "domainId": "domain:utl",
+  "chunkIndex": 2,
+  "chunkTotal": 6,
+  "isHeaderChunk": false,
+  "domainHeader": {
+    "domainId": "domain:utl",
+    "key": "utl"
+  },
+  "flows": [
+    {
+      "flowId": "flow:ANY /utl/sys/prm/EgovComUtlProcessMonList.do",
+      "entryPoint": "EgovProcessMonController#selectProcessMonList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonList.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonList.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonList.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 70,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMonList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/prm/EgovComUtlProcessMonLog.do",
+      "entryPoint": "EgovProcessMonController#selectProcessMonLog",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonLog.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonLog.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonLog.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonLogVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 332,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMonLog.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do",
+      "entryPoint": "EgovProcessMonController#selectProcessMonLogList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonLogVO.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 282,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMonLogList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do",
+      "entryPoint": "EgovProcessMonController#updateProcessMon",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 202,
+        "snippet": "@RequestMapping(value = \"/utl/sys/prm/EgovComUtlProcessMonModify.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do",
+      "entryPoint": "EgovProcessMonController#updateProcessMonView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 180,
+        "snippet": "@RequestMapping(value = \"/utl/sys/prm/EgovComUtlProcessMonModifyView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do",
+      "entryPoint": "EgovProcessMonController#insertProcessMon",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 144,
+        "snippet": "@RequestMapping(value = \"/utl/sys/prm/EgovComUtlProcessMonRegist.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do",
+      "entryPoint": "EgovProcessMonController#insertProcessMonView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 122,
+        "snippet": "@RequestMapping(value = \"/utl/sys/prm/EgovComUtlProcessMonRegistView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do",
+      "entryPoint": "EgovProcessMonController#deleteProcessMon",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 238,
+        "snippet": "@RequestMapping(value = \"/utl/sys/prm/EgovComUtlProcessMonRemove.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/prm/selectProcessSttus.do",
+      "entryPoint": "EgovProcessMonController#selectProcessSttus",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonChecker.java",
+        "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+        "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+        "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 261,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/selectProcessSttus.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/getProxySvc.do",
+      "entryPoint": "EgovProxySvcController#selectProxySvc",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/selectProxyLogList.do",
+      "entryPoint": "EgovProxySvcController#selectProxyLogList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+        "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 265,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxyLogList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/selectProxyLogListView.do",
+      "entryPoint": "EgovProxySvcController#selectProxyLogListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 250,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxyLogListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/selectProxySvcList.do",
+      "entryPoint": "EgovProxySvcController#selectProxySvcList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+        "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 96,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxySvcList.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/selectProxySvcListView.do",
+      "entryPoint": "EgovProxySvcController#selectProxySvcListView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/pxy/selectProxySvcListView.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 84,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/selectProxySvcListView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/pxy/updtViewProxySvc.do",
+      "entryPoint": "EgovProxySvcController#updateViewProxySvc",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 191,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/updtViewProxySvc.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/rsc/checkLloginSession.do",
+      "entryPoint": "EgovLoginSesionController#checkLoginSession",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "line": 66,
+        "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/rsc/loginSessionView.do",
+      "entryPoint": "EgovLoginSesionController#checkLoginSessionView",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/rsc/loginSessionView.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "line": 46,
+        "snippet": "@RequestMapping(value = \"/utl/sys/rsc/loginSessionView.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/rsc/setLoginSession.do",
+      "entryPoint": "EgovLoginSesionController#setLoginSession",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+        "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "line": 56,
+        "snippet": "@RequestMapping(value = \"/utl/sys/rsc/setLoginSession.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/srm/getServerResrceMntrng.do",
+      "entryPoint": "EgovServerResrceMntrngController#selectServerResrceMntrng",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+        "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+        "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+        "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+        "line": 155,
+        "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+      }
+    },
+    {
+      "flowId": "flow:ANY /utl/sys/srm/selectMntrngServerList.do",
+      "entryPoint": "EgovServerResrceMntrngController#selectMntrngServerList",
+      "entryType": "http",
+      "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "stepIds": [
+        "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+        "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+        "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+        "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+        "line": 59,
+        "snippet": "@RequestMapping(value = \"/utl/sys/srm/selectMntrngServerList.do\")"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonList.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonList.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+      "layer": "unknown",
+      "className": "ProcessMonVO",
+      "kgSummary": "프로세스 조회를 위한 검색·페이징 VO로, 검색조건·키워드·페이징 파라미터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+        "line": 18,
+        "snippet": "public class ProcessMonVO extends ProcessMon {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonList.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "layer": "service",
+      "className": "EgovProcessMonService",
+      "kgSummary": "프로세스 모니터링(Process Monitoring) 업무의 service interface로, 프로세스 및 프로세스 로그의 CRUD·조회·상태변경 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "process-monitoring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "line": 16,
+        "snippet": "public interface EgovProcessMonService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonLog.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonLog.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "layer": "service",
+      "className": "EgovProcessMonService",
+      "kgSummary": "프로세스 모니터링(Process Monitoring) 업무의 service interface로, 프로세스 및 프로세스 로그의 CRUD·조회·상태변경 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "process-monitoring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "line": 16,
+        "snippet": "public interface EgovProcessMonService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonLog.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonLogVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonLogVO.java",
+      "layer": "unknown",
+      "className": "ProcessMonLogVO",
+      "kgSummary": "프로세스 로그 조회를 위한 검색·페이징 VO로, 검색조건·키워드·기간(시작/종료 일시)·페이징 파라미터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonLogVO.java",
+        "line": 18,
+        "snippet": "public class ProcessMonLogVO extends ProcessMonLog {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonLogVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonLogVO.java",
+      "layer": "unknown",
+      "className": "ProcessMonLogVO",
+      "kgSummary": "프로세스 로그 조회를 위한 검색·페이징 VO로, 검색조건·키워드·기간(시작/종료 일시)·페이징 파라미터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonLogVO.java",
+        "line": 18,
+        "snippet": "public class ProcessMonLogVO extends ProcessMonLog {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "layer": "service",
+      "className": "EgovProcessMonService",
+      "kgSummary": "프로세스 모니터링(Process Monitoring) 업무의 service interface로, 프로세스 및 프로세스 로그의 CRUD·조회·상태변경 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "process-monitoring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "line": 16,
+        "snippet": "public interface EgovProcessMonService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonLogList.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+      "layer": "unknown",
+      "className": "ProcessMonVO",
+      "kgSummary": "프로세스 조회를 위한 검색·페이징 VO로, 검색조건·키워드·페이징 파라미터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+        "line": 18,
+        "snippet": "public class ProcessMonVO extends ProcessMon {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "layer": "service",
+      "className": "EgovProcessMonService",
+      "kgSummary": "프로세스 모니터링(Process Monitoring) 업무의 service interface로, 프로세스 및 프로세스 로그의 CRUD·조회·상태변경 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "process-monitoring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "line": 16,
+        "snippet": "public interface EgovProcessMonService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModify.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "layer": "service",
+      "className": "EgovProcessMonService",
+      "kgSummary": "프로세스 모니터링(Process Monitoring) 업무의 service interface로, 프로세스 및 프로세스 로그의 CRUD·조회·상태변경 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "process-monitoring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "line": 16,
+        "snippet": "public interface EgovProcessMonService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonModifyView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+      "layer": "unknown",
+      "className": "ProcessMonVO",
+      "kgSummary": "프로세스 조회를 위한 검색·페이징 VO로, 검색조건·키워드·페이징 파라미터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+        "line": 18,
+        "snippet": "public class ProcessMonVO extends ProcessMon {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "layer": "service",
+      "className": "EgovProcessMonService",
+      "kgSummary": "프로세스 모니터링(Process Monitoring) 업무의 service interface로, 프로세스 및 프로세스 로그의 CRUD·조회·상태변경 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "process-monitoring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "line": 16,
+        "snippet": "public interface EgovProcessMonService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegist.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRegistView.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+      "layer": "service",
+      "className": "EgovProcessMonService",
+      "kgSummary": "프로세스 모니터링(Process Monitoring) 업무의 service interface로, 프로세스 및 프로세스 로그의 CRUD·조회·상태변경 계약을 정의한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "process-monitoring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/EgovProcessMonService.java",
+        "line": 16,
+        "snippet": "public interface EgovProcessMonService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/EgovComUtlProcessMonRemove.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+      "layer": "api",
+      "className": "EgovProcessMonController",
+      "kgSummary": "프로세스 모니터링 화면 요청을 처리하는 Spring MVC controller로, 프로세스 목록/상세/등록/수정/삭제, 상태조회, 로그 조회 요청을 라우팅하고 페이징·인증·메시지 처리를 수행한다.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "process-monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/web/EgovProcessMonController.java",
+        "line": 104,
+        "snippet": "@RequestMapping(\"/utl/sys/prm/EgovComUtlProcessMon.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonChecker.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonChecker.java",
+      "layer": "unknown",
+      "className": "ProcessMonChecker",
+      "kgSummary": "OS 명령으로 실행 중인 프로세스의 PID를 조회하는 프로세스 모니터링 점검 유틸리티.",
+      "kgTags": [
+        "utility",
+        "process-monitoring",
+        "system"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonChecker.java",
+        "line": 38,
+        "snippet": "public class ProcessMonChecker {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+      "layer": "unknown",
+      "className": "ProcessMonVO",
+      "kgSummary": "프로세스 조회를 위한 검색·페이징 VO로, 검색조건·키워드·페이징 파라미터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "search",
+        "pagination"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/prm/service/ProcessMonVO.java",
+        "line": 18,
+        "snippet": "public class ProcessMonVO extends ProcessMon {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+      "layer": "unknown",
+      "className": "FileSystemUtils",
+      "kgSummary": "OS별(df/dir) 명령을 실행해 디스크 여유 공간을 계산하고, 화이트리스트 기반으로 배치 셸 프로세스를 안전하게 기동하는 파일시스템 유틸.",
+      "kgTags": [
+        "utility",
+        "filesystem",
+        "process",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/FileSystemUtils.java",
+        "line": 56,
+        "snippet": "public class FileSystemUtils {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "layer": "unknown",
+      "className": "EgovWebUtil",
+      "kgSummary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+      "kgTags": [
+        "utility",
+        "security",
+        "validation",
+        "xss",
+        "sanitization",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "line": 25,
+        "snippet": "public class EgovWebUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/prm/selectProcessSttus.do:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "layer": "unknown",
+      "className": "EgovProperties",
+      "kgSummary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+      "kgTags": [
+        "utility",
+        "config",
+        "properties"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "line": 49,
+        "snippet": "public class EgovProperties {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "layer": "service",
+      "className": "EgovProxySvcService",
+      "kgSummary": "프록시 서비스 관리(목록·상세·등록·수정·삭제·로그·서버구동)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "proxy",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "line": 15,
+        "snippet": "public interface EgovProxySvcService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/getProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+      "layer": "unknown",
+      "className": "ProxyLog",
+      "kgSummary": "프록시 연결 로그(접속 IP·포트·시간·등록정보 등)를 담는 VO. ComDefaultVO를 상속해 페이징 필드 포함.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "proxy",
+        "logging"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+        "line": 14,
+        "snippet": "public class ProxyLog extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "layer": "unknown",
+      "className": "EgovDateUtil",
+      "kgSummary": "날짜/시간 처리 정적 유틸리티로, 날짜 연산·포맷·검증·음양력 변환 등 폭넓은 헬퍼를 제공한다.",
+      "kgTags": [
+        "utility",
+        "date",
+        "helper",
+        "static"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "line": 36,
+        "snippet": "public class EgovDateUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "layer": "service",
+      "className": "EgovProxySvcService",
+      "kgSummary": "프록시 서비스 관리(목록·상세·등록·수정·삭제·로그·서버구동)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "proxy",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "line": 15,
+        "snippet": "public interface EgovProxySvcService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "layer": "unknown",
+      "className": "EgovStringUtil",
+      "kgSummary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+      "kgTags": [
+        "utility",
+        "string",
+        "helper",
+        "static",
+        "tested"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+        "line": 43,
+        "snippet": "public class EgovStringUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+      "layer": "unknown",
+      "className": "EgovDateUtil",
+      "kgSummary": "날짜/시간 처리 정적 유틸리티로, 날짜 연산·포맷·검증·음양력 변환 등 폭넓은 헬퍼를 제공한다.",
+      "kgTags": [
+        "utility",
+        "date",
+        "helper",
+        "static"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/fcc/service/EgovDateUtil.java",
+        "line": 36,
+        "snippet": "public class EgovDateUtil {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxyLogListView.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+      "layer": "unknown",
+      "className": "ProxyLog",
+      "kgSummary": "프록시 연결 로그(접속 IP·포트·시간·등록정보 등)를 담는 VO. ComDefaultVO를 상속해 페이징 필드 포함.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "proxy",
+        "logging"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxyLog.java",
+        "line": 14,
+        "snippet": "public class ProxyLog extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+      "layer": "unknown",
+      "className": "ProxySvc",
+      "kgSummary": "프록시 서비스 정의(프록시 IP/포트·대상 서비스·상태 등)를 담는 VO. ComDefaultVO 상속.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/ProxySvc.java",
+        "line": 19,
+        "snippet": "public class ProxySvc extends ComDefaultVO {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "layer": "service",
+      "className": "EgovProxySvcService",
+      "kgSummary": "프록시 서비스 관리(목록·상세·등록·수정·삭제·로그·서버구동)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "proxy",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "line": 15,
+        "snippet": "public interface EgovProxySvcService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/selectProxySvcListView.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+      "layer": "api",
+      "className": "EgovProxySvcController",
+      "kgSummary": "프록시 서비스 관리 화면의 목록·상세·등록·수정·삭제·로그 조회 요청을 처리하는 Spring MVC 컨트롤러.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "spring-mvc",
+        "proxy"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/web/EgovProxySvcController.java",
+        "line": 126,
+        "snippet": "@RequestMapping(value = \"/utl/sys/pxy/getProxySvc.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+      "layer": "service",
+      "className": "EgovProxySvcService",
+      "kgSummary": "프록시 서비스 관리(목록·상세·등록·수정·삭제·로그·서버구동)의 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "proxy",
+        "service-layer"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/pxy/service/EgovProxySvcService.java",
+        "line": 15,
+        "snippet": "public interface EgovProxySvcService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+      "layer": "unknown",
+      "className": "ComDefaultCodeVO",
+      "kgSummary": "공통(공통코드·XSS)의 조회 조건/전달용 VO(ComDefaultCodeVO). 페이징·검색 파라미터 등 화면과 서비스 간 데이터를 담는다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/ComDefaultCodeVO.java",
+        "line": 28,
+        "snippet": "@SuppressWarnings(\"serial\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/pxy/updtViewProxySvc.do:src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+      "layer": "service",
+      "className": "EgovCmmUseService",
+      "kgSummary": "공통(공통코드·XSS) 기능의 서비스 인터페이스(EgovCmmUseService). 컨트롤러가 의존하는 비즈니스 메서드 계약을 선언한다.",
+      "kgTags": [
+        "service",
+        "interface",
+        "type-definition",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovCmmUseService.java",
+        "line": 26,
+        "snippet": "public interface EgovCmmUseService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "layer": "api",
+      "className": "EgovLoginSesionController",
+      "kgSummary": "로그인 세션 확인/설정 화면 요청을 EgovLoginSesionCeckUtil로 위임하는 Spring MVC Controller.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "session"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "line": 66,
+        "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "layer": "service",
+      "className": "EgovLoginSesionCeckUtil",
+      "kgSummary": "로그인 세션 상태 확인/설정 유틸리티로, EgovUserDetailsHelper의 인증 사용자 정보에 접근해 세션 URL을 관리한다.",
+      "kgTags": [
+        "utility",
+        "session",
+        "authentication"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "line": 20,
+        "snippet": "@Service(\"egovLoginSesionCeckUtil\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/checkLloginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/loginSessionView.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "layer": "api",
+      "className": "EgovLoginSesionController",
+      "kgSummary": "로그인 세션 확인/설정 화면 요청을 EgovLoginSesionCeckUtil로 위임하는 Spring MVC Controller.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "session"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "line": 66,
+        "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+      "layer": "api",
+      "className": "EgovLoginSesionController",
+      "kgSummary": "로그인 세션 확인/설정 화면 요청을 EgovLoginSesionCeckUtil로 위임하는 Spring MVC Controller.",
+      "kgTags": [
+        "api-handler",
+        "controller",
+        "session"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/web/EgovLoginSesionController.java",
+        "line": 66,
+        "snippet": "@RequestMapping(value = \"/utl/sys/rsc/checkLloginSession.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+      "layer": "service",
+      "className": "EgovLoginSesionCeckUtil",
+      "kgSummary": "로그인 세션 상태 확인/설정 유틸리티로, EgovUserDetailsHelper의 인증 사용자 정보에 접근해 세션 URL을 관리한다.",
+      "kgTags": [
+        "utility",
+        "session",
+        "authentication"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/rsc/service/EgovLoginSesionCeckUtil.java",
+        "line": 20,
+        "snippet": "@Service(\"egovLoginSesionCeckUtil\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "relPath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+      "layer": "unknown",
+      "className": "EgovUserDetailsHelper",
+      "kgSummary": "EgovUserDetailsService에 위임하여 인증 사용자 정보·권한 목록·인증 여부를 조회하는 정적 헬퍼.",
+      "kgTags": [
+        "utility",
+        "authentication",
+        "security"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/util/EgovUserDetailsHelper.java",
+        "line": 25,
+        "snippet": "public class EgovUserDetailsHelper {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/LoginVO.java",
+      "relPath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+      "layer": "unknown",
+      "className": "LoginVO",
+      "kgSummary": "인증된 사용자의 로그인 정보(ID·이름·이메일·기관·고유ID·GPKI DN 등)를 담는 세션용 VO. 공통 인증 전반에서 사용된다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "authentication",
+        "session",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/LoginVO.java",
+        "line": 33,
+        "snippet": "public class LoginVO implements Serializable{"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/rsc/setLoginSession.do:src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+      "layer": "service",
+      "className": "EgovUserDetailsService",
+      "kgSummary": "인증 사용자 조회·권한 조회·인증 여부 확인을 정의하는 공통 사용자 상세 서비스 interface.",
+      "kgTags": [
+        "type-definition",
+        "service-interface",
+        "authentication",
+        "common"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/service/EgovUserDetailsService.java",
+        "line": 5,
+        "snippet": "public interface EgovUserDetailsService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "layer": "api",
+      "className": "EgovServerResrceMntrngController",
+      "kgSummary": "서버 자원 모니터링 화면의 Spring MVC 컨트롤러로, 대상 서버 목록과 모니터링 이력 조회를 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "monitoring",
+        "api-handler"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+        "line": 155,
+        "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+      "layer": "unknown",
+      "className": "ServerResrceMntrngVO",
+      "kgSummary": "서버 자원 모니터링 검색/목록 처리를 위한 VO로, 조회 조건과 결과 리스트를 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+        "line": 16,
+        "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+      "layer": "service",
+      "className": "EgovServerResrceMntrngService",
+      "kgSummary": "서버 자원 모니터링 비즈니스 로직 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+        "line": 15,
+        "snippet": "public interface EgovServerResrceMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/srm/getServerResrceMntrng.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+      "layer": "api",
+      "className": "EgovServerResrceMntrngController",
+      "kgSummary": "서버 자원 모니터링 화면의 Spring MVC 컨트롤러로, 대상 서버 목록과 모니터링 이력 조회를 처리한다.",
+      "kgTags": [
+        "controller",
+        "spring-mvc",
+        "monitoring",
+        "api-handler"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/web/EgovServerResrceMntrngController.java",
+        "line": 155,
+        "snippet": "@RequestMapping(value = \"/utl/sys/srm/getServerResrceMntrng.do\")"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+      "layer": "unknown",
+      "className": "ServerResrceMntrngVO",
+      "kgSummary": "서버 자원 모니터링 검색/목록 처리를 위한 VO로, 조회 조건과 결과 리스트를 보유한다.",
+      "kgTags": [
+        "data-model",
+        "vo",
+        "monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/ServerResrceMntrngVO.java",
+        "line": 16,
+        "snippet": "public class ServerResrceMntrngVO extends ServerResrceMntrng {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+      "relPath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+      "layer": "service",
+      "className": "EgovServerResrceMntrngService",
+      "kgSummary": "서버 자원 모니터링 비즈니스 로직 계약을 정의하는 서비스 인터페이스.",
+      "kgTags": [
+        "service",
+        "interface",
+        "monitoring"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/utl/sys/srm/service/EgovServerResrceMntrngService.java",
+        "line": 15,
+        "snippet": "public interface EgovServerResrceMntrngService {"
+      }
+    },
+    {
+      "stepId": "step:ANY /utl/sys/srm/selectMntrngServerList.do:src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+      "layer": "service",
+      "className": "EgovMessageSource",
+      "kgSummary": "공통 다국어 메시지 소스 컴포넌트로, ReloadableResourceBundleMessageSource를 감싸 코드/Locale 기반 메시지 조회 헬퍼를 제공한다.",
+      "kgTags": [
+        "service",
+        "i18n",
+        "message-source",
+        "spring",
+        "utility"
+      ],
+      "citation": {
+        "filePath": "src/main/java/egovframework/com/cmm/EgovMessageSource.java",
+        "line": 26,
+        "snippet": "public class EgovMessageSource extends ReloadableResourceBundleMessageSource implements MessageSource {"
+      }
+    }
+  ]
+}

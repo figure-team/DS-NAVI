@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "key": "index",
+  "domainId": "domain:index",
+  "chunkIndex": 0,
+  "chunkTotal": 1,
+  "isHeaderChunk": true,
+  "domainHeader": {
+    "domainId": "domain:index",
+    "key": "index",
+    "kgHints": [
+      {
+        "relPath": "src/main/webapp/index.jsp",
+        "className": null,
+        "summary": "웹 애플리케이션 루트 진입점 JSP로, 초기 요청을 메인 컨트롤러 URL로 포워딩/리다이렉트한다.",
+        "tags": [
+          "jsp",
+          "entry-point",
+          "routing"
+        ],
+        "citation": {
+          "filePath": "src/main/webapp/index.jsp",
+          "line": 1,
+          "snippet": "<%@ page language=\"java\" contentType=\"text/html; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+        }
+      }
+    ],
+    "cross": [],
+    "flowCount": 1,
+    "stepCount": 1
+  },
+  "flows": [
+    {
+      "flowId": "flow:GET /index.jsp",
+      "entryPoint": "GET /index.jsp",
+      "entryType": "http",
+      "filePath": "src/main/webapp/index.jsp",
+      "stepIds": [
+        "step:GET /index.jsp:src/main/webapp/index.jsp"
+      ],
+      "citation": {
+        "filePath": "src/main/webapp/index.jsp",
+        "line": 1,
+        "snippet": "<%@ page language=\"java\" contentType=\"text/html; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:GET /index.jsp:src/main/webapp/index.jsp",
+      "relPath": "src/main/webapp/index.jsp",
+      "layer": "api",
+      "className": null,
+      "kgSummary": "웹 애플리케이션 루트 진입점 JSP로, 초기 요청을 메인 컨트롤러 URL로 포워딩/리다이렉트한다.",
+      "kgTags": [
+        "jsp",
+        "entry-point",
+        "routing"
+      ],
+      "citation": {
+        "filePath": "src/main/webapp/index.jsp",
+        "line": 1,
+        "snippet": "<%@ page language=\"java\" contentType=\"text/html; charset=utf-8\" pageEncoding=\"utf-8\"%>"
+      }
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "domainId": "domain:load",
+  "files": [
+    {
+      "className": "EgovWebUtil",
+      "kgHint": {
+        "summary": "XSS·파일경로·SQL/OS/LDAP injection 등 공통 웹 보안 필터링 static 유틸리티. 프레임워크 전반의 입력값 정화에 사용된다.",
+        "tags": [
+          "utility",
+          "security",
+          "validation",
+          "xss",
+          "sanitization",
+          "tested"
+        ]
+      },
+      "line": 25,
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "slice": {
+        "endLine": 94,
+        "startLine": 15,
+        "text": " *\t2017-02-07   이정은      시큐어코딩(ES) - 시큐어코딩 경로 조작 및 자원 삽입[CWE-22, CWE-23, CWE-95, CWE-99]\n *  2018.08.17   신용호      filePathBlackList 수정\n *  2018.10.10   신용호      . => \\\\.으로 수정\n *  2022.05.10   정진오      clearXSS() 메소드 추가\n *  2022.06.09   김장하      NSR 보안조치 (removeOSCmdRisk 함수에 윈도우 다중 명령 실행 키워드 추가)\n *  2023.08.10   신용호      removeLDAPInjectionRisk() 오류 수정\n *  2024.12.04   신용호      filePathBlackList() basePath 추가\n * </pre>\n */\n\npublic class EgovWebUtil {\n\tpublic static String clearXSSMinimum(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\"\", \"&#34;\");\n\t\treturnValue = returnValue.replaceAll(\"\\'\", \"&#39;\");\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSSMaximum(String value) {\n\t\tString returnValue = value;\n\t\treturnValue = clearXSSMinimum(returnValue);\n\n\t\treturnValue = returnValue.replace(\"%00\", \"\");\n\n\t\treturnValue = returnValue.replaceAll(\"%\", \"&#37;\");\n\n\t\t// \\\\. => .\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\./\", \"\"); // ../\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\\\\\\\\\", \"\"); // ..\\\n\t\treturnValue = returnValue.replaceAll(\"\\\\./\", \"\"); // ./\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String clearXSS(String value) {\n\t\tif (value == null || value.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\tString returnValue = value;\n\t\treturnValue = returnValue.replaceAll(\"&\", \"&amp;\");\n\t\treturnValue = returnValue.replaceAll(\"%2E\", \"&#46;\");\n\t\treturnValue = returnValue.replaceAll(\"%2F\", \"&#47;\");\n\t\treturnValue = returnValue.replaceAll(\"<\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\">\", \"&gt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3C\", \"&lt;\");\n\t\treturnValue = returnValue.replaceAll(\"%3E\", \"&gt;\");\n\n\t\treturn returnValue;\n\t}\n\n\tpublic static String filePathBlackList(String value) {\n\t\tString returnValue = value;\n\t\tif (returnValue == null || returnValue.trim().equals(\"\")) {\n\t\t\treturn \"\";\n\t\t}\n\n\t\treturnValue = returnValue.replaceAll(\"\\\\.\\\\.\", \"\");\n\n\t\treturn returnValue;\n\t}\n\n\t/**\n\t * 파일경로 보안취약점 조치\n\t * # 주의사항\n\t * 1. basePath는 반드시 지정해야 한다.\n\t * 2. basePath는 ROOT Path \"/\" 사용 금지 한다.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovProperties",
+      "kgHint": {
+        "summary": "프로퍼티 파일을 로드해 키 기준으로 설정 값을 조회하는 공통 프로퍼티 접근 유틸. 프레임워크 전반의 Globals·경로 설정에 사용된다.",
+        "tags": [
+          "utility",
+          "config",
+          "properties"
+        ]
+      },
+      "line": 49,
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "slice": {
+        "endLine": 118,
+        "startLine": 39,
+        "text": " *   수정일              수정자          수정내용\n *   ----------  --------  ---------------------------\n *   2009.01.19  박지욱          최초 생성\n *   2011.07.20    서준식     Globals파일의 상대경로를 읽은 메서드 추가\n *   2014.10.13    이기하     Globals.properties 값이 null일 경우 오류처리\n *   2019.04.26    신용호     RELATIVE_PATH_PREFIX Path 적용 방식 개선\n *   2022.01.21    윤주호     Try-catch-resource 조치 및 Method Refactoring\n *</pre>\n */\n\npublic class EgovProperties {\n\n\tprivate static final Logger LOGGER = LoggerFactory.getLogger(EgovProperties.class);\n\n\t//파일구분자\n\tfinal static String FILE_SEPARATOR = System.getProperty(\"file.separator\");\n\n\t//프로퍼티 파일의 물리적 위치\n\t//public static final String GLOBALS_PROPERTIES_FILE = System.getProperty(\"user.home\") + FILE_SEPARATOR + \"egovProps\" +FILE_SEPARATOR + \"globals.properties\";\n\n\tpublic static final String RELATIVE_PATH_PREFIX = EgovProperties.class.getResource(\"\") == null ? \"\"\n\t\t: EgovProperties.class.getResource(\"\").getPath().substring(0,\n\t\t\tEgovProperties.class.getResource(\"\").getPath().lastIndexOf(\"com\"));\n\t//public static final String RELATIVE_PATH_PREFIX = EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(0,EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath().indexOf(\"WEB-INF/classes/\")+\"WEB-INF/classes/\".length())+\"egovframework/\";\n\n\tpublic static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR\n\t\t+ \"globals.properties\";\n\n\t/**\n\t * 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 값을 반환한다(Globals.java 전용)\n\t * @param keyName String\n\t * @return String\n\t */\n\tpublic static String getProperty(String keyName) {\n\t\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\t\tLOGGER.debug(\"===>>> getProperty\" + EgovStringUtil.isNullToString(EgovProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath()));\n\t\tLOGGER.debug(\"getProperty : {} = {}\", GLOBALS_PROPERTIES_FILE, keyName);\n\n\t\treturn getPropertyValueByKey(keyName);\n\t}\n\n\t/**\n\t * 인자로 주어진 문자열을 Key값으로 하는 상대경로 프로퍼티 값을 절대경로로 반환한다(Globals.java 전용)\n\t * @param keyName String\n\t * @return String\n\t */\n\tpublic static String getPathProperty(String keyName) {\n\t\tLOGGER.debug(\"getPathProperty : {} = {}\", GLOBALS_PROPERTIES_FILE, keyName);\n\n\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(keyName);\n\t}\n\n\t/**\n\t * 주어진 파일에서 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 값을 반환한다\n\t * @param fileName String\n\t * @param key String\n\t * @return String\n\t */\n\tpublic static String getProperty(String fileName, String keyName) {\n\t\treturn getPropertyValueByKey(fileName, keyName);\n\t}\n\n\t/**\n\t * 주어진 파일에서 인자로 주어진 문자열을 Key값으로 하는 프로퍼티 상대 경로값을 절대 경로값으로 반환한다\n\t * @param fileName String\n\t * @param key String\n\t * @return String\n\t */\n\tpublic static String getPathProperty(String fileName, String keyName) {\n\t\treturn RELATIVE_PATH_PREFIX + \"egovProps\" + FILE_SEPARATOR + getProperty(fileName, keyName);\n\t}\n\n\t/**\n\t * 주어진 프로파일의 내용을 파싱하여 (key-value) 형태의 구조체 배열을 반환한다.\n\t * @param property String\n\t * @return ArrayList\n\t */\n\tpublic static ArrayList<Map<String, String>> loadPropertyFile(String propertyPath) {\n\n\t\t// key - value 형태로 된 배열 결과",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovStringUtil",
+      "kgHint": {
+        "summary": "문자열 처리 정적 유틸리티로, 자르기·치환·인코딩·null 처리·HTML/특수문자 변환·한글 조사 처리 등을 제공한다.",
+        "tags": [
+          "utility",
+          "string",
+          "helper",
+          "static",
+          "tested"
+        ]
+      },
+      "line": 43,
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "slice": {
+        "endLine": 112,
+        "startLine": 33,
+        "text": " * See the License for the specific language governing permissions and\n * limitations under the License.\n */\nimport java.io.UnsupportedEncodingException;\nimport java.math.BigDecimal;\nimport java.security.SecureRandom;\nimport java.sql.Timestamp;\nimport java.text.SimpleDateFormat;\nimport java.util.Locale;\n\npublic class EgovStringUtil {\n\t/**\n\t * 빈 문자열 <code>\"\"</code>.\n\t */\n\tpublic static final String EMPTY = \"\";\n\n\t// 221116\t김혜준\t2022 시큐어코딩 조치\n\tprivate static SecureRandom rnd = new SecureRandom();\n\n\t/**\n\t * <p>Padding을 할 수 있는 최대 수치</p>\n\t */\n\t// private static final int PAD_LIMIT = 8192;\n\n\t/**\n\t * <p>An array of <code>String</code>s used for padding.</p>\n\t * <p>Used for efficient space padding. The length of each String expands as needed.</p>\n\t */\n\t/*\n\tprivate static final String[] PADDING = new String[Character.MAX_VALUE];\n\n\tstatic {\n\t\t// space padding is most common, start with 64 chars\n\t\tPADDING[32] = \"                                                                \";\n\t}\n\t */\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 지정한길이에다가 해당 문자열을 붙여주는 메서드.\n\t * @param source 원본 문자열 배열\n\t * @param output 더할문자열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, String output, int slength) {\n\t\tString returnVal = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\treturnVal = source.substring(0, slength) + output;\n\t\t\t} else {\n\t\t\t\treturnVal = source;\n\t\t\t}\n\t\t}\n\t\treturn returnVal;\n\t}\n\n\t/**\n\t * 문자열이 지정한 길이를 초과했을때 해당 문자열을 삭제하는 메서드\n\t * @param source 원본 문자열 배열\n\t * @param slength 지정길이\n\t * @return 지정길이로 잘라서 더할분자열 합친 문자열\n\t */\n\tpublic static String cutString(String source, int slength) {\n\t\tString result = null;\n\t\tif (source != null) {\n\t\t\tif (source.length() > slength) {\n\t\t\t\tresult = source.substring(0, slength);\n\t\t\t} else {\n\t\t\t\tresult = source;\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\t/**\n\t * <p>\n\t * String이 비었거나(\"\") 혹은 null 인지 검증한다.\n\t * </p>\n\t *\n\t * <pre>",
+        "truncated": true
+      }
+    },
+    {
+      "className": "EgovWhiteList",
+      "kgHint": {
+        "summary": "화이트리스트 기반 입력 검증 헬퍼로, EgovWebUtil을 활용해 허용 값 목록을 로드하고 신규/기존 검사 로직을 제공한다.",
+        "tags": [
+          "validation",
+          "security",
+          "whitelist",
+          "test"
+        ]
+      },
+      "line": 18,
+      "relPath": "src/test/java/egovframework/com/cmm/service/EgovWhiteList.java",
+      "slice": {
+        "endLine": 87,
+        "startLine": 8,
+        "text": "import java.nio.charset.Charset;\nimport java.nio.charset.StandardCharsets;\nimport java.nio.file.Files;\nimport java.nio.file.Path;\nimport java.nio.file.Paths;\nimport java.util.ArrayList;\nimport java.util.List;\n\nimport egovframework.com.cmm.EgovWebUtil;\n\npublic class EgovWhiteList {\n\n\t//파일구분자\n\tfinal static  String FILE_SEPARATOR = System.getProperty(\"file.separator\");\n\tpublic static final String RELATIVE_PATH_PREFIX = EgovProperties.RELATIVE_PATH_PREFIX;\n\n\tpublic static boolean checkNew(String keyword) {\n\n\t\tString fName = EgovProperties.getProperty(\"Globals.linkWhitelistFile\");\n\t\tif ( fName == null || \"\".equals(fName) ) {\n\t\t\tthrow new RuntimeException(\"Globals.linkWhitelistFile is not defined!\");\n\t\t}\n\t\treturn checkNew(keyword, fName);\n\t}\n\n\tpublic static boolean checkNew(String keyword, String whiteListFile) {\n\n\t\tString filePath = RELATIVE_PATH_PREFIX+\"egovProps\"+FILE_SEPARATOR+whiteListFile;\n\n\t\tList<String> whiteList = loadWhiteListNew(EgovWebUtil.filePathBlackList(filePath));\n\t\tif ( whiteList == null ) return false;\n\n\t\tfor (String whiteListData : whiteList) {\n\n\t\t\tif ( whiteListData != null ) {\n\t\t\t\tif ( !whiteListData.trim().equals(\"\") ) {\n\t\t\t\t\tif (\"#\".equals(whiteListData.substring(0,1))) {\n\t\t\t\t\t\t// 주석으로 인식 - Pass\n\t\t\t\t\t} else {\n\t\t\t\t\t\tif (whiteListData.equals(keyword)) return true;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\treturn false;\n\t}\n\t\n\tpublic static boolean check(String keyword) {\n\t\t\n\t\tString fName = EgovProperties.getProperty(\"Globals.linkWhitelistFile\");\n\t\tif ( fName == null || \"\".equals(fName) ) {\n\t\t\tthrow new RuntimeException(\"Globals.linkWhitelistFile is not defined!\");\n\t\t}\n\t\treturn check(keyword, fName);\n\t}\n\t\n\tpublic static boolean check(String keyword, String whiteListFile) {\n\t\t\n\t\tString filePath = RELATIVE_PATH_PREFIX+\"egovProps\"+FILE_SEPARATOR+whiteListFile;\n\t\t\n\t\tList<String> whiteList = loadWhiteList(EgovWebUtil.filePathBlackList(filePath));\n\t\tif ( whiteList == null ) return false;\n\t\t\n\t\tfor (String whiteListData : whiteList) {\n\t\t\t\n\t\t\tif ( whiteListData != null ) {\n\t\t\t\tif ( !whiteListData.trim().equals(\"\") ) {\n\t\t\t\t\tif (\"#\".equals(whiteListData.substring(0,1))) {\n\t\t\t\t\t\t// 주석으로 인식 - Pass\n\t\t\t\t\t} else {\n\t\t\t\t\t\tif (whiteListData.equals(keyword)) return true;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\t\n\t\treturn false;\n\t}\n\t",
+        "truncated": true
+      }
+    },
+    {
+      "className": "TestLoadFile",
+      "kgHint": {
+        "summary": "리소스 경로 로딩과 EgovWhiteList의 URL 허용여부(check/checkNew)를 로그로 확인하는 진단용 main 테스트다.",
+        "tags": [
+          "test",
+          "diagnostic",
+          "whitelist",
+          "main-runner"
+        ]
+      },
+      "line": 10,
+      "relPath": "src/test/java/egovframework/com/cmm/service/TestLoadFile.java",
+      "slice": {
+        "endLine": 34,
+        "startLine": 1,
+        "text": "package egovframework.com.cmm.service;\n\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\npublic class TestLoadFile {\n\n\tprotected static Logger egovLogger = LoggerFactory.getLogger(TestLoadFile.class);\n\n\tpublic static void main(String[] args) {\n\t\t// TODO Auto-generated method stub\n\t\t/*EgovWhiteList.check(\"\");\n\t\tList<String> result = EgovWhiteList.loadWhiteList(\"\");\n\t\tfor (String whiteListData : result) {\n\t\t\tegovLogger.debug(\"===> whiteList Data = \"+ whiteListData);\n\t\t}*/\n\n\t\t// Run As > Java Application 실행시 경로가 Web Server 배포 경로와 다르므로 별도 지정 필요\n\t\t//egovLogger.debug(\">>> ORG RELATIVE_PATH_PREFIX = \"+EgovWhiteList.RELATIVE_PATH_PREFIX);\n\t\t//EgovWhiteList.RELATIVE_PATH_PREFIX = \"C:/eGovFrameDev-3.7.0-64bit_dev/workspace/egovframework-all-in-one-AllNew/target/classes/egovframework\";\n\t\tegovLogger.debug(\">>> \"+EgovProperties.class.getResource(\".\").getPath());\n\t\tegovLogger.debug(\">>> \"+TestLoadFile.class.getResource(\".\").getPath());\n\t\tegovLogger.debug(\">>> TEST RELATIVE_PATH_PREFIX = \"+EgovWhiteList.RELATIVE_PATH_PREFIX);\n\n\t\tboolean result = EgovWhiteList.check(\"/egovframework/com/main_bottom\");\n\t\tegovLogger.debug(\"===>>> result = \"+result);\n\t\t\n\t\tboolean resultNew = EgovWhiteList.checkNew(\"/egovframework/com/main_bottom\");\n\t\tegovLogger.debug(\"===>>> resultNew = \"+resultNew);\n\n\t\tegovLogger.debug(\">>> \"+EgovProperties.class.getResource(\".\").getPath());\n\n\t}\n}",
+        "truncated": false
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "TestLoadFile#main",
+      "entryType": "cli",
+      "filePath": "src/test/java/egovframework/com/cmm/service/TestLoadFile.java",
+      "flowId": "flow:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main",
+      "line": 10,
+      "stepIds": [
+        "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/test/java/egovframework/com/cmm/service/TestLoadFile.java",
+        "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/test/java/egovframework/com/cmm/service/EgovWhiteList.java",
+        "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+        "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+        "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+      ]
+    }
+  ],
+  "gitCommit": "c417732a829c34b20ff73091fe6c886d84bd7811",
+  "key": "load",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/EgovWebUtil.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/cmm/EgovWebUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/cmm/service/EgovProperties.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/cmm/service/EgovProperties.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/main/java/egovframework/com/utl/fcc/service/EgovStringUtil.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/test/java/egovframework/com/cmm/service/EgovWhiteList.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/test/java/egovframework/com/cmm/service/EgovWhiteList.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/cmm/service/TestLoadFile.java",
+      "stepId": "step:batch:src/test/java/egovframework/com/cmm/service/TestLoadFile.java#main:src/test/java/egovframework/com/cmm/service/TestLoadFile.java"
+    }
+  ]
+}

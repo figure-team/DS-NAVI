@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:pdf",
+  "name": "PDF 변환 유틸리티",
+  "summary": {
+    "text": "OpenOffice 소켓 연결을 이용해 문서를 PDF로 변환하는 기능을 수동 실행 테스트 드라이버로 검증하는 개발용 유틸리티 도메인이다.",
+    "citations": [
+      {
+        "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+        "line": 38,
+        "snippet": "public static void main(String[] args) {"
+      }
+    ]
+  },
+  "entities": [],
+  "businessRules": [],
+  "crossDomainInteractions": [],
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java#main",
+      "name": "문서 PDF 변환 테스트 실행",
+      "summary": {
+        "text": "OpenOffice 소켓 연결을 통해 문서를 PDF로 변환하는 동작을 main 진입점에서 수동 실행으로 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+            "line": 38,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java#main",
+      "name": "문서 PDF 변환 변형 테스트 실행",
+      "summary": {
+        "text": "PDF 변환 시나리오의 변형(2번)을 main 진입점에서 실행하여 OpenOffice 변환 흐름을 확인한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+            "line": 38,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+      "name": "PDF 변환 테스트 드라이버",
+      "summary": {
+        "text": "OpenOffice 소켓 연결을 통해 문서를 PDF로 변환하는 동작을 수동 실행(main)으로 확인하는 개발용 테스트 드라이버이다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter.java",
+            "line": 38,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    },
+    {
+      "stepId": "step:batch:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java#main:src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+      "name": "PDF 변환 변형 테스트 드라이버",
+      "summary": {
+        "text": "PDF 변환 시나리오의 변형(2번)을 수동 실행 테스트로 확인하는 개발용 드라이버로, main에서 OpenOffice 변환 흐름을 검증한다.",
+        "citations": [
+          {
+            "filePath": "src/test/java/egovframework/com/utl/sim/TestPdfConverter2.java",
+            "line": 38,
+            "snippet": "public static void main(String[] args) {"
+          }
+        ]
+      }
+    }
+  ]
+}

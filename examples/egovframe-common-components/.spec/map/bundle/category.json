@@ -1,0 +1,204 @@
+{
+  "domainId": "domain:category",
+  "files": [
+    {
+      "className": "CategoryController",
+      "kgHint": {
+        "summary": "메서드 단위 보안 애노테이션 검증을 위한 카테고리 CRUD 스텁 Spring MVC test controller.",
+        "tags": [
+          "test",
+          "api-handler",
+          "controller",
+          "spring-mvc"
+        ]
+      },
+      "line": 23,
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "slice": {
+        "endLine": 49,
+        "startLine": 13,
+        "text": "    @RequestMapping(\"/sale/listCategory.do\")\n    public void selectCategoryList() {\n        LOGGER.debug(\"### CategoryController selectCategoryList() \");\n    }\n\n    @RequestMapping(\"/sale/addCategoryView.do\")\n    public String addCategoryView() {\n        return \"/sale/registerCategory\";\n    }\n\n    @RequestMapping(\"/sale/addCategory.do\")\n    public String addCategory() {\n        return \"forward:/sale/listCategory.do\";\n    }\n\n    @RequestMapping(\"/sale/updateCategoryView.do\")\n    public String updateCategoryView() {\n        return \"/sale/registerCategory\";\n    }\n\n    @RequestMapping(\"/sale/updateCategory.do\")\n    public String updateCategory() {\n        return \"forward:/sale/listCategory.do\";\n    }\n\n    @RequestMapping(\"/sale/deleteCategory.do\")\n    public String deleteCategory() {\n        return \"forward:/sale/listCategory.do\";\n    }\n\n    @RequestMapping(\"/system/accessDenied.do\")\n    public String accessDenyView() {\n        return \"/system/accessDenied\";\n    }\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "CategoryController#addCategory",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "flowId": "flow:ANY /sale/addCategory.do",
+      "line": 23,
+      "stepIds": [
+        "step:ANY /sale/addCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ]
+    },
+    {
+      "entryPoint": "CategoryController#addCategoryView",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "flowId": "flow:ANY /sale/addCategoryView.do",
+      "line": 18,
+      "stepIds": [
+        "step:ANY /sale/addCategoryView.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ]
+    },
+    {
+      "entryPoint": "CategoryController#deleteCategory",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "flowId": "flow:ANY /sale/deleteCategory.do",
+      "line": 38,
+      "stepIds": [
+        "step:ANY /sale/deleteCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ]
+    },
+    {
+      "entryPoint": "CategoryController#selectCategoryList",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "flowId": "flow:ANY /sale/listCategory.do",
+      "line": 13,
+      "stepIds": [
+        "step:ANY /sale/listCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ]
+    },
+    {
+      "entryPoint": "CategoryController#updateCategory",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "flowId": "flow:ANY /sale/updateCategory.do",
+      "line": 33,
+      "stepIds": [
+        "step:ANY /sale/updateCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ]
+    },
+    {
+      "entryPoint": "CategoryController#updateCategoryView",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "flowId": "flow:ANY /sale/updateCategoryView.do",
+      "line": 28,
+      "stepIds": [
+        "step:ANY /sale/updateCategoryView.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ]
+    },
+    {
+      "entryPoint": "CategoryController#accessDenyView",
+      "entryType": "http",
+      "filePath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "flowId": "flow:ANY /system/accessDenied.do",
+      "line": 43,
+      "stepIds": [
+        "step:ANY /system/accessDenied.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+      ]
+    }
+  ],
+  "gitCommit": "9591ae21d1431dc1b8e32430c6218b55f33d8ed2",
+  "key": "category",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepId": "step:ANY /sale/addCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepId": "step:ANY /sale/addCategoryView.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepId": "step:ANY /sale/deleteCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepId": "step:ANY /sale/listCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepId": "step:ANY /sale/updateCategory.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepId": "step:ANY /sale/updateCategoryView.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/test/java/egovframework/com/security/web/CategoryController.java",
+      "stepId": "step:ANY /system/accessDenied.do:src/test/java/egovframework/com/security/web/CategoryController.java"
+    }
+  ]
+}

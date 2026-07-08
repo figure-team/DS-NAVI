@@ -1,0 +1,47 @@
+{
+  "key": "context",
+  "chunkIndex": 0,
+  "isHeaderChunk": true,
+  "domain": {
+    "name": "공통 기반·화면 라우팅",
+    "summary": {
+      "text": "XML 기반 크론 트리거 설정으로 배치 스케줄링 컨텍스트를 정의하는 공통 기반 도메인이다.",
+      "citations": []
+    },
+    "entities": [],
+    "businessRules": [],
+    "crossDomainInteractions": []
+  },
+  "flows": [
+    {
+      "flowId": "flow:batch:src/test/resources/egovframework/spring/dev/scheduling/context-scheduling.xml#xmlCronTrigger",
+      "name": "배치 크론 트리거 스케줄 등록",
+      "summary": {
+        "text": "XML 설정으로 CronTriggerFactoryBean 을 등록하여 배치 작업의 실행 주기를 스케줄링한다.",
+        "citations": [
+          {
+            "filePath": "src/test/resources/egovframework/spring/dev/scheduling/context-scheduling.xml",
+            "line": 32,
+            "snippet": "<bean id=\"xmlCronTrigger\" class=\"org.springframework.scheduling.quartz.CronTriggerFactoryBean\">"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:batch:src/test/resources/egovframework/spring/dev/scheduling/context-scheduling.xml#xmlCronTrigger:src/test/resources/egovframework/spring/dev/scheduling/context-scheduling.xml",
+      "name": "크론 트리거 빈 정의",
+      "summary": {
+        "text": "CronTriggerFactoryBean 을 이용해 배치 스케줄링용 크론 트리거를 정의하는 설정 단계이다.",
+        "citations": [
+          {
+            "filePath": "src/test/resources/egovframework/spring/dev/scheduling/context-scheduling.xml",
+            "line": 32,
+            "snippet": "<bean id=\"xmlCronTrigger\" class=\"org.springframework.scheduling.quartz.CronTriggerFactoryBean\">"
+          }
+        ]
+      }
+    }
+  ]
+}

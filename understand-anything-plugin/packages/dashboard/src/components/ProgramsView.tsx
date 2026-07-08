@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
-import { Badge, ConfBadge, Ev, PageHead, ProtoTabs, StatTile } from "./proto/Proto";
+import { Badge, ConfBadge, PageHead, ProtoTabs, StatTile } from "./proto/Proto";
 
 /**
  * 프로그램 목록 뷰(pmpl-proto pg-programs) — 엔진 산출물을 전용 화면으로 승격한다.
@@ -13,6 +13,9 @@ import { Badge, ConfBadge, Ev, PageHead, ProtoTabs, StatTile } from "./proto/Pro
  * 데이터: dev 서버가 `.spec/map/` 을 화이트리스트 서빙(GET /program-inventory.json 등),
  * 데모는 public/ 로 동봉. 파일 부재(404)면 해당 탭에 "엔진 스캔 미실행" 을 정직하게 표기한다.
  * 합성 금지: 엔진 미산출 항목(복잡도 분류 등)은 렌더하지 않고 산출물 문서로 유도한다.
+ *
+ * URL 단일 소스: ?ptab=&pq=&ptype=&pdomain= (검색은 replace). fetch 는 마운트 1회로,
+ * searchParams 변화는 refetch 를 유발하지 않는다(무한 refetch 방지).
  */
 
 interface Program {
@@ -53,10 +56,26 @@ interface FpSummary {
   unclassified: number;
   unadjustedFp: number;
 }
+interface Evidence {
+  file: string;
+  line: number;
+}
+interface FpDataFunction {
+  name: string;
+  kind: string;
+  evidence?: Evidence;
+}
+interface FpTransaction {
+  routeId?: string;
+  method?: string;
+  path?: string;
+  kind?: string;
+  evidence?: Evidence;
+}
 interface ProgramInventory {
   programs: Program[];
   stats: InventoryStats;
-  fp: { summary: FpSummary };
+  fp: { summary: FpSummary; dataFunctions?: FpDataFunction[]; transactions?: FpTransaction[] };
   gitCommit: string;
 }
 
@@ -76,11 +95,15 @@ interface InterfaceItem {
   direction?: string;
   protocol?: string;
   endpoint?: string;
-  evidence?: { file: string; line: number };
+  evidence?: Evidence;
+}
+interface ProtocolCount {
+  protocol: string;
+  count: number;
 }
 interface InterfacesFile {
   items: InterfaceItem[];
-  stats: { total: number };
+  stats: { total: number; byProtocol?: ProtocolCount[]; unresolvedEndpoints?: number; callSiteTotal?: number };
   suspectSignals: SuspectSignals;
 }
 interface BatchJob {
@@ -89,15 +112,20 @@ interface BatchJob {
   trigger?: string;
   schedule?: string;
   handler?: string;
-  evidence?: { file: string; line: number };
+  evidence?: Evidence;
+}
+interface TriggerCount {
+  trigger: string;
+  count: number;
 }
 interface BatchFile {
   jobs: BatchJob[];
-  stats: { total: number };
+  stats: { total: number; byTrigger?: TriggerCount[]; unresolvedHandlers?: number };
   suspectSignals: SuspectSignals;
 }
 
 type TabKey = "list" | "fp" | "if" | "batch";
+const TAB_KEYS: TabKey[] = ["list", "fp", "if", "batch"];
 
 /** 프로그램 유형 → 화면 라벨. 미매핑 유형은 원문을 그대로 노출한다(합성 금지). */
 const TYPE_LABEL: Record<string, string> = {
@@ -110,9 +138,76 @@ const TYPE_LABEL: Record<string, string> = {
 };
 const typeLabel = (t: string): string => TYPE_LABEL[t] ?? t;
 
+/**
+ * domainVia 신뢰도 라벨 — 전부 정적 분석 자동 판정(사람 확정 아님).
+ * reachability = 호출/도달성 그래프로 귀속 추적(근거확보). common = 복수 도메인 공유.
+ * directory/prefix = 경로·이름 접두 추정. null(도메인 없음)은 별도 "미조인" 으로 구분.
+ */
+const VIA_DISPLAY: Record<string, { label: string; tone: "ok" | "info" | "warn"; title: string }> = {
+  reachability: { label: "근거확보", tone: "ok", title: "호출·도달성 그래프로 도메인 귀속이 추적됨 — 기계 판정" },
+  common: { label: "공유", tone: "info", title: "복수 도메인이 공유하는 공통 요소 — 기계 판정" },
+  directory: { label: "추정", tone: "warn", title: "디렉터리 경로 기반 추정 — 기계 판정" },
+  prefix: { label: "추정", tone: "warn", title: "이름 접두 기반 추정 — 기계 판정" },
+};
+
 /** 200행 초과 시 상위 N만 렌더(정직 표기 병행). */
 const ROW_CAP = 200;
 const DELIVERABLE_LINK = "/deliverables/si-프로그램목록";
+
+/** 검색 매치 하이라이트 — 대소문자 무시로 needle 구간을 강조한다(합성 없음). */
+function Highlight({ text, q }: { text: string; q: string }) {
+  const needle = q.trim();
+  if (!needle || !text) return <>{text}</>;
+  const lower = text.toLowerCase();
+  const nl = needle.toLowerCase();
+  const parts: ReactNode[] = [];
+  let i = 0;
+  let idx = lower.indexOf(nl, i);
+  while (idx !== -1) {
+    if (idx > i) parts.push(text.slice(i, idx));
+    parts.push(
+      <mark
+        key={`${idx}-${parts.length}`}
+        style={{ background: "color-mix(in srgb, var(--color-status-info) 26%, transparent)", color: "inherit", borderRadius: 3, padding: "0 1px" }}
+      >
+        {text.slice(idx, idx + needle.length)}
+      </mark>,
+    );
+    i = idx + needle.length;
+    idx = lower.indexOf(nl, i);
+  }
+  if (i < text.length) parts.push(text.slice(i));
+  return <>{parts}</>;
+}
+
+/**
+ * 근거(file:line) 클릭 → 코드 뷰어. Proto.Ev(표기 전용) 대신 로컬 클릭형 버튼.
+ * 프로그램 행은 line 미보유 → filePath:1 로 열되 표기는 경로만(showLine=false).
+ * 코드 뷰어 allowlist(그래프 밖 파일)로 실제 열람이 실패해도 UI 는 깨지지 않는다(툴팁 유지).
+ */
+function EvBtn({
+  file,
+  line,
+  showLine = true,
+  onOpen,
+}: {
+  file: string;
+  line: number;
+  showLine?: boolean;
+  onOpen: (file: string, line: number) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(file, line)}
+      title={`코드 열기 — ${file}:${line}`}
+      className="cursor-pointer bg-transparent border-0 text-text-muted hover:text-accent transition-colors"
+      style={{ fontFamily: "var(--font-mono)", fontSize: 11, padding: 0, textAlign: "left", wordBreak: "break-all" }}
+    >
+      {showLine ? `${file}:${line}` : file}
+    </button>
+  );
+}
 
 /** BtnOutline 과 동일한 외형을 갖는 라우터 링크. */
 function OutlineLink({ to, title, children }: { to: string; title?: string; children: ReactNode }) {
@@ -207,8 +302,37 @@ function ScanNotRun({ what }: { what: string }) {
   );
 }
 
+/** sticky thead — 스크롤 컨테이너 내부 기준. */
+const STICKY_HEAD: CSSProperties = { position: "sticky", top: 0, background: "var(--color-panel)", zIndex: 2 };
+
+/** 검색 input(공용) — 활성 탭에 걸린 ?pq= 를 조작한다. */
+function SearchInput({
+  value,
+  onChange,
+  placeholder,
+  label,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  label: string;
+}) {
+  return (
+    <input
+      type="search"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      aria-label={label}
+      className="bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent transition-colors"
+      style={{ fontSize: 13, padding: "6px 10px", minWidth: 200 }}
+    />
+  );
+}
+
 export default function ProgramsView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
+  const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
   const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
   const dataBase = import.meta.env.BASE_URL;
   const tokenQ = accessToken && !DEMO_MODE ? `?token=${encodeURIComponent(accessToken)}` : "";
@@ -220,10 +344,23 @@ export default function ProgramsView() {
   const [batch, setBatch] = useState<BatchFile | null>(null);
   const [batchMissing, setBatchMissing] = useState(false);
 
-  const [tab, setTab] = useState<TabKey>("list");
-  const [q, setQ] = useState("");
-  const [typeFilter, setTypeFilter] = useState("전체");
-  const [domainFilter, setDomainFilter] = useState("전체");
+  // URL 단일 소스 — 탭·검색·필터. fetch 의존성과 분리되어 refetch 를 유발하지 않는다.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawTab = searchParams.get("ptab") ?? "list";
+  const tab: TabKey = TAB_KEYS.includes(rawTab as TabKey) ? (rawTab as TabKey) : "list";
+  const q = searchParams.get("pq") ?? "";
+  const typeFilter = searchParams.get("ptype") ?? "전체";
+  const domainFilter = searchParams.get("pdomain") ?? "전체";
+
+  const setParam = (k: string, v: string | null, replace = false) =>
+    setSearchParams(
+      (prev) => {
+        if (v) prev.set(k, v);
+        else prev.delete(k);
+        return prev;
+      },
+      { replace },
+    );
 
   useEffect(() => {
     let alive = true;
@@ -263,7 +400,10 @@ export default function ProgramsView() {
       .filter((p) => {
         if (typeFilter !== "전체" && p.type !== typeFilter) return false;
         if (domainFilter !== "전체" && p.domain !== domainFilter) return false;
-        if (needle && !p.name.toLowerCase().includes(needle) && !p.filePath.toLowerCase().includes(needle)) return false;
+        if (needle) {
+          const hay = [p.name, p.filePath, p.id, p.domain ?? "", ...(p.notes ?? [])].join(" ").toLowerCase();
+          if (!hay.includes(needle)) return false;
+        }
         return true;
       })
       .sort((a, b) => a.id.localeCompare(b.id));
@@ -275,6 +415,8 @@ export default function ProgramsView() {
   const otherLangSum = (inv?.stats.excluded.otherLang ?? []).reduce((n, o) => n + o.count, 0);
 
   const fp = inv?.fp.summary;
+  const dataFunctions = inv?.fp.dataFunctions ?? [];
+  const transactions = inv?.fp.transactions ?? [];
   const gitShort = inv?.gitCommit ? inv.gitCommit.slice(0, 7) : "—";
 
   const tabs: Array<{ key: TabKey; label: string; count?: number }> = [
@@ -283,6 +425,19 @@ export default function ProgramsView() {
     { key: "if", label: "인터페이스", count: interfaces?.stats.total },
     { key: "batch", label: "배치", count: batch?.stats.total },
   ];
+
+  // 인터페이스/배치 검색(활성 탭의 ?pq= 재사용).
+  const ifNeedle = q.trim().toLowerCase();
+  const ifRows = (interfaces?.items ?? []).filter(
+    (it) =>
+      !ifNeedle ||
+      [it.direction, it.protocol, it.endpoint, it.name, it.id].filter(Boolean).join(" ").toLowerCase().includes(ifNeedle),
+  );
+  const batchRows = (batch?.jobs ?? []).filter(
+    (j) =>
+      !ifNeedle ||
+      [j.name, j.id, j.trigger, j.schedule, j.handler].filter(Boolean).join(" ").toLowerCase().includes(ifNeedle),
+  );
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
@@ -313,37 +468,52 @@ export default function ProgramsView() {
         </p>
       ) : (
         <>
-          <ProtoTabs tabs={tabs} active={tab} onChange={setTab} />
+          <ProtoTabs tabs={tabs} active={tab} onChange={(k) => setParam("ptab", k === "list" ? null : k)} />
 
           {tab === "list" && (
             <>
               <section className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", marginBottom: 14 }}>
-                {inv.stats.byType.map((b) => (
-                  <StatTile key={b.type} label={typeLabel(b.type)} value={b.count} />
-                ))}
+                {inv.stats.byType.map((b) => {
+                  const active = typeFilter === b.type;
+                  return (
+                    <button
+                      key={b.type}
+                      type="button"
+                      onClick={() => setParam("ptype", active ? null : b.type)}
+                      aria-pressed={active}
+                      title={active ? `${typeLabel(b.type)} 필터 해제` : `${typeLabel(b.type)} 유형만 보기`}
+                      className="text-left cursor-pointer"
+                      style={{
+                        background: "none",
+                        border: 0,
+                        padding: 0,
+                        borderRadius: 10,
+                        outline: active ? "2px solid var(--color-accent)" : "none",
+                        outlineOffset: 2,
+                      }}
+                    >
+                      <StatTile label={typeLabel(b.type)} value={b.count} small={active ? "선택됨" : undefined} />
+                    </button>
+                  );
+                })}
                 {fp && fp.unclassified > 0 && (
-                  <StatTile
-                    label="미분류"
-                    value={fp.unclassified}
-                    small="표면화"
-                    valueColor="var(--color-status-warn)"
-                  />
+                  <StatTile label="미분류" value={fp.unclassified} small="표면화" valueColor="var(--color-status-warn)" />
                 )}
               </section>
 
               <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "6px 14px 14px" }}>
                 {/* 필터 줄 — 검색 + 유형 + 도메인 */}
                 <div className="flex items-center gap-2.5 flex-wrap" style={{ padding: "12px 4px" }}>
-                  <input
+                  <SearchInput
                     value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    placeholder="이름·경로 검색"
-                    className="bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent transition-colors"
-                    style={{ fontSize: 13, padding: "6px 10px", minWidth: 200 }}
+                    onChange={(v) => setParam("pq", v || null, true)}
+                    placeholder="이름·경로·ID·도메인·노트 검색"
+                    label="프로그램 검색(이름·경로·ID·도메인·노트)"
                   />
                   <select
                     value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
+                    onChange={(e) => setParam("ptype", e.target.value === "전체" ? null : e.target.value)}
+                    aria-label="유형 필터"
                     className="bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent transition-colors cursor-pointer"
                     style={{ fontSize: 13, padding: "6px 10px" }}
                   >
@@ -356,7 +526,8 @@ export default function ProgramsView() {
                   </select>
                   <select
                     value={domainFilter}
-                    onChange={(e) => setDomainFilter(e.target.value)}
+                    onChange={(e) => setParam("pdomain", e.target.value === "전체" ? null : e.target.value)}
+                    aria-label="도메인 필터"
                     className="bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent transition-colors cursor-pointer"
                     style={{ fontSize: 13, padding: "6px 10px" }}
                   >
@@ -377,19 +548,35 @@ export default function ProgramsView() {
                   <table className="proto-tbl">
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>이름</th>
-                        <th>유형</th>
-                        <th>도메인</th>
-                        <th className="num">LOC</th>
-                        <th>경로</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">이름</th>
+                        <th scope="col">유형</th>
+                        <th scope="col">레이어</th>
+                        <th scope="col">도메인</th>
+                        <th scope="col" className="num">
+                          LOC
+                        </th>
+                        <th scope="col">경로</th>
                       </tr>
                     </thead>
                     <tbody>
                       {rows.map((p) => (
                         <tr key={p.id}>
-                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, whiteSpace: "nowrap" }}>{p.id}</td>
-                          <td style={{ fontWeight: 650 }}>{p.name}</td>
+                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, whiteSpace: "nowrap" }}>
+                            <Highlight text={p.id} q={q} />
+                          </td>
+                          <td style={{ fontWeight: 650 }}>
+                            <Highlight text={p.name} q={q} />
+                            {p.notes && p.notes.length > 0 && (
+                              <span
+                                title={p.notes.join("\n")}
+                                className="text-text-muted bg-elevated"
+                                style={{ fontSize: 10, padding: "1px 6px", borderRadius: 5, marginLeft: 6, whiteSpace: "nowrap", fontWeight: 500 }}
+                              >
+                                라우트 {p.notes.length}
+                              </span>
+                            )}
+                          </td>
                           <td>
                             <span
                               className="text-text-secondary bg-elevated"
@@ -398,16 +585,21 @@ export default function ProgramsView() {
                               {typeLabel(p.type)}
                             </span>
                           </td>
-                          <td className="text-text-secondary">{p.domain ?? "—"}</td>
+                          <td className="text-text-muted" style={{ fontSize: 12 }}>
+                            {p.layer && p.layer !== "unknown" ? p.layer : "—"}
+                          </td>
+                          <td>
+                            <DomainCell domain={p.domain} via={p.domainVia} q={q} />
+                          </td>
                           <td className="num">{p.loc}</td>
                           <td>
-                            <Ev>{p.filePath}</Ev>
+                            <EvBtn file={p.filePath} line={1} showLine={false} onOpen={openCodeViewerAt} />
                           </td>
                         </tr>
                       ))}
                       {rows.length === 0 && (
                         <tr>
-                          <td colSpan={6} className="text-text-muted" style={{ textAlign: "center", padding: "20px 0" }}>
+                          <td colSpan={7} className="text-text-muted" style={{ textAlign: "center", padding: "20px 0" }}>
                             조건에 맞는 프로그램이 없습니다.
                           </td>
                         </tr>
@@ -427,53 +619,174 @@ export default function ProgramsView() {
                   집계 제외: 설정 XML {inv.stats.excluded.configXml} · 비대상 언어 {otherLangSum} · 판독 불가{" "}
                   {inv.stats.excluded.unreadable}
                 </div>
+                <div className="text-text-muted" style={{ fontSize: 11.5, padding: "6px 4px 0", lineHeight: 1.6 }}>
+                  도메인 배지는 정적 분석 자동 판정 — <b>근거확보</b>(도달성 추적) · <b>공유</b>(복수 도메인) · <b>추정</b>(경로·접두) · <b>미조인</b>(귀속 없음).
+                  경로 클릭 시 코드 열람.
+                </div>
               </div>
             </>
           )}
 
           {tab === "fp" && fp && (
-            <div className="grid gap-3.5 grid-cols-1 lg:grid-cols-2">
-              <PanelCard>
-                <PanelHead>데이터 기능 후보</PanelHead>
-                <FpRow label="ILF (내부 논리 파일)" value={fp.ilf} sub="테이블" badge={<ConfBadge kind="fix" />} />
-                <FpRow label="EIF (외부 연계 파일)" value={fp.eif} badge={<ConfBadge kind="fix" />} />
+            <div className="flex flex-col" style={{ gap: 14 }}>
+              <div className="grid gap-3.5 grid-cols-1 lg:grid-cols-2">
+                <PanelCard>
+                  <PanelHead>데이터 기능 후보</PanelHead>
+                  <FpRow label="ILF (내부 논리 파일)" value={fp.ilf} sub="테이블" badge={<ConfBadge kind="fix" />} />
+                  <FpRow label="EIF (외부 연계 파일)" value={fp.eif} badge={<ConfBadge kind="fix" />} />
 
-                <PanelHead style={{ marginTop: 16 }}>트랜잭션 기능 후보</PanelHead>
-                <FpRow label="EI (외부 입력)" value={fp.ei} badge={<ConfBadge kind="est" />} />
-                <FpRow label="EO (외부 출력)" value={fp.eo} badge={<ConfBadge kind="est" />} />
-                <FpRow label="EQ (외부 조회)" value={fp.eq} badge={<ConfBadge kind="est" />} />
-                {fp.unclassified > 0 && (
-                  <FpRow
-                    label="미분류 트랜잭션"
-                    value={fp.unclassified}
-                    badge={
-                      <Badge tone="warn" title="EI/EO/EQ 로 확정 분류하지 못한 경로 — 집계에서 제외하고 표면화">
-                        미분류 표면화
-                      </Badge>
-                    }
-                  />
-                )}
-              </PanelCard>
+                  <PanelHead style={{ marginTop: 16 }}>트랜잭션 기능 후보</PanelHead>
+                  <FpRow label="EI (외부 입력)" value={fp.ei} badge={<ConfBadge kind="est" />} />
+                  <FpRow label="EO (외부 출력)" value={fp.eo} badge={<ConfBadge kind="est" />} />
+                  <FpRow label="EQ (외부 조회)" value={fp.eq} badge={<ConfBadge kind="est" />} />
+                  {fp.unclassified > 0 && (
+                    <FpRow
+                      label="미분류 트랜잭션"
+                      value={fp.unclassified}
+                      badge={
+                        <Badge tone="warn" title="EI/EO/EQ 로 확정 분류하지 못한 경로 — 집계에서 제외하고 표면화">
+                          미분류 표면화
+                        </Badge>
+                      }
+                    />
+                  )}
+                </PanelCard>
 
-              <PanelCard>
-                <PanelHead>FP 하한 산정</PanelHead>
-                <div
-                  className="tabular-nums"
-                  style={{ fontSize: 40, fontWeight: 650, letterSpacing: "-1px", color: "var(--color-text-primary)", lineHeight: 1.1 }}
-                >
-                  {fp.unadjustedFp}
+                <PanelCard>
+                  <PanelHead>FP 하한 산정</PanelHead>
+                  <div
+                    className="tabular-nums"
+                    style={{ fontSize: 40, fontWeight: 650, letterSpacing: "-1px", color: "var(--color-text-primary)", lineHeight: 1.1 }}
+                  >
+                    {fp.unadjustedFp}
+                  </div>
+                  <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.7, marginTop: 12 }}>
+                    FP 하한 산정치 — 미분류 {fp.unclassified}건은 집계에서 제외하고 표면화합니다(침묵 누락 금지). 근거 열은 xlsx에 포함.
+                  </p>
+                  <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.7, marginTop: 12 }}>
+                    복잡도 분류는 엔진 미산출 — FP 상세 근거는 산출물{" "}
+                    <Link to={DELIVERABLE_LINK} className="text-accent" style={{ textDecoration: "none" }}>
+                      si-프로그램목록
+                    </Link>{" "}
+                    참조.
+                  </p>
+                </PanelCard>
+              </div>
+
+              {/* 데이터 기능 후보 표(ILF/EIF) — 근거 클릭 → 코드, 이름 → 데이터 탭 테이블 */}
+              {dataFunctions.length > 0 && (
+                <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "6px 14px 14px" }}>
+                  <div className="text-text-primary" style={{ fontSize: 13, fontWeight: 650, padding: "12px 4px 8px" }}>
+                    데이터 기능 후보 {dataFunctions.length}건 — 유형·근거 추적
+                  </div>
+                  <div className="overflow-x-auto" style={{ maxHeight: "calc(100vh - 420px)", overflowY: "auto" }}>
+                    <table className="proto-tbl">
+                      <thead>
+                        <tr>
+                          <th scope="col" style={STICKY_HEAD}>
+                            이름
+                          </th>
+                          <th scope="col" style={STICKY_HEAD}>
+                            유형
+                          </th>
+                          <th scope="col" style={STICKY_HEAD}>
+                            근거
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dataFunctions.map((d, i) => (
+                          <tr key={`${d.name}-${i}`}>
+                            <td style={{ fontWeight: 650, fontFamily: "var(--font-mono)", fontSize: 12 }}>
+                              <Link
+                                to={`/data?tab=tables&table=${encodeURIComponent(d.name)}`}
+                                title={`데이터 탭에서 ${d.name} 테이블 보기`}
+                                style={{ color: "var(--color-status-info)", textDecoration: "none" }}
+                              >
+                                {d.name}
+                              </Link>
+                            </td>
+                            <td>
+                              <Badge tone="info" title="FP 데이터 기능 분류(정적 분석 자동 판정)">
+                                {d.kind}
+                              </Badge>
+                            </td>
+                            <td>
+                              {d.evidence ? (
+                                <EvBtn file={d.evidence.file} line={d.evidence.line} onOpen={openCodeViewerAt} />
+                              ) : (
+                                <span className="text-text-muted" style={{ fontSize: 11 }}>
+                                  —
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-                <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.7, marginTop: 12 }}>
-                  FP 하한 산정치 — 미분류 {fp.unclassified}건은 집계에서 제외하고 표면화합니다(침묵 누락 금지). 근거 열은 xlsx에 포함.
-                </p>
-                <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.7, marginTop: 12 }}>
-                  복잡도 분류는 엔진 미산출 — FP 상세 근거는 산출물{" "}
-                  <Link to={DELIVERABLE_LINK} className="text-accent" style={{ textDecoration: "none" }}>
-                    si-프로그램목록
-                  </Link>{" "}
-                  참조.
-                </p>
-              </PanelCard>
+              )}
+
+              {/* 트랜잭션 후보 표 — 미분류 사유 추적(경로·메서드·근거) */}
+              {transactions.length > 0 && (
+                <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "6px 14px 14px" }}>
+                  <div className="text-text-primary" style={{ fontSize: 13, fontWeight: 650, padding: "12px 4px 8px" }}>
+                    트랜잭션 후보 {transactions.length}건 — 왜 미분류인지 근거로 추적
+                  </div>
+                  <div className="overflow-x-auto" style={{ maxHeight: "calc(100vh - 420px)", overflowY: "auto" }}>
+                    <table className="proto-tbl">
+                      <thead>
+                        <tr>
+                          <th scope="col" style={STICKY_HEAD}>
+                            메서드
+                          </th>
+                          <th scope="col" style={STICKY_HEAD}>
+                            경로
+                          </th>
+                          <th scope="col" style={STICKY_HEAD}>
+                            분류
+                          </th>
+                          <th scope="col" style={STICKY_HEAD}>
+                            근거
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {transactions.map((t, i) => (
+                          <tr key={t.routeId ?? i}>
+                            <td className="text-text-secondary" style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, whiteSpace: "nowrap" }}>
+                              {t.method ?? "—"}
+                            </td>
+                            <td style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, wordBreak: "break-all" }}>{t.path ?? t.routeId ?? "—"}</td>
+                            <td>
+                              {t.kind === "UNCLASSIFIED" ? (
+                                <Badge tone="warn" title="EI/EO/EQ 로 확정 분류하지 못함 — 집계 제외·표면화">
+                                  미분류
+                                </Badge>
+                              ) : (
+                                <Badge tone="info">{t.kind ?? "—"}</Badge>
+                              )}
+                            </td>
+                            <td>
+                              {t.evidence ? (
+                                <EvBtn file={t.evidence.file} line={t.evidence.line} onOpen={openCodeViewerAt} />
+                              ) : (
+                                <span className="text-text-muted" style={{ fontSize: 11 }}>
+                                  —
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="text-text-muted" style={{ fontSize: 11.5, padding: "10px 4px 0", lineHeight: 1.6 }}>
+                    미분류 트랜잭션은 FP 하한 집계에서 제외하고 표면화합니다 — 근거(file:line) 클릭 시 코드 열람.
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -497,31 +810,72 @@ export default function ProgramsView() {
                 <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.7 }}>
                   0건은 &quot;스캔 안 함&quot;과 다릅니다 — 음성 결과도 정직하게 보고합니다. 미해석 항목이 있으면 [미확인]으로 남습니다.
                 </p>
+                <IfStatLine stats={interfaces.stats} />
                 <SuspectList signals={interfaces.suspectSignals} />
               </PanelCard>
             ) : (
               <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "6px 14px 14px" }}>
+                <div className="flex items-center gap-2.5 flex-wrap" style={{ padding: "12px 4px 4px" }}>
+                  <SearchInput
+                    value={q}
+                    onChange={(v) => setParam("pq", v || null, true)}
+                    placeholder="방향·프로토콜·엔드포인트 검색"
+                    label="인터페이스 검색"
+                  />
+                  <div className="flex-1" />
+                  <span className="text-text-muted tabular-nums" style={{ fontSize: 12 }}>
+                    {ifRows.length}/{interfaces.items.length}건
+                  </span>
+                </div>
+                <div style={{ padding: "0 4px 8px" }}>
+                  <IfStatLine stats={interfaces.stats} />
+                </div>
                 <div className="overflow-x-auto">
                   <table className="proto-tbl">
                     <thead>
                       <tr>
-                        <th>방향</th>
-                        <th>프로토콜</th>
-                        <th>엔드포인트</th>
-                        <th>근거</th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          방향
+                        </th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          프로토콜
+                        </th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          엔드포인트
+                        </th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          근거
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {interfaces.items.map((it, i) => (
+                      {ifRows.map((it, i) => (
                         <tr key={it.id ?? i}>
                           <td className="text-text-secondary">{it.direction ?? "—"}</td>
-                          <td className="text-text-secondary">{it.protocol ?? "—"}</td>
-                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{it.endpoint ?? it.name ?? "—"}</td>
+                          <td className="text-text-secondary">
+                            <Highlight text={it.protocol ?? "—"} q={q} />
+                          </td>
+                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>
+                            <Highlight text={it.endpoint ?? it.name ?? "—"} q={q} />
+                          </td>
                           <td>
-                            <Ev>{it.evidence ? `${it.evidence.file}:${it.evidence.line}` : "—"}</Ev>
+                            {it.evidence ? (
+                              <EvBtn file={it.evidence.file} line={it.evidence.line} onOpen={openCodeViewerAt} />
+                            ) : (
+                              <span className="text-text-muted" style={{ fontSize: 11 }}>
+                                —
+                              </span>
+                            )}
                           </td>
                         </tr>
                       ))}
+                      {ifRows.length === 0 && (
+                        <tr>
+                          <td colSpan={4} className="text-text-muted" style={{ textAlign: "center", padding: "20px 0" }}>
+                            조건에 맞는 연계가 없습니다.
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -547,33 +901,78 @@ export default function ProgramsView() {
                 <p className="text-text-secondary" style={{ fontSize: 13, marginBottom: 10, lineHeight: 1.7 }}>
                   cron · Quartz · @Scheduled · shell 잡 신호가 발견되지 않았습니다. 배치 진입점은 도달성 분석에 자동 등록되어 &quot;데드코드&quot; 오판을 방지합니다.
                 </p>
+                <BatchStatLine stats={batch.stats} />
                 <SuspectList signals={batch.suspectSignals} />
               </PanelCard>
             ) : (
               <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "6px 14px 14px" }}>
+                <div className="flex items-center gap-2.5 flex-wrap" style={{ padding: "12px 4px 4px" }}>
+                  <SearchInput
+                    value={q}
+                    onChange={(v) => setParam("pq", v || null, true)}
+                    placeholder="잡·트리거·핸들러 검색"
+                    label="배치 검색"
+                  />
+                  <div className="flex-1" />
+                  <span className="text-text-muted tabular-nums" style={{ fontSize: 12 }}>
+                    {batchRows.length}/{batch.jobs.length}건
+                  </span>
+                </div>
+                <div style={{ padding: "0 4px 8px" }}>
+                  <BatchStatLine stats={batch.stats} />
+                </div>
                 <div className="overflow-x-auto">
                   <table className="proto-tbl">
                     <thead>
                       <tr>
-                        <th>잡</th>
-                        <th>트리거</th>
-                        <th>스케줄</th>
-                        <th>핸들러</th>
-                        <th>근거</th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          잡
+                        </th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          트리거
+                        </th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          스케줄
+                        </th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          핸들러
+                        </th>
+                        <th scope="col" style={STICKY_HEAD}>
+                          근거
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {batch.jobs.map((j, i) => (
+                      {batchRows.map((j, i) => (
                         <tr key={j.id ?? i}>
-                          <td style={{ fontWeight: 650 }}>{j.name ?? j.id ?? "—"}</td>
-                          <td className="text-text-secondary">{j.trigger ?? "—"}</td>
+                          <td style={{ fontWeight: 650 }}>
+                            <Highlight text={j.name ?? j.id ?? "—"} q={q} />
+                          </td>
+                          <td className="text-text-secondary">
+                            <Highlight text={j.trigger ?? "—"} q={q} />
+                          </td>
                           <td style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{j.schedule ?? "—"}</td>
-                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{j.handler ?? "—"}</td>
+                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>
+                            <Highlight text={j.handler ?? "—"} q={q} />
+                          </td>
                           <td>
-                            <Ev>{j.evidence ? `${j.evidence.file}:${j.evidence.line}` : "—"}</Ev>
+                            {j.evidence ? (
+                              <EvBtn file={j.evidence.file} line={j.evidence.line} onOpen={openCodeViewerAt} />
+                            ) : (
+                              <span className="text-text-muted" style={{ fontSize: 11 }}>
+                                —
+                              </span>
+                            )}
                           </td>
                         </tr>
                       ))}
+                      {batchRows.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="text-text-muted" style={{ textAlign: "center", padding: "20px 0" }}>
+                            조건에 맞는 배치 잡이 없습니다.
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -583,6 +982,87 @@ export default function ProgramsView() {
               </div>
             ))}
         </>
+      )}
+    </div>
+  );
+}
+
+/** 도메인 셀 — 단일 도메인은 /domains/:key 로 점프, 복합(a+b)은 텍스트. via 신뢰도 배지 병기. */
+function DomainCell({ domain, via, q }: { domain: string | null; via?: string | null; q: string }) {
+  if (!domain) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-text-muted">
+        —
+        <Badge tone="mut" title="도메인 귀속 없음 — 미조인(기계 판정)">
+          미조인
+        </Badge>
+      </span>
+    );
+  }
+  const single = !domain.includes("+");
+  const viaInfo = via ? VIA_DISPLAY[via] : undefined;
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {single ? (
+        <Link
+          to={`/domains/${encodeURIComponent(domain)}`}
+          title={`${domain} 도메인으로 이동`}
+          style={{ color: "var(--color-status-info)", textDecoration: "none" }}
+        >
+          <Highlight text={domain} q={q} />
+        </Link>
+      ) : (
+        <span className="text-text-secondary">
+          <Highlight text={domain} q={q} />
+        </span>
+      )}
+      {viaInfo && (
+        <Badge tone={viaInfo.tone} title={viaInfo.title}>
+          {viaInfo.label}
+        </Badge>
+      )}
+    </span>
+  );
+}
+
+/** 인터페이스 unresolved 표면화 — 총계·프로토콜 분포·미해석 엔드포인트(침묵 누락 금지). */
+function IfStatLine({ stats }: { stats: InterfacesFile["stats"] }) {
+  const byProtocol = stats.byProtocol ?? [];
+  const unresolved = stats.unresolvedEndpoints ?? 0;
+  return (
+    <div className="flex flex-wrap items-center text-text-muted" style={{ gap: 10, fontSize: 12 }}>
+      <span className="tabular-nums">연계 총 {stats.total}건</span>
+      {stats.callSiteTotal != null && <span className="tabular-nums">호출부 {stats.callSiteTotal}</span>}
+      {byProtocol.map((p) => (
+        <span key={p.protocol} className="tabular-nums">
+          {p.protocol} {p.count}
+        </span>
+      ))}
+      {unresolved > 0 && (
+        <Badge tone="warn" title="엔드포인트를 확정하지 못한 연계 신호 — 표면화">
+          미해석 엔드포인트 {unresolved}
+        </Badge>
+      )}
+    </div>
+  );
+}
+
+/** 배치 unresolved 표면화 — 총계·트리거 분포·미해석 핸들러(침묵 누락 금지). */
+function BatchStatLine({ stats }: { stats: BatchFile["stats"] }) {
+  const byTrigger = stats.byTrigger ?? [];
+  const unresolved = stats.unresolvedHandlers ?? 0;
+  return (
+    <div className="flex flex-wrap items-center text-text-muted" style={{ gap: 10, fontSize: 12 }}>
+      <span className="tabular-nums">잡 총 {stats.total}건</span>
+      {byTrigger.map((t) => (
+        <span key={t.trigger} className="tabular-nums">
+          {t.trigger} {t.count}
+        </span>
+      ))}
+      {unresolved > 0 && (
+        <Badge tone="warn" title="핸들러를 확정하지 못한 배치 신호 — 표면화">
+          미해석 핸들러 {unresolved}
+        </Badge>
       )}
     </div>
   );

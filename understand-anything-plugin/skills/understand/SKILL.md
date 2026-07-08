@@ -323,11 +323,17 @@ Load `.understand-anything/intermediate/batches.json` (produced by Phase 1.5). I
 
    The workflow fans out one analyzer agent per batch (each reads its own slice from disk), then runs a deterministic completeness audit (`audit-batches.mjs`: sentinel ∧ valid JSON ∧ output file-set ⊇ slice `files[]`) and re-dispatches incomplete batches at most 2 times.
 
+   **No Workflow tool on this platform (e.g. opencode)?** Run the bundled headless CLI driver instead — same slices, same disk-guarded audit and bounded re-dispatch, model-agnostic (each batch runs as a headless `opencode run` session using the CLI's configured model unless `--model provider/model` is passed):
+   ```bash
+   node <SKILL_DIR>/phase2-fanout-cli.mjs $PROJECT_ROOT/.understand-anything/intermediate --concurrency 5
+   ```
+   Run it in the background with a generous timeout (hours-scale on large projects). It prints per-batch progress to stderr (logs per batch in `intermediate/fanout-logs/`) and ONE final JSON line to stdout with the same shape as the workflow return — treat that line as step 3's result and continue identically.
+
 3. When the workflow returns `{ totalBatches, analyzed, skippedByGuard, failed }`:
    - Add every `failed[]` entry to `$PHASE_WARNINGS` — never silently drop them; merge proceeds with the batches that exist.
    - If `skippedByGuard > 0`, report it as informational: those batches were completed by a previous interrupted run and reused via the disk guard (idempotent resume).
 
-4. Interrupted run? Just re-run `/understand`: Phase 1.5 recomputes byte-identical batches (seeded Louvain), and the disk guard skips every completed batch, so only the remainder is analyzed. If the Workflow tool is unavailable on this platform, fall back to the inline dispatch loop below.
+4. Interrupted run? Just re-run `/understand`: Phase 1.5 recomputes byte-identical batches (seeded Louvain), and the disk guard skips every completed batch, so only the remainder is analyzed (both the Workflow route and the CLI driver resume this way). Fall back to the inline dispatch loop below ONLY when neither the Workflow tool nor a headless CLI runner is available.
 
 5. Skip the inline dispatch loop and continue directly at the merge step (`merge-batch-graphs.py`).
 

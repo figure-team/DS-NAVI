@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router";
 import { useDashboardStore } from "../store";
 import TrustBadge from "./TrustBadge";
-import { Badge, BtnAccent, BtnOutline, ConfBadge, PageHead, type ConfKind } from "./proto/Proto";
+import { Badge, BtnAccent, BtnOutline, ConfBadge, Ev, PageHead, type ConfKind } from "./proto/Proto";
 
 /**
  * ktds-fork (S4): 화면설계서 뷰 — SI 화면설계서 슬라이드 재현.
- * 좌: 도메인별 화면 목록 / 우: 캡처 + 번호 배지 오버레이(①②③=입력, ⓐⓑⓒ=이벤트/링크)
+ * 좌: 도메인별 화면 목록(통합 검색) / 우: 캡처 + 번호 배지 오버레이(①②③=입력, ⓐⓑⓒ=이벤트/링크)
  * + 하단 범례 표(항목/이벤트/동작/설명/근거/신뢰도).
  * 데이터: screens.json(생성물, 불변) + screen-overrides.json(사람 편집) 클라이언트 병합.
  * 배지는 PNG 에 굽지 않고 bbox(문서 좌표)를 %로 환산해 오버레이한다.
+ * 선택·검색은 URL(?screen=&q=)로 이관 — 딥링크·새로고침·뒤로가기 동작(데이터 맵 관례).
  */
 
 interface BBox { x: number; y: number; width: number; height: number }
@@ -38,6 +40,7 @@ interface Screen {
   domain: string | null;
   scenario: string | null;
   openedFrom: string | null;
+  graphNodeId: string | null;
   capture: { path: string; width: number; height: number; capturedAt: string };
   summary: { text: string; confidence: string } | null;
   annotations: Annotation[];
@@ -73,15 +76,23 @@ function badgeGlyph(kind: Annotation["kind"], no: number): string {
 }
 const annKey = (a: Annotation) => `${a.kind}:${a.no}`;
 
-/** 종류별 배지 색상 — 입력=남색 / 버튼·이벤트=금색 / 링크=회색. */
-type KindStyle = { bg: string; fg: string; border: string; swatch: string };
+/** 종류별 배지 색상 — 입력=남색 / 버튼·이벤트=금색 / 링크=회색. 캡처(bg-white) 위 오버레이 전용 고정색. */
+type KindStyle = { bg: string; fg: string; border: string };
 const KIND_STYLE: Record<string, KindStyle> = {
-  field: { bg: "#2f5d8a", fg: "#ffffff", border: "#2f5d8a", swatch: "#4d82bd" },
-  region: { bg: "#2f5d8a", fg: "#ffffff", border: "#2f5d8a", swatch: "#4d82bd" },
-  action: { bg: "var(--color-accent)", fg: "#141414", border: "var(--color-accent)", swatch: "var(--color-accent)" },
-  link: { bg: "#55585c", fg: "#ececec", border: "#8a8d92", swatch: "#8a8d92" },
+  field: { bg: "#2f5d8a", fg: "#ffffff", border: "#2f5d8a" },
+  region: { bg: "#2f5d8a", fg: "#ffffff", border: "#2f5d8a" },
+  action: { bg: "var(--color-accent)", fg: "#141414", border: "var(--color-accent)" },
+  link: { bg: "#55585c", fg: "#ececec", border: "#8a8d92" },
 };
 const kindStyle = (kind: string): KindStyle => KIND_STYLE[kind] ?? KIND_STYLE.link;
+/** 패널(테마 적응) 위 스와치·번호 색 — 캡처 밖이라 고정 hex 대신 시맨틱 토큰으로 보정. */
+const KIND_SWATCH_TOKEN: Record<string, string> = {
+  field: "var(--color-status-info)",
+  region: "var(--color-status-info)",
+  action: "var(--color-accent)",
+  link: "var(--color-text-muted)",
+};
+const kindSwatch = (kind: string): string => KIND_SWATCH_TOKEN[kind] ?? KIND_SWATCH_TOKEN.link;
 /** 범례 섹션 순서 — 입력 → 버튼·이벤트 → 링크. */
 const KIND_ORDER: Array<Annotation["kind"]> = ["field", "region", "action", "link"];
 const KIND_SECTION: Record<string, string> = {
@@ -98,18 +109,19 @@ const DOMAIN_LABEL: Record<string, string> = {
   order: "주문(order)",
   common: "공통(common)",
 };
-const CONFIDENCE_LABEL: Record<string, string> = {
-  CONFIRMED: "확정",
-  CONFIRMED_AI: "확정(AI)",
-  INFERRED: "추정",
-  UNVERIFIED: "확인 필요",
+/**
+ * 신뢰도 표시 — 전부 정적 분석 자동 판정(사람 확정 아님)이라 "확정" 계열 라벨을 피한다.
+ * 사람 확정은 selOv.confirmed / TrustBadge 로 시각·문구를 분리한다(데이터 맵 CrudTab 관례).
+ */
+const MECH_CONF: Record<string, { kind: ConfKind; label: string; title: string }> = {
+  CONFIRMED: { kind: "fix", label: "근거확보", title: "핸들러·근거(file:line)가 정적 분석으로 추적됨 — 기계 판정" },
+  CONFIRMED_AI: { kind: "ai", label: "근거확보(AI)", title: "AI 보조로 판정된 근거 — 기계 판정" },
+  INFERRED: { kind: "est", label: "추정", title: "핸들러 미검출 또는 메서드명 추론 — 기계 판정" },
+  UNVERIFIED: { kind: "chk", label: "확인 필요", title: "근거 없음 — 확인 필요" },
 };
-const CONF_KIND: Record<string, ConfKind> = {
-  CONFIRMED: "fix",
-  CONFIRMED_AI: "ai",
-  INFERRED: "est",
-  UNVERIFIED: "chk",
-};
+const mechConf = (c: string) => MECH_CONF[c] ?? MECH_CONF.INFERRED;
+/** 신뢰도 카운트 요약 순서. */
+const CONF_ORDER = ["CONFIRMED", "CONFIRMED_AI", "INFERRED", "UNVERIFIED"];
 const KIND_LABEL: Record<string, string> = {
   field: "입력",
   action: "이벤트",
@@ -118,24 +130,97 @@ const KIND_LABEL: Record<string, string> = {
 };
 const APPROVER_LS_KEY = "ktds.approver";
 
+/** 검색어 매치 하이라이트 — 첫 매치만 강조(시맨틱 accent). */
+function Highlight({ text, q }: { text: string; q: string }) {
+  if (!q) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="bg-transparent text-accent font-semibold">{text.slice(idx, idx + q.length)}</mark>
+      {text.slice(idx + q.length)}
+    </>
+  );
+}
+
+/**
+ * 미매핑 JSP·도달 실패 배너(데이터 맵 UnresolvedBanner 패턴을 이 파일에 로컬 복제).
+ * severity 접이식 카드로 침묵 누락 대신 건수를 항상 표면화한다.
+ */
+function SpecFold({ title, sub, entries }: { title: string; sub: string; entries: string[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      className="rounded-lg border border-border-subtle bg-panel"
+      style={{ borderLeft: "3px solid var(--color-status-warn)", padding: "8px 14px", marginBottom: 10 }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 w-full text-left cursor-pointer bg-transparent border-0"
+        style={{ font: "inherit" }}
+      >
+        <span style={{ fontSize: 9, width: 10 }}>{open ? "▾" : "▸"}</span>
+        <span className="text-text-primary" style={{ fontSize: 13, fontWeight: 650 }}>
+          {title}
+        </span>
+        <span className="text-text-muted" style={{ fontSize: 12 }}>
+          {sub}
+        </span>
+      </button>
+      {open && (
+        <ul style={{ margin: "8px 0 4px", paddingLeft: 24 }} className="space-y-0.5">
+          {entries.map((e) => (
+            <li key={e} className="break-all">
+              <Ev>{e}</Ev>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export default function ScreenSpecView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
   const approverHandle = useDashboardStore((s) => s.approverHandle);
+  const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
   const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
   const dataBase = import.meta.env.BASE_URL;
   const tokenQ = accessToken && !DEMO_MODE ? `?token=${encodeURIComponent(accessToken)}` : "";
   const canWrite = Boolean(accessToken) && !DEMO_MODE;
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selId = searchParams.get("screen");
+  const q = searchParams.get("q") ?? "";
+  const setParam = (k: string, v: string | null, replace = false) =>
+    setSearchParams(
+      (prev) => {
+        if (v) prev.set(k, v);
+        else prev.delete(k);
+        return prev;
+      },
+      { replace },
+    );
+
   const [file, setFile] = useState<ScreensFile | null>(null);
   const [overrides, setOverrides] = useState<Record<string, ScreenOverride>>({});
   const [error, setError] = useState<string | null>(null);
-  const [selId, setSelId] = useState<string | null>(null);
   const [hoverKey, setHoverKey] = useState<string | null>(null);
+  const [imgError, setImgError] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draftTitle, setDraftTitle] = useState("");
   const [draftAnn, setDraftAnn] = useState<Record<string, AnnOverride>>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  // 선택 화면이 바뀌면 편집·hover·캡처 오류 상태를 초기화한다(URL 이관 후 onClick 대체).
+  useEffect(() => {
+    setEditing(false);
+    setHoverKey(null);
+    setImgError(false);
+  }, [selId]);
 
   const load = useCallback(() => {
     setError(null);
@@ -159,21 +244,38 @@ export default function ScreenSpecView() {
     load();
   }, [load]);
 
+  const title = (s: Screen) => overrides[s.id]?.titleOverride ?? s.title;
+
+  // 통합 검색 대상 — 제목·URL·JSP·주석 label/target(각 화면 자신의 override 반영).
+  const screenHay = useCallback(
+    (s: Screen) => {
+      const ov = overrides[s.id];
+      const parts = [ov?.titleOverride ?? s.title, s.url, s.jspFile ?? ""];
+      for (const a of s.annotations) {
+        parts.push(ov?.annotations?.[annKey(a)]?.label ?? a.label);
+        if (a.handler?.target) parts.push(a.handler.target);
+      }
+      return parts.join("\n").toLowerCase();
+    },
+    [overrides],
+  );
+
+  const ql = q.trim().toLowerCase();
   const groups = useMemo(() => {
     const byDomain = new Map<string, Screen[]>();
     for (const s of file?.screens ?? []) {
+      if (ql && !screenHay(s).includes(ql)) continue;
       const key = s.domain ?? "기타";
       byDomain.set(key, [...(byDomain.get(key) ?? []), s]);
     }
     return [...byDomain.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [file]);
+  }, [file, ql, screenHay]);
 
   const sel = useMemo(
     () => file?.screens.find((s) => s.id === selId) ?? file?.screens[0] ?? null,
     [file, selId],
   );
   const selOv = sel ? overrides[sel.id] : undefined;
-  const title = (s: Screen) => overrides[s.id]?.titleOverride ?? s.title;
   const merged = useCallback(
     (a: Annotation): { description: string | null; label: string; note: string | null; hidden: boolean } => {
       const o = selOv?.annotations?.[annKey(a)];
@@ -266,10 +368,16 @@ export default function ScreenSpecView() {
 
   const visibleAnns = sel.annotations.filter((a) => !merged(a).hidden);
   const notes = visibleAnns.filter((a) => merged(a).note);
+  // 신뢰도별 카운트(핸들러 있는 주석만) + 핸들러 없음 — 스케일 대비 상단 요약.
+  const confCounts = new Map<string, number>();
+  for (const a of visibleAnns) {
+    if (a.handler) confCounts.set(a.handler.confidence, (confCounts.get(a.handler.confidence) ?? 0) + 1);
+  }
+  const noHandler = visibleAnns.filter((a) => !a.handler).length;
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-      {/* pmpl-proto page-head — 미매핑·도달 실패는 침묵 누락 대신 헤더 메타로 표면화 */}
+      {/* pmpl-proto page-head — 미매핑·도달 실패·프래그먼트는 침묵 누락 대신 헤더 메타로 표면화 */}
       <PageHead
         title="화면설계서"
         meta={
@@ -277,13 +385,45 @@ export default function ScreenSpecView() {
             화면 <b className="text-text-primary tabular-nums">{file.screens.length}</b>
             {" · "}도달 실패 <b className="text-text-primary tabular-nums">{file.missing.length}</b>건
             {" · "}미매핑 <b className="text-text-primary tabular-nums">{file.unmatchedJsps.length}</b>건
+            {" · "}프래그먼트 <b className="text-text-primary tabular-nums">{file.fragments?.length ?? 0}</b>건
           </>
         }
       />
 
+      {/* 미매핑 JSP·도달 실패 — severity 접이식 배너(데이터 맵 패턴 로컬 복제) */}
+      {(file.unmatchedJsps.length > 0 || file.missing.length > 0) && (
+        <div style={{ marginBottom: 14 }}>
+          {file.unmatchedJsps.length > 0 && (
+            <SpecFold
+              title={`미매핑 JSP ${file.unmatchedJsps.length}건`}
+              sub="— 화면 URL 로 도달하지 못해 캡처가 없는 JSP"
+              entries={file.unmatchedJsps}
+            />
+          )}
+          {file.missing.length > 0 && (
+            <SpecFold
+              title={`도달 실패 ${file.missing.length}건`}
+              sub="— 요청했으나 응답에 실패한 URL"
+              entries={file.missing.map((m) => `${m.url} — ${m.reason}`)}
+            />
+          )}
+        </div>
+      )}
+
       {/* 프로토 .scr — 좌 260px 트리 카드 + 우 상세 카드 */}
       <div className="grid items-start grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]" style={{ gap: 14 }}>
         <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow proto-tree">
+          {/* 통합 검색 — 제목·URL·JSP·주석 매칭(?q= 이관, 히스토리 오염 방지 replace) */}
+          <div style={{ padding: "8px 8px 4px" }}>
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setParam("q", e.target.value || null, true)}
+              placeholder="화면·URL·항목 검색"
+              className="w-full rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
+              style={{ padding: "6px 10px", fontSize: 12.5 }}
+            />
+          </div>
           {groups.map(([domain, screens]) => (
             <div key={domain}>
               <div className="fold">{DOMAIN_LABEL[domain] ?? domain} ({screens.length})</div>
@@ -291,15 +431,13 @@ export default function ScreenSpecView() {
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => {
-                    setSelId(s.id);
-                    setEditing(false);
-                    setHoverKey(null);
-                  }}
+                  onClick={() => setParam("screen", s.id)}
                   className={`doc ${s.id === sel.id ? "on" : ""}`}
                   title={s.scenario ? `시나리오 ${s.scenario} 로 도달` : undefined}
                 >
-                  <span className="truncate" style={{ minWidth: 0 }}>{title(s)}</span>
+                  <span className="truncate" style={{ minWidth: 0 }}>
+                    <Highlight text={title(s)} q={ql} />
+                  </span>
                   {overrides[s.id]?.confirmed && (
                     <span className="st"><Badge tone="ok">확정</Badge></span>
                   )}
@@ -307,26 +445,9 @@ export default function ScreenSpecView() {
               ))}
             </div>
           ))}
-          {(file.missing.length > 0 || file.unmatchedJsps.length > 0) && (
-            <div style={{ marginTop: 8, borderTop: "1px solid var(--color-border-subtle)", paddingTop: 8 }}>
-              {file.unmatchedJsps.length > 0 && (
-                <div className="flex items-center gap-2" style={{ padding: "4px 8px", fontSize: 12 }} title={file.unmatchedJsps.join("\n")}>
-                  <span className="text-text-muted">미매핑 JSP {file.unmatchedJsps.length}건</span>
-                  <span className="ml-auto"><Badge tone="warn">확인</Badge></span>
-                </div>
-              )}
-              {file.missing.length > 0 && (
-                <details style={{ padding: "4px 8px", fontSize: 12 }}>
-                  <summary className="cursor-pointer text-text-muted">도달 실패 보고 {file.missing.length}건</summary>
-                  <ul style={{ marginTop: 4 }} className="space-y-0.5 text-text-muted">
-                    {file.missing.map((m) => (
-                      <li key={m.url + m.reason} className="break-all" style={{ fontSize: 11 }}>
-                        {m.url} — {m.reason}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              )}
+          {groups.length === 0 && (
+            <div className="text-text-muted" style={{ padding: "8px 10px", fontSize: 12 }}>
+              검색 결과 없음
             </div>
           )}
         </div>
@@ -345,6 +466,15 @@ export default function ScreenSpecView() {
               <b className="text-text-primary" style={{ fontSize: 15 }}>{title(sel)}</b>
             )}
             <span className="text-text-muted break-all" style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{sel.url}</span>
+            {sel.graphNodeId && (
+              <Link
+                to={`/structure?node=${encodeURIComponent(sel.graphNodeId)}`}
+                className="whitespace-nowrap font-semibold hover:underline"
+                style={{ fontSize: 11.5, color: "var(--color-status-info)", textDecoration: "none" }}
+              >
+                구조 탭에서 보기 →
+              </Link>
+            )}
             {selOv?.confirmed ? <TrustBadge confirmedBy={selOv.approver} /> : <Badge tone="info">초안</Badge>}
             <div className="flex-1" />
             {saveError && <span style={{ fontSize: 11, color: "var(--color-status-warn)" }}>저장 실패: {saveError}</span>}
@@ -364,23 +494,29 @@ export default function ScreenSpecView() {
               )
             )}
           </div>
-          {/* .dmeta — 렌더 JSP · 시나리오 */}
+          {/* .dmeta — 렌더 JSP · 시나리오 · 진입 경로 */}
           <div className="text-text-muted" style={{ fontSize: 12, marginBottom: 12 }}>
             {sel.jspFile && <>렌더 JSP: <span style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{sel.jspFile}</span></>}
             {sel.jspFile && sel.scenario && " · "}
             {sel.scenario && <>시나리오: {sel.scenario}</>}
+            {(sel.jspFile || sel.scenario) && sel.openedFrom && " · "}
+            {sel.openedFrom && <>진입 경로: {sel.openedFrom}</>}
           </div>
           {sel.summary && (
             <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 12 }}>
               {sel.summary.text}
               <span style={{ marginLeft: 6 }}>
-                <ConfBadge kind={CONF_KIND[sel.summary.confidence] ?? "est"} label={CONFIDENCE_LABEL[sel.summary.confidence]} />
+                <ConfBadge
+                  kind={mechConf(sel.summary.confidence).kind}
+                  label={mechConf(sel.summary.confidence).label}
+                  title={mechConf(sel.summary.confidence).title}
+                />
               </span>
             </p>
           )}
 
           {/* 배지 색상 키 */}
-          <div className="flex items-center gap-4 text-text-muted" style={{ fontSize: 11, marginBottom: 12 }}>
+          <div className="flex items-center gap-4 text-text-muted" style={{ fontSize: 11, marginBottom: 10 }}>
             {KIND_ORDER.filter((k) => k !== "region").map((k) => (
               <span key={k} className="inline-flex items-center gap-1.5">
                 <span
@@ -401,48 +537,87 @@ export default function ScreenSpecView() {
             ))}
           </div>
 
-          {/* 캡처 + 배지 오버레이 */}
-          <div
-            className="relative border border-border-medium rounded-lg overflow-hidden bg-white"
-            style={{ maxWidth: sel.capture.width }}
-          >
-            <img
-              src={imgSrc(sel)}
-              alt={title(sel)}
-              className="block w-full h-auto select-none"
-              draggable={false}
-            />
-            {visibleAnns.map((a) => {
-              const key = annKey(a);
-              const active = hoverKey === key;
-              const st = kindStyle(a.kind);
+          {/* 신뢰도 카운트 요약 — 스케일 대비 상단 집계(전부 기계 판정) */}
+          <div className="flex items-center flex-wrap gap-2 text-text-muted" style={{ fontSize: 11, marginBottom: 12 }}>
+            <span>동작 신뢰도</span>
+            {CONF_ORDER.filter((c) => (confCounts.get(c) ?? 0) > 0).map((c) => {
+              const mc = mechConf(c);
               return (
-                <span
-                  key={key}
-                  onMouseEnter={() => setHoverKey(key)}
-                  onMouseLeave={() => setHoverKey(null)}
-                  title={`${merged(a).label} — ${merged(a).description ?? ""}`}
-                  className="absolute flex items-center justify-center rounded-full font-bold cursor-default transition-transform"
-                  style={{
-                    left: `${((a.bbox.x + a.bbox.width) / sel.capture.width) * 100}%`,
-                    top: `${(a.bbox.y / sel.capture.height) * 100}%`,
-                    transform: `translate(-50%, -50%) scale(${active ? 1.4 : 1})`,
-                    width: 20,
-                    height: 20,
-                    fontSize: 13,
-                    lineHeight: "20px",
-                    background: st.bg,
-                    color: st.fg,
-                    border: `1.5px solid ${st.border}`,
-                    boxShadow: active ? "0 0 0 2px #fff, 0 0 6px rgba(0,0,0,0.5)" : "0 0 2px rgba(0,0,0,0.6)",
-                    zIndex: active ? 10 : 1,
-                  }}
-                >
-                  {badgeGlyph(a.kind, a.no)}
+                <span key={c} className="inline-flex items-center gap-1">
+                  <ConfBadge kind={mc.kind} label={mc.label} title={mc.title} />
+                  <b className="text-text-secondary tabular-nums">{confCounts.get(c)}</b>
                 </span>
               );
             })}
+            {confCounts.size === 0 && <span>—</span>}
+            {noHandler > 0 && (
+              <span className="inline-flex items-center gap-1" title="핸들러가 없는 항목(입력 필드 등)">
+                · 핸들러 없음 <b className="text-text-secondary tabular-nums">{noHandler}</b>
+              </span>
+            )}
           </div>
+
+          {/* 캡처 + 배지 오버레이 (로드 실패 시 경로 폴백 카드) */}
+          {imgError ? (
+            <div
+              className="rounded-lg border border-border-medium bg-panel text-text-muted"
+              style={{ padding: "24px 20px", fontSize: 12.5, lineHeight: 1.7 }}
+            >
+              캡처 이미지를 불러올 수 없습니다.
+              <div className="break-all" style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, marginTop: 6 }}>
+                {sel.capture.path}
+              </div>
+            </div>
+          ) : (
+            <div
+              className="relative border border-border-medium rounded-lg overflow-hidden bg-white"
+              style={{ maxWidth: sel.capture.width }}
+            >
+              <img
+                src={imgSrc(sel)}
+                alt={title(sel)}
+                className="block w-full h-auto select-none"
+                draggable={false}
+                onError={() => setImgError(true)}
+              />
+              {visibleAnns.map((a) => {
+                const key = annKey(a);
+                const active = hoverKey === key;
+                const st = kindStyle(a.kind);
+                const m = merged(a);
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onMouseEnter={() => setHoverKey(key)}
+                    onMouseLeave={() => setHoverKey(null)}
+                    onFocus={() => setHoverKey(key)}
+                    onBlur={() => setHoverKey(null)}
+                    onClick={() => setHoverKey(key)}
+                    aria-label={`${badgeGlyph(a.kind, a.no)} ${m.label}${m.description ? ` — ${m.description}` : ""}`}
+                    title={`${m.label} — ${m.description ?? ""}`}
+                    className="absolute flex items-center justify-center rounded-full font-bold cursor-pointer transition-transform p-0"
+                    style={{
+                      left: `${((a.bbox.x + a.bbox.width) / sel.capture.width) * 100}%`,
+                      top: `${(a.bbox.y / sel.capture.height) * 100}%`,
+                      transform: `translate(-50%, -50%) scale(${active ? 1.4 : 1})`,
+                      width: 20,
+                      height: 20,
+                      fontSize: 13,
+                      lineHeight: "20px",
+                      background: st.bg,
+                      color: st.fg,
+                      border: `1.5px solid ${st.border}`,
+                      boxShadow: active ? "0 0 0 2px #fff, 0 0 6px rgba(0,0,0,0.5)" : "0 0 2px rgba(0,0,0,0.6)",
+                      zIndex: active ? 10 : 1,
+                    }}
+                  >
+                    {badgeGlyph(a.kind, a.no)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* 범례 표 — 프로토 .tbl */}
           <div className="overflow-x-auto" style={{ marginTop: 14 }}>
@@ -462,14 +637,13 @@ export default function ScreenSpecView() {
                 {KIND_ORDER.flatMap((kind) => {
                   const rows = visibleAnns.filter((a) => a.kind === kind);
                   if (rows.length === 0) return [];
-                  const st = kindStyle(kind);
                   const header = (
                     <tr key={`sec:${kind}`}>
                       <td colSpan={7} style={{ paddingTop: 12, paddingBottom: 4, borderBottom: "none" }}>
                         <span className="inline-flex items-center gap-1.5 font-semibold text-text-secondary" style={{ fontSize: 11 }}>
                           <span
                             className="inline-block w-2.5 h-2.5 rounded-full"
-                            style={{ background: st.swatch }}
+                            style={{ background: kindSwatch(kind) }}
                           />
                           {KIND_SECTION[kind] ?? kind} ({rows.length})
                         </span>
@@ -487,7 +661,7 @@ export default function ScreenSpecView() {
                         onMouseLeave={() => setHoverKey(null)}
                         style={hoverKey === key ? { background: "color-mix(in srgb, var(--color-accent) 7%, transparent)" } : undefined}
                       >
-                        <td className="font-semibold" style={{ color: kindStyle(a.kind).swatch }}>
+                        <td className="font-semibold" style={{ color: kindSwatch(a.kind) }}>
                           {badgeGlyph(a.kind, a.no)}
                         </td>
                         <td className="text-text-muted">{KIND_LABEL[a.kind] ?? a.kind}</td>
@@ -504,13 +678,16 @@ export default function ScreenSpecView() {
                             </div>
                           )}
                           {a.handler?.evidence.map((ev) => (
-                            <code
+                            <button
                               key={`${ev.file}:${ev.line}`}
-                              className="inline-block mt-0.5 mr-1 px-1 rounded bg-elevated text-text-muted break-all"
-                              style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}
+                              type="button"
+                              onClick={() => openCodeViewerAt(ev.file, ev.line)}
+                              title="코드 뷰어에서 열기"
+                              className="inline-block mt-0.5 mr-1 px-1 rounded bg-elevated break-all cursor-pointer border-0"
+                              style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)" }}
                             >
                               {ev.file}:{ev.line}
-                            </code>
+                            </button>
                           ))}
                         </td>
                         <td className="text-text-secondary">
@@ -541,12 +718,11 @@ export default function ScreenSpecView() {
                           )}
                         </td>
                         <td>
-                          {a.handler && (
-                            <ConfBadge
-                              kind={CONF_KIND[a.handler.confidence] ?? "est"}
-                              label={CONFIDENCE_LABEL[a.handler.confidence]}
-                            />
-                          )}
+                          {a.handler &&
+                            (() => {
+                              const mc = mechConf(a.handler.confidence);
+                              return <ConfBadge kind={mc.kind} label={mc.label} title={mc.title} />;
+                            })()}
                         </td>
                       </tr>
                     );

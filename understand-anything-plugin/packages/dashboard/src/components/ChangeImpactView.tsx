@@ -1,17 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
 import { Badge, BtnAccent, Ev, PageHead, StatTile } from "./proto/Proto";
+import type { BadgeTone } from "./proto/Proto";
 
 /**
  * 변경 · 영향 분석 뷰(pmpl-proto pg-change 정합) — impact.json 을 CR 단위 화면으로 승격한다.
- * 구조 그래프의 색칠 오버레이로만 소비되던 상·하류 도달성(seeds·needsReview·viaKinds 분해)을
- * 그대로 노출하고 변경영향분석서(05)/구조 오버레이로 연결한다.
+ * 구조 그래프의 색칠 오버레이로만 소비되던 상·하류 도달성(seeds·needsReview·viaKinds 분해)에 더해
+ * 진입점(라우트)·도메인·플로우·영속성(매퍼/테이블) 영향까지 그대로 노출하고,
+ * 변경영향분석서(09)/구조 오버레이(?overlay=impact)/도메인 딥링크로 연결한다.
  *
  * 데이터: dev 서버 GET /impact.json (토큰 게이트). 이 파일은 CR 원장이 아니라 최신 분석 1건이므로
- * 좌측 트리는 "분석 결과 (1)" 만 정직하게 표기한다. 404 → 빈 상태 카드.
+ * 좌측 트리는 "분석 결과 (1)" 만 정직하게 표기한다. 404 → 빈 상태, 그 외 실패 → 오류 상태.
+ * 검증: impact-verify-report.json 이 있으면 GROUNDED 근거를 표면화(부재 시 미표기 — 정직).
  */
 interface Citation {
   filePath: string;
@@ -35,6 +38,64 @@ interface Seed {
 interface NeedsReviewItem {
   reason: string;
   ref: string;
+  /** 선택 — 미지정/그 외는 경고(warn), "info" 는 무해 참고. UnresolvedBanner 규약과 동일. */
+  severity?: string;
+}
+
+/** upstream.api — 영향받는 진입점(라우트). */
+interface ApiRoute {
+  id: string;
+  filePath: string;
+  line: number;
+  handler: string;
+  targetKind: string;
+  via: string;
+  confidence: string;
+}
+
+/** upstream.domains — 영향 도메인(진입점 기반 추정). */
+interface DomainRef {
+  domainId: string;
+  key: string;
+  name: string;
+  confidence: string;
+}
+
+/** upstream.flows — 영향 플로우(진입점 기반 추정). */
+interface FlowRef {
+  flowId: string;
+  routeId: string;
+  domainId: string;
+  domainKey: string;
+  domainName: string;
+  confidence: string;
+  via: string;
+}
+
+interface MapperRef {
+  namespace: string;
+  relPath: string;
+  owners: string[];
+  citation: Citation | null;
+}
+
+interface TableCatalogEntry {
+  name: string;
+  filePath: string;
+  startLine: number | null;
+  endLine: number | null;
+}
+
+interface TableSlot {
+  mapperRelPath: string;
+  sqlSlice: { filePath: string; startLine: number; endLine: number };
+}
+
+interface Persistence {
+  mappers?: MapperRef[];
+  kgTableCatalog?: TableCatalogEntry[];
+  tableCandidateSlots?: TableSlot[];
+  note?: string;
 }
 
 interface ImpactData {
@@ -43,17 +104,44 @@ interface ImpactData {
   fanInThreshold: number;
   edgeKinds: string[];
   seeds: Seed[];
-  upstream: { files: ImpactFile[] };
+  upstream: {
+    files: ImpactFile[];
+    api?: ApiRoute[];
+    domains?: DomainRef[];
+    flows?: FlowRef[];
+    persistence?: Persistence;
+  };
   downstream: { files: ImpactFile[] };
   needsReview: NeedsReviewItem[];
+  overEdges?: { importOnlyCount?: number };
 }
 
-type Status = "loading" | "ready" | "empty";
+interface VerifyItem {
+  ref: string;
+  kind: string;
+  verdict: string;
+}
+
+interface VerifyReport {
+  items: VerifyItem[];
+  overall: {
+    citationOk: number;
+    citationTotal: number;
+    groundedPct: number;
+    itemGrounded: number;
+    itemTotal: number;
+    uncitedClaims: number;
+  };
+}
+
+type Status = "loading" | "ready" | "empty" | "error";
 
 /** relPath 를 마지막 2세그먼트로 축약(전체는 title 로). */
 const short2 = (p: string): string => p.split("/").slice(-2).join("/");
 /** citation 근거는 파일명만 노출. */
 const baseName = (p: string): string => p.split("/").pop() ?? p;
+/** flowId → 사람이 읽는 라우트 표기("flow:ANY /x" → "/x"). */
+const shortFlow = (id: string): string => id.replace(/^flow:/, "").replace(/^ANY\s+/, "");
 
 const CARD = "rounded-[10px] border border-border-subtle bg-panel card-shadow";
 const GRP_LABEL: CSSProperties = {
@@ -74,6 +162,22 @@ const PANEL_H3: CSSProperties = {
   fontWeight: 700,
   color: "var(--color-text-primary)",
   marginBottom: 8,
+};
+const CHIP: CSSProperties = {
+  fontFamily: "var(--font-mono)",
+  fontSize: 12,
+  padding: "3px 8px",
+  borderRadius: 6,
+  background: "var(--color-elevated)",
+  color: "var(--color-text-secondary)",
+  textDecoration: "none",
+  border: "1px solid var(--color-border-subtle)",
+};
+
+/** 검증 verdict → 배지(GROUNDED = 근거확보, 그 외 = 확인 필요). */
+const VERDICT: Record<string, { label: string; tone: BadgeTone }> = {
+  GROUNDED: { label: "근거확보", tone: "ok" },
+  NEEDS_REVIEW: { label: "확인 필요", tone: "warn" },
 };
 
 /** viaKinds 조합별 그룹(정렬은 minDepth 오름차순 → 첫 등장 순서 = 얕은 깊이 우선). */
@@ -103,7 +207,39 @@ function LinkBtn({ to, children, title }: { to: string; children: ReactNode; tit
   );
 }
 
-function FileRow({ f }: { f: ImpactFile }) {
+/** file:line 근거 → 코드 뷰어 오픈(citation null 은 호출 측에서 폴백 처리). */
+function CiteBtn({
+  filePath,
+  line,
+  label,
+  onOpen,
+}: {
+  filePath: string;
+  line: number;
+  label?: string;
+  onOpen: (filePath: string, line: number) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(filePath, line)}
+      title={`${filePath}:${line}`}
+      className="cursor-pointer bg-transparent border-0 hover:underline"
+      style={{
+        font: "inherit",
+        fontFamily: "var(--font-mono)",
+        fontSize: 11,
+        color: "var(--color-status-info)",
+        flex: "none",
+        padding: 0,
+      }}
+    >
+      {label ?? `근거 ${baseName(filePath)}:${line}`}
+    </button>
+  );
+}
+
+function FileRow({ f, onOpen }: { f: ImpactFile; onOpen: (filePath: string, line: number) => void }) {
   return (
     <div className="flex items-center gap-2" style={ROW}>
       <span
@@ -114,9 +250,7 @@ function FileRow({ f }: { f: ImpactFile }) {
         {short2(f.relPath)}
       </span>
       {f.citation ? (
-        <Ev style={{ flex: "none" }}>
-          근거 {baseName(f.citation.filePath)}:{f.citation.line}
-        </Ev>
+        <CiteBtn filePath={f.citation.filePath} line={f.citation.line} onOpen={onOpen} />
       ) : (
         <Ev style={{ flex: "none" }}>근거 위치 미상</Ev>
       )}
@@ -128,7 +262,15 @@ function FileRow({ f }: { f: ImpactFile }) {
 }
 
 /** 그룹 렌더 + 상위 limit 행 캡. 초과분은 "외 n건" 으로 정직하게 표기(침묵 누락 금지). */
-function FileGroups({ files, limit }: { files: ImpactFile[]; limit: number }) {
+function FileGroups({
+  files,
+  limit,
+  onOpen,
+}: {
+  files: ImpactFile[];
+  limit: number;
+  onOpen: (filePath: string, line: number) => void;
+}) {
   const groups = groupByVia(files);
   const out: ReactNode[] = [];
   let shown = 0;
@@ -145,7 +287,7 @@ function FileGroups({ files, limit }: { files: ImpactFile[]; limit: number }) {
           <span style={{ fontFamily: "var(--font-mono)" }}>{key}</span> ({gfiles.length})
         </div>
         {take.map((f) => (
-          <FileRow key={f.relPath} f={f} />
+          <FileRow key={f.relPath} f={f} onOpen={onOpen} />
         ))}
       </div>,
     );
@@ -162,42 +304,153 @@ function FileGroups({ files, limit }: { files: ImpactFile[]; limit: number }) {
   );
 }
 
+/** needsReview 배너 — reason 그룹핑 fold + severity(warn/info) 분리(UnresolvedBanner 패턴 로컬 복제). */
+function ReviewFold({ tone, title, sub, items }: { tone: "warn" | "info"; title: string; sub: string; items: NeedsReviewItem[] }) {
+  const [open, setOpen] = useState(false);
+  const borderColor = tone === "warn" ? "var(--color-status-warn)" : "var(--color-border-medium)";
+  const groups = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const it of items) m.set(it.reason, [...(m.get(it.reason) ?? []), it.ref]);
+    return [...m.entries()].map(([reason, refs]) => ({ reason, refs }));
+  }, [items]);
+  return (
+    <div
+      className="rounded-lg border border-border-subtle bg-panel"
+      style={{ borderLeft: `3px solid ${borderColor}`, padding: "8px 14px", marginBottom: 10 }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 w-full text-left cursor-pointer bg-transparent border-0"
+        style={{ font: "inherit" }}
+      >
+        <span style={{ fontSize: 9, width: 10 }}>{open ? "▾" : "▸"}</span>
+        <span className="text-text-primary" style={{ fontSize: 13, fontWeight: 650 }}>
+          {title}
+        </span>
+        <span className="text-text-muted" style={{ fontSize: 12 }}>
+          {sub}
+        </span>
+      </button>
+      {open && (
+        <div style={{ margin: "8px 0 4px", paddingLeft: 20 }}>
+          {groups.map((g) => (
+            <div key={g.reason} style={{ marginBottom: 6 }}>
+              <div className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.5 }}>
+                {g.reason} <span className="text-text-muted">×{g.refs.length}</span>
+              </div>
+              <ul style={{ margin: "2px 0 0", paddingLeft: 16 }}>
+                {g.refs.map((ref) => (
+                  <li key={ref} style={{ marginBottom: 1 }}>
+                    <Ev>{ref}</Ev>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ChangeImpactView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
   const openImpactModal = useDashboardStore((s) => s.openImpactModal);
+  const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
+  const [searchParams, setSearchParams] = useSearchParams();
   const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
   const dataBase = import.meta.env.BASE_URL;
   const tokenQ = accessToken && !DEMO_MODE ? `?token=${encodeURIComponent(accessToken)}` : "";
 
   const [data, setData] = useState<ImpactData | null>(null);
+  const [verify, setVerify] = useState<VerifyReport | null>(null);
   const [status, setStatus] = useState<Status>("loading");
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     let alive = true;
     setStatus("loading");
+    setVerify(null);
+    // 필수 — impact.json. 404 는 "아직 분석 없음"(빈 상태), 그 외 실패는 오류 상태로 구분.
     fetch(`${dataBase}impact.json${tokenQ}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((d: ImpactData) => {
+      .then(async (r) => {
+        if (r.status === 404) return { kind: "empty" as const };
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const d = (await r.json()) as ImpactData;
+        if (d && Array.isArray(d.seeds) && d.downstream && d.upstream) return { kind: "ok" as const, d };
+        return { kind: "empty" as const };
+      })
+      .then((res) => {
         if (!alive) return;
-        if (d && Array.isArray(d.seeds) && d.downstream && d.upstream) {
-          setData(d);
+        if (res.kind === "ok") {
+          setData(res.d);
           setStatus("ready");
         } else {
           setStatus("empty");
         }
       })
-      .catch(() => {
-        if (alive) setStatus("empty");
+      .catch((e: unknown) => {
+        if (!alive) return;
+        setErrorMsg(e instanceof Error ? e.message : String(e));
+        setStatus("error");
       });
+    // 선택 — 검증 리포트. 부재/실패는 조용히 무시(정직: 없으면 미표기).
+    fetch(`${dataBase}impact-verify-report.json${tokenQ}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((v: VerifyReport | null) => {
+        if (alive && v && Array.isArray(v.items) && v.overall) setVerify(v);
+      })
+      .catch(() => {});
     return () => {
       alive = false;
     };
   }, [dataBase, tokenQ]);
 
+  const verdictOf = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const it of verify?.items ?? []) m.set(it.ref, it.verdict);
+    return m;
+  }, [verify]);
+
+  // 영향받는 파일 검색·필터 — ?q=(파일 경로) & ?via=(viaKind). 검색 활성 시 limit 캡 해제(전량 도달).
+  const upFiles = useMemo(() => data?.upstream.files ?? [], [data]);
+  const downFiles = useMemo(() => data?.downstream.files ?? [], [data]);
+  const allVias = useMemo(() => {
+    const set = new Set<string>();
+    for (const f of [...upFiles, ...downFiles]) for (const v of f.viaKinds) set.add(v);
+    return [...set].sort();
+  }, [upFiles, downFiles]);
+
+  const q = (searchParams.get("q") ?? "").trim().toLowerCase();
+  const viaParam = searchParams.get("via");
+  const viaFilter = viaParam && allVias.includes(viaParam) ? viaParam : null;
+  const searchActive = q.length > 0 || viaFilter != null;
+
+  const filterFiles = (files: ImpactFile[]): ImpactFile[] =>
+    files.filter((f) => {
+      if (q && !f.relPath.toLowerCase().includes(q)) return false;
+      if (viaFilter && !f.viaKinds.includes(viaFilter)) return false;
+      return true;
+    });
+  const downView = filterFiles(downFiles);
+  const upView = filterFiles(upFiles);
+  const rowLimit = searchActive ? Number.POSITIVE_INFINITY : 12;
+
+  const setParam = (k: string, v: string | null, replace = false) =>
+    setSearchParams(
+      (prev) => {
+        if (v) prev.set(k, v);
+        else prev.delete(k);
+        return prev;
+      },
+      { replace },
+    );
+
   const head = (
     <PageHead
       title="변경 · 영향 분석"
-      meta="impact.json · CR 단위 상·하류 도달성 — 변경영향분석서(05)의 원천"
+      meta="impact.json · CR 단위 상·하류 도달성 — 변경영향분석서(09)의 원천"
       actions={<BtnAccent onClick={openImpactModal}>자연어 영향 분석</BtnAccent>}
     />
   );
@@ -210,6 +463,18 @@ export default function ChangeImpactView() {
           <p className="text-text-muted" style={{ fontSize: 13, padding: "4px 2px" }}>
             불러오는 중…
           </p>
+        ) : status === "error" ? (
+          <div
+            className={CARD}
+            style={{ padding: "20px 24px", borderLeft: "3px solid var(--color-status-error)" }}
+          >
+            <p className="text-text-primary" style={{ fontSize: 13.5, fontWeight: 650, marginBottom: 6 }}>
+              영향 분석을 불러오지 못했습니다
+            </p>
+            <p className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.6 }}>
+              사유: <code>{errorMsg}</code> — 네트워크 또는 접근 토큰을 확인한 뒤 새로고침하세요.
+            </p>
+          </div>
         ) : (
           <div className={CARD} style={{ padding: "28px", textAlign: "center" }}>
             <p className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
@@ -222,8 +487,32 @@ export default function ChangeImpactView() {
   }
 
   const sha7 = data.gitCommit.slice(0, 7);
-  const upFiles = data.upstream.files;
-  const downFiles = data.downstream.files;
+  const api = data.upstream.api ?? [];
+  const domains = data.upstream.domains ?? [];
+  const flows = data.upstream.flows ?? [];
+  const persistence = data.upstream.persistence;
+  const mappers = persistence?.mappers ?? [];
+  const importOnly = data.overEdges?.importOnlyCount ?? 0;
+
+  const slotMap = new Map<string, TableSlot["sqlSlice"]>();
+  for (const s of persistence?.tableCandidateSlots ?? []) slotMap.set(s.mapperRelPath, s.sqlSlice);
+
+  // kgTableCatalog 는 대/소문자·파일 플레이스홀더 중복 → 테이블명 기준 dedup(첫 등장 유지).
+  const tables: TableCatalogEntry[] = [];
+  {
+    const seen = new Set<string>();
+    for (const t of persistence?.kgTableCatalog ?? []) {
+      if (/\.sql$/i.test(t.name)) continue;
+      const key = t.name.toUpperCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      tables.push(t);
+    }
+    tables.sort((a, b) => a.name.toUpperCase().localeCompare(b.name.toUpperCase()));
+  }
+
+  const warnReview = data.needsReview.filter((r) => r.severity !== "info");
+  const infoReview = data.needsReview.filter((r) => r.severity === "info");
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
@@ -258,8 +547,8 @@ export default function ChangeImpactView() {
               </b>
               <Badge tone="ok">분석 완료</Badge>
               <div className="flex-1" />
-              <LinkBtn to="/deliverables/09_impact-analysis">변경영향분석서(05) 보기</LinkBtn>
-              <LinkBtn to="/structure">그래프 오버레이 →</LinkBtn>
+              <LinkBtn to="/deliverables/09_impact-analysis">변경영향분석서(09) 보기</LinkBtn>
+              <LinkBtn to="/structure?overlay=impact">그래프 오버레이 →</LinkBtn>
             </div>
             <div style={{ marginTop: 12 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
@@ -267,11 +556,11 @@ export default function ChangeImpactView() {
               </div>
               <div className="flex flex-wrap" style={{ gap: 6 }}>
                 {data.seeds.map((s) => {
-                  const fixed = s.confidence === "CONFIRMED";
+                  const grounded = s.confidence === "CONFIRMED";
                   return (
                     <span
                       key={s.relPath}
-                      title={s.relPath}
+                      title={`${s.relPath} · origin=${s.origin} · ${grounded ? "근거확보" : "추정"}(기계 판정)`}
                       className="inline-flex items-center"
                       style={{
                         gap: 6,
@@ -288,14 +577,17 @@ export default function ChangeImpactView() {
                         style={{
                           fontSize: 10.5,
                           fontWeight: 700,
-                          color: fixed ? "var(--color-status-ok)" : "var(--color-status-warn)",
+                          color: grounded ? "var(--color-status-ok)" : "var(--color-status-warn)",
                         }}
                       >
-                        [{fixed ? "확정" : "추정"}]
+                        {grounded ? "근거확보" : "추정"}
                       </span>
                     </span>
                   );
                 })}
+              </div>
+              <div className="text-text-muted" style={{ fontSize: 11.5, marginTop: 6 }}>
+                시드 판정은 정적 분석 자동(기계 판정) — 사람 확정 아님
               </div>
             </div>
           </div>
@@ -308,26 +600,213 @@ export default function ChangeImpactView() {
             <StatTile label="엣지 종류" value={data.edgeKinds.length} small={`깊이 캡 ${data.depthCap}`} />
           </section>
 
+          {/* 검증 요약(선택) — impact-verify-report.json 이 있을 때만 근거 표면화 */}
+          {verify && (
+            <div
+              className={CARD}
+              style={{ padding: "10px 16px", marginBottom: 14, borderLeft: "3px solid var(--color-status-ok)" }}
+            >
+              <div className="flex items-center flex-wrap" style={{ gap: 10 }}>
+                <Badge tone="ok">검증</Badge>
+                <span className="text-text-secondary" style={{ fontSize: 12.5 }}>
+                  {verify.overall.itemGrounded}/{verify.overall.itemTotal} 항목 근거확보(GROUNDED) · 인용 정확{" "}
+                  {verify.overall.groundedPct}% ({verify.overall.citationOk}/{verify.overall.citationTotal})
+                </span>
+                <span className="text-text-muted" style={{ fontSize: 11.5 }}>
+                  — 미인용 주장 {verify.overall.uncitedClaims}건은 확인 필요
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* 영향받는 진입점(라우트) — upstream.api */}
+          {api.length > 0 && (
+            <div className={CARD} style={{ padding: "16px 18px", marginBottom: 14 }}>
+              <h3 style={PANEL_H3}>
+                영향받는 진입점 <span className="text-text-muted" style={{ fontWeight: 500 }}>({api.length})</span>
+              </h3>
+              {api.map((r) => {
+                const verdict = verdictOf.get(r.id);
+                const vb = verdict ? VERDICT[verdict] : undefined;
+                return (
+                  <div key={r.id} className="flex items-center gap-2" style={ROW}>
+                    <span
+                      className="truncate"
+                      title={r.id}
+                      style={{ fontFamily: "var(--font-mono)", fontSize: 12, minWidth: 0, flex: "1 1 auto", color: "var(--color-text-primary)" }}
+                    >
+                      {r.handler}
+                    </span>
+                    {vb && (
+                      <Badge tone={vb.tone} style={{ flex: "none" }}>
+                        {vb.label}
+                      </Badge>
+                    )}
+                    <CiteBtn filePath={r.filePath} line={r.line} onOpen={openCodeViewerAt} />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* 영향 도메인 · 플로우 — upstream.domains / upstream.flows (진입점 기반 추정) */}
+          {(domains.length > 0 || flows.length > 0) && (
+            <div className={CARD} style={{ padding: "16px 18px", marginBottom: 14 }}>
+              <h3 style={PANEL_H3}>영향 도메인 · 플로우</h3>
+              {domains.length > 0 && (
+                <>
+                  <div style={GRP_LABEL}>도메인 ({domains.length})</div>
+                  <div className="flex flex-wrap" style={{ gap: 6 }}>
+                    {domains.map((d) => (
+                      <Link key={d.domainId} to={`/domains/${encodeURIComponent(d.domainId)}`} title={d.domainId} style={CHIP}>
+                        {d.name}
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+              {flows.length > 0 && (
+                <>
+                  <div style={GRP_LABEL}>플로우 ({flows.length})</div>
+                  <div className="flex flex-wrap" style={{ gap: 6 }}>
+                    {flows.map((f) => (
+                      <Link
+                        key={f.flowId}
+                        to={`/domains/${encodeURIComponent(f.domainId)}?flow=${encodeURIComponent(f.flowId)}`}
+                        title={`${f.flowId} · ${f.domainName}`}
+                        style={CHIP}
+                      >
+                        {shortFlow(f.flowId)}
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+              <div className="text-text-muted" style={{ fontSize: 11.5, marginTop: 8 }}>
+                도메인·플로우는 진입점 기반 추정(기계 판정) — 칩 클릭 시 도메인 · 순서도로 이동
+              </div>
+            </div>
+          )}
+
+          {/* 건드리는 DB — 매퍼 + 테이블 카탈로그 (persistence) */}
+          {(mappers.length > 0 || tables.length > 0) && (
+            <div className={CARD} style={{ padding: "16px 18px", marginBottom: 14 }}>
+              <h3 style={PANEL_H3}>건드리는 DB</h3>
+              {mappers.length > 0 && (
+                <>
+                  <div style={GRP_LABEL}>매퍼 ({mappers.length})</div>
+                  {mappers.map((m) => {
+                    const slice = slotMap.get(m.relPath);
+                    return (
+                      <div key={m.relPath} className="flex items-center gap-2" style={ROW}>
+                        <span
+                          className="truncate"
+                          title={m.namespace}
+                          style={{ fontFamily: "var(--font-mono)", fontSize: 12, minWidth: 0, flex: "1 1 auto", color: "var(--color-text-primary)" }}
+                        >
+                          {baseName(m.relPath)}
+                        </span>
+                        <span className="text-text-muted" style={{ fontSize: 11, flex: "none" }}>
+                          소유자 {m.owners.length}
+                        </span>
+                        {slice ? (
+                          <CiteBtn
+                            filePath={slice.filePath}
+                            line={slice.startLine}
+                            label={`SQL ${slice.startLine}–${slice.endLine}행`}
+                            onOpen={openCodeViewerAt}
+                          />
+                        ) : m.citation ? (
+                          <CiteBtn filePath={m.citation.filePath} line={m.citation.line} onOpen={openCodeViewerAt} />
+                        ) : (
+                          <Ev style={{ flex: "none" }}>근거 위치 미상</Ev>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+              {tables.length > 0 && (
+                <>
+                  <div style={GRP_LABEL}>테이블 카탈로그 ({tables.length})</div>
+                  <div className="flex flex-wrap" style={{ gap: 6 }}>
+                    {tables.map((t) => (
+                      <button
+                        key={t.name}
+                        type="button"
+                        onClick={() => openCodeViewerAt(t.filePath, t.startLine ?? 1)}
+                        title={`${t.filePath}:${t.startLine ?? 1}`}
+                        className="cursor-pointer hover:bg-elevated"
+                        style={{ ...CHIP, font: "inherit", fontFamily: "var(--font-mono)", fontSize: 12 }}
+                      >
+                        {t.name}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="text-text-muted" style={{ fontSize: 11.5, marginTop: 8, lineHeight: 1.5 }}>
+                    테이블은 census 인벤토리 후보 — 매퍼 XML의 실제 접근 컬럼은 SQL 슬라이스에서 확인하세요.
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           {/* 2컬럼 패널 */}
           <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: 14 }}>
             {/* 좌 — 영향 분해 (하류 + 상류, viaKinds 그룹) */}
             <div className={CARD} style={{ padding: "16px 18px" }}>
               <h3 style={PANEL_H3}>영향 분해</h3>
-              {downFiles.length === 0 && upFiles.length === 0 ? (
+
+              {/* 툴바 — 파일 검색 + viaKind 필터(?q=&via=). 검색 활성 시 12행 캡 해제(전량 도달). */}
+              <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 10 }}>
+                <input
+                  type="search"
+                  value={searchParams.get("q") ?? ""}
+                  onChange={(e) => setParam("q", e.target.value || null, true)}
+                  placeholder="파일 경로 검색"
+                  className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
+                  style={{ padding: "6px 12px", fontSize: 12.5, width: 170 }}
+                />
+                <select
+                  value={viaFilter ?? ""}
+                  onChange={(e) => setParam("via", e.target.value || null)}
+                  className="rounded-lg border border-border-medium bg-panel text-text-secondary"
+                  style={{ padding: "6px 10px", fontSize: 12.5 }}
+                >
+                  <option value="">경로 종류 전체</option>
+                  {allVias.map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+                {searchActive && (
+                  <span className="text-text-muted" style={{ fontSize: 12 }}>
+                    {downView.length + upView.length}건 표시 중
+                  </span>
+                )}
+              </div>
+
+              {downView.length === 0 && upView.length === 0 ? (
                 <p className="text-text-muted" style={{ fontSize: 12.5, padding: "4px 2px" }}>
-                  영향 파일 없음
+                  {searchActive ? "검색·필터에 맞는 영향 파일 없음" : "영향 파일 없음"}
                 </p>
               ) : (
                 <>
-                  {downFiles.length > 0 && <FileGroups files={downFiles} limit={12} />}
-                  {upFiles.length > 0 && (
+                  {downView.length > 0 && <FileGroups files={downView} limit={rowLimit} onOpen={openCodeViewerAt} />}
+                  {upView.length > 0 && (
                     <>
-                      <div style={GRP_LABEL}>상류 ({upFiles.length})</div>
-                      <FileGroups files={upFiles} limit={12} />
+                      <div style={GRP_LABEL}>상류 ({upView.length})</div>
+                      <FileGroups files={upView} limit={rowLimit} onOpen={openCodeViewerAt} />
                     </>
                   )}
                 </>
               )}
+
+              <div className="text-text-muted" style={{ fontSize: 11.5, padding: "10px 2px 0", lineHeight: 1.5 }}>
+                d = 시드로부터 도달 깊이 · 근거(file:line) 클릭 시 코드 열람
+                {importOnly > 0 && ` · import 전용 간선 ${importOnly}건은 도달성에서 제외됨`}
+              </div>
             </div>
 
             {/* 우 — 확인 필요 · 후속 조치 */}
@@ -338,35 +817,30 @@ export default function ChangeImpactView() {
                   확인 필요 항목 없음
                 </p>
               ) : (
-                data.needsReview.map((nr, i) => (
-                  <div
-                    key={`${nr.ref}-${i}`}
-                    className="flex items-start gap-2"
-                    style={{
-                      padding: "8px 10px",
-                      marginBottom: 8,
-                      borderRadius: 8,
-                      background: "color-mix(in srgb, var(--color-status-warn) 8%, transparent)",
-                      border: "1px solid color-mix(in srgb, var(--color-status-warn) 25%, transparent)",
-                    }}
-                  >
-                    <Badge tone="warn" style={{ flex: "none", marginTop: 1 }}>
-                      needsReview
-                    </Badge>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 12.5, color: "var(--color-text-secondary)", lineHeight: 1.5 }}>
-                        {nr.reason}
-                      </div>
-                      <Ev>{nr.ref}</Ev>
-                    </div>
-                  </div>
-                ))
+                <>
+                  {warnReview.length > 0 && (
+                    <ReviewFold
+                      tone="warn"
+                      title={`확인 필요 ${warnReview.length}건`}
+                      sub="— 정합 확인이 필요한 신호"
+                      items={warnReview}
+                    />
+                  )}
+                  {infoReview.length > 0 && (
+                    <ReviewFold
+                      tone="info"
+                      title={`참고 ${infoReview.length}건`}
+                      sub="— 무해 신호"
+                      items={infoReview}
+                    />
+                  )}
+                </>
               )}
 
               <div style={GRP_LABEL}>영향 산출물</div>
               <div className="flex items-center gap-2" style={ROW}>
                 <span style={{ fontSize: 13, color: "var(--color-text-primary)", flex: "1 1 auto" }}>
-                  변경영향분석서(05)
+                  변경영향분석서(09)
                 </span>
                 <Link to="/deliverables/09_impact-analysis" style={LINK_TEXT}>
                   보기 →
@@ -376,7 +850,7 @@ export default function ChangeImpactView() {
                 <span style={{ fontSize: 13, color: "var(--color-text-primary)", flex: "1 1 auto" }}>
                   구조 그래프 오버레이
                 </span>
-                <Link to="/structure" style={LINK_TEXT}>
+                <Link to="/structure?overlay=impact" style={LINK_TEXT}>
                   열기 →
                 </Link>
               </div>

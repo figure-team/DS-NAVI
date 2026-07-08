@@ -47,10 +47,51 @@ export function businessFlowRejectedReason(node: GraphNode | undefined): string 
   return typeof meta?.businessFlowRejected === "string" ? meta.businessFlowRejected : null;
 }
 
-/** domainMeta.businessFlow → BizFlow. 형태가 어긋나면 null(폴백 경로로). */
+/**
+ * B안(복수화): 단위 업무 프로세스 1건 — domainMeta.businessFlows[] 의 원소.
+ * `index` 는 파싱 생존분 기준 표시 순서(딥링크 `?bf=` 의 기준), `title` 은
+ * 프로세스 이름(레거시 단수 산출물은 무제목 → null, UI 가 기본 라벨을 붙인다).
+ */
+export interface BizProcess {
+  index: number;
+  title: string | null;
+  flow: BizFlow;
+}
+
+/**
+ * domainMeta → 업무 프로세스 목록. 신형 `businessFlows[]` 우선, 없으면 레거시
+ * 단수 `businessFlow` 를 1건 목록으로(하위호환 — 재분석 전 구 산출물). 형태가
+ * 어긋나는 프로세스는 그 장만 조용히 제외한다(다른 장 렌더 보존 — 부분 수용).
+ */
+export function parseBusinessFlows(node: GraphNode | undefined): BizProcess[] {
+  const meta = node?.domainMeta as { businessFlows?: unknown; businessFlow?: unknown } | undefined;
+  if (Array.isArray(meta?.businessFlows)) {
+    const out: BizProcess[] = [];
+    for (const raw of meta!.businessFlows as unknown[]) {
+      const o = raw as Record<string, unknown>;
+      const flow = parseBizGraph(o);
+      if (flow) {
+        out.push({
+          index: out.length,
+          title: typeof o.title === "string" ? o.title : null,
+          flow,
+        });
+      }
+    }
+    return out;
+  }
+  const legacy = parseBizGraph(meta?.businessFlow);
+  return legacy ? [{ index: 0, title: null, flow: legacy }] : [];
+}
+
+/** 첫 프로세스만 — 레거시 호출부/테스트 호환용 축약. */
 export function parseBusinessFlow(node: GraphNode | undefined): BizFlow | null {
-  const meta = node?.domainMeta as { businessFlow?: unknown } | undefined;
-  const raw = meta?.businessFlow as { nodes?: unknown; edges?: unknown } | undefined;
+  return parseBusinessFlows(node)[0]?.flow ?? null;
+}
+
+/** 순서도 그래프 1장 파싱 공통부 — 알 수 없는 형태는 null 로 degrade. */
+function parseBizGraph(rawInput: unknown): BizFlow | null {
+  const raw = rawInput as { nodes?: unknown; edges?: unknown } | undefined | null;
   if (!raw || !Array.isArray(raw.nodes) || !Array.isArray(raw.edges)) return null;
 
   const nodes: BizFlowNode[] = [];

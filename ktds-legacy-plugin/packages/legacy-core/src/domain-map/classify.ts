@@ -22,6 +22,7 @@ import type {
   RoutesReport,
   SlicesReport,
 } from './types.js'
+import { isDomainIneligibleRoot } from './slices.js'
 
 /** 구조/패키지 루트 세그먼트 — 도메인 의미 없음, 토큰 탐색에서 건너뜀. */
 const STRUCTURE_SEGMENTS = new Set([
@@ -149,12 +150,37 @@ export function classifyByDirectory(relPaths: string[]): DirectoryClassification
     depth++
   }
 
+  // 통과 네임스페이스 세그먼트 동적 감지(브랜치 상대): 같은 부모 경로를 공유하는 파일들
+  // 안에서 한 세그먼트 값이 NAMESPACE_SHARE 이상을 덮으면(예 src/main/java 밑에서
+  // `egovframework` 가 사실상 전부) 도메인 신호가 아니라 벤더/패키지 네임스페이스이므로
+  // 토큰 후보에서 건너뛴다. 전역이 아니라 브랜치 상대라야 webapp/resources 형제에
+  // 희석되지 않고 java 서브트리의 네임스페이스를 잡는다. STRUCTURE_SEGMENTS 하드코딩을
+  // 프로젝트 고유 패키지 루트로 일반화 → com/<org>/<feature> 의 <feature>(uss/sym/cop)
+  // 까지 내려간다. 도메인 분기(소수값)는 덮지 못하므로 보존된다.
+  const NAMESPACE_SHARE = 0.9
+  const branchCounts = new Map<string, Map<string, number>>() // 부모경로 → (세그먼트값 → 수)
+  for (const segs of dirSegs) {
+    for (let d = 0; d < segs.length; d++) {
+      const parent = segs.slice(0, d).join('/')
+      let m = branchCounts.get(parent)
+      if (!m) branchCounts.set(parent, (m = new Map()))
+      m.set(segs[d], (m.get(segs[d]) ?? 0) + 1)
+    }
+  }
+  const isNamespaceSeg = (segs: string[], d: number): boolean => {
+    const m = branchCounts.get(segs.slice(0, d).join('/'))
+    if (!m) return false
+    let total = 0
+    for (const c of m.values()) total += c
+    return total > 0 && (m.get(segs[d]) ?? 0) / total >= NAMESPACE_SHARE
+  }
+
   const tokenByFile = new Map<string, string>()
   for (let i = 0; i < relPaths.length; i++) {
     const segs = dirSegs[i]
     for (let d = depth; d < segs.length; d++) {
       const seg = segs[d]
-      if (isStructureOrLayer(seg)) continue
+      if (isStructureOrLayer(seg) || isNamespaceSeg(segs, d)) continue
       tokenByFile.set(relPaths[i], seg)
       break
     }
@@ -218,17 +244,47 @@ export function buildCandidates(
   // 여러 루트가 같은 디렉토리 토큰(예 'mybatis')을 공유해 도메인이 하나로 붕괴하므로,
   // 공유 토큰인 루트는 파일명 prefix(Account→account 등)로 분리한다. 전역 boolean 으로
   // 판정하면 단 하나의 이질 루트(예 WEB-INF/web.xml)가 나머지를 통째로 붕괴시킨다.
-  const rootsByDirToken = new Map<string, number>()
+  // 각 디렉토리 토큰이 담는 파일명 prefix 의 분포 — 조직 스타일 판정용.
+  // prefix 가 그 토큰 그룹을 실제로 '분할'하면(여러 prefix 가 고르게 = package-by-layer,
+  // 예 jpetstore …/web/actions/{Account,Order}ActionBean) → prefix 로 분리한다.
+  // 한 prefix 가 지배하면(package-by-feature + 벤더 접두어, 예 uss/ 밑 대부분 Egov*
+  // → 'egov' 지배, 소수 이질 루트 존재) → 디렉토리 토큰(=feature 패키지 uss/sym/cop)을
+  // key 로. **지배율 기반**이라 단 하나의 이질 루트가 서브패키지를 통째로 붕괴시키지 않는다.
+  const PREFIX_PARTITION_MAX = 0.7 // 최다 prefix 점유율이 이 미만이어야 prefix 가 도메인을 가른다고 본다
+  const prefixDistByDirToken = new Map<string, Map<string, number>>()
   for (const slice of slices.slices) {
+    if (isDomainIneligibleRoot(slice.root)) continue // 시드 부적격 루트는 분포에서 제외
     const t = dirToken(slice.root)
-    if (t !== null) rootsByDirToken.set(t, (rootsByDirToken.get(t) ?? 0) + 1)
+    if (t === null) continue
+    const p = prefixToken(slice.root)
+    if (p === null) continue
+    let m = prefixDistByDirToken.get(t)
+    if (!m) prefixDistByDirToken.set(t, (m = new Map<string, number>()))
+    m.set(p, (m.get(p) ?? 0) + 1)
+  }
+  const prefixPartitions = (t: string): boolean => {
+    const m = prefixDistByDirToken.get(t)
+    if (!m || m.size < 2) return false
+    let total = 0
+    let max = 0
+    for (const c of m.values()) {
+      total += c
+      if (c > max) max = c
+    }
+    return total > 0 && max / total < PREFIX_PARTITION_MAX
   }
   const rootKey = new Map<string, string>()
   for (const slice of slices.slices) {
+    // 도메인 '시드' 제외 — 테스트/정적 진입점(예 src/test/**, code404.jsp)은 자기
+    // 도메인을 만들지 않는다. slices 도달성은 유지되므로(program-inventory·risk-report
+    // 소비), 이 루트가 도달한 파일은 아래 ownership 에서 실제 생산 도메인 멤버로 합류한다.
+    if (isDomainIneligibleRoot(slice.root)) continue
     const t = dirToken(slice.root)
-    const tokenUniqueToRoot = t !== null && rootsByDirToken.get(t) === 1
+    // t 가 유일(1루트)이면 분포 크기 1 → prefixPartitions=false → 디렉토리 토큰 채택
+    // (기존 '유일 토큰' 동작 보존).
+    const useDir = t !== null && !prefixPartitions(t)
     const key =
-      (tokenUniqueToRoot ? t : null) ??
+      (useDir ? t : null) ??
       prefixToken(slice.root) ??
       (slice.root.split('/').pop() ?? slice.root).replace(/\.[^.]+$/, '').toLowerCase()
     rootKey.set(slice.root, key)
@@ -258,6 +314,10 @@ export function buildCandidates(
   const unresolved: string[] = []
 
   for (const own of slices.ownership) {
+    // NOTE: 테스트/정적 파일을 도메인 '멤버'에서까지 빼면 안 된다 — 예 order 컨트롤러가
+    // forward 하는 list.jsp 는 order 도메인의 화면 멤버다(program-inventory 가 domain 을
+    // 참조). 제외는 도메인 '시드'(slices.addEntry 의 isDomainIneligibleRoot)에서만 하고,
+    // 실제 생산 도메인이 도달한 파일은 그 도메인 멤버로 유지한다.
     const isRoot = rootKey.has(own.relPath)
     if (own.status === 'shared') {
       // 루트 자신이 다른 루트의 슬라이스에 들어가도 루트는 자기 도메인의 닻이다.
@@ -266,17 +326,21 @@ export function buildCandidates(
     }
     if (own.status === 'sole') {
       if (isRoot) continue // 루트는 이미 등재
-      const ownerKey = rootKey.get(own.owners[0])!
-      const dKey = dirToken(own.relPath)
-      if (dKey !== null && byKey.has(dKey) && dKey !== ownerKey) {
-        // 도달성 vs 디렉토리 충돌 → 모호 큐(어느 쪽에도 배정하지 않음, 사람 게이트行).
-        ambiguous.push({ relPath: own.relPath, reachKey: ownerKey, directoryKey: dKey })
-      } else {
-        candidateOf(ownerKey).files.push({ relPath: own.relPath, via: 'reachability' })
+      const ownerKey = rootKey.get(own.owners[0])
+      if (ownerKey !== undefined) {
+        const dKey = dirToken(own.relPath)
+        if (dKey !== null && byKey.has(dKey) && dKey !== ownerKey) {
+          // 도달성 vs 디렉토리 충돌 → 모호 큐(어느 쪽에도 배정하지 않음, 사람 게이트行).
+          ambiguous.push({ relPath: own.relPath, reachKey: ownerKey, directoryKey: dKey })
+        } else {
+          candidateOf(ownerKey).files.push({ relPath: own.relPath, via: 'reachability' })
+        }
+        continue
       }
-      continue
+      // owner 가 시드 부적격(테스트/정적 진입점)이라 도메인 key 가 없음 → 아래 디렉토리/
+      // prefix 폴백으로 실제 생산 도메인에 멤버로 합류 시도(예 order/list.jsp → order).
     }
-    // unreached → 디렉토리 > prefix 폴백, 기존 도메인 key 에만 합류.
+    // unreached(또는 시드 부적격 owner) → 디렉토리 > prefix 폴백, 기존 도메인 key 에만 합류.
     const dKey = dirToken(own.relPath)
     if (dKey !== null && byKey.has(dKey)) {
       candidateOf(dKey).files.push({ relPath: own.relPath, via: 'directory' })

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { useDashboardStore } from "../store";
 import { useNavigate, useSearchParams } from "react-router";
@@ -11,15 +11,15 @@ import GroundedBar from "./GroundedBar";
 import {
   buildSequentialFallback,
   businessFlowRejectedReason,
-  parseBusinessFlow,
+  parseBusinessFlows,
 } from "../utils/businessFlow";
 import {
   buildDomainFlows,
+  buildFlowSections,
   domainIcon,
   filterFlows,
   findDomain,
   flowFacets,
-  flowGroupKey,
   hasBusinessFlow,
   isFilterActive,
   parseDomainClaims,
@@ -47,9 +47,11 @@ import {
  * business 탭 내용물(순서도)은 P4 — P3 는 데이터 없음 상태를 정직하게 표기한다.
  *
  * USECASE GROUPING (documented choice): real domain-graph.json has no "usecase"
- * field, so flows are grouped by `entryType` into honest buckets (HTTP / Batch /
- * Event / Other). When all flows fall in a single bucket the group header is
- * suppressed and a flat list is rendered — avoids a noisy single-section label.
+ * field. Sections are built by `buildFlowSections` (domainData.ts): when a
+ * domain has 2+ distinct sub-packages (filePath-derived, e.g. eGov `cop`'s
+ * bbs/smt/adb/...), flows are sectioned by sub-package — avoids one flat
+ * 200+ row list. Otherwise it falls back to the original `entryType` buckets
+ * (HTTP / Batch / Event / Other), identical to pre-subgroup behavior.
  */
 
 // Method badge palette — ported from prototype `.method-*` classes.
@@ -68,8 +70,6 @@ const METHOD_STYLE: Record<FlowMethod, { bg: string; color: string }> = {
   EVENT: methodStyle("EVENT"),
   FLOW: methodStyle("FLOW"),
 };
-
-const GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
 
 /** 점진 windowing — 최초 렌더 행 수 / 센티널 도달 시 증가 폭 (§4-2 계측 후 채택). */
 const WINDOW_INITIAL = 100;
@@ -145,7 +145,8 @@ export default function FlowListView() {
   const [groupSel, setGroupSel] = useState<Set<FlowGroupKey>>(new Set());
   const [methodSel, setMethodSel] = useState<Set<FlowMethod>>(new Set());
   const [verdictSel, setVerdictSel] = useState<Set<FlowVerdictKey>>(new Set());
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<FlowGroupKey>>(new Set());
+  // 섹션 키 — 서브그룹(예: "adb") 또는 폴백 entryType(FlowGroupKey) 둘 다 문자열.
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   const flows = useMemo<DomainFlow[]>(
     () =>
@@ -154,6 +155,24 @@ export default function FlowListView() {
         : [],
     [domainGraph, activeDomainId],
   );
+  // 비병합 인덱스 — 병합으로 목록에서 접힌 폼 흐름을 +폼 배지 클릭으로 선택했을
+  // 때 스파인 헤더(method/path/name)를 해석하기 위한 조회 전용.
+  const flowIndex = useMemo<DomainFlow[]>(
+    () =>
+      domainGraph && activeDomainId
+        ? buildDomainFlows(domainGraph, activeDomainId, { mergeForms: false })
+        : [],
+    [domainGraph, activeDomainId],
+  );
+
+  // 최초엔 기능 목록을 전부 접힌 상태로 — 흐름이 많은 도메인(예 협업 216)에서 서브패키지
+  // 헤더만 먼저 보이게 한다(사용자 요청). 도메인 전환마다 재적용하되, 섹션이 여러 개일
+  // 때만(그룹화된 경우) 접는다 — 단일 섹션까지 접으면 목록이 통째로 숨어 어색하다.
+  // useLayoutEffect = 216행을 펼쳐 그렸다 접는 깜빡임 차단(페인트 전 반영).
+  useLayoutEffect(() => {
+    const sections = buildFlowSections(flows);
+    setCollapsedGroups(sections.length >= 2 ? new Set(sections.map((s) => s.key)) : new Set());
+  }, [activeDomainId, flows]);
 
   const domainNode = useMemo(
     () => (domainGraph && activeDomainId ? findDomain(domainGraph, activeDomainId) : undefined),
@@ -164,11 +183,18 @@ export default function FlowListView() {
     [domainNode],
   );
 
-  // P4: 업무 흐름도 데이터 — 채움(businessFlow) 우선, 미채움은 순차 폴백. useMemo 로
-  // 참조를 고정한다(매 렌더 재생성 시 BusinessFlowView 의 ELK 레이아웃이 재실행됨).
+  // P4/B안: 업무 흐름도 데이터 — 프로세스 목록(businessFlows[], 레거시 단수 포함)
+  // 우선, 전무하면 순차 폴백. useMemo 로 참조를 고정한다(매 렌더 재생성 시
+  // BusinessFlowView 의 ELK 레이아웃이 재실행됨).
+  const bizProcesses = useMemo(() => parseBusinessFlows(domainNode), [domainNode]);
+  // ?bf= 딥링크 — 표시 순서 인덱스(URL 이 진실). 비숫자/범위 밖은 0 으로 클램프.
+  const bfParam = Number.parseInt(searchParams.get("bf") ?? "", 10);
+  const bfIdx = Number.isFinite(bfParam)
+    ? Math.min(Math.max(bfParam, 0), Math.max(bizProcesses.length - 1, 0))
+    : 0;
   const bizFlow = useMemo(() => {
-    const parsed = parseBusinessFlow(domainNode);
-    if (parsed) return parsed;
+    const proc = bizProcesses[bfIdx];
+    if (proc) return proc.flow;
     return flows.length > 0
       ? buildSequentialFallback(flows, {
           start: t.flowList.bfStart,
@@ -176,8 +202,16 @@ export default function FlowListView() {
           more: t.flowList.bfMore,
         })
       : null;
-  }, [domainNode, flows, t]);
+  }, [bizProcesses, bfIdx, flows, t]);
   const bizRejected = useMemo(() => businessFlowRejectedReason(domainNode), [domainNode]);
+  const switchProcess = (i: number) => {
+    // 탭 전환(switchView)과 동일 규약 — replace, 라이브 location 기준, 토큰 차단.
+    const p = new URLSearchParams(window.location.search);
+    if (i === 0) p.delete("bf");
+    else p.set("bf", String(i));
+    p.delete("token");
+    setSearchParams(p, { replace: true });
+  };
 
   // §3 탭 해석 — URL이 진실. ?flow= 딥링크(pre-P3)는 code 탭(하위호환).
   const view = resolveWorkspaceView(
@@ -206,21 +240,16 @@ export default function FlowListView() {
   const filtered = useMemo(() => filterFlows(flows, filter), [flows, filter]);
   const filterOn = isFilterActive(filter);
 
-  // Group flows by entryType bucket, preserving graph order within a group.
-  // 그룹은 필터 결과 위에서 재구성 — 그룹 접힘은 필터와 독립.
-  const groups = useMemo(() => {
-    const map = new Map<FlowGroupKey, DomainFlow[]>();
-    for (const f of filtered) {
-      const key = flowGroupKey(f.entryType);
-      const list = map.get(key) ?? [];
-      list.push(f);
-      map.set(key, list);
-    }
-    return GROUP_ORDER.filter((k) => map.has(k)).map((k) => ({
-      key: k,
-      flows: map.get(k)!,
-    }));
-  }, [filtered]);
+  // 섹션 기준(서브패키지 vs entryType)은 **전체 흐름** 기준 1회 판정 — 검색 중 부분집합으로
+  // 재판정하면 결과가 한 서브패키지로 좁혀질 때 그룹핑이 "HTTP 엔드포인트"로 뒤집힌다(버그).
+  const bySubGroup = useMemo(
+    () => new Set(flows.map((f) => f.subGroup).filter((g): g is string => g !== null)).size >= 2,
+    [flows],
+  );
+
+  // 서브패키지 또는 폴백 entryType 으로 섹션 구성(domainData.buildFlowSections).
+  // 그룹은 필터 결과 위에서 재구성 — 그룹 접힘은 필터와 독립(모드는 전체 기준 고정).
+  const groups = useMemo(() => buildFlowSections(filtered, bySubGroup), [filtered, bySubGroup]);
 
   const groupLabel: Record<FlowGroupKey, string> = {
     http: t.flowList.groupHttp,
@@ -241,21 +270,17 @@ export default function FlowListView() {
   const availableMethods = facets.methods;
   const availableVerdicts = facets.verdicts;
 
-  const selectedFlow = flows.find((f) => f.id === selectedFlowId) ?? null;
-  const singleGroup = groups.length <= 1;
+  const selectedFlow =
+    flows.find((f) => f.id === selectedFlowId) ??
+    flowIndex.find((f) => f.id === selectedFlowId) ??
+    null;
 
-  // 표시 순서(그룹 순회) 기준 1..N 번호 — **필터와 무관하게 전체 목록 기준**으로
+  // 표시 순서(섹션 순회) 기준 1..N 번호 — **필터와 무관하게 전체 목록 기준**으로
   // 고정해, 필터 중에도 행 번호·접힘 레일 번호가 같은 기능을 가리킨다.
-  const fullOrdered = useMemo(() => {
-    const map = new Map<FlowGroupKey, DomainFlow[]>();
-    for (const f of flows) {
-      const key = flowGroupKey(f.entryType);
-      const list = map.get(key) ?? [];
-      list.push(f);
-      map.set(key, list);
-    }
-    return GROUP_ORDER.filter((k) => map.has(k)).flatMap((k) => map.get(k)!);
-  }, [flows]);
+  const fullOrdered = useMemo(
+    () => buildFlowSections(flows, bySubGroup).flatMap((g) => g.flows),
+    [flows, bySubGroup],
+  );
   const flowNumber = useMemo(() => {
     const m = new Map<string, number>();
     fullOrdered.forEach((f, i) => m.set(f.id, i + 1));
@@ -267,17 +292,19 @@ export default function FlowListView() {
 
   // §4-2 점진 windowing — 그룹 헤더+행을 평탄화한 렌더 목록에 센티널 기반 창을 적용.
   type RenderItem =
-    | { kind: "header"; group: FlowGroupKey; count: number; collapsed: boolean }
+    | { kind: "header"; sectionKey: string; label: string; count: number; collapsed: boolean }
     | { kind: "flow"; flow: DomainFlow };
   const renderItems = useMemo<RenderItem[]>(() => {
     const items: RenderItem[] = [];
+    // pmpl-proto .fl-grp — 그룹 헤더는 단일 그룹이어도 항상 노출("HTTP 엔드포인트 (6)").
     for (const g of groups) {
-      const collapsed = collapsedGroups.has(g.key);
-      if (!singleGroup) items.push({ kind: "header", group: g.key, count: g.flows.length, collapsed });
-      if (!collapsed || singleGroup) for (const f of g.flows) items.push({ kind: "flow", flow: f });
+      // 검색/필터 활성 시엔 접힘 무시하고 항상 펼침 — 결과가 접힌 헤더에 가려지지 않게.
+      const collapsed = !filterOn && collapsedGroups.has(g.key);
+      items.push({ kind: "header", sectionKey: g.key, label: g.label, count: g.flows.length, collapsed });
+      if (!collapsed) for (const f of g.flows) items.push({ kind: "flow", flow: f });
     }
     return items;
-  }, [groups, collapsedGroups, singleGroup]);
+  }, [groups, collapsedGroups, filterOn]);
 
   const [windowSize, setWindowSize] = useState(WINDOW_INITIAL);
   // 필터/도메인 변경 시 창 리셋 — 검색 결과 최상단부터 다시. 키는 JSON 직렬화로
@@ -393,7 +420,8 @@ export default function FlowListView() {
               {
                 key: "code" as const,
                 label: t.flowList.tabCode.replace("{count}", "").trim(),
-                count: flows.length,
+                // 탭에는 갯수 비노출(사용자 결정) — 갯수는 목록 그룹 헤더가 담당.
+                count: null,
               },
             ]
           ).map((tab) => {
@@ -440,12 +468,78 @@ export default function FlowListView() {
           id="workspace-panel-business"
           role="tabpanel"
           aria-labelledby="workspace-tab-business"
-          className="flex-1 min-h-0"
+          className="flex-1 min-h-0 flex overflow-hidden"
         >
           {bizFlow && activeDomainId ? (
-            <BusinessFlowView domainId={activeDomainId} biz={bizFlow} rejectedReason={bizRejected} />
+            <>
+              {/* B안: 업무 프로세스 목록 — 2개 이상일 때만. 기능 탭 좌측 목록과
+                  동일한 카드 언어(pmpl-proto .fl-list). 선택은 ?bf= 딥링크. */}
+              {bizProcesses.length > 1 && (
+                <aside
+                  className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
+                  style={{
+                    width: 300,
+                    margin: "12px 0 12px 12px",
+                    boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
+                  }}
+                >
+                  <div
+                    className="shrink-0 text-text-muted"
+                    style={{ fontSize: 11, fontWeight: 700, padding: "12px 16px 6px" }}
+                  >
+                    {t.flowList.bizProcesses}{" "}
+                    <span className="tabular-nums">({bizProcesses.length})</span>
+                  </div>
+                  <div className="flex-1 overflow-y-auto" style={{ padding: "0 10px 12px" }}>
+                    {bizProcesses.map((p, i) => {
+                      const active = i === bfIdx;
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => switchProcess(i)}
+                          aria-current={active}
+                          className="flex items-center gap-2 text-left rounded-[7px] cursor-pointer transition-colors w-full hover:bg-elevated min-w-0"
+                          style={{
+                            padding: "7px 8px",
+                            fontSize: 12.5,
+                            fontWeight: active ? 600 : 400,
+                            background: active
+                              ? "color-mix(in srgb, var(--color-accent) 8%, transparent)"
+                              : undefined,
+                          }}
+                        >
+                          <span className="text-text-primary truncate">
+                            {p.title ??
+                              t.flowList.bizProcessDefault.replace("{n}", String(i + 1))}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </aside>
+              )}
+              {/* 그래프 카드 — 기능 탭 중앙 카드와 동일한 카드 언어(화면 통일). */}
+              <div
+                className="flex-1 min-w-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
+                style={{
+                  margin: 12,
+                  boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
+                }}
+              >
+                <div className="flex-1 min-h-0 relative">
+                  {/* key=bfIdx — 프로세스 전환 시 ELK 레이아웃·노드 선택 상태 리셋. */}
+                  <BusinessFlowView
+                    key={bfIdx}
+                    domainId={activeDomainId}
+                    biz={bizFlow}
+                    rejectedReason={bizRejected}
+                  />
+                </div>
+              </div>
+            </>
           ) : (
-            <div className="h-full flex items-center justify-center px-8 text-center">
+            <div className="flex-1 flex items-center justify-center px-8 text-center">
               <p className="text-text-secondary" style={{ fontSize: 13 }}>
                 {t.flowList.businessEmpty}
               </p>
@@ -509,21 +603,41 @@ export default function FlowListView() {
       /* LEFT sidebar: flow list. Clicking a row selects the flow and renders its
           code graph in the center pane. */
       <aside
-        className="shrink-0 h-full flex flex-col border-r border-border-subtle bg-surface/40"
-        style={{ width: 320 }}
+        className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
+        style={{
+          width: 300,
+          margin: "12px 0 12px 12px",
+          boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
+        }}
       >
-        {/* sidebar header — §4-2 검색 + 필터 칩 + 접기 버튼 */}
-        <div className="shrink-0 border-b border-border-subtle" style={{ padding: "12px 12px 10px" }}>
+        {/* sidebar header — pmpl-proto .fl-list: 검색(.fl-search) + 필터 칩 + 접기 버튼 */}
+        <div className="shrink-0" style={{ padding: "10px 10px 0" }}>
           <div className="flex items-center gap-2">
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t.flowList.searchPlaceholder}
-              aria-label={t.flowList.searchPlaceholder}
-              className="flex-1 min-w-0 border border-border-medium bg-panel text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
-              style={{ fontSize: 12.5, padding: "6px 10px", borderRadius: 7 }}
-            />
+            <div className="relative flex-1 min-w-0">
+              <svg
+                aria-hidden
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="absolute text-text-muted pointer-events-none"
+                style={{ left: 9, top: "50%", transform: "translateY(-50%)" }}
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t.flowList.searchPlaceholder}
+                aria-label={t.flowList.searchPlaceholder}
+                className="w-full border border-border-medium bg-panel text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+                style={{ fontSize: 12.5, padding: "6px 10px 6px 28px", borderRadius: 7 }}
+              />
+            </div>
             <button
               type="button"
               onClick={() => setListCollapsed(true)}
@@ -535,9 +649,14 @@ export default function FlowListView() {
               «
             </button>
           </div>
-          {/* 필터 칩 — 이 도메인에 실존하는 값만. 그룹(버킷 2+일 때만)·메소드(2+)·verdict(2+). */}
-          {(availableGroups.length > 1 || availableMethods.length > 1 || availableVerdicts.length > 1) && (
-            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+          {/* 필터 칩 — pmpl-proto: "전체" 칩 상시 + 이 도메인에 실존하는 값만.
+              그룹(버킷 2+일 때만)·메소드(2+)·verdict(2+). */}
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+              <FilterChip
+                label={t.flowList.chipAll}
+                active={!filterOn}
+                onToggle={clearFilters}
+              />
               {availableGroups.length > 1 &&
                 availableGroups.map((g) => (
                   <FilterChip
@@ -565,8 +684,7 @@ export default function FlowListView() {
                     onToggle={() => toggleIn(verdictSel, v, setVerdictSel)}
                   />
                 ))}
-            </div>
-          )}
+          </div>
           {/* 결과 카운트 + 초기화 — 필터 활성 시에만(정직한 축소 표기). */}
           {filterOn && (
             <div className="flex items-center justify-between mt-2">
@@ -586,45 +704,50 @@ export default function FlowListView() {
         </div>
 
         {/* scrollable flow rows — windowed render list (§4-2) */}
-        <div className="flex-1 overflow-y-auto" style={{ padding: "12px" }}>
+        <div className="flex-1 overflow-y-auto" style={{ padding: "6px 10px 12px" }}>
           {filtered.length === 0 ? (
             <p className="text-text-muted text-center" style={{ fontSize: 12, padding: "24px 8px" }}>
               {t.flowList.noMatches}
             </p>
           ) : (
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col">
               {visibleItems.map((item) =>
                 item.kind === "header" ? (
                   <button
-                    key={`h:${item.group}`}
+                    key={`h:${item.sectionKey}`}
                     type="button"
                     onClick={() =>
-                      toggleIn(collapsedGroups, item.group, setCollapsedGroups)
+                      toggleIn(collapsedGroups, item.sectionKey, setCollapsedGroups)
                     }
                     aria-expanded={!item.collapsed}
-                    className="flex items-center gap-2 uppercase text-text-muted mt-3 first:mt-0 mb-0.5 cursor-pointer hover:text-text-secondary transition-colors w-full"
-                    style={{ fontSize: 10, letterSpacing: "0.09em" }}
+                    className="flex items-center gap-1.5 text-text-muted mt-2 first:mt-0 cursor-pointer hover:text-text-secondary transition-colors w-full text-left"
+                    style={{ fontSize: 11, fontWeight: 700, padding: "4px 6px 2px" }}
                   >
                     <span aria-hidden style={{ fontSize: 8 }}>
                       {item.collapsed ? "▶" : "▼"}
                     </span>
-                    <span>{groupLabel[item.group]}</span>
-                    <span className="tabular-nums">({item.count})</span>
-                    <span className="flex-1 h-px bg-border-subtle" />
+                    <span>
+                      {/* 서브그룹 섹션은 label 이 채워져 그대로 렌더, entryType 폴백은
+                          label="" 이라 groupLabel(i18n) 로 해석한다. */}
+                      {item.label || groupLabel[item.sectionKey as FlowGroupKey]}{" "}
+                      <span className="tabular-nums">({item.count})</span>
+                    </span>
                   </button>
                 ) : (
                   (() => {
                     const flow = item.flow;
-                    const isSelected = flow.id === selectedFlowId;
+                    // 병합된 폼 흐름 선택 중에도 소속 행(처리 흐름)을 하이라이트.
+                    const isFormSelected = flow.formFlow?.id === selectedFlowId;
+                    const isSelected = flow.id === selectedFlowId || isFormSelected;
                     return (
-                    /* 프로토 .fl-item — 컴팩트 1.5줄 행: [번호][메소드] 이름 / 경로(mono).
+                    /* pmpl-proto .fl-item — 단일행: [메소드] 이름 경로(mono, 인라인).
                        스텝 수는 title 툴팁으로 이동(밀도 우선), 검토필요만 배지 표시. */
                     <button
                       key={flow.id}
                       type="button"
                       onClick={() => setSelectedFlow(flow.id)}
-                      title={`${flow.name} — ${t.flowList.stepCount.replace("{count}", String(flow.stepCount))}`}
-                      className="flow-row flex flex-col gap-0.5 text-left rounded-[7px] cursor-pointer transition-colors w-full hover:bg-elevated"
+                      title={`${flow.path} — ${t.flowList.stepCount.replace("{count}", String(flow.stepCount))}`}
+                      className="flow-row flex items-center gap-2 text-left rounded-[7px] cursor-pointer transition-colors w-full hover:bg-elevated min-w-0"
                       style={{
                         padding: "7px 8px",
                         fontWeight: isSelected ? 600 : 400,
@@ -633,36 +756,51 @@ export default function FlowListView() {
                           : undefined,
                       }}
                     >
-                      <span className="flex items-center gap-2 min-w-0">
-                        {/* 번호 — 접힘 레일 번호와 동일 매핑. 필터 중 비연속 가능(툴팁). */}
-                        <span
-                          title={t.flowList.numberHint}
-                          className="shrink-0 text-text-muted tabular-nums text-right"
-                          style={{ minWidth: 16, fontSize: 10, fontFamily: "var(--font-mono)" }}
-                        >
-                          {flowNumber.get(flow.id)}
-                        </span>
                         <MethodBadge method={flow.method} size="sm" />
+                        {/* 경로는 행에서 제외 — 선택 시 중앙 헤더에 표시(중복 제거). */}
                         <span className="text-text-primary truncate" style={{ fontSize: 12.5 }}>
                           {flow.name}
                         </span>
+                        {/* A안: 병합된 폼 진입 흐름 표식 — 클릭하면 폼 흐름의
+                            스파인으로 전환(행 클릭과 분리, 중첩 button 금지라 span). */}
+                        {flow.formFlow && (
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedFlow(flow.formFlow!.id);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSelectedFlow(flow.formFlow!.id);
+                              }
+                            }}
+                            title={t.flowList.formIncludedHint.replace("{name}", flow.formFlow.name)}
+                            className={`shrink-0 rounded cursor-pointer transition-colors ${
+                              isFormSelected
+                                ? "text-accent"
+                                : "bg-elevated text-text-muted hover:text-accent"
+                            }`}
+                            style={{
+                              fontSize: 10,
+                              padding: "1px 5px",
+                              fontWeight: 600,
+                              background: isFormSelected
+                                ? "color-mix(in srgb, var(--color-accent) 12%, transparent)"
+                                : undefined,
+                            }}
+                          >
+                            {t.flowList.formIncluded}
+                          </span>
+                        )}
                         {flow.grounding?.verdict === "NEEDS_REVIEW" && (
                           <span className="ml-auto shrink-0">
                             <VerdictBadge verdict="NEEDS_REVIEW" />
                           </span>
                         )}
-                      </span>
-                      <span
-                        className="text-text-muted truncate"
-                        style={{
-                          fontFamily: "var(--font-mono)",
-                          fontSize: 10.5,
-                          paddingLeft: 24,
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {flow.path}
-                      </span>
                     </button>
                     );
                   })()
@@ -677,8 +815,16 @@ export default function FlowListView() {
       )}
 
       {/* CENTER + RIGHT: selected flow's code graph (FlowSpineView renders its own
-          right sidebar, which now appears only when a node is clicked). */}
-      <div className="flex-1 min-w-0 h-full flex flex-col bg-root">
+          right sidebar, which now appears only when a node is clicked).
+          pmpl-proto .ws — 좌측 목록과 동일한 카드 언어(라운드+보더+그림자)로 감싸
+          두 패널이 한 화면으로 읽히게 한다(그래프 자체는 기존 그대로). */}
+      <div
+        className="flex-1 min-w-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
+        style={{
+          margin: 12,
+          boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
+        }}
+      >
         {selectedFlow ? (
           <>
             {/* center header — selected flow context + grounding */}

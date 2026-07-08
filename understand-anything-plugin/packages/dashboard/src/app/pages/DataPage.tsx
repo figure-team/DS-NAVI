@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 
-const DataMapView = lazy(() => import("../../components/DataMapView")); // ktds-fork (메뉴 개편 2차)
+const DataMapView = lazy(() => import("../../components/data-map/DataMapView")); // ktds-fork (데이터 맵 개편)
 
 /** 데이터 맵(db-schema · CRUD 매트릭스 · 코드 테이블) 섹션 — pmpl-proto pg-data. */
 export default function DataPage() {

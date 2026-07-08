@@ -161,48 +161,108 @@ describe('businessFlow — 그래프 정합 검증', () => {
 })
 
 describe('businessFlow — applyFills 부분 수용', () => {
-  it('정합 통과 시 domainMeta.businessFlow 병합', () => {
+  it('정합 통과 시 domainMeta.businessFlows[0] 병합(레거시 단수 → 1건 정규화)', () => {
     const { nodes, rejected } = applyFills(skeleton(), [orderFill(bf())])
     expect(rejected).toEqual([])
     const domain = nodes.find((n) => n.id === 'domain:order')!
-    const merged = domain.domainMeta?.businessFlow as BusinessFlow
-    expect(merged.nodes.map((n) => n.id)).toEqual(['s', 'a1', 'd1', 'e'])
-    expect(merged.edges).toHaveLength(4)
+    const list = domain.domainMeta?.businessFlows as Array<
+      BusinessFlow & { fillIndex: number; title?: string }
+    >
+    expect(list).toHaveLength(1)
+    expect(list[0].fillIndex).toBe(0)
+    expect(list[0].title).toBeUndefined() // 레거시 단수는 무제목
+    expect(list[0].nodes.map((n) => n.id)).toEqual(['s', 'a1', 'd1', 'e'])
+    expect(list[0].edges).toHaveLength(4)
   })
 
-  it('정합 실패 시 businessFlow 만 기각 — 도메인 fill 나머지는 적용, 사유 표면화', () => {
+  it('정합 실패 시 해당 순서도만 기각 — 도메인 fill 나머지는 적용, 사유 표면화', () => {
     const bad = bf()
     bad.edges = [{ from: 's', to: 'ghost' }, ...bad.edges]
     const { nodes, rejected } = applyFills(skeleton(), [orderFill(bad)])
     expect(rejected).toHaveLength(1)
-    expect(rejected[0].ref).toBe('domain:order#businessFlow')
+    expect(rejected[0].ref).toBe('domain:order#businessFlows[0]')
     expect(rejected[0].kind).toBe('businessFlow') // 구조적 kind(리뷰 C5)
     expect(rejected[0].reason).toContain('edge-to-unknown: ghost')
     const domain = nodes.find((n) => n.id === 'domain:order')!
-    expect(domain.domainMeta?.businessFlow).toBeUndefined()
+    expect(domain.domainMeta?.businessFlows).toBeUndefined()
     // 기각 사유가 그래프에 실려 대시보드가 "미채움"과 구별한다(리뷰 C2).
     expect(domain.domainMeta?.businessFlowRejected).toContain('edge-to-unknown: ghost')
     expect(domain.name).toBe('주문') // 부분 수용 — 도메인 채움은 유지
   })
+
+  it('B안 복수: 프로세스 단위 기각 — 생존분만 병합(fillIndex 보존), 배너 없음', () => {
+    const bad = bf()
+    bad.edges = [{ from: 's', to: 'ghost' }, ...bad.edges]
+    const fill: DomainFill = {
+      ...orderFill(),
+      businessFlows: [
+        { title: '주문 취소', ...bad },
+        { title: '주문 접수', ...bf() },
+      ],
+    }
+    const { nodes, rejected } = applyFills(skeleton(), [fill])
+    expect(rejected).toHaveLength(1)
+    expect(rejected[0].ref).toBe('domain:order#businessFlows[0]')
+    expect(rejected[0].reason).toContain('주문 취소') // title 로 어느 프로세스인지 식별
+    const domain = nodes.find((n) => n.id === 'domain:order')!
+    const list = domain.domainMeta?.businessFlows as Array<{ fillIndex: number; title: string }>
+    expect(list).toHaveLength(1)
+    expect(list[0].title).toBe('주문 접수')
+    expect(list[0].fillIndex).toBe(1) // 기각으로 배열이 밀려도 원본 인덱스 보존
+    // 생존 프로세스가 있으면 기각 배너를 세우지 않는다(그것을 보여준다).
+    expect(domain.domainMeta?.businessFlowRejected).toBeUndefined()
+  })
+
+  it('B안 복수: businessFlows 가 있으면 레거시 단수는 무시된다', () => {
+    const fill: DomainFill = {
+      ...orderFill(bf()),
+      businessFlows: [{ title: '주문 접수', ...bf() }],
+    }
+    const { nodes } = applyFills(skeleton(), [fill])
+    const domain = nodes.find((n) => n.id === 'domain:order')!
+    const list = domain.domainMeta?.businessFlows as Array<{ title?: string }>
+    expect(list).toHaveLength(1)
+    expect(list[0].title).toBe('주문 접수')
+    expect(domain.domainMeta?.businessFlow).toBeUndefined()
+  })
 })
 
 describe('businessFlow — verify 항목화 + embed 장식', () => {
-  it('인용 보유 노드만 businessFlow 항목으로 검증되고, 기각 도메인은 제외된다', async () => {
+  it('인용 보유 노드만 businessFlow 항목으로 검증되고, 기각 프로세스는 인덱스 단위 제외', async () => {
     const report = await verifyFills('/nonexistent-root', [orderFill(bf())], null)
     const refs = report.domains[0].items.map((i) => i.ref)
-    expect(refs).toContain('domain:order#businessFlow[a1]')
-    expect(refs).toContain('domain:order#businessFlow[d1]')
-    expect(refs).not.toContain('domain:order#businessFlow[s]') // start 는 면제
+    expect(refs).toContain('domain:order#businessFlow[0][a1]')
+    expect(refs).toContain('domain:order#businessFlow[0][d1]')
+    expect(refs).not.toContain('domain:order#businessFlow[0][s]') // start 는 면제
 
     const excluded = await verifyFills(
       '/nonexistent-root',
       [orderFill(bf())],
       null,
-      new Set(['domain:order']),
+      new Set(['domain:order#businessFlows[0]']),
     )
     expect(excluded.domains[0].items.map((i) => i.ref)).not.toContain(
-      'domain:order#businessFlow[a1]',
+      'domain:order#businessFlow[0][a1]',
     )
+  })
+
+  it('B안 복수: 기각 인덱스만 건너뛰고 생존 프로세스는 원본 인덱스 ref 로 검증', async () => {
+    const fill: DomainFill = {
+      ...orderFill(),
+      businessFlows: [
+        { title: '주문 취소', ...bf() },
+        { title: '주문 접수', ...bf() },
+      ],
+    }
+    const report = await verifyFills(
+      '/nonexistent-root',
+      [fill],
+      null,
+      new Set(['domain:order#businessFlows[0]']),
+    )
+    const refs = report.domains[0].items.map((i) => i.ref)
+    expect(refs).not.toContain('domain:order#businessFlow[0][a1]') // 기각분 제외
+    expect(refs).toContain('domain:order#businessFlow[1][a1]') // 생존분은 원본 인덱스
   })
 
   it('embedVerification: bf 노드에 verdict/citations 장식, 카드 지표에서는 businessFlow 제외', async () => {
@@ -211,9 +271,9 @@ describe('businessFlow — verify 항목화 + embed 장식', () => {
     const report = await verifyFills('/nonexistent-root', [orderFill(bf())], null)
     const embedded = embedVerification(nodes, report)
     const domain = embedded.find((n) => n.id === 'domain:order')!
-    const merged = domain.domainMeta?.businessFlow as {
+    const merged = (domain.domainMeta?.businessFlows as Array<{
       nodes: Array<{ id: string; verdict?: string; citations?: Array<{ status: string }> }>
-    }
+    }>)[0]
     const a1 = merged.nodes.find((n) => n.id === 'a1')!
     expect(a1.verdict).toBe('NEEDS_REVIEW')
     expect(a1.citations?.[0].status).toBe('no-file')
@@ -222,5 +282,32 @@ describe('businessFlow — verify 항목화 + embed 장식', () => {
     // 카드 지표(ktdsClaims)에는 businessFlow 항목이 섞이지 않는다.
     const kinds = (domain.domainMeta?.ktdsClaims as Array<{ kind: string }>).map((c) => c.kind)
     expect(kinds).not.toContain('businessFlow')
+  })
+
+  it('B안 복수: embed 는 fillIndex 로 재결합 — 밀린 배열에서도 장식이 어긋나지 않는다', async () => {
+    const bad = bf()
+    bad.edges = [{ from: 's', to: 'ghost' }, ...bad.edges]
+    const fill: DomainFill = {
+      ...orderFill(),
+      businessFlows: [
+        { title: '주문 취소', ...bad },
+        { title: '주문 접수', ...bf() },
+      ],
+    }
+    const { nodes, rejected } = applyFills(skeleton(), [fill])
+    const rejectedRefs = new Set(
+      rejected.filter((r) => r.kind === 'businessFlow').map((r) => r.ref),
+    )
+    const report = await verifyFills('/nonexistent-root', [fill], null, rejectedRefs)
+    const embedded = embedVerification(nodes, report)
+    const domain = embedded.find((n) => n.id === 'domain:order')!
+    const list = domain.domainMeta?.businessFlows as Array<{
+      title: string
+      nodes: Array<{ id: string; verdict?: string }>
+    }>
+    expect(list).toHaveLength(1)
+    expect(list[0].title).toBe('주문 접수')
+    // 배열상 0번째지만 fillIndex=1 ref(#businessFlow[1][a1])와 재결합돼 장식된다.
+    expect(list[0].nodes.find((n) => n.id === 'a1')!.verdict).toBe('NEEDS_REVIEW')
   })
 })

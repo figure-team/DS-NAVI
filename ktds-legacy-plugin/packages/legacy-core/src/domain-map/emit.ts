@@ -201,30 +201,35 @@ export function embedVerification(nodes: UaGraphNode[], report: VerifyReport): U
       const claims = dr.items.filter(
         (it) => it.kind !== 'flow' && it.kind !== 'step' && it.kind !== 'businessFlow',
       )
-      // P4: 순서도 노드에 검증 결과 덧입힘 — ref `<domainId>#businessFlow[<nodeId>]`.
+      // P4/B안: 순서도 노드에 검증 결과 덧입힘 — ref
+      // `<domainId>#businessFlow[<fillIndex>][<nodeId>]`(verify 와 동일 키 규약).
       // activity/decision 은 verdict + 검증된 인용(status 포함)으로 교체, start/end
       // (인용 면제·검증 항목 없음)는 원본 유지. 대시보드는 이 verdict 로 [확인 필요]
-      // 배지를 그린다(설계 §4-1).
-      const bf = node.domainMeta?.businessFlow as
-        | { nodes: Array<Record<string, unknown>>; edges: unknown[] }
+      // 배지를 그린다(설계 §4-1). fillIndex 는 applyFills 가 병합 시 보존한 fill 내
+      // 원본 인덱스 — 중간 프로세스 기각으로 배열이 밀려도 재결합이 어긋나지 않는다.
+      const bfs = node.domainMeta?.businessFlows as
+        | Array<{ fillIndex?: unknown; nodes?: Array<Record<string, unknown>>; edges?: unknown[] }>
         | undefined
-      const decoratedBf =
-        bf && Array.isArray(bf.nodes)
-          ? {
-              ...bf,
-              nodes: bf.nodes.map((n) => {
-                const it = itemByRef.get(`${node.id}#businessFlow[${String(n.id)}]`)
+      const decoratedBfs = Array.isArray(bfs)
+        ? bfs.map((p) => {
+            if (!Array.isArray(p.nodes)) return p
+            const idx = typeof p.fillIndex === 'number' ? p.fillIndex : 0
+            return {
+              ...p,
+              nodes: p.nodes.map((n) => {
+                const it = itemByRef.get(`${node.id}#businessFlow[${idx}][${String(n.id)}]`)
                 return it ? { ...n, verdict: it.verdict, citations: it.citations } : n
               }),
             }
-          : bf
-      if (claims.length === 0 && !decoratedBf) return node
+          })
+        : undefined
+      if (claims.length === 0 && !decoratedBfs) return node
       const grounded = claims.filter((c) => c.verdict === 'GROUNDED').length
       return {
         ...node,
         domainMeta: {
           ...node.domainMeta,
-          ...(decoratedBf ? { businessFlow: decoratedBf } : {}),
+          ...(decoratedBfs ? { businessFlows: decoratedBfs } : {}),
           ...(claims.length > 0
             ? {
                 ktdsClaims: claims,

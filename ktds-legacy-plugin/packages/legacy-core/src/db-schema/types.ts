@@ -82,6 +82,8 @@ export const DbTableSchema = z.object({
   indexes: z.array(DbIndexSchema),
   /** 코드/룩업 테이블 휴리스틱(상태값·과금 정책 근거 후보). */
   isCodeTable: z.boolean(),
+  /** 코드성 판정 사유(예: "테이블명 패턴 'category'"). 미해당 null. 구버전 산출물 부재 허용. */
+  codeTableReason: z.string().nullable().default(null),
   /** dataload INSERT 행(캡 적용). rowCount 가 실제 총 행수(캡 초과 보고). */
   rows: z.array(DbRowSchema),
   rowCount: z.number().int().nonnegative(),
@@ -121,8 +123,10 @@ export const DbSchemaModelSchema = z.object({
   tables: z.array(DbTableSchema),
   /** 라이브 DB 연결 신호(정적 탐지, 무연결). 비어있지 않으면 SKILL 이 .sql 덤프를 권장. */
   liveDbSignals: z.array(LiveDbSignalSchema),
-  /** 파싱 못한 신호(보고, 누락 금지). */
-  unresolved: z.array(z.object({ ref: z.string(), reason: z.string() })),
+  /** 파싱 못한 신호(보고, 누락 금지). severity 부재 = 'warn'(구버전 하위호환). */
+  unresolved: z.array(
+    z.object({ ref: z.string(), reason: z.string(), severity: z.enum(['warn', 'info']).optional() }),
+  ),
 })
 export type DbSchemaModel = z.infer<typeof DbSchemaModelSchema>
 

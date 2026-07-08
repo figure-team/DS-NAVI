@@ -304,6 +304,35 @@ If the script exits non-zero, the failure is hard — relay the full stderr to t
 
 Load `.understand-anything/intermediate/batches.json` (produced by Phase 1.5). Iterate the `batches[]` array.
 
+**Scale gate:** If `totalBatches` > 30, use the **Workflow fan-out route** below instead of the inline dispatch loop — at that scale the per-batch dispatch/ack round-trips would flood the main conversation context. With 30 batches or fewer, continue with the inline loop as written. The incremental update path ALWAYS uses the inline loop regardless of batch count (its `batchIndex` values stay sparse after filtering, which the fan-out route's contiguous `1..N` iteration cannot handle).
+
+#### Workflow fan-out route (full analysis, totalBatches > 30)
+
+1. Generate one self-contained slice per batch (all paths passed MUST be absolute):
+   ```bash
+   node <SKILL_DIR>/slice-batch-inputs.mjs $PROJECT_ROOT \
+     --skill-dir <SKILL_DIR> \
+     --agent-def-path $PLUGIN_ROOT/agents/file-analyzer.md \
+     --language-directive "$LANGUAGE_DIRECTIVE"
+   ```
+   Pass `--language-directive ""` when no directive is set. This writes `intermediate/inputs/batch-input-<i>.json` — each slice carries everything an analyzer agent needs (projectRoot, skillDir, agentDefPath, project narrative, files, batchImportData, neighborMap), so no batch payload ever enters your context.
+
+2. Report: `[Phase 2/7] Analyzing files — <totalFiles> files in <totalBatches> batches (Workflow fan-out, background)...`, then invoke the **Workflow tool** with:
+   - `scriptPath`: `<SKILL_DIR>/phase2-fanout.workflow.js`
+   - `args`: `{ "intermediateDir": "$PROJECT_ROOT/.understand-anything/intermediate", "skillDir": "<SKILL_DIR>", "totalBatches": <totalBatches> }`
+
+   The workflow fans out one analyzer agent per batch (each reads its own slice from disk), then runs a deterministic completeness audit (`audit-batches.mjs`: sentinel ∧ valid JSON ∧ output file-set ⊇ slice `files[]`) and re-dispatches incomplete batches at most 2 times.
+
+3. When the workflow returns `{ totalBatches, analyzed, skippedByGuard, failed }`:
+   - Add every `failed[]` entry to `$PHASE_WARNINGS` — never silently drop them; merge proceeds with the batches that exist.
+   - If `skippedByGuard > 0`, report it as informational: those batches were completed by a previous interrupted run and reused via the disk guard (idempotent resume).
+
+4. Interrupted run? Just re-run `/understand`: Phase 1.5 recomputes byte-identical batches (seeded Louvain), and the disk guard skips every completed batch, so only the remainder is analyzed. If the Workflow tool is unavailable on this platform, fall back to the inline dispatch loop below.
+
+5. Skip the inline dispatch loop and continue directly at the merge step (`merge-batch-graphs.py`).
+
+#### Inline dispatch route (default: totalBatches ≤ 30, and all incremental runs)
+
 Report: `[Phase 2/7] Analyzing files — <totalFiles> files in <totalBatches> batches (up to 5 concurrent)...`
 
 For each batch, dispatch a subagent using the `file-analyzer` agent definition (at `agents/file-analyzer.md`). Run up to **5 subagents concurrently**. Append the following additional context:

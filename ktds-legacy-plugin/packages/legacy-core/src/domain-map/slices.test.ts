@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path'
 import { buildCensus } from './census.js'
 import { extractRoutes } from './extract.js'
 import { extractEdges } from './edges.js'
-import { buildSlices, DEFAULT_DEPTH_CAP } from './slices.js'
+import { buildSlices, DEFAULT_DEPTH_CAP, isDomainIneligibleRoot } from './slices.js'
 import type { SlicesReport } from './types.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -102,5 +102,32 @@ describe('slices — shop-mini chain recall', () => {
     expect([...roots].sort()).toEqual(roots)
     const rels = report.ownership.map((o) => o.relPath)
     expect([...rels].sort()).toEqual(rels)
+  })
+})
+
+describe('isDomainIneligibleRoot — 테스트/정적 진입점은 도메인 씨앗이 아니다', () => {
+  it('테스트 소스 루트를 제외한다(src/test, src/it, __tests__)', () => {
+    // eGov 실제 사례: src/test/java 밑 main()/JUnit 이 진입점으로 잡혀 도메인이 되던 것.
+    expect(isDomainIneligibleRoot('src/test/java/egovframework/com/utl/sim/TestPingNetwork.java')).toBe(true)
+    expect(isDomainIneligibleRoot('src/test/java/egovframework/com/validation/nullcheck/NullCheckTest.java')).toBe(true)
+    expect(isDomainIneligibleRoot('src/it/java/com/foo/FooIT.java')).toBe(true)
+    expect(isDomainIneligibleRoot('web/__tests__/foo.spec.ts')).toBe(true)
+  })
+
+  it('정적 뷰 자원을 제외한다(jsp/html/css)', () => {
+    expect(isDomainIneligibleRoot('src/main/webapp/code404.jsp')).toBe(true)
+    expect(isDomainIneligibleRoot('src/main/webapp/index.jsp')).toBe(true)
+    expect(isDomainIneligibleRoot('src/main/webapp/html/egovframework/com/ext/ldapumt/dept_html.jsp')).toBe(true)
+    expect(isDomainIneligibleRoot('src/main/webapp/css/egovframework/com/com.css')).toBe(true)
+  })
+
+  it('생산 코드(컨트롤러/서비스)는 제외하지 않는다', () => {
+    // 이름/경로에 test 가 포함돼도 test 소스 루트가 아니면 제외 안 함(패키지명 test 오탐 방지).
+    expect(isDomainIneligibleRoot('src/main/java/egovframework/com/uss/umt/web/EgovUserManageController.java')).toBe(false)
+    expect(isDomainIneligibleRoot('src/main/java/com/shop/web/OrderController.java')).toBe(false)
+    expect(isDomainIneligibleRoot('src/main/java/com/foo/testutil/RequestTester.java')).toBe(false)
+    expect(isDomainIneligibleRoot('src/main/java/com/foo/service/UserService.java')).toBe(false)
+    // .js/.ts 는 제외 안 함(JS 프로젝트에선 코드).
+    expect(isDomainIneligibleRoot('src/index.ts')).toBe(false)
   })
 })

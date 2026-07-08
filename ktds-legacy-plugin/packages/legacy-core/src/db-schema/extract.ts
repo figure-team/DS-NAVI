@@ -20,8 +20,8 @@ import { discoverLiveDbSignals } from './discover.js'
 import { DbSchemaModelSchema, DATALOAD_ROW_CAP } from './types.js'
 import type { DbSchemaModel, DbTable, DbSchemaTier } from './types.js'
 
-/** W8 캐시 섹션 salt — ddl-scan/dataload-scan 의 파싱 의미가 바뀌면 bump. */
-const SQL_FACTS_SALT = 'v1'
+/** W8 캐시 섹션 salt — ddl-scan/dataload-scan 의 파싱 의미가 바뀌면 bump. v2: DbTable.codeTableReason 추가. */
+const SQL_FACTS_SALT = 'v2'
 
 /**
  * W8 캐시 팩트 — .sql 파일 1개의 DDL/데이터로드 파싱 결과(내용의 순수 함수).
@@ -40,15 +40,70 @@ function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
 }
 
-/** 코드/룩업 테이블 휴리스틱 — 명명 패턴 또는 (코드컬럼 + 라벨컬럼) 동반. */
-function looksLikeCodeTable(table: DbTable): boolean {
-  if (/(^|_)(code|cd|codes|type|types|status|common|comm|grp|group|category|categories|lookup|kind)(_|$)/i.test(table.name)) {
-    return true
+/** 코드/룩업 테이블 휴리스틱 — 명명 패턴 또는 (코드컬럼 + 라벨컬럼) 동반. 판정 사유 반환(미해당 null). */
+const CODE_NAME_RE = /(^|_)(code|cd|codes|type|types|status|common|comm|grp|group|category|categories|lookup|kind)(_|$)/i
+function codeTableReasonOf(table: DbTable): string | null {
+  const m = CODE_NAME_RE.exec(table.name)
+  if (m) return `테이블명 패턴 '${m[2].toLowerCase()}'`
+  const codeCol = table.columns.find((c) => {
+    const n = c.name.toLowerCase()
+    return n === 'code' || n === 'cd' || /(_cd|_code|code|cd)$/.test(n)
+  })
+  const labelCol = table.columns.find((c) => {
+    const n = c.name.toLowerCase()
+    return /(name|nm|label|desc|title)$/.test(n) || n === 'name'
+  })
+  return codeCol && labelCol ? `코드컬럼 '${codeCol.name}' + 라벨컬럼 '${labelCol.name}'` : null
+}
+
+/**
+ * 중복 CREATE TABLE 구조 비교 — 채택 정의(kept) 대비 중복 정의(dup)의 차이 요약 목록(비었으면 동일).
+ * 비교 대상: 컬럼(type·NULL·키·DEFAULT)·PK·UNIQUE·FK·CHECK·INDEX. 이름 소문자 정규화,
+ * 그룹은 정렬 후 서명 비교. relPath·line·comment 는 제외(방언 파일 간 무의미 차이).
+ */
+function diffTableDefs(kept: DbTable, dup: DbTable): string[] {
+  const diffs: string[] = []
+  const lc = (s: string) => s.toLowerCase()
+  const norm = (s: string | null) => (s ?? '').replace(/\s+/g, '').toUpperCase()
+  const effPk = (t: DbTable, c: { name: string; primaryKey: boolean }) =>
+    c.primaryKey || t.primaryKey.some((p) => lc(p) === lc(c.name))
+
+  const keptCols = new Map(kept.columns.map((c) => [lc(c.name), c]))
+  const dupCols = new Map(dup.columns.map((c) => [lc(c.name), c]))
+  for (const [k, dc] of dupCols) {
+    const kc = keptCols.get(k)
+    if (!kc) {
+      diffs.push(`컬럼 추가 '${dc.name}'`)
+    } else if (norm(kc.type) !== norm(dc.type)) {
+      diffs.push(`컬럼 상이 '${dc.name}'(type ${kc.type}≠${dc.type})`)
+    } else if (kc.nullable !== dc.nullable) {
+      diffs.push(`컬럼 상이 '${dc.name}'(NULL 제약)`)
+    } else if (effPk(kept, kc) !== effPk(dup, dc) || kc.unique !== dc.unique) {
+      diffs.push(`컬럼 상이 '${dc.name}'(키 제약)`)
+    } else if (norm(kc.default) !== norm(dc.default)) {
+      diffs.push(`컬럼 상이 '${dc.name}'(DEFAULT)`)
+    }
   }
-  const cols = table.columns.map((c) => c.name.toLowerCase())
-  const hasCode = cols.some((c) => c === 'code' || c === 'cd' || /(_cd|_code|code|cd)$/.test(c))
-  const hasLabel = cols.some((c) => /(name|nm|label|desc|title)$/.test(c) || c === 'name')
-  return hasCode && hasLabel
+  for (const [k, kc] of keptCols) if (!dupCols.has(k)) diffs.push(`컬럼 누락 '${kc.name}'`)
+
+  const pkSig = (t: DbTable) =>
+    [...new Set([...t.primaryKey.map(lc), ...t.columns.filter((c) => c.primaryKey).map((c) => lc(c.name))])]
+      .sort()
+      .join(',')
+  if (pkSig(kept) !== pkSig(dup)) diffs.push('PK 상이')
+  const groupSig = (groups: string[][]) => groups.map((g) => g.map(lc).sort().join('+')).sort().join('|')
+  if (groupSig(kept.uniques) !== groupSig(dup.uniques)) diffs.push('UNIQUE 상이')
+  const fkSig = (t: DbTable) =>
+    t.foreignKeys
+      .map((f) => `${f.columns.map(lc).sort().join('+')}>${lc(f.refTable)}(${f.refColumns.map(lc).sort().join('+')})`)
+      .sort()
+      .join('|')
+  if (fkSig(kept) !== fkSig(dup)) diffs.push('FK 상이')
+  const checkSig = (t: DbTable) => t.checks.map((c) => norm(c.expression)).sort().join('|')
+  if (checkSig(kept) !== checkSig(dup)) diffs.push('CHECK 상이')
+  const idxSig = (t: DbTable) => t.indexes.map((i) => `${i.columns.map(lc).sort().join('+')}:${i.unique}`).sort().join('|')
+  if (idxSig(kept) !== idxSig(dup)) diffs.push('INDEX 상이')
+  return diffs
 }
 
 /** census 의 .sql 파일을 파싱해 DB 스키마 모델 생성. */
@@ -58,7 +113,7 @@ export function extractDbSchema(
   cache?: ScanCacheSession,
 ): DbSchemaModel {
   const tableByKey = new Map<string, DbTable>()
-  const unresolved: Array<{ ref: string; reason: string }> = []
+  const unresolved: Array<{ ref: string; reason: string; severity?: 'warn' | 'info' }> = []
   let sqlFileCount = 0
 
   const key = (name: string) => name.toLowerCase()
@@ -111,7 +166,19 @@ export function extractDbSchema(
     for (const t of tables) {
       const k = key(t.name)
       if (tableByKey.has(k)) {
-        unresolved.push({ ref: `${relPath}:${t.name}`, reason: '중복 CREATE TABLE(첫 정의 유지)' })
+        // 구조 diff — 동일 정의(방언별 부트스트랩 중복 등)는 info 로 강등, 상이만 warn 유지.
+        const diffs = diffTableDefs(tableByKey.get(k)!, t)
+        if (diffs.length === 0) {
+          unresolved.push({ ref: `${relPath}:${t.name}`, reason: '중복 CREATE TABLE(동일 정의·첫 정의 유지)', severity: 'info' })
+        } else {
+          const head = diffs.slice(0, 3).join(', ')
+          const rest = diffs.length > 3 ? ` 외 ${diffs.length - 3}건` : ''
+          unresolved.push({
+            ref: `${relPath}:${t.name}`,
+            reason: `중복 CREATE TABLE(정의 상이·첫 정의 유지) — ${head}${rest}`,
+            severity: 'warn',
+          })
+        }
         continue
       }
       tableByKey.set(k, t)
@@ -167,6 +234,7 @@ export function extractDbSchema(
             checks: [],
             indexes: [],
             isCodeTable: false,
+            codeTableReason: null,
             rows: [],
             rowCount: 0,
           }
@@ -185,7 +253,10 @@ export function extractDbSchema(
   }
 
   const tables = [...tableByKey.values()]
-  for (const t of tables) t.isCodeTable = looksLikeCodeTable(t)
+  for (const t of tables) {
+    t.codeTableReason = codeTableReasonOf(t)
+    t.isCodeTable = t.codeTableReason !== null
+  }
   tables.sort((a, b) => cmp(a.name, b.name) || cmp(a.relPath, b.relPath))
   unresolved.sort((a, b) => cmp(a.ref, b.ref) || cmp(a.reason, b.reason))
 

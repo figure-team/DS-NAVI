@@ -1,374 +1,101 @@
-<h1 align="center">Understand Anything</h1>
+<h1 align="center">DS-NAVI</h1>
 
 <p align="center">
-  <strong>Turn any codebase, knowledge base, or docs into an interactive knowledge graph you can explore, search, and ask questions about.</strong>
+  <strong>레거시 시스템의 코드를 유일한 진실로 삼아 — 업무 지도부터 SI 산출물까지 자동 복원하는 분석 대시보드</strong>
   <br />
-  <em>Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.</em>
-</p>
-
-<p align="center">
-  <strong>Understand Anything. <a href="https://egonex.ai">Understand Anyone.</a></strong>
-  <br />
-  <em>AI should help people, not replace them.</em>
-</p>
-
-<p align="center">
-  <a href="https://trendshift.io/repositories/23482" target="_blank"><img src="https://trendshift.io/api/badge/repositories/23482" alt="Understand Anything | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</p>
-
-<p align="center">
-  <a href="README.md">English</a> | <a href="READMEs/README.zh-CN.md">简体中文</a> | <a href="READMEs/README.zh-TW.md">繁體中文</a> | <a href="READMEs/README.ja-JP.md">日本語</a> | <a href="READMEs/README.ko-KR.md">한국어</a> | <a href="READMEs/README.es-ES.md">Español</a> | <a href="READMEs/README.tr-TR.md">Türkçe</a> | <a href="READMEs/README.ru-RU.md">Русский</a>
-</p>
-
-<p align="center">
-  <a href="#-quick-start"><img src="https://img.shields.io/badge/Quick_Start-blue" alt="Quick Start" /></a>
-  <a href="https://github.com/Egonex-AI/Understand-Anything/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow" alt="License: MIT" /></a>
-  <a href="https://docs.anthropic.com/en/docs/claude-code"><img src="https://img.shields.io/badge/Claude_Code-8A2BE2" alt="Claude Code" /></a>
-  <a href="#codex"><img src="https://img.shields.io/badge/Codex-000000" alt="Codex" /></a>
-  <a href="#vs-code--github-copilot"><img src="https://img.shields.io/badge/Copilot-24292e" alt="Copilot" /></a>
-  <a href="#copilot-cli"><img src="https://img.shields.io/badge/Copilot_CLI-24292e" alt="Copilot CLI" /></a>
-  <a href="#gemini-cli"><img src="https://img.shields.io/badge/Gemini_CLI-4285F4" alt="Gemini CLI" /></a>
-  <a href="#opencode"><img src="https://img.shields.io/badge/OpenCode-38bdf8" alt="OpenCode" /></a>
-  <a href="#mistral-vibe-cli"><img src="https://img.shields.io/badge/Vibe_CLI-7c3aed" alt="Vibe CLI" /></a>
-  <a href="#trae"><img src="https://img.shields.io/badge/Trae-7e22ce" alt="Trae" /></a>
-  <a href="https://understand-anything.com"><img src="https://img.shields.io/badge/Homepage-d4a574" alt="Homepage" /></a>
-  <a href="https://understand-anything.com/demo/"><img src="https://img.shields.io/badge/Live_Demo-00c853" alt="Live Demo" /></a>
-  <a href="https://egonex.ai"><img src="https://img.shields.io/badge/Understand_Anyone-egonex.ai-d4a574" alt="Understand Anyone" /></a>
-</p>
-
-<p align="center">
-  <img src="assets/hero.png" alt="Understand Anything — Turn any codebase into an interactive knowledge graph" width="800" />
-</p>
-
-<p align="center">
-  <strong>An open-source project from <a href="https://github.com/Egonex-AI">Egonex</a></strong>
-  <br />
-  <em>Originally created by <a href="https://github.com/Lum1104">Lum1104</a>.</em>
+  <em>LLM + 정적 분석 하이브리드 · <a href="https://github.com/Egonex-AI/Understand-Anything">Understand Anything</a> 기반 ktds 포크</em>
 </p>
 
 ---
 
-**You just joined a new team. The codebase is 200,000 lines of code. Where do you even start?**
+## 왜 만들었나
 
-Understand Anything is a [Claude Code Plugin](https://code.claude.com/docs/en/plugins-reference#plugins-reference) that analyzes your project with a multi-agent pipeline, builds a knowledge graph of every file, function, class, and dependency, then gives you an interactive dashboard to explore it all visually. Stop reading code blind. Start seeing the big picture.
+SI 현장에서 레거시 시스템을 인수하거나 차세대로 전환할 때 반복되는 문제:
 
-> **The goal isn't a graph that wows you with how complex your codebase is — it's a graph that quietly teaches you how every piece fits together.**
+- **문서가 없거나 코드와 다르다.** 설계서·정책서는 오래전 것이고, 실제 동작은 코드에만 있다.
+- **파악에 걸리는 시간이 곧 비용이다.** 업무 흐름·DB 사용·화면 목록을 사람이 코드를 읽어 재구성하는 데 수개월이 든다.
+- **AI 산출물은 신뢰 문제가 있다.** LLM이 그럴듯하게 지어낸 문서는 검수 비용이 더 든다.
 
----
+DS-NAVI는 이 세 가지를 정면으로 다룬다. 코드에서 **근거(file:line)와 함께** 업무 지도·데이터 맵·화면설계서·추적표·산출물 문서를 복원하고, 사람이 대시보드에서 검수·확정하는 **사람-기계 협업 파이프라인**을 제공한다.
 
-## ✨ Features
+## 신뢰 원칙 (모든 기능의 공통 기반)
 
-> [!NOTE]
-> **Want to skip the reading?** Try the [live demo](https://understand-anything.com/demo/) in our [homepage](https://understand-anything.com/) — a fully interactive dashboard you can pan, zoom, search, and explore right in your browser.
+| 원칙 | 구현 |
+|---|---|
+| **날조 0** | 화면의 모든 수치·문장은 수집된 사실에서만 조립. 값이 없으면 "[미확인]"으로 정직하게 표시 |
+| **근거 우선** | 판정마다 `파일:라인` 근거 칩 — 클릭하면 코드 뷰어로 원문 확인 |
+| **기계 판정의 정직성** | 기계 판정은 "근거확보/추정(기계 판정)", 사람 승인만 "확정" — 두 개념을 라벨·색으로 분리 |
+| **침묵 누락 금지** | 분석 못 한 것(미해석·미매핑·부분 지원·0건 vs 미실행)을 숨기지 않고 사유와 함께 표면화 |
+| **결정론** | 같은 커밋에서 재실행하면 같은 산출물(byte-diff 0 지향) — 검수 결과가 조용히 뒤집히지 않음 |
+| **확정의 생존** | 사람의 편집·확정은 오버레이 파일에 분리 저장 — 재분석해도 살아남음 |
 
-### Explore the structural graph
+## 기능 구성 — 무엇을, 왜
 
-Navigate your codebase as an interactive knowledge graph — every file, function, and class is a node you can click, search, and explore. Select any node to see plain-English summaries, relationships, and guided tours.
+분석 스킬(Claude Code 등에서 실행)이 산출물을 만들고, 대시보드 메뉴가 그것을 검수·활용 화면으로 제공한다. 사용법은 **[가이드.md](가이드.md)** 참조.
 
-### Understand business logic
+### 이해 — "이 시스템이 뭐 하는 물건인가"
 
-Switch to the domain view and see how your code maps to real business processes — domains, flows, and steps laid out as a horizontal graph.
+| 메뉴 | 무엇 | 왜 필요한가 |
+|---|---|---|
+| **홈** | 실적·위험·프로그램 요약 카드 | PM이 아침에 열어 30초 안에 상태 파악 — 각 카드가 상세 메뉴 진입점 |
+| **업무 지도** | 도메인 카드 → 시스템 구성도 → 업무 흐름도(프로세스별 순서도) | 인수인계의 첫 질문 "이 시스템 업무가 뭐냐"에 코드 근거로 답한다. 조직도가 아니라 코드에서 복원한 지도 |
+| **구조** | 지식그래프 기반 계층 구조 지도 + diff/영향/위험 오버레이 | 아키텍처 파악과 "변경하면 어디가 흔들리나"를 한 화면에서 — 다른 메뉴의 분석 결과를 지도 위에 얹는 캔버스 |
+| **데이터** | DB 스키마 · 기능×테이블 CRUD 매트릭스 · 코드 테이블 | 레거시의 실질은 DB에 있다. 어떤 기능이 어떤 테이블을 읽고 쓰는지가 전환 범위 산정의 근거 |
+| **화면설계서** | 실행 앱 실측 캡처 + 요소 배지 + 범례(핸들러·근거·신뢰도) | 화면설계서를 손으로 다시 그리는 대신, 실제 앱을 캡처하고 코드 핸들러와 연결 — "그림"이 아니라 "검증 가능한 명세" |
 
-### Analyze knowledge bases
+### 요구 · 변경 — "요구가 코드 어디에 구현됐고, 바꾸면 뭐가 흔들리나"
 
-Point `/understand-knowledge` at a [Karpathy-pattern LLM wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) and get a force-directed knowledge graph with community clustering. The deterministic parser extracts wikilinks and categories from `index.md`, then LLM agents discover implicit relationships, extract entities, and surface claims — turning your wiki into a navigable graph of interconnected ideas.
+| 메뉴 | 무엇 | 왜 필요한가 |
+|---|---|---|
+| **추적표** | 요구↔기능↔구현↔데이터↔시험 추적 매트릭스 + 새 요청 5단계 인테이크 + 변경 관리 | SI 검수의 중심 문서. 역방향(코드→요구 복원)으로 시작해, 신규 요청은 가이드된 절차로 원장에 축적 — 추적성이 유지된 채 성장 |
+| **변경·영향** | 변경 기점 기준 상·하류 도달성 — 영향 파일·진입점(API)·도메인·DB | "이 파일 고치면 어디까지 영향?"에 기계 판정+근거로 답해 회귀 범위·시험 범위 산정을 뒷받침 |
 
-<table>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>🧭 Guided Tours</h3>
-      <p>Auto-generated walkthroughs of the architecture, ordered by dependency. Learn the codebase in the right order.</p>
-    </td>
-    <td width="50%" valign="top">
-      <h3>🔍 Fuzzy & Semantic Search</h3>
-      <p>Find anything by name or by meaning. Search "which parts handle auth?" and get relevant results across the graph.</p>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>📊 Diff Impact Analysis</h3>
-      <p>See which parts of the system your changes affect before you commit. Understand ripple effects across the codebase.</p>
-    </td>
-    <td width="50%" valign="top">
-      <h3>🎭 Persona-Adaptive UI</h3>
-      <p>The dashboard adjusts its detail level based on who you are — junior dev, PM, or power user.</p>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>🏗️ Layer Visualization</h3>
-      <p>Automatic grouping by architectural layer — API, Service, Data, UI, Utility — with color-coded legend.</p>
-    </td>
-    <td width="50%" valign="top">
-      <h3>📚 Language Concepts</h3>
-      <p>12 programming patterns (generics, closures, decorators, etc.) explained in context wherever they appear.</p>
-    </td>
-  </tr>
-</table>
+### 정량 · 보고 — "규모와 위험을 숫자로"
 
----
+| 메뉴 | 무엇 | 왜 필요한가 |
+|---|---|---|
+| **프로그램** | 프로그램 인벤토리 + FP 산정 근거 + 인터페이스 + 배치 | 견적·전환 계획의 기초 수량. FP는 집계만이 아니라 **후보별 근거**까지 제시해 산정 방어 가능 |
+| **품질·위험** | 위험 모듈 랭킹(복잡도·팬인·변경량) + 분석 커버리지 + 정확도 기준선 | 어디부터 손대야 하는지(위험), 그리고 **이 분석 자체를 얼마나 믿어도 되는지**(커버리지·정확도)를 함께 공개 |
+| **보고서** | 주간 실적(커밋·라인·모듈·추이·증감) + 복사/인쇄/md | 주간보고 작성 시간을 0에 수렴 — git 사실만으로 조립하므로 부풀림이 원천 불가 |
 
-## 🚀 Quick Start
+### 정책 · 산출 · 참고 — "납품 가능한 문서로"
 
-### 1. Install the plugin
+| 메뉴 | 무엇 | 왜 필요한가 |
+|---|---|---|
+| **정책서** | 코드·DB에서 추출한 정책 신호 + 기존 정책서와 대조(일치/불일치/누락) | 정책 문서는 낡는다. 코드가 말하는 현행 정책을 추출하고 문서와의 어긋남을 드러냄 — 정책 문장을 지어내지 않음 |
+| **산출물** | 템플릿 기반 SI 표준 문서 생성 + 웹 편집·확정 + xlsx 병기 | 납품 문서를 코드 근거에서 생성하되 최종 책임은 사람이 — 편집·확정이 재생성에도 살아남는 워크플로 |
+| **문서(위키)** | 분석 문서 리더 | 산출물 외 참고 문서의 열람 창구 |
+| **지식그래프** | 원본 Understand Anything 그래프 워크벤치 | 메뉴화되지 않은 자유 탐색·투어·질의의 원형 |
+
+## 동작 구조
+
+```
+분석 대상 프로젝트
+ ├─ /understand           → .understand-anything/knowledge-graph.json   (코드 지식그래프)
+ ├─ /understand-map 외    → .spec/map/*.json                            (업무지도·DB·RTM·영향·정책·실적)
+ └─ /understand-docs      → .spec/wiki/*.md                             (SI 산출물 문서)
+                                   │
+                                   ▼
+대시보드(React SPA) ── 토큰 게이트 dev 서버가 위 산출물을 서빙
+ · URL = 단일 상태(딥링크·새로고침·공유)     · 근거 칩 → 코드 뷰어
+ · 사람 편집·확정 → *-overrides.json 오버레이(재분석 생존)
+```
+
+- **모노레포**: `understand-anything-plugin/`(업스트림 코어+대시보드) · `ktds-legacy-plugin/`(SI 특화 스킬·legacy-core) · `examples/jpetstore-6`(데모 분석 결과)
+- **하이브리드 분석**: LLM(의미 이해·요약)과 정적 분석(tree-sitter·결정론 리졸버)을 역할 분담 — 수치·구조는 정적 분석이, 서술은 근거 제약 아래 LLM이
+- 업스트림 코어는 무수정 유지(`ua-base` 태그로 게이트), ktds 확장은 별도 패키지로 분리
+
+## 빠른 시작
 
 ```bash
-/plugin marketplace add Egonex-AI/Understand-Anything
-/plugin install understand-anything
+pnpm install
+# 데모(분석 없이 바로 보기 — jpetstore-6 스냅샷)
+pnpm --filter @understand-anything/dashboard build:demo
+pnpm --filter @understand-anything/dashboard preview:demo
 ```
 
-### 2. Analyze your codebase
+실제 프로젝트 분석·라이브 실행·메뉴별 사용법 → **[가이드.md](가이드.md)** · 설계 문서 → `docs/ktds/`
 
-```bash
-/understand
-```
+## 크레딧
 
-A multi-agent pipeline scans your project, extracts every file, function, class, and dependency, then builds a knowledge graph saved to `.understand-anything/knowledge-graph.json`.
-
-**Localized output:** Use `--language` to generate content in your preferred language:
-
-```bash
-# Generate Chinese content (知识图节点描述和 Dashboard UI)
-/understand --language zh
-
-# Supported languages: en (default), zh, zh-TW, ja, ko, ru
-```
-
-On the **first run** in a project — when you don't pass `--language` and no language is stored yet — `/understand` detects the language you're conversing in. If it isn't English, it asks you to confirm (or override) before generating; English conversations are unaffected. Your choice is saved to `.understand-anything/config.json` and reused on every later run.
-
-The `--language` parameter affects:
-- Node summaries and descriptions in the knowledge graph
-- Dashboard UI labels, buttons, and tooltips
-- Guided tour explanations
-
-### 3. Explore the dashboard
-
-```bash
-/understand-dashboard
-```
-
-An interactive web dashboard opens with your codebase visualized as a graph — color-coded by architectural layer, searchable, and clickable. Select any node to see its code, relationships, and a plain-English explanation.
-
-### 4. Keep learning
-
-```bash
-# Ask anything about the codebase
-/understand-chat How does the payment flow work?
-
-# Analyze impact of your current changes
-/understand-diff
-
-# Deep-dive into a specific file or function
-/understand-explain src/auth/login.ts
-
-# Generate an onboarding guide for new team members
-/understand-onboard
-
-# Extract business domain knowledge (domains, flows, steps)
-/understand-domain
-
-# Analyze a Karpathy-pattern LLM wiki knowledge base
-/understand-knowledge ~/path/to/wiki
-
-# Re-run anytime — incremental by default (only re-analyzes changed files)
-/understand
-
-# Auto-update on every commit via a post-commit hook
-/understand --auto-update
-
-# Scope to a subdirectory (for huge monorepos)
-/understand src/frontend
-```
-
----
-
-## 🌐 Multi-Platform Installation
-
-Understand-Anything works across multiple AI coding platforms.
-
-### Claude Code (Native)
-
-```bash
-/plugin marketplace add Egonex-AI/Understand-Anything
-/plugin install understand-anything
-```
-
-
-### One-line install (Codex / OpenCode / OpenClaw / Antigravity / Gemini CLI / Pi Agent / Vibe CLI / VS Code Copilot / Hermes / Cline / KIMI CLI / Trae / Nanobot / Kiro)
-
-
-**macOS / Linux:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/Egonex-AI/Understand-Anything/main/install.sh | bash
-# or skip the prompt by passing the platform:
-curl -fsSL https://raw.githubusercontent.com/Egonex-AI/Understand-Anything/main/install.sh | bash -s codex
-```
-
-**Windows (PowerShell):**
-```powershell
-iwr -useb https://raw.githubusercontent.com/Egonex-AI/Understand-Anything/main/install.ps1 | iex
-```
-
-The installer clones the repo to `~/.understand-anything/repo` and creates the right symlinks for the chosen platform. Restart your CLI/IDE afterwards.
-
-- Supported `<platform>` values: `gemini`, `codex`, `opencode`, `pi`, `openclaw`, `antigravity`, `vibe`, `vscode`, `hermes`, `cline`, `kimi`, `trae`, `nanobot`, `kiro`
-- Update later: `./install.sh --update`
-- Uninstall: `./install.sh --uninstall <platform>`
-
-### Cursor
-
-Cursor auto-discovers the plugin via `.cursor-plugin/plugin.json` when this repo is cloned. No manual installation needed — just clone and open in Cursor.
-
-If auto-discovery doesn't pick it up, install it manually: open **Cursor Settings → Plugins**, paste `https://github.com/Egonex-AI/Understand-Anything` into the search field, and add it from there.
-
-### VS Code + GitHub Copilot
-
-VS Code with GitHub Copilot (v1.108+) auto-discovers the plugin via `.copilot-plugin/plugin.json` when this repo is cloned. No manual installation needed — just clone and open in VS Code.
-
-For personal skills (available across all projects), run the `install.sh` above with the `vscode` platform.
-
-### Copilot CLI
-
-```bash
-copilot plugin install Egonex-AI/Understand-Anything:understand-anything-plugin
-```
-
-### Kiro CLI / IDE
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Egonex-AI/Understand-Anything/main/install.sh | bash -s kiro
-```
-
-After installation:
-- **Kiro CLI**: `kiro-cli chat --agent understand "Analyze this project"`
-- **Kiro IDE**: The skills are symlinked into `~/.kiro/skills/` and the `understand` agent is written to `~/.kiro/agents/understand.json`, so both are available after restarting the IDE.
-
-For personal skills (available across all projects), run the `install.sh` above with the `kiro` platform.
-
-### Platform Compatibility
-
-| Platform | Status | Install Method |
-|----------|--------|----------------|
-| Claude Code | ✅ Native | Plugin marketplace |
-| Cursor | ✅ Supported | Auto-discovery |
-| VS Code + GitHub Copilot | ✅ Supported | Auto-discovery |
-| Copilot CLI | ✅ Supported | Plugin install |
-| Codex | ✅ Supported | `install.sh codex` |
-| OpenCode | ✅ Supported | `install.sh opencode` |
-| OpenClaw | ✅ Supported | `install.sh openclaw` |
-| Antigravity | ✅ Supported | `install.sh antigravity` |
-| Gemini CLI | ✅ Supported | `install.sh gemini` |
-| Pi Agent | ✅ Supported | `install.sh pi` |
-| Vibe CLI | ✅ Supported | `install.sh vibe` |
-| Hermes | ✅ Supported | `install.sh hermes` |
-| Cline | ✅ Supported | `install.sh cline` |
-| KIMI CLI | ✅ Supported | `install.sh kimi` |
-| Trae | ✅ Supported | `install.sh trae` |
-| Nanobot | ✅ Supported | `install.sh nanobot` |
-| Kiro CLI / IDE | ✅ Supported | `install.sh kiro` |
-
-
----
-
-## 📦 Share the Graph with Your Team
-
-The graph is just JSON — **commit it once, and teammates skip the pipeline**. Good for onboarding, PR reviews, and docs-as-code.
-
-> **Example:** [GoogleCloudPlatform/microservices-demo](https://github.com/GoogleCloudPlatform/microservices-demo) — Go / Java / Python / Node reference with a committed graph.
-
-**What to commit:** everything in `.understand-anything/` *except* `intermediate/` and `diff-overlay.json` (those are local scratch).
-
-```gitignore
-.understand-anything/intermediate/
-.understand-anything/diff-overlay.json
-```
-
-**Keep it fresh:** enable `/understand --auto-update` — a post-commit hook incrementally patches the graph so each commit lands with a matching graph. Or re-run `/understand` manually before releases.
-
-**Large graphs (10 MB+):** track with **git-lfs**.
-
-```bash
-git lfs install
-git lfs track ".understand-anything/*.json"
-git add .gitattributes .understand-anything/
-```
-
----
-
-## 🔧 Under the Hood
-
-### Tree-sitter + LLM hybrid
-
-Static analysis and LLMs do what each does best:
-
-- **Tree-sitter (deterministic)** — parses source into a concrete syntax tree and extracts structural facts: imports, exports, function/class definitions, call sites, inheritance. Pre-resolved into an `importMap` during the scan phase and passed to file-analyzers so they don't re-derive imports from source. Same input → same output, every run. Also powers fingerprint-based change detection for incremental updates.
-- **LLM (semantic)** — reads the parsed structure alongside the original source to produce what parsers can't: plain-English summaries, tags, architectural layer assignments, business-domain mapping, guided tours, language concept callouts.
-
-This split is why the graph is reproducible on the structural side (the same code always yields the same edges) while still capturing intent on the semantic side (what a file is *for*, not just what it imports).
-
-### Multi-Agent Pipeline
-
-The `/understand` command orchestrates 5 specialized agents, and `/understand-domain` adds a 6th:
-
-| Agent | Role |
-|-------|------|
-| `project-scanner` | Discover files, detect languages and frameworks |
-| `file-analyzer` | Extract functions, classes, imports; produce graph nodes and edges |
-| `architecture-analyzer` | Identify architectural layers |
-| `tour-builder` | Generate guided learning tours |
-| `graph-reviewer` | Validate graph completeness and referential integrity (runs inline by default; use `--review` for full LLM review) |
-| `domain-analyzer` | Extract business domains, flows, and process steps (used by `/understand-domain`) |
-| `article-analyzer` | Extract entities, claims, and implicit relationships from wiki articles (used by `/understand-knowledge`) |
-
-File analyzers run in parallel (up to 5 concurrent, 20-30 files per batch). Supports incremental updates — only re-analyzes files that changed since the last run.
-
----
-
-## 🎥 Community
-
-A community-made walkthrough by **Better Stack**.
-
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=VmIUXVlt7_I"><img src="https://img.youtube.com/vi/VmIUXVlt7_I/maxresdefault.jpg" alt="Community walkthrough by Better Stack — watch on YouTube" width="480" /></a>
-  <br />
-  <em><a href="https://www.youtube.com/watch?v=VmIUXVlt7_I">Watch on YouTube &rarr;</a></em>
-</p>
-
-Made a video, blog post, or tutorial? Open an issue or PR — happy to feature it here.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to get started:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Run the tests (`pnpm --filter @understand-anything/core test`)
-4. Commit your changes and open a pull request
-
-Please open an issue first for major changes so we can discuss the approach.
-
----
-
-<p align="center">
-  <strong>Stop reading code blind. Start understanding everything.</strong>
-</p>
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=Egonex-AI%2FUnderstand-Anything&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=Egonex-AI/Understand-Anything&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=Egonex-AI/Understand-Anything&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=Egonex-AI/Understand-Anything&type=date&legend=top-left" />
- </picture>
-</a>
-
-<p align="center">
-  <em>Thanks to everyone who's used and contributed — knowing this saves people time is what made it worth building.</em>
-</p>
-
-<p align="center">
-  MIT License &copy; Yuxiang Lin and Infinite Universe, Inc.
-</p>
+[Understand Anything](https://github.com/Egonex-AI/Understand-Anything) (MIT, Egonex AI)의 포크로, 코어 분석 엔진·대시보드 기반·지식그래프 워크벤치는 업스트림의 것이다. DS-NAVI는 그 위에 SI/레거시 전환 실무(업무 지도, RTM, FP, 정책·산출물, 정직성 원칙)를 얹었다. 업스트림 원문 README는 git 이력에서 볼 수 있다.

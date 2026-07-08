@@ -67,7 +67,9 @@ describe('db-schema 스캐너 (P0)', () => {
     it('코드테이블 인식 + dataload 행(상태값 근거)', () => {
       const cc = table(model, 'common_code')!
       expect(cc.isCodeTable).toBe(true)
+      expect(cc.codeTableReason).toBe("테이블명 패턴 'common'") // 판정 사유 표면화(개편 ④)
       expect(table(model, 'member')!.isCodeTable).toBe(false)
+      expect(table(model, 'member')!.codeTableReason).toBeNull()
       expect(cc.rowCount).toBe(4) // 다중 VALUES 3 + 단일 1
       expect(cc.rows.map((r) => r.values.code)).toEqual(['ACTIVE', 'DORMANT', 'WITHDRAWN', 'BRONZE'])
       expect(cc.rows[0].values).toMatchObject({ code: 'ACTIVE', code_name: '활성', grp: 'MEMBER_STATUS' })
@@ -103,5 +105,37 @@ describe('db-schema 스캐너 (P0)', () => {
     const a = extractDbSchema(fixtureDir, baseCensus)
     const b = extractDbSchema(fixtureDir, baseCensus)
     expect(a).toEqual(b)
+  })
+
+  describe('중복 CREATE TABLE 구조 diff (데이터 맵 개편 ①)', () => {
+    const dupDir = join(here, '..', '..', 'fixtures', 'db-schema-dup')
+    const model = extractDbSchema(dupDir, buildCensus(dupDir))
+
+    it('동일 정의 중복 → severity info(경고 아님)', () => {
+      const u = model.unresolved.find((x) => x.ref === 'second.sql:t_order')!
+      expect(u.reason).toBe('중복 CREATE TABLE(동일 정의·첫 정의 유지)')
+      expect(u.severity).toBe('info')
+    })
+
+    it('상이 정의 중복 → severity warn + diff 요약', () => {
+      const u = model.unresolved.find((x) => x.ref === 'second.sql:t_pay')!
+      expect(u.severity).toBe('warn')
+      expect(u.reason).toContain('정의 상이·첫 정의 유지')
+      expect(u.reason).toContain("컬럼 상이 'method'(type VARCHAR(10)≠varchar(20))")
+      expect(u.reason).toContain("컬럼 추가 'approved_at'")
+    })
+
+    it('첫 정의 유지 — 채택 테이블 구조는 첫 파일 기준', () => {
+      const pay = table(model, 't_pay')!
+      expect(pay.relPath).toBe('first.sql')
+      expect(pay.columns.map((c) => c.name)).toEqual(['pay_id', 'method'])
+      expect(model.unresolved).toHaveLength(2)
+    })
+
+    it('코드성 판정 사유 — 컬럼 조합(코드+라벨)', () => {
+      const reason = table(model, 't_reason')!
+      expect(reason.isCodeTable).toBe(true)
+      expect(reason.codeTableReason).toBe("코드컬럼 'item_cd' + 라벨컬럼 'item_nm'")
+    })
   })
 })

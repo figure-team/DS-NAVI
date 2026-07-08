@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Background,
   Handle,
+  MarkerType,
   Position,
   ReactFlow,
   ReactFlowProvider,
@@ -202,13 +203,47 @@ export default function BusinessFlowView({
   // ELK direction=DOWN — 순서도는 위→아래(work_flow.png 어휘).
   useEffect(() => {
     let cancelled = false;
+    // 순방향 본 체인 우선 정렬 — start 에서 BFS 깊이를 재고, 깊이가 늘지 않는
+    // 엣지(재시도 루프백)는 직선 우선순위 0 으로 강등한다. NETWORK_SIMPLEX 가
+    // 루프백을 직선화하려고 본 체인(시작→활동→판단)을 축에서 끌어내는 문제 차단.
+    // 무라벨 순방향 = 본 체인(5) > 분기 라벨 엣지(1, 어차피 옆으로 꺾임) > 루프백(0).
+    const depth = new Map<string, number>();
+    const adj = new Map<string, string[]>();
+    for (const e of biz.edges) {
+      const list = adj.get(e.from) ?? [];
+      list.push(e.to);
+      adj.set(e.from, list);
+    }
+    const queue = biz.nodes.filter((n) => n.kind === "start").map((n) => n.id);
+    for (const id of queue) depth.set(id, 0);
+    while (queue.length > 0) {
+      const id = queue.shift()!;
+      for (const next of adj.get(id) ?? []) {
+        if (!depth.has(next)) {
+          depth.set(next, depth.get(id)! + 1);
+          queue.push(next);
+        }
+      }
+    }
+    const straightness = (e: { from: string; to: string; label?: string }): string => {
+      const back = (depth.get(e.to) ?? Infinity) <= (depth.get(e.from) ?? -1);
+      return back ? "0" : e.label ? "1" : "5";
+    };
     const input = {
       id: "bizflow",
       layoutOptions: {
         "elk.algorithm": "layered",
         "elk.direction": "DOWN",
-        "elk.spacing.nodeNode": "28",
-        "elk.layered.spacing.nodeNodeBetweenLayers": "44",
+        // 가시성 조정: NETWORK_SIMPLEX 는 직선 체인을 같은 축에 정렬한다(기본
+        // BRANDES_KOEPF 는 폭이 다른 노드들이 지그재그로 흘렀음 — 사용자 지적).
+        "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+        "elk.layered.nodePlacement.favorStraightEdges": "true",
+        "elk.spacing.nodeNode": "36",
+        // 계층 간격을 넓혀 분기 라벨 칩이 놓일 코리도어를 확보한다.
+        "elk.layered.spacing.nodeNodeBetweenLayers": "60",
+        "elk.spacing.edgeNode": "20",
+        "elk.spacing.edgeEdge": "14",
+        "elk.layered.spacing.edgeNodeBetweenLayers": "20",
         "elk.edgeRouting": "ORTHOGONAL",
       },
       children: biz.nodes.map((n) => ({
@@ -220,6 +255,7 @@ export default function BusinessFlowView({
         id: `be${i}`,
         sources: [e.from],
         targets: [e.to],
+        layoutOptions: { "elk.layered.priority.straightness": straightness(e) },
       })),
     };
     applyElkLayout(input).then(({ positioned }) => {
@@ -257,9 +293,13 @@ export default function BusinessFlowView({
       target: e.to,
       type: "elk",
       label: e.label,
-      labelStyle: { fontSize: 10.5, fill: "var(--color-text-muted)", fontWeight: 700 },
+      // 방향 화살표 — 순서도 판독성(흐름 방향)의 기본기.
+      markerEnd: { type: MarkerType.ArrowClosed, width: 15, height: 15, color: "var(--color-border-medium)" },
       style: { stroke: "var(--color-border-medium)", strokeWidth: 1.5 },
-      data: { points: layout.edgePoints.get(`be${i}`) },
+      // labelChip: 분기 라벨을 노드 위 레이어의 칩으로(경로 중간점 SVG 텍스트는
+      // 노드에 가려짐), 앵커는 계층 사이 수평 런(ElkEdge.chipAnchor).
+      // snapHandles:false — 렌더 크기 == ELK 크기라 스냅 불필요, 루프백 왜곡 방지.
+      data: { points: layout.edgePoints.get(`be${i}`), labelChip: true, snapHandles: false },
     }));
   }, [biz, layout]);
 
@@ -353,8 +393,9 @@ export default function BusinessFlowView({
               style={{
                 fontSize: 11,
                 padding: "2px 10px",
-                color: accent,
-                background: `color-mix(in srgb, ${accent} 9%, transparent)`,
+                // 노드의 flow: 칩(status-info)과 동일 색 — 기능 연결 표식의 색 언어 통일.
+                color: "var(--color-status-info)",
+                background: "color-mix(in srgb, var(--color-status-info) 10%, transparent)",
               }}
             >
               {t.flowList.bfOpenFlow}

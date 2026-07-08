@@ -174,7 +174,8 @@ function parseCreateTable(
     foreignKeys,
     checks,
     indexes,
-    isCodeTable: false, // extract 가 데이터·휴리스틱으로 재산정.
+    isCodeTable: false, // extract 가 데이터·휴리스틱으로 재산정(사유 포함).
+    codeTableReason: null,
     rows: [],
     rowCount: 0,
   }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { useDashboardStore } from "../store";
 import { useNavigate, useSearchParams } from "react-router";
@@ -15,11 +15,11 @@ import {
 } from "../utils/businessFlow";
 import {
   buildDomainFlows,
+  buildFlowSections,
   domainIcon,
   filterFlows,
   findDomain,
   flowFacets,
-  flowGroupKey,
   hasBusinessFlow,
   isFilterActive,
   parseDomainClaims,
@@ -47,9 +47,11 @@ import {
  * business 탭 내용물(순서도)은 P4 — P3 는 데이터 없음 상태를 정직하게 표기한다.
  *
  * USECASE GROUPING (documented choice): real domain-graph.json has no "usecase"
- * field, so flows are grouped by `entryType` into honest buckets (HTTP / Batch /
- * Event / Other). When all flows fall in a single bucket the group header is
- * suppressed and a flat list is rendered — avoids a noisy single-section label.
+ * field. Sections are built by `buildFlowSections` (domainData.ts): when a
+ * domain has 2+ distinct sub-packages (filePath-derived, e.g. eGov `cop`'s
+ * bbs/smt/adb/...), flows are sectioned by sub-package — avoids one flat
+ * 200+ row list. Otherwise it falls back to the original `entryType` buckets
+ * (HTTP / Batch / Event / Other), identical to pre-subgroup behavior.
  */
 
 // Method badge palette — ported from prototype `.method-*` classes.
@@ -68,8 +70,6 @@ const METHOD_STYLE: Record<FlowMethod, { bg: string; color: string }> = {
   EVENT: methodStyle("EVENT"),
   FLOW: methodStyle("FLOW"),
 };
-
-const GROUP_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
 
 /** 점진 windowing — 최초 렌더 행 수 / 센티널 도달 시 증가 폭 (§4-2 계측 후 채택). */
 const WINDOW_INITIAL = 100;
@@ -145,7 +145,8 @@ export default function FlowListView() {
   const [groupSel, setGroupSel] = useState<Set<FlowGroupKey>>(new Set());
   const [methodSel, setMethodSel] = useState<Set<FlowMethod>>(new Set());
   const [verdictSel, setVerdictSel] = useState<Set<FlowVerdictKey>>(new Set());
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<FlowGroupKey>>(new Set());
+  // 섹션 키 — 서브그룹(예: "adb") 또는 폴백 entryType(FlowGroupKey) 둘 다 문자열.
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   const flows = useMemo<DomainFlow[]>(
     () =>
@@ -163,6 +164,15 @@ export default function FlowListView() {
         : [],
     [domainGraph, activeDomainId],
   );
+
+  // 최초엔 기능 목록을 전부 접힌 상태로 — 흐름이 많은 도메인(예 협업 216)에서 서브패키지
+  // 헤더만 먼저 보이게 한다(사용자 요청). 도메인 전환마다 재적용하되, 섹션이 여러 개일
+  // 때만(그룹화된 경우) 접는다 — 단일 섹션까지 접으면 목록이 통째로 숨어 어색하다.
+  // useLayoutEffect = 216행을 펼쳐 그렸다 접는 깜빡임 차단(페인트 전 반영).
+  useLayoutEffect(() => {
+    const sections = buildFlowSections(flows);
+    setCollapsedGroups(sections.length >= 2 ? new Set(sections.map((s) => s.key)) : new Set());
+  }, [activeDomainId, flows]);
 
   const domainNode = useMemo(
     () => (domainGraph && activeDomainId ? findDomain(domainGraph, activeDomainId) : undefined),
@@ -230,21 +240,16 @@ export default function FlowListView() {
   const filtered = useMemo(() => filterFlows(flows, filter), [flows, filter]);
   const filterOn = isFilterActive(filter);
 
-  // Group flows by entryType bucket, preserving graph order within a group.
-  // 그룹은 필터 결과 위에서 재구성 — 그룹 접힘은 필터와 독립.
-  const groups = useMemo(() => {
-    const map = new Map<FlowGroupKey, DomainFlow[]>();
-    for (const f of filtered) {
-      const key = flowGroupKey(f.entryType);
-      const list = map.get(key) ?? [];
-      list.push(f);
-      map.set(key, list);
-    }
-    return GROUP_ORDER.filter((k) => map.has(k)).map((k) => ({
-      key: k,
-      flows: map.get(k)!,
-    }));
-  }, [filtered]);
+  // 섹션 기준(서브패키지 vs entryType)은 **전체 흐름** 기준 1회 판정 — 검색 중 부분집합으로
+  // 재판정하면 결과가 한 서브패키지로 좁혀질 때 그룹핑이 "HTTP 엔드포인트"로 뒤집힌다(버그).
+  const bySubGroup = useMemo(
+    () => new Set(flows.map((f) => f.subGroup).filter((g): g is string => g !== null)).size >= 2,
+    [flows],
+  );
+
+  // 서브패키지 또는 폴백 entryType 으로 섹션 구성(domainData.buildFlowSections).
+  // 그룹은 필터 결과 위에서 재구성 — 그룹 접힘은 필터와 독립(모드는 전체 기준 고정).
+  const groups = useMemo(() => buildFlowSections(filtered, bySubGroup), [filtered, bySubGroup]);
 
   const groupLabel: Record<FlowGroupKey, string> = {
     http: t.flowList.groupHttp,
@@ -270,18 +275,12 @@ export default function FlowListView() {
     flowIndex.find((f) => f.id === selectedFlowId) ??
     null;
 
-  // 표시 순서(그룹 순회) 기준 1..N 번호 — **필터와 무관하게 전체 목록 기준**으로
+  // 표시 순서(섹션 순회) 기준 1..N 번호 — **필터와 무관하게 전체 목록 기준**으로
   // 고정해, 필터 중에도 행 번호·접힘 레일 번호가 같은 기능을 가리킨다.
-  const fullOrdered = useMemo(() => {
-    const map = new Map<FlowGroupKey, DomainFlow[]>();
-    for (const f of flows) {
-      const key = flowGroupKey(f.entryType);
-      const list = map.get(key) ?? [];
-      list.push(f);
-      map.set(key, list);
-    }
-    return GROUP_ORDER.filter((k) => map.has(k)).flatMap((k) => map.get(k)!);
-  }, [flows]);
+  const fullOrdered = useMemo(
+    () => buildFlowSections(flows, bySubGroup).flatMap((g) => g.flows),
+    [flows, bySubGroup],
+  );
   const flowNumber = useMemo(() => {
     const m = new Map<string, number>();
     fullOrdered.forEach((f, i) => m.set(f.id, i + 1));
@@ -293,18 +292,19 @@ export default function FlowListView() {
 
   // §4-2 점진 windowing — 그룹 헤더+행을 평탄화한 렌더 목록에 센티널 기반 창을 적용.
   type RenderItem =
-    | { kind: "header"; group: FlowGroupKey; count: number; collapsed: boolean }
+    | { kind: "header"; sectionKey: string; label: string; count: number; collapsed: boolean }
     | { kind: "flow"; flow: DomainFlow };
   const renderItems = useMemo<RenderItem[]>(() => {
     const items: RenderItem[] = [];
     // pmpl-proto .fl-grp — 그룹 헤더는 단일 그룹이어도 항상 노출("HTTP 엔드포인트 (6)").
     for (const g of groups) {
-      const collapsed = collapsedGroups.has(g.key);
-      items.push({ kind: "header", group: g.key, count: g.flows.length, collapsed });
+      // 검색/필터 활성 시엔 접힘 무시하고 항상 펼침 — 결과가 접힌 헤더에 가려지지 않게.
+      const collapsed = !filterOn && collapsedGroups.has(g.key);
+      items.push({ kind: "header", sectionKey: g.key, label: g.label, count: g.flows.length, collapsed });
       if (!collapsed) for (const f of g.flows) items.push({ kind: "flow", flow: f });
     }
     return items;
-  }, [groups, collapsedGroups]);
+  }, [groups, collapsedGroups, filterOn]);
 
   const [windowSize, setWindowSize] = useState(WINDOW_INITIAL);
   // 필터/도메인 변경 시 창 리셋 — 검색 결과 최상단부터 다시. 키는 JSON 직렬화로
@@ -714,10 +714,10 @@ export default function FlowListView() {
               {visibleItems.map((item) =>
                 item.kind === "header" ? (
                   <button
-                    key={`h:${item.group}`}
+                    key={`h:${item.sectionKey}`}
                     type="button"
                     onClick={() =>
-                      toggleIn(collapsedGroups, item.group, setCollapsedGroups)
+                      toggleIn(collapsedGroups, item.sectionKey, setCollapsedGroups)
                     }
                     aria-expanded={!item.collapsed}
                     className="flex items-center gap-1.5 text-text-muted mt-2 first:mt-0 cursor-pointer hover:text-text-secondary transition-colors w-full text-left"
@@ -727,7 +727,9 @@ export default function FlowListView() {
                       {item.collapsed ? "▶" : "▼"}
                     </span>
                     <span>
-                      {groupLabel[item.group]}{" "}
+                      {/* 서브그룹 섹션은 label 이 채워져 그대로 렌더, entryType 폴백은
+                          label="" 이라 groupLabel(i18n) 로 해석한다. */}
+                      {item.label || groupLabel[item.sectionKey as FlowGroupKey]}{" "}
                       <span className="tabular-nums">({item.count})</span>
                     </span>
                   </button>

@@ -38,6 +38,11 @@ export interface DomainFlow {
    * 승계한다. null = 대응 폼 흐름 없음.
    */
   formFlow: { id: string; name: string } | null;
+  /**
+   * 도메인 내부 서브패키지 코드(예: "adb") — filePath 의 `/<domainKey>/<seg>/`
+   * 세그먼트에서 파생(층 세그먼트는 제외). null = 파생 불가(filePath 없음/미매치).
+   */
+  subGroup: string | null;
 }
 
 /** A citation backing a domain-level claim (embedded by emit's embedVerification). */
@@ -475,6 +480,68 @@ export function buildDomainCards(graph: KnowledgeGraph): {
   return { stats, cards };
 }
 
+/** 층(layer) 세그먼트 — sub-group 후보로 매치돼도 실제 기능 그룹이 아니므로 제외. */
+const LAYER_SEGMENTS = new Set([
+  "web",
+  "service",
+  "dao",
+  "impl",
+  "mapper",
+  "vo",
+  "controller",
+  "api",
+  "com",
+]);
+
+/**
+ * `domainId`(예: "domain:cop")에서 도메인 키("cop")를 파싱한다. 접두사가 없으면
+ * 원본을 그대로 키로 취급(방어적 폴백).
+ */
+function domainKeyFromId(domainId: string): string {
+  return domainId.startsWith("domain:") ? domainId.slice("domain:".length) : domainId;
+}
+
+/**
+ * filePath 의 `/<domainKey>/<seg>/` 세그먼트에서 서브패키지 코드를 파생한다.
+ * 층 세그먼트(web/service/dao/…)는 실제 기능 그룹이 아니므로 null 로 취급한다
+ * (예: `.../cmm/web/...` 은 "web" 이 아니라 서브그룹 없음).
+ */
+function deriveSubGroup(filePath: string | undefined, domainKey: string): string | null {
+  if (!filePath || !domainKey) return null;
+  // 도메인 키는 경로/파일명 토큰 유래라 대부분 [a-z0-9]지만, 메타문자가 섞인 키가
+  // 그대로 패턴에 들어가면 RegExp 생성이 던져 도메인 화면이 죽는다 — 이스케이프.
+  const escaped = domainKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`/${escaped}/([a-z0-9]+)/`, "i");
+  const m = filePath.match(re);
+  if (!m) return null;
+  const seg = m[1].toLowerCase();
+  return LAYER_SEGMENTS.has(seg) ? null : seg;
+}
+
+/**
+ * eGovFrame 공통컴포넌트 서브패키지 코드 → 업무 라벨(best-effort). 미매핑은 코드
+ * 대문자 폴백.
+ */
+export const SUBGROUP_LABELS: Record<string, string> = {
+  // cop 협업
+  bbs: "게시판", smt: "일정관리", cmy: "커뮤니티", ems: "이메일", adb: "주소록",
+  cmt: "댓글", ncm: "알림", tpl: "템플릿", scp: "스크랩", sms: "SMS", stf: "직원/서식", com: "공통",
+  // uss 사용자지원
+  ion: "정보제공", olp: "온라인설문", olh: "온라인도움말", umt: "사용자·회원관리", sam: "회원가입",
+  // sym 시스템관리
+  ccm: "공통코드", log: "로그", bat: "배치", mnu: "메뉴", tbm: "게시판템플릿", sym: "시스템",
+  // sec 보안 / uat 인증 / ssi 연계 / ext 확장
+  ram: "역할관리", pki: "인증서", drm: "권한", gmt: "그룹관리", rgm: "등록관리", rmt: "원격관리",
+  uap: "인증정책", uia: "통합인증", syi: "시스템연계",
+  captcha: "캡차", ldapumt: "LDAP", oauth: "OAuth", msg: "메시지",
+  // dam 자료 / utl 유틸 / sts 통계
+  map: "지도", spe: "명세", sys: "시스템유틸", sim: "네트워크/시뮬", wed: "웹에디터", jso: "JSON",
+};
+
+export function subGroupLabel(code: string): string {
+  return SUBGROUP_LABELS[code] ?? code.toUpperCase();
+}
+
 /**
  * Build the screen-2 flow rows for one domain.
  * `mergeForms: false` 는 병합 없이 전 흐름을 돌려준다 — 병합으로 목록에서
@@ -486,6 +553,7 @@ export function buildDomainFlows(
   opts: { mergeForms?: boolean } = {},
 ): DomainFlow[] {
   const mergeForms = opts.mergeForms !== false;
+  const domainKey = domainKeyFromId(domainId);
   const flowIds = new Set(
     graph.edges
       .filter((e) => e.type === "contains_flow" && e.source === domainId)
@@ -524,6 +592,7 @@ export function buildDomainFlows(
         entryType: entryType ?? "",
         grounding: parseFlowStepClaim(node),
         formFlow: formNode ? { id: formNode.id, name: formNode.name } : null,
+        subGroup: deriveSubGroup(node.filePath, domainKey),
       };
     });
 }
@@ -546,6 +615,71 @@ export function flowGroupKey(entryType: string): FlowGroupKey {
   if (t === "cron" || t === "batch" || t === "schedule") return "batch";
   if (t === "event" || t === "message" || t === "queue") return "event";
   return "other";
+}
+
+const GROUP_SECTION_ORDER: FlowGroupKey[] = ["http", "batch", "event", "other"];
+
+/** One collapsible section in the flow list — a sub-package group, or (fallback) an entryType group. */
+export interface FlowSection {
+  key: string;
+  label: string;
+  flows: DomainFlow[];
+}
+
+/**
+ * 도메인 내부 서브패키지 그룹핑(§ domain-internal sub-package grouping).
+ * eGov 처럼 216개 흐름이 전부 entryType=http 인 도메인은 flowGroupKey 로 나누면
+ * 단일 버킷(평면 목록)이 되어 압도적이다 — filePath 기반 subGroup 이 2종 이상
+ * 실존할 때는 그걸로 섹션을 나누고, 아니면(0/1종) 기존 entryType 폴백을 그대로
+ * 유지한다(jpetstore·eGov cmm 등 소규모 도메인은 오늘과 동일 동작).
+ *
+ * `forceSubGroup` — 섹션 기준(서브패키지 vs entryType)을 호출측이 강제한다. 검색/필터
+ * 결과처럼 부분집합에 대해 섹션을 만들 때, 부분집합의 subGroup 종수로 모드를 재판정하면
+ * 검색 도중 그룹핑이 뒤집힌다(서브패키지→"HTTP"). 그래서 FlowListView 는 **전체 흐름**
+ * 기준으로 모드를 1회 정해 두 호출(전체·필터결과)에 동일하게 넘긴다. 미지정이면 자동판정.
+ */
+export function buildFlowSections(flows: DomainFlow[], forceSubGroup?: boolean): FlowSection[] {
+  const distinctSubGroups = new Set(
+    flows.map((f) => f.subGroup).filter((g): g is string => g !== null),
+  );
+  const bySubGroup = forceSubGroup ?? distinctSubGroups.size >= 2;
+
+  if (bySubGroup) {
+    const map = new Map<string, DomainFlow[]>();
+    const other: DomainFlow[] = [];
+    for (const f of flows) {
+      if (f.subGroup === null) {
+        other.push(f);
+        continue;
+      }
+      const list = map.get(f.subGroup) ?? [];
+      list.push(f);
+      map.set(f.subGroup, list);
+    }
+    const sections: FlowSection[] = [...map.entries()]
+      // 내림차순 개수, 동률은 key 오름차순 — 결정론.
+      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+      .map(([key, list]) => ({ key, label: subGroupLabel(key), flows: list }));
+    if (other.length > 0) {
+      sections.push({ key: "__other", label: "기타", flows: other });
+    }
+    return sections;
+  }
+
+  // 폴백: 기존 entryType 그룹핑. label 은 빈 문자열로 남겨 호출측(FlowListView)이
+  // t.flowList.group* i18n 라벨을 그대로 쓰게 한다(다국어 유지, key=FlowGroupKey).
+  const map = new Map<FlowGroupKey, DomainFlow[]>();
+  for (const f of flows) {
+    const key = flowGroupKey(f.entryType);
+    const list = map.get(key) ?? [];
+    list.push(f);
+    map.set(key, list);
+  }
+  return GROUP_SECTION_ORDER.filter((k) => map.has(k)).map((k) => ({
+    key: k,
+    label: "",
+    flows: map.get(k)!,
+  }));
 }
 
 /** Flow verdict bucket for the filter chips — "none" = unfilled (no grounding). */

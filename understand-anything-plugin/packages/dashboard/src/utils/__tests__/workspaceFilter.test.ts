@@ -25,6 +25,7 @@ function flow(over: Partial<DomainFlow>): DomainFlow {
     entryType: "http",
     grounding: null,
     formFlow: null,
+    subGroup: null,
     ...over,
   };
 }

@@ -115,6 +115,7 @@ describe("buildSequentialFallback — 결정론 순차 근사", () => {
     entryType: "http",
     formFlow: null,
     grounding: null,
+    subGroup: null,
   });
 
   const LABELS = { start: "시작", end: "종료", more: "…외 {count}건" };

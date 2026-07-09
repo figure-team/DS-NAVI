@@ -695,6 +695,10 @@ export declare const DomainMapSummarySchema: z.ZodObject<{
             }, z.core.$strip>>;
         }, z.core.$strip>>;
     }, z.core.$strip>;
+    planDrift: z.ZodOptional<z.ZodObject<{
+        addedRoots: z.ZodArray<z.ZodString>;
+        removedRoots: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>>;
 }, z.core.$strip>;
 export type DomainMapSummary = z.infer<typeof DomainMapSummarySchema>;
 /**

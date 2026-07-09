@@ -319,6 +319,7 @@ async function runMap() {
 
   console.log(`도메인 맵 요약 — ${projectRoot}`)
   console.log('온보딩 우선순위("여기부터 보세요") 랭킹 + 교차 도메인 의존.')
+  reportPlanDrift(summary.planDrift)
   console.log('')
   console.log('  순위 키(key)            이름                흐름  노드  우선  근거')
   console.log('  ---- ------------------ ------------------ ---- ---- ---- ----')
@@ -341,6 +342,25 @@ async function runMap() {
   }
   console.log('')
   console.log('산출물: .spec/map/domain-map.json (동일 commit 재실행 byte-diff=0)')
+}
+
+/**
+ * 확정 플랜 드리프트 경고 — 현재 후보와 확정 플랜이 어긋나면 이 요약/골격은 '낡은
+ * 경계' 기준이다. 조용히 진행해 bundle/fill 이 구 경계로 폭주하는 사고를 막는다:
+ * 드리프트가 있으면 반드시 재확정 후 map→bundle→fill 을 다시 돌려야 한다.
+ */
+function reportPlanDrift(drift) {
+  if (!drift) return
+  const added = drift.addedRoots ?? []
+  const removed = drift.removedRoots ?? []
+  if (added.length === 0 && removed.length === 0) return
+  const sample = (arr) => arr.slice(0, 3).join(', ') + (arr.length > 3 ? ` 외 ${arr.length - 3}개` : '')
+  console.log('')
+  console.log('⚠️⚠️ 확정 플랜 드리프트 — 현재 후보와 domain-plan.confirmed.json 이 어긋납니다.')
+  if (added.length > 0) console.log(`   플랜에 없는 새 루트 ${added.length}개: ${sample(added)}`)
+  if (removed.length > 0) console.log(`   플랜에만 있고 후보에 없는 루트 ${removed.length}개: ${sample(removed)}`)
+  console.log('   이 요약과 skeleton 은 낡은 플랜 기준입니다. 이대로 bundle/fill 을 진행하지 마세요.')
+  console.log('   재확정: confirm --auto-approve --by <담당자> [--ops <ops.json>] → map/bundle 재실행.')
 }
 
 /**

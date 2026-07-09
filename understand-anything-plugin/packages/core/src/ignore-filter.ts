@@ -7,6 +7,12 @@ import { join } from "node:path";
  * exclusion rules, plus bin/obj for .NET projects.
  */
 export const DEFAULT_IGNORE_PATTERNS: string[] = [
+  // Tool self-output — analysis artifacts must never be re-analyzed as
+  // project source. Normally untracked, but demo/vendored repos commit them,
+  // and the git-ls-files enumeration path would otherwise pick them up.
+  ".understand-anything/",
+  ".spec/",
+
   // Dependency directories
   "node_modules/",
   ".git/",

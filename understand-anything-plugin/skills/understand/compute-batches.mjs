@@ -268,6 +268,31 @@ function buildNonCodeBatches(nonCodeFiles) {
 }
 
 /**
+ * Batch machine-eligible files (markup/docs/csv + SQL-mapper XML — see
+ * isMachineEligible) by immediate parent directory, max 20 per batch,
+ * mirroring Group E semantics.
+ * mergeable=true so tiny batches pool via mergeSmallBatches, which keeps the
+ * machine pool separate from the LLM pool to preserve tier purity.
+ */
+function buildMachineBatches(machineFiles) {
+  const dirOf = p => p.includes('/') ? p.slice(0, p.lastIndexOf('/')) : '';
+  const byDir = new Map();
+  for (const f of [...machineFiles].sort((a, b) => a.path.localeCompare(b.path))) {
+    const dir = dirOf(f.path);
+    if (!byDir.has(dir)) byDir.set(dir, []);
+    byDir.get(dir).push(f);
+  }
+  const MAX_M = 20;
+  const groups = [];
+  for (const [, files] of byDir) {
+    for (let i = 0; i < files.length; i += MAX_M) {
+      groups.push({ files: files.slice(i, i + MAX_M), mergeable: true });
+    }
+  }
+  return groups;
+}
+
+/**
  * Build a lookup map from file path → batchIndex across all batches (code +
  * non-code). Used to resolve cross-batch neighbor references in neighborMap.
  */
@@ -315,6 +340,44 @@ function countBasedAssignment(codeFiles, batchSize = 12) {
 }
 
 /**
+ * Machine-tier eligibility (task A, file tiering): files whose knowledge-graph
+ * nodes are generated deterministically (template summary + tree-sitter
+ * structure) with NO LLM call. Scope: markup/docs, tabular data, and SQL-mapper
+ * XML (MyBatis/iBatis — detected by content, passed in as `mapperPaths`; their
+ * namespace/query/table facts plus DAO-interface and DB-variant edges are all
+ * deterministically extractable, and measured LLM output for them carried no
+ * information beyond that). `.sql` stays in the LLM tier (egov: 1,900 files
+ * with 2,269 edges incl. migrates), as do schema definitions
+ * (.graphql/.proto/.prisma) and non-mapper config.
+ */
+const EMPTY_PATH_SET = new Set();
+function isMachineEligible(f, mapperPaths = EMPTY_PATH_SET) {
+  if (f.fileCategory === 'markup' || f.fileCategory === 'docs') return true;
+  if (f.fileCategory === 'data' && /\.(csv|tsv)$/i.test(f.path)) return true;
+  if (mapperPaths.has(f.path)) return true;
+  return false;
+}
+
+/**
+ * Detect SQL-mapper XML files by content (`<mapper namespace=` / `<sqlMap
+ * namespace=`), never by filename — web.xml / Spring context XML must stay in
+ * the LLM tier. Unreadable files simply stay LLM-tier (safe side).
+ */
+function detectMapperXml(projectRoot, files) {
+  const out = new Set();
+  for (const f of files) {
+    if (f.fileCategory !== 'config' || !/\.xml$/i.test(f.path)) continue;
+    try {
+      const content = readFileSync(join(projectRoot, f.path), 'utf-8');
+      if (/<\s*(?:mapper|sqlMap)\b[^>]*\bnamespace\s*=/.test(content)) out.add(f.path);
+    } catch {
+      // unreadable → not machine-eligible
+    }
+  }
+  return out;
+}
+
+/**
  * Pool small mergeable batches into "misc" batches to reduce dispatch overhead.
  * Preserves semantic groupings (non-code Groups A-D, marked `mergeable=false`)
  * regardless of size; only merges code Louvain singletons / orphans and
@@ -328,7 +391,7 @@ function countBasedAssignment(codeFiles, batchSize = 12) {
  * Returns the rewritten batch list with reassigned batchIndex (1-based,
  * keepers first preserving their relative order, misc batches appended).
  */
-function mergeSmallBatches(bareBatches) {
+function mergeSmallBatches(bareBatches, mapperPaths = EMPTY_PATH_SET) {
   // MIN_BATCH_SIZE=3: below this, file-analyzer dispatch overhead (subagent
   // spin-up, prompt setup) dwarfs the per-file analysis cost — not worth a
   // standalone batch.
@@ -356,13 +419,20 @@ function mergeSmallBatches(bareBatches) {
   }
 
   // Pool and sort deterministically by path so repeated runs match byte-for-byte.
+  // Machine-eligible files are pooled SEPARATELY from the rest so misc batches
+  // stay tier-pure — mixing them would drag machine files back into LLM batches
+  // (tier assignment promotes any mixed batch out of 'machine').
   const pooledFiles = smallMergeable
     .flatMap(b => b.files)
     .sort((a, b) => a.path.localeCompare(b.path));
+  const machinePool = pooledFiles.filter(f => isMachineEligible(f, mapperPaths));
+  const llmPool = pooledFiles.filter(f => !isMachineEligible(f, mapperPaths));
 
   const miscBatches = [];
-  for (let i = 0; i < pooledFiles.length; i += MAX_MERGE_TARGET) {
-    miscBatches.push({ files: pooledFiles.slice(i, i + MAX_MERGE_TARGET) });
+  for (const pool of [llmPool, machinePool]) {
+    for (let i = 0; i < pool.length; i += MAX_MERGE_TARGET) {
+      miscBatches.push({ files: pool.slice(i, i + MAX_MERGE_TARGET) });
+    }
   }
 
   // Use `Info:` rather than `Warning:` — singleton consolidation is a
@@ -517,14 +587,28 @@ async function main() {
     files: paths.sort().map(p => fileMetaByPath.get(p)),
     mergeable: true,
   }));
-  const nonCodeGroups = buildNonCodeBatches(nonCodeFiles);
+  // Machine-eligible files get their own parent-dir batches (never mixed with
+  // LLM-tier non-code) so downstream tier assignment yields pure 'machine'
+  // batches that generate-machine-batches.mjs can fill without any LLM call.
+  const mapperPaths = detectMapperXml(projectRoot, nonCodeFiles);
+  if (mapperPaths.size) {
+    process.stderr.write(
+      `Info: compute-batches: detected ${mapperPaths.size} SQL-mapper XML files (machine tier)\n`,
+    );
+  }
+  const machineFiles = nonCodeFiles.filter(f => isMachineEligible(f, mapperPaths));
+  const llmNonCodeFiles = nonCodeFiles.filter(f => !isMachineEligible(f, mapperPaths));
+  const nonCodeGroups = [
+    ...buildNonCodeBatches(llmNonCodeFiles),
+    ...buildMachineBatches(machineFiles),
+  ];
   const nonCodeBatchObjsBare = nonCodeGroups.map((g, i) => ({
     batchIndex: codeBatchObjsBare.length + i + 1,
     files: g.files,
     mergeable: g.mergeable,
   }));
   const bareBatches = [...codeBatchObjsBare, ...nonCodeBatchObjsBare];
-  const mergedBareBatches = mergeSmallBatches(bareBatches);
+  const mergedBareBatches = mergeSmallBatches(bareBatches, mapperPaths);
   const batchOf = buildBatchOfMap(mergedBareBatches);
 
   // Build reverse import map: target → [sources that import target]
@@ -590,7 +674,18 @@ async function main() {
 
       if (kept.length) neighborMap[f.path] = kept;
     }
-    return { batchIndex: b.batchIndex, files: b.files, batchImportData, neighborMap };
+    // Routing tier (deterministic): 'code' = batch contains ANY application-code
+    // file — its summaries are the ones humans actually read, so it gets the
+    // upper model. 'machine' = every file is machine-eligible (markup/docs/csv
+    // + SQL-mapper XML) — nodes are generated by script with NO LLM call.
+    // 'light' = remaining
+    // non-code (script/config/infra/.sql/schema defs) — real content, but
+    // template summaries won't do; analyzed by a lighter model. Mixed batches
+    // promote upward ('code' over 'light' over 'machine') — safe side.
+    const tier = b.files.some(f => f.fileCategory === 'code') ? 'code'
+      : b.files.every(f => isMachineEligible(f, mapperPaths)) ? 'machine'
+      : 'light';
+    return { batchIndex: b.batchIndex, tier, files: b.files, batchImportData, neighborMap };
   });
 
   let finalBatches = batches;
@@ -619,8 +714,11 @@ async function main() {
   const batchSizes = finalBatches.map(b => b.files.length);
   const maxSize = batchSizes.length ? Math.max(...batchSizes) : 0;
   const minSize = batchSizes.length ? Math.min(...batchSizes) : 0;
+  const tierCounts = { code: 0, light: 0, machine: 0 };
+  for (const b of finalBatches) tierCounts[b.tier] = (tierCounts[b.tier] || 0) + 1;
   process.stderr.write(
-    `Wrote ${finalBatches.length} batches (sizes: max=${maxSize}, min=${minSize}) to ${outPath}\n`,
+    `Wrote ${finalBatches.length} batches (sizes: max=${maxSize}, min=${minSize}; ` +
+    `tiers: ${tierCounts.code} code, ${tierCounts.light} light, ${tierCounts.machine} machine) to ${outPath}\n`,
   );
 }
 

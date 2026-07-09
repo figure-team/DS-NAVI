@@ -59,6 +59,9 @@ describe('compute-batches.mjs — Louvain basic', () => {
       const dirs = new Set(b.files.map(f => f.path.split('/')[1]));
       expect(dirs.size).toBe(1); // all files in the batch share src/<dir>/
     }
+
+    // All-code fixture → every batch is model-routing tier 'code'
+    expect(batches.batches.every(b => b.tier === 'code')).toBe(true);
   });
 
   it('produces deterministic output across runs', () => {
@@ -254,6 +257,21 @@ describe('compute-batches.mjs — non-code grouping', () => {
     const minNonCodeIdx = Math.min(...nonCodeBatches.map(b => b.batchIndex));
     expect(minNonCodeIdx).toBeGreaterThan(maxCodeIdx);
   });
+
+  it('routing tier: code > light > machine, mirroring isMachineEligible', () => {
+    // Invariant across ALL batches, including merged misc batches: any code
+    // file promotes to 'code'; a batch of only machine-eligible files
+    // (markup/docs/csv+tsv) is 'machine'; the rest is 'light'.
+    const machineEligible = f =>
+      f.fileCategory === 'markup' || f.fileCategory === 'docs' ||
+      (f.fileCategory === 'data' && /\.(csv|tsv)$/i.test(f.path));
+    for (const b of batches.batches) {
+      const expected = b.files.some(f => f.fileCategory === 'code') ? 'code'
+        : b.files.every(machineEligible) ? 'machine'
+        : 'light';
+      expect(b.tier).toBe(expected);
+    }
+  });
 });
 
 describe('compute-batches.mjs — Group E MAX_E split', () => {
@@ -294,6 +312,8 @@ describe('compute-batches.mjs — Group E MAX_E split', () => {
     expect(docsBatches.length).toBe(2);
     const sizes = docsBatches.map(b => b.files.length).sort((a, b) => b - a);
     expect(sizes).toEqual([20, 5]);
+    // Pure docs batches are machine tier — generated without any LLM call
+    for (const b of docsBatches) expect(b.tier).toBe('machine');
   });
 });
 

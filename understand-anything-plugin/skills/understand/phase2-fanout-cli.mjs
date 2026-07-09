@@ -18,6 +18,11 @@
 //     --skill-dir <dir>        dir containing audit-batches.mjs (default: this script's dir)
 //     --concurrency <n>        parallel child sessions (default: 5)
 //     --model <provider/model> passthrough to `opencode run -m` (default: CLI's configured model)
+//     --light-model <provider/model>
+//                              model for light-tier batches (slice tier === 'light':
+//                              markup/data/docs/config only — template-grade summaries).
+//                              Code-tier batches keep --model / the CLI default.
+//                              Ignored when --runner-cmd overrides the child command.
 //     --variant <v>            passthrough to `opencode run --variant`
 //     --runner-cmd "<cmd>"     override the child command entirely (whitespace-split;
 //                              the analyze prompt is appended as the last argument).
@@ -31,7 +36,7 @@
 // non-zero only for setup errors (no slices, audit script missing, etc.).
 
 import { spawn, spawnSync } from 'node:child_process';
-import { createWriteStream, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -40,13 +45,14 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 function parseArgs(argv) {
   const opts = {
     intermediateDir: null, skillDir: HERE, concurrency: 5, model: null,
-    variant: null, runnerCmd: null, timeoutSec: 0, rounds: 3,
+    lightModel: null, variant: null, runnerCmd: null, timeoutSec: 0, rounds: 3,
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--skill-dir') opts.skillDir = resolve(argv[++i]);
     else if (a === '--concurrency') opts.concurrency = Math.max(1, parseInt(argv[++i], 10) || 5);
     else if (a === '--model') opts.model = argv[++i];
+    else if (a === '--light-model') opts.lightModel = argv[++i];
     else if (a === '--variant') opts.variant = argv[++i];
     else if (a === '--runner-cmd') opts.runnerCmd = argv[++i];
     else if (a === '--timeout-sec') opts.timeoutSec = Math.max(0, parseInt(argv[++i], 10) || 0);
@@ -59,7 +65,7 @@ function parseArgs(argv) {
 
 const opts = parseArgs(process.argv);
 if (!opts.intermediateDir) {
-  console.error('Usage: node phase2-fanout-cli.mjs <intermediateDir> [--concurrency 5] [--model provider/model] [--runner-cmd "..."]');
+  console.error('Usage: node phase2-fanout-cli.mjs <intermediateDir> [--concurrency 5] [--model provider/model] [--light-model provider/model] [--runner-cmd "..."]');
   process.exit(1);
 }
 const { intermediateDir, skillDir } = opts;
@@ -113,10 +119,24 @@ ${retryReason ? `\nThis is a RE-DISPATCH. Previous attempt was incomplete: ${ret
 
 4. Reply with ONE line only: \`batch ${i}: <filesAnalyzed> files, <nodes> nodes, <edges> edges\`. Never include node/edge JSON or file lists in your reply — completion is verified on disk, not from your reply.`;
 
-function childCommand(prompt) {
+/** Per-batch tier from the slice on disk; missing/old slices default to 'code'. */
+function tierOf(i) {
+  try {
+    const slice = JSON.parse(readFileSync(join(inputsDir, `batch-input-${i}.json`), 'utf-8'));
+    return slice.tier === 'light' ? 'light' : 'code';
+  } catch {
+    return 'code';
+  }
+}
+
+function modelFor(i) {
+  return (opts.lightModel && tierOf(i) === 'light') ? opts.lightModel : opts.model;
+}
+
+function childCommand(prompt, model) {
   if (opts.runnerCmd) return [...opts.runnerCmd.split(/\s+/).filter(Boolean), prompt];
   const cmd = ['opencode', 'run', '--dir', projectRoot, '--dangerously-skip-permissions'];
-  if (opts.model) cmd.push('-m', opts.model);
+  if (model) cmd.push('-m', model);
   if (opts.variant) cmd.push('--variant', opts.variant);
   cmd.push(prompt);
   return cmd;
@@ -126,7 +146,7 @@ function runChild(i, round, retryReason) {
   return new Promise((resolveP) => {
     const logPath = join(logsDir, `batch-${i}-r${round}.log`);
     const out = createWriteStream(logPath);
-    const cmd = childCommand(analyzePrompt(i, retryReason));
+    const cmd = childCommand(analyzePrompt(i, retryReason), modelFor(i));
     const child = spawn(cmd[0], cmd.slice(1), { stdio: ['ignore', 'pipe', 'pipe'] });
     let timer = null;
     if (opts.timeoutSec > 0) {

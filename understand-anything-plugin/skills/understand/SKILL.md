@@ -317,9 +317,25 @@ Load `.understand-anything/intermediate/batches.json` (produced by Phase 1.5). I
    ```
    Pass `--language-directive ""` when no directive is set. This writes `intermediate/inputs/batch-input-<i>.json` — each slice carries everything an analyzer agent needs (projectRoot, skillDir, agentDefPath, project narrative, files, batchImportData, neighborMap), so no batch payload ever enters your context.
 
-2. Report: `[Phase 2/7] Analyzing files — <totalFiles> files in <totalBatches> batches (Workflow fan-out, background)...`, then invoke the **Workflow tool** with:
+   Then pre-generate the machine-tier batches deterministically — **no LLM involved**:
+   ```bash
+   node <SKILL_DIR>/generate-machine-batches.mjs $PROJECT_ROOT --locale <$OUTPUT_LANGUAGE code, e.g. ko>
+   ```
+   Batches whose `batches.json` entry has `tier: "machine"` (pure markup/docs/csv files and SQL-mapper XML — MyBatis/iBatis, detected by content) get their `batch-<i>.json` + `.done` sentinel written directly from template summaries plus parser-extracted structure; SQL mappers also get deterministic `defines_schema` edges to their DAO interfaces and `related` edges between DB variants. The dispatch below never spends an agent on them. The script prints `{ generated, files, mappers, daoEdges, variantEdges }` — `generated: 0` is normal for code-heavy projects.
+
+2. **Batch-model gate.** Every `batches.json` entry carries a deterministic `tier` field: `code` (contains application-code files — the summaries humans actually read), `light` (non-code with real content — script/config/infra/SQL/schema definitions; template summaries won't do, but a lighter model suffices), or `machine` (pure markup/docs/csv and SQL-mapper XML — already pre-generated in step 1 with **no LLM at all**, unaffected by this gate). Call edges are resolved deterministically in Phase 3.5, and judgment-heavy single dispatches (architecture-analyzer, tour-builder, domain assignment) always use the session model regardless. Since this route means an hours-scale run, let the user choose once — if the platform supports interactive questions (e.g. the AskUserQuestion tool), ask which policy to use:
+   - **혼합 라우팅 (권장)** — code 티어는 세션 모델, light 티어만 sonnet: "핵심 코드 요약 품질 유지, 물량 구간만 절감" → `codeModel: "inherit"`, `lightModel: "sonnet"`
+   - **전부 sonnet** — 최대 절감: "핵심 코드 요약문도 sonnet 품질, 속도·비용 최소" → `codeModel: "sonnet"`, `lightModel: "sonnet"`
+   - **전부 세션 모델** — 최고 품질: "절감 없음, 소요 시간·비용 최대" → `codeModel: "inherit"`, `lightModel: "inherit"`
+
+   If the platform cannot ask interactively, default to 혼합 라우팅 without asking. Then compute the light/machine batch index lists:
+   ```bash
+   node -e "const d=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));const idx=t=>d.batches.filter(b=>b.tier===t).map(b=>b.batchIndex);console.log(JSON.stringify({light:idx('light'),machine:idx('machine')}))" "$PROJECT_ROOT/.understand-anything/intermediate/batches.json"
+   ```
+
+3. Report: `[Phase 2/7] Analyzing files — <totalFiles> files in <totalBatches> batches (Workflow fan-out, background)...`, then invoke the **Workflow tool** with:
    - `scriptPath`: `<SKILL_DIR>/phase2-fanout.workflow.js`
-   - `args`: `{ "intermediateDir": "$PROJECT_ROOT/.understand-anything/intermediate", "skillDir": "<SKILL_DIR>", "totalBatches": <totalBatches> }`
+   - `args`: `{ "intermediateDir": "$PROJECT_ROOT/.understand-anything/intermediate", "skillDir": "<SKILL_DIR>", "totalBatches": <totalBatches>, "codeModel": "<from the gate>", "lightModel": "<from the gate>", "lightBatches": <light array from the one-liner>, "machineBatches": <machine array from the one-liner> }`
 
    The workflow fans out one analyzer agent per batch (each reads its own slice from disk), then runs a deterministic completeness audit (`audit-batches.mjs`: sentinel ∧ valid JSON ∧ output file-set ⊇ slice `files[]`) and re-dispatches incomplete batches at most 2 times.
 
@@ -327,21 +343,27 @@ Load `.understand-anything/intermediate/batches.json` (produced by Phase 1.5). I
    ```bash
    node <SKILL_DIR>/phase2-fanout-cli.mjs $PROJECT_ROOT/.understand-anything/intermediate --concurrency 5
    ```
-   Run it in the background with a generous timeout (hours-scale on large projects). It prints per-batch progress to stderr (logs per batch in `intermediate/fanout-logs/`) and ONE final JSON line to stdout with the same shape as the workflow return — treat that line as step 3's result and continue identically.
+   Run it in the background with a generous timeout (hours-scale on large projects). It prints per-batch progress to stderr (logs per batch in `intermediate/fanout-logs/`) and ONE final JSON line to stdout with the same shape as the workflow return — treat that line as step 4's result and continue identically. The batch-model gate applies here too: pass `--light-model <provider/model>` (the CLI's own model-id format, e.g. a Sonnet-class id) to route light-tier batches to the lighter model while code-tier batches keep `--model` / the CLI's configured model — this is the 혼합 라우팅 equivalent. If unsure of the exact model id, omit both flags and let the CLI use its configured model for everything. Machine-tier batches need no flag at all: step 1 already wrote their outputs, so the driver's initial audit marks them complete and never spawns a child session for them.
 
-3. When the workflow returns `{ totalBatches, analyzed, skippedByGuard, failed }`:
+4. When the workflow returns `{ totalBatches, analyzed, skippedByGuard, failed }`:
    - Add every `failed[]` entry to `$PHASE_WARNINGS` — never silently drop them; merge proceeds with the batches that exist.
    - If `skippedByGuard > 0`, report it as informational: those batches were completed by a previous interrupted run and reused via the disk guard (idempotent resume).
 
-4. Interrupted run? Just re-run `/understand`: Phase 1.5 recomputes byte-identical batches (seeded Louvain), and the disk guard skips every completed batch, so only the remainder is analyzed (both the Workflow route and the CLI driver resume this way). Fall back to the inline dispatch loop below ONLY when neither the Workflow tool nor a headless CLI runner is available.
+5. Interrupted run? Just re-run `/understand`: Phase 1.5 recomputes byte-identical batches (seeded Louvain), and the disk guard skips every completed batch, so only the remainder is analyzed (both the Workflow route and the CLI driver resume this way). Fall back to the inline dispatch loop below ONLY when neither the Workflow tool nor a headless CLI runner is available.
 
-5. Skip the inline dispatch loop and continue directly at the merge step (`merge-batch-graphs.py`).
+6. Skip the inline dispatch loop and continue directly at the merge step (`merge-batch-graphs.py`).
 
 #### Inline dispatch route (default: totalBatches ≤ 30, and all incremental runs)
 
 Report: `[Phase 2/7] Analyzing files — <totalFiles> files in <totalBatches> batches (up to 5 concurrent)...`
 
-For each batch, dispatch a subagent using the `file-analyzer` agent definition (at `agents/file-analyzer.md`). Run up to **5 subagents concurrently**. Append the following additional context:
+First handle machine-tier batches without any dispatch: if any `batches.json` entry has `tier: "machine"`, run
+```bash
+node <SKILL_DIR>/generate-machine-batches.mjs $PROJECT_ROOT --locale <$OUTPUT_LANGUAGE code, e.g. ko>
+```
+which writes those batches' `batch-<i>.json` + `.done` directly (template summaries + parser structure, no LLM). Exclude `tier: "machine"` batches from the dispatch loop below. This applies to incremental runs too — the script only processes batches present in the (filtered) `batches.json`.
+
+For each remaining batch, dispatch a subagent using the `file-analyzer` agent definition (at `agents/file-analyzer.md`). Run up to **5 subagents concurrently**. If the platform's agent dispatch supports a per-call model override (e.g. the Agent tool's `model` parameter), apply 혼합 라우팅 silently — do NOT ask the user on this route (runs here are short): batches whose entry has `tier: "light"` (non-code with real content — script/config/infra/SQL/schema definitions) dispatch with **`model: sonnet`**, while `tier: "code"` batches dispatch with no override (session model). Entries without a `tier` field (older batches.json) count as `code`. If no model override is supported, dispatch as-is. Append the following additional context:
 
 > **Additional context from main session:**
 >

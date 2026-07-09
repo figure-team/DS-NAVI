@@ -1,0 +1,222 @@
+import { childrenOfType, startLine } from '../tree-sitter.js';
+import { beanBodyRange, blankNestedBeans } from '../../batch-scan/bean-index.js';
+/** @Scheduled 가 받는, schedule 문자열을 구성하는 속성(우선순위 순). */
+const SCHEDULE_ATTRS = ['cron', 'fixedRate', 'fixedDelay'];
+/** 직계 named child 중 첫 번째 주어진 타입. */
+function child(node, type) {
+    for (const c of node.namedChildren) {
+        if (c && c.type === type)
+            return c;
+    }
+    return null;
+}
+/** string_literal 노드의 실제 문자열(따옴표 제외). */
+function stringLiteralValue(node) {
+    const frag = childrenOfType(node, 'string_fragment')[0];
+    return frag ? frag.text : '';
+}
+/** method_declaration 의 메서드 이름(formal_parameters 직전 identifier). */
+function methodName(method) {
+    const named = method.namedChildren.filter((c) => c !== null);
+    const fpIdx = named.findIndex((c) => c.type === 'formal_parameters');
+    if (fpIdx > 0 && named[fpIdx - 1].type === 'identifier')
+        return named[fpIdx - 1].text;
+    return named.find((c) => c.type === 'identifier')?.text ?? null;
+}
+/** program 전체에서 class_declaration 들을 재귀 수집. */
+function findClassDeclarations(root) {
+    const out = [];
+    const stack = [root];
+    while (stack.length > 0) {
+        const node = stack.pop();
+        for (const c of node.namedChildren) {
+            if (!c)
+                continue;
+            if (c.type === 'class_declaration')
+                out.push(c);
+            stack.push(c);
+        }
+    }
+    return out;
+}
+/**
+ * @Scheduled 어노테이션의 schedule 문자열을 추출한다.
+ * cron / fixedRate / fixedDelay 중 첫 매칭을 `<attr>=<value>` 로 표기한다.
+ * (cron 도 `cron=<expr>` 로 표기해 트리거 종류를 표면화한다.)
+ */
+function extractScheduleAttr(annot) {
+    const argList = child(annot, 'annotation_argument_list');
+    if (!argList)
+        return null;
+    for (const attr of SCHEDULE_ATTRS) {
+        for (const pair of childrenOfType(argList, 'element_value_pair')) {
+            const name = child(pair, 'identifier')?.text;
+            if (name !== attr)
+                continue;
+            const lit = child(pair, 'string_literal');
+            const value = lit
+                ? stringLiteralValue(lit)
+                : pair.namedChildren.filter((c) => c !== null)[1]?.text ?? '';
+            return `${attr}=${value}`;
+        }
+    }
+    return null;
+}
+/**
+ * 단일 Java 파일에서 배치 진입점을 추출한다.
+ * @param root 파싱된 program 노드
+ * @param filePath census relPath
+ */
+export function extractJavaBatchEntries(root, filePath) {
+    const out = [];
+    for (const cls of findClassDeclarations(root)) {
+        const clsName = child(cls, 'identifier')?.text ?? null;
+        const body = child(cls, 'class_body');
+        if (!body)
+            continue;
+        for (const method of childrenOfType(body, 'method_declaration')) {
+            const mods = child(method, 'modifiers');
+            const modText = mods ? mods.text : '';
+            const mName = methodName(method) ?? '<unknown>';
+            const handler = clsName ? `${clsName}#${mName}` : mName;
+            // @Scheduled (어노테이션당 1엔트리 — 반복 @Scheduled 지원).
+            if (mods) {
+                const scheduledAnnots = childrenOfType(mods, 'annotation', 'marker_annotation').filter((a) => child(a, 'identifier')?.text === 'Scheduled');
+                for (const annot of scheduledAnnots) {
+                    out.push({
+                        entryId: `batch:${filePath}#${mName}`,
+                        trigger: 'scheduled',
+                        schedule: extractScheduleAttr(annot),
+                        filePath,
+                        line: startLine(annot),
+                        handler,
+                        notes: [],
+                    });
+                }
+            }
+            // public static void main(String[]).
+            if (mName === 'main' && /\bpublic\b/.test(modText) && /\bstatic\b/.test(modText)) {
+                out.push({
+                    entryId: `batch:${filePath}#main`,
+                    trigger: 'main',
+                    schedule: null,
+                    filePath,
+                    line: startLine(method),
+                    handler,
+                    notes: [],
+                });
+            }
+        }
+    }
+    return out;
+}
+/** XML 파일 텍스트에서 줄 번호(1-based)를 구한다. */
+function lineAt(text, index) {
+    let line = 1;
+    for (let i = 0; i < index && i < text.length; i++) {
+        if (text[i] === '\n')
+            line++;
+    }
+    return line;
+}
+/** XML 주석 영역을 공백으로 치환(주석 내용 무시, 줄 번호 보존). */
+function stripXmlComments(text) {
+    return text.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '));
+}
+/** 단일 XML 여는 태그 텍스트에서 속성 값을 읽는다. */
+function attrValue(tag, name) {
+    const m = tag.match(new RegExp(`\\b${name}\\s*=\\s*"([^"]*)"`));
+    return m ? m[1] : null;
+}
+/**
+ * <bean ...> 요소 1개의 본문에서 <property name="..." value=".."|ref=".."/> 를 읽는다.
+ * 본문은 해당 bean 의 여는 태그 끝부터 다음 같은 깊이 닫힘까지의 근사 범위다.
+ */
+function readBeanProperty(body, propName) {
+    const re = new RegExp(`<property\\b[^>]*\\bname\\s*=\\s*"${propName}"[^>]*/?>`, 'g');
+    const m = re.exec(body);
+    if (!m)
+        return { value: null, ref: null };
+    return { value: attrValue(m[0], 'value'), ref: attrValue(m[0], 'ref') };
+}
+/**
+ * 단일 XML 파일에서 배치 진입점을 추출한다.
+ * - CronTriggerFactoryBean 빈(중첩 포함) -> quartz
+ * - <task:scheduled .../> -> task-xml
+ */
+export function extractXmlBatchEntries(rawText, filePath) {
+    const out = [];
+    const text = stripXmlComments(rawText);
+    // 1) Quartz CronTrigger 빈. 본문은 깊이 추적으로 정확히 — 첫 </bean> 근사는 중첩 빈
+    //    (인라인 jobDetail 관용구)에서 cronExpression 유실/속성 오귀속을 만든다(W2 실증).
+    const beanOpenRe = /<bean\b[^>]*>/g;
+    let bm;
+    while ((bm = beanOpenRe.exec(text)) !== null) {
+        const tag = bm[0];
+        const cls = attrValue(tag, 'class');
+        if (!cls || !/CronTriggerFactoryBean$/.test(cls))
+            continue;
+        const bodyStart = bm.index + tag.length;
+        const rawBody = tag.endsWith('/>') ? '' : text.slice(bodyStart, beanBodyRange(text, bodyStart).end);
+        // 트리거 자신의 속성은 중첩 빈을 지운 본문에서 읽는다.
+        const ownBody = blankNestedBeans(rawBody);
+        const jobDetail = readBeanProperty(ownBody, 'jobDetail');
+        const cronProp = readBeanProperty(ownBody, 'cronExpression');
+        let handler = jobDetail.ref;
+        // 인라인 jobDetail 관용구: <property name="jobDetail"><bean class="…MethodInvoking…">
+        //   <property name="targetObject" ref="X"/><property name="targetMethod" value="m"/>
+        // ref 가 없으면 중첩 MethodInvoking 빈에서 X#m 으로 해석(원본 rawBody 에서).
+        if (handler === null) {
+            const region = rawBody.match(/<property\b[^>]*\bname\s*=\s*"jobDetail"[^>]*>([\s\S]*?)<\/property>/);
+            const inner = region?.[1] ?? '';
+            if (/MethodInvokingJobDetailFactoryBean/.test(inner)) {
+                const targetRef = inner.match(/<property\b[^>]*\bname\s*=\s*"targetObject"[^>]*\bref\s*=\s*"([^"]*)"/);
+                const targetMethod = inner.match(/<property\b[^>]*\bname\s*=\s*"targetMethod"[^>]*\bvalue\s*=\s*"([^"]*)"/);
+                if (targetRef)
+                    handler = targetMethod ? `${targetRef[1]}#${targetMethod[1]}` : targetRef[1];
+            }
+        }
+        const schedule = cronProp.value !== null ? `cron=${cronProp.value}` : null;
+        const symbol = handler ?? attrValue(tag, 'id') ?? 'trigger';
+        out.push({
+            entryId: `batch:${filePath}#${symbol}`,
+            trigger: 'quartz',
+            schedule,
+            filePath,
+            line: lineAt(text, bm.index),
+            handler,
+            notes: [],
+        });
+    }
+    // 2) Spring <task:scheduled .../>. (컨테이너 <task:scheduled-tasks> 와 구분: 뒤에 -tasks 제외.)
+    const taskRe = /<task:scheduled(?![-\w])[^>]*\/?>/g;
+    let tm;
+    while ((tm = taskRe.exec(text)) !== null) {
+        const tag = tm[0];
+        const ref = attrValue(tag, 'ref');
+        const method = attrValue(tag, 'method');
+        const cron = attrValue(tag, 'cron');
+        const fixedRate = attrValue(tag, 'fixed-rate');
+        const fixedDelay = attrValue(tag, 'fixed-delay');
+        const handler = ref ? (method ? `${ref}#${method}` : ref) : null;
+        const schedule = cron !== null
+            ? `cron=${cron}`
+            : fixedRate !== null
+                ? `fixedRate=${fixedRate}`
+                : fixedDelay !== null
+                    ? `fixedDelay=${fixedDelay}`
+                    : null;
+        const symbol = handler ?? 'task';
+        out.push({
+            entryId: `batch:${filePath}#${symbol}`,
+            trigger: 'task-xml',
+            schedule,
+            filePath,
+            line: lineAt(text, tm.index),
+            handler,
+            notes: [],
+        });
+    }
+    return out;
+}
+//# sourceMappingURL=batch.js.map

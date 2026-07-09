@@ -19,23 +19,30 @@
 ## 2. 소스 자급화 (명령어가 실제로 실행되게)
 
 ⚠️ **핵심:** 개발 트리(pnpm workspace)에서 `packages/legacy-core/node_modules` 는
-워크스페이스 루트(`.pnpm`)와 sibling 플러그인(`@understand-anything/core`)을 가리키는
-**심링크**다. 플러그인을 `/plugin install`(소스 `cp -R`)로 설치하면 이 심링크가 플러그인
-밖을 가리켜 깨지고, 런타임에 `Cannot find package 'zod'` 등으로 죽는다.
+워크스페이스 루트(`.pnpm`)와 sibling(`@understand-anything/core`)을 가리키는 **심링크**이고,
+`dist`·`node_modules` 는 `.gitignore` 대상이다. 그래서 아무 조치 없이 `marketplace add <git>`
+로 신선하게 클론하면 커밋된 소스만 받아 런타임에 `Cannot find package 'zod'` 로 죽고,
+문법 wasm 이 없으면 `/understand-map` 이 crash 없이 `java-facts=0`(조용히 빈 분석)이 된다.
 
-→ 설치/배포 직전에 소스를 자급화한다(워크스페이스 dep 까지 실파일로 평탄화한 자급
-node_modules 주입, 내부 `.pnpm` — UA 플러그인과 동일 모델):
+→ **해법: 플러그인 루트에 lean 자급본을 만들어 git 에 커밋한다.** `.gitignore` 는
+`ktds-legacy-plugin/node_modules/` 와 `packages/legacy-core/dist/` 를 예외(`!`) 처리해
+이 산출물을 추적한다. 소스 변경 후 **릴리스 직전** 재실행하고 결과를 커밋할 것:
 
 ```bash
-ktds-legacy-plugin/scripts/vendor-deps.sh
+ktds-legacy-plugin/scripts/vendor-deps.sh   # ~37M: JS 런타임 클로저 + 문법 wasm
+git add -A ktds-legacy-plugin/node_modules ktds-legacy-plugin/packages/legacy-core/dist
 ```
 
-실행 후 `packages/legacy-core/node_modules` 가 자급 상태가 되어 `/plugin install` 또는
-`cp -R` 로 그대로 설치된다. dev deps(typescript/vitest)도 포함되어 build/test 도 계속
-동작한다.
+- 자급 위치는 **플러그인 루트 `node_modules`**(flat 실파일). pnpm 이 만들지 않는 경로라
+  dev 워크스페이스와 충돌하지 않고, node walk-up + `require.resolve` 로 그대로 해석된다.
+- 포함: `zod · ignore · fuse.js · yaml · web-tree-sitter · @understand-anything/core(dist)`
+  + `tree-sitter-*` 문법(각 `package.json + *.wasm` 만, 네이티브 prebuild ~280M 제외).
+- **제외**: `playwright-core`(스크린샷·QA-visual 명령 전용 — 그 명령은 별도 `playwright
+  install` 필요), 네이티브 prebuild, dev deps.
 
-> 주의: 루트 `pnpm install` 을 다시 돌리면 node_modules 가 워크스페이스 심링크로
-> 되돌아간다. 그 경우 `vendor-deps.sh` 를 재실행해 자급 상태로 만든 뒤 설치할 것.
+> 주의: 루트 `pnpm install` 은 `packages/legacy-core/node_modules` 를 심링크로 되돌리지만
+> 자급본은 플러그인 루트에 있어 영향받지 않는다. 소스(엔진/문법 설정)를 바꿨을 때만
+> `vendor-deps.sh` 재실행 후 재커밋하면 된다.
 
 ## 3. 프로젝트별 활성화 (원하는 프로젝트에만)
 

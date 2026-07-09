@@ -1,3 +1,4 @@
+import { PlanOpsSchema } from './types.js';
 function cmp(a, b) {
     return a < b ? -1 : a > b ? 1 : 0;
 }
@@ -90,6 +91,48 @@ export function excludeDomain(plan, key) {
     };
 }
 /**
+ * ops 파일 파싱 — 형식 오류는 어떤 항목이 왜 틀렸는지 명확히 던진다(조용한 스킵 금지).
+ */
+export function parsePlanOps(raw) {
+    const parsed = PlanOpsSchema.safeParse(raw);
+    if (!parsed.success) {
+        const issue = parsed.error.issues[0];
+        throw new Error(`ops 형식 오류(${issue.path.join('.')}): ${issue.message} — ` +
+            `허용: {op:"merge",from,into} | {op:"move",root,to} | {op:"exclude",key} | {op:"rename",key,name}`);
+    }
+    return parsed.data;
+}
+/**
+ * 보정 연산 순차 적용 — 자동 플랜 위에 사람 결정을 결정론적으로 재생한다.
+ * 각 연산은 기존 순수 함수(merge/move/exclude/rename)로 위임하며, 존재하지 않는
+ * key/root 는 해당 함수가 몇 번째 연산인지 식별 가능한 오류로 던진다.
+ */
+export function applyOps(plan, ops) {
+    let next = plan;
+    ops.forEach((op, i) => {
+        try {
+            switch (op.op) {
+                case 'merge':
+                    next = mergeDomains(next, op.from, op.into);
+                    break;
+                case 'move':
+                    next = moveRoot(next, op.root, op.to);
+                    break;
+                case 'exclude':
+                    next = excludeDomain(next, op.key);
+                    break;
+                case 'rename':
+                    next = renameDomain(next, op.key, op.name);
+                    break;
+            }
+        }
+        catch (err) {
+            throw new Error(`ops[${i}] ${op.op} 적용 실패: ${err.message}`);
+        }
+    });
+    return next;
+}
+/**
  * 드리프트 감지 — confirmed 이후 코드가 변해 후보가 달라진 경우.
  * addedRoots: 현재 후보에 새로 생겼지만 플랜이 모르는 루트(재확정 필요 신호).
  * removedRoots: 플랜이 알지만 현재 후보에 없는 루트(삭제/이동됨).
@@ -116,6 +159,7 @@ export function planTable(source) {
             rootCount: c.roots.length,
             entryCount: c.entryCount,
             fileCount: c.files.length + c.roots.length,
+            confidence: c.confidence,
         }))
             .sort((a, b) => cmp(a.key, b.key));
     }

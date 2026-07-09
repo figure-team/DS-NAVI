@@ -11,6 +11,9 @@ const STRUCTURE_SEGMENTS = new Set([
     'org',
     'net',
     'io',
+    // 배포 기술구조 폴더 — 도메인이 아니라 컨테이너 규약(잡음 도메인 web-inf 방지).
+    'web-inf',
+    'meta-inf',
 ]);
 /** 레이어/기술 계층 세그먼트 — 도메인 토큰이 될 수 없음. */
 const LAYER_SEGMENTS = new Set([
@@ -29,6 +32,8 @@ const LAYER_SEGMENTS = new Set([
     'web',
     'api',
     'common',
+    // 뷰 기술 폴더(WEB-INF/jsp/<feature>/…) — 건너뛰면 다음 세그먼트가 실 도메인이다.
+    'jsp',
 ]);
 /** 파일명 토큰 중 도메인 의미가 없는 접미/계층 토큰(prefix 폴백용). */
 const STOP_TOKENS = new Set([
@@ -127,14 +132,40 @@ export function classifyByDirectory(relPaths) {
             m.set(segs[d], (m.get(segs[d]) ?? 0) + 1);
         }
     }
-    const isNamespaceSeg = (segs, d) => {
-        const m = branchCounts.get(segs.slice(0, d).join('/'));
-        if (!m)
-            return false;
+    // 표본 1개짜리 브랜치는 모든 세그먼트가 100% 지배라 '무조건' 네임스페이스로 오폭한다
+    // (멀티모듈에서 파일이 적은 모듈의 feature 세그먼트까지 삼켜 도메인 신호를 죽인다).
+    // 최소 표본(≥2) 미달 브랜치는 지배율 판정 대신, 표본이 충분한 브랜치에서 이미
+    // 네임스페이스로 확정된 '값'(com/acme/egovframework 류는 모듈이 달라도 같다)만 스킵한다.
+    const NAMESPACE_MIN_FILES = 2;
+    // 브랜치 총계는 한 번만 계산해 공유한다 — isNamespaceSeg 는 파일×세그먼트마다 불리는
+    // 핫패스라 매 호출 합산은 대형 프로젝트에서 이차 비용이 된다.
+    const branchTotals = new Map();
+    for (const [parent, m] of branchCounts) {
         let total = 0;
         for (const c of m.values())
             total += c;
-        return total > 0 && (m.get(segs[d]) ?? 0) / total >= NAMESPACE_SHARE;
+        branchTotals.set(parent, total);
+    }
+    const namespaceValues = new Set();
+    for (const [parent, m] of branchCounts) {
+        const total = branchTotals.get(parent);
+        if (total < NAMESPACE_MIN_FILES)
+            continue;
+        for (const [seg, c] of m) {
+            if (c / total >= NAMESPACE_SHARE)
+                namespaceValues.add(seg);
+        }
+    }
+    const isNamespaceSeg = (segs, d) => {
+        const parent = segs.slice(0, d).join('/');
+        const m = branchCounts.get(parent);
+        if (!m)
+            return false;
+        const total = branchTotals.get(parent);
+        if (total >= NAMESPACE_MIN_FILES) {
+            return (m.get(segs[d]) ?? 0) / total >= NAMESPACE_SHARE;
+        }
+        return namespaceValues.has(segs[d]);
     };
     const tokenByFile = new Map();
     for (let i = 0; i < relPaths.length; i++) {
@@ -176,11 +207,18 @@ export function tokenizeBasename(relPath) {
         .map((t) => t.toLowerCase().replace(/[[\]()@{}]/g, ''))
         .filter((t) => t.length > 0);
 }
-/** 첫 비-STOP 토큰 = prefix. 전부 STOP 이면 null(도메인 신호 없음). */
-export function prefixToken(relPath) {
+/**
+ * 첫 비-STOP 토큰 = prefix. 전부 STOP 이면 null(도메인 신호 없음).
+ * 1글자 토큰은 디렉터리 세그먼트 규칙(isStructureOrLayer)과 동형으로 제외 —
+ * FCommonController 의 'f' 같은 무의미 키를 막는다. skip(관용 접두어)도 건너뛴다.
+ */
+export function prefixToken(relPath, skip) {
     for (const token of tokenizeBasename(relPath)) {
-        if (!STOP_TOKENS.has(token) && !/^\d+$/.test(token))
-            return token;
+        if (STOP_TOKENS.has(token) || /^\d+$/.test(token) || token.length < 2)
+            continue;
+        if (skip?.has(token))
+            continue;
+        return token;
     }
     return null;
 }
@@ -203,10 +241,17 @@ export function buildCandidates(census, routes, slices) {
     // → 'egov' 지배, 소수 이질 루트 존재) → 디렉토리 토큰(=feature 패키지 uss/sym/cop)을
     // key 로. **지배율 기반**이라 단 하나의 이질 루트가 서브패키지를 통째로 붕괴시키지 않는다.
     const PREFIX_PARTITION_MAX = 0.7; // 최다 prefix 점유율이 이 미만이어야 prefix 가 도메인을 가른다고 본다
+    // 분포는 관용 접두어 스킵 없이 '원시' prefix 로 계산한다 — 벤더 접두어(Egov*)가
+    // 지배하는 feature 패키지(uss/sym/…)는 지배율 판정으로 분할이 '안 일어나는' 것이
+    // 정답인데, 스킵한 분포로 판정하면 2차 토큰이 흩어져 오분할된다.
+    // 시드 통계 단일 패스 — 디렉터리 토큰별 접두어 분포(분할 판정)와 접두어별 디렉터리
+    // 그룹 집합(관용 접두어 감지)을 같은 (t, p) 관측에서 함께 쌓는다. 두 통계의 시드
+    // 자격 규칙이 갈라지면 분할 판정과 관용 감지가 조용히 어긋난다.
     const prefixDistByDirToken = new Map();
+    const dirGroupsByPrefix = new Map();
     for (const slice of slices.slices) {
         if (isDomainIneligibleRoot(slice.root))
-            continue; // 시드 부적격 루트는 분포에서 제외
+            continue; // 시드 부적격 루트는 통계에서 제외
         const t = dirToken(slice.root);
         if (t === null)
             continue;
@@ -217,6 +262,10 @@ export function buildCandidates(census, routes, slices) {
         if (!m)
             prefixDistByDirToken.set(t, (m = new Map()));
         m.set(p, (m.get(p) ?? 0) + 1);
+        let g = dirGroupsByPrefix.get(p);
+        if (!g)
+            dirGroupsByPrefix.set(p, (g = new Set()));
+        g.add(t);
     }
     const prefixPartitions = (t) => {
         const m = prefixDistByDirToken.get(t);
@@ -231,6 +280,17 @@ export function buildCandidates(census, routes, slices) {
         }
         return total > 0 && max / total < PREFIX_PARTITION_MAX;
     };
+    // 전역 관용 접두어 — 같은 파일명 첫 토큰이 서로 다른 디렉터리 토큰 그룹
+    // CONVENTION_MIN_GROUPS 개 이상에서 시드로 반복되면 조직 명명 관례(예 Egov*/Co*)다.
+    // 도메인 키가 될 자격이 없으므로 '키 산출 시에만' 건너뛴다(분포 판정에는 원시 유지).
+    // 감지는 시드(루트)에서만 하되 적용은 멤버십 폴백에도 미친다 — 관례 여부는 진입점
+    // 명명에서 판정하는 게 표본이 깨끗하고, 멤버 파일(CoOrderList.jsp 류)도 같은 관례를
+    // 따르므로 접두어 뒤 실 토큰으로 귀속하는 쪽이 일관된다(의도된 비대칭).
+    const CONVENTION_MIN_GROUPS = 3;
+    const conventionPrefixes = new Set([...dirGroupsByPrefix.entries()]
+        .filter(([, groups]) => groups.size >= CONVENTION_MIN_GROUPS)
+        .map(([p]) => p));
+    // 1패스 — 시드 키잉 + 증거 확신도(high=디렉터리 정합, medium=접두어 분할, low=폴백).
     const rootKey = new Map();
     for (const slice of slices.slices) {
         // 도메인 '시드' 제외 — 테스트/정적 진입점(예 src/test/**, code404.jsp)은 자기
@@ -241,11 +301,60 @@ export function buildCandidates(census, routes, slices) {
         const t = dirToken(slice.root);
         // t 가 유일(1루트)이면 분포 크기 1 → prefixPartitions=false → 디렉토리 토큰 채택
         // (기존 '유일 토큰' 동작 보존).
-        const useDir = t !== null && !prefixPartitions(t);
-        const key = (useDir ? t : null) ??
-            prefixToken(slice.root) ??
-            (slice.root.split('/').pop() ?? slice.root).replace(/\.[^.]+$/, '').toLowerCase();
-        rootKey.set(slice.root, key);
+        if (t !== null && !prefixPartitions(t)) {
+            rootKey.set(slice.root, { key: t, confidence: 'high' });
+            continue;
+        }
+        const p = prefixToken(slice.root, conventionPrefixes);
+        if (p !== null) {
+            // 디렉터리 토큰이 있었는데 분할된 경우만 medium(분할 근거 있음), 없으면 low(폴백).
+            rootKey.set(slice.root, { key: p, confidence: t !== null ? 'medium' : 'low' });
+            continue;
+        }
+        const base = (slice.root.split('/').pop() ?? slice.root).replace(/\.[^.]+$/, '').toLowerCase();
+        rootKey.set(slice.root, { key: base, confidence: 'low' });
+    }
+    // 2패스 — 파편 재흡수: 접두어로 키잉된 루트(분할 파편)의 디렉터리 토큰이 이미 다른
+    // 루트의 key 로 존재하면 그 도메인으로 귀속한다. package-by-feature 에서 이질 명명
+    // 파일 몇 개가 분할을 촉발해 떨어져 나간 파편(예 event/ 밑 CoEventController → 'co')을
+    // 본체('event')로 되돌린다. package-by-layer(jpetstore actions/)는 레이어 폴더명이
+    // 파일 접두어와 절대 일치하지 않으므로 재흡수가 일어나지 않는다(분할 보존).
+    // 결과는 순회 순서와 무관하다: 대상 키는 1패스 스냅샷(pass1Keys)에 고정되고 각
+    // 반복은 자기 루트만 갱신한다. 재흡수된 루트는 디렉터리 공점유 증거를 얻었으므로
+    // medium 으로 승격한다 — low 로 남기면 3패스 격리가 방금 합류한 본체 도메인에서
+    // 루트를 도로 뽑아내는 모순이 생긴다(예 event/ 밑 STOP-only 파일명 루트).
+    const pass1Keys = new Set([...rootKey.values()].map((i) => i.key));
+    for (const [root, seed] of rootKey) {
+        if (seed.confidence === 'high')
+            continue;
+        const t = dirToken(root);
+        if (t !== null && t !== seed.key && pass1Keys.has(t)) {
+            rootKey.set(root, { key: t, confidence: 'medium' });
+        }
+    }
+    // 3패스 — 약신호 격리: low 시드가 전체 시드의 '소수'(≤ LOW_QUARANTINE_MAX_SHARE)일
+    // 때만 자기 도메인을 만들지 않고 격리한다(_review, 조용한 누락 금지 — root/무산 key 보존).
+    // 비율 조건인 이유: 강신호 구조(feature 패키지)가 지배하는 프로젝트에서 common/ 덤프
+    // 잔여만 격리하는 게 목적이다. low 가 다수면 그 프로젝트는 구조 신호가 원래 없는 것
+    // (package-by-layer 소형 앱 등)이므로 격리하면 컨트롤러가 전멸한다 — 단 하나의 이질
+    // 루트(배치 잡 등)가 나머지를 통째로 격리시키는 붕괴를 막는다. 퇴화 프로젝트(flat 등)도
+    // 동일 이유로 격리하지 않는다.
+    const LOW_QUARANTINE_MAX_SHARE = 0.3;
+    const quarantined = [];
+    const lowCount = [...rootKey.values()].filter((i) => i.confidence === 'low').length;
+    if (!directory.degenerate &&
+        lowCount > 0 &&
+        lowCount / rootKey.size <= LOW_QUARANTINE_MAX_SHARE) {
+        // 순회 순서 무관(각 반복이 자기 항목만 제거), 출력 순서는 반환 직전 정렬이 보장.
+        // 격리 루트는 rootKey 에서 빠지므로 아래 멤버십 루프에서 일반 파일로 취급된다 —
+        // 다른 루트가 도달하면 그 도메인의 '멤버'로 합류한다(의도: 격리는 "자기 도메인을
+        // 만들지 않는다"이지 "어디에도 속하지 못한다"가 아니다. 진입점 자격만 박탈).
+        for (const [root, seed] of rootKey) {
+            if (seed.confidence !== 'low')
+                continue;
+            quarantined.push({ root, key: seed.key, reason: 'weak-signal' });
+            rootKey.delete(root);
+        }
     }
     // 각 후보의 entryCount = 그 후보의 루트들이 선언한 라우트/배치 entryId 수.
     const entryCountByRoot = new Map();
@@ -256,13 +365,19 @@ export function buildCandidates(census, routes, slices) {
     const candidateOf = (key) => {
         let c = byKey.get(key);
         if (!c) {
-            c = { roots: [], files: [] };
+            c = { roots: [], files: [], confidence: 'low' };
             byKey.set(key, c);
         }
         return c;
     };
-    for (const [root, key] of [...rootKey.entries()].sort((a, b) => cmp(a[0], b[0]))) {
-        candidateOf(key).roots.push(root);
+    const CONFIDENCE_RANK = { high: 2, medium: 1, low: 0 };
+    for (const [root, seed] of [...rootKey.entries()].sort((a, b) => cmp(a[0], b[0]))) {
+        const c = candidateOf(seed.key);
+        c.roots.push(root);
+        // 후보 확신도 = 루트들 중 최고 증거(재흡수로 섞인 파편이 본체 등급을 깎지 않는다).
+        if (CONFIDENCE_RANK[seed.confidence] > CONFIDENCE_RANK[c.confidence]) {
+            c.confidence = seed.confidence;
+        }
     }
     const common = [];
     const ambiguous = [];
@@ -282,7 +397,7 @@ export function buildCandidates(census, routes, slices) {
         if (own.status === 'sole') {
             if (isRoot)
                 continue; // 루트는 이미 등재
-            const ownerKey = rootKey.get(own.owners[0]);
+            const ownerKey = rootKey.get(own.owners[0])?.key;
             if (ownerKey !== undefined) {
                 const dKey = dirToken(own.relPath);
                 if (dKey !== null && byKey.has(dKey) && dKey !== ownerKey) {
@@ -303,7 +418,7 @@ export function buildCandidates(census, routes, slices) {
             candidateOf(dKey).files.push({ relPath: own.relPath, via: 'directory' });
             continue;
         }
-        const pKey = prefixToken(own.relPath);
+        const pKey = prefixToken(own.relPath, conventionPrefixes);
         if (pKey !== null && byKey.has(pKey)) {
             candidateOf(pKey).files.push({ relPath: own.relPath, via: 'prefix' });
             continue;
@@ -317,6 +432,7 @@ export function buildCandidates(census, routes, slices) {
         roots: [...c.roots].sort(cmp),
         entryCount: c.roots.reduce((n, r) => n + (entryCountByRoot.get(r) ?? 0), 0),
         files: [...c.files].sort((x, y) => cmp(x.relPath, y.relPath)),
+        confidence: c.confidence,
     }));
     return {
         schemaVersion: 1,
@@ -326,6 +442,8 @@ export function buildCandidates(census, routes, slices) {
         common: common.sort((a, b) => cmp(a.relPath, b.relPath)),
         ambiguous: ambiguous.sort((a, b) => cmp(a.relPath, b.relPath)),
         unresolved: unresolved.sort(cmp),
+        quarantined: quarantined.sort((a, b) => cmp(a.root, b.root)),
+        conventionPrefixes: [...conventionPrefixes].sort(cmp),
     };
 }
 //# sourceMappingURL=classify.js.map

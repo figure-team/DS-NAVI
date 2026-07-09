@@ -31,8 +31,11 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> scan
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> plan
 ```
 
-자동 분류된 도메인 후보를 **한국어 표**(키/루트수/진입수/파일수)로 보여준다. 쓰기 없음.
+자동 분류된 도메인 후보를 **한국어 표**(키/루트수/진입수/파일수/**확신도**)로 보여준다. 쓰기 없음.
 이 표는 자동 결과이며 확정 전 사람 검토가 필요하다(사람 게이트).
+
+- **확신도**: 높음(디렉터리 토큰 정합) > 중간(파일명 접두어 분할) > 낮음(폴백). 증거가 약한(낮음) 진입점은 상위 신호 도메인이 하나라도 있으면 **도메인을 만들지 않고 격리**(`_review`)되어 표 아래 별도 보고된다(조용한 누락 금지 — candidates.json `quarantined`).
+- **관용 접두어**: 파일명 첫 토큰이 여러 디렉터리 그룹에 반복되면(벤더 접두어 `Egov*`/`Co*` 류) 도메인 키 후보에서 제외하고 보고한다(`conventionPrefixes`).
 
 ## 3) 확정 (사람 게이트)
 
@@ -42,9 +45,23 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> confirm
 
 # 확정 실행(후보를 그대로 수용해 확정 플랜 기록)
 node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> confirm --auto-approve --by <담당자>
+
+# 경계를 고쳐 확정(사람/LLM 보정 연산을 자동 플랜 위에 결정론 적용)
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> confirm --auto-approve --by <담당자> --ops <ops.json>
 ```
 
 자동 확정은 하지 않는다. `--auto-approve --by <담당자>` 가 모두 있을 때만 `domain-plan.confirmed.json` 을 기록한다(없으면 표 + 안내만 출력하고 종료 코드 2). 도메인 `key` 는 불변(skeleton ID 의 닻)이며, 표시명만 개명할 수 있다(AC-31, LLM 제안명은 `renameDomain` 으로 적용).
+
+**보정 연산(ops)**: plan 표를 보고 경계를 고칠 때는 ops JSON 배열을 `--ops` 로 준다. LLM 이 제안서를 쓰고 사람이 확정하는 흐름을 권장하며, ops 파일을 `.spec/map/domain-ops.json` 에 보관하면 재스캔 후에도 같은 결정이 재생된다(결정론 닻).
+
+```json
+[
+  { "op": "merge", "from": "my", "into": "mypage" },
+  { "op": "move", "root": "src/…/FooController.java", "to": "board" },
+  { "op": "exclude", "key": "kimtest" },
+  { "op": "rename", "key": "cs", "name": "고객센터" }
+]
+```
 
 산출: `.spec/map/domain-plan.confirmed.json` (재실행 결정론의 닻).
 

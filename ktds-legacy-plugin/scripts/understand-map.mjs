@@ -229,33 +229,78 @@ async function runPlan() {
   printPlanTable(rows)
   console.log('')
   console.log(`총 ${rows.length}개 도메인 후보.`)
+  reportClassifySignals(candidates)
   console.log('확정하려면: confirm --auto-approve --by <담당자>')
+  console.log('경계를 고쳐 확정하려면: confirm --auto-approve --by <담당자> --ops <ops.json>')
+  console.log('  (ops: [{"op":"merge","from":…,"into":…} | {"op":"move","root":…,"to":…} | {"op":"exclude","key":…} | {"op":"rename","key":…,"name":…}])')
+}
+
+/** 분류 신호 보고 — 격리(_review)·관용 접두어를 표면화한다(조용한 누락 금지). */
+function reportClassifySignals(candidates) {
+  const quarantined = candidates.quarantined ?? []
+  const conventions = candidates.conventionPrefixes ?? []
+  if (quarantined.length > 0) {
+    console.log('')
+    console.log(`격리(_review) ${quarantined.length}건 — 증거가 약해 도메인을 만들지 않은 진입점:`)
+    for (const q of quarantined) {
+      console.log(`  - ${q.root} (무산 key: ${q.key})`)
+    }
+    console.log('  실 도메인에 붙이려면 confirm --ops 의 move 를, 무시해도 되면 그대로 두세요.')
+  }
+  if (conventions.length > 0) {
+    console.log(`관용 접두어(도메인 키 제외): ${conventions.join(', ')}`)
+  }
 }
 
 async function runConfirm() {
-  const { scanDomainMap, planTable, buildAutoPlan, writeConfirmedPlan } = engine
+  const { scanDomainMap, planTable, buildAutoPlan, writeConfirmedPlan, parsePlanOps, applyOps } =
+    engine
   const { candidates } = await scanDomainMap(projectRoot)
   const rows = planTable(candidates)
   const autoApprove = hasFlag('--auto-approve')
   const by = flagValue('--by')
+  const opsPath = flagValue('--ops')
 
   if (!autoApprove || !by) {
     console.log(`도메인 경계 확정(미실행) — ${projectRoot}`)
     console.log('확정은 사람 게이트입니다. 자동 확정하지 않습니다.')
     console.log('')
     printPlanTable(rows)
+    reportClassifySignals(candidates)
     console.log('')
     console.log('위 경계를 그대로 확정하려면 다음을 실행하세요(NON-TTY 안전):')
     console.log('  confirm --auto-approve --by <담당자 핸들>')
+    console.log('경계를 고쳐 확정하려면 ops 파일을 함께 주세요:')
+    console.log('  confirm --auto-approve --by <담당자 핸들> --ops <ops.json>')
     process.exit(2)
   }
 
-  const plan = buildAutoPlan(candidates, by)
+  let plan = buildAutoPlan(candidates, by)
+  if (opsPath) {
+    let raw
+    try {
+      raw = JSON.parse(readFileSync(opsPath, 'utf8'))
+    } catch (err) {
+      console.error(`ops 파일을 읽을 수 없습니다(${opsPath}): ${err.message}`)
+      process.exit(2)
+    }
+    try {
+      const ops = parsePlanOps(raw)
+      plan = applyOps(plan, ops)
+      console.log(`보정 연산 ${ops.length}건 적용 — ${opsPath}`)
+    } catch (err) {
+      console.error(String(err.message))
+      process.exit(2)
+    }
+  }
   const path = writeConfirmedPlan(projectRoot, plan)
   console.log(`도메인 경계 확정 완료 — 결정자: ${by}`)
   console.log(`  확정 도메인 ${plan.domains.length}개:`)
   for (const d of plan.domains) {
     console.log(`    - ${d.key} (이름: ${d.name}, 루트 ${d.roots.length}개)`)
+  }
+  if (plan.excludedKeys.length > 0) {
+    console.log(`  제외 key: ${plan.excludedKeys.join(', ')}`)
   }
   console.log(`  산출물: ${path}`)
   console.log('다음 단계: map(요약 + 우선순위 랭킹).')
@@ -417,11 +462,12 @@ function readSkeletonOrExit() {
 
 /** 후보 도메인 경계 표(헤더 + 구분선 + 행)를 출력한다. plan/confirm 공용(동일 출력). */
 function printPlanTable(rows) {
-  console.log('  키(key)            루트수  진입수  파일수')
-  console.log('  ------------------ ------ ------ ------')
+  const confKo = { high: '높음', medium: '중간', low: '낮음' }
+  console.log('  키(key)            루트수  진입수  파일수  확신도')
+  console.log('  ------------------ ------ ------ ------ ------')
   for (const r of rows) {
     console.log(
-      `  ${pad(r.key, 18)} ${padNum(r.rootCount, 6)} ${padNum(r.entryCount, 6)} ${padNum(r.fileCount, 6)}`,
+      `  ${pad(r.key, 18)} ${padNum(r.rootCount, 6)} ${padNum(r.entryCount, 6)} ${padNum(r.fileCount, 6)} ${pad(confKo[r.confidence] ?? '-', 6)}`,
     )
   }
 }

@@ -65,6 +65,8 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> confirm --au
 
 산출: `.spec/map/domain-plan.confirmed.json` (재실행 결정론의 닻).
 
+> ⚠️ **낡은 플랜 재사용 금지**: 기존 확정 플랜이 있어도 분류기 개선·코드 변경으로 현재 후보와 어긋날 수 있다(`map` 이 "확정 플랜 드리프트" 경고로 표면화). **드리프트가 보고되면 낡은 플랜을 결정론 닻이라며 그대로 쓰지 말고 반드시 confirm 을 재실행해 재확정**한 뒤 map→bundle→fill 을 진행한다 — 낡은 경계로 bundle/fill 을 돌리면 도메인 수십 개 분량의 LLM 작업이 헛돈다.
+
 ## 4) 요약 (우선순위 + 교차 도메인)
 
 ```
@@ -76,6 +78,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> map
 - **우선순위(E-b, AC-32)**: `priorityScore = 복잡도*3 + 결합도*2 + 크기*1`(고정 정수 가중치). 정렬은 우선순위 DESC, 동점이면 key ASC. rank 는 1-based.
 - **교차 도메인(E-c, AC-33)**: 서로 다른 도메인 파일 사이의 의존 엣지를 도메인 단위로 집계하되, 근거(evidence)는 실제 파일 엣지로 grounded 하게 보존(합성 금지). self-domain 엣지 제외.
 - **요약(AC-3)**: 도메인별 흐름수/노드수/우선순위/grounded(모든 멤버 노드가 파일:라인 앵커 보유 시 true, AC-9)/대표 앵커.
+- **플랜 드리프트(planDrift)**: 현재 후보와 확정 플랜의 루트 어긋남(addedRoots/removedRoots)을 domain-map.json 에 싣고 CLI 가 ⚠️ 경고한다. 드리프트가 있으면 이 요약·skeleton 은 낡은 경계 기준 — **bundle/fill 진행 전 confirm 재확정 필수**.
 
 > ℹ️ P2의 노드(step)는 **파일 단위 구조 도달성**으로 산출된다(슬라이스 기반). 메서드 단위 정밀 호출그래프(8종 receiver 해석)는 **P3**에서 정밀화된다 — 현재 노드수는 파일 입도 기준이다.
 

@@ -1,16 +1,19 @@
 import { describe, it, expect } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { cpSync, mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { buildCensus } from './census.js'
-import { extractRoutes } from './extract.js'
+import { buildMap, extractRoutes } from './extract.js'
 import { extractEdges } from './edges.js'
 import { buildSlices } from './slices.js'
 import { buildCandidates } from './classify.js'
-import { buildAutoPlan, renameDomain } from './confirm.js'
+import { buildAutoPlan, excludeDomain, renameDomain } from './confirm.js'
 import { buildSkeleton } from './skeleton.js'
-import { stableJson } from './persist.js'
+import { stableJson, writeConfirmedPlan } from './persist.js'
 import {
   buildCrossDomainGraph,
+  buildDomainMapSummary,
   scoreDomains,
   buildNameSuggestionContext,
 } from './domain-map.js'
@@ -197,5 +200,50 @@ describe('domain-map — determinism (byte-identical re-runs)', () => {
     expect(stableJson(scoreDomains(a.skeleton, gA))).toBe(
       stableJson(scoreDomains(b.skeleton, gB)),
     )
+  })
+})
+
+describe('domain-map — 확정 플랜 드리프트 표면화(낡은 플랜 폭주 방지)', () => {
+  it('플랜과 후보가 어긋나면 buildMap/summary 가 planDrift 를 싣는다', async () => {
+    const tmp = mkdtempSync(join(tmpdir(), 'ua-drift-'))
+    try {
+      cpSync(shopMini, tmp, { recursive: true })
+      const first = await buildMap(tmp)
+      expect(first.needsConfirm).toBe(true)
+
+      // 후보 그대로 확정 → 드리프트 없음.
+      const plan = buildAutoPlan(first.candidates, 'tester')
+      writeConfirmedPlan(tmp, plan)
+      const clean = await buildMap(tmp)
+      if (clean.needsConfirm) throw new Error('confirmed plan must be picked up')
+      expect(clean.planDrift).toEqual({ addedRoots: [], removedRoots: [] })
+
+      // ops(exclude)로 의도적으로 뺀 도메인의 루트는 드리프트 오탐이 아니어야 한다.
+      const excludedKey = plan.domains[1].key
+      const excludedRoot = plan.domains[1].roots[0]
+      writeConfirmedPlan(tmp, excludeDomain(plan, excludedKey))
+      const withExclude = await buildMap(tmp)
+      if (withExclude.needsConfirm) throw new Error('confirmed plan must be picked up')
+      expect(withExclude.planDrift.addedRoots).not.toContain(excludedRoot)
+      expect(withExclude.planDrift.removedRoots).toEqual([])
+      writeConfirmedPlan(tmp, plan) // 원복
+
+      // 낡은 플랜 시뮬레이션: 첫 도메인의 실제 루트를 유령 루트로 바꿔치기.
+      const realRoot = plan.domains[0].roots[0]
+      const stale = {
+        ...plan,
+        domains: [
+          { ...plan.domains[0], roots: ['src/ghost/GhostController.java'] },
+          ...plan.domains.slice(1),
+        ],
+      }
+      writeConfirmedPlan(tmp, stale)
+      const summary = await buildDomainMapSummary(tmp)
+      expect(summary.planDrift).toBeDefined()
+      expect(summary.planDrift!.addedRoots).toContain(realRoot)
+      expect(summary.planDrift!.removedRoots).toEqual(['src/ghost/GhostController.java'])
+    } finally {
+      rmSync(tmp, { recursive: true, force: true })
+    }
   })
 })

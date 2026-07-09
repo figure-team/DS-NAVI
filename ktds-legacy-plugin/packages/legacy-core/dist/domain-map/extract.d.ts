@@ -80,5 +80,14 @@ export declare function buildMap(projectRoot: string, options?: {
     plan: ConfirmedPlan;
     skeleton: SkeletonReport;
     methodCallGraph: MethodCallGraph;
+    /**
+     * 확정 플랜 vs 현재 후보의 루트 드리프트. 비어 있지 않으면 이 skeleton 은
+     * '낡은 경계' 기준이다 — 호출측(CLI/스킬)은 반드시 표면화하고 재확정을 안내한다.
+     * (분류기 개선 후 낡은 132개 플랜으로 bundle/fill 이 폭주한 사고의 재발 방지.)
+     */
+    planDrift: {
+        addedRoots: string[];
+        removedRoots: string[];
+    };
 }>;
 //# sourceMappingURL=extract.d.ts.map

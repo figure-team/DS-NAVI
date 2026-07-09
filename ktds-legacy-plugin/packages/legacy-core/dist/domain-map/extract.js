@@ -12,6 +12,7 @@ import { buildCensus } from './census.js';
 import { extractEdges } from './edges.js';
 import { buildSlices } from './slices.js';
 import { buildCandidates } from './classify.js';
+import { detectPlanDrift } from './confirm.js';
 import { buildMethodCallGraph } from './method-calls.js';
 import { readConfirmedPlan, writeCandidates, writeCensus, writeDashboardConfig, writeEdges, writeMapArtifact, writeMethodCalls, writeRoutes, writeSkeleton, writeSlices, } from './persist.js';
 import { extractJpaModel } from '../jpa/extract.js';
@@ -444,6 +445,22 @@ export async function buildMap(projectRoot, options = {}) {
     if (!plan) {
         return { needsConfirm: true, ...scan };
     }
+    // ops(exclude)로 사람이 의도적으로 뺀 도메인의 루트는 후보에 계속 나타나므로
+    // 그대로 두면 영구 오탐 드리프트가 된다 — excludedKeys 소속 루트는 제외한다.
+    const rawDrift = detectPlanDrift(plan, scan.candidates);
+    const excludedKeys = new Set(plan.excludedKeys);
+    const keyByRoot = new Map();
+    for (const c of scan.candidates.candidates) {
+        for (const r of c.roots)
+            keyByRoot.set(r, c.key);
+    }
+    const planDrift = {
+        addedRoots: rawDrift.addedRoots.filter((r) => {
+            const key = keyByRoot.get(r);
+            return key === undefined || !excludedKeys.has(key);
+        }),
+        removedRoots: rawDrift.removedRoots,
+    };
     // P3: 메서드 단위 호출 그래프 빌드/기록 후 skeleton refinement 로 전달.
     // 트레이스가 핸들러에서 프로젝트 파일로 해소되면 step 이 메서드 정밀이 되고,
     // 아니면 skeleton 내부에서 슬라이스 파일 단위로 폴백한다(P2 동작 유지).
@@ -464,7 +481,7 @@ export async function buildMap(projectRoot, options = {}) {
     emitDomainGraph(projectRoot, skeleton);
     // 대시보드 UI 언어를 사용자 설정(기본 ko)으로 오버레이 — UA 코어의 "en" 기본 무력화.
     writeDashboardConfig(projectRoot);
-    return { needsConfirm: false, ...scan, plan, skeleton, methodCallGraph };
+    return { needsConfirm: false, ...scan, plan, skeleton, methodCallGraph, planDrift };
 }
 /** server.servlet.context-path 를 properties/yaml 에서 best-effort 로 읽는다. */
 function readContextPath(projectRoot) {

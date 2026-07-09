@@ -461,6 +461,18 @@ export const DomainMapSummarySchema = z.object({
   gitCommit: z.string().nullable(),
   domains: z.array(DomainMapSummaryDomainSchema),
   crossDomain: CrossDomainGraphSchema,
+  /**
+   * 확정 플랜 드리프트 — 현재 후보(candidates)와 확정 플랜(domain-plan.confirmed.json)의
+   * 루트 어긋남. 분류기 개선·코드 변경 후 낡은 플랜을 조용히 재사용해 skeleton/bundle 이
+   * 구 경계로 폭주하는 사고를 막기 위해 요약에 항상 실어 표면화한다(조용한 누락 금지).
+   * 구버전 domain-map.json 하위호환을 위해 optional.
+   */
+  planDrift: z
+    .object({
+      addedRoots: z.array(z.string()),
+      removedRoots: z.array(z.string()),
+    })
+    .optional(),
 })
 export type DomainMapSummary = z.infer<typeof DomainMapSummarySchema>
 

@@ -13,6 +13,7 @@ import { buildCensus } from './census.js'
 import { extractEdges } from './edges.js'
 import { buildSlices } from './slices.js'
 import { buildCandidates } from './classify.js'
+import { detectPlanDrift } from './confirm.js'
 import { buildMethodCallGraph } from './method-calls.js'
 import {
   readConfirmedPlan,
@@ -572,12 +573,33 @@ export async function buildMap(
       plan: ConfirmedPlan
       skeleton: SkeletonReport
       methodCallGraph: MethodCallGraph
+      /**
+       * 확정 플랜 vs 현재 후보의 루트 드리프트. 비어 있지 않으면 이 skeleton 은
+       * '낡은 경계' 기준이다 — 호출측(CLI/스킬)은 반드시 표면화하고 재확정을 안내한다.
+       * (분류기 개선 후 낡은 132개 플랜으로 bundle/fill 이 폭주한 사고의 재발 방지.)
+       */
+      planDrift: { addedRoots: string[]; removedRoots: string[] }
     }
 > {
   const scan = await scanDomainMap(projectRoot)
   const plan = readConfirmedPlan(projectRoot)
   if (!plan) {
     return { needsConfirm: true, ...scan }
+  }
+  // ops(exclude)로 사람이 의도적으로 뺀 도메인의 루트는 후보에 계속 나타나므로
+  // 그대로 두면 영구 오탐 드리프트가 된다 — excludedKeys 소속 루트는 제외한다.
+  const rawDrift = detectPlanDrift(plan, scan.candidates)
+  const excludedKeys = new Set(plan.excludedKeys)
+  const keyByRoot = new Map<string, string>()
+  for (const c of scan.candidates.candidates) {
+    for (const r of c.roots) keyByRoot.set(r, c.key)
+  }
+  const planDrift = {
+    addedRoots: rawDrift.addedRoots.filter((r) => {
+      const key = keyByRoot.get(r)
+      return key === undefined || !excludedKeys.has(key)
+    }),
+    removedRoots: rawDrift.removedRoots,
   }
   // P3: 메서드 단위 호출 그래프 빌드/기록 후 skeleton refinement 로 전달.
   // 트레이스가 핸들러에서 프로젝트 파일로 해소되면 step 이 메서드 정밀이 되고,
@@ -603,7 +625,7 @@ export async function buildMap(
   emitDomainGraph(projectRoot, skeleton)
   // 대시보드 UI 언어를 사용자 설정(기본 ko)으로 오버레이 — UA 코어의 "en" 기본 무력화.
   writeDashboardConfig(projectRoot)
-  return { needsConfirm: false, ...scan, plan, skeleton, methodCallGraph }
+  return { needsConfirm: false, ...scan, plan, skeleton, methodCallGraph, planDrift }
 }
 
 /** server.servlet.context-path 를 properties/yaml 에서 best-effort 로 읽는다. */

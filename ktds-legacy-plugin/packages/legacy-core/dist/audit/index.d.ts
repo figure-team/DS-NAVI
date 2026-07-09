@@ -1,0 +1,41 @@
+/**
+ * audit (P4.2) — doc-state 전이가 남기는 감사 이벤트의 단일 소스.
+ *
+ * append-only(추가 전용) · chronological(추가 순서 = 시간 순서, `at`이 호출자
+ * 공급이라 같은 입력 -> 같은 로그). engine 안에서 Date.now()/new Date() 미사용.
+ * zod 스키마로 손편집/버전 스큐를 조용히 통과시키지 않는다.
+ */
+import { z } from 'zod';
+/** 감사 이벤트 종류 — doc-state 전이 3종(승인/반려/제출). */
+export declare const AuditEventTypeSchema: z.ZodEnum<{
+    APPROVED: "APPROVED";
+    RETURNED: "RETURNED";
+    SUBMITTED: "SUBMITTED";
+}>;
+export type AuditEventType = z.infer<typeof AuditEventTypeSchema>;
+/**
+ * 감사 이벤트 — event/by/at(필수) + detail(선택).
+ * `at`은 호출자 공급 ISO 문자열(결정론: engine 내부에서 시간 생성 금지).
+ */
+export declare const AuditEventSchema: z.ZodObject<{
+    event: z.ZodEnum<{
+        APPROVED: "APPROVED";
+        RETURNED: "RETURNED";
+        SUBMITTED: "SUBMITTED";
+    }>;
+    by: z.ZodString;
+    at: z.ZodString;
+    detail: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type AuditEvent = z.infer<typeof AuditEventSchema>;
+/**
+ * 감사 로그에 이벤트를 추가한 **새 배열**을 반환(입력 불변 — append-only).
+ * 호출자 공급 `at`을 그대로 보존해 결정론을 유지한다.
+ */
+export declare function appendAudit(audit: readonly AuditEvent[], event: AuditEvent): AuditEvent[];
+/**
+ * 감사 로그를 결정론 텍스트로 렌더 — 한 줄/이벤트, 후행 개행.
+ * 입력 순서(append 순서)를 유지한다. 이벤트가 없으면 빈 문자열.
+ */
+export declare function renderAuditLog(audit: readonly AuditEvent[]): string;
+//# sourceMappingURL=index.d.ts.map

@@ -1,0 +1,348 @@
+/**
+ * RTM(요구사항 추적표) 데이터 모델 — 단일 소스(구조화 산출물 rtm.json).
+ *
+ * 설계: docs/ktds/RTM_TAB_DESIGN.md. doc-generator 와 동형으로 zod 스키마 + z.infer.
+ * confidence 는 ../types.js 의 CONFIDENCE_VALUES 단일 소스에서만 가져온다(중복 정의 금지).
+ *
+ * v2 확장(9개 빈틈 반영): ①인수조건(AC) 계층 ②비기능요구(NFR) ③검증 스파인(시험결과·결함·고객검수)
+ * ④요구사항 lifecycle ⑤요구사항 메타 ⑥커버리지 롤업 ⑦요구사항 의존성 ⑧산출물 연계 ⑨변경관리.
+ * 후방호환: 신규 필드는 default/optional 로 둬 기존 산출물·인테이크가 점진 채택한다.
+ *
+ * 범위: AS-IS(코드 근거)는 buildRtm, 요구사항/AC/상태 재계산은 applyRequirements, 커버리지는
+ * computeCoverage. 모든 배열은 결정론 정렬(byte-identical 재실행, Date.now 미사용).
+ */
+import { z } from 'zod';
+import { CONFIDENCE_VALUES } from '../types.js';
+import { EvidenceSchema } from '../doc-generator/types.js';
+/** confidence 등급 — CONFIDENCE_VALUES 단일 소스와 일치. */
+export const RtmConfidenceSchema = z.enum(CONFIDENCE_VALUES);
+/** 추적 셀 — 한 추적 축(진입점/구현/데이터/테스트)의 값 + 근거. */
+export const RtmTraceCellSchema = z.object({
+    value: z.string(),
+    confidence: RtmConfidenceSchema,
+    evidence: z.array(EvidenceSchema),
+});
+// ── ③ 검증 스파인 ───────────────────────────────────────────────────────────
+/** 시험 결과 — 통과/실패/해당없음/미실행. */
+export const TestResultSchema = z.enum(['PASS', 'FAIL', 'NA', 'UNTESTED']);
+/** 테스트 참조 — 케이스 + 결과 + 결함 연계(실패 시). 한 AC/기능의 검증 단위. */
+export const TestRefSchema = z.object({
+    caseId: z.string(),
+    result: TestResultSchema.default('UNTESTED'),
+    defectId: z.string().nullable().default(null),
+    note: z.string().optional(),
+});
+// ── ① 인수조건(업무규칙) 계층 ────────────────────────────────────────────────
+/** 인수조건 유형 — 분기/선행조건/후행액션/예외/일반규칙. */
+export const AcKindSchema = z.enum(['branch', 'precondition', 'postcondition', 'exception', 'rule']);
+/**
+ * 인수조건(Acceptance Criterion) — 검증 가능한 조건 1개. 요구사항과 기능 사이 N:M 다리.
+ * fnIds 로 구현 기능을 매핑(changeset 도출의 근거). tests 로 검증(③).
+ */
+export const AcceptanceCriterionSchema = z.object({
+    id: z.string(),
+    text: z.string(),
+    kind: AcKindSchema.default('rule'),
+    fnIds: z.array(z.string()).default([]),
+    confidence: RtmConfidenceSchema.default('INFERRED'),
+    tests: z.array(TestRefSchema).default([]),
+});
+// ── 기능 행 ──────────────────────────────────────────────────────────────────
+export const RtmOriginSchema = z.enum(['AS_IS', 'TO_BE']);
+export const RtmFunctionStateSchema = z.enum([
+    'IMPLEMENTED',
+    'PARTIAL',
+    'PLANNED',
+    'CHANGED',
+    'ORPHANED',
+]);
+/** 산출물 연계(⑧) — 이 기능/요구가 반영된 SI 문서 항목(docId + 앵커). */
+export const DeliverableRefSchema = z.object({
+    docId: z.string(),
+    anchor: z.string().optional(),
+});
+/** 기능에 걸린 업무규칙 역참조(①) — 현행 요구사항들의 AC 를 이 기능 관점으로 집계. */
+export const RtmFunctionRuleSchema = z.object({
+    reqId: z.string(),
+    acId: z.string(),
+    text: z.string(),
+    kind: AcKindSchema,
+    confidence: RtmConfidenceSchema,
+});
+/**
+ * 기능 행(RTM 뷰① 한 행) — flow 노드 1개 = 기능 1개. 추적 4축 + 도메인 귀속 + 상태.
+ * v2: nfrTags(②) · rules(①, 현행 head 집계) · deliverableRefs(⑧).
+ */
+export const RtmFunctionRowSchema = z.object({
+    id: z.string(),
+    featureId: z.string(),
+    name: z.string(),
+    domainId: z.string(),
+    domainName: z.string(),
+    entryPoint: RtmTraceCellSchema,
+    implementation: RtmTraceCellSchema,
+    data: RtmTraceCellSchema,
+    test: RtmTraceCellSchema,
+    origin: RtmOriginSchema,
+    state: RtmFunctionStateSchema,
+    requirementHistory: z.array(z.string()),
+    nfrTags: z.array(z.string()).default([]),
+    rules: z.array(RtmFunctionRuleSchema).default([]),
+    deliverableRefs: z.array(DeliverableRefSchema).default([]),
+    /** R7 사용자 정의 필드 값 — key = `custom:<id>` (오버레이 editedCells 에서 병합). */
+    custom: z.record(z.string(), z.string()).default({}),
+});
+// ── W5 테스트 시나리오(설계: RTM_TEST_SCENARIO_DESIGN.md) ────────────────────
+/** 시나리오 종류 — 정상/예외/경계. */
+export const TestScenarioKindSchema = z.enum(['normal', 'exception', 'boundary']);
+/**
+ * 단위테스트 시나리오 초안 — 기능 행별 결정론 템플릿 생성(전부 INFERRED [추정]).
+ * 확정은 rtm-overrides.json `_scenarios` 오버레이(확정 시 CONFIRMED 승격 — 기능 셀과
+ * 달리 시나리오 확정 = 사람 검토 완료 의미가 명확). AC.tests[](수행 결과)와 별개 축:
+ * 시나리오 = 설계 초안, TestRef = 수행 기록(확정 후 caseId 연결은 사람 몫).
+ */
+export const RtmTestScenarioSchema = z.object({
+    /**
+     * 안정 id — `TS-<fnId>-<N|B|E|E:reqId:acId>`. fnId(flow 노드 id)·(reqId,acId) 기반이라
+     * 재스캔의 flow/AC 증감에도 이동하지 않는다(위치값 featureId 기반이면 확정 오버레이가
+     * 무음 오귀속 — 리뷰 C1).
+     */
+    id: z.string(),
+    fnId: z.string(),
+    reqId: z.string().nullable().default(null),
+    acId: z.string().nullable().default(null),
+    kind: TestScenarioKindSchema,
+    title: z.string(),
+    given: z.string(),
+    when: z.string(),
+    then: z.string(),
+    confidence: RtmConfidenceSchema,
+    /** 원천 셀(진입점/구현) evidence 승계. */
+    evidence: z.array(EvidenceSchema).default([]),
+    /** [미확인] 축소 생성 사유 등. */
+    notes: z.array(z.string()).default([]),
+});
+// ── R7 사용자 정의 필드(§5.1 활성화) ─────────────────────────────────────────
+/**
+ * 사용자 정의 필드 정의 — rtm-overrides.json `_fields` 섹션(id 키 record)이 원본.
+ * 행 값은 기능 오버레이 editedCells["custom:<id>"] (기존 record 스키마가 이미 수용).
+ * 정의 삭제는 비파괴(값 보존 — 재등록 시 복원).
+ */
+export const RtmCustomFieldSchema = z.object({
+    /** `custom:<slug>` 네임스페이스 고정. */
+    id: z.string(),
+    label: z.string(),
+    scope: z.literal('function'),
+    createdBy: z.string(),
+    at: z.string(),
+});
+/** 도메인 그룹 헤더. */
+export const RtmDomainSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    functionCount: z.number().int(),
+});
+/** 변경 묶음(changeset) — 한 요구사항이 기능 집합에 가한 분류(−/~/+/=). */
+export const RtmChangesetSchema = z.object({
+    added: z.array(z.string()),
+    modified: z.array(z.string()),
+    removed: z.array(z.string()),
+    revived: z.array(z.string()),
+});
+// ── ②④⑤⑦⑨ 요구사항 메타/유형/상태/의존/변경관리 ──────────────────────────────
+/** 요구사항 유형(②) — 기능 / 비기능. */
+export const RequirementTypeSchema = z.enum(['functional', 'nonfunctional']);
+/** 비기능 분류(②) — 성능/보안/가용성/확장성/사용성/유지보수성/규정준수/기타. */
+export const NfrCategorySchema = z.enum([
+    'performance',
+    'security',
+    'availability',
+    'scalability',
+    'usability',
+    'maintainability',
+    'compliance',
+    'other',
+]);
+/** 요구사항 진행상태(④, lifecycle) — 접수→분석→설계→개발→시험→완료 / 보류 / 반려. */
+export const RequirementLifecycleSchema = z.enum([
+    'RECEIVED',
+    'ANALYZING',
+    'DESIGNING',
+    'DEVELOPING',
+    'TESTING',
+    'DONE',
+    'HOLD',
+    'REJECTED',
+]);
+/** 우선순위(⑤). */
+export const PrioritySchema = z.enum(['HIGH', 'MEDIUM', 'LOW']);
+/** 요구사항 출처/메타(⑤) — 원문 + 요청자·출처문서·요청일·대상 릴리스. */
+export const RequirementSourceSchema = z
+    .object({
+    kind: z.string(),
+    raw: z.string(),
+    requester: z.string().optional(),
+    doc: z.string().optional(),
+    section: z.string().optional(),
+    requestedAt: z.string().optional(),
+    targetRelease: z.string().optional(),
+})
+    .nullable();
+/** 변경관리 메타(⑨) — CR 번호·사유·승인자·영향공수(영향도 엔진 산정 연계). */
+export const ChangeReqSchema = z
+    .object({
+    crNo: z.string().nullable().default(null),
+    reason: z.string().nullable().default(null),
+    approver: z.string().nullable().default(null),
+    effort: z.string().nullable().default(null),
+})
+    .nullable();
+/** 고객 검수(③ 2축) — 내부확정과 별개로 고객이 요구 충족을 승인하는 축. */
+export const SignoffSchema = z
+    .object({
+    approved: z.boolean(),
+    by: z.string().nullable().default(null),
+    at: z.string().nullable().default(null),
+})
+    .nullable();
+/**
+ * 요구사항(RTM 뷰② 한 행) — 고객 요청 1건. v2: 유형(②)·메타(⑤)·lifecycle(④)·의존(⑦)·
+ * 변경관리(⑨)·고객검수(③)·인수조건(①). changeset 은 AC fnIds 와 일치(applyRequirements 가 검증/도출).
+ */
+export const RtmRequirementSchema = z.object({
+    id: z.string(),
+    text: z.string(),
+    type: RequirementTypeSchema.default('functional'),
+    nfrCategory: NfrCategorySchema.nullable().default(null),
+    /** 비기능 횡단 귀속(②) — 도메인/기능 id 태그. 비면 시스템 전체. */
+    nfrScope: z.array(z.string()).default([]),
+    priority: PrioritySchema.default('MEDIUM'),
+    lifecycle: RequirementLifecycleSchema.default('RECEIVED'),
+    // 유효성 상태(절차 B) — ACTIVE(유효) / SUPERSEDED(신규 요구로 대체) / WITHDRAWN(CR 철회·폐기).
+    // WITHDRAWN 은 SUPERSEDED 와 달리 대체 요구가 없다(요청 자체 취소). 파괴적 삭제 금지(이력 보존).
+    status: z.enum(['ACTIVE', 'SUPERSEDED', 'WITHDRAWN']),
+    supersedes: z.string().nullable(),
+    supersededBy: z.string().nullable(),
+    dependsOn: z.array(z.string()).default([]),
+    source: RequirementSourceSchema,
+    changeReq: ChangeReqSchema.default(null),
+    signoff: SignoffSchema.default(null),
+    acceptanceCriteria: z.array(AcceptanceCriterionSchema).default([]),
+    changeset: RtmChangesetSchema,
+});
+// ── ⑥ 커버리지 / 갭 롤업 ─────────────────────────────────────────────────────
+/**
+ * 커버리지 리포트(⑥) — 요구사항/기능 단위 구현·검증 집계 + 양방향 갭. computeCoverage 가 산출.
+ * RTM 의 핵심 가치(빈칸=위험)를 요약 수치로 드러낸다.
+ */
+export const RtmCoverageSchema = z.object({
+    requirements: z.object({
+        total: z.number().int(),
+        implemented: z.number().int(),
+        verified: z.number().int(),
+        signedOff: z.number().int(),
+        byLifecycle: z.record(z.string(), z.number().int()),
+    }),
+    functions: z.object({
+        total: z.number().int(),
+        implemented: z.number().int(),
+        planned: z.number().int(),
+        orphaned: z.number().int(),
+        confirmed: z.number().int(),
+    }),
+    tests: z.object({
+        total: z.number().int(),
+        pass: z.number().int(),
+        fail: z.number().int(),
+        untested: z.number().int(),
+    }),
+    /** W5 시나리오 롤업 — 초안/확정 카운트(optional: 구버전 rtm.json 하위호환). */
+    scenarios: z
+        .object({
+        total: z.number().int(),
+        confirmed: z.number().int(),
+        byKind: z.object({
+            normal: z.number().int(),
+            exception: z.number().int(),
+            boundary: z.number().int(),
+        }),
+    })
+        .optional(),
+    gaps: z.object({
+        unimplemented: z.array(z.string()),
+        orphanCode: z.array(z.string()),
+        unverified: z.array(z.string()),
+    }),
+    /** 요구사항 단위 진척 롤업(§9 뷰② 구현 x/y · 검증 x/y) — reqId → 대상/구현/AC/통과 수. */
+    byRequirement: z.record(z.string(), z.object({
+        targetsTotal: z.number().int(),
+        targetsBuilt: z.number().int(),
+        acsTotal: z.number().int(),
+        acsPassed: z.number().int(),
+    })),
+});
+/**
+ * 무결성 진단(critic C1/C2/M4/M5) — LLM 인테이크 산출은 잘못될 수 있으므로 참조 무결성을
+ * 강제 대신 **가시화**한다(조용한 손실 금지). error=치명(댕글링/순환/드롭), warn=주의(불일치).
+ */
+export const RtmDiagnosticSchema = z.object({
+    level: z.enum(['error', 'warn']),
+    code: z.string(),
+    message: z.string(),
+    ref: z.string().optional(),
+});
+// ── 오버레이(사람 편집/확정/검증 입력) — rtm-overrides.json ──────────────────────
+/** 감사 이벤트 — append-only(누가 언제 무엇을). */
+export const RtmAuditEventSchema = z.object({ event: z.string(), by: z.string(), at: z.string() });
+/** 기능 행 오버레이(R3) — 셀 교정 + 확정자. on-disk 에서는 fnId 키로 최상위. */
+export const RtmFunctionOverrideSchema = z.object({
+    editedCells: z.record(z.string(), z.string()).default({}),
+    approver: z.string(),
+    at: z.string(),
+    audit: z.array(RtmAuditEventSchema).default([]),
+});
+/** 시험결과 오버레이 — AC 테스트의 PASS/FAIL/NA + 결함(사람 실측 입력, critic ⓐ). */
+export const RtmTestOverrideSchema = z.object({
+    result: TestResultSchema,
+    defectId: z.string().nullable().default(null),
+});
+/**
+ * 요구사항 오버레이 — lifecycle 전이·고객검수(signoff)·시험결과 기록(검증 스파인 입력 경로).
+ * tests 키 = "<acId>::<caseId>". on-disk 에서는 `_requirements` 아래 reqId 키.
+ */
+export const RtmRequirementOverrideSchema = z.object({
+    lifecycle: RequirementLifecycleSchema.optional(),
+    signoff: SignoffSchema.optional(),
+    tests: z.record(z.string(), RtmTestOverrideSchema).default({}),
+    approver: z.string(),
+    at: z.string(),
+    audit: z.array(RtmAuditEventSchema).default([]),
+});
+/**
+ * 시나리오 오버레이(W5) — G/W/T·제목 편집 + 확정. on-disk 에서는 `_scenarios` 아래 tsId 키.
+ * 적용 시 해당 시나리오 confidence → CONFIRMED. editedCells 키: title/given/when/then.
+ */
+export const RtmScenarioOverrideSchema = z.object({
+    editedCells: z.record(z.string(), z.string()).default({}),
+    approver: z.string(),
+    at: z.string(),
+    audit: z.array(RtmAuditEventSchema).default([]),
+});
+/**
+ * rtm.json — RTM 구조화 산출물(생성물, 불변). 사람 편집/확정은 rtm-overrides.json 오버레이.
+ * coverage 는 computeCoverage 결과(파생). 모든 배열은 정렬되어 byte-identical 재실행을 보장한다.
+ */
+export const RtmModelSchema = z.object({
+    schemaVersion: z.literal(2),
+    gitCommit: z.string().nullable(),
+    domains: z.array(RtmDomainSchema),
+    functions: z.array(RtmFunctionRowSchema),
+    requirements: z.array(RtmRequirementSchema),
+    /** W5 단위테스트 시나리오 초안(결정론 생성) — 구버전 rtm.json 은 빈 배열로 파싱. */
+    testScenarios: z.array(RtmTestScenarioSchema).default([]),
+    /** R7 사용자 정의 필드 정의(오버레이 `_fields` 병합 결과) — id ASC. */
+    customFields: z.array(RtmCustomFieldSchema).default([]),
+    coverage: RtmCoverageSchema.optional(),
+    diagnostics: z.array(RtmDiagnosticSchema).optional(),
+});
+//# sourceMappingURL=types.js.map

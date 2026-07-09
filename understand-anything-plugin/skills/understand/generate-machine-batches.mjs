@@ -22,9 +22,14 @@
  * files still get a minimal node so completeness never regresses.
  *
  * Usage:
- *   node generate-machine-batches.mjs <project-root> [--locale <id>]
+ *   node generate-machine-batches.mjs <project-root> [--locale <id>] [--all-tiers]
  *
  * --locale: template language for summaries (en, ko; others fall back to en).
+ * --all-tiers: /understand --lite mode — generate EVERY batch (not just
+ *   tier==='machine'): code/script files additionally get tree-sitter
+ *   function/class child nodes (file-analyzer significance filter) with
+ *   `contains` edges; SQL/config/infra get category templates. The only LLM
+ *   call left in the pipeline is the Phase 4 architecture analysis.
  */
 
 import { createRequire } from 'node:module';
@@ -57,6 +62,11 @@ const TEMPLATES = {
     doc: (n, secs) => `Documentation file (${n} lines${secs.length ? `; sections: ${secs.join(', ')}` : ''}).`,
     tabular: (rows, cols) => `Tabular data file (${rows} rows${cols.length ? `; columns: ${cols.join(', ')}` : ''}).`,
     mapper: (ns, db, total, parts, tables) => `SQL mapper (MyBatis/iBatis) for namespace ${ns}${db ? ` (${db})` : ''} — ${total} statements${parts ? ` (${parts})` : ''}${tables.length ? `; main tables: ${tables.join(', ')}` : ''}.`,
+    codeFile: (lang, fn, cls, n) => `${lang} source file${fn || cls ? ` — ${[fn ? `${fn} functions` : '', cls ? `${cls} classes` : ''].filter(Boolean).join(', ')}` : ''} (${n} lines).`,
+    func: (name, s, e, p) => `Function ${name} (L${s}–${e}${p ? `, ${p} params` : ''}).`,
+    cls: (name, m, s, e) => `Class ${name}${m ? ` — ${m} methods` : ''} (L${s}–${e}).`,
+    sql: (stmts, tables) => `SQL file — ${stmts} statements${tables.length ? `; tables: ${tables.join(', ')}` : ''}.`,
+    config: (n, keys) => `Configuration file (${n} lines${keys ? `, ${keys} keys` : ''}).`,
     generic: (ext, n) => `${ext.toUpperCase()} file (${n} lines).`,
     unreadable: () => 'File could not be read during analysis.',
   },
@@ -66,6 +76,11 @@ const TEMPLATES = {
     doc: (n, secs) => `문서 파일 (${n}라인${secs.length ? `; 섹션: ${secs.join(', ')}` : ''}).`,
     tabular: (rows, cols) => `표 형식 데이터 파일 (${rows}행${cols.length ? `; 컬럼: ${cols.join(', ')}` : ''}).`,
     mapper: (ns, db, total, parts, tables) => `${ns} 네임스페이스의${db ? ` ${db}용` : ''} SQL 매퍼(MyBatis/iBatis) — 쿼리 ${total}개${parts ? `(${parts})` : ''}${tables.length ? `, 주요 테이블: ${tables.join(', ')}` : ''}.`,
+    codeFile: (lang, fn, cls, n) => `${lang} 소스 파일${fn || cls ? ` — ${[fn ? `함수 ${fn}개` : '', cls ? `클래스 ${cls}개` : ''].filter(Boolean).join(', ')}` : ''} (${n}라인).`,
+    func: (name, s, e, p) => `함수 ${name} (L${s}–${e}${p ? `, 파라미터 ${p}개` : ''}).`,
+    cls: (name, m, s, e) => `클래스 ${name}${m ? ` — 메서드 ${m}개` : ''} (L${s}–${e}).`,
+    sql: (stmts, tables) => `SQL 파일 — 구문 ${stmts}개${tables.length ? `, 테이블: ${tables.join(', ')}` : ''}.`,
+    config: (n, keys) => `설정 파일 (${n}라인${keys ? `, 키 ${keys}개` : ''}).`,
     generic: (ext, n) => `${ext.toUpperCase()} 파일 (${n}라인).`,
     unreadable: () => '분석 중 파일을 읽을 수 없었습니다.',
   },
@@ -132,7 +147,14 @@ function complexityOf(nonEmptyLines) {
 function nodeKind(file) {
   if (file.fileCategory === 'docs') return { type: 'document', prefix: 'document' };
   if (file.fileCategory === 'data') return { type: 'table', prefix: 'table' };
-  return { type: 'file', prefix: 'file' }; // markup → file (treated like code)
+  if (file.fileCategory === 'config') return { type: 'config', prefix: 'config' };
+  if (file.fileCategory === 'infra') {
+    const p = file.path;
+    if (/\.tf(vars)?$/i.test(p) || /vagrantfile$/i.test(p)) return { type: 'resource', prefix: 'resource' };
+    if (/\.github\/workflows\/|\.gitlab-ci\.yml$|\.circleci\/|jenkinsfile$/i.test(p)) return { type: 'pipeline', prefix: 'pipeline' };
+    return { type: 'service', prefix: 'service' }; // Dockerfile, compose, k8s
+  }
+  return { type: 'file', prefix: 'file' }; // code / script / markup
 }
 
 /**
@@ -172,6 +194,28 @@ export function buildMachineNode(file, content, t, structResult, mapperInfo = nu
       .join('/');
     summary = t.mapper(mapperInfo.namespace, mapperInfo.db, mapperInfo.total, parts, mapperInfo.tables);
     tags = ['configuration', 'database', 'sql-mapper', 'machine-tier'];
+  } else if (file.fileCategory === 'code' || file.fileCategory === 'script') {
+    const fn = structResult?.functions?.length ?? 0;
+    const cls = structResult?.classes?.length ?? 0;
+    summary = t.codeFile(file.language || ext || 'source', fn, cls, totalLines);
+    tags = [file.fileCategory === 'script' ? 'script' : 'source', 'machine-tier'];
+  } else if (file.fileCategory === 'data' && /\.sql$/i.test(file.path)) {
+    const stmts = (content.match(/(?:^|;)\s*(?:create|insert|update|delete|select|alter|drop)\b/gi) || []).length;
+    const freq = new Map();
+    for (const m of content.matchAll(/(?<!<)\b(?:from|join|into|update|(?:create|alter|drop)\s+table(?:\s+if\s+not\s+exists)?)\s+([A-Za-z_][A-Za-z0-9_.$]*)/gi)) {
+      const name = m[1].toUpperCase();
+      if (SQL_NON_TABLE_WORDS.has(name.toLowerCase())) continue;
+      freq.set(name, (freq.get(name) || 0) + 1);
+    }
+    const tables = [...freq.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 3).map(([n]) => n);
+    summary = t.sql(stmts, tables);
+    tags = ['data', 'database', 'machine-tier'];
+  } else if (file.fileCategory === 'config') {
+    const keys = /\.(properties|ini|env)$/i.test(file.path)
+      ? lines.filter(l => /^[ \t]*[^#!;[\s][^=:]*[=:]/.test(l)).length
+      : 0;
+    summary = t.config(totalLines, keys);
+    tags = ['configuration', 'machine-tier'];
   } else if (/^html?$/i.test(ext)) {
     const m = content.match(/<title[^>]*>([^<]*)<\/title>/i);
     summary = t.html(totalLines, m ? TRUNC(m[1].trim()) : '');
@@ -197,20 +241,65 @@ export function buildMachineNode(file, content, t, structResult, mapperInfo = nu
   return { ...base, summary, tags, complexity: complexityOf(nonEmpty) };
 }
 
+/**
+ * Function/class child nodes for code-tier files (--all-tiers only), applying
+ * the file-analyzer significance filter deterministically: functions with 10+
+ * lines or exported; classes with 2+ methods or 20+ lines. Returns
+ * { nodes, edges } where every child gets a `contains` edge from the file node.
+ * Exported for unit tests.
+ */
+export function buildChildNodes(fileNodeId, file, structResult, t) {
+  const nodes = [];
+  const edges = [];
+  if (!structResult) return { nodes, edges };
+  const exported = new Set((structResult.exports ?? []).map(e => e.name));
+
+  for (const fn of structResult.functions ?? []) {
+    const span = fn.endLine - fn.startLine + 1;
+    if (span < 10 && !exported.has(fn.name)) continue;
+    const id = `function:${file.path}:${fn.name}`;
+    nodes.push({
+      id, type: 'function', name: fn.name, filePath: file.path,
+      summary: t.func(fn.name, fn.startLine, fn.endLine, (fn.params ?? []).length),
+      tags: ['function', 'machine-tier'],
+      complexity: complexityOf(span),
+    });
+    edges.push({ source: fileNodeId, target: id, type: 'contains', direction: 'forward', weight: 1.0 });
+  }
+
+  for (const cls of structResult.classes ?? []) {
+    const span = cls.endLine - cls.startLine + 1;
+    const methods = (cls.methods ?? []).length;
+    if (methods < 2 && span < 20 && !exported.has(cls.name)) continue;
+    const id = `class:${file.path}:${cls.name}`;
+    nodes.push({
+      id, type: 'class', name: cls.name, filePath: file.path,
+      summary: t.cls(cls.name, methods, cls.startLine, cls.endLine),
+      tags: ['class', 'machine-tier'],
+      complexity: complexityOf(span),
+    });
+    edges.push({ source: fileNodeId, target: id, type: 'contains', direction: 'forward', weight: 1.0 });
+  }
+
+  return { nodes, edges };
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 async function main() {
   const positional = [];
   let locale = 'en';
+  let allTiers = false;
   for (let i = 2; i < process.argv.length; i++) {
     const a = process.argv[i];
     if (a === '--locale') locale = process.argv[++i] ?? 'en';
+    else if (a === '--all-tiers') allTiers = true;
     else positional.push(a);
   }
   const projectRoot = positional[0] ? resolve(positional[0]) : null;
   if (!projectRoot) {
-    process.stderr.write('Usage: node generate-machine-batches.mjs <project-root> [--locale <id>]\n');
+    process.stderr.write('Usage: node generate-machine-batches.mjs <project-root> [--locale <id>] [--all-tiers]\n');
     process.exit(1);
   }
   const t = TEMPLATES[locale] ?? TEMPLATES.en;
@@ -223,7 +312,7 @@ async function main() {
   }
   const batchesDoc = JSON.parse(readFileSync(batchesPath, 'utf-8'));
   const { batches, exportsByPath } = batchesDoc;
-  const machineBatches = (batches ?? []).filter(b => b.tier === 'machine');
+  const machineBatches = (batches ?? []).filter(b => allTiers || b.tier === 'machine');
   if (machineBatches.length === 0) {
     process.stderr.write('Info: generate-machine-batches: no machine-tier batches — nothing to do\n');
     console.log(JSON.stringify({ generated: 0, files: 0 }));
@@ -291,6 +380,12 @@ async function main() {
       const node = buildMachineNode(file, content, t, structResult, mapperInfo);
       nodes.push(node);
 
+      if (allTiers && (file.fileCategory === 'code' || file.fileCategory === 'script')) {
+        const children = buildChildNodes(node.id, file, structResult, t);
+        nodes.push(...children.nodes);
+        edges.push(...children.edges);
+      }
+
       if (mapperInfo) {
         mapperCount++;
         // Mapper → DAO interface (namespace resolution). Deterministic and
@@ -344,7 +439,7 @@ async function main() {
   }
 
   process.stderr.write(
-    `Info: generate-machine-batches: wrote ${machineBatches.length} machine-tier batches ` +
+    `Info: generate-machine-batches: wrote ${machineBatches.length} ${allTiers ? 'batches (--all-tiers, lite mode)' : 'machine-tier batches'} ` +
     `(${fileCount} files incl. ${mapperCount} SQL mappers → ${daoEdgeCount} DAO edges, ` +
     `${variantEdgeCount} variant edges; locale ${TEMPLATES[locale] ? locale : `${locale}→en fallback`}) — no LLM calls\n`,
   );

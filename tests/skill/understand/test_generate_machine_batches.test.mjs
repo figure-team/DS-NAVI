@@ -262,3 +262,103 @@ describe('generate-machine-batches.mjs — SQL-mapper XML machineization', () =>
     expect(rel[0].target).toBe('config:src/main/resources/mapper/UserDAO_SQL_mysql.xml');
   });
 });
+
+describe('generate-machine-batches.mjs — --all-tiers (lite mode)', () => {
+  let root;
+  let intermediate;
+  let batchesDoc;
+  let allNodes;
+  let allEdges;
+
+  beforeAll(() => {
+    root = mkdtempSync(join(tmpdir(), 'ua-gmb-lite-'));
+    intermediate = join(root, '.understand-anything', 'intermediate');
+    mkdirSync(intermediate, { recursive: true });
+    mkdirSync(join(root, 'src'), { recursive: true });
+    mkdirSync(join(root, 'db'), { recursive: true });
+    mkdirSync(join(root, 'conf'), { recursive: true });
+
+    // Exported big function (child node) + tiny non-exported one (filtered out)
+    writeFileSync(join(root, 'src', 'service.ts'), [
+      'export function processOrder(order: unknown, ctx: unknown) {',
+      ...Array.from({ length: 10 }, (_, i) => `  console.log(${i});`),
+      '}',
+      'function tiny() { return 1; }',
+      '',
+    ].join('\n'));
+    writeFileSync(join(root, 'db', 'schema.sql'),
+      'CREATE TABLE ORDERS (ID INT);\nCREATE TABLE USERS (ID INT);\nINSERT INTO ORDERS VALUES (1);\n');
+    writeFileSync(join(root, 'conf', 'app.properties'), '# comment\nkey.a=1\nkey.b=2\n');
+
+    const files = [
+      { path: 'src/service.ts', language: 'typescript', sizeLines: 13, fileCategory: 'code' },
+      { path: 'db/schema.sql', language: 'sql', sizeLines: 3, fileCategory: 'data' },
+      { path: 'conf/app.properties', language: 'properties', sizeLines: 3, fileCategory: 'config' },
+    ];
+    const importMap = Object.fromEntries(files.map(f => [f.path, []]));
+    writeFileSync(join(intermediate, 'scan-result.json'), JSON.stringify({
+      name: 'lite-test', description: '', languages: ['typescript'], frameworks: [],
+      files, totalFiles: files.length, filteredByIgnore: 0,
+      estimatedComplexity: 'small', importMap,
+    }));
+
+    let r = run('compute-batches.mjs', [root]);
+    expect(r.status).toBe(0);
+    r = run('slice-batch-inputs.mjs', [root, '--skill-dir', SKILL_DIR, '--agent-def-path', AGENT_DEF, '--language-directive', '']);
+    expect(r.status).toBe(0);
+    r = run('generate-machine-batches.mjs', [root, '--locale', 'ko', '--all-tiers']);
+    expect(r.status).toBe(0);
+    batchesDoc = JSON.parse(readFileSync(join(intermediate, 'batches.json'), 'utf-8'));
+    expect(JSON.parse(r.stdout).generated).toBe(batchesDoc.batches.length);
+
+    allNodes = batchesDoc.batches.flatMap(b =>
+      JSON.parse(readFileSync(join(intermediate, `batch-${b.batchIndex}.json`), 'utf-8')).nodes);
+    allEdges = batchesDoc.batches.flatMap(b =>
+      JSON.parse(readFileSync(join(intermediate, `batch-${b.batchIndex}.json`), 'utf-8')).edges);
+  });
+
+  afterAll(() => {
+    if (root) rmSync(root, { recursive: true, force: true });
+  });
+
+  it('generates EVERY batch (code/light tiers included) and audit passes', () => {
+    for (const b of batchesDoc.batches) {
+      expect(existsSync(join(intermediate, `batch-${b.batchIndex}.done`))).toBe(true);
+    }
+    const audit = spawnSync('node', [join(SKILL_DIR, 'audit-batches.mjs'), intermediate], { encoding: 'utf-8' });
+    expect(JSON.parse(audit.stdout).incomplete).toEqual([]);
+  });
+
+  it('creates code file node + significant function child with contains edge', () => {
+    const byId = new Map(allNodes.map(n => [n.id, n]));
+    const file = byId.get('file:src/service.ts');
+    expect(file.summary).toContain('typescript 소스 파일');
+    expect(file.summary).toContain('함수 2개');
+
+    const fn = byId.get('function:src/service.ts:processOrder');
+    expect(fn).toBeDefined();
+    expect(fn.type).toBe('function');
+    expect(fn.summary).toContain('함수 processOrder');
+    expect(fn.summary).toContain('파라미터 2개');
+    // tiny() is < 10 lines and not exported → filtered out
+    expect(byId.has('function:src/service.ts:tiny')).toBe(false);
+
+    const contains = allEdges.filter(e => e.type === 'contains');
+    expect(contains).toContainEqual({
+      source: 'file:src/service.ts', target: 'function:src/service.ts:processOrder',
+      type: 'contains', direction: 'forward', weight: 1.0,
+    });
+  });
+
+  it('creates sql table node and config node with deterministic templates', () => {
+    const byId = new Map(allNodes.map(n => [n.id, n]));
+    const sql = byId.get('table:db/schema.sql');
+    expect(sql.type).toBe('table');
+    expect(sql.summary).toContain('SQL 파일 — 구문 3개');
+    expect(sql.summary).toContain('ORDERS');
+
+    const conf = byId.get('config:conf/app.properties');
+    expect(conf.type).toBe('config');
+    expect(conf.summary).toContain('키 2개');
+  });
+});

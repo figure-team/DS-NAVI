@@ -6,7 +6,14 @@
  * 모든 순수 함수는 새 플랜 객체를 반환하며 입력을 변형하지 않는다(불변).
  * 모든 도메인/루트/aliasKeys/excludedKeys 는 정렬되어 byte-identical 을 보장한다.
  */
-import type { CandidatesReport, ConfirmedDomain, ConfirmedPlan } from './types.js'
+import type {
+  CandidatesReport,
+  ConfirmedDomain,
+  ConfirmedPlan,
+  DomainConfidence,
+  PlanOp,
+} from './types.js'
+import { PlanOpsSchema } from './types.js'
 
 function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
@@ -113,6 +120,51 @@ export function excludeDomain(plan: ConfirmedPlan, key: string): ConfirmedPlan {
 }
 
 /**
+ * ops 파일 파싱 — 형식 오류는 어떤 항목이 왜 틀렸는지 명확히 던진다(조용한 스킵 금지).
+ */
+export function parsePlanOps(raw: unknown): PlanOp[] {
+  const parsed = PlanOpsSchema.safeParse(raw)
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]
+    throw new Error(
+      `ops 형식 오류(${issue.path.join('.')}): ${issue.message} — ` +
+        `허용: {op:"merge",from,into} | {op:"move",root,to} | {op:"exclude",key} | {op:"rename",key,name}`,
+    )
+  }
+  return parsed.data
+}
+
+/**
+ * 보정 연산 순차 적용 — 자동 플랜 위에 사람 결정을 결정론적으로 재생한다.
+ * 각 연산은 기존 순수 함수(merge/move/exclude/rename)로 위임하며, 존재하지 않는
+ * key/root 는 해당 함수가 몇 번째 연산인지 식별 가능한 오류로 던진다.
+ */
+export function applyOps(plan: ConfirmedPlan, ops: PlanOp[]): ConfirmedPlan {
+  let next = plan
+  ops.forEach((op, i) => {
+    try {
+      switch (op.op) {
+        case 'merge':
+          next = mergeDomains(next, op.from, op.into)
+          break
+        case 'move':
+          next = moveRoot(next, op.root, op.to)
+          break
+        case 'exclude':
+          next = excludeDomain(next, op.key)
+          break
+        case 'rename':
+          next = renameDomain(next, op.key, op.name)
+          break
+      }
+    } catch (err) {
+      throw new Error(`ops[${i}] ${op.op} 적용 실패: ${(err as Error).message}`)
+    }
+  })
+  return next
+}
+
+/**
  * 드리프트 감지 — confirmed 이후 코드가 변해 후보가 달라진 경우.
  * addedRoots: 현재 후보에 새로 생겼지만 플랜이 모르는 루트(재확정 필요 신호).
  * removedRoots: 플랜이 알지만 현재 후보에 없는 루트(삭제/이동됨).
@@ -136,6 +188,8 @@ export interface PlanRow {
   rootCount: number
   entryCount: number
   fileCount: number
+  /** 증거 확신도 — 후보(candidates) 소스에서만 존재(확정 플랜은 미보유). */
+  confidence?: DomainConfidence
 }
 
 /**
@@ -152,6 +206,7 @@ export function planTable(source: CandidatesReport | ConfirmedPlan): PlanRow[] {
         rootCount: c.roots.length,
         entryCount: c.entryCount,
         fileCount: c.files.length + c.roots.length,
+        confidence: c.confidence,
       }))
       .sort((a, b) => cmp(a.key, b.key))
   }

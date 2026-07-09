@@ -10,6 +10,8 @@ import {
   excludeDomain,
   detectPlanDrift,
   planTable,
+  parsePlanOps,
+  applyOps,
   writeConfirmedPlan,
   readConfirmedPlan,
 } from './confirm.js'
@@ -174,5 +176,44 @@ describe('confirm — write/read round-trip is stable', () => {
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }
+  })
+})
+
+describe('confirm — parsePlanOps/applyOps (사람 게이트 보정 연산)', () => {
+  it('merge/move/exclude/rename 을 순차 적용한다', () => {
+    const plan = buildAutoPlan(sampleCandidates())
+    const ops = parsePlanOps([
+      { op: 'merge', from: 'user', into: 'order' },
+      { op: 'rename', key: 'order', name: '주문' },
+    ])
+    const next = applyOps(plan, ops)
+    expect(next.domains.map((d) => d.key)).toEqual(['order'])
+    expect(next.domains[0].name).toBe('주문')
+    expect(next.domains[0].aliasKeys).toEqual(['user'])
+    expect(next.domains[0].roots).toContain('src/user/UserController.java')
+  })
+
+  it('exclude 는 excludedKeys 에 감사 추적을 남긴다', () => {
+    const plan = buildAutoPlan(sampleCandidates())
+    const next = applyOps(plan, [{ op: 'exclude', key: 'user' }])
+    expect(next.domains.map((d) => d.key)).toEqual(['order'])
+    expect(next.excludedKeys).toEqual(['user'])
+  })
+
+  it('형식 오류는 어떤 항목이 틀렸는지 식별 가능한 오류를 던진다', () => {
+    expect(() => parsePlanOps([{ op: 'merge', from: 'a' }])).toThrow(/ops 형식 오류/)
+    expect(() => parsePlanOps({ op: 'exclude', key: 'x' })).toThrow(/ops 형식 오류/)
+  })
+
+  it('존재하지 않는 key 는 몇 번째 연산인지 포함해 실패한다', () => {
+    const plan = buildAutoPlan(sampleCandidates())
+    expect(() => applyOps(plan, [{ op: 'exclude', key: 'ghost' }])).toThrow(/ops\[0\] exclude/)
+  })
+
+  it('applyOps 는 입력 플랜을 변형하지 않는다(불변)', () => {
+    const plan = buildAutoPlan(sampleCandidates())
+    const before = stableJson(plan)
+    applyOps(plan, [{ op: 'merge', from: 'user', into: 'order' }])
+    expect(stableJson(plan)).toBe(before)
   })
 })

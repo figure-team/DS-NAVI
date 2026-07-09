@@ -152,12 +152,19 @@ export const DomainFileSchema = z.object({
     relPath: z.string(),
     via: DomainViaSchema,
 });
+/**
+ * 도메인 키 증거 확신도 — high(디렉터리 토큰 정합) > medium(접두어 분할) > low(폴백).
+ * low 시드는 상위 신호 도메인이 존재하면 자기 도메인을 만들지 않고 격리된다(quarantined).
+ */
+export const DomainConfidenceSchema = z.enum(['high', 'medium', 'low']);
 /** 단일 도메인 후보 — key 는 불변(다운스트림 skeleton 의 닻). */
 export const DomainCandidateSchema = z.object({
     key: z.string(),
     roots: z.array(z.string()),
     entryCount: z.number().int(),
     files: z.array(DomainFileSchema),
+    /** 루트들 중 최고 확신도 — 구버전 candidates.json 하위호환을 위해 optional. */
+    confidence: DomainConfidenceSchema.optional(),
 });
 /**
  * candidates.json — 결정론적 도메인 분류(S4-5) 산출물.
@@ -180,7 +187,38 @@ export const CandidatesReportSchema = z.object({
         directoryKey: z.string(),
     })),
     unresolved: z.array(z.string()),
+    /**
+     * 격리(_review) — 증거가 약한(low) 시드는 상위 신호 도메인이 하나라도 있으면
+     * 도메인을 만들지 않고 여기 격리된다(조용한 누락 금지: root + 무산된 key 보존).
+     * 격리 루트의 도달 파일은 디렉터리/접두어 폴백으로 실 도메인 멤버십에 합류를 시도한다.
+     * 구버전 candidates.json 하위호환을 위해 optional.
+     */
+    quarantined: z
+        .array(z.object({
+        root: z.string(),
+        key: z.string(),
+        reason: z.enum(['weak-signal']),
+    }))
+        .optional(),
+    /**
+     * 전역 관용 접두어 — 파일명 첫 토큰이 서로 다른 디렉터리 토큰 그룹 3개 이상에서
+     * 반복되면 조직 명명 관례(벤더 접두어, 예 Egov·Co)로 보고 키 후보에서 건너뛴다.
+     * 투명성 위해 보고. 구버전 하위호환 optional.
+     */
+    conventionPrefixes: z.array(z.string()).optional(),
 });
+/**
+ * 사람 게이트 보정 연산(ops) — confirm --ops <file> 로 자동 플랜 위에 결정론 적용.
+ * merge(도메인 병합) / move(루트 이동) / exclude(도메인 제외) / rename(표시명 개명).
+ * ops 파일을 .spec/map/ 에 두고 재실행하면 사람 결정이 그대로 재생된다(결정론 닻).
+ */
+export const PlanOpSchema = z.discriminatedUnion('op', [
+    z.object({ op: z.literal('merge'), from: z.string(), into: z.string() }),
+    z.object({ op: z.literal('move'), root: z.string(), to: z.string() }),
+    z.object({ op: z.literal('exclude'), key: z.string() }),
+    z.object({ op: z.literal('rename'), key: z.string(), name: z.string() }),
+]);
+export const PlanOpsSchema = z.array(PlanOpSchema);
 /** 확정된 단일 도메인 — key 는 불변, name 은 표시용(개명 가능). */
 export const ConfirmedDomainSchema = z.object({
     key: z.string(),

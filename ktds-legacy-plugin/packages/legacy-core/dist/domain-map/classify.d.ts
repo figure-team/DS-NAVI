@@ -8,6 +8,11 @@
  *   건너뛴 첫 세그먼트를 토큰으로 삼는다. 퇴화(클러스터 <2 / 단일 집중 >50%) 시 폴백.
  * - prefix(폴백): 클래스/파일 base 명을 CamelCase 로 쪼개 STOP_TOKENS 를 버리고
  *   선행 도메인 토큰으로 클러스터링한다.
+ * - 시드 확신도(confidence): high(디렉터리 정합) > medium(접두어 분할) > low(폴백).
+ *   키잉 후 2패스로 분할 파편을 본체 디렉터리 도메인에 재흡수하고, 3패스로 low 시드를
+ *   격리한다(quarantined — 상위 신호 도메인이 있을 때만; 퇴화 프로젝트는 기존 동작 유지).
+ * - 관용 접두어(conventionPrefixes): 여러 디렉터리 그룹에 반복되는 파일명 첫 토큰
+ *   (벤더 접두어 Egov·Co 류)은 키 후보에서 제외.
  * - ambiguous: 도달성과 디렉토리가 서로 다른 도메인으로 분류한 파일(자동 미해소, 사람 게이트行).
  * - common: shared 소유 파일.
  * - unresolved: 어떤 신호도 없는 파일(절대 조용히 누락하지 않음).
@@ -31,8 +36,12 @@ export interface DirectoryClassification {
 export declare function classifyByDirectory(relPaths: string[]): DirectoryClassification;
 /** "AccountActionBean.java" → ["account","action","bean"], "line_item.sql" → ["line","item"]. */
 export declare function tokenizeBasename(relPath: string): string[];
-/** 첫 비-STOP 토큰 = prefix. 전부 STOP 이면 null(도메인 신호 없음). */
-export declare function prefixToken(relPath: string): string | null;
+/**
+ * 첫 비-STOP 토큰 = prefix. 전부 STOP 이면 null(도메인 신호 없음).
+ * 1글자 토큰은 디렉터리 세그먼트 규칙(isStructureOrLayer)과 동형으로 제외 —
+ * FCommonController 의 'f' 같은 무의미 키를 막는다. skip(관용 접두어)도 건너뛴다.
+ */
+export declare function prefixToken(relPath: string, skip?: ReadonlySet<string>): string | null;
 /** census/routes/slices 로 도메인 후보(candidates.json)를 만든다. */
 export declare function buildCandidates(census: CensusReport, routes: Pick<RoutesReport, 'routes' | 'batchEntries'>, slices: SlicesReport): CandidatesReport;
 //# sourceMappingURL=classify.d.ts.map

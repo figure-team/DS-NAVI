@@ -310,6 +310,16 @@ export declare const DomainFileSchema: z.ZodObject<{
     }>;
 }, z.core.$strip>;
 export type DomainFile = z.infer<typeof DomainFileSchema>;
+/**
+ * 도메인 키 증거 확신도 — high(디렉터리 토큰 정합) > medium(접두어 분할) > low(폴백).
+ * low 시드는 상위 신호 도메인이 존재하면 자기 도메인을 만들지 않고 격리된다(quarantined).
+ */
+export declare const DomainConfidenceSchema: z.ZodEnum<{
+    high: "high";
+    medium: "medium";
+    low: "low";
+}>;
+export type DomainConfidence = z.infer<typeof DomainConfidenceSchema>;
 /** 단일 도메인 후보 — key 는 불변(다운스트림 skeleton 의 닻). */
 export declare const DomainCandidateSchema: z.ZodObject<{
     key: z.ZodString;
@@ -323,6 +333,11 @@ export declare const DomainCandidateSchema: z.ZodObject<{
             prefix: "prefix";
         }>;
     }, z.core.$strip>>;
+    confidence: z.ZodOptional<z.ZodEnum<{
+        high: "high";
+        medium: "medium";
+        low: "low";
+    }>>;
 }, z.core.$strip>;
 export type DomainCandidate = z.infer<typeof DomainCandidateSchema>;
 /**
@@ -350,6 +365,11 @@ export declare const CandidatesReportSchema: z.ZodObject<{
                 prefix: "prefix";
             }>;
         }, z.core.$strip>>;
+        confidence: z.ZodOptional<z.ZodEnum<{
+            high: "high";
+            medium: "medium";
+            low: "low";
+        }>>;
     }, z.core.$strip>>;
     common: z.ZodArray<z.ZodObject<{
         relPath: z.ZodString;
@@ -361,8 +381,54 @@ export declare const CandidatesReportSchema: z.ZodObject<{
         directoryKey: z.ZodString;
     }, z.core.$strip>>;
     unresolved: z.ZodArray<z.ZodString>;
+    quarantined: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        root: z.ZodString;
+        key: z.ZodString;
+        reason: z.ZodEnum<{
+            "weak-signal": "weak-signal";
+        }>;
+    }, z.core.$strip>>>;
+    conventionPrefixes: z.ZodOptional<z.ZodArray<z.ZodString>>;
 }, z.core.$strip>;
 export type CandidatesReport = z.infer<typeof CandidatesReportSchema>;
+/**
+ * 사람 게이트 보정 연산(ops) — confirm --ops <file> 로 자동 플랜 위에 결정론 적용.
+ * merge(도메인 병합) / move(루트 이동) / exclude(도메인 제외) / rename(표시명 개명).
+ * ops 파일을 .spec/map/ 에 두고 재실행하면 사람 결정이 그대로 재생된다(결정론 닻).
+ */
+export declare const PlanOpSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    op: z.ZodLiteral<"merge">;
+    from: z.ZodString;
+    into: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    op: z.ZodLiteral<"move">;
+    root: z.ZodString;
+    to: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    op: z.ZodLiteral<"exclude">;
+    key: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    op: z.ZodLiteral<"rename">;
+    key: z.ZodString;
+    name: z.ZodString;
+}, z.core.$strip>], "op">;
+export type PlanOp = z.infer<typeof PlanOpSchema>;
+export declare const PlanOpsSchema: z.ZodArray<z.ZodDiscriminatedUnion<[z.ZodObject<{
+    op: z.ZodLiteral<"merge">;
+    from: z.ZodString;
+    into: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    op: z.ZodLiteral<"move">;
+    root: z.ZodString;
+    to: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    op: z.ZodLiteral<"exclude">;
+    key: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    op: z.ZodLiteral<"rename">;
+    key: z.ZodString;
+    name: z.ZodString;
+}, z.core.$strip>], "op">>;
 /** 확정된 단일 도메인 — key 는 불변, name 은 표시용(개명 가능). */
 export declare const ConfirmedDomainSchema: z.ZodObject<{
     key: z.ZodString;

@@ -17,6 +17,7 @@ import { join } from "node:path"
 const KTDS = [
   "understand-init", "understand-map", "understand-onboard", "understand-impact",
   "understand-docs", "understand-policy", "understand-rtm",
+  "understand-report", "understand-screens",
 ]
 const UA = [
   "understand", "understand-dashboard", "understand-domain",

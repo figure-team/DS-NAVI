@@ -76,6 +76,8 @@ let written = 0;
 for (const b of batches) {
   const slice = {
     batchIndex: b.batchIndex,
+    // 'code' fallback: older batches.json without tier routes to the upper model.
+    tier: b.tier === 'light' ? 'light' : 'code',
     totalBatches,
     projectRoot,
     skillDir,

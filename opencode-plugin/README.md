@@ -25,16 +25,16 @@ opencode-plugin/
 추가하면 재설치만으로 Claude·opencode 양쪽에 반영된다(복사본 드리프트 없음).
 
 설치 시 대상 `.opencode/` 에 깔리는 것:
-- `command/*.md` — SKILL.md 에서 생성된 14개 슬래시 커맨드(`/understand`, `/understand-map` …)
+- `command/*.md` — SKILL.md 에서 생성된 16개 슬래시 커맨드(`/understand`, `/understand-map` …)
 - `plugins/atlas.js` — 환경변수 주입 플러그인
 - `agents/*.md` — U-A 서브에이전트 9종 (`/understand` 파이프라인 디스패치용)
 - `bundle` → `ktds-legacy-plugin`, `bundle-ua` → `understand-anything-plugin` (dev=심링크)
 
-## 커맨드 (14)
+## 커맨드 (16)
 
-| ktds (7) | U-A (7) |
+| ktds (9) | U-A (7) |
 | --- | --- |
-| understand-init, understand-map, understand-onboard*, understand-impact, understand-docs, understand-policy, understand-rtm | understand, understand-dashboard, understand-domain, understand-explain, understand-diff, understand-chat, understand-knowledge |
+| understand-init, understand-map, understand-onboard*, understand-impact, understand-docs, understand-policy, understand-rtm, understand-report, understand-screens | understand, understand-dashboard, understand-domain, understand-explain, understand-diff, understand-chat, understand-knowledge |
 
 \* `understand-onboard` 는 ktds(가이드 1-명령 온보딩)가 U-A 동명 스킬을 대체한다(이름 충돌 회피).
 
@@ -73,11 +73,18 @@ opencode run --command understand-dashboard "$(pwd)"
 opencode 1.15.13 (인증=OpenAI) 기준 실증:
 - ✅ 플러그인 로드 + `shell.env` 가 셸에 `$ATLAS_PLUGIN_ROOT` 주입 (라이브)
 - ✅ 번들 ktds 엔진이 opencode 셸에서 무수정 실행 → jpetstore `understand-map scan` 동일 산출
-- ✅ 14개 커맨드 frontmatter YAML 유효 + opencode 발견
+- ✅ 16개 커맨드 frontmatter YAML 유효 + opencode 발견 (understand-report/-screens 는 2026-07-08 추가 — 라이브 재검증 필요)
 - ✅ 9개 U-A 서브에이전트 opencode 가 `(subagent)` 로 인식
 - ⏳ `/understand` 전체 멀티에이전트 파이프라인 + 대시보드 렌더 라이브 — 비용(서브에이전트 다수) 때문에 사용자 트리거로 남김
 
 ## 미동작/주의 (Claude 대비 차이)
+
+- U-A `/understand` **대규모 경로(배치>30)**: Claude 의 Workflow 팬아웃 대신 번들 드라이버
+  `bundle-ua/skills/understand/phase2-fanout-cli.mjs` 가 배치당 headless `opencode run` 세션을
+  팬아웃한다(동일 슬라이스·동일 `audit-batches.mjs` 감사·재디스패치 ≤2회). 커맨드 본문(SKILL.md)에
+  안내가 포함돼 있어 별도 조작 불필요. **모델 불문** — opencode 에 설정된 모델을 그대로 쓰고,
+  `--model provider/model` 로 배치 분석만 다른 모델을 지정할 수 있다. 자식 세션은
+  `--dangerously-skip-permissions` 로 무인 실행된다(분석 대상 프로젝트 디렉터리 스코프).
 
 - Claude `hooks.json`(SessionStart staleness / commit auto-update)은 아직 미포팅 → `atlas.js` 의
   `session.created` / `tool.execute.after` 이벤트 훅으로 재작성 예정.

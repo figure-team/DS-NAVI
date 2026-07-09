@@ -9,7 +9,15 @@
 // args (all paths absolute):
 //   { intermediateDir: string,   // <projectRoot>/.understand-anything/intermediate
 //     skillDir: string,          // dir containing audit-batches.mjs etc.
-//     totalBatches: number }
+//     totalBatches: number,
+//     codeModel?: string,        // model for code-tier batches (default 'inherit' = session model)
+//     lightModel?: string,       // model for light-tier batches (default 'sonnet')
+//     lightBatches?: number[],   // batchIndex list of light-tier batches (batches.json
+//                                // entries with tier === 'light'); absent/empty = all code-tier
+//     machineBatches?: number[] }// batchIndex list of machine-tier batches already generated
+//                                // on disk by generate-machine-batches.mjs — skipped at
+//                                // dispatch; the audit still verifies them and re-dispatches
+//                                // to an LLM agent if generation left one incomplete
 //
 // Batch payloads never pass through this script or its prompts: each agent
 // reads its own self-contained slice batch-input-<i>.json from disk (§3.2).
@@ -27,10 +35,21 @@ export const meta = {
 
 // Tolerate hosts that deliver args as a JSON-encoded string instead of an object.
 const A = typeof args === 'string' ? JSON.parse(args) : args
-const { intermediateDir, skillDir, totalBatches } = A ?? {}
+const { intermediateDir, skillDir, totalBatches, codeModel = 'inherit', lightModel = 'sonnet', lightBatches = [], machineBatches = [] } = A ?? {}
 if (!intermediateDir || !skillDir || !totalBatches) {
   throw new Error('args must provide { intermediateDir, skillDir, totalBatches }')
 }
+
+// Mixed model routing, keyed by the deterministic per-batch tier from
+// compute-batches (fileCategory-based): code-tier batches produce the summaries
+// humans actually read → session model by default; light-tier batches
+// (markup/data/docs/config only) produce template-grade summaries/tags on top of
+// script-extracted structure → a lighter model is safe. Judgment-heavy stages
+// (architecture-analyzer, tour-builder) are dispatched elsewhere and always use
+// the session model.
+const lightSet = new Set(lightBatches)
+const asOpts = m => (m === 'inherit' ? {} : { model: m })
+const modelOptsFor = i => (lightSet.has(i) ? asOpts(lightModel) : asOpts(codeModel))
 
 const ACK = {
   type: 'object',
@@ -88,12 +107,16 @@ node ${skillDir}/audit-batches.mjs ${intermediateDir}
 It prints a single JSON: { "complete": [...], "incomplete": [{ "batchIndex", "reason" }] }.
 Return { incomplete } via structured output, copied verbatim from the script output. Do NOT attempt to fix, re-analyze, or delete anything yourself.`
 
-const indices = Array.from({ length: totalBatches }, (_, k) => k + 1)
+// Machine-tier batches were generated deterministically before this workflow
+// ran — no agent dispatched. They remain in the Audit scope below: if the
+// generator failed one, the audit re-dispatches it to a normal LLM agent.
+const machineSet = new Set(machineBatches)
+const indices = Array.from({ length: totalBatches }, (_, k) => k + 1).filter(i => !machineSet.has(i))
 
 phase('Analyze')
-log(`Fanning out ${totalBatches} batches (self-contained slices, disk-guarded skip)`)
+log(`Fanning out ${indices.length} batches (${machineSet.size} machine-tier pre-generated, self-contained slices, disk-guarded skip)`)
 const acks = await pipeline(indices, i =>
-  agent(analyzePrompt(i), { label: `batch:${i}`, phase: 'Analyze', schema: ACK }))
+  agent(analyzePrompt(i), { label: `batch:${i}`, phase: 'Analyze', schema: ACK, ...modelOptsFor(i) }))
 
 phase('Audit')
 // Bounded re-dispatch: initial run + at most 2 re-injections per §4.4, then
@@ -106,7 +129,7 @@ for (let round = 0; round < 3; round++) {
   if (round === 2) { failed = pending; break }
   log(`Audit round ${round + 1}: ${pending.length} incomplete — re-dispatching`)
   await parallel(pending.map(p => () =>
-    agent(analyzePrompt(p.batchIndex, p.reason), { label: `retry:${p.batchIndex}`, phase: 'Audit', schema: ACK })))
+    agent(analyzePrompt(p.batchIndex, p.reason), { label: `retry:${p.batchIndex}`, phase: 'Audit', schema: ACK, ...modelOptsFor(p.batchIndex) })))
 }
 
 const okAcks = acks.filter(Boolean)

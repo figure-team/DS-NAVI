@@ -15,6 +15,7 @@ import type { Edge, Node, NodeProps } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
 import { Badge } from "../proto/Proto";
+import { useTheme } from "../../themes/index.ts";
 import { applyElkLayout } from "../../utils/elk-layout";
 import { mergeElkPositions, nodesToElkInput } from "../../utils/layout";
 import { TableDetail } from "./TablesTab";
@@ -52,17 +53,16 @@ interface ErdNodeData extends Record<string, unknown> {
 }
 
 /**
- * 관계(FK)별 매칭 색 팔레트 — 모드(라이트/다크)에 따라 값이 스위치되는
- * 기존 method-* 토큰을 재사용해 양쪽 테마에서 가독을 보장한다.
+ * 관계(FK)별 매칭 색 팔레트 — 모드별 5색, dataviz 검증기(색각 이상 시뮬레이션 +
+ * 서피스 대비) 통과 조합. 파랑↔보라·빨강↔주황·청록↔초록처럼 일반 시야에서도
+ * 붙어 보이는 쌍을 배제했고, CVD 바닥 밴드(ΔE 10.3~11.2)는 FK 행↔PK 행을 잇는
+ * 물리적 연결선 + 항상 보이는 컬럼명 텍스트가 2차 인코딩으로 보완한다.
+ * 순서는 고정 배정(관계 수가 적을수록 앞 색부터) — 임의 재배열 금지.
  */
-const REL_PALETTE = [
-  "var(--color-method-get)",
-  "var(--color-method-post)",
-  "var(--color-method-put)",
-  "var(--color-method-delete)",
-  "var(--color-method-batch)",
-  "var(--color-method-event)",
-];
+const REL_PALETTES: Record<"light" | "dark", string[]> = {
+  light: ["#2a78d6", "#eb6834", "#008300", "#e87ba4", "#eda100"],
+  dark: ["#3987e5", "#d95926", "#008300", "#d55181", "#c98500"],
+};
 type ErdFlowNode = Node<ErdNodeData, "erdTable">;
 
 /** 노드에 보여줄 키 컬럼(PK → FK → UNIQUE 순, 최대 MAX_KEY_ROWS). */
@@ -115,15 +115,23 @@ function ErdTableNode({ data }: NodeProps<ErdFlowNode>) {
         {data.keyRows.map((r) => {
           const rel = data.colColors[r.name.toLowerCase()] ?? [];
           // 관계가 여럿이면 동심 링(최대 3겹)으로 겹쳐 그린다 — inset shadow 는 앞선 항목이 위.
+          // 배경 틴트는 라이트 서피스에서 3:1 미달인 링 색(노랑·마젠타)의 시인성 완충(relief).
           const rings = rel
             .slice(0, 3)
-            .map((c, i) => `inset 0 0 0 ${1.5 * (i + 1)}px ${c}`)
+            .map((c, i) => `inset 0 0 0 ${2 + 1.5 * i}px ${c}`)
             .join(", ");
           return (
           <div
             key={r.name}
             className="flex items-center gap-1.5"
-            style={{ height: ROW_H, borderRadius: 5, padding: "0 5px", margin: "0 -5px", boxShadow: rings || undefined }}
+            style={{
+              height: ROW_H,
+              borderRadius: 5,
+              padding: "0 5px",
+              margin: "0 -5px",
+              boxShadow: rings || undefined,
+              background: rel.length ? `color-mix(in srgb, ${rel[0]} 12%, transparent)` : undefined,
+            }}
           >
             <Badge tone={KIND_TONE[r.kind]} style={{ fontSize: 9, padding: "0px 4px" }}>
               {r.kind}
@@ -168,6 +176,8 @@ function pkColsOf(t: DbTable): string[] {
 }
 
 function ErdCanvas({ schema }: { schema: DbSchema }) {
+  const isDark = useTheme().preset.isDark;
+  const relPalette = REL_PALETTES[isDark ? "dark" : "light"];
   const [searchParams, setSearchParams] = useSearchParams();
   const selName = searchParams.get("table");
   const selected = useMemo(
@@ -215,13 +225,13 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
     let i = 0;
     for (const e of fkEdges) {
       if (e.source !== selected.name && e.target !== selected.name) continue;
-      const color = REL_PALETTE[i++ % REL_PALETTE.length];
+      const color = relPalette[i++ % relPalette.length];
       edgeColors.set(e.id, color);
       for (const c of e.columns) push(e.source, c, color);
       for (const c of e.refColumns) push(e.target, c, color);
     }
     return { edgeColors, rowColors };
-  }, [selected, fkEdges]);
+  }, [selected, fkEdges, relPalette]);
 
   // 선택 테이블의 1-hop 이웃(FK 양방향) — 강조/디밍 판정.
   const neighborhood = useMemo(() => {

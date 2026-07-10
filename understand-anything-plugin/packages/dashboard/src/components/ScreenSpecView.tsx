@@ -863,16 +863,6 @@ export default function ScreenSpecView() {
                 </button>
               </MetaRow>
             )}
-            {sel.scenario && (
-              <MetaRow label="도달 시나리오" help="캡처 봇이 이 화면에 도달하려고 먼저 수행한 사전 절차(예: signon=로그인 후, order-flow=주문 진행 중, error=오류 유도)">
-                {sel.scenario}
-              </MetaRow>
-            )}
-            {sel.openedFrom && (
-              <MetaRow label="진입 경로" help="캡처 봇이 직전에 어느 화면/링크에서 이동해 왔는지 — 실제 사용자 동선의 재현 경로">
-                {sel.openedFrom}
-              </MetaRow>
-            )}
             {summaryInfo?.evidenceParts && (
               <MetaRow label="근거" help="설명 판단이 나온 코드 위치 — 클릭하면 코드 뷰어로 엽니다. 배지: 근거확보=결정적 정적 분석 추적 / 근거확보(추정)=AI 가 코드를 읽어 보완 판정(검토 권장)">
                 {summaryInfo.evidenceParts.map((p, i) =>
@@ -902,22 +892,39 @@ export default function ScreenSpecView() {
                 </span>
               </MetaRow>
             )}
-            {summaryInfo && (
-              <MetaRow label="설명" help="정적 분석이 요약한 화면의 역할 — 판단의 코드 출처는 위 근거 행">
-                {summaryInfo.text}
-                {/* 근거 인용이 없는 화면(정적 페이지 등)은 신뢰도 배지를 설명 옆에 유지 */}
-                {!summaryInfo.evidenceParts && (
-                  <span style={{ marginLeft: 6 }}>
-                    <ConfBadge
-                      kind={mechConf(summaryInfo.confidence).kind}
-                      label={mechConf(summaryInfo.confidence).label}
-                      title={mechConf(summaryInfo.confidence).title}
-                    />
-                  </span>
-                )}
-              </MetaRow>
-            )}
           </div>
+          {/* 설명 — 식별 메타(카드)와 분리한 본문 문단. 판단의 코드 출처는 카드 근거 행. */}
+          {summaryInfo && (
+            <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, margin: "0 0 6px" }}>
+              {summaryInfo.text}
+              {/* 근거 인용이 없는 화면은 신뢰도 배지를 설명 옆에 유지 */}
+              {!summaryInfo.evidenceParts && (
+                <span style={{ marginLeft: 6 }}>
+                  <ConfBadge
+                    kind={mechConf(summaryInfo.confidence).kind}
+                    label={mechConf(summaryInfo.confidence).label}
+                    title={mechConf(summaryInfo.confidence).title}
+                  />
+                </span>
+              )}
+            </p>
+          )}
+          {/* 도달 정보 — 캡처 봇의 도달 방법(시나리오·직전 화면), 화면 자체 속성이 아니라 별도 라인 */}
+          {(sel.scenario || sel.openedFrom) && (
+            <div className="text-text-muted" style={{ fontSize: 11.5, marginBottom: 12 }}>
+              {sel.scenario && (
+                <span title="캡처 봇이 이 화면에 도달하려고 먼저 수행한 사전 절차(예: signon=로그인 후, order-flow=주문 진행 중, error=오류 유도)">
+                  도달 시나리오 <b className="text-text-secondary">{sel.scenario}</b>
+                </span>
+              )}
+              {sel.scenario && sel.openedFrom && " · "}
+              {sel.openedFrom && (
+                <span title="캡처 봇이 직전에 어느 화면/링크에서 이동해 왔는지 — 실제 사용자 동선의 재현 경로">
+                  진입 경로 <b className="text-text-secondary">{sel.openedFrom}</b>
+                </span>
+              )}
+            </div>
+          )}
 
           {/* 배지 색상 키 = 표시 토글 — 클릭한 종류만 캡처 위 배지를 끄고 켠다(표는 전수 유지) */}
           <div className="flex items-center gap-3 text-text-muted" style={{ fontSize: 11, marginBottom: 10 }}>

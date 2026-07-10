@@ -716,16 +716,6 @@ export default function ScreenSpecView() {
                 {bizLink.label}
               </Link>
             )}
-            {sel.graphNodeId && (
-              <Link
-                to={`/structure?node=${encodeURIComponent(sel.graphNodeId)}`}
-                className="whitespace-nowrap hover:underline text-text-muted"
-                style={{ fontSize: 11.5, textDecoration: "none" }}
-                title="구조 탭에서 렌더 JSP 노드 보기"
-              >
-                구조 →
-              </Link>
-            )}
             {selOv?.confirmed ? <TrustBadge confirmedBy={selOv.approver} /> : <Badge tone="info">초안</Badge>}
             <div className="flex-1" />
             {saveError && <span style={{ fontSize: 11, color: "var(--color-status-warn)" }}>저장 실패: {saveError}</span>}
@@ -785,19 +775,19 @@ export default function ScreenSpecView() {
                 {sel.openedFrom}
               </MetaRow>
             )}
+            {sel.summary && (
+              <MetaRow label="설명" help="정적 분석이 요약한 화면의 역할 — 옆 배지는 판정 신뢰도(근거확보=코드 근거 file:line 추적됨)">
+                {sel.summary.text}
+                <span style={{ marginLeft: 6 }}>
+                  <ConfBadge
+                    kind={mechConf(sel.summary.confidence).kind}
+                    label={mechConf(sel.summary.confidence).label}
+                    title={mechConf(sel.summary.confidence).title}
+                  />
+                </span>
+              </MetaRow>
+            )}
           </div>
-          {sel.summary && (
-            <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 12 }}>
-              {sel.summary.text}
-              <span style={{ marginLeft: 6 }}>
-                <ConfBadge
-                  kind={mechConf(sel.summary.confidence).kind}
-                  label={mechConf(sel.summary.confidence).label}
-                  title={mechConf(sel.summary.confidence).title}
-                />
-              </span>
-            </p>
-          )}
 
           {/* 배지 색상 키 = 표시 토글 — 클릭한 종류만 캡처 위 배지를 끄고 켠다(표는 전수 유지) */}
           <div className="flex items-center gap-3 text-text-muted" style={{ fontSize: 11, marginBottom: 10 }}>

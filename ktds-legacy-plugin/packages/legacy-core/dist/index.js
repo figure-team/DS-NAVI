@@ -21,6 +21,7 @@ export { buildBundles, safeKeyFilename, bundleDir, BUNDLE_DIR, DEFAULT_SLICE_LIN
 export { readFills, applyFills, unfilledNodes, fillDir, fillPathFor, FILL_DIR, CitationSchema, ClaimSchema as FillClaimSchema, DomainFillSchema, } from './domain-map/fill.js';
 export { verifyFills, writeVerifyReport, VERIFY_REPORT_FILENAME, CITATION_STATUS, VerifiedCitationSchema, VerifiedItemSchema, DomainVerifyResultSchema, VerifyReportSchema, } from './domain-map/verify.js';
 export { runFillPipeline } from './domain-map/fill-pipeline.js';
+export { prepFillChunks, auditFillFragments, mergeFillFragments, readFillChunkIndex, fillPrepDir, fillFragDir, FILL_PREP_DIR, FILL_FRAG_DIR, FILL_PREP_INDEX_FILENAME, DEFAULT_CHUNK_FLOWS, DEFAULT_CHUNK_CHAR_CAP, FillChunkSchema, FillChunkIndexSchema, FillFragmentSchema, } from './domain-map/fill-fanout.js';
 export { buildCrossDomainGraph, scoreDomains, buildDomainMapSummary, buildNameSuggestionContext, W_COMPLEXITY, W_COUPLING, W_SIZE, DEFAULT_SAMPLE_ANCHOR_CAP, DEFAULT_SAMPLE_FILE_CAP, } from './domain-map/domain-map.js';
 export { extractJavaFacts } from './domain-map/java-facts.js';
 export { extractEdges } from './domain-map/edges.js';

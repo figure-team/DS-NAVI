@@ -10,6 +10,10 @@
  *            `--auto-approve --by <handle>` 가 있을 때만 확정 플랜을 기록한다.
  *   map      도메인 맵 요약(우선순위 랭킹 + 교차 도메인 엣지, 한국어). 확정 플랜 필요.
  *   bundle   도메인별 LLM 채움 입력 묶음(.spec/map/bundle/<key>.json) 조립. skeleton 필요.
+ *   fill-prep  대규모 팬아웃용 청크 준비 — 번들을 흐름 N개 단위 자립 청크로 분해
+ *              (+검증 통과 보장 pre-cite 동봉, .spec/map/fill-prep/). bundle 필요.
+ *   fill-audit 팬아웃 조각(fill-frag) 완결성 감사 — 순수 JSON 1줄 출력(기계 소비).
+ *   fill-merge 조각을 도메인별 fill/<key>.json 으로 결정론 병합. emit 선행 단계.
  *   emit     채움 파이프라인 — fill/<key>.json 적용 + 인용 기계검증 + domain-graph.json emit.
  *
  * 모든 출력은 결정론·한국어. 동일 commit 재실행 시 산출물 byte-diff=0.
@@ -71,6 +75,15 @@ switch (sub) {
   case 'bundle':
     await runBundle()
     break
+  case 'fill-prep':
+    await runFillPrep()
+    break
+  case 'fill-audit':
+    await runFillAudit()
+    break
+  case 'fill-merge':
+    await runFillMerge()
+    break
   case 'emit':
     await runEmit()
     break
@@ -79,7 +92,7 @@ switch (sub) {
     break
   default:
     console.error(
-      `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | map | bundle | emit | templates.`,
+      `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | map | bundle | fill-prep | fill-audit | fill-merge | emit | templates.`,
     )
     process.exit(2)
 }
@@ -417,6 +430,10 @@ function runTemplates() {
   console.log('계층 템플릿을 프로젝트별로 바꾸려면 위 override 경로에 <계층>.md 를 두세요(편집 즉시 반영).')
 }
 
+/** fill 팬아웃 규모 게이트 — 이 값을 넘으면 인라인 대신 팬아웃 경로를 권장한다. */
+const FANOUT_GATE_DOMAINS = 8
+const FANOUT_GATE_FLOWS = 60
+
 async function runBundle() {
   const { buildBundles } = engine
   const skeleton = readSkeletonOrExit()
@@ -428,14 +445,97 @@ async function runBundle() {
     const omitted = b.sliceOmitted.length > 0 ? ` (슬라이스 생략 ${b.sliceOmitted.length}개)` : ''
     console.log(`    - ${b.key}: 흐름 ${b.flows.length}개 · 단계 ${b.steps.length}개 · 파일 ${b.files.length}개${omitted}`)
   }
+  const totalFlows = bundles.reduce((n, b) => n + b.flows.length, 0)
+  const totalSteps = bundles.reduce((n, b) => n + b.steps.length, 0)
+  console.log(`  합계: 흐름 ${totalFlows}개 · 단계 ${totalSteps}개`)
   console.log('')
   console.log('산출물 경로:')
   for (const p of paths) console.log(`  ${p}`)
   console.log('')
+  if (bundles.length > FANOUT_GATE_DOMAINS || totalFlows > FANOUT_GATE_FLOWS) {
+    console.log(
+      `⚠️ 규모 게이트: 도메인 ${bundles.length}개(>${FANOUT_GATE_DOMAINS}) 또는 흐름 ${totalFlows}개(>${FANOUT_GATE_FLOWS}) — ` +
+        '인라인 채움 대신 팬아웃 경로를 권장합니다.',
+    )
+    console.log('  → fill-prep → (Workflow 팬아웃: scripts/map-fill-fanout.workflow.js) → fill-merge → emit')
+    console.log('')
+  }
   console.log('다음 단계: 도메인별 fill/<key>.json 을 작성한 뒤 emit 을 실행하세요.')
   console.log('계약: 모든 사실 주장(summary/entities/businessRules/흐름/단계)에 file:line + 스니펫 인용 필수.')
   console.log('  → fill 경로: .spec/map/fill/<key>.json  (스키마: DomainFill — citations min 1, snippet ≥ 8자)')
   console.log('  → 채움 후: emit (인용 기계검증 + domain-graph.json 산출).')
+}
+
+/** 팬아웃 청크 준비 — 번들을 흐름 N개 단위 자립 청크로 분해(+pre-cite 동봉). */
+async function runFillPrep() {
+  const { prepFillChunks, DEFAULT_CHUNK_FLOWS } = engine
+  const chunkFlowsRaw = flagValue('--chunk-flows')
+  const chunkFlows = chunkFlowsRaw ? Number.parseInt(chunkFlowsRaw, 10) : DEFAULT_CHUNK_FLOWS
+  if (!Number.isInteger(chunkFlows) || chunkFlows < 1) {
+    console.error(`--chunk-flows 값이 잘못됐습니다: ${chunkFlowsRaw} (1 이상 정수)`)
+    process.exit(2)
+  }
+  let index
+  try {
+    ;({ index } = await prepFillChunks(projectRoot, { chunkFlows }))
+  } catch (err) {
+    console.error(`fill-prep 실패: ${err.message}`)
+    process.exit(2)
+  }
+  const t = index.totals
+  console.log(`fill 팬아웃 청크 준비 완료 — ${projectRoot}`)
+  console.log(`  도메인 ${t.domains}개 → 청크 ${t.chunks}개 (청크당 흐름 ${index.chunkFlows}개)`)
+  console.log(`  흐름 ${t.flows}개 · 단계 ${t.steps}개`)
+  if (t.preCiteMissing > 0) {
+    console.log(`  ⚠️ pre-cite 미확보 ${t.preCiteMissing}건 — 해당 항목은 에이전트가 슬라이스에서 직접 인용해야 합니다(실패 시 NEEDS_REVIEW).`)
+  }
+  console.log('  산출물: .spec/map/fill-prep/<chunkId>.json + index.json')
+  console.log('')
+  console.log('다음 단계(팬아웃): Workflow 도구로 scripts/map-fill-fanout.workflow.js 실행')
+  console.log('  (청크 id 목록은 fill-prep/index.json 의 chunks[].chunkId)')
+  console.log('  에이전트가 fill-frag/<chunkId>.json 을 쓰면: fill-audit(감사) → fill-merge(병합) → emit')
+}
+
+/** 조각 완결성 감사 — 순수 JSON 1줄만 출력한다(Workflow 감사 에이전트가 verbatim 소비). */
+async function runFillAudit() {
+  const { auditFillFragments } = engine
+  const chunkFlag = flagValue('--chunk')
+  const only = chunkFlag ? chunkFlag.split(',').map((s) => s.trim()).filter(Boolean) : undefined
+  let audit
+  try {
+    audit = await auditFillFragments(projectRoot, only)
+  } catch (err) {
+    console.error(`fill-audit 실패: ${err.message}`)
+    process.exit(2)
+  }
+  console.log(JSON.stringify(audit))
+}
+
+/** 조각 → 도메인별 fill/<key>.json 결정론 병합. */
+async function runFillMerge() {
+  const { mergeFillFragments } = engine
+  let result
+  try {
+    result = await mergeFillFragments(projectRoot)
+  } catch (err) {
+    console.error(`fill-merge 실패: ${err.message}`)
+    process.exit(2)
+  }
+  console.log(`fill 조각 병합 완료 — ${projectRoot}`)
+  console.log(`  병합 도메인 ${result.written.length}개(.spec/map/fill/):`)
+  for (const w of result.written) {
+    const missing = w.missingChunks.length > 0 ? ` — ⚠️ 미완결 청크 ${w.missingChunks.length}개 [${w.missingChunks.join(', ')}] (부분 병합, emit 폴백)` : ''
+    console.log(`    - ${w.key}: 흐름 ${w.flows}개 · 단계 ${w.steps}개${missing}`)
+  }
+  if (result.skippedDomains.length > 0) {
+    console.log(`  ⚠️ 병합 불가 도메인 ${result.skippedDomains.length}개(헤더 청크 미완결 — fill 미기록, emit 에서 pending):`)
+    for (const s of result.skippedDomains) console.log(`    - ${s.key}: ${s.reason}`)
+  }
+  if (result.droppedItems > 0) {
+    console.log(`  ⚠️ 청크 선언 밖 id 항목 ${result.droppedItems}건 버림(유령/타 청크 id — 조용한 수용 금지).`)
+  }
+  console.log('')
+  console.log('다음 단계: emit (인용 기계검증 + domain-graph.json 산출).')
 }
 
 async function runEmit() {

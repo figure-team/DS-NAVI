@@ -106,7 +106,11 @@ async function loadKgHints(projectRoot) {
     }
     return hints;
 }
-async function sliceFile(projectRoot, relPath, anchorLine, sliceLines) {
+/**
+ * 앵커 라인 주변 소스 슬라이스를 읽는다(앵커 위 10줄부터 sliceLines 창).
+ * fill-fanout 이 sliceOmitted 파일의 청크 단위 복구에 재사용한다.
+ */
+export async function sliceFile(projectRoot, relPath, anchorLine, sliceLines) {
     let content;
     try {
         content = await readFile(join(projectRoot, relPath), 'utf8');

@@ -135,6 +135,18 @@ export declare const VerifyReportSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type VerifyReport = z.infer<typeof VerifyReportSchema>;
 /**
+ * 공백 정규화 — 들여쓰기/연속 공백 차이는 일치로 본다(텍스트 자체가 기준).
+ * fill-fanout 의 pre-cite 추출이 같은 함수를 공유한다(검증 규칙 이원화 금지).
+ */
+export declare function normalizeCitationText(s: string): string;
+/**
+ * 스니펫 효력 기준: ") {", "return" 같은 도처 일치 토막은 실재해도 근거가 못 된다
+ * (날조 인용만이 아니라 공허 인용도 막아야 한다). 정규화 유효 길이 8 이상 +
+ * 식별자성 토큰(라틴 3자+ 또는 한글 2자+) 1개 이상.
+ * fill-fanout 의 pre-cite 추출이 같은 함수를 공유한다(검증 규칙 이원화 금지).
+ */
+export declare function isTrivialSnippet(normalized: string): boolean;
+/**
  * fill 전체를 실파일과 대조 — 결과 구조를 반환한다(쓰기는 writeVerifyReport).
  * `rejectedBusinessFlows` = applyFills 가 그래프 정합 실패로 기각한 프로세스 ref
  * (`<domainId>#businessFlows[<i>]`) 집합 — 기각된 순서도의 인용은 그래프에 실리지

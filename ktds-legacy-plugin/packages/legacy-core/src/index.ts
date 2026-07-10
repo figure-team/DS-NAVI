@@ -130,6 +130,30 @@ export type {
 export { runFillPipeline } from './domain-map/fill-pipeline.js'
 export type { FillPipelineResult } from './domain-map/fill-pipeline.js'
 export {
+  prepFillChunks,
+  auditFillFragments,
+  mergeFillFragments,
+  readFillChunkIndex,
+  fillPrepDir,
+  fillFragDir,
+  FILL_PREP_DIR,
+  FILL_FRAG_DIR,
+  FILL_PREP_INDEX_FILENAME,
+  DEFAULT_CHUNK_FLOWS,
+  DEFAULT_CHUNK_CHAR_CAP,
+  FillChunkSchema,
+  FillChunkIndexSchema,
+  FillFragmentSchema,
+} from './domain-map/fill-fanout.js'
+export type {
+  FillChunk,
+  FillChunkIndex,
+  FillFragment,
+  FragmentAudit,
+  MergeFillResult,
+  PrepFillChunksOptions,
+} from './domain-map/fill-fanout.js'
+export {
   buildCrossDomainGraph,
   scoreDomains,
   buildDomainMapSummary,

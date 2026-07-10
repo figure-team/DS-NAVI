@@ -35,7 +35,6 @@ export default function GraphWorkbench({ mode }: Props) {
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const tourActive = useDashboardStore((s) => s.tourActive);
   const persona = useDashboardStore((s) => s.persona);
-  const openImpactModal = useDashboardStore((s) => s.openImpactModal);
   const nodeTypeFilters = useDashboardStore((s) => s.nodeTypeFilters);
   const toggleNodeTypeFilter = useDashboardStore((s) => s.toggleNodeTypeFilter);
   const detailLevel = useDashboardStore((s) => s.detailLevel);
@@ -119,25 +118,8 @@ export default function GraphWorkbench({ mode }: Props) {
         {mode !== "wiki" && (
         <div className="flex items-center gap-4 w-max">
           <DiffToggle />
-          {/* ktds: 구조 뷰에서 자연어 → claude -p /understand-impact 영향도 분석 */}
-          {!isKnowledgeGraph && (
-            <button
-              type="button"
-              onClick={openImpactModal}
-              title={t.impactAnalyze.buttonTitle}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors whitespace-nowrap"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-              {t.impactAnalyze.button}
-            </button>
-          )}
+          {/* 영향도 분석 실행 진입점은 변경·영향 메뉴(ChangeImpactView)로 일원화 —
+              구조 탭은 결과 소비(?overlay=impact)만 담당한다(2026-07-10 결정). */}
           {/* Detail level: file view (architecture) / class view (code structure) */}
           {!isKnowledgeGraph && (
             <>

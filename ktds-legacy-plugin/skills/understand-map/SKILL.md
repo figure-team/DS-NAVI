@@ -1,7 +1,7 @@
 ---
 name: understand-map
 description: 결정론 도메인 맵 — 전수 census/라우트/콜체인/도달성 스캔 + 도메인 경계 확정 + 요약 (.spec/map/*.json, 동일 commit byte-diff=0)
-argument-hint: ["[projectRoot]", "[scan|plan|confirm|map|bundle|emit|templates]"]
+argument-hint: ["[projectRoot]", "[scan|plan|confirm|map|bundle|fill-prep|fill-audit|fill-merge|emit|templates]"]
 ---
 
 # /understand-map
@@ -98,9 +98,15 @@ skeleton 이 있어야 한다(없으면 안내 후 종료). 도메인별로 **LL
 
 산출: `.spec/map/bundle/<key>.json` (동일 입력 byte-diff=0).
 
-## 6) 호스트(Claude) 채움 — fill 작성 (인용 의무)
+## 6) 채움 — fill 작성 (인용 의무)
 
-번들과 emit 사이에서 **호스트(Claude)가 도메인당 1회** 채움을 수행한다:
+번들과 emit 사이의 LLM 채움 단계. **규모 게이트**로 경로를 고른다:
+
+> **규모 게이트:** bundle 출력의 합계(도메인 수·총 흐름 수)를 본다 — **도메인 > 8 또는 총 흐름 > 60** 이면 아래 **팬아웃 경로(§6-B)** 를 쓴다(인라인 도메인당 채움은 그 규모에서 메인 컨텍스트가 폭발한다 — bundle CLI 가 같은 기준으로 ⚠️ 경고를 출력한다). 그 이하면 인라인 경로(§6-A)로 진행한다.
+
+### 6-A) 인라인 경로 (기본 — 소규모)
+
+**호스트(Claude)가 도메인당 1회** 채움을 수행한다:
 
 1. `.spec/map/bundle/<key>.json` 을 읽는다.
 2. 그 안의 소스 슬라이스·구조 신호만 근거로, 도메인/흐름/단계의 `name`·`summary`·`entities`·`businessRules`·`crossDomainInteractions` 을 작성한다.
@@ -123,6 +129,47 @@ skeleton 이 있어야 한다(없으면 안내 후 종료). 도메인별로 **LL
 - 채움은 **도메인 단위 멱등**이다 — 실패/누락 도메인의 `fill/<key>.json` 만 다시 쓰면 그 도메인만 재반영된다.
 
 > 채우지 않은 도메인은 emit 에서 **결정론 라벨 폴백**(도메인=key 표제화, 흐름=진입점, 단계=파일명)으로 빈 이름 대신 구조명을 갖는다(하이브리드: 채움 우선, 미채움은 결정론 라벨).
+
+### 6-B) 팬아웃 경로 (대규모 — 도메인 > 8 또는 총 흐름 > 60)
+
+egov 실증 방법론(1,255흐름·104청크 팬아웃, 근거율 100%)의 정식 경로. 핵심 = **인용 생산을 LLM 에서 제거**: fill-prep 이 흐름·단계마다 검증 통과가 보장된 pre-cite(실파일 결정론 추출)를 청크에 동봉하고, 에이전트는 그것을 **verbatim 복사**만 한다. 청크 페이로드는 메인 컨텍스트를 절대 거치지 않는다(에이전트가 각자 디스크에서 읽는다).
+
+1. **모델 게이트** — 시간이 걸리는 실행이니 플랫폼이 대화형 질문(AskUserQuestion 등)을 지원하면 채움 모델을 한 번 묻는다:
+   - **sonnet (권장)** — egov 1,255흐름 실증: 근거율 100%, 7.5M 토큰/27분. "품질·비용 균형" → `model: "sonnet"`
+   - **세션 모델** — 요약문 품질 최고, 비용·시간 최대 → `model: "inherit"`
+   - **haiku** — 최대 절감. 요약 품질·verbatim 인용 준수 위험이 있으나 감사 재디스패치가 보정 → `model: "haiku"`
+
+   대화형 질문이 불가한 플랫폼이면 묻지 말고 `sonnet` 으로 진행한다. effort 는 `low` 고정을 권장한다(채움은 pre-cite 위 명명·요약이지 열린 분석이 아니다).
+
+2. 청크 준비:
+   ```
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> fill-prep
+   ```
+   번들을 흐름 20개 단위 자립 청크로 분해해 `.spec/map/fill-prep/<chunkId>.json` + `index.json` 을 쓴다(도메인별 첫 청크 = 헤더 청크 — 그 담당 에이전트가 도메인 요약·엔티티·규칙·업무 흐름도도 쓴다). `--chunk-flows N` 으로 조정 가능. pre-cite 미확보 건수가 보고되면 그대로 사용자에게 전달한다(조용한 누락 금지).
+
+3. 청크 id 목록 추출(경로는 절대 경로):
+   ```bash
+   node -e "const d=require('<projectRoot 절대경로>/.spec/map/fill-prep/index.json');console.log(JSON.stringify(d.chunks.map(c=>c.chunkId)))"
+   ```
+
+4. `[fill] 팬아웃 — 청크 <N>개 (Workflow, background)...` 보고 후 **Workflow 도구** 호출:
+   - `scriptPath`: `${CLAUDE_PLUGIN_ROOT}/scripts/map-fill-fanout.workflow.js`
+   - `args`: `{ "projectRoot": "<절대경로>", "cliScript": "${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs 절대경로", "chunkIds": <3의 배열>, "model": "<모델 게이트 결과>", "effort": "low", "language": "한국어" }`
+
+   워크플로는 청크당 에이전트 1명을 팬아웃(각자 자기 청크를 디스크에서 읽어 `fill-frag/<chunkId>.json` 작성)하고, 결정론 감사(`fill-audit`: 존재 ∧ 스키마 ∧ id 정합 ∧ flow/step 커버리지)로 미완결 청크를 최대 2회 재디스패치한다.
+
+   **Workflow 도구가 없는 플랫폼(예: opencode)?** 청크를 인라인으로 처리한다 — 각 `fill-prep/<chunkId>.json` 을 직접 읽어 §6-A 계약 + verbatim pre-cite 규칙대로 `fill-frag/<chunkId>.json` 을 작성(도메인당이 아니라 **청크당**이라 컨텍스트가 유계다). 병렬 에이전트 디스패치가 가능하면 5개씩 동시 처리한다.
+
+5. 워크플로가 `{ totalChunks, filled, skippedByGuard, failed }` 를 반환하면:
+   - `failed[]` 는 전부 사용자에게 보고한다(침묵 금지) — 병합은 있는 청크만으로 진행된다(누락 흐름은 emit 결정론 폴백).
+   - `skippedByGuard > 0` 은 정보성: 이전 중단 실행이 완료한 청크의 재사용(멱등 재개)이다.
+   - 중단됐으면 그냥 재실행 — `fill-audit` 디스크 가드가 완료 청크를 건너뛴다.
+
+6. 병합 → emit:
+   ```
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> fill-merge
+   ```
+   조각을 도메인별 `fill/<key>.json`(DomainFill)으로 결정론 병합한다(id dedupe·청크 선언 밖 id 버림 보고·헤더 미완결 도메인은 pending 유지). 병합 보고의 ⚠️(부분 병합/병합 불가/버림)를 사용자에게 전달한 뒤 §7 emit 으로 계속한다.
 
 ## 7) Emit (인용 기계검증 + 도메인 그래프 산출)
 
@@ -150,4 +197,4 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> emit
 ## 출력 해석
 
 각 단계 요약을 한국어로 보고하고, `.spec/map/` 산출물 경로를 안내한다.
-전체 순서: scan → plan → confirm → map → bundle → (호스트 fill 작성) → emit.
+전체 순서: scan → plan → confirm → map → bundle → fill(§6 규모 게이트: 인라인 또는 fill-prep→Workflow 팬아웃→fill-merge) → emit.

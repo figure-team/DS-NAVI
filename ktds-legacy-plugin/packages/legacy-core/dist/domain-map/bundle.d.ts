@@ -120,6 +120,11 @@ export declare function safeKeyFilename(key: string): string;
 /** `.spec/map/bundle/` 디렉터리 경로. */
 export declare function bundleDir(projectRoot: string): string;
 /**
+ * 앵커 라인 주변 소스 슬라이스를 읽는다(앵커 위 10줄부터 sliceLines 창).
+ * fill-fanout 이 sliceOmitted 파일의 청크 단위 복구에 재사용한다.
+ */
+export declare function sliceFile(projectRoot: string, relPath: string, anchorLine: number, sliceLines: number): Promise<SourceSlice | null>;
+/**
  * skeleton 의 도메인별 번들을 조립해 `.spec/map/bundle/<safeKey>.json` 으로 영속한다.
  * 파일 슬라이스는 relPath 정렬 순서로 charCap 까지 채우고, 초과분은 slice=null +
  * sliceOmitted 에 보고한다. 반환값의 paths 는 기록한 파일들의 절대 경로다.

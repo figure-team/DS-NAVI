@@ -7,6 +7,7 @@ import {
   Handle,
   MarkerType,
   MiniMap,
+  Panel,
   Position,
   ReactFlow,
   ReactFlowProvider,
@@ -18,6 +19,7 @@ import { Badge } from "../proto/Proto";
 import { useTheme } from "../../themes/index.ts";
 import { applyElkLayout } from "../../utils/elk-layout";
 import { mergeElkPositions, nodesToElkInput } from "../../utils/layout";
+import { inferFkEdges } from "./erd-infer";
 import { TableDetail } from "./TablesTab";
 import { isPk } from "./types";
 import type { DbColumn, DbSchema, DbTable } from "./types";
@@ -165,6 +167,8 @@ interface FkEdgeInfo {
   columns: string[];
   /** 부모(target) 쪽 참조 컬럼명(선언 부재 시 부모 PK로 폴백) — 소문자. */
   refColumns: string[];
+  /** 이름 기반 추정 관계(erd-infer) — 점선 렌더, 토글로 숨김 가능. */
+  inferred?: boolean;
 }
 
 /** 테이블 PK 컬럼명(소문자) — primaryKey 배열 또는 컬럼 플래그(스캐너에 따라 한쪽만 채워짐). */
@@ -190,8 +194,12 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
     [schema.tables],
   );
 
+  // 추정 관계 토글 — 기본 표시, ?inferred=0 으로 숨김(QA·회의 공유용 딥링크 유지).
+  const showInferred = searchParams.get("inferred") !== "0";
+
   // 선언 FK → 엣지(자식 → 참조 테이블). 참조 대상이 스키마에 없으면 제외(UnresolvedBanner 영역).
-  const fkEdges = useMemo<FkEdgeInfo[]>(() => {
+  // + 이름 기반 추정 관계(erd-infer) — 선언 FK 없는 레거시 대응, 점선 렌더.
+  const { fkEdges, inferredCount } = useMemo(() => {
     const byLower = new Map(schema.tables.map((t) => [t.name.toLowerCase(), t]));
     const out: FkEdgeInfo[] = [];
     for (const t of schema.tables) {
@@ -209,8 +217,22 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
         });
       }
     }
-    return out;
+    const inferred = inferFkEdges(schema.tables).map<FkEdgeInfo>((e, i) => ({
+      id: `ifk:${e.source}:${i}`,
+      source: e.source,
+      target: e.target,
+      columns: [e.column],
+      refColumns: [e.refColumn],
+      inferred: true,
+    }));
+    return { fkEdges: [...out, ...inferred], inferredCount: inferred.length };
   }, [schema.tables]);
+
+  // 토글 반영된 표시 대상 — 레이아웃·이웃·색 배정 전부 이 목록 기준.
+  const visibleEdges = useMemo(
+    () => (showInferred ? fkEdges : fkEdges.filter((e) => !e.inferred)),
+    [fkEdges, showInferred],
+  );
 
   // 선택 테이블에 닿는 관계별 색 배정 — 같은 색 = 같은 FK 관계(자식 FK 행 ↔ 부모 PK 행 ↔ 연결선).
   const highlight = useMemo(() => {
@@ -223,7 +245,7 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       rowColors.set(table, m);
     };
     let i = 0;
-    for (const e of fkEdges) {
+    for (const e of visibleEdges) {
       if (e.source !== selected.name && e.target !== selected.name) continue;
       const color = relPalette[i++ % relPalette.length];
       edgeColors.set(e.id, color);
@@ -231,18 +253,18 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       for (const c of e.refColumns) push(e.target, c, color);
     }
     return { edgeColors, rowColors };
-  }, [selected, fkEdges, relPalette]);
+  }, [selected, visibleEdges, relPalette]);
 
-  // 선택 테이블의 1-hop 이웃(FK 양방향) — 강조/디밍 판정.
+  // 선택 테이블의 1-hop 이웃(FK 양방향, 추정 포함) — 강조/디밍 판정.
   const neighborhood = useMemo(() => {
     if (!selected) return null;
     const set = new Set<string>([selected.name]);
-    for (const e of fkEdges) {
+    for (const e of visibleEdges) {
       if (e.source === selected.name) set.add(e.target);
       if (e.target === selected.name) set.add(e.source);
     }
     return set;
-  }, [selected, fkEdges]);
+  }, [selected, visibleEdges]);
 
   // 기하(노드·엣지 구성)는 선택과 무관 — 선택 변화로 ELK 재계산이 돌지 않게 분리.
   const base = useMemo(() => {
@@ -258,15 +280,16 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
         data: { name: t.name, isCodeTable: t.isCodeTable, keyRows: rows, moreCount: more, dimmed: false, active: false, colColors: {} },
       };
     });
-    const edges: Edge[] = fkEdges.map((e) => ({
+    const edges: Edge[] = visibleEdges.map((e) => ({
       id: e.id,
       source: e.source,
       target: e.target,
       type: "smoothstep",
       markerEnd: { type: MarkerType.ArrowClosed },
+      data: { inferred: !!e.inferred },
     }));
     return { nodes, edges, dims };
-  }, [schema.tables, fkEdges]);
+  }, [schema.tables, visibleEdges]);
 
   const [layouted, setLayouted] = useState<ErdFlowNode[] | null>(null);
   useEffect(() => {
@@ -306,13 +329,19 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
   const edges = useMemo(
     () =>
       base.edges.map((e) => {
-        // 선택 테이블에 닿는 엣지는 관계 고유색(노드의 FK/PK 행 외곽선과 동일).
+        // 선택 테이블에 닿는 엣지는 관계 고유색(노드의 FK/PK 행 외곽선과 동일). 추정은 점선.
         const rel = highlight?.edgeColors.get(e.id);
+        const dash = e.data?.inferred ? "6 4" : undefined;
         return {
           ...e,
           style: rel
-            ? { stroke: rel, strokeWidth: 2 }
-            : { stroke: "var(--color-border-medium)", strokeWidth: 1.2, opacity: neighborhood ? 0.15 : 1 },
+            ? { stroke: rel, strokeWidth: 2, strokeDasharray: dash }
+            : {
+                stroke: "var(--color-border-medium)",
+                strokeWidth: 1.2,
+                strokeDasharray: dash,
+                opacity: neighborhood ? 0.15 : 1,
+              },
           markerEnd: {
             type: MarkerType.ArrowClosed,
             color: rel ?? "var(--color-border-medium)",
@@ -354,6 +383,29 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
           <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
           <Controls showInteractive={false} />
           {schema.tables.length > 30 && <MiniMap pannable zoomable />}
+          {inferredCount > 0 && (
+            <Panel position="top-left">
+              <label
+                className="flex items-center gap-1.5 rounded-lg border border-border-subtle bg-panel card-shadow cursor-pointer select-none"
+                style={{ padding: "5px 10px", fontSize: 11.5, color: "var(--color-text-secondary)" }}
+              >
+                <input
+                  type="checkbox"
+                  checked={showInferred}
+                  onChange={(ev) =>
+                    setSearchParams((prev) => {
+                      if (ev.target.checked) prev.delete("inferred");
+                      else prev.set("inferred", "0");
+                      return prev;
+                    })
+                  }
+                  style={{ accentColor: "var(--color-status-info)" }}
+                />
+                추정 관계 {inferredCount}건
+                <span className="text-text-muted">— 실선 선언 FK · 점선 추정(컬럼명=타 테이블 PK)</span>
+              </label>
+            </Panel>
+          )}
         </ReactFlow>
       </div>
 

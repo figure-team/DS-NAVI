@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
 import { Badge } from "../proto/Proto";
-import RowSample from "./RowSample";
+import RowSample, { ROW_SAMPLE_MAX } from "./RowSample";
 import { baseName, isPk, len } from "./types";
 import type { DbColumn, DbSchema, DbTable } from "./types";
 
@@ -292,9 +292,9 @@ export function TableDetail({
             <b className="text-text-primary" style={{ fontSize: 13 }}>
               행 데이터 샘플
             </b>
-            {table.rowCount > Math.min(table.rows.length, 5) && (
+            {table.rowCount > Math.min(table.rows.length, ROW_SAMPLE_MAX) && (
               <span className="text-text-muted" style={{ fontSize: 11.5 }}>
-                총 {table.rowCount}행 중 {Math.min(table.rows.length, 5)}행 표시
+                총 {table.rowCount}행 중 {Math.min(table.rows.length, ROW_SAMPLE_MAX)}행 표시
               </span>
             )}
             <div className="flex-1" />

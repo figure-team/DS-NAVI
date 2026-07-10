@@ -117,8 +117,8 @@ const DOMAIN_LABEL: Record<string, string> = {
  * 사람 확정은 selOv.confirmed / TrustBadge 로 시각·문구를 분리한다(데이터 맵 CrudTab 관례).
  */
 const MECH_CONF: Record<string, { kind: ConfKind; label: string; title: string }> = {
-  CONFIRMED: { kind: "fix", label: "근거확보", title: "핸들러·근거(file:line)가 정적 분석으로 추적됨 — 기계 판정" },
-  CONFIRMED_AI: { kind: "ai", label: "근거확보(AI)", title: "AI 보조로 판정된 근거 — 기계 판정" },
+  CONFIRMED: { kind: "fix", label: "근거확보", title: "결정적 정적 분석이 코드에서 근거(file:line)를 직접 추적함 — 규칙 기반이라 재현 가능" },
+  CONFIRMED_AI: { kind: "ai", label: "근거확보(AI)", title: "정적 분석이 잇지 못한 연결을 AI가 코드를 읽어 보완 판정한 근거 — file:line 은 있으나 검토 권장" },
   INFERRED: { kind: "est", label: "추정", title: "핸들러 미검출 또는 메서드명 추론 — 기계 판정" },
   UNVERIFIED: { kind: "chk", label: "확인 필요", title: "근거 없음 — 확인 필요" },
 };
@@ -200,6 +200,65 @@ function computeTrim(img: HTMLImageElement): CaptureCrop | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * 설명 문장에 박혀 있는 "근거: File.java:129, 상수 :48" 인용을 분리한다 —
+ * 본문은 근거 없이 읽히게 다듬고(빈 괄호·꼬리 쉼표 정리), 인용은 별도 행에서
+ * 코드 뷰어 칩으로 렌더한다. 근거 표기가 없으면 원문 그대로.
+ */
+function extractSummaryEvidence(raw: string): { text: string; evidence: string | null } {
+  const m = raw.match(/[,，]?\s*근거\s*[:：]\s*([^)）]*)/);
+  if (!m || m.index === undefined) return { text: raw, evidence: null };
+  const text = (raw.slice(0, m.index) + raw.slice(m.index + m[0].length))
+    .replace(/[(（]\s*[)）]/g, "")
+    .replace(/\s+([.,])/g, "$1")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  return { text, evidence: m[1].trim() };
+}
+
+/** 근거 세그먼트의 렌더 조각 — ref 는 코드 뷰어 칩, text 는 그대로(예: "ERROR 상수"). */
+type EvidencePart =
+  | { type: "ref"; display: string; file: string; line: number }
+  | { type: "text"; display: string };
+
+/**
+ * "CartActionBean.java:137, 상수 :42" / "A.java:125-127 → B.java:151" 를 조각으로.
+ * 파일 없는 ":42" 축약은 직전 파일을 상속하고, basename 은 resolve 로 저장소
+ * 경로를 찾는다(실패 시 텍스트로 강등 — 침묵 누락 없이 원문 보존).
+ */
+function parseEvidenceParts(evidence: string, resolve: (base: string) => string | null): EvidencePart[] {
+  const parts: EvidencePart[] = [];
+  let lastFile: string | null = null;
+  for (const t of evidence.split(/([,，→])/)) {
+    const tok = t.trim();
+    if (!tok) continue;
+    if (tok === "," || tok === "，") {
+      parts.push({ type: "text", display: ", " });
+      continue;
+    }
+    if (tok === "→") {
+      parts.push({ type: "text", display: " → " });
+      continue;
+    }
+    const fm = tok.match(/^(.*?)([\w$.-]+\.[A-Za-z]\w*)\s*:\s*(\d+)(?:\s*-\s*\d+)?$/);
+    if (fm) {
+      const path = resolve(fm[2]);
+      if (path) {
+        lastFile = path;
+        parts.push({ type: "ref", display: tok, file: path, line: Number(fm[3]) });
+        continue;
+      }
+    }
+    const lm = tok.match(/^(.+?)?\s*:\s*(\d+)(?:\s*-\s*\d+)?$/);
+    if (!fm && lm && lastFile) {
+      parts.push({ type: "ref", display: tok, file: lastFile, line: Number(lm[2]) });
+      continue;
+    }
+    parts.push({ type: "text", display: tok });
+  }
+  return parts;
 }
 
 /** 화면 식별 메타 한 행 — 라벨은 hover 툴팁으로 뜻을 설명한다(그리드 2열에 펼쳐짐). */
@@ -489,6 +548,35 @@ export default function ScreenSpecView() {
     return null;
   }, [domainGraph, sel]);
 
+  // 설명 인용의 basename(AccountActionBean.java) → 저장소 경로 해석 맵 —
+  // 전 화면의 핸들러 근거·렌더 JSP 에서 수집(코드 뷰어는 저장소 경로가 필요).
+  const evidencePathMap = useMemo(() => {
+    const map = new Map<string, string>();
+    const add = (p: string | null | undefined) => {
+      if (!p) return;
+      const base = p.split("/").pop();
+      if (base && !map.has(base)) map.set(base, p);
+    };
+    for (const s of file?.screens ?? []) {
+      add(s.jspFile);
+      for (const a of s.annotations) for (const ev of a.handler?.evidence ?? []) add(ev.file);
+    }
+    return map;
+  }, [file]);
+
+  // 설명 본문(근거 인용 제거)과 근거 칩 조각 — 인용이 없으면 evidenceParts=null.
+  const summaryInfo = useMemo(() => {
+    if (!sel?.summary) return null;
+    const { text, evidence } = extractSummaryEvidence(sel.summary.text);
+    return {
+      text,
+      confidence: sel.summary.confidence,
+      evidenceParts: evidence
+        ? parseEvidenceParts(evidence, (base) => evidencePathMap.get(base) ?? null)
+        : null,
+    };
+  }, [sel, evidencePathMap]);
+
   const startEdit = () => {
     if (!sel) return;
     setDraftTitle(title(sel));
@@ -775,14 +863,46 @@ export default function ScreenSpecView() {
                 {sel.openedFrom}
               </MetaRow>
             )}
-            {sel.summary && (
-              <MetaRow label="설명" help="정적 분석이 요약한 화면의 역할 — 옆 배지는 판정 신뢰도(근거확보=코드 근거 file:line 추적됨)">
-                {sel.summary.text}
-                <span style={{ marginLeft: 6 }}>
+            {summaryInfo && (
+              <MetaRow label="설명" help="정적 분석이 요약한 화면의 역할 — 판단의 코드 출처는 아래 근거 행">
+                {summaryInfo.text}
+                {/* 근거 인용이 없는 화면(정적 페이지 등)은 신뢰도 배지를 설명 옆에 유지 */}
+                {!summaryInfo.evidenceParts && (
+                  <span style={{ marginLeft: 6 }}>
+                    <ConfBadge
+                      kind={mechConf(summaryInfo.confidence).kind}
+                      label={mechConf(summaryInfo.confidence).label}
+                      title={mechConf(summaryInfo.confidence).title}
+                    />
+                  </span>
+                )}
+              </MetaRow>
+            )}
+            {summaryInfo?.evidenceParts && (
+              <MetaRow label="근거" help="설명 판단이 나온 코드 위치 — 클릭하면 코드 뷰어로 엽니다. 배지: 근거확보=결정적 정적 분석 추적 / 근거확보(AI)=AI 가 코드를 읽어 보완 판정(검토 권장)">
+                {summaryInfo.evidenceParts.map((p, i) =>
+                  p.type === "ref" ? (
+                    <button
+                      key={`${p.file}:${p.line}:${i}`}
+                      type="button"
+                      onClick={() => openCodeViewerAt(p.file, p.line)}
+                      title={`코드 뷰어에서 열기 — ${p.file}:${p.line}`}
+                      className="inline-block mr-1 px-1 rounded bg-panel break-all cursor-pointer border-0"
+                      style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, color: "var(--color-status-info)" }}
+                    >
+                      {p.display}
+                    </button>
+                  ) : (
+                    <span key={`t:${i}`} className="text-text-muted" style={{ marginRight: p.display === ", " ? 0 : 4 }}>
+                      {p.display}
+                    </span>
+                  ),
+                )}
+                <span style={{ marginLeft: 4 }}>
                   <ConfBadge
-                    kind={mechConf(sel.summary.confidence).kind}
-                    label={mechConf(sel.summary.confidence).label}
-                    title={mechConf(sel.summary.confidence).title}
+                    kind={mechConf(summaryInfo.confidence).kind}
+                    label={mechConf(summaryInfo.confidence).label}
+                    title={mechConf(summaryInfo.confidence).title}
                   />
                 </span>
               </MetaRow>

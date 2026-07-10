@@ -131,6 +131,110 @@ function hasDefinition(s: PolicySignal): boolean {
   return d.length > 0 && !d.includes("주석 없음");
 }
 
+/* ── 도메인 정책 현황 파싱 — policy-domain-*.md 본문에서 §4/§8 지표를 추출한다.
+      문서 원문 열람은 산출물 뷰어 몫이고, 이 탭은 도메인 횡단 "상태·공백" 관점만 담당. ── */
+
+/** 마크다운 표 행 → 셀 배열. 이스케이프된 파이프(\|, 자바 `||` 조건식)는 구분자가 아니다. */
+function splitTableRow(line: string): string[] {
+  const cells: string[] = [];
+  let cur = "";
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === "\\" && line[i + 1] === "|") {
+      cur += "\\|";
+      i++;
+    } else if (ch === "|") {
+      cells.push(cur.trim());
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+  cells.push(cur.trim());
+  return cells.slice(1, -1); // 행 선두/말미 파이프 바깥의 빈 셀 제거
+}
+
+/** `## <num>.` 헤딩부터 다음 `## ` 전까지의 본문 라인들. */
+function sectionLines(content: string, num: number): string[] {
+  const lines = content.split("\n");
+  const start = lines.findIndex((l) => l.startsWith(`## ${num}.`));
+  if (start < 0) return [];
+  const rest = lines.slice(start + 1);
+  const end = rest.findIndex((l) => l.startsWith("## "));
+  return end < 0 ? rest : rest.slice(0, end);
+}
+
+interface DomainIssue {
+  text: string;
+  /** §8 신뢰도 열이 [확인 필요]인 행 — 코드가 답하지 못한 정책 공백. */
+  needsCheck: boolean;
+  /** §8 근거 열의 file:line 앵커들(코드 뷰어 연결용). 범위(52-77)·복수 나열은 첫 라인만 취한다. */
+  evidence: Anchor[];
+}
+
+/** §8 근거 셀의 백틱 경로들(`path:52-77,122` 등)에서 file + 첫 라인 추출. */
+function parseEvidenceCell(cell: string): Anchor[] {
+  const out: Anchor[] = [];
+  for (const m of cell.matchAll(/`([^`\s:]+):(\d+)/g)) {
+    out.push({ file: m[1], line: Number(m[2]) });
+  }
+  return out;
+}
+/** §4 의사결정 테이블 한 행 — 정책명은 스캐폴드(《 》)면 null(미채움). */
+interface PolicyRow {
+  id: string;
+  name: string | null;
+  evidence: Anchor[];
+}
+interface DomainPolicyStats {
+  docId: string;
+  title: string;
+  confirmed: boolean;
+  /** §4 의사결정 테이블의 PL 행들(정책 규칙 목록 뷰·채움 현황 뷰의 원천). */
+  policies: PolicyRow[];
+  /** 정책명이 채워진(스캐폴드 《 》 아님) PL 행 수. */
+  namedCount: number;
+  /** frontmatter evidenceRate(0~1) — 없으면 null. */
+  evidenceRate: number | null;
+  issues: DomainIssue[];
+}
+
+function parseDomainPolicyDoc(item: DocListItem, confirmed: boolean, content: string): DomainPolicyStats {
+  const rate = content.match(/^evidenceRate:\s*([\d.]+)/m);
+  // §4 행 열 순서: 정책 ID | 정책명 | IF | THEN | 우선순위 | 예외/비고 | 신뢰도 | 근거
+  const policies: PolicyRow[] = sectionLines(content, 4)
+    .filter((l) => l.startsWith("| PL-"))
+    .map(splitTableRow)
+    .map((c) => ({
+      id: c[0] ?? "",
+      name: (c[1] ?? "").length > 0 && !(c[1] ?? "").includes("《") ? c[1] : null,
+      evidence: parseEvidenceCell(c[7] ?? ""),
+    }));
+  const issues: DomainIssue[] = sectionLines(content, 8)
+    .filter((l) => /^\| \d+ \|/.test(l))
+    .map(splitTableRow)
+    .filter((c) => (c[1] ?? "").length > 0 && !(c[1] ?? "").includes("《"))
+    .map((c) => ({
+      text: c[1],
+      needsCheck: (c[4] ?? "").includes("확인 필요"),
+      evidence: parseEvidenceCell(c[5] ?? ""),
+    }));
+  return {
+    docId: item.docId,
+    title: item.title,
+    confirmed,
+    policies,
+    namedCount: policies.filter((p) => p.name !== null).length,
+    evidenceRate: rate ? Number(rate[1]) : null,
+    issues,
+  };
+}
+
+/** "주문 정책 정의서" → "주문" — 카드·칩에서 반복되는 접미사 제거. */
+function domainShortName(title: string): string {
+  return title.replace(/\s*정책 정의서\s*$/, "") || title;
+}
+
 /** 검색어 하이라이트 — 첫 매치만 mark 로 감싼다(대소문자 무시). */
 function highlight(text: string, q: string): ReactNode {
   const query = q.trim();
@@ -388,7 +492,7 @@ export default function PolicyView() {
           onQuery={setQuery}
         />
       )}
-      {tab === "dom" && <DomainTab docs={domainDocs} />}
+      {tab === "dom" && <DomainTab docs={domainDocs} accessToken={accessToken} />}
       {tab === "rec" && (
         <ReconcileTab
           entries={entries}
@@ -659,7 +763,88 @@ function CategoryTab({
 
 /* ─────────────────────────── 도메인 정책 ─────────────────────────── */
 
-function DomainTab({ docs }: { docs: DocListItem[] }) {
+/** 도메인 탭 하위 뷰 — 스탯 타일 4개가 각각의 뷰로 전환한다(?view=, 기본 issues). */
+type DomainView = "issues" | "domains" | "policies" | "fill";
+const DOMAIN_VIEWS: DomainView[] = ["issues", "domains", "policies", "fill"];
+
+/** 클릭형 뷰 전환 타일 — 대조 탭 StatFilter와 같은 상호작용 패턴. */
+function ViewTile({
+  label,
+  value,
+  active,
+  valueColor,
+  onClick,
+}: {
+  label: string;
+  value: number | string;
+  active: boolean;
+  valueColor?: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      title={`${label} 보기`}
+      className="text-left cursor-pointer bg-transparent"
+      style={{
+        border: "none",
+        padding: 0,
+        borderRadius: 10,
+        outline: active ? "2px solid var(--color-accent)" : "none",
+        outlineOffset: 1,
+      }}
+    >
+      <StatTile label={label} value={value} valueColor={valueColor} />
+    </button>
+  );
+}
+
+/**
+ * 도메인 정책 현황 대시보드 — 문서 원문 열람(산출물 뷰어)과 역할을 가른다: 여기는 도메인 횡단
+ * "상태(채움·확정)와 공백(§8 미결)" 관점. 문서 6개 본문을 병렬 fetch 해 클라이언트에서 파싱한다.
+ * 스탯 타일이 뷰 스위처: 미결(기본)/도메인별 현황/정책 규칙 목록/채움 현황.
+ */
+function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: string | null }) {
+  const [stats, setStats] = useState<DomainPolicyStats[] | null>(null);
+  const [statsErr, setStatsErr] = useState<string | null>(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const viewParam = searchParams.get("view");
+  const view: DomainView = DOMAIN_VIEWS.includes(viewParam as DomainView) ? (viewParam as DomainView) : "issues";
+  const setView = (v: DomainView) =>
+    setSearchParams((prev) => {
+      if (v === "issues") prev.delete("view");
+      else prev.set("view", v);
+      return prev;
+    });
+
+  useEffect(() => {
+    if (docs.length === 0) return;
+    let alive = true;
+    setStats(null);
+    setStatsErr(null);
+    const tokenQ = accessToken ? `?token=${encodeURIComponent(accessToken)}&` : "?";
+    Promise.all(
+      docs.map(async (d) => {
+        const r = await fetch(`/doc-content.json${tokenQ}docId=${encodeURIComponent(d.docId)}`);
+        if (!r.ok) throw new Error(`${d.docId}: HTTP ${r.status}`);
+        const j = (await r.json()) as { content: string; confirmed: boolean };
+        return parseDomainPolicyDoc(d, j.confirmed, j.content);
+      }),
+    )
+      .then((s) => {
+        if (alive) setStats(s);
+      })
+      .catch((e) => {
+        if (alive) setStatsErr(String(e instanceof Error ? e.message : e));
+      });
+    return () => {
+      alive = false;
+    };
+  }, [docs, accessToken]);
+
   if (docs.length === 0) {
     return (
       <div className={CARD} style={{ padding: "20px 22px" }}>
@@ -681,7 +866,272 @@ function DomainTab({ docs }: { docs: DocListItem[] }) {
     );
   }
 
-  return <DocCards docs={docs} />;
+  if (statsErr) {
+    return (
+      <NoticeCard title="정책서 본문을 불러오지 못했습니다">
+        <code>doc-content.json</code> 응답 오류 ({statsErr}). dev 서버 상태를 확인하세요.
+      </NoticeCard>
+    );
+  }
+  if (stats === null) {
+    return (
+      <p className="text-text-muted" style={{ fontSize: 13 }}>
+        정책서 본문을 불러오는 중…
+      </p>
+    );
+  }
+
+  const totalPl = stats.reduce((a, s) => a + s.policies.length, 0);
+  const totalNamed = stats.reduce((a, s) => a + s.namedCount, 0);
+  const confirmedCount = stats.filter((s) => s.confirmed).length;
+
+  // 미결 모아보기 — 동일 문구(자동 시드 등)는 도메인 칩으로 묶어 중복 나열을 피한다.
+  // 출처를 잃지 않는다: 도메인 칩 = 원문 문서(§8) 링크, 근거 칩 = §8 근거 열의 file:line.
+  const issueMap = new Map<
+    string,
+    { needsCheck: boolean; sources: Array<{ docId: string; domain: string }>; evidence: Anchor[] }
+  >();
+  for (const s of stats) {
+    for (const it of s.issues) {
+      const e = issueMap.get(it.text) ?? { needsCheck: false, sources: [], evidence: [] };
+      e.needsCheck = e.needsCheck || it.needsCheck;
+      e.sources.push({ docId: s.docId, domain: domainShortName(s.title) });
+      if (e.evidence.length === 0) e.evidence = it.evidence;
+      issueMap.set(it.text, e);
+    }
+  }
+  const issueRows = [...issueMap.entries()]
+    .map(([text, v]) => ({ text, ...v }))
+    .sort((a, b) => Number(b.needsCheck) - Number(a.needsCheck));
+  const needsCheckCount = issueRows.filter((r) => r.needsCheck).length;
+
+  return (
+    <>
+      <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: 12, marginBottom: 14 }}>
+        <ViewTile
+          label="도메인 정책서"
+          value={stats.length}
+          active={view === "domains"}
+          onClick={() => setView("domains")}
+        />
+        <ViewTile label="정책 규칙 (PL)" value={totalPl} active={view === "policies"} onClick={() => setView("policies")} />
+        <ViewTile
+          label="정책명 채움"
+          value={`${totalNamed}/${totalPl}`}
+          active={view === "fill"}
+          onClick={() => setView("fill")}
+        />
+        <ViewTile
+          label="미결 — 확인 필요"
+          value={needsCheckCount}
+          valueColor={needsCheckCount > 0 ? "var(--color-status-warn)" : undefined}
+          active={view === "issues"}
+          onClick={() => setView("issues")}
+        />
+      </div>
+
+      {/* 미결(기본) — 도메인 횡단 정책 공백이 이 탭의 본론이다. */}
+      {view === "issues" && (
+        <div className={CARD} style={{ padding: "16px 18px" }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>미결 사항 모아보기</h3>
+          <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, marginBottom: 10 }}>
+            각 정책서 <b>§8 미결 사항</b> 원문 그대로 수집 — 코드로 확정하지 못한 정책 공백. 발주처·현업 확인
+            대상입니다. 도메인 칩은 원문 문서로, 근거 칩은 해당 코드로 연결됩니다.
+          </p>
+          {issueRows.length === 0 && (
+            <p className="text-text-muted" style={{ fontSize: 12.5 }}>
+              미결 사항 없음.
+            </p>
+          )}
+          {issueRows.map((r) => (
+            <div
+              key={r.text}
+              className="flex items-start"
+              style={{ gap: 10, padding: "9px 2px", borderBottom: "1px solid var(--color-border-subtle)" }}
+            >
+              <Badge tone={r.needsCheck ? "warn" : "mut"}>{r.needsCheck ? "확인 필요" : "추정"}</Badge>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6 }}>
+                  {r.text}
+                </p>
+                {r.evidence.length > 0 && (
+                  <span className="inline-flex flex-wrap items-center" style={{ gap: 4, marginTop: 5 }}>
+                    {r.evidence.slice(0, 3).map((a) => (
+                      <CitationChip key={`${a.file}:${a.line}`} filePath={a.file} line={a.line} />
+                    ))}
+                    {r.evidence.length > 3 && (
+                      <span className="text-text-muted" style={{ fontSize: 11 }}>
+                        외 {r.evidence.length - 3}건 — 문서 §8 참조
+                      </span>
+                    )}
+                  </span>
+                )}
+              </div>
+              <span className="inline-flex flex-wrap justify-end" style={{ gap: 4, maxWidth: 150 }}>
+                {r.sources.map((s) => (
+                  <Link
+                    key={s.docId}
+                    to={`/deliverables/${encodeURIComponent(s.docId)}`}
+                    title={`${s.domain} 정책서 §8 원문 보기`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Chip muted>{s.domain} →</Chip>
+                  </Link>
+                ))}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 도메인별 현황 — 원문은 산출물 뷰어로 딥링크. */}
+      {view === "domains" && (
+        <div>
+          <GroupLabel>
+            도메인별 현황 · 확정 {confirmedCount}/{stats.length}
+          </GroupLabel>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3" style={{ gap: 12 }}>
+            {stats.map((s) => (
+              <div key={s.docId} className={CARD} style={{ padding: "12px 14px" }}>
+                <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 6 }}>
+                  <b className="text-text-primary truncate" style={{ fontSize: 13, minWidth: 0 }}>
+                    {domainShortName(s.title)}
+                  </b>
+                  <Badge tone={s.confirmed ? "ok" : "info"}>{s.confirmed ? "확정" : "초안"}</Badge>
+                </div>
+                <p className="text-text-muted tabular-nums" style={{ fontSize: 12, marginBottom: 8 }}>
+                  {s.policies.length === 0 ? (
+                    <>분기 0 — 조건부 정책 없음</>
+                  ) : (
+                    <>
+                      정책 {s.policies.length} · 채움 {s.namedCount}/{s.policies.length}
+                    </>
+                  )}
+                  {" · "}미결 {s.issues.length}
+                  {s.evidenceRate !== null && <> · 근거율 {Math.round(s.evidenceRate * 100)}%</>}
+                </p>
+                <Link
+                  to={`/deliverables/${encodeURIComponent(s.docId)}`}
+                  className="text-accent"
+                  style={{ fontSize: 12, fontWeight: 600, textDecoration: "none" }}
+                >
+                  문서 보기 →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 정책 규칙 목록 — 각 정책서 §4 의사결정 테이블의 PL 행 전체. */}
+      {view === "policies" && (
+        <div className={CARD} style={{ padding: "6px 14px 14px" }}>
+          <GroupLabel>정책 규칙 목록 ({totalPl}) — 각 정책서 §4 의사결정 테이블에서 수집</GroupLabel>
+          <div style={{ maxHeight: 520, overflowY: "auto" }}>
+            <table className="proto-tbl">
+              <thead>
+                <tr>
+                  <th scope="col" style={TH_STICKY}>
+                    정책 ID
+                  </th>
+                  <th scope="col" style={TH_STICKY}>
+                    정책명
+                  </th>
+                  <th scope="col" style={TH_STICKY}>
+                    도메인
+                  </th>
+                  <th scope="col" style={TH_STICKY}>
+                    근거
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.flatMap((s) =>
+                  s.policies.map((p) => (
+                    <tr key={`${s.docId}-${p.id}`}>
+                      <td style={{ fontFamily: "var(--font-mono)", fontSize: 12, whiteSpace: "nowrap" }}>{p.id}</td>
+                      <td className="text-text-secondary" style={{ fontSize: 12.5 }}>
+                        {p.name ?? (
+                          <span className="text-text-muted" style={{ fontStyle: "italic" }}>
+                            미채움 《 》
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <Link
+                          to={`/deliverables/${encodeURIComponent(s.docId)}`}
+                          title={`${domainShortName(s.title)} 정책서 §4 원문 보기`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          <Chip muted>{domainShortName(s.title)} →</Chip>
+                        </Link>
+                      </td>
+                      <td>
+                        <span className="inline-flex flex-wrap items-center" style={{ gap: 4 }}>
+                          {p.evidence.slice(0, 2).map((a) => (
+                            <CitationChip key={`${a.file}:${a.line}`} filePath={a.file} line={a.line} />
+                          ))}
+                        </span>
+                      </td>
+                    </tr>
+                  )),
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 채움 현황 — 정책명 스캐폴드(《 》)가 남은 행만. LLM 보강·사람 검토의 잔여 작업 목록. */}
+      {view === "fill" && (
+        <div className={CARD} style={{ padding: "16px 18px" }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>정책명 채움 현황</h3>
+          <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, marginBottom: 10 }}>
+            결정론 추출은 IF/THEN/근거만 확정합니다 — 정책명은 LLM 보강과 사람 검토가 채웁니다.
+          </p>
+          <div className="flex flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
+            {stats
+              .filter((s) => s.policies.length > 0)
+              .map((s) => (
+                <Chip key={s.docId} on={s.namedCount < s.policies.length}>
+                  {domainShortName(s.title)} {s.namedCount}/{s.policies.length}
+                </Chip>
+              ))}
+          </div>
+          {totalNamed === totalPl ? (
+            <p className="text-text-secondary" style={{ fontSize: 12.5 }}>
+              모든 정책명이 채워졌습니다 ({totalNamed}/{totalPl}) — 남은 스캐폴드 없음. 확정은 산출물 뷰어의 편집·확정
+              흐름에서 진행합니다.
+            </p>
+          ) : (
+            stats.flatMap((s) =>
+              s.policies
+                .filter((p) => p.name === null)
+                .map((p) => (
+                  <div
+                    key={`${s.docId}-${p.id}`}
+                    className="flex items-center"
+                    style={{ gap: 10, padding: "7px 2px", borderBottom: "1px solid var(--color-border-subtle)" }}
+                  >
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{p.id}</span>
+                    <span className="text-text-muted" style={{ fontSize: 12.5, fontStyle: "italic" }}>
+                      정책명 미채움
+                    </span>
+                    <div className="flex-1" />
+                    <Link
+                      to={`/deliverables/${encodeURIComponent(s.docId)}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Chip muted>{domainShortName(s.title)} →</Chip>
+                    </Link>
+                  </div>
+                )),
+            )
+          )}
+        </div>
+      )}
+    </>
+  );
 }
 
 /* ─────────────────────────── 대조 현황 ─────────────────────────── */

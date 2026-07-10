@@ -272,8 +272,8 @@ function parseEvidenceParts(evidence: string, resolve: (base: string) => string 
 }
 
 /**
- * 화면 식별 메타 한 행 — 스펙시트 스타일: 고정폭 라벨 열 + 행 구분선(부모 divide-y).
- * 라벨은 hover 툴팁으로 뜻을 설명하고, emphasis 행(설명)은 본문색으로 강조한다.
+ * 화면 식별 메타 한 행 — 스펙시트 스타일: 고정폭 라벨 열 정렬(구분선은 부모가
+ * 그룹 사이에만 넣는다). 라벨은 hover 툴팁 설명, emphasis 행(설명)은 본문색 강조.
  */
 function MetaRow({ label, help, emphasis, children }: { label: string; help: string; emphasis?: boolean; children: ReactNode }) {
   return (
@@ -842,9 +842,10 @@ export default function ScreenSpecView() {
           {/* 화면 식별 메타 카드 — 호출 URL·렌더 JSP·시나리오·진입 경로를 라벨:값으로 정리.
               라벨 hover 시 각 값의 뜻을 설명한다(기존 타이틀 옆 URL·dmeta 한 줄을 대체). */}
           <div
-            className="rounded-lg bg-elevated divide-y divide-border-subtle"
-            style={{ padding: "3px 14px", marginBottom: 12, maxWidth: MAX_CAPTURE_WIDTH }}
+            className="rounded-lg bg-elevated"
+            style={{ padding: "6px 14px", marginBottom: 12, maxWidth: MAX_CAPTURE_WIDTH }}
           >
+            {/* 1군: 화면 식별·코드 출처(호출 URL·렌더 JSP·근거) */}
             <MetaRow label="호출 URL" help="캡처 시점에 브라우저로 연 주소 — 분석 대상 서버(baseUrl) 기준 상대경로. 화면의 식별 주소이며 코드 근거가 아님">
               <span style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{sel.url || "/ (루트)"}</span>
             </MetaRow>
@@ -859,16 +860,6 @@ export default function ScreenSpecView() {
                 >
                   {sel.jspFile}
                 </button>
-              </MetaRow>
-            )}
-            {sel.scenario && (
-              <MetaRow label="도달 시나리오" help="캡처 봇이 이 화면에 도달하려고 먼저 수행한 사전 절차(예: signon=로그인 후, order-flow=주문 진행 중, error=오류 유도)">
-                {sel.scenario}
-              </MetaRow>
-            )}
-            {sel.openedFrom && (
-              <MetaRow label="진입 경로" help="캡처 봇이 직전에 어느 화면/링크에서 이동해 왔는지 — 실제 사용자 동선의 재현 경로">
-                {sel.openedFrom}
               </MetaRow>
             )}
             {summaryInfo?.evidenceParts && (
@@ -900,20 +891,35 @@ export default function ScreenSpecView() {
                 </span>
               </MetaRow>
             )}
-            {summaryInfo && (
-              <MetaRow label="설명" emphasis help="정적 분석이 요약한 화면의 역할 — 판단의 코드 출처는 위 근거 행">
-                {summaryInfo.text}
-                {/* 근거 인용이 없는 화면(정적 페이지 등)은 신뢰도 배지를 설명 옆에 유지 */}
-                {!summaryInfo.evidenceParts && (
-                  <span style={{ marginLeft: 6 }}>
-                    <ConfBadge
-                      kind={mechConf(summaryInfo.confidence).kind}
-                      label={mechConf(summaryInfo.confidence).label}
-                      title={mechConf(summaryInfo.confidence).title}
-                    />
-                  </span>
+            {/* 2군: 맥락(도달 시나리오·진입 경로·설명) — 1군과 구분선 하나로만 나눈다 */}
+            {(sel.scenario || sel.openedFrom || summaryInfo) && (
+              <div style={{ borderTop: "1px solid var(--color-border-subtle)", marginTop: 3, paddingTop: 3 }}>
+                {sel.scenario && (
+                  <MetaRow label="도달 시나리오" help="캡처 봇이 이 화면에 도달하려고 먼저 수행한 사전 절차(예: signon=로그인 후, order-flow=주문 진행 중, error=오류 유도)">
+                    {sel.scenario}
+                  </MetaRow>
                 )}
-              </MetaRow>
+                {sel.openedFrom && (
+                  <MetaRow label="진입 경로" help="캡처 봇이 직전에 어느 화면/링크에서 이동해 왔는지 — 실제 사용자 동선의 재현 경로">
+                    {sel.openedFrom}
+                  </MetaRow>
+                )}
+                {summaryInfo && (
+                  <MetaRow label="설명" emphasis help="정적 분석이 요약한 화면의 역할 — 판단의 코드 출처는 위 근거 행">
+                    {summaryInfo.text}
+                    {/* 근거 인용이 없는 화면(정적 페이지 등)은 신뢰도 배지를 설명 옆에 유지 */}
+                    {!summaryInfo.evidenceParts && (
+                      <span style={{ marginLeft: 6 }}>
+                        <ConfBadge
+                          kind={mechConf(summaryInfo.confidence).kind}
+                          label={mechConf(summaryInfo.confidence).label}
+                          title={mechConf(summaryInfo.confidence).title}
+                        />
+                      </span>
+                    )}
+                  </MetaRow>
+                )}
+              </div>
             )}
           </div>
 

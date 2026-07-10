@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router";
 
-import { Badge, Ev } from "../proto/Proto";
+import { useDashboardStore } from "../../store";
+import { Badge } from "../proto/Proto";
 import RowSample from "./RowSample";
 import { baseName, isPk, len } from "./types";
 import type { DbColumn, DbSchema, DbTable } from "./types";
@@ -9,7 +10,25 @@ import type { DbColumn, DbSchema, DbTable } from "./types";
 /**
  * 테이블 탭(개편 ②) — 검색(테이블명·comment·컬럼명·컬럼 comment) + 무의존 가상화
  * (content-visibility) + URL 단일 소스(?table=&q=) + 상세 행 데이터 섹션 + 코드성 사유 툴팁.
+ * 컬럼 표는 colgroup 고정 폭(테이블 간 셀 폭 통일), FK 배지는 참조 테이블로 이동,
+ * 근거(file:line)는 클릭 시 코드 뷰어.
  */
+
+/** 클릭 가능한 근거(file:line) — 코드 뷰어 오픈. CrudTab 근거 popover 와 동일 경로. */
+function EvLink({ relPath, line }: { relPath: string; line: number }) {
+  const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
+  return (
+    <button
+      type="button"
+      onClick={() => openCodeViewerAt(relPath, line)}
+      title={`${relPath}:${line} — 코드 뷰어로 열기`}
+      className="cursor-pointer bg-transparent border-0 text-text-muted hover:text-[var(--color-status-info)] hover:underline"
+      style={{ fontFamily: "var(--font-mono)", fontSize: 11, padding: 0 }}
+    >
+      {baseName(relPath)}:{line}
+    </button>
+  );
+}
 
 interface TableMatch {
   table: DbTable;
@@ -117,11 +136,16 @@ function TableDetail({
   table,
   tier,
   highlightCols,
+  knownTables,
+  onSelectTable,
   onSeeCrud,
 }: {
   table: DbTable;
   tier: string;
   highlightCols: Set<string>;
+  /** 소문자 테이블명 → 실제 테이블명 — FK 참조 대상 존재 확인·이동용. */
+  knownTables: Map<string, string>;
+  onSelectTable: (name: string) => void;
   onSeeCrud: () => void;
 }) {
   const rows = table.rowCount || table.rows.length;
@@ -129,96 +153,146 @@ function TableDetail({
     highlightCols.has(c.name)
       ? { background: "color-mix(in srgb, var(--color-status-info) 8%, transparent)" }
       : undefined;
-  return (
-    <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 22px" }}>
-      <div className="flex items-center gap-2.5 flex-wrap" style={{ marginBottom: 4 }}>
-        <b className="font-mono text-text-primary" style={{ fontSize: 15 }}>
-          {table.name}
-        </b>
-        <Badge tone="ok">Tier {tier.toUpperCase()}</Badge>
-        {table.isCodeTable && (
-          <Badge tone="info" title={table.codeTableReason ?? undefined}>
-            코드성{table.codeTableReason ? ` · ${table.codeTableReason}` : ""}
+  // 컬럼명(소문자) → FK 참조 테이블 — 키 셀 FK 배지·참조 테이블 이동.
+  const fkByCol = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const fk of table.foreignKeys ?? [])
+      for (const col of fk.columns) if (!m.has(col.toLowerCase())) m.set(col.toLowerCase(), fk.refTable);
+    return m;
+  }, [table]);
+
+  const keyCell = (c: DbColumn) => {
+    const badges: React.ReactNode[] = [];
+    if (isPk(table, c)) badges.push(<Badge key="pk" tone="info">PK</Badge>);
+    else if (c.unique) badges.push(<Badge key="uq" tone="info">UNIQUE</Badge>);
+    const refTable = fkByCol.get(c.name.toLowerCase());
+    if (refTable) {
+      const target = knownTables.get(refTable.toLowerCase());
+      badges.push(
+        target ? (
+          <button
+            key="fk"
+            type="button"
+            onClick={() => onSelectTable(target)}
+            title={`${refTable} 테이블로 이동`}
+            className="cursor-pointer bg-transparent border-0 hover:underline"
+            style={{ padding: 0 }}
+          >
+            <Badge tone="warn">FK → {refTable}</Badge>
+          </button>
+        ) : (
+          <Badge key="fk" tone="warn" title={`참조 테이블 ${refTable} — 스키마에 없음`}>
+            FK → {refTable}
           </Badge>
-        )}
-        {table.comment && (
-          <span className="text-text-muted" style={{ fontSize: 12 }}>
-            {table.comment}
-          </span>
-        )}
-        <div className="flex-1" />
-        {table.relPath && (
-          <Ev>
-            {baseName(table.relPath)}:{table.line}
-          </Ev>
-        )}
-      </div>
+        ),
+      );
+    }
+    if (badges.length === 0) return <span className="text-text-muted">—</span>;
+    return <span className="inline-flex items-center flex-wrap" style={{ gap: 4 }}>{badges}</span>;
+  };
 
-      <div className="overflow-x-auto" style={{ marginTop: 10 }}>
-        <table className="proto-tbl">
-          <thead>
-            <tr>
-              <th>컬럼</th>
-              <th>타입</th>
-              <th>NULL</th>
-              <th>키</th>
-              <th>설명</th>
-            </tr>
-          </thead>
-          <tbody>
-            {table.columns.map((c) => (
-              <tr key={c.name} style={hl(c)}>
-                <td className="font-mono">{c.name}</td>
-                <td className="font-mono">{c.type}</td>
-                <td className="text-text-muted">{c.nullable ? "NULL" : "NOT NULL"}</td>
-                <td>
-                  {isPk(table, c) ? (
-                    <Badge tone="info">PK</Badge>
-                  ) : c.unique ? (
-                    <Badge tone="info">UNIQUE</Badge>
-                  ) : (
-                    <span className="text-text-muted">—</span>
-                  )}
-                </td>
-                <td>{c.comment ?? <span className="text-text-muted">—</span>}</td>
+  return (
+    <div className="min-w-0 grid" style={{ gap: 14 }}>
+      <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 22px" }}>
+        <div className="flex items-center gap-2.5 flex-wrap" style={{ marginBottom: 4 }}>
+          <b className="font-mono text-text-primary" style={{ fontSize: 15 }}>
+            {table.name}
+          </b>
+          <Badge tone="ok">Tier {tier.toUpperCase()}</Badge>
+          {table.isCodeTable && (
+            <Badge tone="info" title={table.codeTableReason ?? undefined}>
+              코드성{table.codeTableReason ? ` · ${table.codeTableReason}` : ""}
+            </Badge>
+          )}
+          {table.comment && (
+            <span className="text-text-muted" style={{ fontSize: 12 }}>
+              {table.comment}
+            </span>
+          )}
+          <div className="flex-1" />
+          {table.relPath && <EvLink relPath={table.relPath} line={table.line} />}
+        </div>
+
+        <div className="overflow-x-auto" style={{ marginTop: 10 }}>
+          {/* colgroup 고정 폭 — 어떤 테이블을 선택해도 셀 폭이 동일(내용 기반 자동 폭 금지) */}
+          <table className="proto-tbl" style={{ tableLayout: "fixed", minWidth: 640 }}>
+            <colgroup>
+              <col style={{ width: "22%" }} />
+              <col style={{ width: "16%" }} />
+              <col style={{ width: 96 }} />
+              <col style={{ width: "20%" }} />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>컬럼</th>
+                <th>타입</th>
+                <th>NULL</th>
+                <th>키</th>
+                <th>설명</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {table.columns.map((c) => (
+                <tr key={c.name} style={hl(c)}>
+                  <td className="font-mono truncate" title={c.name}>
+                    {c.name}
+                  </td>
+                  <td className="font-mono truncate" title={c.type}>
+                    {c.type}
+                  </td>
+                  <td className="text-text-muted">{c.nullable ? "NULL" : "NOT NULL"}</td>
+                  <td>{keyCell(c)}</td>
+                  <td>{c.comment ?? <span className="text-text-muted">—</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex flex-wrap gap-2" style={{ marginTop: 12 }}>
+          <Chip>FK {len(table.foreignKeys)}</Chip>
+          <Chip>UNIQUE {len(table.uniques)}</Chip>
+          <Chip>CHECK {len(table.checks)}</Chip>
+          <Chip>INDEX {len(table.indexes)}</Chip>
+          {rows > 0 && <Chip>행 데이터 {rows}행 실측</Chip>}
+        </div>
+
+        <div className="text-text-muted" style={{ fontSize: 12, marginTop: 10 }}>
+          사용처:{" "}
+          <button
+            type="button"
+            onClick={onSeeCrud}
+            className="cursor-pointer bg-transparent border-0 font-inherit"
+            style={{ color: "var(--color-status-info)", padding: 0, font: "inherit" }}
+          >
+            CRUD 매트릭스에서 보기
+          </button>{" "}
+          ·{" "}
+          <Link to="/structure" style={{ color: "var(--color-status-info)" }}>
+            구조 그래프
+          </Link>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-2" style={{ marginTop: 12 }}>
-        <Chip>FK {len(table.foreignKeys)}</Chip>
-        <Chip>UNIQUE {len(table.uniques)}</Chip>
-        <Chip>CHECK {len(table.checks)}</Chip>
-        <Chip>INDEX {len(table.indexes)}</Chip>
-        {rows > 0 && <Chip>행 데이터 {rows}행 실측</Chip>}
-      </div>
-
+      {/* 행 데이터 샘플 — 테이블 표와 분리된 별도 카드, 근거는 표 카드와 동일하게 우측 상단 */}
       {table.rows.length > 0 && (
-        <div style={{ marginTop: 14 }}>
-          <div className="text-text-primary" style={{ fontSize: 12.5, fontWeight: 650, marginBottom: 6 }}>
-            행 데이터 샘플
+        <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 22px" }}>
+          <div className="flex items-center gap-2.5 flex-wrap" style={{ marginBottom: 10 }}>
+            <b className="text-text-primary" style={{ fontSize: 13 }}>
+              행 데이터 샘플
+            </b>
+            {table.rowCount > Math.min(table.rows.length, 5) && (
+              <span className="text-text-muted" style={{ fontSize: 11.5 }}>
+                총 {table.rowCount}행 중 {Math.min(table.rows.length, 5)}행 표시
+              </span>
+            )}
+            <div className="flex-1" />
+            {table.relPath && <EvLink relPath={table.relPath} line={table.rows[0].line} />}
           </div>
-          <RowSample table={table} />
+          <RowSample table={table} showEvidence={false} />
         </div>
       )}
-
-      <div className="text-text-muted" style={{ fontSize: 12, marginTop: 10 }}>
-        사용처:{" "}
-        <button
-          type="button"
-          onClick={onSeeCrud}
-          className="cursor-pointer bg-transparent border-0 font-inherit"
-          style={{ color: "var(--color-status-info)", padding: 0, font: "inherit" }}
-        >
-          CRUD 매트릭스에서 보기
-        </button>{" "}
-        ·{" "}
-        <Link to="/structure" style={{ color: "var(--color-status-info)" }}>
-          구조 그래프
-        </Link>
-      </div>
     </div>
   );
 }
@@ -252,6 +326,10 @@ export default function TablesTab({ schema }: { schema: DbSchema }) {
     const m = matches.find((x) => x.table.name === selected.name);
     return new Set(m?.colHits ?? []);
   }, [matches, selected]);
+  const knownTables = useMemo(
+    () => new Map(schema.tables.map((t) => [t.name.toLowerCase(), t.name])),
+    [schema.tables],
+  );
 
   if (schema.tables.length === 0) return <EmptyCard>테이블이 없습니다.</EmptyCard>;
 
@@ -291,6 +369,13 @@ export default function TablesTab({ schema }: { schema: DbSchema }) {
           table={selected}
           tier={schema.tier}
           highlightCols={highlightCols}
+          knownTables={knownTables}
+          onSelectTable={(name) =>
+            setSearchParams((prev) => {
+              prev.set("table", name);
+              return prev;
+            })
+          }
           onSeeCrud={() =>
             setSearchParams((prev) => {
               prev.set("tab", "crud");

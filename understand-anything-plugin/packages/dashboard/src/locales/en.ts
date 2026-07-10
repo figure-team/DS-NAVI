@@ -229,8 +229,6 @@ export const en = {
     userEditedNote: "User-edited & confirmed (exempt from machine verification).",
   },
   detailLevel: {
-    overview: "Overview",
-    overviewTitle: "Overview — hides functions/classes, high-level architecture only",
     filesTitle: "Files only — architecture-level dependencies (fast)",
     classesTitle: "Files + Classes — code structure with inheritance",
     files: "Files",

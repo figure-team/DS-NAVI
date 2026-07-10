@@ -227,8 +227,6 @@ export const zhTW = {
     userEditedNote: "使用者編輯並確認（免機器驗證）。",
   },
   detailLevel: {
-    overview: "概覽",
-    overviewTitle: "概覽 — 隱藏函式/類別，僅顯示高層架構",
     filesTitle: "僅檔案 — 架構級依賴（快速）",
     classesTitle: "檔案 + 類別 — 程式碼結構及繼承關係",
     files: "檔案",

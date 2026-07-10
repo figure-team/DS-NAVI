@@ -227,8 +227,6 @@ export const zh = {
     userEditedNote: "用户编辑并确认（免机器验证）。",
   },
   detailLevel: {
-    overview: "概览",
-    overviewTitle: "概览 — 隐藏函数/类，仅显示高层架构",
     filesTitle: "仅文件 — 架构级依赖（快速）",
     classesTitle: "文件 + 类 — 代码结构及继承关系",
     files: "文件",

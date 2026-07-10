@@ -229,8 +229,6 @@ export const ja = {
     userEditedNote: "ユーザー編集・確定済み（機械検証は免除）。",
   },
   detailLevel: {
-    overview: "概要",
-    overviewTitle: "概要 — 関数・クラスを隠し、高レベルのアーキテクチャのみ",
     filesTitle: "ファイルのみ — アーキテクチャレベルの依存関係（高速）",
     classesTitle: "ファイル + クラス — 継承を含むコード構造",
     files: "ファイル",

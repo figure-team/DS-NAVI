@@ -30,14 +30,8 @@ interface Props {
  */
 export default function GraphWorkbench({ mode }: Props) {
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
-  const persona = useDashboardStore((s) => s.persona);
-  const setPersona = useDashboardStore((s) => s.setPersona);
   const nodeTypeFilters = useDashboardStore((s) => s.nodeTypeFilters);
   const toggleNodeTypeFilter = useDashboardStore((s) => s.toggleNodeTypeFilter);
-  const detailLevel = useDashboardStore((s) => s.detailLevel);
-  const setDetailLevel = useDashboardStore((s) => s.setDetailLevel);
-  const showFunctionsInClassView = useDashboardStore((s) => s.showFunctionsInClassView);
-  const toggleShowFunctionsInClassView = useDashboardStore((s) => s.toggleShowFunctionsInClassView);
   const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const wikiGraph = useDashboardStore((s) => s.wikiGraph); // ktds-fork (ADR-004)
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("info");
@@ -108,72 +102,10 @@ export default function GraphWorkbench({ mode }: Props) {
           <DiffToggle />
           {/* 영향도 분석 실행 진입점은 변경·영향 메뉴(ChangeImpactView)로 일원화 —
               구조 탭은 결과 소비(?overlay=impact)만 담당한다(2026-07-10 결정). */}
-          {/* 상세도 3단: 개요(persona non-technical = 함수·클래스 숨김) / 파일 / 클래스.
-              구 PersonaSelector(개요/학습/심층)를 흡수 — 학습(LearnPanel)은 제거,
-              심층은 무동작 옵션이라 폐기. DetailLevel 타입은 불변(개요는 persona 매핑). */}
-          {!isKnowledgeGraph && (
-            <>
-              <div className="w-px h-5 bg-border-subtle" />
-              <div className="flex items-center bg-elevated rounded-lg p-0.5">
-                <button
-                  type="button"
-                  onClick={() => setPersona("non-technical")}
-                  title={t.detailLevel.overviewTitle}
-                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                    persona === "non-technical"
-                      ? "bg-accent/20 text-accent"
-                      : "text-text-muted hover:text-text-secondary"
-                  }`}
-                >
-                  {t.detailLevel.overview}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPersona("experienced");
-                    setDetailLevel("file");
-                  }}
-                  title={t.detailLevel.filesTitle}
-                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                    persona !== "non-technical" && detailLevel === "file"
-                      ? "bg-accent/20 text-accent"
-                      : "text-text-muted hover:text-text-secondary"
-                  }`}
-                >
-                  {t.detailLevel.files}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPersona("experienced");
-                    setDetailLevel("class");
-                  }}
-                  title={t.detailLevel.classesTitle}
-                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                    persona !== "non-technical" && detailLevel === "class"
-                      ? "bg-accent/20 text-accent"
-                      : "text-text-muted hover:text-text-secondary"
-                  }`}
-                >
-                  {t.detailLevel.classes}
-                </button>
-              </div>
-              {persona !== "non-technical" && detailLevel === "class" && (
-                <button
-                  type="button"
-                  onClick={toggleShowFunctionsInClassView}
-                  title={t.detailLevel.fnTitle}
-                  className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded border transition-colors ${
-                    showFunctionsInClassView
-                      ? "border-amber-500/50 bg-amber-500/10 text-amber-400"
-                      : "border-border-medium bg-elevated text-text-muted hover:text-text-secondary"
-                  }`}
-                >
-                  {t.detailLevel.fn}
-                </button>
-              )}
-            </>
-          )}
+          {/* 상세도 토글(개요/파일/+클래스) 제거 — 구조 탭은 항상 파일 수준 뷰(2026-07-10).
+              jpetstore류 그래프에선 개요=파일이 동일 화면(레이어가 함수/클래스를 직접 안 담음)이고
+              +클래스 확장은 PM/PL 대상이 아니라고 사용자 확정. detailLevel 기본값 "file" 고정 소비.
+              "개요"는 노드 폭발 개편 때 레이어 요약 뷰로 재도입 예정. */}
           <div className="flex items-center gap-1">
             {(isKnowledgeGraph ? [
               { key: "knowledge" as const, label: t.nodeTypeLabels.all, color: "var(--color-node-article)" },

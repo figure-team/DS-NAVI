@@ -21,7 +21,8 @@ function CodeTableCard({ table }: { table: DbTable }) {
           <Ev>판정: {table.codeTableReason}</Ev>
         </div>
       )}
-      <RowSample table={table} />
+      {/* 코드값 일람이 탭의 존재 이유 — 요약 상한(ROW_SAMPLE_MAX) 없이 실측 저장분 전부 표시. */}
+      <RowSample table={table} max={table.rows.length} />
     </div>
   );
 }

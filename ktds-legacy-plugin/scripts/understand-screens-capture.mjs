@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global window, document, CSS */
 /**
  * /understand-screens Stage A — 결정론 캡처 러너 (playwright).
  * 사용: node understand-screens-capture.mjs [projectRoot]

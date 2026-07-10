@@ -18,7 +18,6 @@
 //     effort?: string,       // fill-writer reasoning effort (default 'low')
 //     language?: string }    // output language for names/summaries (default '한국어')
 
-/* global args, agent, pipeline, parallel, phase, log -- Workflow-tool DSL injects these */
 
 export const meta = {
   name: 'ktds-map-fill-fanout',

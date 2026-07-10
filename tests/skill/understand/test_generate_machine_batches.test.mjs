@@ -161,7 +161,7 @@ describe('generate-machine-batches.mjs — SQL-mapper XML machineization', () =>
     mkdirSync(join(root, 'conf'), { recursive: true });
 
     // Short-alias namespace (egov style) + two DB variants
-    const userMapper = (db) => `<?xml version="1.0" encoding="UTF-8"?>
+    const userMapper = (_db) => `<?xml version="1.0" encoding="UTF-8"?>
 <mapper namespace="UserDAO">
   <select id="selectUser">SELECT * FROM COMTNUSER WHERE ID = #{id}</select>
   <select id="selectUserList">SELECT * FROM COMTNUSER ORDER BY ID</select>

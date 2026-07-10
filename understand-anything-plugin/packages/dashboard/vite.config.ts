@@ -1181,16 +1181,118 @@ function handleImpactAnalyzePost(
         impactJob.status = "failed";
         impactJob.finishedAt = new Date().toISOString();
         appendImpactTail(`\n[spawn error] ${err.message}\n`);
+        recordImpactHistory(projectRoot, { ...impactJob });
       });
       child.on("close", (code) => {
         if (impactJob.jobId !== jobId) return;
         impactJob.status = code === 0 ? "done" : "failed";
         impactJob.exitCode = code;
         impactJob.finishedAt = new Date().toISOString();
+        recordImpactHistory(projectRoot, { ...impactJob });
       });
       sendJson(res, 202, { job: { ...impactJob } });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+// ── ktds(WT-E): 영향 분석 히스토리 — job 종료 시 원장 append + 산출물 스냅샷 ─────
+// 대시보드가 띄운 분석만 기록한다(CLI 직접 실행은 서버가 관찰하지 못함 — 정직한 범위).
+// 원장: <root>/.understand-anything/impact-history/ledger.json (최신이 앞, 상한 초과분 삭제)
+// 스냅샷: <root>/.understand-anything/impact-history/<jobId>/{impact,impact-verify-report,impact-overlay}.json
+const IMPACT_HISTORY_MAX = 50;
+/** /impact-history-item 이 서빙하는 스냅샷 파일 화이트리스트. */
+const IMPACT_SNAPSHOT_FILES = new Set([
+  "impact.json",
+  "impact-verify-report.json",
+  "impact-overlay.json",
+]);
+
+interface ImpactHistoryEntry {
+  jobId: string;
+  query: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  status: "done" | "failed";
+  /** 스냅샷 impact.json 의 앵커 커밋(파싱 실패/부재 시 null). */
+  gitCommit: string | null;
+  /** 스냅샷으로 확보된 파일명 — 프론트가 열람 가능 여부를 판단. */
+  files: string[];
+}
+
+function impactHistoryDir(projectRoot: string): string {
+  return path.join(projectRoot, ".understand-anything", "impact-history");
+}
+
+function readImpactHistory(projectRoot: string): ImpactHistoryEntry[] {
+  try {
+    const raw = JSON.parse(
+      fs.readFileSync(path.join(impactHistoryDir(projectRoot), "ledger.json"), "utf-8"),
+    ) as { entries?: ImpactHistoryEntry[] };
+    return Array.isArray(raw.entries) ? raw.entries : [];
+  } catch {
+    return []; // 부재/파손 = 기록 없음(정직한 empty)
+  }
+}
+
+/** job 종료 시점 산출물을 스냅샷하고 원장에 append(동일 jobId 재기록은 dedup). 실패는 로그만. */
+function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
+  try {
+    const jobId = job.jobId;
+    if (!jobId) return;
+    const dir = impactHistoryDir(projectRoot);
+    const snapDir = path.join(dir, jobId);
+    fs.mkdirSync(snapDir, { recursive: true });
+    // 존재하는 산출물만 복사 — 실패 job 은 대개 비어 있다(files 로 정직하게 노출).
+    const sources: Array<[string, string]> = [
+      [path.join(projectRoot, ".spec", "map", "impact.json"), "impact.json"],
+      [
+        path.join(projectRoot, ".spec", "map", "impact-verify-report.json"),
+        "impact-verify-report.json",
+      ],
+      [path.join(projectRoot, ".understand-anything", "impact-overlay.json"), "impact-overlay.json"],
+    ];
+    const files: string[] = [];
+    let gitCommit: string | null = null;
+    for (const [src, name] of sources) {
+      if (!fs.existsSync(src)) continue;
+      fs.copyFileSync(src, path.join(snapDir, name));
+      files.push(name);
+      if (name === "impact.json") {
+        try {
+          const parsed = JSON.parse(fs.readFileSync(src, "utf-8")) as { gitCommit?: unknown };
+          if (typeof parsed.gitCommit === "string") gitCommit = parsed.gitCommit;
+        } catch {
+          // 파싱 실패 → gitCommit null 유지
+        }
+      }
+    }
+    const entry: ImpactHistoryEntry = {
+      jobId,
+      query: job.query ?? "",
+      startedAt: job.startedAt,
+      finishedAt: job.finishedAt,
+      exitCode: job.exitCode,
+      status: job.status === "done" ? "done" : "failed",
+      gitCommit,
+      files,
+    };
+    const entries = [entry, ...readImpactHistory(projectRoot).filter((e) => e.jobId !== jobId)];
+    for (const drop of entries.slice(IMPACT_HISTORY_MAX)) {
+      try {
+        fs.rmSync(path.join(dir, drop.jobId), { recursive: true, force: true });
+      } catch {
+        // 스냅샷 정리 실패는 무시(원장에서만 제거)
+      }
+    }
+    fs.writeFileSync(
+      path.join(dir, "ledger.json"),
+      JSON.stringify({ entries: entries.slice(0, IMPACT_HISTORY_MAX) }, null, 2) + "\n",
+      "utf8",
+    );
+  } catch (err) {
+    console.error("[understand-anything] Failed to record impact history:", err);
+  }
 }
 
 // ── P3: RTM 단계 인테이크 — 가이드 5단계를 단계당 claude -p 1회로 ─────
@@ -1881,6 +1983,8 @@ export default defineConfig({
             pathname === "/doc-xlsx" ||
             pathname === "/impact-analyze" ||
             pathname === "/impact-status" ||
+            pathname === "/impact-history" ||
+            pathname === "/impact-history-item" ||
             pathname === "/rtm.json" ||
             pathname === "/rtm-overrides.json" ||
             pathname === "/rtm-override" ||
@@ -2062,6 +2166,33 @@ export default defineConfig({
           }
           if (pathname === "/impact-status") {
             sendJson(res, 200, { job: { ...impactJob } });
+            return;
+          }
+          // ktds(WT-E): 영향 분석 히스토리 — 원장 목록 + 스냅샷 열람(읽기 전용).
+          if (pathname === "/impact-history") {
+            const historyRoot = impactProjectRoot();
+            sendJson(res, 200, { entries: historyRoot ? readImpactHistory(historyRoot) : [] });
+            return;
+          }
+          if (pathname === "/impact-history-item") {
+            const historyRoot = impactProjectRoot();
+            const id = url.searchParams.get("id") ?? "";
+            const name = url.searchParams.get("name") ?? "impact.json";
+            // jobId 는 crypto.randomBytes(8).hex = 16자 소문자 hex — 경로 조작 원천 차단.
+            if (!historyRoot || !/^[0-9a-f]{16}$/.test(id) || !IMPACT_SNAPSHOT_FILES.has(name)) {
+              sendJson(res, 400, { error: "Invalid snapshot id or name" });
+              return;
+            }
+            const snapFile = path.join(impactHistoryDir(historyRoot), id, name);
+            if (!fs.existsSync(snapFile)) {
+              sendJson(res, 404, { error: "Snapshot not found" });
+              return;
+            }
+            try {
+              sendJson(res, 200, JSON.parse(fs.readFileSync(snapFile, "utf-8")));
+            } catch {
+              sendJson(res, 500, { error: "Failed to read snapshot" });
+            }
             return;
           }
           if (pathname === "/rtm-intake") {

@@ -1,9 +1,8 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
 import { PageHead, ProtoTabs } from "../proto/Proto";
-import CodeTab from "./CodeTab";
 import CrudTab from "./CrudTab";
 import TablesTab from "./TablesTab";
 import UnresolvedBanner from "./UnresolvedBanner";
@@ -19,8 +18,10 @@ const ErdTab = lazy(() => import("./ErdTab"));
  * 데이터 부재 시 화면/탭 단위 정직한 안내 카드(침묵 누락 금지).
  */
 
-type TabKey = "tables" | "erd" | "crud" | "code";
-const TAB_KEYS: TabKey[] = ["tables", "erd", "crud", "code"];
+// 코드 테이블 탭은 2026-07-10 제거(구 ?tab=code 딥링크는 tables 폴백) — 검색·코드성
+// 그룹·배지·판정 사유·행 샘플이 전부 테이블 탭에 흡수돼 고유 가치가 소멸(설계문서 §7 결정 뒤집음).
+type TabKey = "tables" | "erd" | "crud";
+const TAB_KEYS: TabKey[] = ["tables", "erd", "crud"];
 
 /** 정직한 부재/오류 안내 카드. */
 function EmptyCard({ children }: { children: React.ReactNode }) {
@@ -74,14 +75,7 @@ export default function DataMapView() {
     };
   }, [dataBase, tokenQ]);
 
-  const codeTables = useMemo(() => {
-    if (!schema) return [];
-    const flagged = schema.tables.filter((t) => t.isCodeTable);
-    return flagged.length > 0 ? flagged : schema.tables.filter((t) => t.rows.length > 0);
-  }, [schema]);
-  const codeIsFallback = Boolean(schema && !schema.tables.some((t) => t.isCodeTable));
-
-  // db-schema 자체가 없으면 화면 전체를 안내(테이블·코드 탭이 모두 이것에 의존).
+  // db-schema 자체가 없으면 화면 전체를 안내(테이블·ERD 탭이 모두 이것에 의존).
   const schemaMissing = !schema && schemaErr != null;
 
   const meta = schema
@@ -94,7 +88,6 @@ export default function DataMapView() {
     { key: "tables", label: "테이블", count: schema?.tables.length ?? 0 },
     { key: "erd", label: "ERD", count: schema?.tables.length ?? 0 },
     { key: "crud", label: "CRUD 매트릭스", count: crud?.rows.length ?? 0 },
-    { key: "code", label: "코드 테이블", count: codeTables.length },
   ];
 
   return (
@@ -175,8 +168,6 @@ export default function DataMapView() {
                 )}
               </EmptyCard>
             ))}
-
-          {tab === "code" && <CodeTab codeTables={codeTables} codeIsFallback={codeIsFallback} />}
         </>
       )}
     </div>

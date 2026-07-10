@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router";
 import { useDashboardStore } from "../store";
+import { parseBusinessFlows } from "../utils/businessFlow";
 import TrustBadge from "./TrustBadge";
 import { Badge, BtnAccent, BtnOutline, ConfBadge, Ev, PageHead, type ConfKind } from "./proto/Proto";
 
@@ -95,6 +96,8 @@ const KIND_SWATCH_TOKEN: Record<string, string> = {
 const kindSwatch = (kind: string): string => KIND_SWATCH_TOKEN[kind] ?? KIND_SWATCH_TOKEN.link;
 /** 범례 섹션 순서 — 입력 → 버튼·이벤트 → 링크. */
 const KIND_ORDER: Array<Annotation["kind"]> = ["field", "region", "action", "link"];
+/** 배지 토글 단위 — region 은 색·글리프를 field 와 공유하므로 같이 묶는다. */
+const kindGroup = (k: string): string => (k === "region" ? "field" : k);
 const KIND_SECTION: Record<string, string> = {
   field: "입력 항목",
   region: "영역",
@@ -199,6 +202,24 @@ function computeTrim(img: HTMLImageElement): CaptureCrop | null {
   }
 }
 
+/** 화면 식별 메타 한 행 — 라벨은 hover 툴팁으로 뜻을 설명한다(그리드 2열에 펼쳐짐). */
+function MetaRow({ label, help, children }: { label: string; help: string; children: ReactNode }) {
+  return (
+    <>
+      <span
+        className="text-text-muted whitespace-nowrap"
+        title={help}
+        style={{ fontSize: 11, fontWeight: 650, cursor: "help", paddingTop: 1.5, borderBottom: "1px dotted var(--color-border-medium)", alignSelf: "start", justifySelf: "start" }}
+      >
+        {label}
+      </span>
+      <span className="text-text-secondary break-all" style={{ fontSize: 12, lineHeight: 1.55 }}>
+        {children}
+      </span>
+    </>
+  );
+}
+
 /** 검색어 매치 하이라이트 — 첫 매치만 강조(시맨틱 accent). */
 function Highlight({ text, q }: { text: string; q: string }) {
   if (!q) return <>{text}</>;
@@ -287,12 +308,29 @@ export default function ScreenSpecView() {
   const [trim, setTrim] = useState<CaptureCrop | null>(null);
   // 좌측 목록 — 도메인 그룹 접기(기본 전부 접힘). 검색 중에는 강제 전개.
   const [openDomains, setOpenDomains] = useState<ReadonlySet<string>>(new Set());
+  // 배지 색상 키 토글 — 켜진 종류만 캡처 위에 배지를 그린다(표는 전수 유지).
+  const [hiddenKinds, setHiddenKinds] = useState<ReadonlySet<string>>(new Set());
+  // 캡처 배지 클릭 → 범례 표 해당 행으로 스크롤 + 잠깐 강조(flash).
+  const rowRefs = useRef(new Map<string, HTMLTableRowElement>());
+  const [flashKey, setFlashKey] = useState<string | null>(null);
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+  }, []);
+  const jumpToRow = (key: string) => {
+    setHoverKey(key);
+    rowRefs.current.get(key)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setFlashKey(key);
+    if (flashTimer.current) clearTimeout(flashTimer.current);
+    flashTimer.current = setTimeout(() => setFlashKey(null), 1600);
+  };
 
   // 선택 화면이 바뀌면 편집·hover·캡처 오류 상태를 초기화한다(URL 이관 후 onClick 대체).
   useEffect(() => {
     setEditing(false);
     setHoverKey(null);
     setImgError(false);
+    setFlashKey(null);
   }, [selId]);
 
   const load = useCallback(() => {
@@ -389,9 +427,11 @@ export default function ScreenSpecView() {
     });
 
   /**
-   * 업무 지도 딥링크 — 화면 URL(actions/Cart.action?viewCart=)을 domain-graph 의
-   * flow 노드 id("flow:<METHOD> <경로>?<이벤트>")와 대조해 기능 흐름도까지 연결.
-   * 흐름 매칭 실패 시 도메인 워크스페이스(/domains/:id)로만 폴백한다.
+   * 업무 흐름도 딥링크 — 화면 URL(actions/Cart.action?viewCart=)을 domain-graph 의
+   * flow 노드 id("flow:<METHOD> <경로>?<이벤트>")와 대조하고, 그 flow 를 flowRef 로
+   * 참조하는 업무 프로세스(businessFlows[])까지 찾아 해당 챕터(?view=business&bf=)로
+   * 직행한다. 폴백 사다리: 업무 흐름도 챕터 → 기능 흐름도 스파인(?flow=, 어떤
+   * 프로세스도 이 flow 를 안 쓸 때) → 도메인 워크스페이스(흐름 미매칭) → 링크 없음.
    */
   const bizLink = useMemo(() => {
     if (!domainGraph || !sel) return null;
@@ -418,13 +458,34 @@ export default function ScreenSpecView() {
     candidates.push(path);
     for (const c of candidates) {
       const flowId = byUrl.get(c);
-      if (flowId) {
-        const domainId = flowDomain.get(flowId) ?? (sel.domain ? `domain:${sel.domain}` : null);
-        if (domainId) return `/domains/${domainId}?flow=${encodeURIComponent(flowId)}`;
+      if (!flowId) continue;
+      const domainId = flowDomain.get(flowId) ?? (sel.domain ? `domain:${sel.domain}` : null);
+      if (!domainId) continue;
+      const domainNode = domainGraph.nodes.find((n) => n.id === domainId);
+      const bfIdx = parseBusinessFlows(domainNode).findIndex((p) =>
+        p.flow.nodes.some((n) => n.flowRef === flowId),
+      );
+      if (bfIdx >= 0) {
+        return {
+          to: `/domains/${domainId}?view=business${bfIdx > 0 ? `&bf=${bfIdx}` : ""}`,
+          label: "업무 흐름도 →",
+          title: "이 화면의 기능이 등장하는 업무 프로세스 순서도로 이동",
+        };
       }
+      return {
+        to: `/domains/${domainId}?view=code&flow=${encodeURIComponent(flowId)}`,
+        label: "기능 흐름도 →",
+        title: "업무 흐름도에는 이 기능이 없어 기능 탭의 호출 흐름(스파인)으로 이동",
+      };
     }
     const domainId = sel.domain ? `domain:${sel.domain}` : null;
-    if (domainId && domainGraph.nodes.some((n) => n.id === domainId)) return `/domains/${domainId}`;
+    if (domainId && domainGraph.nodes.some((n) => n.id === domainId)) {
+      return {
+        to: `/domains/${domainId}`,
+        label: "업무 지도 →",
+        title: "흐름 매칭 실패 — 도메인 워크스페이스로 이동",
+      };
+    }
     return null;
   }, [domainGraph, sel]);
 
@@ -501,6 +562,8 @@ export default function ScreenSpecView() {
   }
 
   const visibleAnns = sel.annotations.filter((a) => !merged(a).hidden);
+  // 캡처 위에 실제로 그릴 배지 — 색상 키 토글로 꺼진 종류는 제외(표·통계는 전수 유지).
+  const overlayAnns = visibleAnns.filter((a) => !hiddenKinds.has(kindGroup(a.kind)));
   const notes = visibleAnns.filter((a) => merged(a).note);
   // 신뢰도별 카운트(핸들러 있는 주석만) + 핸들러 없음 — 스케일 대비 상단 요약.
   const confCounts = new Map<string, number>();
@@ -643,21 +706,14 @@ export default function ScreenSpecView() {
             ) : (
               <b className="text-text-primary" style={{ fontSize: 15 }}>{title(sel)}</b>
             )}
-            <span
-              className="text-text-muted break-all"
-              style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}
-              title="캡처 시점에 호출한 화면 URL(분석 대상 baseUrl 기준 상대경로) — 코드 근거는 아래 표의 file:line"
-            >
-              {sel.url}
-            </span>
             {bizLink && (
               <Link
-                to={bizLink}
+                to={bizLink.to}
                 className="whitespace-nowrap font-semibold hover:underline"
                 style={{ fontSize: 11.5, color: "var(--color-status-info)", textDecoration: "none" }}
-                title="업무 지도의 해당 도메인(매칭되면 기능 흐름도까지)으로 이동"
+                title={bizLink.title}
               >
-                업무 지도에서 보기 →
+                {bizLink.label}
               </Link>
             )}
             {sel.graphNodeId && (
@@ -689,13 +745,46 @@ export default function ScreenSpecView() {
               )
             )}
           </div>
-          {/* .dmeta — 렌더 JSP · 시나리오 · 진입 경로 */}
-          <div className="text-text-muted" style={{ fontSize: 12, marginBottom: 12 }}>
-            {sel.jspFile && <>렌더 JSP: <span style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{sel.jspFile}</span></>}
-            {sel.jspFile && sel.scenario && " · "}
-            {sel.scenario && <>시나리오: {sel.scenario}</>}
-            {(sel.jspFile || sel.scenario) && sel.openedFrom && " · "}
-            {sel.openedFrom && <>진입 경로: {sel.openedFrom}</>}
+          {/* 화면 식별 메타 카드 — 호출 URL·렌더 JSP·시나리오·진입 경로를 라벨:값으로 정리.
+              라벨 hover 시 각 값의 뜻을 설명한다(기존 타이틀 옆 URL·dmeta 한 줄을 대체). */}
+          <div
+            className="rounded-lg bg-elevated"
+            style={{
+              padding: "9px 12px",
+              marginBottom: 12,
+              display: "grid",
+              gridTemplateColumns: "max-content minmax(0,1fr)",
+              rowGap: 4,
+              columnGap: 14,
+              maxWidth: MAX_CAPTURE_WIDTH,
+            }}
+          >
+            <MetaRow label="호출 URL" help="캡처 시점에 브라우저로 연 주소 — 분석 대상 서버(baseUrl) 기준 상대경로. 화면의 식별 주소이며 코드 근거가 아님">
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{sel.url || "/ (루트)"}</span>
+            </MetaRow>
+            {sel.jspFile && (
+              <MetaRow label="렌더 JSP" help="위 URL 요청을 서버가 최종적으로 그려낸 JSP 템플릿 파일 — 클릭하면 코드 뷰어로 엽니다">
+                <button
+                  type="button"
+                  onClick={() => openCodeViewerAt(sel.jspFile!, 1)}
+                  className="px-1 rounded bg-panel break-all cursor-pointer border-0 text-left"
+                  style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, color: "var(--color-status-info)" }}
+                  title="코드 뷰어에서 열기"
+                >
+                  {sel.jspFile}
+                </button>
+              </MetaRow>
+            )}
+            {sel.scenario && (
+              <MetaRow label="도달 시나리오" help="캡처 봇이 이 화면에 도달하려고 먼저 수행한 사전 절차(예: signon=로그인 후, order-flow=주문 진행 중, error=오류 유도)">
+                {sel.scenario}
+              </MetaRow>
+            )}
+            {sel.openedFrom && (
+              <MetaRow label="진입 경로" help="캡처 봇이 직전에 어느 화면/링크에서 이동해 왔는지 — 실제 사용자 동선의 재현 경로">
+                {sel.openedFrom}
+              </MetaRow>
+            )}
           </div>
           {sel.summary && (
             <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 12 }}>
@@ -710,26 +799,52 @@ export default function ScreenSpecView() {
             </p>
           )}
 
-          {/* 배지 색상 키 */}
-          <div className="flex items-center gap-4 text-text-muted" style={{ fontSize: 11, marginBottom: 10 }}>
-            {KIND_ORDER.filter((k) => k !== "region").map((k) => (
-              <span key={k} className="inline-flex items-center gap-1.5">
-                <span
-                  className="inline-flex items-center justify-center rounded-full font-bold"
+          {/* 배지 색상 키 = 표시 토글 — 클릭한 종류만 캡처 위 배지를 끄고 켠다(표는 전수 유지) */}
+          <div className="flex items-center gap-3 text-text-muted" style={{ fontSize: 11, marginBottom: 10 }}>
+            {KIND_ORDER.filter((k) => k !== "region").map((k) => {
+              const off = hiddenKinds.has(k);
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  aria-pressed={!off}
+                  onClick={() =>
+                    setHiddenKinds((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(k)) next.delete(k);
+                      else next.add(k);
+                      return next;
+                    })
+                  }
+                  className="inline-flex items-center gap-1.5 cursor-pointer bg-transparent rounded-full"
                   style={{
-                    width: 16,
-                    height: 16,
-                    fontSize: 10,
-                    background: kindStyle(k).bg,
-                    color: kindStyle(k).fg,
-                    border: `1px solid ${kindStyle(k).border}`,
+                    font: "inherit",
+                    color: "inherit",
+                    padding: "2px 8px 2px 3px",
+                    border: `1px solid ${off ? "transparent" : "var(--color-border-subtle)"}`,
+                    opacity: off ? 0.4 : 1,
+                    textDecoration: off ? "line-through" : "none",
+                    transition: "opacity 0.12s ease",
                   }}
+                  title={`클릭 — 캡처 위 ${KIND_SECTION[k] ?? k} 배지 ${off ? "표시" : "숨김"}`}
                 >
-                  {badgeGlyph(k, 1)}
-                </span>
-                {KIND_SECTION[k] ?? k}
-              </span>
-            ))}
+                  <span
+                    className="inline-flex items-center justify-center rounded-full font-bold"
+                    style={{
+                      width: 16,
+                      height: 16,
+                      fontSize: 10,
+                      background: kindStyle(k).bg,
+                      color: kindStyle(k).fg,
+                      border: `1px solid ${kindStyle(k).border}`,
+                    }}
+                  >
+                    {badgeGlyph(k, 1)}
+                  </span>
+                  {KIND_SECTION[k] ?? k}
+                </button>
+              );
+            })}
           </div>
 
           {/* 신뢰도 카운트 요약 — 스케일 대비 상단 집계(전부 기계 판정) */}
@@ -797,7 +912,7 @@ export default function ScreenSpecView() {
                       }}
                       onError={() => setImgError(true)}
                     />
-                    {visibleAnns.map((a) => {
+                    {overlayAnns.map((a) => {
                       const key = annKey(a);
                       const active = hoverKey === key;
                       const st = kindStyle(a.kind);
@@ -810,9 +925,9 @@ export default function ScreenSpecView() {
                           onMouseLeave={() => setHoverKey(null)}
                           onFocus={() => setHoverKey(key)}
                           onBlur={() => setHoverKey(null)}
-                          onClick={() => setHoverKey(key)}
+                          onClick={() => jumpToRow(key)}
                           aria-label={`${badgeGlyph(a.kind, a.no)} ${m.label}${m.description ? ` — ${m.description}` : ""}`}
-                          title={`${m.label} — ${m.description ?? ""}`}
+                          title={`${m.label} — ${m.description ?? ""} (클릭: 아래 표에서 보기)`}
                           className="absolute flex items-center justify-center rounded-full font-bold cursor-pointer transition-transform p-0"
                           style={{
                             left: `${((a.bbox.x + a.bbox.width - cropX) / cropW) * 100}%`,
@@ -877,9 +992,19 @@ export default function ScreenSpecView() {
                     return (
                       <tr
                         key={key}
+                        ref={(el) => {
+                          if (el) rowRefs.current.set(key, el);
+                          else rowRefs.current.delete(key);
+                        }}
                         onMouseEnter={() => setHoverKey(key)}
                         onMouseLeave={() => setHoverKey(null)}
-                        style={hoverKey === key ? { background: "color-mix(in srgb, var(--color-accent) 7%, transparent)" } : undefined}
+                        style={
+                          flashKey === key
+                            ? { background: "color-mix(in srgb, var(--color-accent) 16%, transparent)", transition: "background 0.3s ease" }
+                            : hoverKey === key
+                              ? { background: "color-mix(in srgb, var(--color-accent) 7%, transparent)" }
+                              : { transition: "background 0.3s ease" }
+                        }
                       >
                         <td className="font-semibold" style={{ color: kindSwatch(a.kind) }}>
                           {badgeGlyph(a.kind, a.no)}

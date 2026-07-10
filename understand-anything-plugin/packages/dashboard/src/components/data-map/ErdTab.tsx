@@ -7,7 +7,6 @@ import {
   Handle,
   MarkerType,
   MiniMap,
-  Panel,
   Position,
   ReactFlow,
   ReactFlowProvider,
@@ -406,14 +405,66 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
     });
 
   return (
-    <div
-      className="grid items-start min-w-0"
-      style={{ gap: 14, gridTemplateColumns: selected ? "minmax(0,1fr) 440px" : "minmax(0,1fr)" }}
-    >
+    <div className="min-w-0">
+      {/* 보기 모드 필터 + 범례 — 캔버스를 가리지 않게 캔버스 밖 툴바 행. */}
+      <div className="flex items-center flex-wrap" style={{ gap: 10, marginBottom: 10 }}>
+        <div
+          className="flex items-center gap-1 rounded-lg border border-border-subtle bg-panel card-shadow select-none"
+          style={{ padding: "4px 6px" }}
+        >
+          {ERD_VIEWS.map((v) => {
+            const active = view === v.key;
+            const count = viewCounts[v.key];
+            return (
+              <button
+                key={v.key}
+                type="button"
+                disabled={count === 0}
+                onClick={() =>
+                  setSearchParams((prev) => {
+                    if (v.key === "all") prev.delete("view");
+                    else prev.set("view", v.key);
+                    return prev;
+                  })
+                }
+                className="rounded-md border-0 cursor-pointer disabled:opacity-40 disabled:cursor-default transition-colors"
+                style={{
+                  padding: "4px 9px",
+                  fontSize: 11.5,
+                  fontWeight: active ? 700 : 500,
+                  color: active ? "var(--color-status-info)" : "var(--color-text-secondary)",
+                  background: active
+                    ? "color-mix(in srgb, var(--color-status-info) 12%, transparent)"
+                    : "transparent",
+                }}
+              >
+                {v.label} {count}
+              </button>
+            );
+          })}
+        </div>
+        {inferredCount > 0 && (
+          <div className="flex items-center text-text-muted" style={{ gap: 6, fontSize: 11.5 }}>
+            <svg width="24" height="8" aria-hidden>
+              <line x1="1" y1="4" x2="23" y2="4" stroke="currentColor" strokeWidth="1.8" />
+            </svg>
+            선언 FK
+            <svg width="24" height="8" aria-hidden style={{ marginLeft: 6 }}>
+              <line x1="1" y1="4" x2="23" y2="4" stroke="currentColor" strokeWidth="1.8" strokeDasharray="5 3" />
+            </svg>
+            추정(컬럼명=타 테이블 PK)
+          </div>
+        )}
+      </div>
+
       <div
-        className="rounded-[10px] border border-border-subtle bg-panel card-shadow overflow-hidden"
-        style={{ height: "calc(100vh - 320px)", minHeight: 420 }}
+        className="grid items-start min-w-0"
+        style={{ gap: 14, gridTemplateColumns: selected ? "minmax(0,1fr) 440px" : "minmax(0,1fr)" }}
       >
+        <div
+          className="rounded-[10px] border border-border-subtle bg-panel card-shadow overflow-hidden"
+          style={{ height: "calc(100vh - 320px)", minHeight: 420 }}
+        >
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -429,48 +480,6 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
           <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
           <Controls showInteractive={false} />
           {schema.tables.length > 30 && <MiniMap pannable zoomable />}
-          <Panel position="top-left">
-            <div
-              className="flex items-center gap-1 rounded-lg border border-border-subtle bg-panel card-shadow select-none"
-              style={{ padding: "4px 6px", fontSize: 11.5 }}
-            >
-              {ERD_VIEWS.map((v) => {
-                const active = view === v.key;
-                const count = viewCounts[v.key];
-                return (
-                  <button
-                    key={v.key}
-                    type="button"
-                    disabled={count === 0}
-                    onClick={() =>
-                      setSearchParams((prev) => {
-                        if (v.key === "all") prev.delete("view");
-                        else prev.set("view", v.key);
-                        return prev;
-                      })
-                    }
-                    className="rounded-md border-0 cursor-pointer disabled:opacity-40 disabled:cursor-default transition-colors"
-                    style={{
-                      padding: "4px 9px",
-                      fontSize: 11.5,
-                      fontWeight: active ? 700 : 500,
-                      color: active ? "var(--color-status-info)" : "var(--color-text-secondary)",
-                      background: active
-                        ? "color-mix(in srgb, var(--color-status-info) 12%, transparent)"
-                        : "transparent",
-                    }}
-                  >
-                    {v.label} {count}
-                  </button>
-                );
-              })}
-              {inferredCount > 0 && (
-                <span className="text-text-muted" style={{ padding: "0 6px", fontSize: 11 }}>
-                  실선 선언 FK · 점선 추정(컬럼명=타 테이블 PK)
-                </span>
-              )}
-            </div>
-          </Panel>
         </ReactFlow>
       </div>
 
@@ -508,6 +517,7 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

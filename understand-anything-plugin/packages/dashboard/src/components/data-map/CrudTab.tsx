@@ -57,6 +57,9 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
   const crudq = searchParams.get("crudq") ?? "";
   const crudTable = searchParams.get("crudTable");
   const pivot = searchParams.get("pivot") === "table";
+  // 입력값은 로컬 state 가 원본 — searchParams 를 value 로 직결하면 라우터 갱신 리렌더가
+  // 한글 IME 조합을 끊는다(조합 중 글자 깨짐). URL 은 필터 계산·딥링크용 사본.
+  const [qInput, setQInput] = useState(crudq);
   const [evOpen, setEvOpen] = useState<EvPopover | null>(null);
   const [emptyOpen, setEmptyOpen] = useState(false);
 
@@ -64,26 +67,28 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
   const activeRows = useMemo(() => crud.rows.filter((r) => !rowIsEmpty(r)), [crud.rows]);
   const emptyRows = useMemo(() => crud.rows.filter(rowIsEmpty), [crud.rows]);
 
-  const ql = crudq.trim().toLowerCase();
+  const ql = qInput.trim().toLowerCase();
   const tableFilter = crudTable && tableCols.includes(crudTable) ? crudTable : null;
 
   // 기능 기준(기본) — 검색은 행(기능), 필터는 열(테이블)+그 테이블 접근 행.
   const viewRows = useMemo(() => {
     let rows = activeRows;
-    if (ql) rows = rows.filter((r) => (r.cells[0] ?? "").toLowerCase().includes(ql));
+    if (!pivot && ql) rows = rows.filter((r) => (r.cells[0] ?? "").toLowerCase().includes(ql));
     if (tableFilter) rows = rows.filter((r) => r.cells[tableCols.indexOf(tableFilter) + 1]);
     return rows;
-  }, [activeRows, ql, tableFilter, tableCols]);
+  }, [activeRows, pivot, ql, tableFilter, tableCols]);
   const viewCols = tableFilter ? [tableFilter] : tableCols;
 
-  // 테이블 기준(전치) — 행=테이블, 열=접근 있는 기능. 검색은 열(기능), 필터는 행(테이블).
+  // 테이블 기준(전치) — 행=테이블, 열=접근 있는 기능. 검색도 축 따라 행(테이블) 대상.
   const pivotData = useMemo(() => {
     if (!pivot) return null;
-    const feats = activeRows.filter((r) => !ql || (r.cells[0] ?? "").toLowerCase().includes(ql));
-    const rows = (tableFilter ? [tableFilter] : tableCols).map((t) => {
-      const ti = tableCols.indexOf(t) + 1;
-      return { table: t, cells: feats.map((f) => f.cells[ti] ?? "") };
-    });
+    const feats = activeRows;
+    const rows = (tableFilter ? [tableFilter] : tableCols)
+      .filter((t) => !ql || t.toLowerCase().includes(ql))
+      .map((t) => {
+        const ti = tableCols.indexOf(t) + 1;
+        return { table: t, cells: feats.map((f) => f.cells[ti] ?? "") };
+      });
     return { feats, rows: rows.filter((r) => r.cells.some((c) => c)) };
   }, [pivot, activeRows, ql, tableFilter, tableCols]);
 
@@ -99,19 +104,16 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
 
   return (
     <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "14px 16px" }}>
-      {crud.prose && (
-        <p className="text-text-muted" style={{ fontSize: 12, marginBottom: 10, lineHeight: 1.6 }}>
-          {crud.prose}
-        </p>
-      )}
-
-      {/* 툴바 — 기능 검색 · 테이블 필터 · 전치 토글 */}
+      {/* 툴바 — 축 따라가는 검색(기능/테이블) · 테이블 필터 · 전치 토글 */}
       <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
         <input
           type="search"
-          value={crudq}
-          onChange={(e) => setParam("crudq", e.target.value || null, true)}
-          placeholder="기능 검색"
+          value={qInput}
+          onChange={(e) => {
+            setQInput(e.target.value);
+            setParam("crudq", e.target.value || null, true);
+          }}
+          placeholder={pivot ? "테이블 검색" : "기능 검색"}
           className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
           style={{ padding: "6px 12px", fontSize: 12.5, width: 180 }}
         />
@@ -128,7 +130,19 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
             </option>
           ))}
         </select>
-        <BtnOutline sm onClick={() => setParam("pivot", pivot ? null : "table")}>
+        <BtnOutline
+          sm
+          onClick={() => {
+            // 축이 바뀌면 검색 대상(기능↔테이블)도 바뀌므로 검색어는 초기화.
+            setQInput("");
+            setSearchParams((prev) => {
+              if (pivot) prev.delete("pivot");
+              else prev.set("pivot", "table");
+              prev.delete("crudq");
+              return prev;
+            });
+          }}
+        >
           {pivot ? "기능 기준으로" : "테이블 기준으로"}
         </BtnOutline>
         {(ql || tableFilter) && (

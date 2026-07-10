@@ -492,13 +492,6 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
             fixedColumns={false}
             knownTables={knownTables}
             onSelectTable={(name) => setTable(name)}
-            onSeeCrud={() =>
-              setSearchParams((prev) => {
-                prev.set("tab", "crud");
-                prev.set("crudTable", selected.name);
-                return prev;
-              })
-            }
           />
           <div style={{ marginTop: 10, textAlign: "right" }}>
             <button

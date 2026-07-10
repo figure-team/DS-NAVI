@@ -1155,6 +1155,19 @@ function handleImpactAnalyzePost(
         exitCode: null,
         tail: "",
       };
+      // WAL: 스폰 전 pending 마커를 디스크에 남긴다 — 서버가 job 도중 재시작(config 리로드,
+      // ctrl-c 등)해 close 핸들러를 잃어도 /impact-history 조회 시 reconcile 이 산출물
+      // mtime 으로 결과를 복원한다(질의문 보존).
+      try {
+        fs.mkdirSync(impactHistoryDir(projectRoot), { recursive: true });
+        fs.writeFileSync(
+          path.join(impactHistoryDir(projectRoot), `pending-${jobId}.json`),
+          JSON.stringify({ jobId, query, startedAt: impactJob.startedAt }, null, 2) + "\n",
+          "utf8",
+        );
+      } catch {
+        // pending 기록 실패는 무시(본 기록은 close 핸들러가 시도)
+      }
       let child: ReturnType<typeof spawn>;
       try {
         child = spawn(
@@ -1243,7 +1256,18 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
     const dir = impactHistoryDir(projectRoot);
     const snapDir = path.join(dir, jobId);
     fs.mkdirSync(snapDir, { recursive: true });
-    // 존재하는 산출물만 복사 — 실패 job 은 대개 비어 있다(files 로 정직하게 노출).
+    // 존재하고 "이 job 이 갱신한"(mtime ≥ startedAt) 산출물만 복사 — exit 0 이어도 스킬이
+    // 실행되지 않은 경우(예: 커맨드 미등록) 낡은 결과를 이 질의의 스냅샷처럼 기록하지 않는다.
+    // 실패/무산 job 은 files 가 비어 UI 에서 열람 비활성(정직한 노출).
+    const startedMs = job.startedAt ? Date.parse(job.startedAt) : Number.NaN;
+    const freshEnough = (src: string): boolean => {
+      if (Number.isNaN(startedMs)) return true; // 시작 시각 미상이면 배제하지 않음
+      try {
+        return fs.statSync(src).mtimeMs >= startedMs - 1000; // 파일시스템 mtime 해상도 여유 1s
+      } catch {
+        return false;
+      }
+    };
     const sources: Array<[string, string]> = [
       [path.join(projectRoot, ".spec", "map", "impact.json"), "impact.json"],
       [
@@ -1255,7 +1279,7 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
     const files: string[] = [];
     let gitCommit: string | null = null;
     for (const [src, name] of sources) {
-      if (!fs.existsSync(src)) continue;
+      if (!fs.existsSync(src) || !freshEnough(src)) continue;
       fs.copyFileSync(src, path.join(snapDir, name));
       files.push(name);
       if (name === "impact.json") {
@@ -1273,7 +1297,8 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
       startedAt: job.startedAt,
       finishedAt: job.finishedAt,
       exitCode: job.exitCode,
-      status: job.status === "done" ? "done" : "failed",
+      // exit 0 이어도 이 job 이 갱신한 impact.json 이 없으면(스킬 미실행 등) 실질 실패로 기록.
+      status: job.status === "done" && files.includes("impact.json") ? "done" : "failed",
       gitCommit,
       files,
     };
@@ -1290,8 +1315,70 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
       JSON.stringify({ entries: entries.slice(0, IMPACT_HISTORY_MAX) }, null, 2) + "\n",
       "utf8",
     );
+    fs.rmSync(path.join(dir, `pending-${jobId}.json`), { force: true });
   } catch (err) {
     console.error("[understand-anything] Failed to record impact history:", err);
+  }
+}
+
+/**
+ * 서버 재시작으로 close 핸들러를 잃은 job 복원 — pending 마커와 산출물 mtime 으로 판정.
+ * 산출물(impact.json)이 startedAt 이후 갱신됐으면 done 으로 원장 기록(스냅샷 포함),
+ * 아직이면 고아 claude 가 돌고 있을 수 있어 30분 유예 후 failed 처리. /impact-history
+ * 조회 시 lazy 하게 호출된다(별도 부팅 훅 불필요).
+ */
+function reconcileImpactHistory(projectRoot: string): void {
+  const dir = impactHistoryDir(projectRoot);
+  let names: string[] = [];
+  try {
+    names = fs.readdirSync(dir).filter((n) => /^pending-[0-9a-f]{16}\.json$/.test(n));
+  } catch {
+    return; // 히스토리 디렉토리 자체가 없으면 복원할 것도 없음
+  }
+  if (names.length === 0) return;
+  const ledger = readImpactHistory(projectRoot);
+  for (const n of names) {
+    const file = path.join(dir, n);
+    try {
+      const pending = JSON.parse(fs.readFileSync(file, "utf-8")) as {
+        jobId?: string;
+        query?: string;
+        startedAt?: string;
+      };
+      const jobId = typeof pending.jobId === "string" ? pending.jobId : "";
+      if (!jobId) {
+        fs.rmSync(file, { force: true });
+        continue;
+      }
+      if (jobId === impactJob.jobId && impactJob.status === "running") continue; // 현재 서버가 추적 중
+      if (ledger.some((e) => e.jobId === jobId)) {
+        fs.rmSync(file, { force: true }); // 이미 기록됨(정상 close) — 마커만 정리
+        continue;
+      }
+      const startedMs = pending.startedAt ? Date.parse(pending.startedAt) : Number.NaN;
+      let artifactMs = Number.NaN;
+      try {
+        artifactMs = fs.statSync(path.join(projectRoot, ".spec", "map", "impact.json")).mtimeMs;
+      } catch {
+        // 산출물 부재 — fresh=false 경로
+      }
+      const fresh =
+        !Number.isNaN(startedMs) && !Number.isNaN(artifactMs) && artifactMs >= startedMs - 1000;
+      if (!fresh && !Number.isNaN(startedMs) && Date.now() - startedMs < 30 * 60 * 1000) {
+        continue; // 아직 돌고 있을 수 있음 — 다음 조회 때 재판정
+      }
+      recordImpactHistory(projectRoot, {
+        status: fresh ? "done" : "failed",
+        jobId,
+        query: typeof pending.query === "string" ? pending.query : "",
+        startedAt: pending.startedAt ?? null,
+        finishedAt: fresh ? new Date(artifactMs).toISOString() : new Date().toISOString(),
+        exitCode: null,
+        tail: "",
+      });
+    } catch {
+      // 개별 pending 파손은 건너뜀(다음 조회 때 재시도)
+    }
   }
 }
 
@@ -2171,6 +2258,7 @@ export default defineConfig({
           // ktds(WT-E): 영향 분석 히스토리 — 원장 목록 + 스냅샷 열람(읽기 전용).
           if (pathname === "/impact-history") {
             const historyRoot = impactProjectRoot();
+            if (historyRoot) reconcileImpactHistory(historyRoot); // 재시작으로 잃은 job 복원
             sendJson(res, 200, { entries: historyRoot ? readImpactHistory(historyRoot) : [] });
             return;
           }

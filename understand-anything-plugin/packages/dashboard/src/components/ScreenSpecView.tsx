@@ -863,21 +863,6 @@ export default function ScreenSpecView() {
                 {sel.openedFrom}
               </MetaRow>
             )}
-            {summaryInfo && (
-              <MetaRow label="설명" help="정적 분석이 요약한 화면의 역할 — 판단의 코드 출처는 아래 근거 행">
-                {summaryInfo.text}
-                {/* 근거 인용이 없는 화면(정적 페이지 등)은 신뢰도 배지를 설명 옆에 유지 */}
-                {!summaryInfo.evidenceParts && (
-                  <span style={{ marginLeft: 6 }}>
-                    <ConfBadge
-                      kind={mechConf(summaryInfo.confidence).kind}
-                      label={mechConf(summaryInfo.confidence).label}
-                      title={mechConf(summaryInfo.confidence).title}
-                    />
-                  </span>
-                )}
-              </MetaRow>
-            )}
             {summaryInfo?.evidenceParts && (
               <MetaRow label="근거" help="설명 판단이 나온 코드 위치 — 클릭하면 코드 뷰어로 엽니다. 배지: 근거확보=결정적 정적 분석 추적 / 근거확보(AI)=AI 가 코드를 읽어 보완 판정(검토 권장)">
                 {summaryInfo.evidenceParts.map((p, i) =>
@@ -905,6 +890,21 @@ export default function ScreenSpecView() {
                     title={mechConf(summaryInfo.confidence).title}
                   />
                 </span>
+              </MetaRow>
+            )}
+            {summaryInfo && (
+              <MetaRow label="설명" help="정적 분석이 요약한 화면의 역할 — 판단의 코드 출처는 위 근거 행">
+                {summaryInfo.text}
+                {/* 근거 인용이 없는 화면(정적 페이지 등)은 신뢰도 배지를 설명 옆에 유지 */}
+                {!summaryInfo.evidenceParts && (
+                  <span style={{ marginLeft: 6 }}>
+                    <ConfBadge
+                      kind={mechConf(summaryInfo.confidence).kind}
+                      label={mechConf(summaryInfo.confidence).label}
+                      title={mechConf(summaryInfo.confidence).title}
+                    />
+                  </span>
+                )}
               </MetaRow>
             )}
           </div>

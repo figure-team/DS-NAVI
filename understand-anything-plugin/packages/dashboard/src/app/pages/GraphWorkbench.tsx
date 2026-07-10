@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useDashboardStore } from "../../store";
 import GraphView from "../../components/GraphView";
 import KnowledgeGraphView from "../../components/KnowledgeGraphView";
@@ -9,13 +9,10 @@ import LayerLegend from "../../components/LayerLegend";
 import DiffToggle from "../../components/DiffToggle";
 import FilterPanel from "../../components/FilterPanel";
 import ExportMenu from "../../components/ExportMenu";
-import PersonaSelector from "../../components/PersonaSelector";
 import ProjectOverview from "../../components/ProjectOverview";
 import FileExplorer from "../../components/FileExplorer";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useI18n } from "../../contexts/I18nContext";
-
-const LearnPanel = lazy(() => import("../../components/LearnPanel"));
 
 type SidebarTab = "info" | "files";
 type MobilePane = "main" | "info" | "files";
@@ -33,8 +30,8 @@ interface Props {
  */
 export default function GraphWorkbench({ mode }: Props) {
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
-  const tourActive = useDashboardStore((s) => s.tourActive);
   const persona = useDashboardStore((s) => s.persona);
+  const setPersona = useDashboardStore((s) => s.setPersona);
   const nodeTypeFilters = useDashboardStore((s) => s.nodeTypeFilters);
   const toggleNodeTypeFilter = useDashboardStore((s) => s.toggleNodeTypeFilter);
   const detailLevel = useDashboardStore((s) => s.detailLevel);
@@ -56,18 +53,13 @@ export default function GraphWorkbench({ mode }: Props) {
   }, [selectedNodeId, isMobile]);
 
   // Determine sidebar content
-  // NodeInfo always takes priority when a node is selected.
-  // Learn mode adds LearnPanel below it; otherwise ProjectOverview shows when idle.
-  const isLearnMode = tourActive || persona === "junior";
+  // NodeInfo always takes priority when a node is selected; ProjectOverview shows when idle.
+  // (학습 페르소나/LearnPanel 은 구조 탭에서 제거 — 코드 읽기 투어는 PM/PL 대상이 아니고
+  //  lite 분석은 투어를 생성하지 않음. 투어의 후속 형태는 홈·업무지도 쪽 제안으로 이관, 2026-07-10)
   const infoSidebarContent = (
     <>
       {selectedNodeId && <NodeInfo />}
-      {isLearnMode && (
-        <Suspense fallback={null}>
-          <LearnPanel />
-        </Suspense>
-      )}
-      {!selectedNodeId && !isLearnMode && <ProjectOverview />}
+      {!selectedNodeId && <ProjectOverview />}
     </>
   );
 
@@ -108,10 +100,6 @@ export default function GraphWorkbench({ mode }: Props) {
   // 컨텍스트 툴바 — 구 레거시 헤더의 워크벤치 전용 액션(데스크톱·모바일 공유, 가로 스크롤).
   const toolbar = (
     <header className="flex items-center px-3 sm:px-5 py-2.5 bg-surface border-b border-border-subtle shrink-0 gap-2 sm:gap-4">
-      <div className="flex items-center gap-3 sm:gap-5 shrink-0 min-w-0">
-        <PersonaSelector />
-      </div>
-
       {/* Middle — scrollable legends */}
       {/* ktds-fork (ADR-004): "문서"(wiki) 모드는 범례·레이어 전부 숨김(flex-1 스페이서만 유지) */}
       <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
@@ -120,17 +108,34 @@ export default function GraphWorkbench({ mode }: Props) {
           <DiffToggle />
           {/* 영향도 분석 실행 진입점은 변경·영향 메뉴(ChangeImpactView)로 일원화 —
               구조 탭은 결과 소비(?overlay=impact)만 담당한다(2026-07-10 결정). */}
-          {/* Detail level: file view (architecture) / class view (code structure) */}
+          {/* 상세도 3단: 개요(persona non-technical = 함수·클래스 숨김) / 파일 / 클래스.
+              구 PersonaSelector(개요/학습/심층)를 흡수 — 학습(LearnPanel)은 제거,
+              심층은 무동작 옵션이라 폐기. DetailLevel 타입은 불변(개요는 persona 매핑). */}
           {!isKnowledgeGraph && (
             <>
               <div className="w-px h-5 bg-border-subtle" />
               <div className="flex items-center bg-elevated rounded-lg p-0.5">
                 <button
                   type="button"
-                  onClick={() => setDetailLevel("file")}
+                  onClick={() => setPersona("non-technical")}
+                  title={t.detailLevel.overviewTitle}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                    persona === "non-technical"
+                      ? "bg-accent/20 text-accent"
+                      : "text-text-muted hover:text-text-secondary"
+                  }`}
+                >
+                  {t.detailLevel.overview}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPersona("experienced");
+                    setDetailLevel("file");
+                  }}
                   title={t.detailLevel.filesTitle}
                   className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                    detailLevel === "file"
+                    persona !== "non-technical" && detailLevel === "file"
                       ? "bg-accent/20 text-accent"
                       : "text-text-muted hover:text-text-secondary"
                   }`}
@@ -139,10 +144,13 @@ export default function GraphWorkbench({ mode }: Props) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setDetailLevel("class")}
+                  onClick={() => {
+                    setPersona("experienced");
+                    setDetailLevel("class");
+                  }}
                   title={t.detailLevel.classesTitle}
                   className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                    detailLevel === "class"
+                    persona !== "non-technical" && detailLevel === "class"
                       ? "bg-accent/20 text-accent"
                       : "text-text-muted hover:text-text-secondary"
                   }`}
@@ -150,7 +158,7 @@ export default function GraphWorkbench({ mode }: Props) {
                   {t.detailLevel.classes}
                 </button>
               </div>
-              {detailLevel === "class" && (
+              {persona !== "non-technical" && detailLevel === "class" && (
                 <button
                   type="button"
                   onClick={toggleShowFunctionsInClassView}

@@ -110,7 +110,9 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
   navigationLevel: "overview",
   activeLayerId: null,
 
-  persona: "junior",
+  // 기본 "experienced" — 구 PersonaSelector(개요/학습/심층) 제거 후 "junior"(학습)는
+  // 설정 경로가 없고, "non-technical"(개요)만 상세도 토글이 매핑한다 (2026-07-10).
+  persona: "experienced",
 
   focusNodeId: null,
   nodeHistory: [],

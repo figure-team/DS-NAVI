@@ -229,6 +229,8 @@ export const ko = {
     userEditedNote: "사용자 편집·확정됨 (기계검증 면제).",
   },
   detailLevel: {
+    overview: "개요",
+    overviewTitle: "개요 — 함수·클래스 숨김, 고수준 아키텍처만",
     filesTitle: "파일만 — 아키텍처 레벨 의존성 (빠름)",
     classesTitle: "파일 + 클래스 — 상속 포함 코드 구조",
     files: "파일",

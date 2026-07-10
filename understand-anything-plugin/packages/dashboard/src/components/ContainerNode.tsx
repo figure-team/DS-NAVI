@@ -2,6 +2,7 @@ import { memo } from "react";
 import type { NodeProps, Node } from "@xyflow/react";
 import { getLayerColor } from "./LayerLegend";
 import { useDiffLabels } from "../hooks/useDiffLabels";
+import { useI18n } from "../contexts/I18nContext";
 
 export interface ContainerNodeData extends Record<string, unknown> {
   containerId: string;
@@ -27,6 +28,7 @@ function ContainerNodeComponent({ data, width, height }: NodeProps<ContainerFlow
   const color = getLayerColor(data.colorIndex);
   // ktds-fork (ADR-003): 활성 채널 라벨 (diff="변경됨/영향받음", impact="변경예정/영향받음")
   const { lblChanged, lblAffected } = useDiffLabels();
+  const { t } = useI18n();
 
   // ktds-fork: 변경 포함=적색, 영향만=호박색 (기존: 둘 다 적색)
   const diffChanged = data.diffChangedCount ?? 0;
@@ -136,6 +138,28 @@ function ContainerNodeComponent({ data, width, height }: NodeProps<ContainerFlow
         </span>
         <span style={{ color: "#a39787", fontSize: 11 }}>{data.childCount}</span>
       </div>
+      {/* 접힘 본문 — 빈 박스로 보이지 않게 내용물 요약 + 펼치기 힌트를 채운다 (2026-07-10) */}
+      {!data.isExpanded && (
+        <div
+          style={{
+            position: "absolute",
+            left: 16,
+            right: 16,
+            bottom: 10,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: 11,
+            color: "#a39787",
+          }}
+        >
+          <span>
+            {data.childCount}
+            {t.containerNode.files}
+          </span>
+          <span style={{ opacity: 0.75 }}>{t.containerNode.expand} ▸</span>
+        </div>
+      )}
     </div>
   );
 }

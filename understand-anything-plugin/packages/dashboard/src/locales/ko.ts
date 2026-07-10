@@ -228,6 +228,10 @@ export const ko = {
     noWriteServer: "읽기 전용 모드 — 저장하려면 dev 서버가 필요합니다.",
     userEditedNote: "사용자 편집·확정됨 (기계검증 면제).",
   },
+  containerNode: {
+    files: "개 파일",
+    expand: "클릭해 펼치기",
+  },
   detailLevel: {
     filesTitle: "파일만 — 아키텍처 레벨 의존성 (빠름)",
     classesTitle: "파일 + 클래스 — 상속 포함 코드 구조",

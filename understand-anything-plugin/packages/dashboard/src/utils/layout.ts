@@ -201,6 +201,10 @@ export function applyForceLayout(
 export const ELK_DEFAULT_LAYOUT_OPTIONS: Record<string, string> = {
   algorithm: "layered",
   "elk.direction": "DOWN",
+  // 비연결 컴포넌트(고립 노드가 많은 문서·설정성 레이어)가 한 줄로 길게 늘어서지
+  // 않도록 화면 비율에 맞춰 여러 행으로 감아 배치한다(ELK component packing).
+  "elk.aspectRatio": "1.7",
+  "elk.spacing.componentComponent": "60",
   "elk.layered.spacing.nodeNodeBetweenLayers": "100",
   "elk.spacing.nodeNode": "80",
   "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",

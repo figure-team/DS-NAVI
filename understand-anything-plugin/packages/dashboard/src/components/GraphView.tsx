@@ -537,25 +537,11 @@ function useLayerDetailTopology(): LayerDetailTopology & {
       nodeToContainer,
     );
 
-    // Container size estimate (size memory takes priority).
-    // Caps prevent first-paint sprawl: at 100 children sqrt() yields
-    // ~3360px which renders as a huge empty box pre-expansion. Stage 2
-    // sets the actual size once it's measured, and Task 15 re-flows.
-    const STAGE1_MAX_CONTAINER_WIDTH = 800;
-    const STAGE1_MAX_CONTAINER_HEIGHT = 600;
-    const sizeMemory = useDashboardStore.getState().containerSizeMemory;
-    const containerWidth = (c: DerivedContainer) => {
-      const memo = sizeMemory.get(c.id)?.width;
-      if (memo) return memo;
-      const estimate = Math.sqrt(c.nodeIds.length) * NODE_WIDTH * 1.2;
-      return Math.min(STAGE1_MAX_CONTAINER_WIDTH, Math.max(NODE_WIDTH, estimate));
-    };
-    const containerHeight = (c: DerivedContainer) => {
-      const memo = sizeMemory.get(c.id)?.height;
-      if (memo) return memo;
-      const estimate = Math.sqrt(c.nodeIds.length) * NODE_HEIGHT * 1.2;
-      return Math.min(STAGE1_MAX_CONTAINER_HEIGHT, Math.max(NODE_HEIGHT, estimate));
-    };
+    // 접힌 컨테이너 = 일반 노드와 같은 컴팩트 카드(2026-07-10). 구 sqrt(자식수) 추정은
+    // "내용 없는 큰 빈 박스"로 렌더돼 깨진 화면처럼 보였다(문서 레이어 QA). 펼치면
+    // ELK(INCLUDE_CHILDREN)가 실측 크기를 계산하므로 접힘 상태 크기는 카드면 충분하다.
+    const containerWidth = (_c: DerivedContainer) => NODE_WIDTH;
+    const containerHeight = (_c: DerivedContainer) => NODE_HEIGHT;
 
     // Build container flow nodes (children NOT rendered yet — Task 12)
     const containerFlowNodes: ContainerFlowNode[] = containers.map((c, idx) => ({
@@ -817,6 +803,41 @@ function useLayerDetailTopology(): LayerDetailTopology & {
           useDashboardStore.getState().appendLayoutIssues(issues);
         }
         const topLevel = positioned.children ?? [];
+
+        // 고립 아톰(연결 엣지 0) 그리드 재배치 — hierarchyHandling=INCLUDE_CHILDREN
+        // 모드의 ELK는 컴포넌트 분리 배치(aspectRatio 감기)를 지원하지 않아 고립
+        // 노드들이 첫 랭크에 한 줄로 길게 늘어선다(문서·설정성 레이어에서 두드러짐).
+        // 연결된 콘텐츠 아래에 화면 비율(~1.7)에 맞는 그리드로 다시 감아 배치한다.
+        {
+          const connectedIds = new Set<string>();
+          for (const e of elkEdges) {
+            connectedIds.add(e.sources[0]);
+            connectedIds.add(e.targets[0]);
+          }
+          const isolated = topLevel.filter((c) => !connectedIds.has(c.id));
+          const connected = topLevel.filter((c) => connectedIds.has(c.id));
+          if (isolated.length >= 3) {
+            const GAP = 48;
+            const cellW = Math.max(...isolated.map((c) => c.width ?? NODE_WIDTH)) + GAP;
+            const cellH = Math.max(...isolated.map((c) => c.height ?? NODE_HEIGHT)) + GAP;
+            const cols = Math.max(
+              1,
+              Math.ceil(Math.sqrt((1.7 * isolated.length * cellH) / cellW)),
+            );
+            let baseX = 0;
+            let baseY = 0;
+            if (connected.length > 0) {
+              baseX = Math.min(...connected.map((c) => c.x ?? 0));
+              baseY =
+                Math.max(...connected.map((c) => (c.y ?? 0) + (c.height ?? 0))) + GAP * 1.5;
+            }
+            isolated.forEach((c, i) => {
+              c.x = baseX + (i % cols) * cellW;
+              c.y = baseY + Math.floor(i / cols) * cellH;
+            });
+          }
+        }
+
         const posById = new Map(topLevel.map((c) => [c.id, c]));
 
         // Position container atoms (size from ELK when expanded), ungrouped

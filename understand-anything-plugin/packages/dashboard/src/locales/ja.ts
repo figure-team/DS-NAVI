@@ -228,6 +228,10 @@ export const ja = {
     noWriteServer: "読み取り専用モード — 保存には dev サーバーが必要です。",
     userEditedNote: "ユーザー編集・確定済み（機械検証は免除）。",
   },
+  containerNode: {
+    files: " ファイル",
+    expand: "クリックで展開",
+  },
   detailLevel: {
     filesTitle: "ファイルのみ — アーキテクチャレベルの依存関係（高速）",
     classesTitle: "ファイル + クラス — 継承を含むコード構造",

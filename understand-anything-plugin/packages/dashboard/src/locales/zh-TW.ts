@@ -226,6 +226,10 @@ export const zhTW = {
     noWriteServer: "唯讀模式 — 儲存需要 dev 伺服器。",
     userEditedNote: "使用者編輯並確認（免機器驗證）。",
   },
+  containerNode: {
+    files: " 個檔案",
+    expand: "點擊展開",
+  },
   detailLevel: {
     filesTitle: "僅檔案 — 架構級依賴（快速）",
     classesTitle: "檔案 + 類別 — 程式碼結構及繼承關係",

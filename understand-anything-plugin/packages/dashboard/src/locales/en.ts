@@ -228,6 +228,10 @@ export const en = {
     noWriteServer: "Read-only mode — saving requires the dev server.",
     userEditedNote: "User-edited & confirmed (exempt from machine verification).",
   },
+  containerNode: {
+    files: " files",
+    expand: "Click to expand",
+  },
   detailLevel: {
     filesTitle: "Files only — architecture-level dependencies (fast)",
     classesTitle: "Files + Classes — code structure with inheritance",

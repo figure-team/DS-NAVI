@@ -59,28 +59,16 @@ export const createOverlaySlice: StateCreator<DashboardStore, [], [], OverlaySli
   toggleDiffMode: () => get().toggleOverlay("diff"),
 
   setOverlayData: (source, data) =>
-    set((state) => {
+    set(() => {
+      // 적재만 한다 — 모든 채널 토글 전용(자동 활성 제거, 2026-07-10). 디스크에 남은
+      // 과거 impact/diff 산출이 첫 진입부터 그래프 전체를 흐리게 만들던 것을 중단.
+      // 활성 경로는 ①DiffToggle 칩 ②?overlay= 딥링크 ③분석 직후(reloadImpactOverlay).
       const next: Partial<DashboardStore> =
         source === "diff"
           ? { diffOverlayData: data }
           : source === "impact"
             ? { impactOverlayData: data }
             : { riskOverlayData: data };
-      // risk 채널은 분석 이벤트가 아니라 상시 품질 지표 — 자동 활성 경쟁에서 제외(토글 전용).
-      if (source === "risk") return next;
-      // 자동 활성: 시드가 있고, (활성 가능한 다른 채널이 없거나 || 이 채널이 더
-      // 최신)일 때. 빈 채널(changed=0 — KG 미조인 발행)은 경쟁자가 아니다(리뷰
-      // minor: 빈 채널의 최신 generatedAt이 유효 채널의 자동 활성을 막는 순서
-      // 의존 제거). 두 채널이 비동기로 도착해도 최종 활성 = 최신 유효 분석.
-      const other = source === "diff" ? state.impactOverlayData : state.diffOverlayData;
-      const newer =
-        other === null || other.changed.length === 0 || data.generatedAt >= other.generatedAt;
-      if (data.changed.length > 0 && newer) {
-        next.overlaySource = source;
-        next.diffMode = true;
-        next.changedNodeIds = new Set(data.changed);
-        next.affectedNodeIds = new Set(data.affected);
-      }
       return next;
     }),
 

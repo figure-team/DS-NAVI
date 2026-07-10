@@ -226,6 +226,10 @@ export const zh = {
     noWriteServer: "只读模式 — 保存需要 dev 服务器。",
     userEditedNote: "用户编辑并确认（免机器验证）。",
   },
+  containerNode: {
+    files: " 个文件",
+    expand: "点击展开",
+  },
   detailLevel: {
     filesTitle: "仅文件 — 架构级依赖（快速）",
     classesTitle: "文件 + 类 — 代码结构及继承关系",

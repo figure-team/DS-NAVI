@@ -4,7 +4,7 @@ import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
 import { dataUrl } from "../shared/api/client";
-import { Badge, BtnAccent, BtnOutline, ConfBadge, PageHead, ProtoTabs, StatTile } from "./proto/Proto";
+import { Badge, BtnAccent, ConfBadge, PageHead, ProtoTabs, StatTile } from "./proto/Proto";
 import type { BadgeTone, ConfKind } from "./proto/Proto";
 import CitationChip from "./CitationChip";
 
@@ -12,6 +12,10 @@ import CitationChip from "./CitationChip";
  * 정책서 뷰(신설, pmpl-proto pg-policy 1416~1512행) — 정적 추출한 정책 "신호"를
  * 카테고리별/도메인/대조 3탭으로 검증한다. 코드가 진실의 원천이며, 규범 서술(정책 문장)은
  * LLM 2단계 산출물이라 이 화면은 목업 문장을 합성하지 않는다 — 신호·근거·대조만 실데이터로 노출.
+ *
+ * 카테고리 탭의 관점은 "구조가 아니라 규범": 테이블·컬럼·관계는 데이터 메뉴 소관이므로
+ * DDL 무결성 신호(PK/NOT NULL/FK)는 요약 카운트 + 데이터 메뉴 링크로 접고, 이 탭은
+ * ERD 가 보여주지 못하는 것 — 정책서 문서 · 검증/권한 코드 신호 · 용어 사전 — 을 중심에 둔다.
  *
  * 데이터: policy-signals.json({signals[]}) · policy-reconcile.json({entries[]}) · doc-list.json.
  * dataUrl()로 demo/live 를 흡수(HomePage·ScreenSpecView 관례). 신호가 없으면 화면 전체 빈 상태.
@@ -23,7 +27,8 @@ interface Anchor {
   line: number;
 }
 interface PolicySignal {
-  category: "data" | "glossary";
+  /** legacy-core PolicyCategory — 1단계 추출기가 현재 내는 것은 data·glossary·validation·authz 4종. */
+  category: string;
   kind: string;
   subject: string;
   detail: string;
@@ -46,7 +51,7 @@ interface ReconcileEntry {
 interface ReconcileFile {
   entries?: ReconcileEntry[];
 }
-/** doc-list.json 항목(DocsView와 동일 스키마) — 여기선 policy-domain-* 문서만 소비. */
+/** doc-list.json 항목(DocsView와 동일 스키마) — 여기선 policy-* 문서(카테고리 4종 + 도메인)만 소비. */
 interface DocListItem {
   docId: string;
   title: string;
@@ -107,18 +112,24 @@ const STATUS_META: Record<string, { tone: BadgeTone; color: string; icon: string
 const STATUS_ORDER = ["준수", "위반", "미정의", "문서에만"] as const;
 
 /**
- * 정적 추출이 다루지 못한 정책 카테고리(신호 0) — 뭉뚱그리지 않고 사유를 구분한다.
- * 권한은 별도 매트릭스 카드에서 코드 추론 결과 신호 0(미발견), 나머지는 1단계 추출 범위 밖(미구현·2단계 예정).
+ * 1단계 결정론 추출이 아직 다루지 못하는 정책 카테고리(legacy-core PolicyCategory 중
+ * status/account/billing/integration/security) — 신호 0 이 "없다"가 아니라 "추출 범위 밖"임을 명시.
+ * 검증·권한은 추출기가 지원하므로 여기가 아니라 코드 신호 섹션에서 0건 사유(미발견)를 다룬다.
  */
-const EMPTY_CATEGORIES: Array<{ label: string; reason: "미발견" | "미구현" }> = [
-  { label: "권한", reason: "미발견" },
-  { label: "검증", reason: "미구현" },
-  { label: "상태값", reason: "미구현" },
-  { label: "계정", reason: "미구현" },
-  { label: "과금", reason: "미구현" },
-  { label: "연계", reason: "미구현" },
-  { label: "보안", reason: "미구현" },
-];
+const NOT_EXTRACTED_CATEGORIES = ["상태값", "계정", "과금", "연계", "보안"] as const;
+
+/** 검증·권한 코드 신호 kind → 한글 라벨 + 배지 톤(추출기 kind: bean-validation·class-authz·method-authz). */
+const CODE_KIND: Record<string, { label: string; tone: BadgeTone }> = {
+  "bean-validation": { label: "검증", tone: "info" },
+  "class-authz": { label: "권한(클래스)", tone: "warn" },
+  "method-authz": { label: "권한(메서드)", tone: "warn" },
+};
+
+/** 용어 신호에 실제 정의(DDL 주석)가 있는지 — 추출기는 주석 부재를 "(주석 없음)" 원문으로 남긴다. */
+function hasDefinition(s: PolicySignal): boolean {
+  const d = s.detail.trim();
+  return d.length > 0 && !d.includes("주석 없음");
+}
 
 /** 검색어 하이라이트 — 첫 매치만 mark 로 감싼다(대소문자 무시). */
 function highlight(text: string, q: string): ReactNode {
@@ -285,7 +296,16 @@ export default function PolicyView() {
 
   const dataSignals = useMemo(() => (signals ?? []).filter((s) => s.category === "data"), [signals]);
   const glossary = useMemo(() => (signals ?? []).filter((s) => s.category === "glossary"), [signals]);
+  const codeSignals = useMemo(
+    () => (signals ?? []).filter((s) => s.category === "validation" || s.category === "authz"),
+    [signals],
+  );
   const domainDocs = useMemo(() => docs.filter((d) => d.docId.startsWith("policy-domain-")), [docs]);
+  // 카테고리 정책서 4종(policy-glossary/data/validation/authz) — LLM 보강까지 거친 산출물.
+  const categoryDocs = useMemo(
+    () => docs.filter((d) => d.docId.startsWith("policy-") && !d.docId.startsWith("policy-domain-")),
+    [docs],
+  );
 
   const total = signals?.length ?? 0;
 
@@ -310,7 +330,7 @@ export default function PolicyView() {
           </NoticeCard>
         ) : (
           <NoticeCard title="정책 신호 없음">
-            <code>/understand-policy</code> 1단계(신호 추출)를 먼저 실행하세요.
+            CLI에서 <code>/understand-policy</code>를 실행해 신호를 먼저 추출하세요.
           </NoticeCard>
         )}
       </div>
@@ -322,7 +342,7 @@ export default function PolicyView() {
       <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
         <PageHead title="정책서" />
         <NoticeCard title="정책 신호 없음">
-          <code>/understand-policy</code> 1단계(신호 추출)를 먼저 실행하세요.
+          CLI에서 <code>/understand-policy</code>를 실행해 신호를 먼저 추출하세요.
         </NoticeCard>
       </div>
     );
@@ -334,21 +354,17 @@ export default function PolicyView() {
         title="정책서"
         meta={
           <>
-            policy-signals <b className="text-text-primary tabular-nums">{total}</b>건 (데이터{" "}
-            <b className="text-text-primary tabular-nums">{dataSignals.length}</b> · 용어{" "}
-            <b className="text-text-primary tabular-nums">{glossary.length}</b>) · 근거 file:line · 규범 서술은
+            policy-signals <b className="text-text-primary tabular-nums">{total}</b>건 (검증·권한{" "}
+            <b className="text-text-primary tabular-nums">{codeSignals.length}</b> · 용어{" "}
+            <b className="text-text-primary tabular-nums">{glossary.length}</b> · 데이터 무결성{" "}
+            <b className="text-text-primary tabular-nums">{dataSignals.length}</b>) · 근거 file:line · 규범 서술은
             [추정] 마킹
           </>
         }
         actions={
-          <>
-            <BtnOutline disabled title="/understand-policy 2단계 — CLI에서 실행">
-              정책서 md 생성
-            </BtnOutline>
-            <BtnAccent disabled title="후속 예정 — 인수 시나리오는 대조 탭 참조">
-              기존 정책서 가져오기
-            </BtnAccent>
-          </>
+          <BtnAccent disabled title="후속 예정 — 인수 시나리오는 대조 탭 참조">
+            기존 정책서 가져오기
+          </BtnAccent>
         }
       />
 
@@ -362,7 +378,16 @@ export default function PolicyView() {
         onChange={setTab}
       />
 
-      {tab === "cat" && <CategoryTab dataSignals={dataSignals} glossary={glossary} query={query} onQuery={setQuery} />}
+      {tab === "cat" && (
+        <CategoryTab
+          dataSignals={dataSignals}
+          glossary={glossary}
+          codeSignals={codeSignals}
+          catDocs={categoryDocs}
+          query={query}
+          onQuery={setQuery}
+        />
+      )}
       {tab === "dom" && <DomainTab docs={domainDocs} />}
       {tab === "rec" && (
         <ReconcileTab
@@ -380,253 +405,8 @@ export default function PolicyView() {
 
 /* ─────────────────────────── 카테고리별 정책 ─────────────────────────── */
 
-interface SignalGroup {
-  table: string;
-  rows: PolicySignal[];
-  subtotals: Array<{ label: string; count: number }>;
-}
-
-function groupByTable(sigs: PolicySignal[]): SignalGroup[] {
-  const map = new Map<string, PolicySignal[]>();
-  for (const s of sigs) {
-    const key = tableOf(s.subject);
-    const bucket = map.get(key);
-    if (bucket) bucket.push(s);
-    else map.set(key, [s]);
-  }
-  return [...map.entries()].map(([table, rows]) => {
-    const counts = new Map<string, number>();
-    for (const r of rows) {
-      const l = kindOf(r.kind).label;
-      counts.set(l, (counts.get(l) ?? 0) + 1);
-    }
-    return { table, rows, subtotals: [...counts.entries()].map(([label, count]) => ({ label, count })) };
-  });
-}
-
-function CategoryTab({
-  dataSignals,
-  glossary,
-  query,
-  onQuery,
-}: {
-  dataSignals: PolicySignal[];
-  glossary: PolicySignal[];
-  query: string;
-  onQuery: (v: string) => void;
-}) {
-  const q = query.trim().toLowerCase();
-  const filteredData = useMemo(() => dataSignals.filter((s) => signalMatch(s, q)), [dataSignals, q]);
-  const filteredGloss = useMemo(() => glossary.filter((s) => signalMatch(s, q)), [glossary, q]);
-  const groups = useMemo(() => groupByTable(filteredData), [filteredData]);
-
-  const missing = EMPTY_CATEGORIES.filter((c) => c.reason === "미발견");
-  const notImpl = EMPTY_CATEGORIES.filter((c) => c.reason === "미구현");
-
-  return (
-    <>
-      <div className="flex flex-wrap items-center" style={{ gap: 8, marginBottom: 12 }}>
-        <Chip on>데이터 {dataSignals.length}</Chip>
-        <Chip on>용어 {glossary.length}</Chip>
-        <span className="text-text-muted inline-flex items-center flex-wrap" style={{ gap: 8, fontSize: 12 }}>
-          <span className="inline-flex items-center" style={{ gap: 5 }}>
-            <ConfBadge kind="fix" /> 근거확보 = DDL 확정
-          </span>
-          <span className="inline-flex items-center" style={{ gap: 5 }}>
-            <ConfBadge kind="est" /> 추정 = 기계 판정
-          </span>
-        </span>
-      </div>
-
-      <SearchBar value={query} onChange={onQuery} placeholder="신호 검색 (대상·종류·근거)" />
-
-      <div className="grid grid-cols-1 items-start lg:grid-cols-[minmax(0,1fr)_320px]" style={{ gap: 14 }}>
-        {/* 좌: 데이터 신호(테이블별 그룹핑) + 용어 사전 */}
-        <div className={CARD} style={{ padding: "6px 14px 14px" }}>
-          <GroupLabel>
-            데이터 신호 ({filteredData.length}
-            {q && ` / ${dataSignals.length}`}) · 테이블 {groups.length}
-          </GroupLabel>
-          <div style={{ maxHeight: 460, overflowY: "auto" }}>
-            <table className="proto-tbl">
-              <thead>
-                <tr>
-                  <th scope="col" style={TH_STICKY}>
-                    대상
-                  </th>
-                  <th scope="col" style={TH_STICKY}>
-                    신호
-                  </th>
-                  <th scope="col" style={TH_STICKY}>
-                    근거
-                  </th>
-                  <th scope="col" style={TH_STICKY}>
-                    신뢰도
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {groups.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="text-text-muted" style={{ padding: "14px 8px", fontSize: 12.5 }}>
-                      검색 결과 없음
-                    </td>
-                  </tr>
-                )}
-                {groups.map((g) => (
-                  <SignalGroupRows key={g.table} group={g} q={query} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <GroupLabel>
-            용어 사전 ({filteredGloss.length}
-            {q && ` / ${glossary.length}`})
-          </GroupLabel>
-          {filteredGloss.length === 0 && (
-            <div className="text-text-muted" style={{ padding: "7px 4px", fontSize: 12.5 }}>
-              {q ? "검색 결과 없음" : "용어 신호 없음"}
-            </div>
-          )}
-          {filteredGloss.map((s, i) => (
-            <div
-              key={`${s.subject}-${i}`}
-              className="flex items-center"
-              style={{ gap: 10, padding: "7px 4px", borderBottom: "1px solid var(--color-border-subtle)" }}
-            >
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 12.5, fontWeight: 600 }}>
-                {highlight(s.subject, query)}
-              </span>
-              <span className="text-text-muted" style={{ fontSize: 12 }}>
-                {highlight(s.detail, query)}
-              </span>
-              <div className="flex-1" />
-              <CitationChip filePath={s.anchor.file} line={s.anchor.line} />
-              <ConfBadge kind={confKind(s.confidence)} />
-            </div>
-          ))}
-        </div>
-
-        {/* 우: 권한 매트릭스(신호 0 정직 공백) + 미해석 카테고리 사유 구분 */}
-        <div className="flex flex-col" style={{ gap: 14 }}>
-          <div className={CARD} style={{ padding: "16px 18px" }}>
-            <h3 className="flex items-center flex-wrap" style={{ gap: 8, fontSize: 14, fontWeight: 700 }}>
-              권한 매트릭스
-              <Badge tone="mut">신호 0 — 코드 추론 미수행</Badge>
-            </h3>
-            <p className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.65, marginTop: 10 }}>
-              권한(role) 구분 신호가 발견되지 않았습니다. 로그인 세션 체크 등 코드 신호는 도메인 정책서(2단계)에서
-              [추정]으로 서술됩니다.
-            </p>
-            <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
-              관리자 기능 부재가 정직하게 드러납니다.
-            </p>
-          </div>
-
-          <div className={CARD} style={{ padding: "16px 18px" }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>미해석 카테고리</h3>
-            <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, marginBottom: 10 }}>
-              신호가 없는 정책 영역을 사유별로 구분합니다.
-            </p>
-            <div className="text-text-secondary" style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
-              신호 미발견 (코드 추론 후 0)
-            </div>
-            <div className="flex flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
-              {missing.map((c) => (
-                <Chip key={c.label} muted>
-                  {c.label}
-                </Chip>
-              ))}
-            </div>
-            <div className="text-text-secondary" style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
-              정적 추출 미구현 (2단계 예정)
-            </div>
-            <div className="flex flex-wrap" style={{ gap: 8 }}>
-              {notImpl.map((c) => (
-                <Chip key={c.label} muted>
-                  {c.label}
-                </Chip>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
-/** 한 테이블 그룹: 소계 헤더 행 + 신호 행들. */
-function SignalGroupRows({ group, q }: { group: SignalGroup; q: string }) {
-  return (
-    <>
-      <tr>
-        <td colSpan={4} style={{ background: "var(--color-elevated)", padding: "6px 8px" }}>
-          <span className="inline-flex items-center flex-wrap" style={{ gap: 8 }}>
-            <span className="text-text-primary" style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 700 }}>
-              {highlight(group.table, q)}
-            </span>
-            <span className="text-text-muted tabular-nums" style={{ fontSize: 11 }}>
-              {group.rows.length}건
-            </span>
-            {group.subtotals.map((s) => (
-              <span key={s.label} className="text-text-muted" style={{ fontSize: 11 }}>
-                {s.label} {s.count}
-              </span>
-            ))}
-          </span>
-        </td>
-      </tr>
-      {group.rows.map((s, i) => {
-        const k = kindOf(s.kind);
-        const showDetail = s.detail.trim().toLowerCase() !== k.label.toLowerCase();
-        return (
-          <tr key={`${s.subject}-${s.anchor.file}-${s.anchor.line}-${i}`}>
-            <td style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>{highlight(s.subject, q)}</td>
-            <td>
-              <span className="inline-flex flex-wrap items-center" style={{ gap: 6 }}>
-                <Badge tone={k.tone}>{k.label}</Badge>
-                {showDetail && (
-                  <span className="text-text-secondary" style={{ fontSize: 12 }}>
-                    {highlight(s.detail, q)}
-                  </span>
-                )}
-              </span>
-            </td>
-            <td>
-              <CitationChip filePath={s.anchor.file} line={s.anchor.line} />
-            </td>
-            <td>
-              <ConfBadge kind={confKind(s.confidence)} />
-            </td>
-          </tr>
-        );
-      })}
-    </>
-  );
-}
-
-/* ─────────────────────────── 도메인 정책 ─────────────────────────── */
-
-function DomainTab({ docs }: { docs: DocListItem[] }) {
-  if (docs.length === 0) {
-    return (
-      <div className={CARD} style={{ padding: "20px 22px" }}>
-        <p className="text-text-primary" style={{ fontSize: 14, fontWeight: 650, marginBottom: 6 }}>
-          도메인 정책서 미생성
-        </p>
-        <p className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.65 }}>
-          신호 수집(1단계)은 완료되었습니다. <code>/understand-policy</code> 2단계(LLM 규범 서술 + 사람 검증)를
-          실행하면 도메인당 1문서가 생성됩니다.
-        </p>
-        <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, marginTop: 12 }}>
-          파이프라인: 정적 추출(신호) → 근거 수집 → LLM 규범 서술 → 사람 검증. 코드가 진실의 원천이며, 모든 정책
-          문장은 file:line 근거를 갖고 불확실하면 [확인필요]로 표기됩니다.
-        </p>
-      </div>
-    );
-  }
-
+/** policy-* 문서 카드 그리드 — 카테고리 정책서·도메인 정책서 공용(산출물 뷰어로 링크). */
+function DocCards({ docs }: { docs: DocListItem[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3" style={{ gap: 12 }}>
       {docs.map((d) => (
@@ -648,6 +428,260 @@ function DomainTab({ docs }: { docs: DocListItem[] }) {
       ))}
     </div>
   );
+}
+
+function CategoryTab({
+  dataSignals,
+  glossary,
+  codeSignals,
+  catDocs,
+  query,
+  onQuery,
+}: {
+  dataSignals: PolicySignal[];
+  glossary: PolicySignal[];
+  codeSignals: PolicySignal[];
+  catDocs: DocListItem[];
+  query: string;
+  onQuery: (v: string) => void;
+}) {
+  const q = query.trim().toLowerCase();
+  const filteredCode = useMemo(() => codeSignals.filter((s) => signalMatch(s, q)), [codeSignals, q]);
+  const filteredGloss = useMemo(() => glossary.filter((s) => signalMatch(s, q)), [glossary, q]);
+  const definedGloss = useMemo(() => glossary.filter(hasDefinition).length, [glossary]);
+
+  // DDL 무결성(PK/NOT NULL/FK)은 데이터 메뉴가 원본 — 여기선 재나열하지 않고 kind별 요약만.
+  const dataCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const s of dataSignals) {
+      const l = kindOf(s.kind).label;
+      m.set(l, (m.get(l) ?? 0) + 1);
+    }
+    return [...m.entries()].map(([label, count]) => ({ label, count }));
+  }, [dataSignals]);
+  const dataTables = useMemo(() => new Set(dataSignals.map((s) => tableOf(s.subject))).size, [dataSignals]);
+
+  return (
+    <>
+      <div className="flex flex-wrap items-center" style={{ gap: 8, marginBottom: 12 }}>
+        <Chip on>검증·권한 {codeSignals.length}</Chip>
+        <Chip on>용어 {glossary.length}</Chip>
+        <Chip muted>데이터 무결성 {dataSignals.length}</Chip>
+        <span className="text-text-muted inline-flex items-center flex-wrap" style={{ gap: 8, fontSize: 12 }}>
+          <span className="inline-flex items-center" style={{ gap: 5 }}>
+            <ConfBadge kind="fix" /> 근거확보 = 코드/DDL 원문
+          </span>
+          <span className="inline-flex items-center" style={{ gap: 5 }}>
+            <ConfBadge kind="est" /> 추정 = 기계 판정
+          </span>
+        </span>
+      </div>
+
+      <SearchBar value={query} onChange={onQuery} placeholder="신호 검색 (대상·내용·근거)" />
+
+      <div className="grid grid-cols-1 items-start lg:grid-cols-[minmax(0,1fr)_320px]" style={{ gap: 14 }}>
+        {/* 좌: 카테고리 정책서(LLM 보강 산출물) → 검증·권한 코드 신호 → 용어 사전 */}
+        <div className="flex flex-col" style={{ gap: 14 }}>
+          {catDocs.length > 0 ? (
+            <div>
+              <GroupLabel>카테고리 정책서 ({catDocs.length})</GroupLabel>
+              <DocCards docs={catDocs} />
+            </div>
+          ) : (
+            <div className={CARD} style={{ padding: "16px 18px" }}>
+              <p className="text-text-primary" style={{ fontSize: 13.5, fontWeight: 650, marginBottom: 6 }}>
+                카테고리 정책서(.md) 미생성
+              </p>
+              <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.65, marginBottom: 8 }}>
+                아래 신호는 정책서의 원재료입니다. CLI에서 <code>/understand-policy</code>(기본 모드)를 실행하면
+                결정론 추출이 용어/데이터/검증/권한 4종 문서를 앵커 표 골격으로 만듭니다.
+              </p>
+              <p className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.65 }}>
+                이어지는 LLM 보강이 앵커 소스를 읽어 규범 서술을 [확정]/[추정] 표기로 채웁니다.
+              </p>
+            </div>
+          )}
+
+          <div className={CARD} style={{ padding: "6px 14px 14px" }}>
+            <GroupLabel>
+              검증·권한 코드 신호 ({filteredCode.length}
+              {q && ` / ${codeSignals.length}`})
+            </GroupLabel>
+            {codeSignals.length === 0 ? (
+              <div style={{ padding: "2px 4px 8px" }}>
+                <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.65, marginBottom: 8 }}>
+                  검증(Bean Validation)·권한(Security 어노테이션) 신호{" "}
+                  <b>0건 — 추출은 수행됐고 코드에서 미발견</b>입니다.
+                </p>
+                <p className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.65 }}>
+                  어노테이션 없이 코드 분기로 구현된 검증·권한 규칙은 도메인 정책서(domain 모드)가 의사결정
+                  테이블로 서술합니다.
+                </p>
+              </div>
+            ) : (
+              <div style={{ maxHeight: 380, overflowY: "auto" }}>
+                <table className="proto-tbl">
+                  <thead>
+                    <tr>
+                      <th scope="col" style={TH_STICKY}>
+                        대상
+                      </th>
+                      <th scope="col" style={TH_STICKY}>
+                        신호
+                      </th>
+                      <th scope="col" style={TH_STICKY}>
+                        근거
+                      </th>
+                      <th scope="col" style={TH_STICKY}>
+                        신뢰도
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCode.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="text-text-muted" style={{ padding: "14px 8px", fontSize: 12.5 }}>
+                          검색 결과 없음
+                        </td>
+                      </tr>
+                    )}
+                    {filteredCode.map((s, i) => {
+                      const k = CODE_KIND[s.kind] ?? { label: s.kind, tone: "mut" as BadgeTone };
+                      return (
+                        <tr key={`${s.subject}-${s.anchor.file}-${s.anchor.line}-${i}`}>
+                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
+                            {highlight(s.subject, query)}
+                          </td>
+                          <td>
+                            <span className="inline-flex flex-wrap items-center" style={{ gap: 6 }}>
+                              <Badge tone={k.tone}>{k.label}</Badge>
+                              <span className="text-text-secondary" style={{ fontSize: 12 }}>
+                                {highlight(s.detail, query)}
+                              </span>
+                            </span>
+                          </td>
+                          <td>
+                            <CitationChip filePath={s.anchor.file} line={s.anchor.line} />
+                          </td>
+                          <td>
+                            <ConfBadge kind={confKind(s.confidence)} />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <div className={CARD} style={{ padding: "6px 14px 14px" }}>
+            <GroupLabel>
+              용어 사전 ({filteredGloss.length}
+              {q && ` / ${glossary.length}`}) · 정의 채움 {definedGloss}/{glossary.length}
+            </GroupLabel>
+            {definedGloss === 0 && glossary.length > 0 && !q && (
+              <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, padding: "0 4px 6px" }}>
+                DDL에 테이블·컬럼 주석이 없어 이름만 수집된 상태 — 정의는 LLM 보강(용어 정책서)이 사용처를 읽어
+                [추정]으로 채웁니다.
+              </p>
+            )}
+            {filteredGloss.length === 0 && (
+              <div className="text-text-muted" style={{ padding: "7px 4px", fontSize: 12.5 }}>
+                {q ? "검색 결과 없음" : "용어 신호 없음"}
+              </div>
+            )}
+            {filteredGloss.map((s, i) => (
+              <div
+                key={`${s.subject}-${i}`}
+                className="flex items-center"
+                style={{ gap: 10, padding: "7px 4px", borderBottom: "1px solid var(--color-border-subtle)" }}
+              >
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 12.5, fontWeight: 600 }}>
+                  {highlight(s.subject, query)}
+                </span>
+                <span
+                  className="text-text-muted"
+                  style={{ fontSize: 12, opacity: hasDefinition(s) ? 1 : 0.6, fontStyle: hasDefinition(s) ? undefined : "italic" }}
+                >
+                  {highlight(s.detail, query)}
+                </span>
+                <div className="flex-1" />
+                <CitationChip filePath={s.anchor.file} line={s.anchor.line} />
+                <ConfBadge kind={confKind(s.confidence)} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 우: 데이터 무결성 요약(원본은 데이터 메뉴) + 미해석 카테고리 사유 */}
+        <div className="flex flex-col" style={{ gap: 14 }}>
+          <div className={CARD} style={{ padding: "16px 18px" }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>데이터 무결성 요약</h3>
+            <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, marginBottom: 10 }}>
+              DDL 제약 {dataSignals.length}건 · 테이블 {dataTables}개 — 컬럼 구조·관계·근거 원본은 데이터
+              메뉴(테이블·ERD)에서 봅니다.
+            </p>
+            <div className="flex flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
+              {dataCounts.map((c) => (
+                <Chip key={c.label}>
+                  {c.label} {c.count}
+                </Chip>
+              ))}
+            </div>
+            <Link
+              to="/data"
+              className="text-accent"
+              style={{ fontSize: 12.5, fontWeight: 600, textDecoration: "none" }}
+            >
+              데이터 메뉴에서 보기 →
+            </Link>
+          </div>
+
+          <div className={CARD} style={{ padding: "16px 18px" }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>미해석 카테고리</h3>
+            <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, marginBottom: 10 }}>
+              결정론 추출 범위 밖(미구현) — 신호 0이 &ldquo;정책 없음&rdquo;을 뜻하지 않습니다.
+            </p>
+            <div className="flex flex-wrap" style={{ gap: 8 }}>
+              {NOT_EXTRACTED_CATEGORIES.map((c) => (
+                <Chip key={c} muted>
+                  {c}
+                </Chip>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─────────────────────────── 도메인 정책 ─────────────────────────── */
+
+function DomainTab({ docs }: { docs: DocListItem[] }) {
+  if (docs.length === 0) {
+    return (
+      <div className={CARD} style={{ padding: "20px 22px" }}>
+        <p className="text-text-primary" style={{ fontSize: 14, fontWeight: 650, marginBottom: 6 }}>
+          도메인 정책서 미생성
+        </p>
+        <p className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.65, marginBottom: 8 }}>
+          신호 수집은 완료되었습니다. CLI에서 <code>/understand-policy &lt;root&gt; domain</code>(도메인 모드)을
+          실행하면 결정론 추출이 도메인당 1문서(§0~§8, 의사결정 테이블 시드)를 만듭니다.
+        </p>
+        <p className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.65 }}>
+          이어지는 LLM 보강 + 사람 검증이 정책명·업무 언어를 채웁니다.
+        </p>
+        <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.6, marginTop: 12 }}>
+          파이프라인: 정적 추출(신호) → 근거 수집 → LLM 규범 서술 → 사람 검증. 코드가 진실의 원천이며, 모든 정책
+          문장은 file:line 근거를 갖고 불확실하면 [확인필요]로 표기됩니다.
+        </p>
+      </div>
+    );
+  }
+
+  return <DocCards docs={docs} />;
 }
 
 /* ─────────────────────────── 대조 현황 ─────────────────────────── */

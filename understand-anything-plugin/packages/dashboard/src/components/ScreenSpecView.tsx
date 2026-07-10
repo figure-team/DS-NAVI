@@ -562,35 +562,64 @@ export default function ScreenSpecView() {
             // 검색 중에는 접힘 상태를 무시하고 매칭 그룹을 전부 펼쳐 보여준다.
             const open = ql !== "" || openDomains.has(domain);
             return (
-              <div key={domain}>
+              <div key={domain} style={{ marginTop: 2 }}>
+                {/* 그룹 헤더 — 자식(.doc)과 같은 행 리듬(패딩·라운드·호버), 카운트는 우측 배지 */}
                 <button
                   type="button"
                   onClick={() => toggleDomain(domain)}
-                  className="fold flex items-center gap-1.5 w-full text-left cursor-pointer bg-transparent border-0"
-                  style={{ fontFamily: "inherit" }}
+                  className="flex items-center w-full text-left cursor-pointer bg-transparent border-0 rounded-[7px] hover:bg-elevated"
+                  style={{ padding: "6px 8px", gap: 7, fontFamily: "inherit" }}
                   aria-expanded={open}
                 >
-                  <span style={{ fontSize: 8, width: 9, flex: "none" }}>{open ? "▾" : "▸"}</span>
-                  <span className="truncate">{DOMAIN_LABEL[domain] ?? domain}</span>
-                  <span className="tabular-nums" style={{ fontWeight: 500 }}>({screens.length})</span>
+                  <span
+                    className="inline-flex justify-center text-text-muted"
+                    style={{
+                      fontSize: 9,
+                      width: 10,
+                      flex: "none",
+                      transition: "transform 0.12s ease",
+                      transform: open ? "rotate(90deg)" : "none",
+                    }}
+                  >
+                    ▸
+                  </span>
+                  <span className="truncate text-text-primary" style={{ fontSize: 12.5, fontWeight: 650 }}>
+                    {DOMAIN_LABEL[domain] ?? domain}
+                  </span>
+                  <span
+                    className="tabular-nums text-text-muted bg-elevated rounded-full"
+                    style={{ marginLeft: "auto", flex: "none", fontSize: 10.5, fontWeight: 600, padding: "1px 7px" }}
+                  >
+                    {screens.length}
+                  </span>
                 </button>
-                {open &&
-                  screens.map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => setParam("screen", s.id)}
-                      className={`doc ${s.id === sel.id ? "on" : ""}`}
-                      title={s.scenario ? `시나리오 ${s.scenario} 로 도달` : undefined}
-                    >
-                      <span className="truncate" style={{ minWidth: 0 }}>
-                        <Highlight text={title(s)} q={ql} />
-                      </span>
-                      {overrides[s.id]?.confirmed && (
-                        <span className="st"><Badge tone="ok">확정</Badge></span>
-                      )}
-                    </button>
-                  ))}
+                {/* 자식 목록 — 셰브런 축에 맞춘 가이드 라인으로 그룹 소속을 붙여 보인다 */}
+                {open && (
+                  <div
+                    style={{
+                      margin: "2px 0 6px 12px",
+                      paddingLeft: 6,
+                      borderLeft: "1px solid var(--color-border-subtle)",
+                    }}
+                  >
+                    {screens.map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => setParam("screen", s.id)}
+                        className={`doc ${s.id === sel.id ? "on" : ""}`}
+                        title={s.scenario ? `시나리오 ${s.scenario} 로 도달` : undefined}
+                      >
+                        <span className="truncate" style={{ minWidth: 0 }}>
+                          <Highlight text={title(s)} q={ql} />
+                        </span>
+                        {overrides[s.id]?.confirmed && (
+                          <span className="st"><Badge tone="ok">확정</Badge></span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}

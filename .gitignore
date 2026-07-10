@@ -31,5 +31,7 @@ understand-anything-plugin/packages/dashboard/qa-workmap-out/
 # 클론에서 /understand-init·/understand-map 등이 동작한다(없으면 zod 에러·java-facts=0).
 !/ktds-legacy-plugin/node_modules/
 !/ktds-legacy-plugin/node_modules/**
+# 단, .bin 심링크는 pnpm install 산물 — 벤더링 자산 아님(0.3.9 랜딩 때 커밋 제외 확인).
+/ktds-legacy-plugin/node_modules/.bin/
 !/ktds-legacy-plugin/packages/legacy-core/dist/
 !/ktds-legacy-plugin/packages/legacy-core/dist/**

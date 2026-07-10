@@ -13,8 +13,6 @@ import { createGraphSlice } from "./slices/graph-slice";
 import type { GraphSlice } from "./slices/graph-slice";
 import { createCanvasSlice } from "./slices/canvas-slice";
 import type { CanvasSlice } from "./slices/canvas-slice";
-import { createTourSlice } from "./slices/tour-slice";
-import type { TourSlice } from "./slices/tour-slice";
 import { createCodeViewerSlice } from "./slices/code-viewer-slice";
 import type { CodeViewerSlice } from "./slices/code-viewer-slice";
 import { createOverlaySlice } from "./slices/overlay-slice";
@@ -27,7 +25,6 @@ import type { SessionSlice } from "./slices/session-slice";
 export interface DashboardStore
   extends GraphSlice,
     CanvasSlice,
-    TourSlice,
     CodeViewerSlice,
     OverlaySlice,
     DomainSlice,
@@ -36,7 +33,6 @@ export interface DashboardStore
 export const useDashboardStore = create<DashboardStore>()((set, get, api) => ({
   ...createGraphSlice(set, get, api),
   ...createCanvasSlice(set, get, api),
-  ...createTourSlice(set, get, api),
   ...createCodeViewerSlice(set, get, api),
   ...createOverlaySlice(set, get, api),
   ...createDomainSlice(set, get, api),

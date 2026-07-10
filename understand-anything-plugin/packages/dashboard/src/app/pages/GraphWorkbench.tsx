@@ -84,10 +84,8 @@ export default function GraphWorkbench() {
           <DiffToggle />
           {/* 영향도 분석 실행 진입점은 변경·영향 메뉴(ChangeImpactView)로 일원화 —
               구조 탭은 결과 소비(?overlay=impact)만 담당한다(2026-07-10 결정). */}
-          {/* 상세도 토글(개요/파일/+클래스) 제거 — 구조 탭은 항상 파일 수준 뷰(2026-07-10).
-              jpetstore류 그래프에선 개요=파일이 동일 화면(레이어가 함수/클래스를 직접 안 담음)이고
-              +클래스 확장은 PM/PL 대상이 아니라고 사용자 확정. detailLevel 기본값 "file" 고정 소비.
-              "개요"는 노드 폭발 개편 때 레이어 요약 뷰로 재도입 예정. */}
+          {/* 상세도 토글(개요/파일/+클래스)은 제거됨 — 구조 탭은 항상 파일 수준 뷰(2026-07-10 확정,
+              detailLevel 상태 자체도 2026-07-11 제거). "개요"는 노드 폭발 개편 때 레이어 요약 뷰로 재도입 예정. */}
           <div className="flex items-center gap-1">
             {([
               { key: "code" as const, label: t.nodeTypeLabels.code, color: "var(--color-node-file)" },

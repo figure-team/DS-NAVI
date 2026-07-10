@@ -13,7 +13,6 @@ export const zhTW = {
     filter: "篩選",
     resetAll: "重置全部",
     analyzed: "分析時間",
-    startGuidedTour: "開始導覽",
     truncated: "(已截斷)",
     preview: "預覽",
     doubleClickToOpen: "雙擊開啟",
@@ -69,14 +68,6 @@ export const zhTW = {
     complexity: "複雜度",
     layers: "層級",
     edgeCategories: "邊類別",
-  },
-  personaSelector: {
-    overview: "概覽",
-    overviewDesc: "高層次架構視圖",
-    learn: "學習",
-    learnDesc: "完整儀表板與導覽學習",
-    deepDive: "深入",
-    deepDiveDesc: "程式碼聚焦與對話",
   },
   sidebar: {
     info: "資訊",
@@ -230,14 +221,6 @@ export const zhTW = {
     files: " 個檔案",
     expand: "點擊展開",
   },
-  detailLevel: {
-    filesTitle: "僅檔案 — 架構級依賴（快速）",
-    classesTitle: "檔案 + 類別 — 程式碼結構及繼承關係",
-    files: "檔案",
-    classes: "+類別",
-    fnTitle: "切換函數節點（可能降低渲染速度）",
-    fn: "函數",
-  },
   nodeTypeLabels: {
     all: "全部",
     code: "程式碼",
@@ -270,8 +253,6 @@ export const zhTW = {
   },
   // ktds: 結構標籤頁「影響分析」按鈕/彈窗 — 自然語言 → claude -p /understand-impact
   impactAnalyze: {
-    button: "影響分析",
-    buttonTitle: "用自然語言執行變更影響分析",
     title: "變更影響分析",
     description:
       "用自然語言描述你打算進行的變更。分析完成後，結構圖上會醒目顯示變更/受影響的節點。",
@@ -286,20 +267,6 @@ export const zhTW = {
     errGeneric: "啟動分析失敗。",
     toastDone: "影響分析完成 — 結果已在結構圖上醒目顯示。",
     toastFailed: "影響分析失敗。請查看主控台/日誌。",
-  },
-  learnPanel: {
-    finish: "完成",
-    next: "下一步",
-    prev: "上一步",
-    noTour: "無導覽可用",
-    noTourHint: "從知識圖谱生成導覽以獲取程式碼庫的引導式講解",
-    projectTour: "專案導覽",
-    steps: "步",
-    stepsTitle: "步驟",
-    guidedWalkthrough: "程式碼庫引導式講解",
-    startTour: "開始導覽",
-    tour: "導覽",
-    exitTour: "退出導覽",
   },
   layer: {
     defaultName: "層級",
@@ -357,8 +324,6 @@ export const zhTW = {
     tour: "導覽",
     view: "檢視",
     focusSearch: "聚焦搜尋列",
-    nextStep: "下一步導覽",
-    prevStep: "上一步導覽",
     toggleDiff: "切換差異模式",
     toggleImpact: "切換影響模式",
     toggleFilter: "切換篩選面板",

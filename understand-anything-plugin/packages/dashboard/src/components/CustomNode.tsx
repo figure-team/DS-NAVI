@@ -68,7 +68,6 @@ export interface CustomNodeData extends Record<string, unknown> {
   isHighlighted: boolean;
   searchScore?: number;
   isSelected: boolean;
-  isTourHighlighted: boolean;
   isDiffChanged: boolean;
   isDiffAffected: boolean;
   isDiffFaded: boolean;
@@ -101,8 +100,6 @@ function CustomNodeComponent({
   let extraClass = "";
   if (data.isSelected) {
     extraClass = "ring-2 ring-accent node-glow";
-  } else if (data.isTourHighlighted) {
-    extraClass = "ring-2 ring-accent-dim animate-accent-pulse";
   } else if (data.isHighlighted) {
     const score = data.searchScore ?? 1;
     if (score <= 0.1) {

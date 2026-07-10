@@ -26,7 +26,6 @@ export default function ExportMenu() {
   const exportMenuOpen = useDashboardStore((s) => s.exportMenuOpen);
   const toggleExportMenu = useDashboardStore((s) => s.toggleExportMenu);
   const reactFlowInstance = useDashboardStore((s) => s.reactFlowInstance);
-  const persona = useDashboardStore((s) => s.persona);
   const { t } = useI18n();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -191,14 +190,8 @@ export default function ExportMenu() {
     }
 
     try {
-      // Apply persona and filters to create filtered graph
-      // Non-technical persona: hide function/class sub-nodes, keep everything else
-      const subFileTypes = new Set(["function", "class"]);
-      let filteredGraphNodes = persona === "non-technical"
-        ? graph.nodes.filter((n) => !subFileTypes.has(n.type))
-        : graph.nodes;
-
-      filteredGraphNodes = filterNodes(filteredGraphNodes, nodeIdToLayerIds, filters);
+      // Apply filters to create filtered graph
+      const filteredGraphNodes = filterNodes(graph.nodes, nodeIdToLayerIds, filters);
       const filteredNodeIds = new Set(filteredGraphNodes.map((n) => n.id));
 
       let filteredGraphEdges = graph.edges.filter(

@@ -123,8 +123,6 @@ export default function ShellLayout(ctx: ShellContext) {
             state.clearActiveFlow();
           } else if (state.navigationLevel === "layer-detail") {
             state.navigateToOverview();
-          } else if (state.tourActive) {
-            state.stopTour();
           } else {
             setShowKeyboardHelp(false);
           }
@@ -141,29 +139,6 @@ export default function ShellLayout(ctx: ShellContext) {
           searchInput?.focus();
         },
         category: "Navigation",
-      },
-      // Tour controls
-      {
-        key: "ArrowRight",
-        description: t.keyboardShortcuts.nextStep,
-        action: () => {
-          const state = useDashboardStore.getState();
-          if (state.tourActive) {
-            state.nextTourStep();
-          }
-        },
-        category: "Tour",
-      },
-      {
-        key: "ArrowLeft",
-        description: t.keyboardShortcuts.prevStep,
-        action: () => {
-          const state = useDashboardStore.getState();
-          if (state.tourActive) {
-            state.prevTourStep();
-          }
-        },
-        category: "Tour",
       },
       // View toggles
       {

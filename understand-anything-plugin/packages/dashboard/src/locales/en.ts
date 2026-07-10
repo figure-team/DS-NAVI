@@ -13,7 +13,6 @@ export const en = {
     filter: "Filter",
     resetAll: "Reset All",
     analyzed: "Analyzed",
-    startGuidedTour: "Start Guided Tour",
     truncated: "(truncated)",
     preview: "Preview",
     doubleClickToOpen: "double-click to open",
@@ -69,14 +68,6 @@ export const en = {
     complexity: "Complexity",
     layers: "Layers",
     edgeCategories: "Edge Categories",
-  },
-  personaSelector: {
-    overview: "Overview",
-    overviewDesc: "High-level architecture view",
-    learn: "Learn",
-    learnDesc: "Full dashboard with guided learning",
-    deepDive: "Deep Dive",
-    deepDiveDesc: "Code-focused with chat",
   },
   sidebar: {
     info: "Info",
@@ -232,14 +223,6 @@ export const en = {
     files: " files",
     expand: "Click to expand",
   },
-  detailLevel: {
-    filesTitle: "Files only — architecture-level dependencies (fast)",
-    classesTitle: "Files + Classes — code structure with inheritance",
-    files: "Files",
-    classes: "+Classes",
-    fnTitle: "Toggle function nodes (may slow down rendering)",
-    fn: "fn",
-  },
   nodeTypeLabels: {
     all: "All",
     code: "Code",
@@ -272,8 +255,6 @@ export const en = {
   },
   // ktds: structure tab "Impact analysis" button/modal — NL → claude -p /understand-impact
   impactAnalyze: {
-    button: "Impact analysis",
-    buttonTitle: "Run change impact analysis from natural language",
     title: "Change Impact Analysis",
     description:
       "Describe the change you intend to make in natural language. When the analysis finishes, changed/affected nodes are highlighted on the structure graph.",
@@ -288,20 +269,6 @@ export const en = {
     errGeneric: "Failed to start analysis.",
     toastDone: "Impact analysis complete — results highlighted on the structure graph.",
     toastFailed: "Impact analysis failed. Check the console/logs.",
-  },
-  learnPanel: {
-    finish: "Finish",
-    next: "Next",
-    prev: "Prev",
-    noTour: "No tour available",
-    noTourHint: "Generate a tour from your knowledge graph to get a guided walkthrough",
-    projectTour: "Project Tour",
-    steps: "steps",
-    stepsTitle: "Steps",
-    guidedWalkthrough: "Guided walkthrough of the codebase",
-    startTour: "Start Tour",
-    tour: "Tour",
-    exitTour: "Exit Tour",
   },
   layer: {
     defaultName: "Layer",
@@ -359,8 +326,6 @@ export const en = {
     tour: "Tour",
     view: "View",
     focusSearch: "Focus search bar",
-    nextStep: "Next tour step",
-    prevStep: "Previous tour step",
     toggleDiff: "Toggle diff mode",
     toggleImpact: "Toggle impact mode",
     toggleFilter: "Toggle filter panel",

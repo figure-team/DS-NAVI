@@ -13,7 +13,6 @@ export const ko = {
     filter: "필터",
     resetAll: "모두 재설정",
     analyzed: "분석 시간",
-    startGuidedTour: "가이드 투어 시작",
     truncated: "(생략)",
     preview: "미리보기",
     doubleClickToOpen: "두 번 클릭하여 열기",
@@ -69,14 +68,6 @@ export const ko = {
     complexity: "복잡도",
     layers: "레이어",
     edgeCategories: "엣지 카테고리",
-  },
-  personaSelector: {
-    overview: "개요",
-    overviewDesc: "고수준 아키텍처 뷰",
-    learn: "학습",
-    learnDesc: "가이드 학습 포함 완전 대시보드",
-    deepDive: "심층",
-    deepDiveDesc: "코드 중심 채팅",
   },
   sidebar: {
     info: "정보",
@@ -232,14 +223,6 @@ export const ko = {
     files: "개 파일",
     expand: "클릭해 펼치기",
   },
-  detailLevel: {
-    filesTitle: "파일만 — 아키텍처 레벨 의존성 (빠름)",
-    classesTitle: "파일 + 클래스 — 상속 포함 코드 구조",
-    files: "파일",
-    classes: "+클래스",
-    fnTitle: "함수 노드 토글 (렌더링 속도 저하 가능)",
-    fn: "fn",
-  },
   nodeTypeLabels: {
     all: "모두",
     code: "코드",
@@ -272,8 +255,6 @@ export const ko = {
   },
   // ktds: 구조 탭 "영향도 분석" 버튼/모달 — 자연어 → claude -p /understand-impact
   impactAnalyze: {
-    button: "영향도 분석",
-    buttonTitle: "자연어로 변경 영향도 분석 실행",
     title: "변경 영향도 분석",
     description:
       "변경하려는 내용을 자연어로 설명하세요. 분석이 끝나면 구조 그래프에 변경/영향 노드가 표시됩니다.",
@@ -288,20 +269,6 @@ export const ko = {
     errGeneric: "분석 실행에 실패했습니다.",
     toastDone: "영향도 분석 완료 — 구조 그래프에 결과를 표시했습니다.",
     toastFailed: "영향도 분석에 실패했습니다. 콘솔/로그를 확인하세요.",
-  },
-  learnPanel: {
-    finish: "완료",
-    next: "다음",
-    prev: "이전",
-    noTour: "투어 없음",
-    noTourHint: "지식 그래프에서 투어를 생성하여 코드베이스의 가이드 워크스루를 얻으세요",
-    projectTour: "프로젝트 투어",
-    steps: "단계",
-    stepsTitle: "단계",
-    guidedWalkthrough: "코드베이스 가이드 워크스루",
-    startTour: "투어 시작",
-    tour: "투어",
-    exitTour: "투어 종료",
   },
   layer: {
     defaultName: "레이어",
@@ -359,8 +326,6 @@ export const ko = {
     tour: "투어",
     view: "보기",
     focusSearch: "검색창 포커스",
-    nextStep: "다음 투어 단계",
-    prevStep: "이전 투어 단계",
     toggleDiff: "차분 모드 전환",
     toggleImpact: "영향도 모드 전환",
     toggleFilter: "필터 패널 전환",

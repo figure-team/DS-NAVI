@@ -1,10 +1,10 @@
-// 슬라이스 소유: WT-A(구조·지식그래프·위키) — 그래프 데이터·인덱스·선택·탐색·검색·페르소나.
+// 슬라이스 소유: WT-A(구조) — 그래프 데이터·인덱스·선택·탐색·검색.
 // 다른 워크트리는 읽기(셀렉터)만. 필드 추가/변경은 A 세션에서.
 import { SearchEngine } from "@understand-anything/core/search";
 import type { SearchResult } from "@understand-anything/core/search";
 import type { GraphNode, KnowledgeGraph } from "@understand-anything/core/types";
 import type { StateCreator } from "zustand";
-import type { Persona, NavigationLevel } from "../types";
+import type { NavigationLevel } from "../types";
 import type { DashboardStore } from "../index";
 
 /**
@@ -17,9 +17,8 @@ import type { DashboardStore } from "../index";
  * - `nodeIdToLayerId` preserves the prior `findNodeLayer` "first matching
  *   layer wins" semantics — if a node id appears in multiple layers
  *   (rare but legal in the schema), the first occurrence in `graph.layers`
- *   order is the one we map to. Drives navigation (drillIntoLayer, tour
- *   step → layer, sidebar history) where a single canonical layer is the
- *   right answer.
+ *   order is the one we map to. Drives navigation (drillIntoLayer,
+ *   sidebar history) where a single canonical layer is the right answer.
  *
  * - `nodeIdToLayerIds` records *every* layer a node belongs to. Drives
  *   membership queries (filterNodes) where the prior `Layer[] +
@@ -72,8 +71,6 @@ export interface GraphSlice {
   navigationLevel: NavigationLevel;
   activeLayerId: string | null;
 
-  persona: Persona;
-
   // Focus mode: isolate a node's 1-hop neighborhood
   focusNodeId: string | null;
 
@@ -90,7 +87,6 @@ export interface GraphSlice {
   navigateToOverview: () => void;
   setFocusNode: (nodeId: string | null) => void;
   setSearchQuery: (query: string) => void;
-  setPersona: (persona: Persona) => void;
 }
 
 export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> = (set, get) => ({
@@ -106,10 +102,6 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
 
   navigationLevel: "overview",
   activeLayerId: null,
-
-  // 기본 "experienced" — 구 PersonaSelector(개요/학습/심층) 제거 후 "junior"(학습)는
-  // 설정 경로가 없고, "non-technical"(개요)만 상세도 토글이 매핑한다 (2026-07-10).
-  persona: "experienced",
 
   focusNodeId: null,
   nodeHistory: [],
@@ -288,14 +280,4 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
     const searchResults = engine.search(query);
     set({ searchQuery: query, searchResults });
   },
-
-  setPersona: (persona) =>
-    set({
-      persona,
-      // Persona changes filter node types, which shifts container.nodeIds.
-      containerLayoutCache: new Map(),
-      containerSizeMemory: new Map(),
-      expandedContainers: new Set(),
-      pendingFocusContainer: null,
-    }),
 });

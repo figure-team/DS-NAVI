@@ -10,7 +10,6 @@ import {
 } from "../types";
 import type {
   Complexity,
-  DetailLevel,
   EdgeCategory,
   FilterState,
   NodeCategory,
@@ -36,13 +35,6 @@ export interface CanvasSlice {
   // Node type category filters
   nodeTypeFilters: Record<NodeCategory, boolean>;
   toggleNodeTypeFilter: (category: NodeCategory) => void;
-
-  // Detail level: "file" shows only file nodes (architecture view),
-  // "class" shows files + class nodes (code structure view) with optional function expansion.
-  detailLevel: DetailLevel;
-  setDetailLevel: (level: DetailLevel) => void;
-  showFunctionsInClassView: boolean;
-  toggleShowFunctionsInClassView: () => void;
 
   toggleFilterPanel: () => void;
   toggleExportMenu: () => void;
@@ -106,29 +98,6 @@ export const createCanvasSlice: StateCreator<DashboardStore, [], [], CanvasSlice
       // Filter changes shift container.nodeIds; cached child positions
       // may reference filtered-out children. Drop the cache so Stage 2
       // recomputes against the current set.
-      containerLayoutCache: new Map(),
-      containerSizeMemory: new Map(),
-      expandedContainers: new Set(),
-      pendingFocusContainer: null,
-    })),
-
-  detailLevel: "file",
-  setDetailLevel: (level) =>
-    set({
-      detailLevel: level,
-      // Detail level changes which nodes are visible; cached positions stale.
-      // Reset fn toggle so it doesn't resurrect when re-entering class view.
-      showFunctionsInClassView: false,
-      containerLayoutCache: new Map(),
-      containerSizeMemory: new Map(),
-      expandedContainers: new Set(),
-      pendingFocusContainer: null,
-    }),
-
-  showFunctionsInClassView: false,
-  toggleShowFunctionsInClassView: () =>
-    set((state) => ({
-      showFunctionsInClassView: !state.showFunctionsInClassView,
       containerLayoutCache: new Map(),
       containerSizeMemory: new Map(),
       expandedContainers: new Set(),

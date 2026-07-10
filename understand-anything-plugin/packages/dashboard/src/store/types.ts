@@ -1,7 +1,6 @@
 // 공용 타입·상수 — 모든 슬라이스와 소비 컴포넌트가 공유한다.
 // 병렬 워크트리 규약: 이 파일은 "추가만"(additive). 기존 타입 변경은 셸 소유 세션에서만.
 
-export type Persona = "non-technical" | "junior" | "experienced";
 export type NavigationLevel = "overview" | "layer-detail";
 export type NodeType = "file" | "function" | "class" | "module" | "concept" | "config" | "document" | "service" | "table" | "endpoint" | "pipeline" | "schema" | "resource" | "domain" | "flow" | "step" | "article" | "entity" | "topic" | "claim" | "source";
 export type Complexity = "simple" | "moderate" | "complex";
@@ -20,7 +19,6 @@ export type ViewMode =
   | "quality"
   | "report"
   | "policy";
-export type DetailLevel = "file" | "class";
 
 export interface FilterState {
   nodeTypes: Set<NodeType>;

@@ -13,7 +13,6 @@ export const ja = {
     filter: "フィルター",
     resetAll: "すべてリセット",
     analyzed: "分析日時",
-    startGuidedTour: "ガイド付きツアーを開始",
     truncated: "(省略)",
     preview: "プレビュー",
     doubleClickToOpen: "ダブルクリックで開く",
@@ -69,14 +68,6 @@ export const ja = {
     complexity: "複雑度",
     layers: "レイヤー",
     edgeCategories: "エッジカテゴリ",
-  },
-  personaSelector: {
-    overview: "概要",
-    overviewDesc: "高レベルアーキテクチャビュー",
-    learn: "学習",
-    learnDesc: "ガイド付き学習付き完全ダッシュボード",
-    deepDive: "詳細",
-    deepDiveDesc: "コード中心のチャット",
   },
   sidebar: {
     info: "情報",
@@ -232,14 +223,6 @@ export const ja = {
     files: " ファイル",
     expand: "クリックで展開",
   },
-  detailLevel: {
-    filesTitle: "ファイルのみ — アーキテクチャレベルの依存関係（高速）",
-    classesTitle: "ファイル + クラス — 継承を含むコード構造",
-    files: "ファイル",
-    classes: "+クラス",
-    fnTitle: "関数ノードを切り替え（レンダリングが遅くなる可能性）",
-    fn: "fn",
-  },
   nodeTypeLabels: {
     all: "すべて",
     code: "コード",
@@ -272,8 +255,6 @@ export const ja = {
   },
   // ktds: 構造タブ「影響分析」ボタン/モーダル — 自然言語 → claude -p /understand-impact
   impactAnalyze: {
-    button: "影響分析",
-    buttonTitle: "自然言語で変更影響分析を実行",
     title: "変更影響分析",
     description:
       "行おうとしている変更を自然言語で記述してください。分析が完了すると、構造グラフ上に変更/影響ノードがハイライト表示されます。",
@@ -288,20 +269,6 @@ export const ja = {
     errGeneric: "分析の開始に失敗しました。",
     toastDone: "影響分析が完了 — 結果を構造グラフ上にハイライトしました。",
     toastFailed: "影響分析に失敗しました。コンソール/ログを確認してください。",
-  },
-  learnPanel: {
-    finish: "完了",
-    next: "次へ",
-    prev: "前へ",
-    noTour: "ツアーがありません",
-    noTourHint: "知識グラフからツアーを生成してコードベースのガイド付きウォークスルーを取得",
-    projectTour: "プロジェクトツアー",
-    steps: "ステップ",
-    stepsTitle: "ステップ",
-    guidedWalkthrough: "コードベースのガイド付きウォークスルー",
-    startTour: "ツアー開始",
-    tour: "ツアー",
-    exitTour: "ツアー終了",
   },
   layer: {
     defaultName: "レイヤー",
@@ -359,8 +326,6 @@ export const ja = {
     tour: "ツアー",
     view: "ビュー",
     focusSearch: "検索バーにフォーカス",
-    nextStep: "次のツアーステップ",
-    prevStep: "前のツアーステップ",
     toggleDiff: "差分モード切り替え",
     toggleImpact: "影響モード切替",
     toggleFilter: "フィルターパネル切り替え",

@@ -13,7 +13,6 @@ export const zh = {
     filter: "筛选",
     resetAll: "重置全部",
     analyzed: "分析时间",
-    startGuidedTour: "开始导览",
     truncated: "(已截断)",
     preview: "预览",
     doubleClickToOpen: "双击打开",
@@ -69,14 +68,6 @@ export const zh = {
     complexity: "复杂度",
     layers: "层级",
     edgeCategories: "边类别",
-  },
-  personaSelector: {
-    overview: "概览",
-    overviewDesc: "高层次架构视图",
-    learn: "学习",
-    learnDesc: "完整仪表盘与导览学习",
-    deepDive: "深入",
-    deepDiveDesc: "代码聚焦与对话",
   },
   sidebar: {
     info: "信息",
@@ -230,14 +221,6 @@ export const zh = {
     files: " 个文件",
     expand: "点击展开",
   },
-  detailLevel: {
-    filesTitle: "仅文件 — 架构级依赖（快速）",
-    classesTitle: "文件 + 类 — 代码结构及继承关系",
-    files: "文件",
-    classes: "+类",
-    fnTitle: "切换函数节点（可能降低渲染速度）",
-    fn: "函数",
-  },
   nodeTypeLabels: {
     all: "全部",
     code: "代码",
@@ -270,8 +253,6 @@ export const zh = {
   },
   // ktds: 结构标签页"影响分析"按钮/弹窗 — 自然语言 → claude -p /understand-impact
   impactAnalyze: {
-    button: "影响分析",
-    buttonTitle: "用自然语言运行变更影响分析",
     title: "变更影响分析",
     description:
       "用自然语言描述你打算做的变更。分析完成后，结构图上会高亮显示变更/受影响的节点。",
@@ -286,20 +267,6 @@ export const zh = {
     errGeneric: "启动分析失败。",
     toastDone: "影响分析完成 — 结果已在结构图上高亮显示。",
     toastFailed: "影响分析失败。请查看控制台/日志。",
-  },
-  learnPanel: {
-    finish: "完成",
-    next: "下一步",
-    prev: "上一步",
-    noTour: "无导览可用",
-    noTourHint: "从知识图谱生成导览以获取代码库的引导式讲解",
-    projectTour: "项目导览",
-    steps: "步",
-    stepsTitle: "步骤",
-    guidedWalkthrough: "代码库引导式讲解",
-    startTour: "开始导览",
-    tour: "导览",
-    exitTour: "退出导览",
   },
   layer: {
     defaultName: "层级",
@@ -357,8 +324,6 @@ export const zh = {
     tour: "导览",
     view: "视图",
     focusSearch: "聚焦搜索栏",
-    nextStep: "下一步导览",
-    prevStep: "上一步导览",
     toggleDiff: "切换差异模式",
     toggleImpact: "切换影响模式",
     toggleFilter: "切换筛选面板",

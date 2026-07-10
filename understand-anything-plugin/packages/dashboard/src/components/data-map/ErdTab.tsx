@@ -47,7 +47,22 @@ interface ErdNodeData extends Record<string, unknown> {
   moreCount: number;
   dimmed: boolean;
   active: boolean;
+  /** 선택 테이블 기준 FK↔PK 컬럼 매칭 색(소문자 컬럼명 → 관계색들). */
+  colColors: Record<string, string[]>;
 }
+
+/**
+ * 관계(FK)별 매칭 색 팔레트 — 모드(라이트/다크)에 따라 값이 스위치되는
+ * 기존 method-* 토큰을 재사용해 양쪽 테마에서 가독을 보장한다.
+ */
+const REL_PALETTE = [
+  "var(--color-method-get)",
+  "var(--color-method-post)",
+  "var(--color-method-put)",
+  "var(--color-method-delete)",
+  "var(--color-method-batch)",
+  "var(--color-method-event)",
+];
 type ErdFlowNode = Node<ErdNodeData, "erdTable">;
 
 /** 노드에 보여줄 키 컬럼(PK → FK → UNIQUE 순, 최대 MAX_KEY_ROWS). */
@@ -97,8 +112,19 @@ function ErdTableNode({ data }: NodeProps<ErdFlowNode>) {
         )}
       </div>
       <div style={{ padding: "5px 10px" }}>
-        {data.keyRows.map((r) => (
-          <div key={r.name} className="flex items-center gap-1.5" style={{ height: ROW_H }}>
+        {data.keyRows.map((r) => {
+          const rel = data.colColors[r.name.toLowerCase()] ?? [];
+          // 관계가 여럿이면 동심 링(최대 3겹)으로 겹쳐 그린다 — inset shadow 는 앞선 항목이 위.
+          const rings = rel
+            .slice(0, 3)
+            .map((c, i) => `inset 0 0 0 ${1.5 * (i + 1)}px ${c}`)
+            .join(", ");
+          return (
+          <div
+            key={r.name}
+            className="flex items-center gap-1.5"
+            style={{ height: ROW_H, borderRadius: 5, padding: "0 5px", margin: "0 -5px", boxShadow: rings || undefined }}
+          >
             <Badge tone={KIND_TONE[r.kind]} style={{ fontSize: 9, padding: "0px 4px" }}>
               {r.kind}
             </Badge>
@@ -109,7 +135,8 @@ function ErdTableNode({ data }: NodeProps<ErdFlowNode>) {
               {r.type}
             </span>
           </div>
-        ))}
+          );
+        })}
         {data.moreCount > 0 && (
           <div className="text-text-muted" style={{ fontSize: 10.5, height: FOOTER_H, display: "flex", alignItems: "center" }}>
             외 {data.moreCount}개 컬럼
@@ -126,6 +153,18 @@ interface FkEdgeInfo {
   id: string;
   source: string;
   target: string;
+  /** 자식(source) 쪽 FK 컬럼명 — 소문자. */
+  columns: string[];
+  /** 부모(target) 쪽 참조 컬럼명(선언 부재 시 부모 PK로 폴백) — 소문자. */
+  refColumns: string[];
+}
+
+/** 테이블 PK 컬럼명(소문자) — primaryKey 배열 또는 컬럼 플래그(스캐너에 따라 한쪽만 채워짐). */
+function pkColsOf(t: DbTable): string[] {
+  const declared = t.primaryKey?.length
+    ? t.primaryKey
+    : t.columns.filter((c) => c.primaryKey).map((c) => c.name);
+  return declared.map((c) => c.toLowerCase());
 }
 
 function ErdCanvas({ schema }: { schema: DbSchema }) {
@@ -143,16 +182,46 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
 
   // 선언 FK → 엣지(자식 → 참조 테이블). 참조 대상이 스키마에 없으면 제외(UnresolvedBanner 영역).
   const fkEdges = useMemo<FkEdgeInfo[]>(() => {
+    const byLower = new Map(schema.tables.map((t) => [t.name.toLowerCase(), t]));
     const out: FkEdgeInfo[] = [];
     for (const t of schema.tables) {
       for (const [i, fk] of (t.foreignKeys ?? []).entries()) {
-        const target = knownTables.get(fk.refTable.toLowerCase());
-        if (!target || target === t.name) continue;
-        out.push({ id: `fk:${t.name}:${i}`, source: t.name, target });
+        const targetTable = byLower.get(fk.refTable.toLowerCase());
+        if (!targetTable || targetTable.name === t.name) continue;
+        out.push({
+          id: `fk:${t.name}:${i}`,
+          source: t.name,
+          target: targetTable.name,
+          columns: fk.columns.map((c) => c.toLowerCase()),
+          refColumns: fk.refColumns?.length
+            ? fk.refColumns.map((c) => c.toLowerCase())
+            : pkColsOf(targetTable),
+        });
       }
     }
     return out;
-  }, [schema.tables, knownTables]);
+  }, [schema.tables]);
+
+  // 선택 테이블에 닿는 관계별 색 배정 — 같은 색 = 같은 FK 관계(자식 FK 행 ↔ 부모 PK 행 ↔ 연결선).
+  const highlight = useMemo(() => {
+    if (!selected) return null;
+    const edgeColors = new Map<string, string>();
+    const rowColors = new Map<string, Map<string, string[]>>();
+    const push = (table: string, col: string, color: string) => {
+      const m = rowColors.get(table) ?? new Map<string, string[]>();
+      m.set(col, [...(m.get(col) ?? []), color]);
+      rowColors.set(table, m);
+    };
+    let i = 0;
+    for (const e of fkEdges) {
+      if (e.source !== selected.name && e.target !== selected.name) continue;
+      const color = REL_PALETTE[i++ % REL_PALETTE.length];
+      edgeColors.set(e.id, color);
+      for (const c of e.columns) push(e.source, c, color);
+      for (const c of e.refColumns) push(e.target, c, color);
+    }
+    return { edgeColors, rowColors };
+  }, [selected, fkEdges]);
 
   // 선택 테이블의 1-hop 이웃(FK 양방향) — 강조/디밍 판정.
   const neighborhood = useMemo(() => {
@@ -176,7 +245,7 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
         id: t.name,
         type: "erdTable",
         position: { x: 0, y: 0 },
-        data: { name: t.name, isCodeTable: t.isCodeTable, keyRows: rows, moreCount: more, dimmed: false, active: false },
+        data: { name: t.name, isCodeTable: t.isCodeTable, keyRows: rows, moreCount: more, dimmed: false, active: false, colColors: {} },
       };
     });
     const edges: Edge[] = fkEdges.map((e) => ({
@@ -219,27 +288,29 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
         ...n.data,
         active: n.id === selected?.name,
         dimmed: neighborhood != null && !neighborhood.has(n.id),
+        colColors: Object.fromEntries(highlight?.rowColors.get(n.id) ?? []),
       },
     }));
-  }, [layouted, selected, neighborhood]);
+  }, [layouted, selected, neighborhood, highlight]);
 
   const edges = useMemo(
     () =>
       base.edges.map((e) => {
-        const connected = selected != null && (e.source === selected.name || e.target === selected.name);
+        // 선택 테이블에 닿는 엣지는 관계 고유색(노드의 FK/PK 행 외곽선과 동일).
+        const rel = highlight?.edgeColors.get(e.id);
         return {
           ...e,
-          style: connected
-            ? { stroke: "var(--color-status-info)", strokeWidth: 2 }
+          style: rel
+            ? { stroke: rel, strokeWidth: 2 }
             : { stroke: "var(--color-border-medium)", strokeWidth: 1.2, opacity: neighborhood ? 0.15 : 1 },
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            color: connected ? "var(--color-status-info)" : "var(--color-border-medium)",
+            color: rel ?? "var(--color-border-medium)",
           },
-          zIndex: connected ? 10 : 0,
+          zIndex: rel ? 10 : 0,
         };
       }),
-    [base.edges, selected, neighborhood],
+    [base.edges, neighborhood, highlight],
   );
 
   const setTable = (name: string | null) =>

@@ -11,6 +11,7 @@ import {
   Position,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
 } from "@xyflow/react";
 import type { Edge, Node, NodeProps } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -171,6 +172,14 @@ interface FkEdgeInfo {
   inferred?: boolean;
 }
 
+type ErdView = "all" | "fk" | "inferred" | "isolated";
+const ERD_VIEWS: Array<{ key: ErdView; label: string }> = [
+  { key: "all", label: "전체" },
+  { key: "fk", label: "선언 FK" },
+  { key: "inferred", label: "추정 FK" },
+  { key: "isolated", label: "고립" },
+];
+
 /** 테이블 PK 컬럼명(소문자) — primaryKey 배열 또는 컬럼 플래그(스캐너에 따라 한쪽만 채워짐). */
 function pkColsOf(t: DbTable): string[] {
   const declared = t.primaryKey?.length
@@ -182,6 +191,7 @@ function pkColsOf(t: DbTable): string[] {
 function ErdCanvas({ schema }: { schema: DbSchema }) {
   const isDark = useTheme().preset.isDark;
   const relPalette = REL_PALETTES[isDark ? "dark" : "light"];
+  const { fitView } = useReactFlow();
   const [searchParams, setSearchParams] = useSearchParams();
   const selName = searchParams.get("table");
   const selected = useMemo(
@@ -194,8 +204,9 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
     [schema.tables],
   );
 
-  // 추정 관계 토글 — 기본 표시, ?inferred=0 으로 숨김(QA·회의 공유용 딥링크 유지).
-  const showInferred = searchParams.get("inferred") !== "0";
+  // 보기 모드 — 전체 / 선언 FK 연결 / 추정 FK 연결 / 고립(연결 없음). URL ?view= 단일 소스.
+  const viewParam = searchParams.get("view");
+  const view: ErdView = ERD_VIEWS.some((v) => v.key === viewParam) ? (viewParam as ErdView) : "all";
 
   // 선언 FK → 엣지(자식 → 참조 테이블). 참조 대상이 스키마에 없으면 제외(UnresolvedBanner 영역).
   // + 이름 기반 추정 관계(erd-infer) — 선언 FK 없는 레거시 대응, 점선 렌더.
@@ -228,11 +239,35 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
     return { fkEdges: [...out, ...inferred], inferredCount: inferred.length };
   }, [schema.tables]);
 
-  // 토글 반영된 표시 대상 — 레이아웃·이웃·색 배정 전부 이 목록 기준.
-  const visibleEdges = useMemo(
-    () => (showInferred ? fkEdges : fkEdges.filter((e) => !e.inferred)),
-    [fkEdges, showInferred],
-  );
+  // 모드별 표시 대상(노드 집합 + 엣지 목록) — 레이아웃·이웃·색 배정 전부 이 기준.
+  // tables=null 은 "전체". 모드별 노드 수는 필터 배지에 표기.
+  const { visibleEdges, visibleTables, viewCounts } = useMemo(() => {
+    const declared = fkEdges.filter((e) => !e.inferred);
+    const inferred = fkEdges.filter((e) => e.inferred);
+    const nodeSet = (edges: FkEdgeInfo[]) =>
+      new Set(edges.flatMap((e) => [e.source, e.target]));
+    const fkNodes = nodeSet(declared);
+    const infNodes = nodeSet(inferred);
+    const isolated = new Set(
+      schema.tables.map((t) => t.name).filter((n) => !fkNodes.has(n) && !infNodes.has(n)),
+    );
+    const byView: Record<ErdView, { tables: Set<string> | null; edges: FkEdgeInfo[] }> = {
+      all: { tables: null, edges: fkEdges },
+      fk: { tables: fkNodes, edges: declared },
+      inferred: { tables: infNodes, edges: inferred },
+      isolated: { tables: isolated, edges: [] },
+    };
+    return {
+      visibleEdges: byView[view].edges,
+      visibleTables: byView[view].tables,
+      viewCounts: {
+        all: schema.tables.length,
+        fk: fkNodes.size,
+        inferred: infNodes.size,
+        isolated: isolated.size,
+      } satisfies Record<ErdView, number>,
+    };
+  }, [fkEdges, schema.tables, view]);
 
   // 선택 테이블에 닿는 관계별 색 배정 — 같은 색 = 같은 FK 관계(자식 FK 행 ↔ 부모 PK 행 ↔ 연결선).
   const highlight = useMemo(() => {
@@ -267,9 +302,13 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
   }, [selected, visibleEdges]);
 
   // 기하(노드·엣지 구성)는 선택과 무관 — 선택 변화로 ELK 재계산이 돌지 않게 분리.
+  // (보기 모드 변화는 노드 집합이 바뀌므로 재계산 대상.)
   const base = useMemo(() => {
     const dims = new Map<string, { width: number; height: number }>();
-    const nodes: ErdFlowNode[] = schema.tables.map((t) => {
+    const shown = visibleTables
+      ? schema.tables.filter((t) => visibleTables.has(t.name))
+      : schema.tables;
+    const nodes: ErdFlowNode[] = shown.map((t) => {
       const fkCols = new Set((t.foreignKeys ?? []).flatMap((fk) => fk.columns.map((c) => c.toLowerCase())));
       const { rows, more } = keyRowsOf(t, fkCols);
       dims.set(t.name, { width: NODE_W, height: nodeHeight(rows.length, more) });
@@ -289,7 +328,7 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       data: { inferred: !!e.inferred },
     }));
     return { nodes, edges, dims };
-  }, [schema.tables, visibleEdges]);
+  }, [schema.tables, visibleTables, visibleEdges]);
 
   const [layouted, setLayouted] = useState<ErdFlowNode[] | null>(null);
   useEffect(() => {
@@ -311,6 +350,13 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       alive = false;
     };
   }, [base]);
+
+  // 보기 모드 전환 등으로 노드 집합·배치가 바뀌면 뷰포트 재적합(fitView prop 은 초기 1회뿐).
+  useEffect(() => {
+    if (!layouted) return;
+    const raf = requestAnimationFrame(() => fitView({ padding: 0.15, duration: 200 }));
+    return () => cancelAnimationFrame(raf);
+  }, [layouted, fitView]);
 
   // 선택/이웃 강조는 레이아웃 결과 위에 오버레이(위치 재계산 없음).
   const nodes = useMemo(() => {
@@ -383,29 +429,48 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
           <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
           <Controls showInteractive={false} />
           {schema.tables.length > 30 && <MiniMap pannable zoomable />}
-          {inferredCount > 0 && (
-            <Panel position="top-left">
-              <label
-                className="flex items-center gap-1.5 rounded-lg border border-border-subtle bg-panel card-shadow cursor-pointer select-none"
-                style={{ padding: "5px 10px", fontSize: 11.5, color: "var(--color-text-secondary)" }}
-              >
-                <input
-                  type="checkbox"
-                  checked={showInferred}
-                  onChange={(ev) =>
-                    setSearchParams((prev) => {
-                      if (ev.target.checked) prev.delete("inferred");
-                      else prev.set("inferred", "0");
-                      return prev;
-                    })
-                  }
-                  style={{ accentColor: "var(--color-status-info)" }}
-                />
-                추정 관계 {inferredCount}건
-                <span className="text-text-muted">— 실선 선언 FK · 점선 추정(컬럼명=타 테이블 PK)</span>
-              </label>
-            </Panel>
-          )}
+          <Panel position="top-left">
+            <div
+              className="flex items-center gap-1 rounded-lg border border-border-subtle bg-panel card-shadow select-none"
+              style={{ padding: "4px 6px", fontSize: 11.5 }}
+            >
+              {ERD_VIEWS.map((v) => {
+                const active = view === v.key;
+                const count = viewCounts[v.key];
+                return (
+                  <button
+                    key={v.key}
+                    type="button"
+                    disabled={count === 0}
+                    onClick={() =>
+                      setSearchParams((prev) => {
+                        if (v.key === "all") prev.delete("view");
+                        else prev.set("view", v.key);
+                        return prev;
+                      })
+                    }
+                    className="rounded-md border-0 cursor-pointer disabled:opacity-40 disabled:cursor-default transition-colors"
+                    style={{
+                      padding: "4px 9px",
+                      fontSize: 11.5,
+                      fontWeight: active ? 700 : 500,
+                      color: active ? "var(--color-status-info)" : "var(--color-text-secondary)",
+                      background: active
+                        ? "color-mix(in srgb, var(--color-status-info) 12%, transparent)"
+                        : "transparent",
+                    }}
+                  >
+                    {v.label} {count}
+                  </button>
+                );
+              })}
+              {inferredCount > 0 && (
+                <span className="text-text-muted" style={{ padding: "0 6px", fontSize: 11 }}>
+                  실선 선언 FK · 점선 추정(컬럼명=타 테이블 PK)
+                </span>
+              )}
+            </div>
+          </Panel>
         </ReactFlow>
       </div>
 

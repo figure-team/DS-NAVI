@@ -130,6 +130,75 @@ const KIND_LABEL: Record<string, string> = {
 };
 const APPROVER_LS_KEY = "ktds.approver";
 
+/** 캡처 표시 상한(px) — 원본 크기 그대로 보이되 이 폭을 넘으면 축소. */
+const MAX_CAPTURE_WIDTH = 1120;
+
+/** 캡처 여백 자동 제거 결과(문서 좌표). null = 제거 실패/무의미 → 원본 그대로. */
+interface CaptureCrop { x: number; y: number; width: number; height: number }
+/** 화면 id → 트림 결과 캐시 — 캔버스 스캔은 화면당 1회면 충분하다. */
+const TRIM_CACHE = new Map<string, CaptureCrop | null>();
+const TRIM_TOLERANCE = 8;
+const TRIM_PAD = 10;
+
+/**
+ * 고정 뷰포트 캡처(1280×800)의 바깥 여백(브라우저 배경 단색)을 잘라낸다 —
+ * 우하단 모서리 픽셀을 배경색으로 보고 네 변에서 배경뿐인 행/열을 걷어낸다.
+ * 실패(캔버스 불가·과도 축소)는 null 로 원본 폴백. 같은 오리진 이미지 전용.
+ */
+function computeTrim(img: HTMLImageElement): CaptureCrop | null {
+  const w = img.naturalWidth;
+  const h = img.naturalHeight;
+  if (w < 2 || h < 2) return null;
+  try {
+    const cv = document.createElement("canvas");
+    cv.width = w;
+    cv.height = h;
+    const ctx = cv.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0);
+    const data = ctx.getImageData(0, 0, w, h).data;
+    const c0 = ((h - 1) * w + (w - 1)) * 4;
+    const isBg = (x: number, y: number) => {
+      const i = (y * w + x) * 4;
+      return (
+        Math.abs(data[i] - data[c0]) <= TRIM_TOLERANCE &&
+        Math.abs(data[i + 1] - data[c0 + 1]) <= TRIM_TOLERANCE &&
+        Math.abs(data[i + 2] - data[c0 + 2]) <= TRIM_TOLERANCE
+      );
+    };
+    const rowBg = (y: number) => {
+      for (let x = 0; x < w; x++) if (!isBg(x, y)) return false;
+      return true;
+    };
+    const colBg = (x: number, y0: number, y1: number) => {
+      for (let y = y0; y <= y1; y++) if (!isBg(x, y)) return false;
+      return true;
+    };
+    let top = 0;
+    let bottom = h - 1;
+    let left = 0;
+    let right = w - 1;
+    while (bottom > top && rowBg(bottom)) bottom--;
+    while (top < bottom && rowBg(top)) top++;
+    while (right > left && colBg(right, top, bottom)) right--;
+    while (left < right && colBg(left, top, bottom)) left++;
+    if (right - left < 80 || bottom - top < 60) return null; // 퇴화 — 사실상 빈 캡처
+    const x = Math.max(0, left - TRIM_PAD);
+    const y = Math.max(0, top - TRIM_PAD);
+    const crop: CaptureCrop = {
+      x,
+      y,
+      width: Math.min(w, right + 1 + TRIM_PAD) - x,
+      height: Math.min(h, bottom + 1 + TRIM_PAD) - y,
+    };
+    // 여백이 거의 없으면(<3%) 트림 무의미 — 원본 유지로 레이아웃 흔들림 방지.
+    if (crop.width * crop.height > w * h * 0.97) return null;
+    return crop;
+  } catch {
+    return null;
+  }
+}
+
 /** 검색어 매치 하이라이트 — 첫 매치만 강조(시맨틱 accent). */
 function Highlight({ text, q }: { text: string; q: string }) {
   if (!q) return <>{text}</>;
@@ -186,6 +255,7 @@ export default function ScreenSpecView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
   const approverHandle = useDashboardStore((s) => s.approverHandle);
   const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
+  const domainGraph = useDashboardStore((s) => s.domainGraph);
   const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
   const dataBase = import.meta.env.BASE_URL;
   const tokenQ = accessToken && !DEMO_MODE ? `?token=${encodeURIComponent(accessToken)}` : "";
@@ -214,6 +284,9 @@ export default function ScreenSpecView() {
   const [draftAnn, setDraftAnn] = useState<Record<string, AnnOverride>>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [trim, setTrim] = useState<CaptureCrop | null>(null);
+  // 좌측 목록 — 도메인 그룹 접기(기본 전부 접힘). 검색 중에는 강제 전개.
+  const [openDomains, setOpenDomains] = useState<ReadonlySet<string>>(new Set());
 
   // 선택 화면이 바뀌면 편집·hover·캡처 오류 상태를 초기화한다(URL 이관 후 onClick 대체).
   useEffect(() => {
@@ -293,6 +366,67 @@ export default function ScreenSpecView() {
     DEMO_MODE
       ? `${dataBase}${s.capture.path}`
       : `/screen-asset?path=${encodeURIComponent(s.capture.path)}&token=${encodeURIComponent(accessToken ?? "")}`;
+
+  // 화면 전환 시 트림 상태 동기화 — 캐시 히트면 즉시, 아니면 onLoad 에서 채운다.
+  useEffect(() => {
+    setTrim(sel ? (TRIM_CACHE.get(sel.id) ?? null) : null);
+  }, [sel]);
+
+  // ?screen= 딥링크/선택 시 해당 도메인 그룹만 자동 전개(기본은 전부 접힘 유지).
+  useEffect(() => {
+    if (!selId || !file) return;
+    const s = file.screens.find((x) => x.id === selId);
+    if (!s) return;
+    const key = s.domain ?? "기타";
+    setOpenDomains((prev) => (prev.has(key) ? prev : new Set(prev).add(key)));
+  }, [selId, file]);
+  const toggleDomain = (d: string) =>
+    setOpenDomains((prev) => {
+      const next = new Set(prev);
+      if (next.has(d)) next.delete(d);
+      else next.add(d);
+      return next;
+    });
+
+  /**
+   * 업무 지도 딥링크 — 화면 URL(actions/Cart.action?viewCart=)을 domain-graph 의
+   * flow 노드 id("flow:<METHOD> <경로>?<이벤트>")와 대조해 기능 흐름도까지 연결.
+   * 흐름 매칭 실패 시 도메인 워크스페이스(/domains/:id)로만 폴백한다.
+   */
+  const bizLink = useMemo(() => {
+    if (!domainGraph || !sel) return null;
+    const flowDomain = new Map<string, string>();
+    for (const e of domainGraph.edges) {
+      if (String(e.source).startsWith("domain:") && String(e.target).startsWith("flow:")) {
+        flowDomain.set(String(e.target), String(e.source));
+      }
+    }
+    const byUrl = new Map<string, string>();
+    for (const n of domainGraph.nodes) {
+      if (n.type !== "flow" || !n.id.startsWith("flow:")) continue;
+      const sp = n.id.indexOf(" ");
+      if (sp > 0) byUrl.set(n.id.slice(sp + 1), n.id);
+    }
+    const [pathPart, queryPart] = sel.url.split("?");
+    const path = `/${pathPart.replace(/^\//, "")}`;
+    // 값 없는 쿼리 파라미터(viewCart= 등)가 이벤트 이름 — 경로 단독은 마지막 후보.
+    const candidates = (queryPart ?? "")
+      .split("&")
+      .map((kv) => kv.split("="))
+      .filter(([k, v]) => k && !v)
+      .map(([k]) => `${path}?${k}`);
+    candidates.push(path);
+    for (const c of candidates) {
+      const flowId = byUrl.get(c);
+      if (flowId) {
+        const domainId = flowDomain.get(flowId) ?? (sel.domain ? `domain:${sel.domain}` : null);
+        if (domainId) return `/domains/${domainId}?flow=${encodeURIComponent(flowId)}`;
+      }
+    }
+    const domainId = sel.domain ? `domain:${sel.domain}` : null;
+    if (domainId && domainGraph.nodes.some((n) => n.id === domainId)) return `/domains/${domainId}`;
+    return null;
+  }, [domainGraph, sel]);
 
   const startEdit = () => {
     if (!sel) return;
@@ -424,27 +558,42 @@ export default function ScreenSpecView() {
               style={{ padding: "6px 10px", fontSize: 12.5 }}
             />
           </div>
-          {groups.map(([domain, screens]) => (
-            <div key={domain}>
-              <div className="fold">{DOMAIN_LABEL[domain] ?? domain} ({screens.length})</div>
-              {screens.map((s) => (
+          {groups.map(([domain, screens]) => {
+            // 검색 중에는 접힘 상태를 무시하고 매칭 그룹을 전부 펼쳐 보여준다.
+            const open = ql !== "" || openDomains.has(domain);
+            return (
+              <div key={domain}>
                 <button
-                  key={s.id}
                   type="button"
-                  onClick={() => setParam("screen", s.id)}
-                  className={`doc ${s.id === sel.id ? "on" : ""}`}
-                  title={s.scenario ? `시나리오 ${s.scenario} 로 도달` : undefined}
+                  onClick={() => toggleDomain(domain)}
+                  className="fold flex items-center gap-1.5 w-full text-left cursor-pointer bg-transparent border-0"
+                  style={{ fontFamily: "inherit" }}
+                  aria-expanded={open}
                 >
-                  <span className="truncate" style={{ minWidth: 0 }}>
-                    <Highlight text={title(s)} q={ql} />
-                  </span>
-                  {overrides[s.id]?.confirmed && (
-                    <span className="st"><Badge tone="ok">확정</Badge></span>
-                  )}
+                  <span style={{ fontSize: 8, width: 9, flex: "none" }}>{open ? "▾" : "▸"}</span>
+                  <span className="truncate">{DOMAIN_LABEL[domain] ?? domain}</span>
+                  <span className="tabular-nums" style={{ fontWeight: 500 }}>({screens.length})</span>
                 </button>
-              ))}
-            </div>
-          ))}
+                {open &&
+                  screens.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setParam("screen", s.id)}
+                      className={`doc ${s.id === sel.id ? "on" : ""}`}
+                      title={s.scenario ? `시나리오 ${s.scenario} 로 도달` : undefined}
+                    >
+                      <span className="truncate" style={{ minWidth: 0 }}>
+                        <Highlight text={title(s)} q={ql} />
+                      </span>
+                      {overrides[s.id]?.confirmed && (
+                        <span className="st"><Badge tone="ok">확정</Badge></span>
+                      )}
+                    </button>
+                  ))}
+              </div>
+            );
+          })}
           {groups.length === 0 && (
             <div className="text-text-muted" style={{ padding: "8px 10px", fontSize: 12 }}>
               검색 결과 없음
@@ -465,14 +614,31 @@ export default function ScreenSpecView() {
             ) : (
               <b className="text-text-primary" style={{ fontSize: 15 }}>{title(sel)}</b>
             )}
-            <span className="text-text-muted break-all" style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{sel.url}</span>
+            <span
+              className="text-text-muted break-all"
+              style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}
+              title="캡처 시점에 호출한 화면 URL(분석 대상 baseUrl 기준 상대경로) — 코드 근거는 아래 표의 file:line"
+            >
+              {sel.url}
+            </span>
+            {bizLink && (
+              <Link
+                to={bizLink}
+                className="whitespace-nowrap font-semibold hover:underline"
+                style={{ fontSize: 11.5, color: "var(--color-status-info)", textDecoration: "none" }}
+                title="업무 지도의 해당 도메인(매칭되면 기능 흐름도까지)으로 이동"
+              >
+                업무 지도에서 보기 →
+              </Link>
+            )}
             {sel.graphNodeId && (
               <Link
                 to={`/structure?node=${encodeURIComponent(sel.graphNodeId)}`}
-                className="whitespace-nowrap font-semibold hover:underline"
-                style={{ fontSize: 11.5, color: "var(--color-status-info)", textDecoration: "none" }}
+                className="whitespace-nowrap hover:underline text-text-muted"
+                style={{ fontSize: 11.5, textDecoration: "none" }}
+                title="구조 탭에서 렌더 JSP 노드 보기"
               >
-                구조 탭에서 보기 →
+                구조 →
               </Link>
             )}
             {selOv?.confirmed ? <TrustBadge confirmedBy={selOv.approver} /> : <Badge tone="info">초안</Badge>}
@@ -569,37 +735,59 @@ export default function ScreenSpecView() {
               </div>
             </div>
           ) : (
-            <div
-              className="relative border border-border-medium rounded-lg overflow-hidden bg-white"
-              style={{ maxWidth: sel.capture.width }}
-            >
-              <img
-                src={imgSrc(sel)}
-                alt={title(sel)}
-                className="block w-full h-auto select-none"
-                draggable={false}
-                onError={() => setImgError(true)}
-              />
-              {visibleAnns.map((a) => {
-                const key = annKey(a);
-                const active = hoverKey === key;
-                const st = kindStyle(a.kind);
-                const m = merged(a);
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onMouseEnter={() => setHoverKey(key)}
-                    onMouseLeave={() => setHoverKey(null)}
-                    onFocus={() => setHoverKey(key)}
-                    onBlur={() => setHoverKey(null)}
-                    onClick={() => setHoverKey(key)}
-                    aria-label={`${badgeGlyph(a.kind, a.no)} ${m.label}${m.description ? ` — ${m.description}` : ""}`}
-                    title={`${m.label} — ${m.description ?? ""}`}
-                    className="absolute flex items-center justify-center rounded-full font-bold cursor-pointer transition-transform p-0"
-                    style={{
-                      left: `${((a.bbox.x + a.bbox.width) / sel.capture.width) * 100}%`,
-                      top: `${(a.bbox.y / sel.capture.height) * 100}%`,
+            /*
+             * 캡처 표시 — 고정 뷰포트의 회색 여백을 트림해 실제 내용 크기(1:1)로,
+             * MAX_CAPTURE_WIDTH 초과·장신 캡처는 축소/내부 스크롤로 상한을 건다.
+             * bbox 는 문서 좌표 그대로 두고 크롭 원점만 빼서 %를 다시 잡는다.
+             */
+            (() => {
+              const cropX = trim?.x ?? 0;
+              const cropY = trim?.y ?? 0;
+              const cropW = trim?.width ?? sel.capture.width;
+              const cropH = trim?.height ?? sel.capture.height;
+              return (
+                <div
+                  className="border border-border-medium rounded-lg overflow-auto bg-white"
+                  style={{ maxWidth: Math.min(cropW, MAX_CAPTURE_WIDTH), maxHeight: "75vh" }}
+                >
+                  <div className="relative overflow-hidden" style={{ aspectRatio: `${cropW} / ${cropH}` }}>
+                    <img
+                      src={imgSrc(sel)}
+                      alt={title(sel)}
+                      className="absolute select-none"
+                      style={{
+                        left: `${(-cropX / cropW) * 100}%`,
+                        top: `${(-cropY / cropH) * 100}%`,
+                        width: `${(sel.capture.width / cropW) * 100}%`,
+                        maxWidth: "none",
+                      }}
+                      draggable={false}
+                      onLoad={(e) => {
+                        if (!TRIM_CACHE.has(sel.id)) TRIM_CACHE.set(sel.id, computeTrim(e.currentTarget));
+                        setTrim(TRIM_CACHE.get(sel.id) ?? null);
+                      }}
+                      onError={() => setImgError(true)}
+                    />
+                    {visibleAnns.map((a) => {
+                      const key = annKey(a);
+                      const active = hoverKey === key;
+                      const st = kindStyle(a.kind);
+                      const m = merged(a);
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onMouseEnter={() => setHoverKey(key)}
+                          onMouseLeave={() => setHoverKey(null)}
+                          onFocus={() => setHoverKey(key)}
+                          onBlur={() => setHoverKey(null)}
+                          onClick={() => setHoverKey(key)}
+                          aria-label={`${badgeGlyph(a.kind, a.no)} ${m.label}${m.description ? ` — ${m.description}` : ""}`}
+                          title={`${m.label} — ${m.description ?? ""}`}
+                          className="absolute flex items-center justify-center rounded-full font-bold cursor-pointer transition-transform p-0"
+                          style={{
+                            left: `${((a.bbox.x + a.bbox.width - cropX) / cropW) * 100}%`,
+                            top: `${((a.bbox.y - cropY) / cropH) * 100}%`,
                       transform: `translate(-50%, -50%) scale(${active ? 1.4 : 1})`,
                       width: 20,
                       height: 20,
@@ -611,12 +799,15 @@ export default function ScreenSpecView() {
                       boxShadow: active ? "0 0 0 2px #fff, 0 0 6px rgba(0,0,0,0.5)" : "0 0 2px rgba(0,0,0,0.6)",
                       zIndex: active ? 10 : 1,
                     }}
-                  >
-                    {badgeGlyph(a.kind, a.no)}
-                  </button>
-                );
-              })}
-            </div>
+                        >
+                          {badgeGlyph(a.kind, a.no)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()
           )}
 
           {/* 범례 표 — 프로토 .tbl */}

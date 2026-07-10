@@ -10,7 +10,6 @@ import { useViewMode } from "../../hooks/useViewMode";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 import type { KeyboardShortcut } from "../../hooks/useKeyboardShortcuts";
 import { useI18n } from "../../contexts/I18nContext";
-import { currentMode } from "../viewModePaths";
 import type { ShellContext } from "../Root";
 
 const CodeViewer = lazy(() => import("../../components/CodeViewer"));
@@ -74,8 +73,8 @@ export default function ShellLayout(ctx: ShellContext) {
   );
 
   // 구 setViewMode의 정리 동작 계승 — 섹션이 바뀌면 선택/흐름/코드뷰어를 닫는다.
-  // 마운트(딥링크 최초 진입)에는 발화하지 않고, "선택을 들고 점프"(openWikiDoc,
-  // 도메인 점프)가 preserveTransientOnce를 켠 경우 1회 건너뛴다.
+  // 마운트(딥링크 최초 진입)에는 발화하지 않고, "선택을 들고 점프"(도메인 점프)가
+  // preserveTransientOnce를 켠 경우 1회 건너뛴다.
   const prevMode = useRef(mode);
   useEffect(() => {
     if (prevMode.current !== mode) {
@@ -171,7 +170,6 @@ export default function ShellLayout(ctx: ShellContext) {
         key: "d",
         description: t.keyboardShortcuts.toggleDiff,
         action: () => {
-          if (currentMode() === "wiki") return; // ktds-fork (ADR-004): 문서 모드는 오버레이 비해당
           useDashboardStore.getState().toggleOverlay("diff");
         },
         category: "View",
@@ -180,7 +178,6 @@ export default function ShellLayout(ctx: ShellContext) {
         key: "i",
         description: t.keyboardShortcuts.toggleImpact,
         action: () => {
-          if (currentMode() === "wiki") return; // ktds-fork (ADR-004): 문서 모드는 오버레이 비해당
           useDashboardStore.getState().toggleOverlay("impact");
         },
         category: "View",
@@ -189,7 +186,6 @@ export default function ShellLayout(ctx: ShellContext) {
         key: "r",
         description: "위험 오버레이 토글",
         action: () => {
-          if (currentMode() === "wiki") return; // 문서 모드는 오버레이 비해당
           useDashboardStore.getState().toggleOverlay("risk");
         },
         category: "View",

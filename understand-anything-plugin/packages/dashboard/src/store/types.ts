@@ -6,13 +6,11 @@ export type NavigationLevel = "overview" | "layer-detail";
 export type NodeType = "file" | "function" | "class" | "module" | "concept" | "config" | "document" | "service" | "table" | "endpoint" | "pipeline" | "schema" | "resource" | "domain" | "flow" | "step" | "article" | "entity" | "topic" | "claim" | "source";
 export type Complexity = "simple" | "moderate" | "complex";
 export type EdgeCategory = "structural" | "behavioral" | "data-flow" | "dependencies" | "semantic" | "infrastructure" | "domain" | "knowledge";
-// ktds-fork (ADR-004): "wiki" = 코드그래프 위에 세분화 위키를 "문서" 토글로 오버레이.
 // 신설 6메뉴(pmpl-proto 메뉴 개편 2차): data/change/programs/quality/report/policy.
+// wiki("문서")·knowledge(지식그래프) 모드는 2026-07-11 은퇴 — 내용은 업무지도·데이터·산출물이 흡수.
 export type ViewMode =
   | "structural"
   | "domain"
-  | "knowledge"
-  | "wiki"
   | "docs"
   | "rtm"
   | "screenspec"

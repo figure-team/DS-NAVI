@@ -289,43 +289,6 @@ function DomainNodeDetails({ node, graph }: { node: GraphNode; graph: KnowledgeG
   return null;
 }
 
-// ktds-fork: 도메인 노드의 세분화 위키 문서로 가는 진입점.
-// 도메인 노드 id == wiki 노드 id(= CanonicalNode.uid)로 직접 매칭(검증됨). 구조(코드)
-// 노드는 U-A ordinal id라 wiki id와 겹치지 않아 코드 뷰에선 자연히 매칭 0 → 미표시.
-function RelatedDocsSection({ node }: { node: GraphNode }) {
-  const wikiGraph = useDashboardStore((s) => s.wikiGraph);
-  const openWikiDoc = useDashboardStore((s) => s.openWikiDoc);
-  const markPreserveTransientOnce = useDashboardStore((s) => s.markPreserveTransientOnce);
-  const navigate = useNavigate();
-  const mode = useViewMode();
-  const doc = wikiGraph?.nodes.find((n) => n.id === node.id && n.type === "article");
-  if (!doc) return null;
-  return (
-    <div className="mb-4">
-      <h3 className="text-[11px] font-semibold text-accent uppercase tracking-wider mb-2">관련 문서</h3>
-      <button
-        type="button"
-        onClick={() => {
-          openWikiDoc(doc.id);
-          // P2: 문서 선택을 들고 /wiki로 섹션 이동(원자성은 preserve 플래그가 보장).
-          if (mode !== "wiki") {
-            markPreserveTransientOnce();
-            navigate("/wiki");
-          }
-        }}
-        className="block w-full text-left px-3 py-2 rounded-lg bg-elevated border border-border-subtle hover:border-accent/40 hover:bg-accent/5 transition-colors"
-      >
-        <div className="text-[12px] text-text-primary truncate">{doc.name}</div>
-        {doc.filePath && (
-          <div className="text-[10px] font-mono text-text-muted truncate mt-0.5" title={doc.filePath}>
-            {doc.filePath}
-          </div>
-        )}
-      </button>
-    </div>
-  );
-}
-
 export default function NodeInfo() {
   const graph = useDashboardStore((s) => s.graph);
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
@@ -341,15 +304,8 @@ export default function NodeInfo() {
   const focusNodeId = useDashboardStore((s) => s.focusNodeId);
   const viewMode = useViewMode();
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const wikiGraph = useDashboardStore((s) => s.wikiGraph); // ktds-fork (ADR-004)
 
-  // ktds-fork (ADR-004): "문서" 모드면 위키 그래프에서 노드 조회(본문·위키링크·백링크).
-  const activeGraph =
-    viewMode === "wiki" && wikiGraph
-      ? wikiGraph
-      : viewMode === "domain" && domainGraph
-      ? domainGraph
-      : graph;
+  const activeGraph = viewMode === "domain" && domainGraph ? domainGraph : graph;
   const node = activeGraph?.nodes.find((n) => n.id === selectedNodeId) ?? null;
 
   // Resolve history node names for the breadcrumb trail
@@ -538,11 +494,6 @@ export default function NodeInfo() {
       {/* Domain-specific details */}
       {activeGraph && node && (node.type === "domain" || node.type === "flow" || node.type === "step") && (
         <DomainNodeDetails node={node} graph={activeGraph} />
-      )}
-
-      {/* ktds-fork: 도메인 노드 → 세분화 위키 문서 진입점 ("관련 문서") */}
-      {node && (node.type === "domain" || node.type === "flow" || node.type === "step") && (
-        <RelatedDocsSection node={node} />
       )}
 
       {/* Child classes/functions within this file */}

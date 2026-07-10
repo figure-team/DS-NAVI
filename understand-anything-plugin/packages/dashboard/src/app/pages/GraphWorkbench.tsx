@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDashboardStore } from "../../store";
 import GraphView from "../../components/GraphView";
-import KnowledgeGraphView from "../../components/KnowledgeGraphView";
-import WikiReader from "../../components/WikiReader"; // ktds-fork (ADR-004): 문서 모드 리더
 import SearchBar from "../../components/SearchBar";
 import NodeInfo from "../../components/NodeInfo";
 import LayerLegend from "../../components/LayerLegend";
@@ -17,23 +15,16 @@ import { useI18n } from "../../contexts/I18nContext";
 type SidebarTab = "info" | "files";
 type MobilePane = "main" | "info" | "files";
 
-interface Props {
-  /** 이 워크벤치가 서비스하는 섹션 — 라우트가 결정한다. */
-  mode: "structural" | "knowledge" | "wiki";
-}
-
 /**
- * 그래프 워크벤치 (FRONT_REDESIGN P2) — 구조/지식그래프/위키 3개 섹션이 공유하는
- * "툴바 + 그래프(또는 리더) + 우측 사이드바" 본체.
+ * 그래프 워크벤치 (FRONT_REDESIGN P2) — 구조 섹션의
+ * "툴바 + 그래프 + 우측 사이드바" 본체 (위키·지식그래프 섹션은 2026-07-11 은퇴).
  * 모바일(반응형 통합, 구 MobileLayout 폐기): 사이드바 대신 그래프/정보/파일 콘텐츠 탭 —
  * 비활성 패널은 invisible로 유지해 ReactFlow 치수를 보존한다(구 MobileLayout 기법).
  */
-export default function GraphWorkbench({ mode }: Props) {
+export default function GraphWorkbench() {
   const selectedNodeId = useDashboardStore((s) => s.selectedNodeId);
   const nodeTypeFilters = useDashboardStore((s) => s.nodeTypeFilters);
   const toggleNodeTypeFilter = useDashboardStore((s) => s.toggleNodeTypeFilter);
-  const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
-  const wikiGraph = useDashboardStore((s) => s.wikiGraph); // ktds-fork (ADR-004)
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("info");
   const [mobilePane, setMobilePane] = useState<MobilePane>("main");
   const isMobile = useIsMobile();
@@ -81,23 +72,14 @@ export default function GraphWorkbench({ mode }: Props) {
     </div>
   );
 
-  // 메인 뷰(그래프/리더) — 데스크톱·모바일 공유.
-  const mainView =
-    mode === "knowledge" ? (
-      <KnowledgeGraphView />
-    ) : mode === "wiki" && wikiGraph ? (
-      <WikiReader />
-    ) : (
-      <GraphView />
-    );
+  // 메인 뷰(그래프) — 데스크톱·모바일 공유.
+  const mainView = <GraphView />;
 
   // 컨텍스트 툴바 — 구 레거시 헤더의 워크벤치 전용 액션(데스크톱·모바일 공유, 가로 스크롤).
   const toolbar = (
     <header className="flex items-center px-3 sm:px-5 py-2.5 bg-surface border-b border-border-subtle shrink-0 gap-2 sm:gap-4">
       {/* Middle — scrollable legends */}
-      {/* ktds-fork (ADR-004): "문서"(wiki) 모드는 범례·레이어 전부 숨김(flex-1 스페이서만 유지) */}
       <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
-        {mode !== "wiki" && (
         <div className="flex items-center gap-4 w-max">
           <DiffToggle />
           {/* 영향도 분석 실행 진입점은 변경·영향 메뉴(ChangeImpactView)로 일원화 —
@@ -107,9 +89,7 @@ export default function GraphWorkbench({ mode }: Props) {
               +클래스 확장은 PM/PL 대상이 아니라고 사용자 확정. detailLevel 기본값 "file" 고정 소비.
               "개요"는 노드 폭발 개편 때 레이어 요약 뷰로 재도입 예정. */}
           <div className="flex items-center gap-1">
-            {(isKnowledgeGraph ? [
-              { key: "knowledge" as const, label: t.nodeTypeLabels.all, color: "var(--color-node-article)" },
-            ] : [
+            {([
               { key: "code" as const, label: t.nodeTypeLabels.code, color: "var(--color-node-file)" },
               { key: "config" as const, label: t.nodeTypeLabels.config, color: "var(--color-node-config)" },
               { key: "docs" as const, label: t.nodeTypeLabels.docs, color: "var(--color-node-document)" },
@@ -141,7 +121,6 @@ export default function GraphWorkbench({ mode }: Props) {
           </div>
           <LayerLegend />
         </div>
-        )}
       </div>
 
       {/* Right — fixed actions */}
@@ -157,7 +136,7 @@ export default function GraphWorkbench({ mode }: Props) {
     // 반응형 통합 — 사이드바 대신 콘텐츠 탭. 패널은 마운트 유지(invisible)로
     // ReactFlow 치수·핀치 상태를 보존한다.
     const panes: Array<{ key: MobilePane; label: string }> = [
-      { key: "main", label: mode === "wiki" ? "문서" : t.drawer.structural },
+      { key: "main", label: t.drawer.structural },
       { key: "info", label: t.sidebar.info },
       { key: "files", label: t.sidebar.files },
     ];
@@ -223,20 +202,8 @@ export default function GraphWorkbench({ mode }: Props) {
         </div>
 
         {/* Right sidebar — telescopes at narrower widths */}
-        {/* ktds-fork (ADR-004): "문서" 모드 사이드바 = 폴더 트리(네비게이션). 정보는 메인 리더로. */}
         <aside className="w-[260px] md:w-[300px] lg:w-[360px] shrink-0 bg-surface border-l border-border-subtle overflow-auto">
-          {mode === "wiki" && wikiGraph ? (
-            <div className="h-full flex flex-col min-h-0">
-              <div className="flex items-center px-3 py-2 border-b border-border-subtle bg-surface shrink-0 text-xs font-semibold uppercase tracking-wider text-text-muted">
-                문서 폴더
-              </div>
-              <div className="flex-1 min-h-0 overflow-auto">
-                <FileExplorer />
-              </div>
-            </div>
-          ) : (
-            sidebarContent
-          )}
+          {sidebarContent}
         </aside>
       </div>
     </div>

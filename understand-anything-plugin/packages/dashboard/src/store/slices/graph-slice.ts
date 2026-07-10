@@ -80,8 +80,6 @@ export interface GraphSlice {
   // Sidebar navigation history (stack of visited node IDs)
   nodeHistory: string[];
 
-  isKnowledgeGraph: boolean;
-
   setGraph: (graph: KnowledgeGraph) => void;
   selectNode: (nodeId: string | null) => void;
   navigateToNode: (nodeId: string) => void;
@@ -93,7 +91,6 @@ export interface GraphSlice {
   setFocusNode: (nodeId: string | null) => void;
   setSearchQuery: (query: string) => void;
   setPersona: (persona: Persona) => void;
-  setIsKnowledgeGraph: (value: boolean) => void;
 }
 
 export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> = (set, get) => ({
@@ -116,8 +113,6 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
 
   focusNodeId: null,
   nodeHistory: [],
-
-  isKnowledgeGraph: false,
 
   setGraph: (graph) => {
     const searchEngine = new SearchEngine(graph.nodes);
@@ -303,8 +298,4 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
       expandedContainers: new Set(),
       pendingFocusContainer: null,
     }),
-
-  setIsKnowledgeGraph: (value) => {
-    set({ isKnowledgeGraph: value });
-  },
 });

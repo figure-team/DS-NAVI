@@ -10,16 +10,13 @@ import { useI18n } from "../../contexts/I18nContext";
  */
 export default function MobileTabBar() {
   const graph = useDashboardStore((s) => s.graph);
-  const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const { t } = useI18n();
 
   const items: Array<{ to: string; label: string; icon: ReactNode }> = [
     { to: "/", label: "홈", icon: iconHome },
   ];
-  if (graph && isKnowledgeGraph) {
-    items.push({ to: "/knowledge", label: "지식", icon: iconDomain });
-  } else if (graph) {
+  if (graph) {
     if (domainGraph) items.push({ to: "/domains", label: t.drawer.domain, icon: iconDomain });
     items.push({ to: "/structure", label: t.drawer.structural, icon: iconStructure });
     items.push({ to: "/rtm", label: "추적표", icon: iconRtm });

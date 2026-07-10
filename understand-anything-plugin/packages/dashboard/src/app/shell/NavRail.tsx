@@ -23,18 +23,14 @@ interface Props {
  */
 export default function NavRail({ onShowKeyboardHelp }: Props) {
   const graph = useDashboardStore((s) => s.graph);
-  const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const wikiGraph = useDashboardStore((s) => s.wikiGraph);
   const { t } = useI18n();
 
   // 프로토(pmpl-proto) 그룹·순서 — 이해(업무 지도·구조·데이터·화면설계서) /
   // 요구·변경(추적표·변경·영향) / 정량·보고(프로그램·품질·위험·보고서) /
-  // 정책·산출·참고(정책서·산출물·문서). 메뉴 개편 2차: 신설 6메뉴 포함 전체.
+  // 정책·산출(정책서·산출물). 메뉴 개편 2차: 신설 6메뉴 포함 전체.
   const items: NavItem[] = [{ to: "/", label: "홈", icon: iconHome }];
-  if (graph && isKnowledgeGraph) {
-    items.push({ to: "/knowledge", label: "지식그래프", icon: iconDomain });
-  } else if (graph) {
+  if (graph) {
     if (domainGraph) items.push({ to: "/domains", label: t.drawer.domain, icon: iconDomain, group: "이해" });
     items.push({
       to: "/structure",
@@ -49,9 +45,8 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
     items.push({ to: "/programs", label: "프로그램", icon: iconPrograms, group: "정량 · 보고" });
     items.push({ to: "/quality", label: "품질·위험", icon: iconQuality });
     items.push({ to: "/report", label: "보고서", icon: iconReport });
-    items.push({ to: "/policy", label: "정책서", icon: iconPolicy, group: "정책 · 산출 · 참고" });
+    items.push({ to: "/policy", label: "정책서", icon: iconPolicy, group: "정책 · 산출" });
     items.push({ to: "/deliverables", label: "산출물", icon: iconDocs });
-    if (wikiGraph) items.push({ to: "/wiki", label: "문서", icon: iconWiki });
   }
 
   return (
@@ -159,12 +154,6 @@ const iconScreens = (
     <rect x="3" y="4" width="18" height="12" rx="1.8" />
     <path d="M9 20h6M12 16v4" />
     <circle cx="7" cy="8" r="1.1" fill="currentColor" stroke="none" />
-  </svg>
-);
-const iconWiki = (
-  <svg {...svgProps}>
-    <path d="M4 5a2.5 2.5 0 0 1 2.5-2.5H20V19H6.5A2.5 2.5 0 0 0 4 21.5z" />
-    <path d="M4 19a2.5 2.5 0 0 1 2.5-2.5H20" />
   </svg>
 );
 // 신설 6메뉴 아이콘 — pmpl-proto nav SVG 그대로.

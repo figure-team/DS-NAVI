@@ -30,7 +30,7 @@ export interface SessionSlice {
 
   /** P2: 섹션(URL) 전환 시 선택/흐름/코드뷰어 등 휘발 상태 정리 — 구 setViewMode의 정리 반쪽. */
   resetTransientOnSectionChange: () => void;
-  /** P2: "선택을 들고 섹션 점프"(openWikiDoc, 도메인 점프)가 다음 1회 정리를 건너뛰게 표시. */
+  /** P2: "선택을 들고 섹션 점프"(도메인 점프)가 다음 1회 정리를 건너뛰게 표시. */
   preserveTransientOnce: boolean;
   markPreserveTransientOnce: () => void;
   consumePreserveTransientOnce: () => void;

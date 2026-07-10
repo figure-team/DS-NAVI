@@ -45,7 +45,6 @@ export default function Root() {
 function RootData({ accessToken }: { accessToken: string }) {
   const setGraph = useDashboardStore((s) => s.setGraph);
   const setDomainGraph = useDashboardStore((s) => s.setDomainGraph);
-  const setWikiGraph = useDashboardStore((s) => s.setWikiGraph); // ktds-fork (ADR-004)
   const setOverlayData = useDashboardStore((s) => s.setOverlayData);
   const setNodeOverrides = useDashboardStore((s) => s.setNodeOverrides); // P3
   const setApproverHandle = useDashboardStore((s) => s.setApproverHandle); // P3
@@ -107,10 +106,6 @@ function RootData({ accessToken }: { accessToken: string }) {
         if (result.success && result.data) {
           setGraph(result.data);
           setGraphIssues(result.issues);
-          if ((data as Record<string, unknown>).kind === "knowledge") {
-            // P2: /knowledge로의 이동은 StructurePage의 isKnowledgeGraph 리다이렉트가 담당.
-            useDashboardStore.getState().setIsKnowledgeGraph(true);
-          }
           for (const issue of result.issues) {
             if (issue.level === "auto-corrected") {
               console.warn(`[graph] auto-corrected: ${issue.message}`);
@@ -216,22 +211,6 @@ function RootData({ accessToken }: { accessToken: string }) {
       })
       .catch(() => {});
   }, [setDomainGraph]);
-
-  // ktds-fork (ADR-004): 세분화 위키 그래프 로드 → "문서" 토글 소스. 없으면 토글 미표시.
-  useEffect(() => {
-    fetch(dataUrl("wiki-graph.json", accessToken))
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: unknown) => {
-        if (!data) return;
-        const result = validateGraph(data);
-        if (result.success && result.data) {
-          setWikiGraph(result.data);
-        } else if (result.fatal) {
-          console.warn(`[wiki-graph] validation failed: ${result.fatal}`);
-        }
-      })
-      .catch(() => {});
-  }, [setWikiGraph]);
 
   return (
     <I18nProvider language={outputLanguage ?? "ko"}>

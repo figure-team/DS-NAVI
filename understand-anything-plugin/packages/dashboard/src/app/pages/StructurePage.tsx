@@ -1,15 +1,13 @@
 import { useEffect, useRef } from "react";
-import { Navigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { useDashboardStore } from "../../store";
 import GraphWorkbench from "./GraphWorkbench";
 
-/** 구조 그래프 섹션. 지식그래프(kind: "knowledge") 프로젝트면 /knowledge로 보낸다. */
+/** 구조 그래프 섹션. */
 export default function StructurePage() {
-  const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   useStructureUrlSync();
   useOverlayParam();
-  if (isKnowledgeGraph) return <Navigate to="/knowledge" replace />;
-  return <GraphWorkbench mode="structural" />;
+  return <GraphWorkbench />;
 }
 
 /**

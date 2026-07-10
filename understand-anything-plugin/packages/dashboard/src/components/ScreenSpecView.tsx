@@ -118,7 +118,7 @@ const DOMAIN_LABEL: Record<string, string> = {
  */
 const MECH_CONF: Record<string, { kind: ConfKind; label: string; title: string }> = {
   CONFIRMED: { kind: "fix", label: "근거확보", title: "결정적 정적 분석이 코드에서 근거(file:line)를 직접 추적함 — 규칙 기반이라 재현 가능" },
-  CONFIRMED_AI: { kind: "ai", label: "근거확보(AI)", title: "정적 분석이 잇지 못한 연결을 AI가 코드를 읽어 보완 판정한 근거 — file:line 은 있으나 검토 권장" },
+  CONFIRMED_AI: { kind: "ai", label: "근거확보(추정)", title: "정적 분석이 잇지 못한 연결을 AI가 코드를 읽어 보완 판정한 근거 — 파일 위치는 있으나 검토 권장" },
   INFERRED: { kind: "est", label: "추정", title: "핸들러 미검출 또는 메서드명 추론 — 기계 판정" },
   UNVERIFIED: { kind: "chk", label: "확인 필요", title: "근거 없음 — 확인 필요" },
 };
@@ -208,7 +208,10 @@ function computeTrim(img: HTMLImageElement): CaptureCrop | null {
  * 코드 뷰어 칩으로 렌더한다. 근거 표기가 없으면 원문 그대로.
  */
 function extractSummaryEvidence(raw: string): { text: string; evidence: string | null } {
-  const m = raw.match(/[,，]?\s*근거\s*[:：]\s*([^)）]*)/);
+  // "근거:" 명시 표기가 없어도 경로 형태(file[:line])가 제시돼 있으면 근거로 승격.
+  const m =
+    raw.match(/[,，]?\s*근거\s*[:：]\s*([^)）]*)/) ??
+    raw.match(/((?:[\w.-]+\/)+[\w.-]+\.[A-Za-z]\w*(?:\s*:\s*\d+(?:\s*-\s*\d+)?)?)/);
   if (!m || m.index === undefined) return { text: raw, evidence: null };
   const text = (raw.slice(0, m.index) + raw.slice(m.index + m[0].length))
     .replace(/[(（]\s*[)）]/g, "")
@@ -240,6 +243,13 @@ function parseEvidenceParts(evidence: string, resolve: (base: string) => string 
     }
     if (tok === "→") {
       parts.push({ type: "text", display: " → " });
+      continue;
+    }
+    // 저장소 경로가 통째로 제시된 토큰(src/…/index.html[:12]) — 해석 없이 직접 사용.
+    const dm = tok.match(/^((?:[\w.-]+\/)+[\w.-]+\.[A-Za-z]\w*)\s*(?::\s*(\d+)(?:\s*-\s*\d+)?)?$/);
+    if (dm) {
+      lastFile = dm[1];
+      parts.push({ type: "ref", display: tok, file: dm[1], line: dm[2] ? Number(dm[2]) : 1 });
       continue;
     }
     const fm = tok.match(/^(.*?)([\w$.-]+\.[A-Za-z]\w*)\s*:\s*(\d+)(?:\s*-\s*\d+)?$/);
@@ -864,7 +874,7 @@ export default function ScreenSpecView() {
               </MetaRow>
             )}
             {summaryInfo?.evidenceParts && (
-              <MetaRow label="근거" help="설명 판단이 나온 코드 위치 — 클릭하면 코드 뷰어로 엽니다. 배지: 근거확보=결정적 정적 분석 추적 / 근거확보(AI)=AI 가 코드를 읽어 보완 판정(검토 권장)">
+              <MetaRow label="근거" help="설명 판단이 나온 코드 위치 — 클릭하면 코드 뷰어로 엽니다. 배지: 근거확보=결정적 정적 분석 추적 / 근거확보(추정)=AI 가 코드를 읽어 보완 판정(검토 권장)">
                 {summaryInfo.evidenceParts.map((p, i) =>
                   p.type === "ref" ? (
                     <button

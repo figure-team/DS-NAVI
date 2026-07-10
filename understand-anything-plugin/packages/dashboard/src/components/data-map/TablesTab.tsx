@@ -132,13 +132,19 @@ function TableTree({
   );
 }
 
-function TableDetail({
+/**
+ * 테이블 상세 카드(컬럼 표 + 행 샘플) — 테이블 탭 본문·ERD 탭 사이드 패널 공용.
+ * fixedColumns: 테이블 탭은 true(테이블 간 셀 폭 통일), ERD 사이드 패널은 false
+ * (좁은 패널이라 해당 테이블 데이터에 맞춰 내용 맞춤 폭).
+ */
+export function TableDetail({
   table,
   tier,
   highlightCols,
   knownTables,
   onSelectTable,
   onSeeCrud,
+  fixedColumns = true,
 }: {
   table: DbTable;
   tier: string;
@@ -147,6 +153,7 @@ function TableDetail({
   knownTables: Map<string, string>;
   onSelectTable: (name: string) => void;
   onSeeCrud: () => void;
+  fixedColumns?: boolean;
 }) {
   const rows = table.rowCount || table.rows.length;
   const hl = (c: DbColumn): React.CSSProperties | undefined =>
@@ -193,7 +200,8 @@ function TableDetail({
 
   return (
     <div className="min-w-0 grid" style={{ gap: 14 }}>
-      <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 22px" }}>
+      {/* min-w-0 — grid item 기본 min-width:auto 가 표 자연폭만큼 카드를 키우는 것 방지(표는 카드 안에서 가로 스크롤) */}
+      <div className="min-w-0 rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 22px" }}>
         <div className="flex items-center gap-2.5 flex-wrap" style={{ marginBottom: 4 }}>
           <b className="font-mono text-text-primary" style={{ fontSize: 15 }}>
             {table.name}
@@ -215,14 +223,16 @@ function TableDetail({
 
         <div className="overflow-x-auto" style={{ marginTop: 10 }}>
           {/* colgroup 고정 폭 — 어떤 테이블을 선택해도 셀 폭이 동일(내용 기반 자동 폭 금지) */}
-          <table className="proto-tbl" style={{ tableLayout: "fixed", minWidth: 640 }}>
-            <colgroup>
-              <col style={{ width: "22%" }} />
-              <col style={{ width: "16%" }} />
-              <col style={{ width: 96 }} />
-              <col style={{ width: "20%" }} />
-              <col />
-            </colgroup>
+          <table className="proto-tbl" style={fixedColumns ? { tableLayout: "fixed", minWidth: 640 } : undefined}>
+            {fixedColumns && (
+              <colgroup>
+                <col style={{ width: "22%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: 96 }} />
+                <col style={{ width: "20%" }} />
+                <col />
+              </colgroup>
+            )}
             <thead>
               <tr>
                 <th>컬럼</th>
@@ -241,7 +251,7 @@ function TableDetail({
                   <td className="font-mono truncate" title={c.type}>
                     {c.type}
                   </td>
-                  <td className="text-text-muted">{c.nullable ? "NULL" : "NOT NULL"}</td>
+                  <td className="text-text-muted whitespace-nowrap">{c.nullable ? "NULL" : "NOT NULL"}</td>
                   <td>{keyCell(c)}</td>
                   <td>{c.comment ?? <span className="text-text-muted">—</span>}</td>
                 </tr>
@@ -277,7 +287,7 @@ function TableDetail({
 
       {/* 행 데이터 샘플 — 테이블 표와 분리된 별도 카드, 근거는 표 카드와 동일하게 우측 상단 */}
       {table.rows.length > 0 && (
-        <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 22px" }}>
+        <div className="min-w-0 rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 22px" }}>
           <div className="flex items-center gap-2.5 flex-wrap" style={{ marginBottom: 10 }}>
             <b className="text-text-primary" style={{ fontSize: 13 }}>
               행 데이터 샘플

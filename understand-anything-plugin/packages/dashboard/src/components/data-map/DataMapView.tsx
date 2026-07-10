@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
@@ -9,6 +9,9 @@ import TablesTab from "./TablesTab";
 import UnresolvedBanner from "./UnresolvedBanner";
 import type { CrudMatrix, DbSchema } from "./types";
 
+// ERD 탭은 @xyflow/react + elkjs 를 끌고 오므로 진입 시점 분리 로드.
+const ErdTab = lazy(() => import("./ErdTab"));
+
 /**
  * 데이터 맵(pg-data) 컨테이너 — db-schema.json / crud-matrix.json 로드 + 탭 라우팅.
  * 개편(docs/ktds/DATA_MAP_REDESIGN_DESIGN.md): 탭·선택·검색·필터를 전부 URL 로 이관
@@ -16,8 +19,8 @@ import type { CrudMatrix, DbSchema } from "./types";
  * 데이터 부재 시 화면/탭 단위 정직한 안내 카드(침묵 누락 금지).
  */
 
-type TabKey = "tables" | "crud" | "code";
-const TAB_KEYS: TabKey[] = ["tables", "crud", "code"];
+type TabKey = "tables" | "erd" | "crud" | "code";
+const TAB_KEYS: TabKey[] = ["tables", "erd", "crud", "code"];
 
 /** 정직한 부재/오류 안내 카드. */
 function EmptyCard({ children }: { children: React.ReactNode }) {
@@ -85,10 +88,13 @@ export default function DataMapView() {
     ? `db-schema.json · Tier ${schema.tier?.toUpperCase() ?? "?"} · 테이블 ${schema.tables.length} · SQL ${schema.sqlFileCount ?? "?"}파일`
     : undefined;
 
+  // 배지는 전 탭 상시 표시 — ERD 는 테이블 탭과 같은 대상(테이블 수)을 센다
+  // (FK 관계 수를 넣었더니 "테이블 190 vs ERD 62"로 오독됨). 데이터 부재는 0.
   const tabs: Array<{ key: TabKey; label: string; count?: number }> = [
-    { key: "tables", label: "테이블", count: schema?.tables.length },
-    { key: "crud", label: "CRUD 매트릭스", count: crud?.rows.length },
-    { key: "code", label: "코드 테이블", count: codeTables.length || undefined },
+    { key: "tables", label: "테이블", count: schema?.tables.length ?? 0 },
+    { key: "erd", label: "ERD", count: schema?.tables.length ?? 0 },
+    { key: "crud", label: "CRUD 매트릭스", count: crud?.rows.length ?? 0 },
+    { key: "code", label: "코드 테이블", count: codeTables.length },
   ];
 
   return (
@@ -143,6 +149,15 @@ export default function DataMapView() {
           />
 
           {tab === "tables" && (schema ? <TablesTab schema={schema} /> : <EmptyCard>로딩 중…</EmptyCard>)}
+
+          {tab === "erd" &&
+            (schema ? (
+              <Suspense fallback={<EmptyCard>ERD 로딩 중…</EmptyCard>}>
+                <ErdTab schema={schema} />
+              </Suspense>
+            ) : (
+              <EmptyCard>로딩 중…</EmptyCard>
+            ))}
 
           {tab === "crud" &&
             (crud ? (

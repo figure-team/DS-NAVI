@@ -250,6 +250,11 @@ export const ELK_OVERVIEW_LAYOUT_OPTIONS: Record<string, string> = {
 export const ELK_DETAIL_LAYOUT_OPTIONS: Record<string, string> = {
   ...ELK_DEFAULT_LAYOUT_OPTIONS,
   "elk.hierarchyHandling": "INCLUDE_CHILDREN",
+  // 펼친 컨테이너 안 형제 엣지(예: JSP include 메시 30+개)가 각자 전용 직교 트랙을
+  // 차지하면 노드 위에 '엣지 벽'이 생긴다 — 트랙 간격을 압축해 밀도를 낮춘다.
+  "elk.spacing.edgeEdge": "4",
+  "elk.layered.spacing.edgeEdgeBetweenLayers": "4",
+  "elk.layered.spacing.edgeNodeBetweenLayers": "16",
 };
 
 export function nodesToElkInput(

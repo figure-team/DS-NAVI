@@ -1233,15 +1233,15 @@ function useLayerDetailGraph() {
         const key = `${realSrc}|${realTgt}|${m.type}`;
         if (seen.has(key)) continue;
         seen.add(key);
+        // 상시 라벨 없음(고밀도에서 라벨 벽이 됨) — 타입은 data 에 실어 선택 시에만 표시.
         out.push({
           id: `inflated-${key}`,
           source: realSrc,
           target: realTgt,
           type: "elk",
-          label: m.type,
           style: { stroke: "color-mix(in srgb, var(--color-accent) 50%, transparent)", strokeWidth: 1.5 },
           labelStyle: { fill: "#a39787", fontSize: 10 },
-          data: { points: topo.edgePoints.get(`${realSrc}|${realTgt}`) },
+          data: { points: topo.edgePoints.get(`${realSrc}|${realTgt}`), edgeType: m.type },
         });
       }
     }
@@ -1253,15 +1253,16 @@ function useLayerDetailGraph() {
       const key = `intra|${e.source}|${e.target}|${e.type}`;
       if (seen.has(key)) continue;
       seen.add(key);
+      // 형제 파일 간 배선은 보조 정보 — 흐린 세선·라벨 없음(선택 시 강조/라벨).
+      // JSP 15개짜리 폴더를 펼치면 depends_on 30여 개가 라벨 벽을 만들던 것 완화.
       out.push({
         id: key,
         source: e.source,
         target: e.target,
         type: "elk",
-        label: e.type,
-        style: { stroke: "color-mix(in srgb, var(--color-accent) 50%, transparent)", strokeWidth: 1.5 },
+        style: { stroke: "var(--color-edge-dim)", strokeWidth: 1 },
         labelStyle: { fill: "#a39787", fontSize: 10 },
-        data: { points: topo.edgePoints.get(`${e.source}|${e.target}`) },
+        data: { points: topo.edgePoints.get(`${e.source}|${e.target}`), edgeType: e.type },
       });
     }
     return out;
@@ -1287,7 +1288,15 @@ function useLayerDetailGraph() {
       if ((edge.style as Record<string, unknown>)?.strokeDasharray) return edge;
 
       if (isSelectedEdge) {
-        return { ...edge, animated: true, style: { stroke: "color-mix(in srgb, var(--color-accent) 80%, transparent)", strokeWidth: 2.5 }, labelStyle: { fill: "var(--color-accent)", fontSize: 11, fontWeight: 600 } };
+        // 선택 노드의 엣지에만 관계 타입 라벨을 노출(상시 라벨은 고밀도에서 벽이 됨).
+        const edgeType = (edge.data as Record<string, unknown> | undefined)?.edgeType;
+        return {
+          ...edge,
+          animated: true,
+          label: edge.label ?? (typeof edgeType === "string" ? edgeType : undefined),
+          style: { stroke: "color-mix(in srgb, var(--color-accent) 80%, transparent)", strokeWidth: 2.5 },
+          labelStyle: { fill: "var(--color-accent)", fontSize: 11, fontWeight: 600 },
+        };
       }
       // Fade unrelated edges
       return { ...edge, animated: false, style: { stroke: "var(--color-edge-dim)", strokeWidth: 1 }, labelStyle: { fill: "rgba(163,151,135,0.2)", fontSize: 10 } };
@@ -1391,7 +1400,7 @@ function GraphViewInner() {
     });
   }, [edges, hoveredNodeId, isIncidentEndpoint]);
 
-  const { fitView, getViewport, setCenter } = useReactFlow();
+  const { fitView, getViewport } = useReactFlow();
 
   useEffect(() => {
     setNodes(initialNodes);
@@ -1430,17 +1439,17 @@ function GraphViewInner() {
     if (!pendingFocusContainer) return;
     const node = nodes.find((n) => n.id === pendingFocusContainer);
     if (!node) return;
-    const w =
-      (node.width as number | undefined) ??
-      ((node.style?.width as number | undefined) ?? 0);
-    const h =
-      (node.height as number | undefined) ??
-      ((node.style?.height as number | undefined) ?? 0);
-    const cx = node.position.x + w / 2;
-    const cy = node.position.y + h / 2;
+    // 같은 줌으로 중심만 맞추면(구 setCenter) 뷰포트보다 넓게 펼쳐진 컨테이너는
+    // 좌우가 잘린다 — 컨테이너 전체가 들어오게 맞추되, 확대는 하지 않는다
+    // (제자리 확장 느낌 유지: 작은 컨테이너에서 갑자기 줌인되지 않도록 현재 줌 상한).
     const { zoom } = getViewport();
-    setCenter(cx, cy, { zoom, duration: 0 });
-  }, [pendingFocusContainer, nodes, getViewport, setCenter]);
+    void fitView({
+      nodes: [{ id: pendingFocusContainer }],
+      padding: 0.15,
+      maxZoom: zoom,
+      duration: 0,
+    });
+  }, [pendingFocusContainer, nodes, getViewport, fitView]);
 
   useEffect(() => {
     if (!pendingFocusContainer) return;

@@ -368,6 +368,13 @@ function LegendPanel() {
             }
             text={t.flowList.bfLegendGrounded}
           />
+          {/* 근거 확인 안내 — 캔버스 상시 문구에서 이동(사용자 결정, 소음 제거). */}
+          <p
+            className="text-text-muted border-t border-border-subtle"
+            style={{ fontSize: 10.5, lineHeight: 1.5, paddingTop: 7, marginTop: 2 }}
+          >
+            {t.flowList.bfClickHint}
+          </p>
         </div>
       )}
     </Panel>
@@ -709,14 +716,6 @@ export default function BusinessFlowView({
                   }
                   nodeStrokeWidth={0}
                 />
-              )}
-              {/* 근거 바 발견성 힌트 — 노드 선택 전에만(선택하면 실물이 뜬다). */}
-              {!selected && (
-                <Panel position="bottom-left">
-                  <span className="text-text-muted" style={{ fontSize: 11 }}>
-                    {t.flowList.bfClickHint}
-                  </span>
-                </Panel>
               )}
             </ReactFlow>
           </ReactFlowProvider>

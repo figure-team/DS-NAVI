@@ -209,12 +209,6 @@ export default function DomainMapView() {
     ? cards.filter((c) => (processesByDomain.get(c.id)?.length ?? 0) === 0)
     : [];
 
-  // 구성도 분산 모드 — 도메인이 적을 때(≤9) 정사각형에 가깝게 열을 줄여 세로로
-  // 펼친다(하단 빈 공간 해소). 많으면 기존 밀집 그리드.
-  const diagramCols =
-    businessCards.length > 1 && businessCards.length <= 9
-      ? Math.max(2, Math.ceil(Math.sqrt(businessCards.length)))
-      : null;
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
@@ -262,22 +256,15 @@ export default function DomainMapView() {
           className="min-w-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
           style={{ boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)" }}
         >
-          <div className="flex-1 min-h-0 overflow-y-auto">
-            {/* 보드 — 콘텐츠가 짧으면 뷰포트 높이만큼 늘여 다이어그램 모드의
-                세로 분산(space-evenly)이 실제로 일어나게 한다. */}
-            <div className="flex flex-col" style={{ minHeight: "100%" }}>
-              <div
-                className="grid"
-                style={{
-                  flex: 1,
-                  padding: "16px 18px",
-                  gap: 12,
-                  gridTemplateColumns: diagramCols
-                    ? `repeat(${diagramCols}, minmax(0, 1fr))`
-                    : "repeat(auto-fill, minmax(250px, 1fr))",
-                  alignContent: diagramCols ? "space-evenly" : "start",
-                }}
-              >
+          <div
+            className="flex-1 min-h-0 overflow-y-auto grid"
+            style={{
+              padding: "16px 18px",
+              gap: 12,
+              gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+              alignContent: "start",
+            }}
+          >
             {businessCards.map((card, i) => {
               const processes = processesByDomain.get(card.id) ?? [];
               return (
@@ -297,11 +284,6 @@ export default function DomainMapView() {
                   style={{
                     padding: "13px 14px",
                     animation: `fadeSlideIn 0.35s ease-out ${i * 0.05}s both`,
-                    // 다이어그램 모드 — 넓은 트랙에서 카드가 과도하게 늘어나지 않게
-                    // 상한을 두고 중앙 배치.
-                    ...(diagramCols
-                      ? { width: "100%", maxWidth: 480, justifySelf: "center" as const }
-                      : {}),
                   }}
                 >
                   {/* .h — 아이콘 + 이름, 우측 기능·노드 수 + 상세(근거) 아이콘 */}
@@ -355,8 +337,6 @@ export default function DomainMapView() {
                 </div>
               );
             })}
-              </div>
-            </div>
           </div>
           {/* 기술·부속 도메인 — 업무 0개(배포 설정 등)는 본 그리드와 위계를 분리해
               하단 스트립으로. 근거율 바는 본 카드와 동일하게 유지(표기 일관성). */}

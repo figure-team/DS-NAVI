@@ -189,6 +189,7 @@ export const en = {
     bfLegendFlowRef: "Linked code feature — select a node, then 'Open feature'",
     bfLegendReview: "Needs review — evidence not verified",
     bfLegendGrounded: "Evidence verified",
+    bfMiniMap: "Minimap",
     bfMore: "…and {count} more (see the Features tab)",
     businessRejectedBanner:
       "The business flow was rejected by validation — showing a sequential approximation. Reason: {reason}",

@@ -4,6 +4,7 @@ import {
   getNodesBounds,
   Handle,
   MarkerType,
+  MiniMap,
   Panel,
   Position,
   ReactFlow,
@@ -199,6 +200,8 @@ const EXPORT_RATIO = 2;
 const EXPORT_STAMP_H = 56;
 /** 초기 표시 배율 하한 — 큰 흐름의 전체 맞춤이 글자를 뭉개면 이 배율로 상단부터. */
 const INIT_MIN_ZOOM = 0.7;
+/** 미니맵 표시 선택 저장 키 — 프로세스 전환(key remount)·재방문에도 유지. */
+const MINIMAP_PREF_KEY = "ua-bizflow-minimap";
 
 /**
  * 순서도 래스터 위에 제목 밴드를 얹는다 — 여러 장 내보내면 파일명만으로 구분이
@@ -428,19 +431,18 @@ function ExportPngButton({
     }
   };
 
+  // Panel 래핑은 호출측(우상단 툴바) — 미니맵 토글과 한 줄에 놓기 위해 버튼만 반환.
   return (
-    <Panel position="top-right">
-      <button
-        type="button"
-        onClick={onExport}
-        disabled={busy}
-        title={label}
-        className="rounded-md border border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
-        style={{ fontSize: 11.5, padding: "4px 10px", opacity: busy ? 0.5 : 1 }}
-      >
-        ⤓ {label}
-      </button>
-    </Panel>
+    <button
+      type="button"
+      onClick={onExport}
+      disabled={busy}
+      title={label}
+      className="rounded-md border border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+      style={{ fontSize: 11.5, padding: "4px 10px", opacity: busy ? 0.5 : 1 }}
+    >
+      ⤓ {label}
+    </button>
   );
 }
 
@@ -465,6 +467,28 @@ export default function BusinessFlowView({
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const flowAreaRef = useRef<HTMLDivElement | null>(null);
+
+  // 미니맵 — 사용자 선택(localStorage) 우선, 미선택(null)이면 자동: 흐름이
+  // 화면을 넘쳐 줌 하한이 발동했을 때만 기본 열림(작은 흐름에선 소음).
+  const [miniMapPref, setMiniMapPref] = useState<boolean | null>(() => {
+    try {
+      const v = localStorage.getItem(MINIMAP_PREF_KEY);
+      return v === null ? null : v === "1";
+    } catch {
+      return null;
+    }
+  });
+  const [overflows, setOverflows] = useState(false);
+  const miniMapVisible = miniMapPref ?? overflows;
+  const toggleMiniMap = () => {
+    const next = !miniMapVisible;
+    setMiniMapPref(next);
+    try {
+      localStorage.setItem(MINIMAP_PREF_KEY, next ? "1" : "0");
+    } catch {
+      /* storage 불가 환경 — 세션 상태만 유지 */
+    }
+  };
   const [layout, setLayout] = useState<{
     positions: Map<string, { x: number; y: number }>;
     edgePoints: Map<string, ElkPoint[]>;
@@ -629,6 +653,8 @@ export default function BusinessFlowView({
                 // fitView 는 v12에서 비동기 — 적용 전 getZoom() 은 스테일.
                 await rf.fitView({ padding: 0.15, maxZoom: 1 });
                 if (rf.getZoom() >= INIT_MIN_ZOOM) return;
+                // 하한 발동 = 흐름이 화면을 넘침 → 미니맵 자동 표시 신호.
+                setOverflows(true);
                 const bounds = getNodesBounds(rf.getNodes());
                 const w = flowAreaRef.current?.getBoundingClientRect().width ?? 800;
                 rf.setViewport({
@@ -645,13 +671,45 @@ export default function BusinessFlowView({
             >
               <Background gap={24} size={1} />
               <LegendPanel />
-              <ExportPngButton
-                containerRef={flowAreaRef}
-                // 파일명 금지 문자만 치환 — 한글 제목 유지(문서 첨부 시 식별성).
-                fileName={`업무흐름도_${(title ?? domainId.replace(/^domain:/, "")).replace(/[\\/:*?"<>|]/g, "-")}.png`}
-                stamp={`${domainName ?? domainId.replace(/^domain:/, "")}${title ? ` — ${title}` : ""}`}
-                label={t.flowList.bfExportPng}
-              />
+              {/* 우상단 툴바 — 미니맵 토글 + PNG 내보내기(한 슬롯, Panel 중복 방지). */}
+              <Panel position="top-right" className="flex items-center" style={{ gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={toggleMiniMap}
+                  aria-pressed={miniMapVisible}
+                  className={`rounded-md border transition-colors cursor-pointer ${
+                    miniMapVisible
+                      ? "border-border-medium bg-elevated text-text-primary"
+                      : "border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium"
+                  }`}
+                  style={{ fontSize: 11.5, padding: "4px 10px" }}
+                >
+                  {t.flowList.bfMiniMap}
+                </button>
+                <ExportPngButton
+                  containerRef={flowAreaRef}
+                  // 파일명 금지 문자만 치환 — 한글 제목 유지(문서 첨부 시 식별성).
+                  fileName={`업무흐름도_${(title ?? domainId.replace(/^domain:/, "")).replace(/[\\/:*?"<>|]/g, "-")}.png`}
+                  stamp={`${domainName ?? domainId.replace(/^domain:/, "")}${title ? ` — ${title}` : ""}`}
+                  label={t.flowList.bfExportPng}
+                />
+              </Panel>
+              {miniMapVisible && (
+                <MiniMap
+                  pannable
+                  zoomable
+                  position="bottom-right"
+                  style={{ width: 150, height: 110 }}
+                  bgColor="var(--color-panel)"
+                  maskColor="color-mix(in srgb, var(--color-root) 55%, transparent)"
+                  nodeColor={(n) =>
+                    (n.data as BizNodeData | undefined)?.biz.kind === "decision"
+                      ? "var(--color-status-info)"
+                      : "var(--color-border-medium)"
+                  }
+                  nodeStrokeWidth={0}
+                />
+              )}
               {/* 근거 바 발견성 힌트 — 노드 선택 전에만(선택하면 실물이 뜬다). */}
               {!selected && (
                 <Panel position="bottom-left">

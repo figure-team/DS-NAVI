@@ -189,6 +189,7 @@ export const ko = {
     bfLegendFlowRef: "연결된 코드 기능 — 노드 선택 후 '기능 열기'",
     bfLegendReview: "확인 필요 — 근거 검증 미통과",
     bfLegendGrounded: "근거 검증 통과",
+    bfMiniMap: "미니맵",
     bfMore: "…외 {count}건 (기능 탭에서 전체 확인)",
     businessRejectedBanner:
       "업무 흐름도가 검증 실패로 기각되었습니다 — 아래는 순차 근사입니다. 사유: {reason}",

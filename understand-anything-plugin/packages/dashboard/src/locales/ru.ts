@@ -182,6 +182,13 @@ export const ru = {
     bfEvidenceSelected: "Основание выбранного узла:",
     bfExportPng: "Экспорт PNG",
     bfClickHint: "Нажмите на узел, чтобы увидеть основание ниже",
+    bfLegend: "Легенда",
+    bfLegendStartEnd: "Начало · Конец",
+    bfLegendActivity: "Действие — шаг обработки",
+    bfLegendDecision: "Решение — условие ветвления; метки на линиях — исходы",
+    bfLegendFlowRef: "Связанная функция кода — выберите узел, затем «Открыть функцию»",
+    bfLegendReview: "Требует проверки — основание не подтверждено",
+    bfLegendGrounded: "Основание подтверждено",
     bfMore: "…и ещё {count} (см. вкладку функций)",
     businessRejectedBanner:
       "Бизнес-процесс отклонён проверкой — показано последовательное приближение. Причина: {reason}",

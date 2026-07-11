@@ -182,6 +182,13 @@ export const ko = {
     bfEvidenceSelected: "선택 노드 근거:",
     bfExportPng: "PNG 내보내기",
     bfClickHint: "노드를 클릭하면 아래에서 근거를 확인할 수 있습니다",
+    bfLegend: "범례",
+    bfLegendStartEnd: "시작 · 종료",
+    bfLegendActivity: "활동 — 처리 단계",
+    bfLegendDecision: "판단 — 분기 조건, 선 위 칩은 분기 결과",
+    bfLegendFlowRef: "연결된 코드 기능 — 노드 선택 후 '기능 열기'",
+    bfLegendReview: "확인 필요 — 근거 검증 미통과",
+    bfLegendGrounded: "근거 검증 통과",
     bfMore: "…외 {count}건 (기능 탭에서 전체 확인)",
     businessRejectedBanner:
       "업무 흐름도가 검증 실패로 기각되었습니다 — 아래는 순차 근사입니다. 사유: {reason}",

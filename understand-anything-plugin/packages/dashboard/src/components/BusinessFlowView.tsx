@@ -246,6 +246,131 @@ async function stampTitleBand(
   return canvas.toDataURL("image/png");
 }
 
+/** 범례 행 — 미니 글리프(실물 축소판) + 설명 한 줄. */
+function LegendRow({ glyph, text }: { glyph: React.ReactNode; text: string }) {
+  return (
+    <div className="flex items-center" style={{ gap: 9 }}>
+      <span className="shrink-0 flex items-center justify-center" style={{ width: 30 }}>
+        {glyph}
+      </span>
+      <span className="text-text-secondary" style={{ fontSize: 11, lineHeight: 1.45 }}>
+        {text}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * 범례 — 도형(시작/종료·활동·판단)과 색 표식(보라 코드 연결·주황 확인 필요·
+ * 녹색 검증 통과) 설명(PM/PL 요청). 기본 접힘 토글 — 항상 펼치면 캔버스 소음.
+ * 글리프는 실제 노드 스타일의 축소판이라 색·형태가 본편과 자동 일치하지는
+ * 않으므로, 노드 어휘를 바꿀 때 여기도 함께 갱신할 것.
+ */
+function LegendPanel() {
+  const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  return (
+    <Panel position="top-left">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="rounded-md border border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+        style={{ fontSize: 11.5, padding: "4px 10px" }}
+      >
+        ⓘ {t.flowList.bfLegend}
+      </button>
+      {open && (
+        <div
+          className="rounded-lg border border-border-medium bg-surface shadow-xl flex flex-col"
+          style={{ marginTop: 6, padding: "10px 12px", width: 250, gap: 7 }}
+        >
+          <LegendRow
+            glyph={
+              <span
+                aria-hidden
+                style={{
+                  width: 24,
+                  height: 11,
+                  borderRadius: 6,
+                  border: "1.5px solid var(--color-border-medium)",
+                  background: "var(--color-surface)",
+                  display: "block",
+                }}
+              />
+            }
+            text={t.flowList.bfLegendStartEnd}
+          />
+          <LegendRow
+            glyph={
+              <span
+                aria-hidden
+                style={{
+                  width: 26,
+                  height: 14,
+                  borderRadius: 4,
+                  border: "1px solid var(--color-border-subtle)",
+                  background: "var(--color-panel)",
+                  boxShadow: "0 1px 2px rgba(26,27,31,.08)",
+                  display: "block",
+                }}
+              />
+            }
+            text={t.flowList.bfLegendActivity}
+          />
+          <LegendRow
+            glyph={
+              <svg width={26} height={16} viewBox="0 0 26 16" aria-hidden>
+                <polygon
+                  points="13,1 25,8 13,15 1,8"
+                  fill="var(--color-panel)"
+                  stroke="var(--color-status-info)"
+                  strokeWidth={1.2}
+                />
+              </svg>
+            }
+            text={t.flowList.bfLegendDecision}
+          />
+          <LegendRow
+            glyph={
+              <span
+                aria-hidden
+                className="rounded font-bold"
+                style={{
+                  fontSize: 8.5,
+                  padding: "1px 4px",
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--color-layer-dao)",
+                  background: "color-mix(in srgb, var(--color-layer-dao) 10%, transparent)",
+                }}
+              >
+                flow:
+              </span>
+            }
+            text={t.flowList.bfLegendFlowRef}
+          />
+          <LegendRow
+            glyph={
+              <span aria-hidden style={{ color: "var(--color-status-warn)", fontSize: 13 }}>
+                ⚠
+              </span>
+            }
+            text={t.flowList.bfLegendReview}
+          />
+          <LegendRow
+            glyph={
+              <span aria-hidden style={{ color: "var(--color-status-ok)", fontSize: 13 }}>
+                ✓
+              </span>
+            }
+            text={t.flowList.bfLegendGrounded}
+          />
+        </div>
+      )}
+    </Panel>
+  );
+}
+
 /**
  * PNG 내보내기 — React Flow 공식 패턴: `.react-flow__viewport`(노드+엣지+라벨 칩)를
  * html-to-image 로 노드 경계 사각형에 맞춰 래스터화(pixelRatio 2). 화면 줌/팬과
@@ -519,6 +644,7 @@ export default function BusinessFlowView({
               elementsSelectable
             >
               <Background gap={24} size={1} />
+              <LegendPanel />
               <ExportPngButton
                 containerRef={flowAreaRef}
                 // 파일명 금지 문자만 치환 — 한글 제목 유지(문서 첨부 시 식별성).

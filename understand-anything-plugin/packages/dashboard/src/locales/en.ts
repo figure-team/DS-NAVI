@@ -182,6 +182,13 @@ export const en = {
     bfEvidenceSelected: "Selected node evidence:",
     bfExportPng: "Export PNG",
     bfClickHint: "Click a node to see its evidence below",
+    bfLegend: "Legend",
+    bfLegendStartEnd: "Start · End",
+    bfLegendActivity: "Activity — processing step",
+    bfLegendDecision: "Decision — branch condition; chips on lines are outcomes",
+    bfLegendFlowRef: "Linked code feature — select a node, then 'Open feature'",
+    bfLegendReview: "Needs review — evidence not verified",
+    bfLegendGrounded: "Evidence verified",
     bfMore: "…and {count} more (see the Features tab)",
     businessRejectedBanner:
       "The business flow was rejected by validation — showing a sequential approximation. Reason: {reason}",

@@ -182,6 +182,13 @@ export const ja = {
     bfEvidenceSelected: "選択ノードの根拠:",
     bfExportPng: "PNG エクスポート",
     bfClickHint: "ノードをクリックすると下に根拠が表示されます",
+    bfLegend: "凡例",
+    bfLegendStartEnd: "開始・終了",
+    bfLegendActivity: "アクティビティ — 処理ステップ",
+    bfLegendDecision: "判断 — 分岐条件、線上のチップは分岐結果",
+    bfLegendFlowRef: "関連コード機能 — ノード選択後「機能を開く」",
+    bfLegendReview: "要確認 — 根拠未検証",
+    bfLegendGrounded: "根拠検証済み",
     bfMore: "…ほか {count} 件（機能タブで全件確認）",
     businessRejectedBanner:
       "業務フロー図は検証失敗により却下されました — 以下は順次近似です。理由: {reason}",

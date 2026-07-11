@@ -3,7 +3,6 @@ import { useDashboardStore } from "../../store";
 import GraphView from "../../components/GraphView";
 import SearchBar from "../../components/SearchBar";
 import NodeInfo from "../../components/NodeInfo";
-import LayerLegend from "../../components/LayerLegend";
 import DiffToggle from "../../components/DiffToggle";
 import FilterPanel from "../../components/FilterPanel";
 import ExportMenu from "../../components/ExportMenu";
@@ -117,7 +116,6 @@ export default function GraphWorkbench() {
               </button>
             ))}
           </div>
-          <LayerLegend />
         </div>
       </div>
 

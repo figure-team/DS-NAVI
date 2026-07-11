@@ -174,8 +174,10 @@ function BizNode({ data }: NodeProps) {
             fontSize: 10,
             padding: "1px 6px",
             fontFamily: "var(--font-mono)",
-            color: "var(--color-status-info)",
-            background: "color-mix(in srgb, var(--color-status-info) 10%, transparent)",
+            // 기능(코드) 연결 색 언어 = 보라(layer-dao 재사용, 다크 변형 보유) —
+            // 판단 노드가 info 파랑을 가져가면서 겹쳐 분리(사용자 결정).
+            color: "var(--color-layer-dao)",
+            background: "color-mix(in srgb, var(--color-layer-dao) 10%, transparent)",
           }}
         >
           flow: {flowRefShort(biz.flowRef)}
@@ -566,9 +568,9 @@ export default function BusinessFlowView({
               style={{
                 fontSize: 11,
                 padding: "2px 10px",
-                // 노드의 flow: 칩(status-info)과 동일 색 — 기능 연결 표식의 색 언어 통일.
-                color: "var(--color-status-info)",
-                background: "color-mix(in srgb, var(--color-status-info) 10%, transparent)",
+                // 노드의 flow: 칩(layer-dao 보라)과 동일 색 — 기능 연결 표식의 색 언어 통일.
+                color: "var(--color-layer-dao)",
+                background: "color-mix(in srgb, var(--color-layer-dao) 10%, transparent)",
               }}
             >
               {t.flowList.bfOpenFlow}

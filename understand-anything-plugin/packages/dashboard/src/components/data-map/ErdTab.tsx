@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { useSearchParams } from "react-router";
 import {
   Background,
   BackgroundVariant,
   Controls,
   Handle,
-  MarkerType,
   MiniMap,
   Position,
   ReactFlow,
@@ -19,6 +19,8 @@ import { Badge } from "../proto/Proto";
 import { useTheme } from "../../themes/index.ts";
 import { applyElkLayout } from "../../utils/elk-layout";
 import { mergeElkPositions, nodesToElkInput } from "../../utils/layout";
+import { fkCardinality } from "./erd-cardinality";
+import type { FkCardinality } from "./erd-cardinality";
 import { inferFkEdges } from "./erd-infer";
 import { TableDetail } from "./TablesTab";
 import { isPk } from "./types";
@@ -29,6 +31,8 @@ import type { DbColumn, DbSchema, DbTable } from "./types";
  * 노드 클릭 = 1-hop 이웃 강조(비이웃 디밍, 구조 탭 관례) + 우측 사이드 패널 상세
  * (TableDetail 재사용). 선택은 ?table= URL 단일 소스 — 테이블 탭과 공유되어
  * 탭을 오가도 같은 테이블이 선택돼 있다.
+ * 엣지는 컬럼 앵커(FK 행 ↔ 참조 행에 직접 연결) + crow's foot 카디널리티
+ * (erd-cardinality — 자식 0..N/0..1, 부모 1/0..1, 추정 FK 는 무표기 점선만).
  */
 
 /* ── 노드 크기(ELK 입력) — ErdTableNode 렌더 실측과 맞춘 추정치 ── */
@@ -87,6 +91,35 @@ function nodeHeight(rowCount: number, more: number): number {
 
 const KIND_TONE: Record<ErdColRow["kind"], "info" | "warn"> = { PK: "info", FK: "warn", UQ: "info" };
 
+/** i번째 키 행의 세로 중심 — 컬럼 앵커 핸들 top(px). 몸통 padding-top 5px 포함. */
+const rowAnchorTop = (i: number): number => HEADER_H + 5 + i * ROW_H + ROW_H / 2;
+
+const HIDDEN_HANDLE = { opacity: 0, pointerEvents: "none" } as const;
+
+/**
+ * 키 행별 컬럼 앵커 핸들 — 엣지가 FK/PK 컬럼 행 높이에 직접 붙는다.
+ * 좌우 어느 쪽에 붙을지는 레이아웃 후 상대 위치로 엣지가 고르므로 4방(소스/타깃 × 좌/우) 전부 등록.
+ * id 규약: `{s|t}:{소문자 컬럼명}:{l|r}` — ErdCanvas 의 edges 메모와 맞물림.
+ */
+function ColumnAnchors({ rows }: { rows: ErdColRow[] }) {
+  return (
+    <>
+      {rows.map((r, i) => {
+        const col = r.name.toLowerCase();
+        const top = rowAnchorTop(i);
+        return (
+          <span key={col}>
+            <Handle type="source" id={`s:${col}:l`} position={Position.Left} style={{ ...HIDDEN_HANDLE, top }} />
+            <Handle type="source" id={`s:${col}:r`} position={Position.Right} style={{ ...HIDDEN_HANDLE, top }} />
+            <Handle type="target" id={`t:${col}:l`} position={Position.Left} style={{ ...HIDDEN_HANDLE, top }} />
+            <Handle type="target" id={`t:${col}:r`} position={Position.Right} style={{ ...HIDDEN_HANDLE, top }} />
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
 function ErdTableNode({ data }: NodeProps<ErdFlowNode>) {
   return (
     <div
@@ -98,8 +131,10 @@ function ErdTableNode({ data }: NodeProps<ErdFlowNode>) {
         boxShadow: data.active ? "0 0 0 2px color-mix(in srgb, var(--color-status-info) 35%, transparent)" : undefined,
       }}
     >
-      <Handle type="target" position={Position.Left} style={{ opacity: 0 }} />
-      <Handle type="source" position={Position.Right} style={{ opacity: 0 }} />
+      {/* 노드 레벨 폴백 핸들 — 앵커 컬럼이 MAX_KEY_ROWS 로 잘려 안 보일 때 사용. */}
+      <Handle type="target" position={Position.Left} style={HIDDEN_HANDLE} />
+      <Handle type="source" position={Position.Right} style={HIDDEN_HANDLE} />
+      <ColumnAnchors rows={data.keyRows} />
       <div
         className="flex items-center gap-1.5 border-b border-border-subtle"
         style={{ padding: "7px 10px", height: HEADER_H }}
@@ -159,6 +194,50 @@ function ErdTableNode({ data }: NodeProps<ErdFlowNode>) {
 
 const nodeTypes = { erdTable: ErdTableNode };
 
+/**
+ * crow's foot 마커 defs — 자식 끝 0..N(원+까마귀발)/0..1(원+바), 부모 끝 1(바)/0..1(원+바).
+ * 선언 FK 전용(추정 FK 는 카디널리티 무표기 — 점선만). 관계 강조색 5색 + 기본색별로 한 벌씩
+ * 생성(마커는 CSS 로 색을 못 물려받음). markerUnits=userSpaceOnUse 라 선 굵기(1.2/2)와
+ * 무관하게 크기 고정. 원 fill 은 캔버스 서피스색 — 밑을 지나는 연결선을 가려 ○ 가 읽히게 한다.
+ */
+function ErdMarkerDefs({ palette }: { palette: string[] }) {
+  const colors: Array<[string, string]> = [
+    ["d", "var(--color-border-medium)"],
+    ...palette.map((c, i): [string, string] => [String(i), c]),
+  ];
+  const marker = (id: string, children: ReactNode) => (
+    <marker
+      key={id}
+      id={id}
+      viewBox="0 0 20 12"
+      markerWidth={20}
+      markerHeight={12}
+      refX={20}
+      refY={6}
+      orient="auto-start-reverse"
+      markerUnits="userSpaceOnUse"
+    >
+      {children}
+    </marker>
+  );
+  return (
+    <svg width={0} height={0} style={{ position: "absolute" }} aria-hidden>
+      <defs>
+        {colors.flatMap(([k, c]) => {
+          const crow = <path d="M10 6 L20 1.2 M10 6 L20 6 M10 6 L20 10.8" fill="none" stroke={c} strokeWidth={1.5} />;
+          const bar = <path d="M13 1.5 L13 10.5" fill="none" stroke={c} strokeWidth={1.5} />;
+          const circle = <circle cx={4.5} cy={6} r={3} fill="var(--color-panel)" stroke={c} strokeWidth={1.5} />;
+          return [
+            marker(`erd-many-${k}`, <>{circle}{crow}</>),
+            marker(`erd-one-${k}`, bar),
+            marker(`erd-zeroone-${k}`, <>{circle}{bar}</>),
+          ];
+        })}
+      </defs>
+    </svg>
+  );
+}
+
 interface FkEdgeInfo {
   id: string;
   source: string;
@@ -169,6 +248,8 @@ interface FkEdgeInfo {
   refColumns: string[];
   /** 이름 기반 추정 관계(erd-infer) — 점선 렌더, 토글로 숨김 가능. */
   inferred?: boolean;
+  /** 스키마 제약에서 유도한 카디널리티 — 선언 FK 전용(추정은 근거 없음 → 무주장 까마귀발). */
+  card?: FkCardinality;
 }
 
 type ErdView = "all" | "fk" | "inferred" | "isolated";
@@ -216,14 +297,16 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       for (const [i, fk] of (t.foreignKeys ?? []).entries()) {
         const targetTable = byLower.get(fk.refTable.toLowerCase());
         if (!targetTable || targetTable.name === t.name) continue;
+        const columns = fk.columns.map((c) => c.toLowerCase());
         out.push({
           id: `fk:${t.name}:${i}`,
           source: t.name,
           target: targetTable.name,
-          columns: fk.columns.map((c) => c.toLowerCase()),
+          columns,
           refColumns: fk.refColumns?.length
             ? fk.refColumns.map((c) => c.toLowerCase())
             : pkColsOf(targetTable),
+          card: fkCardinality(t, columns),
         });
       }
     }
@@ -304,6 +387,8 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
   // (보기 모드 변화는 노드 집합이 바뀌므로 재계산 대상.)
   const base = useMemo(() => {
     const dims = new Map<string, { width: number; height: number }>();
+    // 테이블별 노드에 실제 표시된 키 행(소문자) — 컬럼 앵커 핸들 존재 여부 판정.
+    const shownCols = new Map<string, Set<string>>();
     const shown = visibleTables
       ? schema.tables.filter((t) => visibleTables.has(t.name))
       : schema.tables;
@@ -311,6 +396,7 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       const fkCols = new Set((t.foreignKeys ?? []).flatMap((fk) => fk.columns.map((c) => c.toLowerCase())));
       const { rows, more } = keyRowsOf(t, fkCols);
       dims.set(t.name, { width: NODE_W, height: nodeHeight(rows.length, more) });
+      shownCols.set(t.name, new Set(rows.map((r) => r.name.toLowerCase())));
       return {
         id: t.name,
         type: "erdTable",
@@ -323,10 +409,9 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       source: e.source,
       target: e.target,
       type: "smoothstep",
-      markerEnd: { type: MarkerType.ArrowClosed },
       data: { inferred: !!e.inferred },
     }));
-    return { nodes, edges, dims };
+    return { nodes, edges, dims, shownCols };
   }, [schema.tables, visibleTables, visibleEdges]);
 
   const [layouted, setLayouted] = useState<ErdFlowNode[] | null>(null);
@@ -371,31 +456,58 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
     }));
   }, [layouted, selected, neighborhood, highlight]);
 
-  const edges = useMemo(
-    () =>
-      base.edges.map((e) => {
-        // 선택 테이블에 닿는 엣지는 관계 고유색(노드의 FK/PK 행 외곽선과 동일). 추정은 점선.
-        const rel = highlight?.edgeColors.get(e.id);
-        const dash = e.data?.inferred ? "6 4" : undefined;
-        return {
-          ...e,
-          style: rel
-            ? { stroke: rel, strokeWidth: 2, strokeDasharray: dash }
-            : {
-                stroke: "var(--color-border-medium)",
-                strokeWidth: 1.2,
-                strokeDasharray: dash,
-                opacity: neighborhood ? 0.15 : 1,
-              },
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            color: rel ?? "var(--color-border-medium)",
-          },
-          zIndex: rel ? 10 : 0,
-        };
-      }),
-    [base.edges, neighborhood, highlight],
-  );
+  const edges = useMemo(() => {
+    const infoById = new Map(visibleEdges.map((e) => [e.id, e]));
+    const nodeX = new Map((layouted ?? []).map((n) => [n.id, n.position.x]));
+    return base.edges.map((e) => {
+      // 선택 테이블에 닿는 엣지는 관계 고유색(노드의 FK/PK 행 외곽선과 동일). 추정은 점선.
+      const rel = highlight?.edgeColors.get(e.id);
+      const dash = e.data?.inferred ? "6 4" : undefined;
+
+      // 컬럼 앵커 — FK 컬럼 행(자식) ↔ 참조 컬럼 행(부모)에 직접 연결. 좌우는 레이아웃 후
+      // 상대 x 로 결정(복합 FK 는 첫 컬럼 기준). 행이 안 보이면 노드 레벨 폴백.
+      const info = infoById.get(e.id);
+      const sx = nodeX.get(e.source);
+      const tx = nodeX.get(e.target);
+      let sourceHandle: string | undefined;
+      let targetHandle: string | undefined;
+      if (info && sx != null && tx != null) {
+        const ltr = sx <= tx;
+        const sCol = info.columns[0];
+        const tCol = info.refColumns[0];
+        if (sCol && base.shownCols.get(e.source)?.has(sCol)) sourceHandle = `s:${sCol}:${ltr ? "r" : "l"}`;
+        if (tCol && base.shownCols.get(e.target)?.has(tCol)) targetHandle = `t:${tCol}:${ltr ? "l" : "r"}`;
+      }
+
+      // crow's foot — 자식 끝(markerStart) 0..N/0..1, 부모 끝(markerEnd) 1/0..1.
+      // 추정 FK 는 제약 근거가 없어 카디널리티 무표기(점선만).
+      const colorKey = rel ? String(relPalette.indexOf(rel)) : "d";
+      const card = info?.card;
+      const markers = card
+        ? {
+            // React Flow 가 문자열 마커를 url('#…') 로 감싼다 — id 만 넘길 것.
+            markerStart: `erd-${card.childUnique ? "zeroone" : "many"}-${colorKey}`,
+            markerEnd: `erd-${card.parentOptional ? "zeroone" : "one"}-${colorKey}`,
+          }
+        : {};
+
+      return {
+        ...e,
+        sourceHandle,
+        targetHandle,
+        style: rel
+          ? { stroke: rel, strokeWidth: 2, strokeDasharray: dash }
+          : {
+              stroke: "var(--color-border-medium)",
+              strokeWidth: 1.2,
+              strokeDasharray: dash,
+              opacity: neighborhood ? 0.15 : 1,
+            },
+        ...markers,
+        zIndex: rel ? 10 : 0,
+      };
+    });
+  }, [base.edges, base.shownCols, visibleEdges, layouted, neighborhood, highlight, relPalette]);
 
   const setTable = (name: string | null) =>
     setSearchParams((prev) => {
@@ -465,6 +577,7 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
           className="rounded-[10px] border border-border-subtle bg-panel card-shadow overflow-hidden"
           style={{ height: "calc(100vh - 320px)", minHeight: 420 }}
         >
+        <ErdMarkerDefs palette={relPalette} />
         <ReactFlow
           nodes={nodes}
           edges={edges}

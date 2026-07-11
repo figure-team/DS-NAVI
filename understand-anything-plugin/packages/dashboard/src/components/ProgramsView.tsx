@@ -150,6 +150,15 @@ const VIA_DISPLAY: Record<string, { label: string; tone: "ok" | "info" | "warn";
   prefix: { label: "추정", tone: "warn", title: "이름 접두 기반 추정 — 기계 판정" },
 };
 
+/**
+ * 프로그램 ID 생성 규칙(엔진 program-inventory 와 동일) — PGM-<유형태그>-<파일경로 sha256 앞 8hex>.
+ * 경로 시드라 재스캔·내용 수정에도 안정(결정론), 파일 이동·개명 시에만 변경된다.
+ */
+const ID_RULE =
+  "프로그램 ID = PGM-<유형태그>-<파일 경로 sha256 앞 8자리>\n" +
+  "유형태그: SCR 화면 · API · BAT 배치 · SVC 서비스 · DAO · DB · MAP Mapper XML · COM 공통 · TST 테스트\n" +
+  "경로 기반 결정론 — 재스캔에도 ID 불변, 파일 이동·개명 시에만 변경";
+
 /** 200행 초과 시 상위 N만 렌더(정직 표기 병행). */
 const ROW_CAP = 200;
 const DELIVERABLE_LINK = "/deliverables/si-프로그램목록";
@@ -302,6 +311,38 @@ function ScanNotRun({ what }: { what: string }) {
   );
 }
 
+/** 범례 토글 버튼 — 필터 줄에 상주하며 범례 패널 표시를 켜고 끈다. */
+function LegendToggle({ open, onToggle }: { open: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={open}
+      title={open ? "범례 숨기기" : "범례 보기 — ID 규칙·유형태그·배지 읽는 법"}
+      className={`rounded-md border transition-colors cursor-pointer ${
+        open
+          ? "border-accent text-accent bg-transparent"
+          : "border-border-subtle text-text-muted bg-elevated hover:text-text-secondary"
+      }`}
+      style={{ fontSize: 12, fontWeight: 600, padding: "6px 10px" }}
+    >
+      범례 {open ? "숨기기" : "보기"}
+    </button>
+  );
+}
+
+/** 범례 패널 — 토글이 켜졌을 때 필터 줄 바로 아래에 표시. */
+function Legend({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="text-text-muted rounded-lg bg-elevated"
+      style={{ fontSize: 11.5, lineHeight: 1.7, padding: "10px 12px", margin: "0 4px 10px" }}
+    >
+      {children}
+    </div>
+  );
+}
+
 /** sticky thead — 스크롤 컨테이너 내부 기준. */
 const STICKY_HEAD: CSSProperties = { position: "sticky", top: 0, background: "var(--color-panel)", zIndex: 2 };
 
@@ -343,6 +384,7 @@ export default function ProgramsView() {
   const [interfacesMissing, setInterfacesMissing] = useState(false);
   const [batch, setBatch] = useState<BatchFile | null>(null);
   const [batchMissing, setBatchMissing] = useState(false);
+  const [showLegend, setShowLegend] = useState(false);
 
   // URL 단일 소스 — 탭·검색·필터. fetch 의존성과 분리되어 refetch 를 유발하지 않는다.
   const [searchParams, setSearchParams] = useSearchParams();
@@ -538,17 +580,39 @@ export default function ProgramsView() {
                       </option>
                     ))}
                   </select>
+                  <LegendToggle open={showLegend} onToggle={() => setShowLegend((v) => !v)} />
                   <div className="flex-1" />
                   <span className="text-text-muted tabular-nums" style={{ fontSize: 12 }}>
                     {filtered.length}/{total}본
                   </span>
                 </div>
 
+                {showLegend && (
+                  <Legend>
+                    <p style={{ margin: 0 }}>
+                      <b>ID</b> — <span style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>PGM-&lt;유형&gt;-&lt;경로 해시 8자리&gt;</span>{" "}
+                      (파일 경로 sha256 앞 8자리). 경로 기반 결정론이라 재스캔·코드 수정에도 불변, 파일 이동·개명 시에만 변경.
+                    </p>
+                    <p style={{ margin: "4px 0 0" }}>
+                      <b>유형태그</b> — SCR 화면 · API · BAT 배치 · SVC 서비스 · DAO · DB · MAP Mapper XML · COM 공통 · TST 테스트.
+                    </p>
+                    <p style={{ margin: "4px 0 0" }}>
+                      <b>도메인 배지</b> — 정적 분석 자동 판정: <b>근거확보</b>(도달성 추적) · <b>공유</b>(복수 도메인) · <b>추정</b>(경로·접두) ·{" "}
+                      <b>미조인</b>(귀속 없음).
+                    </p>
+                    <p style={{ margin: "4px 0 0" }}>
+                      <b>경로</b> — 클릭 시 코드 열람.
+                    </p>
+                  </Legend>
+                )}
+
                 <div className="overflow-x-auto">
                   <table className="proto-tbl">
                     <thead>
                       <tr>
-                        <th scope="col">ID</th>
+                        <th scope="col" title={ID_RULE} style={{ cursor: "help" }}>
+                          ID
+                        </th>
                         <th scope="col">이름</th>
                         <th scope="col">유형</th>
                         <th scope="col">레이어</th>
@@ -618,10 +682,6 @@ export default function ProgramsView() {
                 <div className="text-text-muted" style={{ fontSize: 12, padding: "10px 4px 0" }}>
                   집계 제외: 설정 XML {inv.stats.excluded.configXml} · 비대상 언어 {otherLangSum} · 판독 불가{" "}
                   {inv.stats.excluded.unreadable}
-                </div>
-                <div className="text-text-muted" style={{ fontSize: 11.5, padding: "6px 4px 0", lineHeight: 1.6 }}>
-                  도메인 배지는 정적 분석 자동 판정 — <b>근거확보</b>(도달성 추적) · <b>공유</b>(복수 도메인) · <b>추정</b>(경로·접두) · <b>미조인</b>(귀속 없음).
-                  경로 클릭 시 코드 열람.
                 </div>
               </div>
             </>

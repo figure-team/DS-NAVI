@@ -63,6 +63,7 @@ import { deriveContainers } from "../utils/containers";
 import type { DerivedContainer } from "../utils/containers";
 import { rankVisibleChildren, computeChildGrid } from "../utils/expandBudget";
 import type { ChildGrid } from "../utils/expandBudget";
+import { rewrapWideRows } from "../utils/rankWrap";
 import { computeLayerStats } from "../utils/layerStats";
 // ktds-fork (ADR-003): 흩어진 diff 집계 로직 통합
 import { useDiffByLayer, useDiffByContainer } from "../hooks/useDiffAggregation";
@@ -707,16 +708,24 @@ function useLayerDetailTopology(): LayerDetailTopology & {
         }
         const topLevel = positioned.children ?? [];
 
-        // 고립 아톰(연결 엣지 0) 그리드 재배치 — hierarchyHandling=INCLUDE_CHILDREN
-        // 모드의 ELK는 컴포넌트 분리 배치(aspectRatio 감기)를 지원하지 않아 고립
-        // 노드들이 첫 랭크에 한 줄로 길게 늘어선다(문서·설정성 레이어에서 두드러짐).
-        // 연결된 콘텐츠 아래에 화면 비율(~1.7)에 맞는 그리드로 다시 감아 배치한다.
+        const connectedIds = new Set<string>();
+        for (const e of elkEdges) {
+          connectedIds.add(e.sources[0]);
+          connectedIds.add(e.targets[0]);
+        }
+
+        // 넓은 랭크 감기 — layered는 같은 랭크(예: 진입 엣지 없는 테스트 파일
+        // 16개)를 한 줄로 깔아 극단적 가로비를 만든다. 임계 이상 랭크를 화면비
+        // 그리드로 다시 감고 아래 랭크를 밀어내린다. 이동 노드의 ELK 라우팅은
+        // 아래에서 무효화(smooth-step 폴백)/평행이동한다.
+        const { rewrapped, shiftById } = rewrapWideRows(
+          topLevel.filter((c) => connectedIds.has(c.id)),
+        );
+
+        // 고립 아톰(연결 엣지 0) 그리드 재배치 — ELK 컴포넌트 패킹과 별개로
+        // 연결된 콘텐츠 아래에 화면 비율(~1.7)에 맞는 그리드로 감아 배치한다
+        // (문서·설정성 레이어에서 두드러지는 한 줄 병리의 고립 노드 판).
         {
-          const connectedIds = new Set<string>();
-          for (const e of elkEdges) {
-            connectedIds.add(e.sources[0]);
-            connectedIds.add(e.targets[0]);
-          }
           const isolated = topLevel.filter((c) => !connectedIds.has(c.id));
           const connected = topLevel.filter((c) => connectedIds.has(c.id));
           if (isolated.length >= 3) {
@@ -775,6 +784,29 @@ function useLayerDetailTopology(): LayerDetailTopology & {
         }
 
         const edgePoints = elkEdgePointMapByEndpoint(positioned);
+        // 랭크 감기 반영: 감긴 노드에 닿는 엣지는 라우팅 무효(제거 → ElkEdge가
+        // smooth-step으로 폴백), 양 끝이 같은 양만큼 내려간 엣지는 평행이동,
+        // 이동량이 다른(감긴 랭크를 가로지르는) 엣지도 무효.
+        if (rewrapped.size > 0) {
+          for (const e of elkEdges) {
+            const s = e.sources[0];
+            const t = e.targets[0];
+            const key = `${s}|${t}`;
+            const pts = edgePoints.get(key);
+            if (!pts) continue;
+            if (rewrapped.has(s) || rewrapped.has(t)) {
+              edgePoints.delete(key);
+              continue;
+            }
+            const ds = shiftById.get(s) ?? 0;
+            const dt = shiftById.get(t) ?? 0;
+            if (ds !== dt) {
+              edgePoints.delete(key);
+            } else if (ds !== 0) {
+              edgePoints.set(key, pts.map((p) => ({ x: p.x, y: p.y + ds })));
+            }
+          }
+        }
         const attach = (e: Edge): Edge => ({
           ...e,
           type: "elk",

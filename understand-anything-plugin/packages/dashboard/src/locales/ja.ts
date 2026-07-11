@@ -137,6 +137,8 @@ export const ja = {
     extScreens: "画面",
     extScreenCount: "キャプチャ画面",
     extScreensLink: "画面設計書 →",
+    supportDomains: "技術・付属",
+    relationLegend: "ドメイン間相互作用 {count}件 — 線にホバーで詳細",
   },
   grounding: {
     rate: "根拠率",

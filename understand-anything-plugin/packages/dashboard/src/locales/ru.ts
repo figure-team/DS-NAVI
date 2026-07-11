@@ -137,6 +137,8 @@ export const ru = {
     extScreens: "Экраны",
     extScreenCount: "Снимки экранов",
     extScreensLink: "Спецификации экранов →",
+    supportDomains: "Технические / вспомогательные",
+    relationLegend: "Взаимодействий доменов: {count} — наведите на линию",
   },
   grounding: {
     rate: "Обоснованность",

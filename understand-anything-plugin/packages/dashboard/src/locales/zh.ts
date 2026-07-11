@@ -137,6 +137,8 @@ export const zh = {
     extScreens: "界面",
     extScreenCount: "截图界面",
     extScreensLink: "界面设计书 →",
+    supportDomains: "技术／附属",
+    relationLegend: "领域间交互 {count} 条 — 悬停连线查看详情",
   },
   grounding: {
     rate: "依据率",

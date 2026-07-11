@@ -480,6 +480,59 @@ export function buildDomainCards(graph: KnowledgeGraph): {
   return { stats, cards };
 }
 
+/** 화면1 구성도의 도메인 간 관계선 — 방향 있는 상호작용(같은 쌍·방향은 병합). */
+export interface DomainRelation {
+  /** 출발 도메인 노드 id. */
+  source: string;
+  /** 도착 도메인 노드 id. */
+  target: string;
+  /** 상호작용 원문 설명(콜론 뒤) — 관계선 툴팁용. */
+  texts: string[];
+}
+
+/** "A → B: 설명" — 화살표는 →/->, 콜론은 반각/전각 허용. */
+const RELATION_RE = /^\s*(.+?)\s*(?:→|->)\s*(.+?)\s*[:：]\s*(\S[\s\S]*)$/;
+
+/**
+ * `domainMeta.crossDomainInteractions`(fill 이 쓰는 "A → B: 설명" 자유서술)에서
+ * 도메인 간 관계 엣지를 파싱한다 — 화면1 구성도 관계선의 유일한 데이터 소스.
+ * 토큰은 도메인 키(id 접미사)·표시명(name) **완전일치**로만 해석하고, 화살표가
+ * 없거나 해석 불가한 문장은 조용히 버린다(날조 0 — 관계선은 파싱 성공분만).
+ * 결과는 source→target 사전순 정렬(결정론).
+ */
+export function buildDomainRelations(graph: KnowledgeGraph): DomainRelation[] {
+  const domains = graph.nodes.filter((n) => n.type === "domain");
+  // 토큰 해석 테이블 — 키("account")와 표시명("계정/회원") 둘 다 등록.
+  const byToken = new Map<string, string>();
+  for (const d of domains) {
+    byToken.set(domainKeyFromId(d.id).toLowerCase(), d.id);
+    if (d.name) byToken.set(d.name.trim().toLowerCase(), d.id);
+  }
+  const acc = new Map<string, DomainRelation>();
+  for (const d of domains) {
+    const meta = d.domainMeta as { crossDomainInteractions?: unknown } | undefined;
+    const raw = meta?.crossDomainInteractions;
+    if (!Array.isArray(raw)) continue;
+    for (const item of raw) {
+      if (typeof item !== "string") continue;
+      const m = item.match(RELATION_RE);
+      if (!m) continue;
+      const source = byToken.get(m[1].trim().toLowerCase());
+      const target = byToken.get(m[2].trim().toLowerCase());
+      if (!source || !target || source === target) continue;
+      const key = `${source} ${target}`;
+      const rel = acc.get(key) ?? { source, target, texts: [] };
+      const text = m[3].trim();
+      // 같은 상호작용을 양쪽 도메인이 중복 서술한 경우 대비 — 동일 문장 1회만.
+      if (!rel.texts.includes(text)) rel.texts.push(text);
+      acc.set(key, rel);
+    }
+  }
+  return [...acc.values()].sort(
+    (a, b) => a.source.localeCompare(b.source) || a.target.localeCompare(b.target),
+  );
+}
+
 /** 층(layer) 세그먼트 — sub-group 후보로 매치돼도 실제 기능 그룹이 아니므로 제외. */
 const LAYER_SEGMENTS = new Set([
   "web",

@@ -137,6 +137,8 @@ export const zhTW = {
     extScreens: "畫面",
     extScreenCount: "截圖畫面",
     extScreensLink: "畫面設計書 →",
+    supportDomains: "技術／附屬",
+    relationLegend: "領域間互動 {count} 筆 — 滑鼠移至連線查看詳情",
   },
   grounding: {
     rate: "依據率",

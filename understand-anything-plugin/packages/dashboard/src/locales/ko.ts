@@ -137,6 +137,8 @@ export const ko = {
     extScreens: "화면",
     extScreenCount: "캡처 화면",
     extScreensLink: "화면설계서 →",
+    supportDomains: "기술·부속",
+    relationLegend: "도메인 간 상호작용 {count}건 — 선 위에 마우스를 올리면 상세",
   },
   grounding: {
     rate: "근거율",

@@ -180,6 +180,7 @@ export const ru = {
     bfEnd: "Конец",
     bfOpenFlow: "Открыть функцию →",
     bfEvidenceSelected: "Основание выбранного узла:",
+    bfExportPng: "Экспорт PNG",
     bfMore: "…и ещё {count} (см. вкладку функций)",
     businessRejectedBanner:
       "Бизнес-процесс отклонён проверкой — показано последовательное приближение. Причина: {reason}",

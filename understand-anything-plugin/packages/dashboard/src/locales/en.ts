@@ -180,6 +180,7 @@ export const en = {
     bfEnd: "End",
     bfOpenFlow: "Open feature →",
     bfEvidenceSelected: "Selected node evidence:",
+    bfExportPng: "Export PNG",
     bfMore: "…and {count} more (see the Features tab)",
     businessRejectedBanner:
       "The business flow was rejected by validation — showing a sequential approximation. Reason: {reason}",

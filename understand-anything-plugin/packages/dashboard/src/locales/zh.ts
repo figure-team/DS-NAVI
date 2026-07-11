@@ -180,6 +180,7 @@ export const zh = {
     bfEnd: "结束",
     bfOpenFlow: "打开功能 →",
     bfEvidenceSelected: "所选节点依据：",
+    bfExportPng: "导出 PNG",
     bfMore: "…另有 {count} 项（详见功能标签页）",
     businessRejectedBanner: "业务流程图未通过校验而被拒绝 — 以下为顺序近似。原因：{reason}",
     businessEmpty: "暂无业务流程数据 — 域填充(businessFlow)后将显示流程图。",

@@ -534,6 +534,7 @@ export default function FlowListView() {
                     domainId={activeDomainId}
                     biz={bizFlow}
                     rejectedReason={bizRejected}
+                    title={bizProcesses[bfIdx]?.title ?? null}
                   />
                 </div>
               </div>

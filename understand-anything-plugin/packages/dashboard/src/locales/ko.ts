@@ -180,6 +180,7 @@ export const ko = {
     bfEnd: "종료",
     bfOpenFlow: "기능 열기 →",
     bfEvidenceSelected: "선택 노드 근거:",
+    bfExportPng: "PNG 내보내기",
     bfMore: "…외 {count}건 (기능 탭에서 전체 확인)",
     businessRejectedBanner:
       "업무 흐름도가 검증 실패로 기각되었습니다 — 아래는 순차 근사입니다. 사유: {reason}",

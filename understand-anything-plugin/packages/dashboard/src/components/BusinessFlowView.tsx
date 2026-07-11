@@ -1,15 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
+  getNodesBounds,
   Handle,
   MarkerType,
+  Panel,
   Position,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
   type Edge,
   type Node,
   type NodeProps,
 } from "@xyflow/react";
+import { toPng } from "html-to-image";
 import { useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
@@ -179,20 +183,96 @@ function BizNode({ data }: NodeProps) {
 const NODE_TYPES = { biz: BizNode };
 const EDGE_TYPES = { elk: ElkEdge };
 
+/** 내보내기 여백(px) — 노드 경계 사각형 밖 숨통. */
+const EXPORT_PAD = 32;
+
+/**
+ * PNG 내보내기 — React Flow 공식 패턴: `.react-flow__viewport`(노드+엣지+라벨 칩)를
+ * html-to-image 로 노드 경계 사각형에 맞춰 래스터화(pixelRatio 2). 화면 줌/팬과
+ * 무관하게 전체 순서도가 담기고, 배경 점·컨트롤·근거 바는 viewport 밖이라 제외된다.
+ * Panel(우상단)은 ReactFlow 자식이어야 하므로 버튼을 여기로 분리(useReactFlow 필요).
+ */
+function ExportPngButton({
+  containerRef,
+  fileName,
+  label,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  fileName: string;
+  label: string;
+}) {
+  const { getNodes } = useReactFlow();
+  const [busy, setBusy] = useState(false);
+
+  const onExport = async () => {
+    const viewport = containerRef.current?.querySelector<HTMLElement>(".react-flow__viewport");
+    if (!viewport || busy) return;
+    setBusy(true);
+    try {
+      const bounds = getNodesBounds(getNodes());
+      const width = Math.ceil(bounds.width) + EXPORT_PAD * 2;
+      const height = Math.ceil(bounds.height) + EXPORT_PAD * 2;
+      const dataUrl = await toPng(viewport, {
+        // 테마(라이트/다크) 배경을 그대로 — 투명 PNG 는 문서 붙여넣기에서 깨져 보인다.
+        backgroundColor: getComputedStyle(document.body).backgroundColor,
+        // 웹폰트(Pretendard·Google Fonts)는 crossorigin 없는 CDN <link>라 CSSOM 접근이
+        // 막혀 임베드가 항상 실패한다(SecurityError 콘솔 소음) — 시도 자체를 끈다.
+        // 래스터는 시스템 한글 폰트로 대체되며 판독성 손실 없음(실측 확인).
+        skipFonts: true,
+        width,
+        height,
+        pixelRatio: 2,
+        style: {
+          width: `${width}px`,
+          height: `${height}px`,
+          transform: `translate(${EXPORT_PAD - bounds.x}px, ${EXPORT_PAD - bounds.y}px) scale(1)`,
+        },
+      });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = fileName;
+      a.click();
+    } catch (err) {
+      console.error("business-flow PNG export failed", err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Panel position="top-right">
+      <button
+        type="button"
+        onClick={onExport}
+        disabled={busy}
+        title={label}
+        className="rounded-md border border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+        style={{ fontSize: 11.5, padding: "4px 10px", opacity: busy ? 0.5 : 1 }}
+      >
+        ⤓ {label}
+      </button>
+    </Panel>
+  );
+}
+
 export default function BusinessFlowView({
   domainId,
   biz,
   rejectedReason,
+  title,
 }: {
   domainId: string;
   biz: BizFlow;
   /** emit 이 businessFlow 를 기각한 사유 — "미채움"과 구별해 배너 분기(리뷰 C2). */
   rejectedReason?: string | null;
+  /** 선택된 업무 프로세스 제목 — PNG 파일명용(없으면 도메인 키 폴백). */
+  title?: string | null;
 }) {
   const { t } = useI18n();
   const [, setSearchParams] = useSearchParams();
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const flowAreaRef = useRef<HTMLDivElement | null>(null);
   const [layout, setLayout] = useState<{
     positions: Map<string, { x: number; y: number }>;
     edgePoints: Map<string, ElkPoint[]>;
@@ -340,7 +420,7 @@ export default function BusinessFlowView({
             : t.flowList.businessFallbackBanner}
         </div>
       )}
-      <div className="flex-1 min-h-0 relative">
+      <div ref={flowAreaRef} className="flex-1 min-h-0 relative">
         {layout && (
           <ReactFlowProvider>
             <ReactFlow
@@ -359,6 +439,12 @@ export default function BusinessFlowView({
               elementsSelectable
             >
               <Background gap={24} size={1} />
+              <ExportPngButton
+                containerRef={flowAreaRef}
+                // 파일명 금지 문자만 치환 — 한글 제목 유지(문서 첨부 시 식별성).
+                fileName={`업무흐름도_${(title ?? domainId.replace(/^domain:/, "")).replace(/[\\/:*?"<>|]/g, "-")}.png`}
+                label={t.flowList.bfExportPng}
+              />
             </ReactFlow>
           </ReactFlowProvider>
         )}

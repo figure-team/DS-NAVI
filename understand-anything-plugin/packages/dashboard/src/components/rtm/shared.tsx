@@ -28,18 +28,29 @@ export function Pill({ label, color, bg }: { label: string; color: string; bg?: 
 }
 
 // pmpl-proto .conf 배지 — 톤 배경(color-mix)을 두른 필. title 로 기계 판정 여부를 명시(CONF_TITLE).
-export const confChip = (label: string, color: string, title?: string) => (
-  <span title={title} style={{ marginLeft: 6, fontSize: 10.5, fontWeight: 700, borderRadius: 4, padding: "1px 6px", whiteSpace: "nowrap", color, background: "color-mix(in srgb, currentColor 12%, transparent)" }}>{label}</span>
+export const confChip = (label: string, color: string, title?: string, style?: React.CSSProperties) => (
+  <span title={title} style={{ marginLeft: 6, fontSize: 10.5, fontWeight: 700, borderRadius: 4, padding: "1px 6px", whiteSpace: "nowrap", color, background: "color-mix(in srgb, currentColor 12%, transparent)", ...style }}>{label}</span>
 );
 
-// pmpl-proto .stat 타일(+진행 바 확장).
-export function Tile({ lbl, n, d, pct, bar }: { lbl: string; n: number | string; d?: string; pct?: number; bar?: string }) {
-  return (
-    <div className="card-shadow" style={{ flex: 1, background: "var(--color-panel)", border: BORDER, borderRadius: 10, padding: "14px 16px" }}>
+// pmpl-proto .stat 타일(+진행 바 확장). onClick 지정 시 필터 토글 버튼이 된다(active=적용 중), sub=산정 기준 한 줄 캡션.
+export function Tile({ lbl, n, d, pct, bar, onClick, active, title, sub }: { lbl: string; n: number | string; d?: string; pct?: number; bar?: string; onClick?: () => void; active?: boolean; title?: string; sub?: string }) {
+  const style: React.CSSProperties = {
+    flex: 1, background: active ? "color-mix(in srgb, var(--color-accent) 4%, var(--color-panel))" : "var(--color-panel)",
+    border: active ? "1px solid var(--color-accent)" : BORDER, borderRadius: 10, padding: "14px 16px",
+  };
+  const inner = (
+    <>
       <div className="text-text-muted" style={{ fontSize: 12, fontWeight: 500, marginBottom: 6 }}>{lbl}</div>
       <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 650, letterSpacing: "-0.5px", color: "var(--color-text-primary)", lineHeight: 1 }}>{n}{d && <span className="text-text-muted" style={{ fontSize: 12.5, fontWeight: 500, letterSpacing: 0 }}>{d}</span>}</div>
-      {pct !== undefined && <div style={{ height: 5, borderRadius: 3, background: "var(--color-elevated)", overflow: "hidden", marginTop: 9 }}><i style={{ display: "block", height: "100%", width: `${pct}%`, background: bar }} /></div>}
-    </div>
+      {sub && <div className="text-text-muted" style={{ fontSize: 10.5, lineHeight: 1.45, marginTop: 7 }}>{sub}</div>}
+      {pct !== undefined && <div style={{ height: 5, borderRadius: 3, background: "var(--color-elevated)", overflow: "hidden", marginTop: sub ? 7 : 9 }}><i style={{ display: "block", height: "100%", width: `${pct}%`, background: bar }} /></div>}
+    </>
+  );
+  if (!onClick) return <div className="card-shadow" style={style} title={title}>{inner}</div>;
+  return (
+    <button type="button" onClick={onClick} title={title} aria-pressed={active} className="card-shadow cursor-pointer hover:border-accent transition-colors" style={{ ...style, font: "inherit", textAlign: "left", display: "block" }}>
+      {inner}
+    </button>
   );
 }
 

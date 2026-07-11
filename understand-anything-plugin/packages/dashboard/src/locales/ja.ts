@@ -181,6 +181,7 @@ export const ja = {
     bfOpenFlow: "機能を開く →",
     bfEvidenceSelected: "選択ノードの根拠:",
     bfExportPng: "PNG エクスポート",
+    bfClickHint: "ノードをクリックすると下に根拠が表示されます",
     bfMore: "…ほか {count} 件（機能タブで全件確認）",
     businessRejectedBanner:
       "業務フロー図は検証失敗により却下されました — 以下は順次近似です。理由: {reason}",

@@ -181,6 +181,7 @@ export const zhTW = {
     bfOpenFlow: "開啟功能 →",
     bfEvidenceSelected: "所選節點依據：",
     bfExportPng: "匯出 PNG",
+    bfClickHint: "點擊節點可在下方查看依據",
     bfMore: "…另有 {count} 項（詳見功能分頁）",
     businessRejectedBanner: "業務流程圖未通過驗證而被拒絕 — 以下為順序近似。原因：{reason}",
     businessEmpty: "尚無業務流程資料 — 網域填充(businessFlow)後將顯示流程圖。",

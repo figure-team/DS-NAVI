@@ -181,6 +181,7 @@ export const ru = {
     bfOpenFlow: "Открыть функцию →",
     bfEvidenceSelected: "Основание выбранного узла:",
     bfExportPng: "Экспорт PNG",
+    bfClickHint: "Нажмите на узел, чтобы увидеть основание ниже",
     bfMore: "…и ещё {count} (см. вкладку функций)",
     businessRejectedBanner:
       "Бизнес-процесс отклонён проверкой — показано последовательное приближение. Причина: {reason}",

@@ -90,7 +90,13 @@ function BizNode({ data }: NodeProps) {
   }
 
   if (biz.kind === "decision") {
-    const stroke = selected ? accent : "var(--color-status-warn)";
+    // 판단은 중립색(info) — warn(주황)은 "문제 있는 단계"로 오독되고(PM/PL 리뷰),
+    // 진짜 [확인 필요](⚠) 노드와도 구분이 안 됐다. 검토 필요만 warn 유지.
+    const stroke = selected
+      ? accent
+      : review
+        ? "var(--color-status-warn)"
+        : "var(--color-status-info)";
     return (
       <div className="relative" style={{ width: w, height: h }}>
         <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
@@ -121,7 +127,7 @@ function BizNode({ data }: NodeProps) {
           style={{
             fontSize: 12,
             fontWeight: 650,
-            color: "var(--color-status-warn)",
+            color: review ? "var(--color-status-warn)" : "var(--color-status-info)",
             padding: "0 30px",
             lineHeight: 1.3,
             wordBreak: "keep-all",
@@ -185,6 +191,58 @@ const EDGE_TYPES = { elk: ElkEdge };
 
 /** 내보내기 여백(px) — 노드 경계 사각형 밖 숨통. */
 const EXPORT_PAD = 32;
+/** 내보내기 배율 — 문서 첨부용 선명도. */
+const EXPORT_RATIO = 2;
+/** 내보내기 상단 제목 밴드 높이(css px) — "도메인 — 프로세스" 스탬프. */
+const EXPORT_STAMP_H = 56;
+/** 초기 표시 배율 하한 — 큰 흐름의 전체 맞춤이 글자를 뭉개면 이 배율로 상단부터. */
+const INIT_MIN_ZOOM = 0.7;
+
+/**
+ * 순서도 래스터 위에 제목 밴드를 얹는다 — 여러 장 내보내면 파일명만으로 구분이
+ * 안 된다(PM/PL 리뷰). 캔버스 fillText 는 문서에 로드된 웹폰트를 그대로 쓴다.
+ */
+async function stampTitleBand(
+  dataUrl: string,
+  stamp: string,
+  background: string,
+): Promise<string> {
+  const img = new Image();
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error("export image decode failed"));
+    img.src = dataUrl;
+  });
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height + EXPORT_STAMP_H * EXPORT_RATIO;
+  const c = canvas.getContext("2d");
+  if (!c) return dataUrl; // 컨텍스트 불가 환경 — 스탬프 없이 원본 유지(다운로드 우선).
+  c.fillStyle = background;
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  const textColor = getComputedStyle(document.body).color;
+  const midY = (EXPORT_STAMP_H / 2 + 4) * EXPORT_RATIO;
+  c.textBaseline = "middle";
+  c.fillStyle = textColor;
+  c.font = `700 ${15 * EXPORT_RATIO}px Pretendard, 'Malgun Gothic', sans-serif`;
+  c.fillText(stamp, EXPORT_PAD * EXPORT_RATIO, midY);
+  c.globalAlpha = 0.55;
+  c.font = `400 ${11.5 * EXPORT_RATIO}px Pretendard, 'Malgun Gothic', sans-serif`;
+  c.textAlign = "right";
+  c.fillText(new Date().toISOString().slice(0, 10), canvas.width - EXPORT_PAD * EXPORT_RATIO, midY);
+  // 제목 밴드 아래 얇은 구분선.
+  c.globalAlpha = 0.15;
+  c.textAlign = "left";
+  c.fillRect(
+    EXPORT_PAD * EXPORT_RATIO,
+    (EXPORT_STAMP_H - 6) * EXPORT_RATIO,
+    canvas.width - EXPORT_PAD * 2 * EXPORT_RATIO,
+    EXPORT_RATIO,
+  );
+  c.globalAlpha = 1;
+  c.drawImage(img, 0, EXPORT_STAMP_H * EXPORT_RATIO);
+  return canvas.toDataURL("image/png");
+}
 
 /**
  * PNG 내보내기 — React Flow 공식 패턴: `.react-flow__viewport`(노드+엣지+라벨 칩)를
@@ -195,10 +253,13 @@ const EXPORT_PAD = 32;
 function ExportPngButton({
   containerRef,
   fileName,
+  stamp,
   label,
 }: {
   containerRef: React.RefObject<HTMLDivElement | null>;
   fileName: string;
+  /** 이미지 상단 제목 밴드 텍스트 — "도메인 — 프로세스". */
+  stamp: string;
   label: string;
 }) {
   const { getNodes } = useReactFlow();
@@ -212,16 +273,17 @@ function ExportPngButton({
       const bounds = getNodesBounds(getNodes());
       const width = Math.ceil(bounds.width) + EXPORT_PAD * 2;
       const height = Math.ceil(bounds.height) + EXPORT_PAD * 2;
+      // 테마(라이트/다크) 배경을 그대로 — 투명 PNG 는 문서 붙여넣기에서 깨져 보인다.
+      const background = getComputedStyle(document.body).backgroundColor;
       const dataUrl = await toPng(viewport, {
-        // 테마(라이트/다크) 배경을 그대로 — 투명 PNG 는 문서 붙여넣기에서 깨져 보인다.
-        backgroundColor: getComputedStyle(document.body).backgroundColor,
-        // 웹폰트(Pretendard·Google Fonts)는 crossorigin 없는 CDN <link>라 CSSOM 접근이
-        // 막혀 임베드가 항상 실패한다(SecurityError 콘솔 소음) — 시도 자체를 끈다.
-        // 래스터는 시스템 한글 폰트로 대체되며 판독성 손실 없음(실측 확인).
-        skipFonts: true,
+        backgroundColor: background,
+        // 폰트 임베드는 켠 채로 둔다 — 같은 출처(vite) Pretendard @font-face 가
+        // 임베드돼야 화면과 동일한 줄바꿈이 유지된다(skipFonts 로 껐더니 대체
+        // 폰트 폭 차이로 노드 라벨 끝이 잘렸음). 크로스오리진 CDN 시트 2건의
+        // SecurityError 콘솔 로그는 무해(해당 시트만 건너뛰고 계속 진행).
         width,
         height,
-        pixelRatio: 2,
+        pixelRatio: EXPORT_RATIO,
         style: {
           width: `${width}px`,
           height: `${height}px`,
@@ -229,7 +291,7 @@ function ExportPngButton({
         },
       });
       const a = document.createElement("a");
-      a.href = dataUrl;
+      a.href = await stampTitleBand(dataUrl, stamp, background);
       a.download = fileName;
       a.click();
     } catch (err) {
@@ -260,13 +322,16 @@ export default function BusinessFlowView({
   biz,
   rejectedReason,
   title,
+  domainName,
 }: {
   domainId: string;
   biz: BizFlow;
   /** emit 이 businessFlow 를 기각한 사유 — "미채움"과 구별해 배너 분기(리뷰 C2). */
   rejectedReason?: string | null;
-  /** 선택된 업무 프로세스 제목 — PNG 파일명용(없으면 도메인 키 폴백). */
+  /** 선택된 업무 프로세스 제목 — PNG 파일명·제목 스탬프용(없으면 도메인 키 폴백). */
   title?: string | null;
+  /** 도메인 표시명 — PNG 제목 스탬프용(없으면 도메인 키 폴백). */
+  domainName?: string | null;
 }) {
   const { t } = useI18n();
   const [, setSearchParams] = useSearchParams();
@@ -430,8 +495,21 @@ export default function BusinessFlowView({
               edgeTypes={EDGE_TYPES}
               onNodeClick={(_, n) => setSelectedId(n.id)}
               onPaneClick={() => setSelectedId(null)}
-              fitView
-              fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
+              onInit={async (rf) => {
+                // 기본은 전체 맞춤 — 단, 큰 흐름에서 글자가 뭉개지는 배율까지
+                // 내려가면(PM/PL 리뷰) 판독 하한(INIT_MIN_ZOOM)으로 올리고
+                // 상단(시작 노드)부터 보여준다. 전체 조망은 스크롤/축소로.
+                // fitView 는 v12에서 비동기 — 적용 전 getZoom() 은 스테일.
+                await rf.fitView({ padding: 0.15, maxZoom: 1 });
+                if (rf.getZoom() >= INIT_MIN_ZOOM) return;
+                const bounds = getNodesBounds(rf.getNodes());
+                const w = flowAreaRef.current?.getBoundingClientRect().width ?? 800;
+                rf.setViewport({
+                  x: w / 2 - (bounds.x + bounds.width / 2) * INIT_MIN_ZOOM,
+                  y: 28 - bounds.y * INIT_MIN_ZOOM,
+                  zoom: INIT_MIN_ZOOM,
+                });
+              }}
               minZoom={0.2}
               proOptions={{ hideAttribution: true }}
               nodesDraggable={false}
@@ -443,8 +521,17 @@ export default function BusinessFlowView({
                 containerRef={flowAreaRef}
                 // 파일명 금지 문자만 치환 — 한글 제목 유지(문서 첨부 시 식별성).
                 fileName={`업무흐름도_${(title ?? domainId.replace(/^domain:/, "")).replace(/[\\/:*?"<>|]/g, "-")}.png`}
+                stamp={`${domainName ?? domainId.replace(/^domain:/, "")}${title ? ` — ${title}` : ""}`}
                 label={t.flowList.bfExportPng}
               />
+              {/* 근거 바 발견성 힌트 — 노드 선택 전에만(선택하면 실물이 뜬다). */}
+              {!selected && (
+                <Panel position="bottom-left">
+                  <span className="text-text-muted" style={{ fontSize: 11 }}>
+                    {t.flowList.bfClickHint}
+                  </span>
+                </Panel>
+              )}
             </ReactFlow>
           </ReactFlowProvider>
         )}

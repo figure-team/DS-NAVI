@@ -181,6 +181,7 @@ export const en = {
     bfOpenFlow: "Open feature →",
     bfEvidenceSelected: "Selected node evidence:",
     bfExportPng: "Export PNG",
+    bfClickHint: "Click a node to see its evidence below",
     bfMore: "…and {count} more (see the Features tab)",
     businessRejectedBanner:
       "The business flow was rejected by validation — showing a sequential approximation. Reason: {reason}",

@@ -222,6 +222,8 @@ export const ko = {
   containerNode: {
     files: "개 파일",
     expand: "클릭해 펼치기",
+    moreFiles: "개 파일 더",
+    showAll: "모두 표시",
   },
   nodeTypeLabels: {
     all: "모두",

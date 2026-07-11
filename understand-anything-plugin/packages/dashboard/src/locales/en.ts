@@ -222,6 +222,8 @@ export const en = {
   containerNode: {
     files: " files",
     expand: "Click to expand",
+    moreFiles: " more files",
+    showAll: "Show all",
   },
   nodeTypeLabels: {
     all: "All",

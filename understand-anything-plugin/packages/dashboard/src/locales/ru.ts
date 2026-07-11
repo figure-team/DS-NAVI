@@ -222,6 +222,8 @@ export const ru = {
   containerNode: {
     files: " файл(ов)",
     expand: "Нажмите, чтобы развернуть",
+    moreFiles: " ещё файл(ов)",
+    showAll: "Показать все",
   },
   nodeTypeLabels: {
     all: "Все",

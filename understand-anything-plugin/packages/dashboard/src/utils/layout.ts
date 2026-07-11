@@ -241,20 +241,19 @@ export const ELK_OVERVIEW_LAYOUT_OPTIONS: Record<string, string> = {
 };
 
 /**
- * Layer-detail options. `hierarchyHandling: INCLUDE_CHILDREN` lets a single
- * ELK pass lay out expanded containers (as parent nodes holding their file
- * children) AND route the edges that cross between containers — so file→file
- * connections get their own orthogonal track instead of all collapsing onto a
- * shared centre channel. Container padding leaves room for the header chrome.
+ * Layer-detail options. Containers are ELK *leaf* atoms — expanded ones get a
+ * pre-computed fixed size from the internal child grid (utils/expandBudget),
+ * so no hierarchical (`INCLUDE_CHILDREN`) pass is needed anymore. This restores
+ * ELK's connected-component packing (aspectRatio wrapping), and cross-atom
+ * edges keep their own orthogonal tracks; file-level edges into/inside expanded
+ * containers render via ElkEdge's smooth-step fallback instead.
+ *
+ * 이력: 구 INCLUDE_CHILDREN 단일 패스는 펼친 컨테이너 내부를 ELK layered가
+ * 배치했는데, 같은 랭크(JSP 13개)가 한 줄로 깔려 극단적 가로비가 나왔다
+ * (2026-07-10 반려). 내부 배치를 의존 무시 그리드로 대체하며 계층 패스 제거.
  */
 export const ELK_DETAIL_LAYOUT_OPTIONS: Record<string, string> = {
   ...ELK_DEFAULT_LAYOUT_OPTIONS,
-  "elk.hierarchyHandling": "INCLUDE_CHILDREN",
-  // 펼친 컨테이너 안 형제 엣지(예: JSP include 메시 30+개)가 각자 전용 직교 트랙을
-  // 차지하면 노드 위에 '엣지 벽'이 생긴다 — 트랙 간격을 압축해 밀도를 낮춘다.
-  "elk.spacing.edgeEdge": "4",
-  "elk.layered.spacing.edgeEdgeBetweenLayers": "4",
-  "elk.layered.spacing.edgeNodeBetweenLayers": "16",
 };
 
 export function nodesToElkInput(

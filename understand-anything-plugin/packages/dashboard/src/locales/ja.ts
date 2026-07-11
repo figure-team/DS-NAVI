@@ -222,6 +222,8 @@ export const ja = {
   containerNode: {
     files: " ファイル",
     expand: "クリックで展開",
+    moreFiles: " 件のファイル",
+    showAll: "すべて表示",
   },
   nodeTypeLabels: {
     all: "すべて",

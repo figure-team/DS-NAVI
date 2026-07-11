@@ -220,6 +220,8 @@ export const zhTW = {
   containerNode: {
     files: " 個檔案",
     expand: "點擊展開",
+    moreFiles: " 個更多檔案",
+    showAll: "顯示全部",
   },
   nodeTypeLabels: {
     all: "全部",

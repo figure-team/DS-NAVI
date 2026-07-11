@@ -21,6 +21,8 @@ import PortalNode from "./PortalNode";
 import type { PortalFlowNode } from "./PortalNode";
 import ContainerNode from "./ContainerNode";
 import type { ContainerFlowNode, ContainerNodeData } from "./ContainerNode";
+import MoreChipNode from "./MoreChipNode";
+import type { MoreChipFlowNode } from "./MoreChipNode";
 import Breadcrumb from "./Breadcrumb";
 import { useDashboardStore } from "../store";
 import type {
@@ -59,6 +61,8 @@ import {
 } from "../utils/edgeAggregation";
 import { deriveContainers } from "../utils/containers";
 import type { DerivedContainer } from "../utils/containers";
+import { rankVisibleChildren, computeChildGrid } from "../utils/expandBudget";
+import type { ChildGrid } from "../utils/expandBudget";
 import { computeLayerStats } from "../utils/layerStats";
 // ktds-fork (ADR-003): 흩어진 diff 집계 로직 통합
 import { useDiffByLayer, useDiffByContainer } from "../hooks/useDiffAggregation";
@@ -68,7 +72,20 @@ const nodeTypes = {
   "layer-cluster": LayerClusterNode,
   portal: PortalNode,
   container: ContainerNode,
+  "more-chip": MoreChipNode,
 };
+
+/** 펼친 컨테이너 내부 그리드 파라미터 — 셀은 파일 카드 실측(DETAIL_NODE_*) 기준. */
+const CHILD_GRID = {
+  gap: 20,
+  paddingX: 16,
+  paddingTop: 48, // 컨테이너 헤더(이름·개수) 아래부터
+  paddingBottom: 16,
+} as const;
+
+/** 점진 공개 칩 노드 id — 실 노드 id와 절대 충돌하지 않는 예약 접두어. */
+const MORE_CHIP_PREFIX = "more:";
+const moreChipId = (containerId: string) => `${MORE_CHIP_PREFIX}${containerId}`;
 
 // `elk` edges draw ELK's own orthogonal routing (separate track per edge);
 // edges without routing points fall back to a smooth-step path.
@@ -283,6 +300,11 @@ interface LayerDetailTopology {
   intraContainer: GraphEdge[];
   /** ELK orthogonal routing keyed by `"<source>|<target>"` (final endpoints). */
   edgePoints: Map<string, ElkPoint[]>;
+  /**
+   * 펼친 컨테이너별 점진 공개 상태 — 예산 내 노출 자식 집합과 "+N개" 칩으로
+   * 접힌 개수. 접힌 컨테이너는 엔트리 없음.
+   */
+  expandVisibility: Map<string, { visible: Set<string>; hiddenCount: number }>;
 }
 
 const EMPTY_TOPOLOGY: LayerDetailTopology = {
@@ -296,6 +318,7 @@ const EMPTY_TOPOLOGY: LayerDetailTopology = {
   nodeToContainer: new Map(),
   intraContainer: [],
   edgePoints: new Map(),
+  expandVisibility: new Map(),
 };
 
 /**
@@ -559,16 +582,17 @@ function useLayerDetailTopology(): LayerDetailTopology & {
   const [layoutStatus, setLayoutStatus] = useState<"computing" | "ready">("ready");
 
   const expandedContainers = useDashboardStore((s) => s.expandedContainers);
+  const fullyExpandedContainers = useDashboardStore((s) => s.fullyExpandedContainers);
   const setContainerLayout = useDashboardStore((s) => s.setContainerLayout);
 
-  // ── Single hierarchical ELK pass ────────────────────────────────────────
-  // Expanded containers become ELK parent nodes holding their file children;
-  // collapsed containers, ungrouped files and portals are leaf nodes. Running
-  // the whole layer through ONE `INCLUDE_CHILDREN` layout lets ELK route the
-  // edges that cross between containers on their own orthogonal tracks — a file
-  // in one folder → a file in another no longer collapses onto a shared centre
-  // line. Re-runs when the structure OR the expansion set changes (the latter
-  // because expanding a container shifts every sibling's position).
+  // ── Single flat ELK pass + per-container child grid ────────────────────
+  // Every atom (collapsed OR expanded container, ungrouped file, portal) is an
+  // ELK *leaf*. An expanded container's size is pre-computed from its internal
+  // child grid (utils/expandBudget): 예산 내 허브 상위 N개 + "+M개" 칩을 화면
+  // 비율로 감아 배치한다 — 구 INCLUDE_CHILDREN 계층 패스는 같은 랭크 자식을
+  // 한 줄로 깔아 극단적 가로비를 만들었다(2026-07-10 반려 지점). 파일 레벨
+  // 엣지는 ElkEdge smooth-step 폴백으로 그린다. Re-runs when the structure OR
+  // the expansion/show-all sets change.
   useEffect(() => {
     if (!built) {
       setTopology(EMPTY_TOPOLOGY);
@@ -592,22 +616,33 @@ function useLayerDetailTopology(): LayerDetailTopology & {
     const visibleNodeIds = new Set(filteredGraphNodes.map((n) => n.id));
     const containerById = new Map(containers.map((c) => [c.id, c]));
 
-    // Hierarchical children: expanded container → parent holding file children
-    // (size computed by ELK); collapsed container / ungrouped file / portal →
-    // leaf with a fixed size.
+    // Atoms are all leaves. Expanded containers: rank children by degree,
+    // cut to the budget (unless the user asked for 전량 표시 via the chip),
+    // wrap the survivors into an aspect-ratio grid, and hand ELK the grid's
+    // fixed footprint.
+    const grids = new Map<string, ChildGrid>();
+    const expandVisibility: LayerDetailTopology["expandVisibility"] = new Map();
     const elkChildren: ElkChild[] = [];
     for (const cn of containerFlowNodes) {
       const c = containerById.get(cn.id);
       const childIds = c ? c.nodeIds.filter((id) => visibleNodeIds.has(id)) : [];
       if (expandedContainers.has(cn.id) && childIds.length > 0) {
-        elkChildren.push({
-          id: cn.id,
-          children: childIds.map((id) => ({
-            id,
-            width: DETAIL_NODE_WIDTH,
-            height: DETAIL_NODE_HEIGHT,
-          })),
+        const ranked = fullyExpandedContainers.has(cn.id)
+          ? { visible: childIds, hidden: [] as string[] }
+          : rankVisibleChildren(childIds, filteredGraphEdges);
+        const cellIds = [...ranked.visible];
+        if (ranked.hidden.length > 0) cellIds.push(moreChipId(cn.id));
+        const grid = computeChildGrid(cellIds, {
+          cellWidth: DETAIL_NODE_WIDTH,
+          cellHeight: DETAIL_NODE_HEIGHT,
+          ...CHILD_GRID,
         });
+        grids.set(cn.id, grid);
+        expandVisibility.set(cn.id, {
+          visible: new Set(ranked.visible),
+          hiddenCount: ranked.hidden.length,
+        });
+        elkChildren.push({ id: cn.id, width: grid.width, height: grid.height });
       } else {
         elkChildren.push({
           id: cn.id,
@@ -631,15 +666,12 @@ function useLayerDetailTopology(): LayerDetailTopology & {
       });
     }
 
-    // Resolve each file→file edge to the endpoints actually rendered: the file
-    // id when its container is expanded (or it is ungrouped), else the collapsed
-    // container atom. This keeps the ELK edge set identical to the edges React
-    // Flow draws, so routing joins back by `"source|target"`.
-    const resolveEndpoint = (fileId: string): string => {
-      const cid = nodeToContainer.get(fileId);
-      if (!cid || cid === fileId) return fileId;
-      return expandedContainers.has(cid) ? fileId : cid;
-    };
+    // Resolve each file→file edge to its atom (container or ungrouped file).
+    // ELK only routes atom↔atom now — file-level fan-out into an expanded
+    // container is rendered by React Flow directly (smooth-step fallback), so
+    // the ELK edge set stays small and the tracks stay legible.
+    const resolveEndpoint = (fileId: string): string =>
+      nodeToContainer.get(fileId) ?? fileId;
     const seenEdge = new Set<string>();
     const elkEdges: ElkEdge[] = [];
     for (const fe of filteredGraphEdges) {
@@ -732,18 +764,13 @@ function useLayerDetailTopology(): LayerDetailTopology & {
         });
 
         // Publish child positions (relative to their container parent) so the
-        // expanded-children memo can render them via parentId + extent.
-        for (const cn of containerFlowNodes) {
-          if (!expandedContainers.has(cn.id)) continue;
-          const parent = posById.get(cn.id);
-          if (!parent?.children) continue;
-          const childPositions = new Map<string, { x: number; y: number }>();
-          for (const ch of parent.children) {
-            childPositions.set(ch.id, { x: ch.x ?? 0, y: ch.y ?? 0 });
-          }
-          setContainerLayout(cn.id, childPositions, {
-            width: parent.width ?? NODE_WIDTH,
-            height: parent.height ?? NODE_HEIGHT,
+        // expanded-children memo can render them via parentId + extent. The
+        // grid was computed before layout — the cache entry includes the
+        // "+N개" 칩 위치(moreChipId 키) when the budget truncated the list.
+        for (const [cid, grid] of grids) {
+          setContainerLayout(cid, grid.positions, {
+            width: grid.width,
+            height: grid.height,
           });
         }
 
@@ -769,19 +796,20 @@ function useLayerDetailTopology(): LayerDetailTopology & {
           nodeToContainer,
           intraContainer,
           edgePoints,
+          expandVisibility,
         });
         setLayoutStatus("ready");
       })
       .catch((err) => {
         if (cancelled) return;
-        console.error("[layer-detail hierarchical ELK] layout failed:", err);
+        console.error("[layer-detail ELK] layout failed:", err);
         setLayoutStatus("ready");
       });
 
     return () => {
       cancelled = true;
     };
-  }, [built, expandedContainers, setContainerLayout]);
+  }, [built, expandedContainers, fullyExpandedContainers, setContainerLayout]);
 
   return { ...topology, layoutStatus };
 }
@@ -857,11 +885,20 @@ function useLayerDetailGraph() {
     [selectNode],
   );
 
+  // 칩 클릭 → 해당 컨테이너 전량 표시(사용자 명시 액션이므로 relayout 허용).
+  const handleShowAll = useCallback(
+    (containerId: string) =>
+      useDashboardStore.getState().showAllContainerChildren(containerId),
+    [],
+  );
+
   const topo = useLayerDetailTopology();
 
   // Build expanded child nodes from the layout cache for any expanded
   // container whose layout has been computed. Collapsed containers
-  // contribute zero children (gating on `expandedContainers`).
+  // contribute zero children (gating on `expandedContainers`). 예산에서
+  // 잘린 자식은 캐시에 위치가 없어 자연히 걸러지고, 대신 "+N개" 칩 노드가
+  // 마지막 셀에 들어간다.
   const expandedChildNodes = useMemo<Node[]>(() => {
     if (expandedContainers.size === 0) return [];
     const out: Node[] = [];
@@ -887,6 +924,21 @@ function useLayerDetailGraph() {
           position: pos,
         } as Node);
       }
+      const vis = topo.expandVisibility.get(containerId);
+      const chipPos = cache.childPositions.get(moreChipId(containerId));
+      if (vis && vis.hiddenCount > 0 && chipPos) {
+        const chip: MoreChipFlowNode = {
+          id: moreChipId(containerId),
+          type: "more-chip",
+          position: chipPos,
+          data: {
+            containerId,
+            hiddenCount: vis.hiddenCount,
+            onShowAll: handleShowAll,
+          },
+        };
+        out.push({ ...chip, parentId: containerId, extent: "parent" } as Node);
+      }
     }
     return out;
   }, [
@@ -894,10 +946,12 @@ function useLayerDetailGraph() {
     containerLayoutCache,
     topo.containers,
     topo.filteredNodes,
+    topo.expandVisibility,
     diffMode,
     changedNodeIds,
     affectedNodeIds,
     handleNodeSelect,
+    handleShowAll,
   ]);
 
   // ── Container visual overlay flags (Task 14) ────────────────────────────
@@ -978,8 +1032,8 @@ function useLayerDetailGraph() {
     }
 
     return combined.map((node) => {
-      // Portal nodes have no overlay state.
-      if (node.type === "portal") return node;
+      // Portal / "+N개" 칩 nodes have no overlay state.
+      if (node.type === "portal" || node.type === "more-chip") return node;
 
       // Container nodes: apply container-specific visual flags.
       if (node.type === "container") {
@@ -1076,6 +1130,15 @@ function useLayerDetailGraph() {
   const expandedEdges = useMemo<Edge[]>(() => {
     if (expandedContainers.size === 0) return topo.edges;
 
+    // 파일 → 실제 렌더 노드 매핑: 예산 내 가시 자식이면 파일 id, 예산에서
+    // 잘린(숨은) 자식이면 그 컨테이너의 "+N개" 칩 — 숨은 파일로 향하던 배선이
+    // 사라지지 않고 칩으로 집계돼 "가려진 것에도 연결이 있다"가 보인다.
+    const displayEndpoint = (fileId: string, atomId: string): string => {
+      const vis = topo.expandVisibility.get(atomId);
+      if (vis && !vis.visible.has(fileId)) return moreChipId(atomId);
+      return fileId;
+    };
+
     const out: Edge[] = [];
     const seen = new Set<string>();
     for (const e of topo.edges) {
@@ -1093,8 +1156,8 @@ function useLayerDetailGraph() {
         return fsc === srcAtom && ftc === tgtAtom;
       });
       for (const m of matching) {
-        const realSrc = srcExpanded ? m.source : srcAtom;
-        const realTgt = tgtExpanded ? m.target : tgtAtom;
+        const realSrc = srcExpanded ? displayEndpoint(m.source, srcAtom) : srcAtom;
+        const realTgt = tgtExpanded ? displayEndpoint(m.target, tgtAtom) : tgtAtom;
         const key = `${realSrc}|${realTgt}|${m.type}`;
         if (seen.has(key)) continue;
         seen.add(key);
@@ -1115,19 +1178,22 @@ function useLayerDetailGraph() {
     for (const e of topo.intraContainer) {
       const cid = topo.nodeToContainer.get(e.source);
       if (!cid || !expandedContainers.has(cid)) continue;
-      const key = `intra|${e.source}|${e.target}|${e.type}`;
+      const s = displayEndpoint(e.source, cid);
+      const t = displayEndpoint(e.target, cid);
+      if (s === t) continue; // 둘 다 칩으로 접힌 형제 배선 — 자기 루프 생략
+      const key = `intra|${s}|${t}|${e.type}`;
       if (seen.has(key)) continue;
       seen.add(key);
       // 형제 파일 간 배선은 보조 정보 — 흐린 세선·라벨 없음(선택 시 강조/라벨).
       // JSP 15개짜리 폴더를 펼치면 depends_on 30여 개가 라벨 벽을 만들던 것 완화.
       out.push({
         id: key,
-        source: e.source,
-        target: e.target,
+        source: s,
+        target: t,
         type: "elk",
         style: { stroke: "var(--color-edge-dim)", strokeWidth: 1 },
         labelStyle: { fill: "#a39787", fontSize: 10 },
-        data: { points: topo.edgePoints.get(`${e.source}|${e.target}`), edgeType: e.type },
+        data: { points: topo.edgePoints.get(`${s}|${t}`), edgeType: e.type },
       });
     }
     return out;
@@ -1137,6 +1203,7 @@ function useLayerDetailGraph() {
     topo.intraContainer,
     topo.nodeToContainer,
     topo.edgePoints,
+    topo.expandVisibility,
     expandedContainers,
   ]);
 
@@ -1167,6 +1234,22 @@ function useLayerDetailGraph() {
       return { ...edge, animated: false, style: { stroke: "var(--color-edge-dim)", strokeWidth: 1 }, labelStyle: { fill: "rgba(163,151,135,0.2)", fontSize: 10 } };
     });
   }, [expandedEdges, topo.portalEdges, selectedNodeId]);
+
+  // 검색/이웃 탐색이 예산에서 잘린 자식에 착지하면 그 컨테이너를 전량 표시로
+  // 승격한다 — 사용자가 명시적으로 그 노드로 이동한 것이므로 relayout 허용.
+  // (선택을 Stage 1 의존성으로 넣으면 모든 클릭이 relayout을 유발하므로,
+  // "숨은 노드에 착지했을 때"만 이벤트성으로 승격하는 우회.)
+  useEffect(() => {
+    for (const nid of [selectedNodeId, focusNodeId]) {
+      if (!nid) continue;
+      const cid = topo.nodeToContainer.get(nid);
+      if (!cid || cid === nid) continue;
+      const vis = topo.expandVisibility.get(cid);
+      if (vis && vis.hiddenCount > 0 && !vis.visible.has(nid)) {
+        useDashboardStore.getState().showAllContainerChildren(cid);
+      }
+    }
+  }, [selectedNodeId, focusNodeId, topo.nodeToContainer, topo.expandVisibility]);
 
   // Expose container topology so the parent component can wire auto-expand
   // triggers (focus, zoom) without having to re-derive containers.
@@ -1384,6 +1467,9 @@ function GraphViewInner() {
       } else if (node.id.startsWith("portal:")) {
         const targetLayerId = node.id.replace("portal:", "");
         drillIntoLayer(targetLayerId);
+      } else if (node.id.startsWith(MORE_CHIP_PREFIX)) {
+        // "+N개" 칩은 노드 선택 대상이 아님 — 칩 자체 onClick이 전량 표시 처리.
+        return;
       } else {
         selectNode(node.id);
       }

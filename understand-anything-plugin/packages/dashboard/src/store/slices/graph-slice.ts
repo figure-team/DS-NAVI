@@ -136,6 +136,7 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
       expandedBranchParents: new Set(),
       containerLayoutCache: new Map(),
       expandedContainers: new Set(),
+      fullyExpandedContainers: new Set(),
       pendingFocusContainer: null,
       containerSizeMemory: new Map(),
       stage1Tick: 0,
@@ -236,6 +237,7 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
       containerLayoutCache: new Map(),
       containerSizeMemory: new Map(),
       expandedContainers: new Set(),
+      fullyExpandedContainers: new Set(),
       pendingFocusContainer: null,
     }),
 
@@ -251,6 +253,7 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
       containerLayoutCache: new Map(),
       containerSizeMemory: new Map(),
       expandedContainers: new Set(),
+      fullyExpandedContainers: new Set(),
       pendingFocusContainer: null,
     }),
 
@@ -264,6 +267,7 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
       containerLayoutCache: new Map(),
       containerSizeMemory: new Map(),
       expandedContainers: new Set(),
+      fullyExpandedContainers: new Set(),
       pendingFocusContainer: null,
     }),
   setSearchMode: (mode) => set({ searchMode: mode }),

@@ -50,6 +50,12 @@ export interface CanvasSlice {
   expandContainer: (containerId: string) => void;
   collapseContainer: (containerId: string) => void;
   collapseAllContainers: () => void;
+  /**
+   * 점진 공개 예외: 펼침은 기본 허브 상위 N개만 노출하는데(utils/expandBudget),
+   * "+M개" 칩으로 사용자가 전량 표시를 명시 요청한 컨테이너 집합. 접으면 잊는다.
+   */
+  fullyExpandedContainers: Set<string>;
+  showAllContainerChildren: (containerId: string) => void;
   /** Container the user just manually expanded; viewport should lock onto it. Cleared by GraphView once the lock is applied. */
   pendingFocusContainer: string | null;
   setPendingFocusContainer: (containerId: string | null) => void;
@@ -101,6 +107,7 @@ export const createCanvasSlice: StateCreator<DashboardStore, [], [], CanvasSlice
       containerLayoutCache: new Map(),
       containerSizeMemory: new Map(),
       expandedContainers: new Set(),
+      fullyExpandedContainers: new Set(),
       pendingFocusContainer: null,
     })),
 
@@ -142,6 +149,16 @@ export const createCanvasSlice: StateCreator<DashboardStore, [], [], CanvasSlice
   },
 
   expandedContainers: new Set<string>(),
+  fullyExpandedContainers: new Set<string>(),
+  showAllContainerChildren: (containerId) =>
+    set((state) => {
+      if (state.fullyExpandedContainers.has(containerId)) return {};
+      const next = new Set(state.fullyExpandedContainers);
+      next.add(containerId);
+      // 전량 표시도 relayout을 유발하므로 수동 펼침과 동일하게 뷰포트를
+      // 해당 컨테이너에 잠근다 — 커진 그리드가 화면 밖으로 밀려나지 않게.
+      return { fullyExpandedContainers: next, pendingFocusContainer: containerId };
+    }),
   pendingFocusContainer: null,
   setPendingFocusContainer: (containerId) =>
     set({ pendingFocusContainer: containerId }),
@@ -151,8 +168,15 @@ export const createCanvasSlice: StateCreator<DashboardStore, [], [], CanvasSlice
       const willExpand = !next.has(containerId);
       if (willExpand) next.add(containerId);
       else next.delete(containerId);
+      // 접으면 전량 표시 기억도 잊는다 — 재펼침은 다시 예산부터.
+      let fully = state.fullyExpandedContainers;
+      if (!willExpand && fully.has(containerId)) {
+        fully = new Set(fully);
+        fully.delete(containerId);
+      }
       return {
         expandedContainers: next,
+        fullyExpandedContainers: fully,
         pendingFocusContainer: willExpand
           ? containerId
           : state.pendingFocusContainer,
@@ -170,9 +194,15 @@ export const createCanvasSlice: StateCreator<DashboardStore, [], [], CanvasSlice
       if (!state.expandedContainers.has(containerId)) return {};
       const next = new Set(state.expandedContainers);
       next.delete(containerId);
-      return { expandedContainers: next };
+      let fully = state.fullyExpandedContainers;
+      if (fully.has(containerId)) {
+        fully = new Set(fully);
+        fully.delete(containerId);
+      }
+      return { expandedContainers: next, fullyExpandedContainers: fully };
     }),
-  collapseAllContainers: () => set({ expandedContainers: new Set() }),
+  collapseAllContainers: () =>
+    set({ expandedContainers: new Set(), fullyExpandedContainers: new Set() }),
 
   containerLayoutCache: new Map(),
   setContainerLayout: (containerId, childPositions, actualSize) =>
@@ -184,7 +214,12 @@ export const createCanvasSlice: StateCreator<DashboardStore, [], [], CanvasSlice
       return { containerLayoutCache: next, containerSizeMemory: sizeNext };
     }),
   clearContainerLayouts: () =>
-    set({ containerLayoutCache: new Map(), expandedContainers: new Set(), pendingFocusContainer: null }),
+    set({
+      containerLayoutCache: new Map(),
+      expandedContainers: new Set(),
+      fullyExpandedContainers: new Set(),
+      pendingFocusContainer: null,
+    }),
 
   containerSizeMemory: new Map(),
 

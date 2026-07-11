@@ -220,6 +220,8 @@ export const zh = {
   containerNode: {
     files: " 个文件",
     expand: "点击展开",
+    moreFiles: " 个更多文件",
+    showAll: "显示全部",
   },
   nodeTypeLabels: {
     all: "全部",

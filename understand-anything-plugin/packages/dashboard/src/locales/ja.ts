@@ -127,7 +127,6 @@ export const ja = {
     extEmbedded: "組み込み",
     moreFlows: "+{count}",
     extSuspect: "疑わしい信号 {count}件 — 未検出連携の可能性(手動確認)",
-    extScanBadge: "スキャン完了・なし",
     extUnscanned: "未スキャン",
     extCount: "{count}件",
     extJobs: "ジョブ",
@@ -138,7 +137,6 @@ export const ja = {
     extScreenCount: "キャプチャ画面",
     extScreensLink: "画面設計書 →",
     supportDomains: "技術・付属",
-    relationLegend: "ドメイン間相互作用 {count}件 — 線にホバーで詳細",
   },
   grounding: {
     rate: "根拠率",

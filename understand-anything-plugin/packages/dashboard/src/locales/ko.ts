@@ -127,7 +127,6 @@ export const ko = {
     extEmbedded: "내장",
     moreFlows: "+{count}",
     extSuspect: "의심 신호 {count}건 — 미탐지 연계 가능성(수동 확인)",
-    extScanBadge: "스캔 완료 · 없음",
     extUnscanned: "미스캔",
     extCount: "{count}건",
     extJobs: "잡",
@@ -138,7 +137,6 @@ export const ko = {
     extScreenCount: "캡처 화면",
     extScreensLink: "화면설계서 →",
     supportDomains: "기술·부속",
-    relationLegend: "도메인 간 상호작용 {count}건 — 선 위에 마우스를 올리면 상세",
   },
   grounding: {
     rate: "근거율",

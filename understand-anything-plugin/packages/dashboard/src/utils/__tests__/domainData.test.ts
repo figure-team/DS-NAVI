@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { buildDomainRelations, flowBadge, parseFlowStepClaim, parseStepDetailSections } from "../domainData";
-import type { GraphNode, KnowledgeGraph } from "@understand-anything/core/types";
+import { flowBadge, parseFlowStepClaim, parseStepDetailSections } from "../domainData";
+import type { GraphNode } from "@understand-anything/core/types";
 
 function flowNode(entryPoint: string, entryType = "http"): GraphNode {
   return {
@@ -183,77 +183,5 @@ describe("parseStepDetailSections — P2 step detail sections", () => {
 
   it("returns [] for a node with no ktdsClaims", () => {
     expect(parseStepDetailSections(flowNode("POST /orders"))).toEqual([]);
-  });
-});
-
-describe("buildDomainRelations — crossDomainInteractions 파싱", () => {
-  function domainNode(id: string, name: string, interactions?: unknown): GraphNode {
-    return {
-      id,
-      type: "domain",
-      name,
-      summary: "",
-      tags: [],
-      complexity: "simple",
-      domainMeta: interactions === undefined ? {} : { crossDomainInteractions: interactions },
-    } as unknown as GraphNode;
-  }
-  function graphOf(nodes: GraphNode[]): KnowledgeGraph {
-    return { nodes, edges: [] } as unknown as KnowledgeGraph;
-  }
-
-  it("도메인 키·표시명 토큰 둘 다 해석하고 source→target 사전순으로 정렬한다", () => {
-    const graph = graphOf([
-      domainNode("domain:account", "계정/회원", [
-        "account → catalog: 즐겨찾기 카테고리 상품을 MyList로 로딩",
-      ]),
-      domainNode("domain:catalog", "카탈로그", [
-        "카탈로그 → account: 공통 액션 빈 기반을 공유",
-      ]),
-    ]);
-    expect(buildDomainRelations(graph)).toEqual([
-      {
-        source: "domain:account",
-        target: "domain:catalog",
-        texts: ["즐겨찾기 카테고리 상품을 MyList로 로딩"],
-      },
-      {
-        source: "domain:catalog",
-        target: "domain:account",
-        texts: ["공통 액션 빈 기반을 공유"],
-      },
-    ]);
-  });
-
-  it("같은 쌍·방향은 병합하고 동일 문장은 1회만 담는다", () => {
-    const graph = graphOf([
-      domainNode("domain:a", "A", ["a → b: 첫째", "a → b: 둘째", "a → b: 첫째"]),
-      domainNode("domain:b", "B"),
-    ]);
-    expect(buildDomainRelations(graph)).toEqual([
-      { source: "domain:a", target: "domain:b", texts: ["첫째", "둘째"] },
-    ]);
-  });
-
-  it("화살표 없는 서술·미해석 토큰·자기참조는 조용히 버린다(날조 0)", () => {
-    const graph = graphOf([
-      domainNode("domain:web-inf", "웹 배포 설정 (web.xml)", [
-        "*.action 매핑을 통해 모든 액션 빈 도메인 요청의 진입점 역할을 한다.",
-        "web-inf → unknown-domain: 미등록 토큰",
-        "web-inf → web-inf: 자기참조",
-      ]),
-      domainNode("domain:a", "A", 42),
-    ]);
-    expect(buildDomainRelations(graph)).toEqual([]);
-  });
-
-  it("ASCII 화살표(->)와 전각 콜론(：)도 허용한다", () => {
-    const graph = graphOf([
-      domainNode("domain:a", "A", ["a -> b： 설명"]),
-      domainNode("domain:b", "B"),
-    ]);
-    expect(buildDomainRelations(graph)).toEqual([
-      { source: "domain:a", target: "domain:b", texts: ["설명"] },
-    ]);
   });
 });

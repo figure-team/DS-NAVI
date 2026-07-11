@@ -127,7 +127,6 @@ export const ru = {
     extEmbedded: "встроенная",
     moreFlows: "+{count}",
     extSuspect: "Подозрительных сигналов: {count} — возможны необнаруженные интеграции (ручная проверка)",
-    extScanBadge: "Скан завершён · нет",
     extUnscanned: "Не сканировано",
     extCount: "{count}",
     extJobs: "Задания",
@@ -138,7 +137,6 @@ export const ru = {
     extScreenCount: "Снимки экранов",
     extScreensLink: "Спецификации экранов →",
     supportDomains: "Технические / вспомогательные",
-    relationLegend: "Взаимодействий доменов: {count} — наведите на линию",
   },
   grounding: {
     rate: "Обоснованность",

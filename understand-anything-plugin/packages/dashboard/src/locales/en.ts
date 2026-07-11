@@ -127,7 +127,6 @@ export const en = {
     extEmbedded: "embedded",
     moreFlows: "+{count}",
     extSuspect: "{count} suspect signals — possible undetected integrations (manual review)",
-    extScanBadge: "Scanned · none",
     extUnscanned: "Not scanned",
     extCount: "{count}",
     extJobs: "Jobs",
@@ -138,7 +137,6 @@ export const en = {
     extScreenCount: "Captured screens",
     extScreensLink: "Screen specs →",
     supportDomains: "Technical / supporting",
-    relationLegend: "Domain interactions: {count} — hover a line for details",
   },
   grounding: {
     rate: "Grounding",

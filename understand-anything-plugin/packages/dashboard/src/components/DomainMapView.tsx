@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { useDashboardStore } from "../store";
 import { useNavigate } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import { dataUrl } from "../shared/api/client";
-import { buildDomainCards, buildDomainRelations } from "../utils/domainData";
+import { buildDomainCards } from "../utils/domainData";
 import { parseBusinessFlows, type BizProcess } from "../utils/businessFlow";
 import DomainCardDetail from "./DomainCardDetail";
-import DomainRelationsLayer, { type CardRect } from "./DomainRelationsLayer";
 import GroundedBar from "./GroundedBar";
 
 /**
@@ -188,46 +187,6 @@ export default function DomainMapView() {
     [processesByDomain],
   );
 
-  // 도메인 간 관계선 데이터 — crossDomainInteractions 파싱 성공분(구성도 관계선).
-  const relations = useMemo(
-    () => (domainGraph ? buildDomainRelations(domainGraph) : []),
-    [domainGraph],
-  );
-
-  // 관계선 좌표계 — 보드(스크롤 콘텐츠) 기준 카드 사각형 실측. null = 측정 전.
-  const boardRef = useRef<HTMLDivElement | null>(null);
-  const cardRefs = useRef(new Map<string, HTMLDivElement>());
-  const [rects, setRects] = useState<Map<string, CardRect> | null>(null);
-  const measure = useCallback(() => {
-    const board = boardRef.current;
-    if (!board) return;
-    const origin = board.getBoundingClientRect();
-    const next = new Map<string, CardRect>();
-    for (const [id, el] of cardRefs.current) {
-      if (!el.isConnected) continue;
-      const r = el.getBoundingClientRect();
-      next.set(id, { x: r.left - origin.left, y: r.top - origin.top, w: r.width, h: r.height });
-    }
-    setRects(next);
-  }, []);
-
-  // 페인트 전 1차 실측 + 카드 등장 애니메이션(translateY) 종료 후 최종 재실측.
-  useLayoutEffect(() => {
-    measure();
-  }, [measure, data, worksExpanded]);
-  useEffect(() => {
-    const id = window.setTimeout(measure, 900);
-    return () => window.clearTimeout(id);
-  }, [measure, data, worksExpanded]);
-  // 카드 폭/높이 변화(창 크기·칩 펼침)는 ResizeObserver 로 추적.
-  useEffect(() => {
-    if (typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => measure());
-    if (boardRef.current) ro.observe(boardRef.current);
-    for (const el of cardRefs.current.values()) ro.observe(el);
-    return () => ro.disconnect();
-  }, [measure, data]);
-
   if (!domainGraph || !data) {
     return (
       <div className="h-full flex items-center justify-center text-text-muted text-sm px-6 text-center">
@@ -251,17 +210,11 @@ export default function DomainMapView() {
     : [];
 
   // 구성도 분산 모드 — 도메인이 적을 때(≤9) 정사각형에 가깝게 열을 줄여 세로로
-  // 펼친다: 카드 사이 공간이 관계선이 지나갈 자리가 된다. 많으면 기존 밀집 그리드.
+  // 펼친다(하단 빈 공간 해소). 많으면 기존 밀집 그리드.
   const diagramCols =
     businessCards.length > 1 && businessCards.length <= 9
       ? Math.max(2, Math.ceil(Math.sqrt(businessCards.length)))
       : null;
-
-  const domainNames = new Map(cards.map((c) => [c.id, c.name]));
-  // 본 그리드에 실측 사각형이 있는 쌍만 그린다 — 부속 도메인 관계는 자연 제외.
-  const visibleRelations = rects
-    ? relations.filter((r) => rects.has(r.source) && rects.has(r.target))
-    : [];
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
@@ -310,9 +263,9 @@ export default function DomainMapView() {
           style={{ boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)" }}
         >
           <div className="flex-1 min-h-0 overflow-y-auto">
-            {/* 보드 — 관계선 좌표계(relative). 콘텐츠가 짧으면 뷰포트 높이만큼 늘여
-                다이어그램 모드의 세로 분산(space-evenly)이 실제로 일어나게 한다. */}
-            <div ref={boardRef} className="relative flex flex-col" style={{ minHeight: "100%" }}>
+            {/* 보드 — 콘텐츠가 짧으면 뷰포트 높이만큼 늘여 다이어그램 모드의
+                세로 분산(space-evenly)이 실제로 일어나게 한다. */}
+            <div className="flex flex-col" style={{ minHeight: "100%" }}>
               <div
                 className="grid"
                 style={{
@@ -331,10 +284,6 @@ export default function DomainMapView() {
                 /* 프로토 .dom — 카드 전체 클릭 = 워크스페이스 진입, hover 시 accent 테두리 */
                 <div
                   key={card.id}
-                  ref={(el) => {
-                    if (el) cardRefs.current.set(card.id, el);
-                    else cardRefs.current.delete(card.id);
-                  }}
                   role="button"
                   tabIndex={0}
                   onClick={() => navigate(`/domains/${card.id}`)}
@@ -349,7 +298,7 @@ export default function DomainMapView() {
                     padding: "13px 14px",
                     animation: `fadeSlideIn 0.35s ease-out ${i * 0.05}s both`,
                     // 다이어그램 모드 — 넓은 트랙에서 카드가 과도하게 늘어나지 않게
-                    // 상한을 두고 중앙 배치: 카드 사이 여백 = 관계선 통로.
+                    // 상한을 두고 중앙 배치.
                     ...(diagramCols
                       ? { width: "100%", maxWidth: 480, justifySelf: "center" as const }
                       : {}),
@@ -407,19 +356,6 @@ export default function DomainMapView() {
               );
             })}
               </div>
-              {/* 도메인 간 관계선 — 카드 실측 후에만(svg 루트는 클릭 무방해). */}
-              {rects && visibleRelations.length > 0 && (
-                <DomainRelationsLayer
-                  relations={visibleRelations}
-                  rects={rects}
-                  names={domainNames}
-                />
-              )}
-              {visibleRelations.length > 0 && (
-                <p className="text-text-muted shrink-0" style={{ fontSize: 10.5, padding: "0 18px 10px" }}>
-                  {t.domainMap.relationLegend.replace("{count}", String(visibleRelations.length))}
-                </p>
-              )}
             </div>
           </div>
           {/* 기술·부속 도메인 — 업무 0개(배포 설정 등)는 본 그리드와 위계를 분리해
@@ -505,12 +441,13 @@ export default function DomainMapView() {
               >
                 {s.key === "interfaces" && (
                   <>
+                    {/* 0건 배지는 미스캔일 때만 — 배지 없음 = 스캔 완료 0건(시각 소음 제거). */}
                     <KvRow label={t.domainMap.extOutbound} value={systemMap.interfaces.outboundCount}
-                      badge={systemMap.interfaces.outboundCount === 0 ? (systemMap.interfaces.scanned ? "ok" : "mut") : undefined}
-                      badgeText={systemMap.interfaces.scanned ? t.domainMap.extScanBadge : t.domainMap.extUnscanned} t={t} />
+                      badge={systemMap.interfaces.outboundCount === 0 && !systemMap.interfaces.scanned ? "mut" : undefined}
+                      badgeText={t.domainMap.extUnscanned} t={t} />
                     <KvRow label={t.domainMap.extInbound} value={systemMap.interfaces.inboundCount}
-                      badge={systemMap.interfaces.inboundCount === 0 ? (systemMap.interfaces.scanned ? "ok" : "mut") : undefined}
-                      badgeText={systemMap.interfaces.scanned ? t.domainMap.extScanBadge : t.domainMap.extUnscanned} t={t} />
+                      badge={systemMap.interfaces.inboundCount === 0 && !systemMap.interfaces.scanned ? "mut" : undefined}
+                      badgeText={t.domainMap.extUnscanned} t={t} />
                     {/* 0건이어도 의심 신호가 있으면 "없음" 아닌 "탐지 못함" 가능성 표면화(정직성). */}
                     {systemMap.interfaces.suspectCount > 0 && (
                       <p style={{ fontSize: 10.5, lineHeight: 1.5, color: "var(--color-status-warn)" }}>
@@ -541,8 +478,8 @@ export default function DomainMapView() {
                   ))}
                 {s.key === "batch" && (
                   <KvRow label={t.domainMap.extJobs} value={systemMap.batch.jobCount}
-                    badge={systemMap.batch.jobCount === 0 ? (systemMap.batch.scanned ? "ok" : "mut") : undefined}
-                    badgeText={systemMap.batch.scanned ? t.domainMap.extScanBadge : t.domainMap.extUnscanned} t={t} />
+                    badge={systemMap.batch.jobCount === 0 && !systemMap.batch.scanned ? "mut" : undefined}
+                    badgeText={t.domainMap.extUnscanned} t={t} />
                 )}
                 {s.key === "screens" && (
                   /* 행 내 화면설계서 링크는 타이틀 → 버튼으로 승격(중복 제거). */

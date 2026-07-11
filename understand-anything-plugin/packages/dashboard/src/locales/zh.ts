@@ -127,7 +127,6 @@ export const zh = {
     extEmbedded: "内嵌",
     moreFlows: "+{count}",
     extSuspect: "可疑信号 {count} 个 — 可能存在未检测到的集成(需人工确认)",
-    extScanBadge: "扫描完成 · 无",
     extUnscanned: "未扫描",
     extCount: "{count} 个",
     extJobs: "作业",
@@ -138,7 +137,6 @@ export const zh = {
     extScreenCount: "截图界面",
     extScreensLink: "界面设计书 →",
     supportDomains: "技术／附属",
-    relationLegend: "领域间交互 {count} 条 — 悬停连线查看详情",
   },
   grounding: {
     rate: "依据率",

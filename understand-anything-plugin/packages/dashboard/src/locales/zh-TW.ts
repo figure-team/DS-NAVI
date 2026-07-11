@@ -127,7 +127,6 @@ export const zhTW = {
     extEmbedded: "內嵌",
     moreFlows: "+{count}",
     extSuspect: "可疑訊號 {count} 個 — 可能存在未偵測到的整合(需人工確認)",
-    extScanBadge: "掃描完成 · 無",
     extUnscanned: "未掃描",
     extCount: "{count} 個",
     extJobs: "作業",
@@ -138,7 +137,6 @@ export const zhTW = {
     extScreenCount: "截圖畫面",
     extScreensLink: "畫面設計書 →",
     supportDomains: "技術／附屬",
-    relationLegend: "領域間互動 {count} 筆 — 滑鼠移至連線查看詳情",
   },
   grounding: {
     rate: "依據率",

@@ -123,8 +123,6 @@ const MECH_CONF: Record<string, { kind: ConfKind; label: string; title: string }
   UNVERIFIED: { kind: "chk", label: "확인 필요", title: "근거 없음 — 확인 필요" },
 };
 const mechConf = (c: string) => MECH_CONF[c] ?? MECH_CONF.INFERRED;
-/** 신뢰도 카운트 요약 순서. */
-const CONF_ORDER = ["CONFIRMED", "CONFIRMED_AI", "INFERRED", "UNVERIFIED"];
 const KIND_LABEL: Record<string, string> = {
   field: "입력",
   action: "이벤트",
@@ -669,12 +667,6 @@ export default function ScreenSpecView() {
   // 캡처 위에 실제로 그릴 배지 — 색상 키 토글로 꺼진 종류는 제외(표·통계는 전수 유지).
   const overlayAnns = visibleAnns.filter((a) => !hiddenKinds.has(kindGroup(a.kind)));
   const notes = visibleAnns.filter((a) => merged(a).note);
-  // 신뢰도별 카운트(핸들러 있는 주석만) + 핸들러 없음 — 스케일 대비 상단 요약.
-  const confCounts = new Map<string, number>();
-  for (const a of visibleAnns) {
-    if (a.handler) confCounts.set(a.handler.confidence, (confCounts.get(a.handler.confidence) ?? 0) + 1);
-  }
-  const noHandler = visibleAnns.filter((a) => !a.handler).length;
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
@@ -969,26 +961,6 @@ export default function ScreenSpecView() {
                 </button>
               );
             })}
-          </div>
-
-          {/* 신뢰도 카운트 요약 — 스케일 대비 상단 집계(전부 기계 판정) */}
-          <div className="flex items-center flex-wrap gap-2 text-text-muted" style={{ fontSize: 11, marginBottom: 12 }}>
-            <span>동작 신뢰도</span>
-            {CONF_ORDER.filter((c) => (confCounts.get(c) ?? 0) > 0).map((c) => {
-              const mc = mechConf(c);
-              return (
-                <span key={c} className="inline-flex items-center gap-1">
-                  <ConfBadge kind={mc.kind} label={mc.label} title={mc.title} />
-                  <b className="text-text-secondary tabular-nums">{confCounts.get(c)}</b>
-                </span>
-              );
-            })}
-            {confCounts.size === 0 && <span>—</span>}
-            {noHandler > 0 && (
-              <span className="inline-flex items-center gap-1" title="핸들러가 없는 항목(입력 필드 등)">
-                · 핸들러 없음 <b className="text-text-secondary tabular-nums">{noHandler}</b>
-              </span>
-            )}
           </div>
 
           {/* 캡처 + 배지 오버레이 (로드 실패 시 경로 폴백 카드) */}

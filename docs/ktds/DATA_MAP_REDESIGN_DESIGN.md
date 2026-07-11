@@ -160,4 +160,10 @@ P3~P4로 DataMapView가 커지면 `data-map/` 하위로 탭별 파일 분리(Tab
 - **함정(재발 방지)**: React Flow에 문자열 마커를 주면 `url('#…')`로 이중 래핑한다 —
   `markerStart: "erd-many-d"`처럼 **id만** 넘길 것. `url(#id)`를 넘기면 마커가 조용히
   사라진다(콘솔 에러 없음).
-- 잔여: PNG 내보내기(ERD 2차 마지막 1건).
+- **PNG 내보내기**: html-to-image `toPng`으로 `.react-flow__viewport` 캡처. **화면 줌 무관
+  zoom=1(테이블 실측 크기) 고정 + pixelRatio 2** — 테이블이 많아도 축소되지 않고 이미지가
+  커진다. 브라우저 캔버스 한 변 한계(16k)를 넘으면 pixelRatio만 자동 축소(레이아웃 불변,
+  `erd-export.ts` 순수 함수 + vitest 5케이스). 마커 defs는 `ViewportPortal`로 뷰포트 내부
+  렌더 — 캡처가 뷰포트 서브트리만 클론하므로 밖에 두면 url(#) 참조가 끊겨 마커만 사라진다.
+  Controls/MiniMap/배경 점은 뷰포트 밖이라 자동 제외, 파일명 `erd-{view}.png`.
+- ERD 2차 잔여 없음(컬럼 앵커·crow's foot·PNG 전부 완료).

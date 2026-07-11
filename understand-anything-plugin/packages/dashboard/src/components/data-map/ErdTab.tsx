@@ -1,19 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useSearchParams } from "react-router";
 import {
   Background,
   BackgroundVariant,
   Controls,
+  getNodesBounds,
   Handle,
   MiniMap,
   Position,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
+  ViewportPortal,
 } from "@xyflow/react";
 import type { Edge, Node, NodeProps } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { toPng } from "html-to-image";
 
 import { Badge } from "../proto/Proto";
 import { useTheme } from "../../themes/index.ts";
@@ -21,6 +24,7 @@ import { applyElkLayout } from "../../utils/elk-layout";
 import { mergeElkPositions, nodesToElkInput } from "../../utils/layout";
 import { fkCardinality } from "./erd-cardinality";
 import type { FkCardinality } from "./erd-cardinality";
+import { planErdExport } from "./erd-export";
 import { inferFkEdges } from "./erd-infer";
 import { TableDetail } from "./TablesTab";
 import { isPk } from "./types";
@@ -271,7 +275,7 @@ function pkColsOf(t: DbTable): string[] {
 function ErdCanvas({ schema }: { schema: DbSchema }) {
   const isDark = useTheme().preset.isDark;
   const relPalette = REL_PALETTES[isDark ? "dark" : "light"];
-  const { fitView } = useReactFlow();
+  const { fitView, getNodes } = useReactFlow();
   const [searchParams, setSearchParams] = useSearchParams();
   const selName = searchParams.get("table");
   const selected = useMemo(
@@ -516,6 +520,38 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       return prev;
     });
 
+  // PNG 내보내기 — 화면 줌 무관 zoom=1(테이블 실측 크기) × pixelRatio(erd-export 계획)로
+  // 캔버스 전체 캡처. 캡처 대상은 .react-flow__viewport 라 Controls/MiniMap/배경 점은 제외,
+  // 마커 defs 는 ViewportPortal 로 뷰포트 안에 있어 클론에 포함된다. 선택 강조 상태도 그대로 찍힘.
+  const flowWrapRef = useRef<HTMLDivElement>(null);
+  const [exporting, setExporting] = useState(false);
+  const exportPng = async () => {
+    const wrap = flowWrapRef.current;
+    const el = wrap?.querySelector<HTMLElement>(".react-flow__viewport");
+    if (!wrap || !el || exporting || !layouted) return;
+    setExporting(true);
+    try {
+      const plan = planErdExport(getNodesBounds(getNodes()));
+      const dataUrl = await toPng(el, {
+        width: plan.width,
+        height: plan.height,
+        pixelRatio: plan.pixelRatio,
+        backgroundColor: getComputedStyle(wrap).backgroundColor,
+        style: {
+          width: `${plan.width}px`,
+          height: `${plan.height}px`,
+          transform: `translate(${plan.x}px, ${plan.y}px) scale(1)`,
+        },
+      });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `erd-${view}.png`;
+      a.click();
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="min-w-0">
       {/* 보기 모드 필터 + 범례 — 캔버스를 가리지 않게 캔버스 밖 툴바 행. */}
@@ -567,6 +603,16 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
             추정(컬럼명=타 테이블 PK)
           </div>
         )}
+        <button
+          type="button"
+          onClick={() => void exportPng()}
+          disabled={exporting || !layouted}
+          className="rounded-lg border border-border-subtle bg-panel card-shadow cursor-pointer disabled:opacity-40 disabled:cursor-default transition-colors"
+          style={{ marginLeft: "auto", padding: "5px 11px", fontSize: 11.5, color: "var(--color-text-secondary)" }}
+          title="현재 보기 모드의 캔버스 전체를 원본 크기 기준 고해상도 PNG로 저장"
+        >
+          {exporting ? "내보내는 중…" : "PNG 내보내기"}
+        </button>
       </div>
 
       <div
@@ -574,10 +620,10 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
         style={{ gap: 14, gridTemplateColumns: selected ? "minmax(0,1fr) 440px" : "minmax(0,1fr)" }}
       >
         <div
+          ref={flowWrapRef}
           className="rounded-[10px] border border-border-subtle bg-panel card-shadow overflow-hidden"
           style={{ height: "calc(100vh - 320px)", minHeight: 420 }}
         >
-        <ErdMarkerDefs palette={relPalette} />
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -593,6 +639,10 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
           <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
           <Controls showInteractive={false} />
           {schema.tables.length > 30 && <MiniMap pannable zoomable />}
+          {/* 마커 defs 는 뷰포트 내부에 있어야 PNG 내보내기(뷰포트 서브트리 클론)에서 url(#) 참조가 살아남는다. */}
+          <ViewportPortal>
+            <ErdMarkerDefs palette={relPalette} />
+          </ViewportPortal>
         </ReactFlow>
       </div>
 

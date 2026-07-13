@@ -72,6 +72,23 @@ describe('emit — structural domain-graph.json (pre-LLM-fill)', () => {
     expect(parsed.edges.length).toBe(skeleton.edges.length)
   })
 
+  it('groups 옵션은 ktdsMap.groups 로 투영되고, 없으면 필드가 생략된다(DOMAIN_HIERARCHY)', async () => {
+    const skeleton = await shopMiniSkeleton()
+    const groups = [{ key: 'g:common', name: '공통', memberKeys: ['order'] }]
+    emitDomainGraph(root, skeleton, { groups })
+    const withGroups = JSON.parse(
+      await readFile(join(root, '.understand-anything', 'domain-graph.json'), 'utf8'),
+    ) as { ktdsMap: { groups?: unknown } }
+    expect(withGroups.ktdsMap.groups).toEqual(groups)
+
+    // groups 부재·빈 배열 → 기존 평면 그래프와 동일(필드 자체가 없음 — 하위호환).
+    emitDomainGraph(root, skeleton, { groups: [] })
+    const flat = JSON.parse(
+      await readFile(join(root, '.understand-anything', 'domain-graph.json'), 'utf8'),
+    ) as { ktdsMap: Record<string, unknown> }
+    expect('groups' in flat.ktdsMap).toBe(false)
+  })
+
   it('dual-load merges a REAL ktds-produced overlay onto the UA KG', async () => {
     // Seed only the UA native KG (no domain overlay yet).
     await mkdir(join(root, '.understand-anything'), { recursive: true })

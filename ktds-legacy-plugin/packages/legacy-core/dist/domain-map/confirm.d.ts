@@ -9,6 +9,15 @@
 import type { CandidatesReport, ConfirmedPlan, DomainConfidence, PlanOp } from './types.js';
 /** 후보를 그대로 수용하는 플랜 — 인터랙티브 세션/--auto-approve 의 시작점. */
 export declare function buildAutoPlan(candidates: CandidatesReport, decidedBy?: string): ConfirmedPlan;
+/**
+ * 그룹 생성·확장(멱등 upsert) — 상단도메인(DOMAIN_HIERARCHY D1)을 plan 에 기록한다.
+ * 같은 key 재호출 시 members 합집합 + name 갱신. 불변 규칙:
+ * `g:` 접두 필수 / member 는 실존 도메인 / 한 도메인은 최대 1개 그룹(다른 그룹
+ * 소속 member 는 오류 — LLM 초안의 중복 배정을 fail-closed 로 잡는다).
+ */
+export declare function groupDomains(plan: ConfirmedPlan, key: string, name: string, members: string[]): ConfirmedPlan;
+/** 그룹 해체 — 그룹만 사라지고 소속 도메인은 잔존(비파괴). 마지막 그룹이면 필드 생략. */
+export declare function ungroupDomains(plan: ConfirmedPlan, key: string): ConfirmedPlan;
 /** 개명 — 표시명만 바꾼다(key 는 skeleton ID 의 닻이라 불변). AC-31: LLM 제안명 적용 지점. */
 export declare function renameDomain(plan: ConfirmedPlan, key: string, newName: string): ConfirmedPlan;
 /** 병합 — from 의 루트를 into 로 흡수, from key 를 into.aliasKeys 에 기록 후 from 도메인 제거. */

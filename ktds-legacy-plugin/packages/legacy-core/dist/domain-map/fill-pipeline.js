@@ -9,7 +9,7 @@
  * 결정론 라벨 폴백으로 빈 이름 대신 구조명을 갖는다(하이브리드).
  */
 import { join } from 'node:path';
-import { gitCommitDate, gitCommitHash, readSkeleton, uaDir, DOMAIN_GRAPH_FILENAME, } from './persist.js';
+import { gitCommitDate, gitCommitHash, readConfirmedPlan, readSkeleton, uaDir, DOMAIN_GRAPH_FILENAME, } from './persist.js';
 import { applyFills, readFills, unfilledNodes } from './fill.js';
 import { verifyFills, writeVerifyReport } from './verify.js';
 import { demoteUnverified, embedVerification, emitFilledDomainGraph, } from './emit.js';
@@ -37,7 +37,10 @@ export async function runFillPipeline(projectRoot, options = {}) {
     // 벽시계(now)를 박으면 같은 입력의 재실행이 byte-diff 를 낸다(P5 발견 결함).
     const analyzedAt = options.analyzedAt ??
         (skeleton.gitCommit ? (gitCommitDate(projectRoot, skeleton.gitCommit) ?? undefined) : undefined);
-    emitFilledDomainGraph(projectRoot, skeleton, verified, { ...options, analyzedAt });
+    // 상단도메인 계층(DOMAIN_HIERARCHY): confirmed plan.groups 를 ktdsMap 으로 투영
+    // (호출자가 options.groups 를 명시하면 그 값이 우선).
+    const groups = options.groups ?? readConfirmedPlan(projectRoot)?.groups;
+    emitFilledDomainGraph(projectRoot, skeleton, verified, { ...options, analyzedAt, groups });
     const domainGraphPath = join(uaDir(projectRoot), DOMAIN_GRAPH_FILENAME);
     // 검증은 현재 워킹트리 파일과 대조하므로, skeleton 이 옛 commit 산물이면 라인 이동으로
     // 정당한 인용이 강등될 수 있다 — 차단 대신 표면화한다.

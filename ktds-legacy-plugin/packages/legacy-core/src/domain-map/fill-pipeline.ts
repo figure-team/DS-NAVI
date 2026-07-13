@@ -12,6 +12,7 @@ import { join } from 'node:path'
 import {
   gitCommitDate,
   gitCommitHash,
+  readConfirmedPlan,
   readSkeleton,
   uaDir,
   DOMAIN_GRAPH_FILENAME,
@@ -71,7 +72,10 @@ export async function runFillPipeline(
   const analyzedAt =
     options.analyzedAt ??
     (skeleton.gitCommit ? (gitCommitDate(projectRoot, skeleton.gitCommit) ?? undefined) : undefined)
-  emitFilledDomainGraph(projectRoot, skeleton, verified, { ...options, analyzedAt })
+  // 상단도메인 계층(DOMAIN_HIERARCHY): confirmed plan.groups 를 ktdsMap 으로 투영
+  // (호출자가 options.groups 를 명시하면 그 값이 우선).
+  const groups = options.groups ?? readConfirmedPlan(projectRoot)?.groups
+  emitFilledDomainGraph(projectRoot, skeleton, verified, { ...options, analyzedAt, groups })
   const domainGraphPath = join(uaDir(projectRoot), DOMAIN_GRAPH_FILENAME)
   // 검증은 현재 워킹트리 파일과 대조하므로, skeleton 이 옛 commit 산물이면 라인 이동으로
   // 정당한 인용이 강등될 수 있다 — 차단 대신 표면화한다.

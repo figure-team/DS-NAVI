@@ -1,4 +1,4 @@
-import { PlanOpsSchema } from './types.js';
+import { GROUP_KEY_PREFIX, PlanOpsSchema } from './types.js';
 function cmp(a, b) {
     return a < b ? -1 : a > b ? 1 : 0;
 }
@@ -23,6 +23,73 @@ export function buildAutoPlan(candidates, decidedBy = 'auto') {
         excludedKeys: [],
     };
 }
+/**
+ * 그룹 정합 유지(불변 규칙 1·5) — 도메인이 사라진 뒤(merge/move/exclude) 그룹의
+ * memberKeys 에서 죽은 key 를 걷어내고, 빈 그룹은 삭제한다. groups 가 비면 필드를
+ * 아예 생략해 그룹 없는 기존 플랜과 직렬화가 일치한다(byte-identical 폴백).
+ */
+function pruneGroups(plan) {
+    if (!plan.groups)
+        return plan;
+    const alive = new Set(plan.domains.map((d) => d.key));
+    const groups = plan.groups
+        .map((g) => ({ ...g, memberKeys: g.memberKeys.filter((k) => alive.has(k)) }))
+        .filter((g) => g.memberKeys.length > 0);
+    if (groups.length === 0) {
+        const { groups: _dropped, ...rest } = plan;
+        return rest;
+    }
+    return { ...plan, groups };
+}
+/** 정렬 규약(불변 규칙 4) — groups 는 key 순, memberKeys 는 사전순. */
+function sortGroups(groups) {
+    return groups
+        .map((g) => ({ ...g, memberKeys: sortUnique(g.memberKeys) }))
+        .sort((a, b) => cmp(a.key, b.key));
+}
+/**
+ * 그룹 생성·확장(멱등 upsert) — 상단도메인(DOMAIN_HIERARCHY D1)을 plan 에 기록한다.
+ * 같은 key 재호출 시 members 합집합 + name 갱신. 불변 규칙:
+ * `g:` 접두 필수 / member 는 실존 도메인 / 한 도메인은 최대 1개 그룹(다른 그룹
+ * 소속 member 는 오류 — LLM 초안의 중복 배정을 fail-closed 로 잡는다).
+ */
+export function groupDomains(plan, key, name, members) {
+    if (!key.startsWith(GROUP_KEY_PREFIX)) {
+        throw new Error(`group key must start with "${GROUP_KEY_PREFIX}": "${key}"`);
+    }
+    if (members.length === 0)
+        throw new Error(`group "${key}" needs at least one member`);
+    for (const m of members) {
+        if (!plan.domains.some((d) => d.key === m))
+            throw new Error(`unknown domain key: "${m}"`);
+        const other = (plan.groups ?? []).find((g) => g.key !== key && g.memberKeys.includes(m));
+        if (other) {
+            throw new Error(`domain "${m}" already belongs to group "${other.key}" — ungroup first`);
+        }
+    }
+    const existing = (plan.groups ?? []).find((g) => g.key === key);
+    const merged = {
+        key,
+        name,
+        memberKeys: sortUnique([...(existing?.memberKeys ?? []), ...members]),
+    };
+    return {
+        ...plan,
+        groups: sortGroups([...(plan.groups ?? []).filter((g) => g.key !== key), merged]),
+    };
+}
+/** 그룹 해체 — 그룹만 사라지고 소속 도메인은 잔존(비파괴). 마지막 그룹이면 필드 생략. */
+export function ungroupDomains(plan, key) {
+    if (!(plan.groups ?? []).some((g) => g.key === key)) {
+        throw new Error(`unknown group key: "${key}"`);
+    }
+    const groups = (plan.groups ?? []).filter((g) => g.key !== key);
+    if (groups.length === 0) {
+        const { groups: _dropped, ...rest } = plan;
+        return rest;
+    }
+    return { ...plan, groups };
+}
 /** 개명 — 표시명만 바꾼다(key 는 skeleton ID 의 닻이라 불변). AC-31: LLM 제안명 적용 지점. */
 export function renameDomain(plan, key, newName) {
     if (!plan.domains.some((d) => d.key === key)) {
@@ -43,7 +110,7 @@ export function mergeDomains(plan, fromKey, intoKey) {
         throw new Error(`unknown domain key: "${fromKey}"`);
     if (!into)
         throw new Error(`unknown domain key: "${intoKey}"`);
-    return {
+    return pruneGroups({
         ...plan,
         domains: plan.domains
             .filter((d) => d.key !== fromKey)
@@ -54,7 +121,7 @@ export function mergeDomains(plan, fromKey, intoKey) {
                 aliasKeys: sortUnique([...d.aliasKeys, fromKey, ...from.aliasKeys]),
             }
             : d),
-    };
+    });
 }
 /**
  * 이동 — 루트 파일을 다른 도메인으로 옮긴다.
@@ -67,7 +134,7 @@ export function moveRoot(plan, root, toKey) {
     if (!plan.domains.some((d) => d.key === toKey)) {
         throw new Error(`unknown domain key: "${toKey}"`);
     }
-    return {
+    return pruneGroups({
         ...plan,
         domains: plan.domains
             .map((d) => ({
@@ -77,18 +144,18 @@ export function moveRoot(plan, root, toKey) {
                 : d.roots.filter((r) => r !== root),
         }))
             .filter((d) => d.roots.length > 0),
-    };
+    });
 }
 /** 제외 — 도메인을 빼고 key 를 excludedKeys 에 기록(정렬, 감사 추적). */
 export function excludeDomain(plan, key) {
     if (!plan.domains.some((d) => d.key === key)) {
         throw new Error(`unknown domain key: "${key}"`);
     }
-    return {
+    return pruneGroups({
         ...plan,
         domains: plan.domains.filter((d) => d.key !== key),
         excludedKeys: sortUnique([...plan.excludedKeys, key]),
-    };
+    });
 }
 /**
  * ops 파일 파싱 — 형식 오류는 어떤 항목이 왜 틀렸는지 명확히 던진다(조용한 스킵 금지).
@@ -98,7 +165,8 @@ export function parsePlanOps(raw) {
     if (!parsed.success) {
         const issue = parsed.error.issues[0];
         throw new Error(`ops 형식 오류(${issue.path.join('.')}): ${issue.message} — ` +
-            `허용: {op:"merge",from,into} | {op:"move",root,to} | {op:"exclude",key} | {op:"rename",key,name}`);
+            `허용: {op:"merge",from,into} | {op:"move",root,to} | {op:"exclude",key} | {op:"rename",key,name} | ` +
+            `{op:"group",key,name,members[]} | {op:"ungroup",key}`);
     }
     return parsed.data;
 }
@@ -123,6 +191,12 @@ export function applyOps(plan, ops) {
                     break;
                 case 'rename':
                     next = renameDomain(next, op.key, op.name);
+                    break;
+                case 'group':
+                    next = groupDomains(next, op.key, op.name, op.members);
+                    break;
+                case 'ungroup':
+                    next = ungroupDomains(next, op.key);
                     break;
             }
         }

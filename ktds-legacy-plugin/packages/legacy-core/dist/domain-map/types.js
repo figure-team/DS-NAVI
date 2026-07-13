@@ -209,7 +209,8 @@ export const CandidatesReportSchema = z.object({
 });
 /**
  * 사람 게이트 보정 연산(ops) — confirm --ops <file> 로 자동 플랜 위에 결정론 적용.
- * merge(도메인 병합) / move(루트 이동) / exclude(도메인 제외) / rename(표시명 개명).
+ * merge(도메인 병합) / move(루트 이동) / exclude(도메인 제외) / rename(표시명 개명) /
+ * group(상단도메인 묶음 생성·확장, 멱등 upsert) / ungroup(그룹 해체 — 도메인은 잔존).
  * ops 파일을 .spec/map/ 에 두고 재실행하면 사람 결정이 그대로 재생된다(결정론 닻).
  */
 export const PlanOpSchema = z.discriminatedUnion('op', [
@@ -217,8 +218,26 @@ export const PlanOpSchema = z.discriminatedUnion('op', [
     z.object({ op: z.literal('move'), root: z.string(), to: z.string() }),
     z.object({ op: z.literal('exclude'), key: z.string() }),
     z.object({ op: z.literal('rename'), key: z.string(), name: z.string() }),
+    z.object({
+        op: z.literal('group'),
+        key: z.string(),
+        name: z.string(),
+        members: z.array(z.string()).min(1),
+    }),
+    z.object({ op: z.literal('ungroup'), key: z.string() }),
 ]);
 export const PlanOpsSchema = z.array(PlanOpSchema);
+/** 그룹 키 접두 — 도메인 key/aliasKeys 공간과 충돌을 원천 차단하는 네임스페이스. */
+export const GROUP_KEY_PREFIX = 'g:';
+/**
+ * 상단도메인(그룹) — 서브도메인 위의 비파괴 표시/내비 계층(DOMAIN_HIERARCHY).
+ * 분류의 진실(파일 귀속·도메인 key)은 불변이고, 그룹은 plan 레벨 오버레이다.
+ */
+export const ConfirmedGroupSchema = z.object({
+    key: z.string().startsWith(GROUP_KEY_PREFIX),
+    name: z.string(),
+    memberKeys: z.array(z.string()).min(1),
+});
 /** 확정된 단일 도메인 — key 는 불변, name 은 표시용(개명 가능). */
 export const ConfirmedDomainSchema = z.object({
     key: z.string(),
@@ -236,6 +255,8 @@ export const ConfirmedPlanSchema = z.object({
     decidedBy: z.string(),
     domains: z.array(ConfirmedDomainSchema),
     excludedKeys: z.array(z.string()),
+    /** 상단도메인 계층(additive) — 부재 = 평면 플랜(기존 파일 그대로 유효). */
+    groups: z.array(ConfirmedGroupSchema).optional(),
 });
 // ──────────────────────────────────────────────────────────────────────────
 // SKELETON(S6) — 결정론적 도메인 그래프 골격.

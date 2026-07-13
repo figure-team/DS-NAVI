@@ -8,6 +8,8 @@ import {
   mergeDomains,
   moveRoot,
   excludeDomain,
+  groupDomains,
+  ungroupDomains,
   detectPlanDrift,
   planTable,
   parsePlanOps,
@@ -215,5 +217,93 @@ describe('confirm — parsePlanOps/applyOps (사람 게이트 보정 연산)', (
     const before = stableJson(plan)
     applyOps(plan, [{ op: 'merge', from: 'user', into: 'order' }])
     expect(stableJson(plan)).toBe(before)
+  })
+})
+
+describe('confirm — group/ungroup (DOMAIN_HIERARCHY)', () => {
+  /** user/order 2도메인 플랜 위에 g:biz(user) 그룹을 얹은 시작점. */
+  function groupedPlan(): ConfirmedPlan {
+    return groupDomains(buildAutoPlan(sampleCandidates()), 'g:biz', '업무', ['user'])
+  }
+
+  it('group 은 정렬된 groups 필드를 만든다(key 순·memberKeys 사전순)', () => {
+    const plan = groupDomains(buildAutoPlan(sampleCandidates()), 'g:biz', '업무', [
+      'user',
+      'order',
+    ])
+    expect(plan.groups).toEqual([{ key: 'g:biz', name: '업무', memberKeys: ['order', 'user'] }])
+  })
+
+  it('같은 op 재적용은 멱등이다(byte-identical)', () => {
+    const once = groupDomains(buildAutoPlan(sampleCandidates()), 'g:biz', '업무', ['user'])
+    const twice = groupDomains(once, 'g:biz', '업무', ['user'])
+    expect(stableJson(twice)).toBe(stableJson(once))
+  })
+
+  it('재호출은 members 합집합 + name 갱신(upsert)', () => {
+    const next = groupDomains(groupedPlan(), 'g:biz', '핵심 업무', ['order'])
+    expect(next.groups).toEqual([
+      { key: 'g:biz', name: '핵심 업무', memberKeys: ['order', 'user'] },
+    ])
+  })
+
+  it('g: 접두 없는 키·미존재 member·빈 members 는 거부한다', () => {
+    const plan = buildAutoPlan(sampleCandidates())
+    expect(() => groupDomains(plan, 'biz', '업무', ['user'])).toThrow(/must start with "g:"/)
+    expect(() => groupDomains(plan, 'g:biz', '업무', ['ghost'])).toThrow(/unknown domain key/)
+    expect(() => groupDomains(plan, 'g:biz', '업무', [])).toThrow(/at least one member/)
+  })
+
+  it('다른 그룹 소속 member 는 거부한다(한 도메인 최대 1그룹)', () => {
+    expect(() => groupDomains(groupedPlan(), 'g:etc', '기타', ['user'])).toThrow(
+      /already belongs to group "g:biz"/,
+    )
+  })
+
+  it('ungroup 은 그룹만 없애고 도메인은 잔존, 마지막 그룹이면 필드를 생략한다', () => {
+    const next = ungroupDomains(groupedPlan(), 'g:biz')
+    expect(next.domains.map((d) => d.key)).toEqual(['order', 'user'])
+    expect('groups' in next).toBe(false)
+    expect(stableJson(next)).toBe(stableJson(buildAutoPlan(sampleCandidates())))
+    expect(() => ungroupDomains(next, 'g:biz')).toThrow(/unknown group key/)
+  })
+
+  it('exclude 로 마지막 member 가 죽으면 그룹도 삭제된다(빈 그룹 금지)', () => {
+    const next = excludeDomain(groupedPlan(), 'user')
+    expect('groups' in next).toBe(false)
+  })
+
+  it('merge 로 사라진 from key 는 그룹에서 이탈한다', () => {
+    const plan = groupDomains(groupedPlan(), 'g:biz', '업무', ['order'])
+    const next = mergeDomains(plan, 'user', 'order')
+    expect(next.groups).toEqual([{ key: 'g:biz', name: '업무', memberKeys: ['order'] }])
+  })
+
+  it('applyOps group/ungroup + parsePlanOps 형식 게이트', () => {
+    const plan = buildAutoPlan(sampleCandidates())
+    const ops = parsePlanOps([
+      { op: 'group', key: 'g:biz', name: '업무', members: ['user', 'order'] },
+    ])
+    const next = applyOps(plan, ops)
+    expect(next.groups?.[0].memberKeys).toEqual(['order', 'user'])
+    expect(() => parsePlanOps([{ op: 'group', key: 'g:x', name: 'x', members: [] }])).toThrow(
+      /ops 형식 오류/,
+    )
+    expect(() => applyOps(next, [{ op: 'ungroup', key: 'g:ghost' }])).toThrow(
+      /ops\[0\] ungroup/,
+    )
+  })
+
+  it('groups 는 영속 round-trip 에서 보존되고, 없는 플랜은 그대로 유효하다', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'confirm-groups-'))
+    try {
+      writeConfirmedPlan(dir, groupedPlan())
+      const read = readConfirmedPlan(dir)
+      expect(read?.groups).toEqual([{ key: 'g:biz', name: '업무', memberKeys: ['user'] }])
+      writeConfirmedPlan(dir, buildAutoPlan(sampleCandidates()))
+      expect('groups' in (readConfirmedPlan(dir) ?? {})).toBe(false)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
 })

@@ -186,13 +186,16 @@ export {
   mergeDomains,
   moveRoot,
   excludeDomain,
+  groupDomains,
+  ungroupDomains,
   detectPlanDrift,
   planTable,
   parsePlanOps,
   applyOps,
 } from './domain-map/confirm.js'
 export type { PlanRow } from './domain-map/confirm.js'
-export type { PlanOp, DomainConfidence } from './domain-map/types.js'
+export { GROUP_KEY_PREFIX } from './domain-map/types.js'
+export type { PlanOp, DomainConfidence, ConfirmedGroup } from './domain-map/types.js'
 export { deriveStepLayer, buildLayerSignals, assignLayers } from './domain-map/step-layer.js'
 export type { LayerSignals } from './domain-map/step-layer.js'
 export {

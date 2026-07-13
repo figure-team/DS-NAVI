@@ -3,7 +3,7 @@ docId: policy-validation
 title: 업무 규칙(Validation) 정책
 methodology: policy
 status: DRAFT
-sourceCommit: d51826fcf3b5618e4a5fc6f5fa1657de3c390ad6
+sourceCommit: ffe1992c2966d46fd3991f875f42bd0d4237e88f
 evidenceRate: 0
 ---
 

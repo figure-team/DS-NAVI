@@ -61,6 +61,17 @@ const OUTPUT_DIR = join(projectRoot, '.understand-anything', 'doc-output')
 // 모드: 기본 category(policy-signals.json), `--mode domain`(도메인 분기). fill-audit 는
 // 순수 JSON 1줄만 출력한다(Workflow 감사 에이전트가 verbatim 소비).
 const fillCommand = process.argv[3]
+// 알 수 없는 모드는 거부한다 — 폴스루로 1단계 재생성이 돌면 policy-*.md 가 다시 쓰이며
+// <!-- policy-fill --> 채움 섹션(LLM 보강)이 조용히 사라진다. 1단계 재생성은 모드 생략 시에만.
+const KNOWN_MODES = ['fill-prep', 'fill-audit', 'fill-merge', 'domain']
+if (fillCommand !== undefined && !KNOWN_MODES.includes(fillCommand)) {
+  console.error(
+    `알 수 없는 모드: ${fillCommand} — 사용 가능: ${KNOWN_MODES.join(' | ')}\n` +
+      '  1단계 결정론 생성(정책서 재생성)은 모드를 생략하고 실행하세요: understand-policy.mjs <projectRoot>\n' +
+      '  ⚠️ 1단계 재생성은 policy-*.md 를 다시 써서 기존 채움 섹션(규범 진술)을 초기화한다 — fill-merge 로 복원 가능.',
+  )
+  process.exit(2)
+}
 if (fillCommand === 'fill-prep' || fillCommand === 'fill-audit' || fillCommand === 'fill-merge') {
   const flags = process.argv.slice(4)
   const flagValue = (name) => {

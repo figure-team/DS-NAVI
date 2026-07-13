@@ -28,6 +28,13 @@ if (!existsSync(distEntry)) {
 
 const projectRoot = process.argv[2] || process.cwd()
 const command = process.argv[3] || 'status'
+// 알 수 없는 모드는 거부한다 — 조용히 status 로 떨어지면 오타(예: fill-merg)가 무해한 요약
+// 출력으로 위장돼 단계 누락을 눈치채지 못한다(policy 쪽 1단계 폴스루 사고와 동일 계열).
+const KNOWN_COMMANDS = ['capture', 'fill-prep', 'fill-audit', 'fill-merge', 'validate', 'status']
+if (!KNOWN_COMMANDS.includes(command)) {
+  console.error(`알 수 없는 모드: ${command} — 사용 가능: ${KNOWN_COMMANDS.join(' | ')}`)
+  process.exit(2)
+}
 const flags = process.argv.slice(4)
 function flagValue(name) {
   const i = flags.indexOf(name)

@@ -33,8 +33,11 @@ interface RtmReq {
 
 /**
  * 옴니박스 (FRONT_REDESIGN §4, 시안 mockup-shell-home) — ⌘K 전역 검색.
- * 소스: 구조 노드(SearchEngine) · 도메인/흐름(domain-graph) · 산출물(doc-list) ·
- * 추적표(rtm 기능/요구). 결과 선택 시에만 이동(자동 라우팅 금지 — structure-scale 원칙).
+ * 소스: 코드(SearchEngine, filePath 있는 노드만 — 코드뷰어 직접 오픈) · 도메인/흐름
+ * (domain-graph) · 산출물(doc-list) · 추적표(rtm 기능/요구). 결과 선택 시에만 이동
+ * (자동 라우팅 금지 — structure-scale 원칙). "코드" 그룹은 이동이 아니라 코드뷰어
+ * 오버레이를 여는 예외(STRUCTURE_FROM_MAP_DESIGN v2 이후 구조 메뉴가 노드를 렌더하지
+ * 않으므로 옛 `/structure?node=` 딥링크는 더 이상 유효한 목적지가 아니다).
  */
 export default function Omnibox({ accessToken }: { accessToken: string }) {
   const [open, setOpen] = useState(false);
@@ -129,20 +132,27 @@ export default function Omnibox({ accessToken }: { accessToken: string }) {
     const lower = q.toLowerCase();
     const out: OmniResult[] = [];
 
-    // 1) 구조 노드 — 퍼지(SearchEngine).
+    // 1) 구조 노드 — 퍼지(SearchEngine). 구조 메뉴가 파일/클래스 KG 뷰를 은퇴한 뒤로는
+    // 노드 자체를 렌더하는 화면이 없다 — 선택 시 코드뷰어를 직접 연다(openCodeViewer,
+    // 인용 칩·EdgeEvidencePopover 등 다른 진입점과 동일한 경로). filePath 없는 노드
+    // (예: table)는 코드뷰어가 보여줄 게 없으므로 결과에서 제외한다.
     const engine = useDashboardStore.getState().searchEngine;
     const nodesById = useDashboardStore.getState().nodesById;
+    const openCodeViewer = useDashboardStore.getState().openCodeViewer;
     if (engine && graph) {
       for (const r of engine.search(q, { limit: 6 })) {
         const node = nodesById.get(r.nodeId);
-        if (!node) continue;
+        if (!node || !node.filePath) continue;
         out.push({
           key: `node:${node.id}`,
-          group: "구조 노드",
+          group: "코드",
           label: node.name,
-          sub: node.filePath ?? undefined,
+          sub: node.filePath,
           badge: node.type,
-          go: () => jump(`/structure?node=${encodeURIComponent(node.id)}`, true),
+          go: () => {
+            openCodeViewer(node.id);
+            close();
+          },
         });
       }
     }
@@ -237,7 +247,7 @@ export default function Omnibox({ accessToken }: { accessToken: string }) {
     }
 
     return out.slice(0, 14);
-  }, [query, graph, domainGraph, jump]);
+  }, [query, graph, domainGraph, jump, close]);
 
   useEffect(() => setCursor(0), [query]);
 
@@ -328,7 +338,7 @@ export default function Omnibox({ accessToken }: { accessToken: string }) {
             <div ref={listRef} className="max-h-[52vh] overflow-auto py-1.5">
               {query.trim() === "" ? (
                 <div className="px-4 py-6 text-[13px] text-text-muted text-center">
-                  이름·경로·ID로 검색합니다. 결과를 선택하면 해당 화면으로 이동합니다.
+                  이름·경로·ID로 검색합니다. 결과를 선택하면 해당 화면으로 이동합니다(코드는 코드뷰어가 열립니다).
                 </div>
               ) : results.length === 0 ? (
                 <div className="px-4 py-6 text-[13px] text-text-muted text-center">

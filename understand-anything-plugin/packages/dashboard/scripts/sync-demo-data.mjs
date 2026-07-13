@@ -41,6 +41,7 @@ const FILES = [
 ];
 // .spec/map/ 산출 — 신설 메뉴 화면이 fetch 하는 파일들(없으면 skip: 우아한 degrade).
 const SPEC_FILES = [
+  "domain-map.json",
   "db-schema.json",
   "crud-matrix.json",
   "program-inventory.json",

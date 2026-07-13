@@ -1,30 +1,23 @@
-// 슬라이스 소유: WT-A(구조) — 그래프 데이터·인덱스·선택·탐색·검색.
+// 슬라이스 소유: WT-A(구조) — 그래프 데이터·인덱스·선택·검색.
 // 다른 워크트리는 읽기(셀렉터)만. 필드 추가/변경은 A 세션에서.
+//
+// STRUCTURE_FROM_MAP_DESIGN v2(2026-07-14): 파일/클래스 KG 뷰(GraphView/
+// GraphWorkbench) 완전 은퇴에 맞춰 그 전용 네비게이션(navigationLevel/activeLayerId/
+// drillIntoLayer/navigateToOverview/navigateToNodeInLayer 등)을 제거했다.
+// `focusNodeId`/`setFocusNode` 는 session-slice.ts(공용, additive-only 규약)의
+// resetTransientOnSectionChange 가, `nodeHistory` 는 domain-slice.ts(WT-B 소유, 이
+// 세션에서 수정 금지)의 navigateToDomain/navigateToFlow 가 여전히 참조하므로 유지
+// (더 이상 UI 진입점은 없다 — 죽은 상태지만 교차 슬라이스 파손을 막기 위한 최소 보존).
 import { SearchEngine } from "@understand-anything/core/search";
 import type { SearchResult } from "@understand-anything/core/search";
 import type { GraphNode, KnowledgeGraph } from "@understand-anything/core/types";
 import type { StateCreator } from "zustand";
-import type { NavigationLevel } from "../types";
 import type { DashboardStore } from "../index";
 
 /**
  * Build the (id → node) and (id → layerId) lookup maps that the rest of
  * the dashboard reads via store selectors. Centralised so `setGraph` and
  * any future graph-replacement path stay in sync.
- *
- * Two layer indexes, intentionally distinct:
- *
- * - `nodeIdToLayerId` preserves the prior `findNodeLayer` "first matching
- *   layer wins" semantics — if a node id appears in multiple layers
- *   (rare but legal in the schema), the first occurrence in `graph.layers`
- *   order is the one we map to. Drives navigation (drillIntoLayer,
- *   sidebar history) where a single canonical layer is the right answer.
- *
- * - `nodeIdToLayerIds` records *every* layer a node belongs to. Drives
- *   membership queries (filterNodes) where the prior `Layer[] +
- *   layer.nodeIds.includes` shape was any-layer-wins — a node in L1 and
- *   L2 with only L2 selected must still pass. Collapsing to first-wins
- *   for filtering would be a silent regression.
  */
 function buildGraphIndexes(graph: KnowledgeGraph): {
   nodesById: Map<string, GraphNode>;
@@ -49,9 +42,6 @@ function buildGraphIndexes(graph: KnowledgeGraph): {
   return { nodesById, nodeIdToLayerId, nodeIdToLayerIds };
 }
 
-/** Maximum number of entries in the sidebar navigation history. */
-const MAX_HISTORY = 50;
-
 export interface GraphSlice {
   graph: KnowledgeGraph | null;
   /** id → node lookup, rebuilt by setGraph. Empty before any graph loads. */
@@ -67,25 +57,14 @@ export interface GraphSlice {
   searchMode: "fuzzy" | "semantic";
   setSearchMode: (mode: "fuzzy" | "semantic") => void;
 
-  // Lens navigation
-  navigationLevel: NavigationLevel;
-  activeLayerId: string | null;
-
-  // Focus mode: isolate a node's 1-hop neighborhood
+  /** 죽은 상태(§ 파일 헤더) — session-slice 의 리셋 로직만 참조. */
   focusNodeId: string | null;
-
-  // Sidebar navigation history (stack of visited node IDs)
+  setFocusNode: (nodeId: string | null) => void;
+  /** 죽은 상태(§ 파일 헤더) — domain-slice 의 navigateToDomain/navigateToFlow 만 참조. */
   nodeHistory: string[];
 
   setGraph: (graph: KnowledgeGraph) => void;
   selectNode: (nodeId: string | null) => void;
-  navigateToNode: (nodeId: string) => void;
-  navigateToNodeInLayer: (nodeId: string) => void;
-  navigateToHistoryIndex: (index: number) => void;
-  goBackNode: () => void;
-  drillIntoLayer: (layerId: string) => void;
-  navigateToOverview: () => void;
-  setFocusNode: (nodeId: string | null) => void;
   setSearchQuery: (query: string) => void;
 }
 
@@ -100,10 +79,8 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
   searchEngine: null,
   searchMode: "fuzzy",
 
-  navigationLevel: "overview",
-  activeLayerId: null,
-
   focusNodeId: null,
+  setFocusNode: (nodeId) => set({ focusNodeId: nodeId, selectedNodeId: nodeId }),
   nodeHistory: [],
 
   setGraph: (graph) => {
@@ -125,8 +102,6 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
       nodeIdToLayerIds,
       searchEngine,
       searchResults,
-      navigationLevel: "overview",
-      activeLayerId: null,
       selectedNodeId: keepSelection ? selectedNodeId : null,
       focusNodeId: null,
       nodeHistory: [],
@@ -134,142 +109,11 @@ export const createGraphSlice: StateCreator<DashboardStore, [], [], GraphSlice> 
       activeFlowId: keepDomainView ? get().activeFlowId : null,
       selectedFlowId: keepDomainView ? get().selectedFlowId : null,
       expandedBranchParents: new Set(),
-      containerLayoutCache: new Map(),
-      expandedContainers: new Set(),
-      fullyExpandedContainers: new Set(),
-      pendingFocusContainer: null,
-      containerSizeMemory: new Map(),
-      stage1Tick: 0,
-      layoutIssues: [],
     });
   },
 
-  selectNode: (nodeId) => {
-    const { selectedNodeId, nodeHistory } = get();
-    if (nodeId && selectedNodeId && nodeId !== selectedNodeId) {
-      // Push current node to history before navigating away
-      set({
-        selectedNodeId: nodeId,
-        nodeHistory: [...nodeHistory, selectedNodeId].slice(-MAX_HISTORY),
-      });
-    } else {
-      set({ selectedNodeId: nodeId });
-    }
-  },
+  selectNode: (nodeId) => set({ selectedNodeId: nodeId }),
 
-  navigateToNode: (nodeId) => {
-    get().navigateToNodeInLayer(nodeId);
-  },
-
-  navigateToNodeInLayer: (nodeId) => {
-    const { graph, selectedNodeId, nodeHistory, nodeIdToLayerId } = get();
-    if (!graph) return;
-    const layerId = nodeIdToLayerId.get(nodeId) ?? null;
-    const newHistory =
-      selectedNodeId && nodeId !== selectedNodeId
-        ? [...nodeHistory, selectedNodeId].slice(-MAX_HISTORY)
-        : nodeHistory;
-    if (layerId) {
-      set({
-        navigationLevel: "layer-detail",
-        activeLayerId: layerId,
-        selectedNodeId: nodeId,
-        focusNodeId: null,
-        codeViewerOpen: false,
-        codeViewerNodeId: null,
-        codeViewerExpanded: false,
-        nodeHistory: newHistory,
-      });
-    } else {
-      set({
-        selectedNodeId: nodeId,
-        nodeHistory: newHistory,
-      });
-    }
-  },
-
-  navigateToHistoryIndex: (index) => {
-    const { nodeHistory, graph, nodeIdToLayerId } = get();
-    if (!graph || index < 0 || index >= nodeHistory.length) return;
-    const targetId = nodeHistory[index];
-    const newHistory = nodeHistory.slice(0, index);
-    const layerId = nodeIdToLayerId.get(targetId) ?? null;
-    set({
-      selectedNodeId: targetId,
-      nodeHistory: newHistory,
-      ...(layerId ? { navigationLevel: "layer-detail" as const, activeLayerId: layerId } : {}),
-    });
-  },
-
-  goBackNode: () => {
-    const { nodeHistory, graph, nodeIdToLayerId } = get();
-    if (nodeHistory.length === 0 || !graph) return;
-    const prevNodeId = nodeHistory[nodeHistory.length - 1];
-    const newHistory = nodeHistory.slice(0, -1);
-    const layerId = nodeIdToLayerId.get(prevNodeId) ?? null;
-    if (layerId) {
-      set({
-        navigationLevel: "layer-detail",
-        activeLayerId: layerId,
-        selectedNodeId: prevNodeId,
-        nodeHistory: newHistory,
-      });
-    } else {
-      set({
-        selectedNodeId: prevNodeId,
-        nodeHistory: newHistory,
-      });
-    }
-  },
-
-  drillIntoLayer: (layerId) =>
-    set({
-      navigationLevel: "layer-detail",
-      activeLayerId: layerId,
-      selectedNodeId: null,
-      focusNodeId: null,
-      codeViewerOpen: false,
-      codeViewerNodeId: null,
-      codeViewerExpanded: false,
-      // Container ids derive from folder names and collide across layers
-      // (e.g. `container:auth` exists in many layers). Drop the cache so
-      // we don't render stale positions for the new layer's children.
-      containerLayoutCache: new Map(),
-      containerSizeMemory: new Map(),
-      expandedContainers: new Set(),
-      fullyExpandedContainers: new Set(),
-      pendingFocusContainer: null,
-    }),
-
-  navigateToOverview: () =>
-    set({
-      navigationLevel: "overview",
-      activeLayerId: null,
-      selectedNodeId: null,
-      focusNodeId: null,
-      codeViewerOpen: false,
-      codeViewerNodeId: null,
-      codeViewerExpanded: false,
-      containerLayoutCache: new Map(),
-      containerSizeMemory: new Map(),
-      expandedContainers: new Set(),
-      fullyExpandedContainers: new Set(),
-      pendingFocusContainer: null,
-    }),
-
-  setFocusNode: (nodeId) =>
-    set({
-      focusNodeId: nodeId,
-      selectedNodeId: nodeId,
-      // Focus mode narrows filteredGraphNodes to focus + 1-hop; the
-      // surviving containers have a subset of their original children,
-      // and the cache must not return positions for filtered-out ids.
-      containerLayoutCache: new Map(),
-      containerSizeMemory: new Map(),
-      expandedContainers: new Set(),
-      fullyExpandedContainers: new Set(),
-      pendingFocusContainer: null,
-    }),
   setSearchMode: (mode) => set({ searchMode: mode }),
   setSearchQuery: (query) => {
     const engine = get().searchEngine;

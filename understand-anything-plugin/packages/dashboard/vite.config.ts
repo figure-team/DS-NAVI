@@ -59,6 +59,7 @@ function findSpecMapFile(fileName: string): string | null {
 
 /** `.spec/map/` 읽기 전용 서빙 대상 — pathname(=파일명) 화이트리스트. */
 const SPEC_MAP_ENDPOINTS = new Set([
+  "/domain-map.json",
   "/db-schema.json",
   "/crud-matrix.json",
   "/program-inventory.json",

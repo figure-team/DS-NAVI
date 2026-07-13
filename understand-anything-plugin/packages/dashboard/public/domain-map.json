@@ -1,0 +1,291 @@
+{
+  "crossDomain": {
+    "edges": [
+      {
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/domain/Item.java"
+          },
+          {
+            "kind": "ctor-param",
+            "line": 34,
+            "source": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+          },
+          {
+            "kind": "field-type",
+            "line": 38,
+            "source": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+          }
+        ],
+        "from": "account",
+        "to": "cart",
+        "weight": 4
+      },
+      {
+        "evidence": [
+          {
+            "kind": "ctor-param",
+            "line": 34,
+            "source": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java"
+          },
+          {
+            "kind": "field-type",
+            "line": 37,
+            "source": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java"
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java"
+          }
+        ],
+        "from": "account",
+        "to": "catalog",
+        "weight": 3
+      },
+      {
+        "evidence": [
+          {
+            "kind": "field-type",
+            "line": 45,
+            "source": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "target": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "target": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+          }
+        ],
+        "from": "cart",
+        "to": "account",
+        "weight": 2
+      },
+      {
+        "evidence": [
+          {
+            "kind": "field-type",
+            "line": 46,
+            "source": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "target": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "target": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+          }
+        ],
+        "from": "catalog",
+        "to": "account",
+        "weight": 2
+      },
+      {
+        "evidence": [
+          {
+            "kind": "field-type",
+            "line": 60,
+            "source": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "target": "src/main/java/org/mybatis/jpetstore/domain/Item.java"
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+            "target": "src/main/java/org/mybatis/jpetstore/domain/Item.java"
+          }
+        ],
+        "from": "catalog",
+        "to": "cart",
+        "weight": 2
+      },
+      {
+        "evidence": [
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/domain/Item.java"
+          },
+          {
+            "kind": "ctor-param",
+            "line": 37,
+            "source": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+          },
+          {
+            "kind": "field-type",
+            "line": 40,
+            "source": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+          },
+          {
+            "kind": "import",
+            "line": null,
+            "source": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "target": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+          }
+        ],
+        "from": "order",
+        "to": "cart",
+        "weight": 4
+      }
+    ],
+    "gitCommit": "dfbb9822f7c17f41a39e96704f4ea4f455580278",
+    "schemaVersion": 1
+  },
+  "domains": [
+    {
+      "flowCount": 7,
+      "grounded": true,
+      "key": "account",
+      "name": "account",
+      "nodeCount": 29,
+      "priorityScore": 133,
+      "rank": 2,
+      "sampleAnchors": [
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+          "line": 106
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+          "line": 115
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+          "line": 128
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+          "line": 137
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+          "line": 149
+        }
+      ]
+    },
+    {
+      "flowCount": 5,
+      "grounded": true,
+      "key": "cart",
+      "name": "cart",
+      "nodeCount": 20,
+      "priorityScore": 94,
+      "rank": 4,
+      "sampleAnchors": [
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 68
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 94
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 116
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 137
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 141
+        }
+      ]
+    },
+    {
+      "flowCount": 5,
+      "grounded": true,
+      "key": "catalog",
+      "name": "catalog",
+      "nodeCount": 21,
+      "priorityScore": 99,
+      "rank": 3,
+      "sampleAnchors": [
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+          "line": 143
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+          "line": 153
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+          "line": 166
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+          "line": 179
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+          "line": 190
+        }
+      ]
+    },
+    {
+      "flowCount": 4,
+      "grounded": true,
+      "key": "order",
+      "name": "order",
+      "nodeCount": 31,
+      "priorityScore": 144,
+      "rank": 1,
+      "sampleAnchors": [
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 107
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 119
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 142
+        },
+        {
+          "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 171
+        }
+      ]
+    },
+    {
+      "flowCount": 1,
+      "grounded": true,
+      "key": "web-inf",
+      "name": "web-inf",
+      "nodeCount": 2,
+      "priorityScore": 8,
+      "rank": 5,
+      "sampleAnchors": [
+        {
+          "file": "src/main/webapp/WEB-INF/web.xml",
+          "line": 60
+        }
+      ]
+    }
+  ],
+  "gitCommit": "dfbb9822f7c17f41a39e96704f4ea4f455580278",
+  "schemaVersion": 1
+}

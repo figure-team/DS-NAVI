@@ -131,6 +131,13 @@ export interface GroupCard {
   memberChips: { id: string; name: string }[];
   /** 칩에 표시되지 않은 나머지 서브도메인 수. */
   moreCount: number;
+  /**
+   * 전체 서브도메인 칩(잘림 없음, memberDomainIds 순서) — 행별 크기 정렬
+   * (useGroupCardRowSizing)이 실제 표시 개수를 동적으로 결정할 때 쓴다.
+   * memberChips/moreCount 는 하위호환을 위해 유지하되, 그리드 렌더는 이 필드를
+   * 소스로 쓴다.
+   */
+  allMemberChips: { id: string; name: string }[];
 }
 
 const CHIP_TOP_N = 4;
@@ -171,6 +178,7 @@ export function buildGroupCards(
       reviewCount,
       memberChips: members.slice(0, CHIP_TOP_N).map((c) => ({ id: c.id, name: c.name })),
       moreCount: Math.max(members.length - CHIP_TOP_N, 0),
+      allMemberChips: members.map((c) => ({ id: c.id, name: c.name })),
     };
   });
 }

@@ -7,6 +7,7 @@ import { dataUrl } from "../shared/api/client";
 import { buildDomainCards } from "../utils/domainData";
 import { parseBusinessFlows, type BizProcess } from "../utils/businessFlow";
 import { buildGroupCards, resolveGroups } from "../utils/domainGroups";
+import { useGroupCardRowSizing } from "../hooks/useGroupCardRowSizing";
 import DomainCardDetail from "./DomainCardDetail";
 import GroundedBar from "./GroundedBar";
 
@@ -206,6 +207,11 @@ export default function DomainMapView() {
     [resolvedGroups, data, workCountByDomain],
   );
 
+  // 그룹 카드 행별 크기 정렬(§ 그룹 카드 그리드 전용) — 평면 카드는 영향 없음
+  // (groupCards가 [] 이면 hook 내부에서 사실상 no-op).
+  const groupCardKeys = useMemo(() => groupCards.map((g) => g.key), [groupCards]);
+  const groupSizing = useGroupCardRowSizing(groupCardKeys);
+
   if (!domainGraph || !data) {
     return (
       <div className="h-full flex items-center justify-center text-text-muted text-sm px-6 text-center">
@@ -278,6 +284,7 @@ export default function DomainMapView() {
           style={{ boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)" }}
         >
           <div
+            ref={hasGroups ? groupSizing.containerRef : undefined}
             className="flex-1 min-h-0 overflow-y-auto grid"
             style={{
               padding: "16px 18px",
@@ -288,72 +295,90 @@ export default function DomainMapView() {
           >
             {hasGroups
               ? /* DOMAIN_HIERARCHY §7 D2 — 카드 = 상단도메인(그룹). 서브도메인 집계
-                   (개수·기능 합계·근거율 합산) + 대표 서브도메인 칩(딥링크). */
-                groupCards.map((g, i) => (
-                  <div
-                    key={g.key}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => navigate(`/domains/${g.key}`)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        navigate(`/domains/${g.key}`);
-                      }
-                    }}
-                    className="domain-card rounded-[10px] bg-panel border border-border-subtle hover:border-accent cursor-pointer transition-colors"
-                    style={{
-                      padding: "13px 14px",
-                      animation: `fadeSlideIn 0.35s ease-out ${i * 0.05}s both`,
-                    }}
-                  >
-                    <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 4 }}>
-                      <span aria-hidden className="select-none shrink-0" style={{ fontSize: 14, lineHeight: 1 }}>
-                        {g.icon}
-                      </span>
-                      <span className="text-text-primary truncate" title={g.name}>
-                        {g.name}
-                      </span>
-                      <span
-                        className="ml-auto text-text-muted whitespace-nowrap shrink-0"
-                        style={{ fontSize: 11.5, fontWeight: 500 }}
-                      >
-                        {t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} ·{" "}
-                        {t.domainMap.flowCount.replace("{count}", String(g.flowCount))}
-                      </span>
-                    </div>
-                    {g.filled && g.groundedPct !== null && (
-                      <div style={{ margin: "7px 0 9px" }}>
-                        <GroundedBar pct={g.groundedPct} grounded={g.groundedCount} review={g.reviewCount} />
-                      </div>
-                    )}
-                    <div className="flex flex-wrap" style={{ gap: 6, marginTop: g.filled ? 0 : 8 }}>
-                      {g.memberChips.map((chip) => (
-                        <button
-                          key={chip.id}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/domains/${g.key}/${chip.id}`);
-                          }}
-                          className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer truncate"
-                          style={{ padding: "3px 9px", fontSize: 12, maxWidth: "100%" }}
-                          title={chip.name}
-                        >
-                          {chip.name}
-                        </button>
-                      ))}
-                      {g.moreCount > 0 && (
-                        <span
-                          className="rounded-full bg-elevated text-text-muted"
-                          style={{ padding: "3px 9px", fontSize: 12 }}
-                        >
-                          {t.domainMap.moreFlows.replace("{count}", String(g.moreCount))}
+                   (개수·기능 합계·근거율 합산) + 대표 서브도메인 칩(딥링크). 칩 노출
+                   개수는 useGroupCardRowSizing 이 행 단위로 동적 결정(§ 행별 크기
+                   정렬) — measuring(sizing 미확정) 동안은 전량을 3줄 높이로 클립해
+                   렌더해야 측정이 가능하다. */
+                groupCards.map((g, i) => {
+                  const sized = groupSizing.sizing.get(g.key);
+                  const measuring = sized === undefined;
+                  const shownChips = measuring ? g.allMemberChips : g.allMemberChips.slice(0, sized.visible);
+                  const hiddenCount = measuring ? 0 : sized.hidden;
+                  return (
+                    <div
+                      key={g.key}
+                      ref={groupSizing.registerCard(g.key)}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => navigate(`/domains/${g.key}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          navigate(`/domains/${g.key}`);
+                        }
+                      }}
+                      className="domain-card rounded-[10px] bg-panel border border-border-subtle hover:border-accent cursor-pointer transition-colors"
+                      style={{
+                        padding: "13px 14px",
+                        animation: `fadeSlideIn 0.35s ease-out ${i * 0.05}s both`,
+                      }}
+                    >
+                      <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 4 }}>
+                        <span aria-hidden className="select-none shrink-0" style={{ fontSize: 14, lineHeight: 1 }}>
+                          {g.icon}
                         </span>
+                        <span className="text-text-primary truncate" title={g.name}>
+                          {g.name}
+                        </span>
+                        <span
+                          className="ml-auto text-text-muted whitespace-nowrap shrink-0"
+                          style={{ fontSize: 11.5, fontWeight: 500 }}
+                        >
+                          {t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} ·{" "}
+                          {t.domainMap.flowCount.replace("{count}", String(g.flowCount))}
+                        </span>
+                      </div>
+                      {g.filled && g.groundedPct !== null && (
+                        <div style={{ margin: "7px 0 9px" }}>
+                          <GroundedBar pct={g.groundedPct} grounded={g.groundedCount} review={g.reviewCount} />
+                        </div>
                       )}
+                      <div
+                        ref={groupSizing.registerChips(g.key)}
+                        className="flex flex-wrap"
+                        style={{
+                          gap: 6,
+                          marginTop: g.filled ? 0 : 8,
+                          ...(measuring ? { maxHeight: 90, overflow: "hidden" } : {}),
+                        }}
+                      >
+                        {shownChips.map((chip) => (
+                          <button
+                            key={chip.id}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/domains/${g.key}/${chip.id}`);
+                            }}
+                            className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer truncate"
+                            style={{ padding: "3px 9px", fontSize: 12, maxWidth: "100%" }}
+                            title={chip.name}
+                          >
+                            {chip.name}
+                          </button>
+                        ))}
+                        {!measuring && hiddenCount > 0 && (
+                          <span
+                            className="rounded-full bg-elevated text-text-muted"
+                            style={{ padding: "3px 9px", fontSize: 12 }}
+                          >
+                            {t.domainMap.moreFlows.replace("{count}", String(hiddenCount))}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               : businessCards.map((card, i) => {
               const processes = processesByDomain.get(card.id) ?? [];
               return (

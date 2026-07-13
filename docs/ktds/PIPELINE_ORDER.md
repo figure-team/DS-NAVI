@@ -6,11 +6,11 @@
 
 ## 1. 전체 순서
 
-```
-[0] /understand (U-A 플러그인, 선택)
-     └→ .understand-anything/knowledge-graph.json
-        구조 탭·dual-load·화면설계 JSP 전수 대조용 (없어도 도메인 트랙 동작)
+> 2026-07-14 개정: **[0] /understand 은퇴**(STRUCTURE_FROM_MAP) — 구조 메뉴는 map 산출
+> (도메인 4뎁스 드릴다운)로 렌더되고, 잔여 소비처용 최소 knowledge-graph.json 은 [3] map 이
+> 자동 emit 한다. 새 프로젝트는 /understand-map 하나로 전 기능이 동작한다.
 
+```
 [1] /understand-map scan                                  ★ 모든 것의 뿌리
      └→ .spec/map/{census, routes, edges, slices, candidates, method-calls}.json
 
@@ -20,8 +20,11 @@
         group-classify 초안: .spec/map/group-ops.suggested.json (사람 검토 후 confirm --ops)
 
 [3] /understand-map map
-     └→ domain-map.json(planDrift 드리프트 게이트) + skeleton.json
-        + domain-graph.json(구조 골격) + system-map.json + config.json
+     └→ domain-map.json(planDrift 드리프트 게이트 + crossDomain — 구조 메뉴 도메인 간 엣지 재원)
+        + skeleton.json + domain-graph.json(구조 골격) + system-map.json + config.json
+        + knowledge-graph.json(최소 결정론 KG — 코드뷰어 allowlist·검색·screens JSP 대조·
+          임팩트 table 카탈로그용. 기존 /understand LLM KG 는 마커 없으면 보존+경고,
+          --overwrite-kg 로만 교체. emit-kg 로 단독 재실행 가능)
 
 [4] /understand-map bundle → fill(인라인 or fill-prep→팬아웃→fill-audit→fill-merge) → emit
      └→ .spec/map/fill/<key>.json → .understand-anything/domain-graph.json 완성
@@ -31,7 +34,8 @@
 [5] /understand-screens  capture(Stage A) → fill(Stage B, 규모 게이트: 화면≤10∧주석≤60 인라인, 초과 팬아웃) → validate
      └→ .understand-anything/screens.json + screens/*.png
         선행: understanding.config.json(screens 섹션) 필수,
-              routes.json 권장(핸들러 [확정] 선기입), knowledge-graph.json 권장(unmatchedJsps 전수 대조)
+              routes.json 권장(핸들러 [확정] 선기입), knowledge-graph.json 권장(unmatchedJsps
+              전수 대조 — [3] map 이 자동 생성하므로 순서만 지키면 항상 충족)
 
 [6] /understand-policy  1단계(결정론 앵커) → 2단계 LLM 보강(행≤60 인라인, 초과 팬아웃)
      └→ .understand-anything/doc-output/policy-{glossary,data,validation,authz}.md
@@ -54,7 +58,8 @@
 ```
 
 - `/understand-onboard` = [1]~[4]를 자동으로 이어 도는 래퍼(fill 없으면 결정론 라벨 폴백 emit).
-- `/understand-init` = 초기 안내. [0]을 먼저 돌려두면 이후 분석이 풍부해진다(없어도 동작).
+- `/understand-init` = 초기 안내(config·scaffold). `/understand`(U-A KG)는 파이프라인에서
+  은퇴 — 명령 자체는 U-A 플러그인에 존치하나 ktds 워크플로에서는 실행하지 않는다.
 
 ## 2. 낡음(스테일) 전파 방향
 

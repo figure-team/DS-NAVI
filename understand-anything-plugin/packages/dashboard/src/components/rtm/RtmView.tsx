@@ -106,7 +106,7 @@ export default function RtmView() {
   // 단계 인테이크(P4) · 변경관리(P6) — 상태·폴링·복구는 훅으로 이동(기계적 이동, 계약 불변).
   const intake = useIntake({ accessToken, tokenQ, loadModel, setToast });
   const { sid } = intake;
-  const { changeReqId, changeRunning, startChange } = useChange({ accessToken, tokenQ, loadModel, setToast });
+  const { changeReqId, changeRunning, startChange, changeModel, setChangeModel } = useChange({ accessToken, tokenQ, loadModel, setToast });
 
   // URL(?view=&req=&fn=&ts=) → 상태 — 딥링크·뒤로가기 복원. ?req= 는 기존 계약 그대로
   // 요청 기준 탭을 강제한다(검증 딥링크).
@@ -314,10 +314,11 @@ export default function RtmView() {
     postReq, postField, addField, resolveApprover,
     effCell, isEdited, isConfirmed, effLifecycle, effSignoff, effTest, fnById, reqById,
     scenarios, effTs, tsConfirmed, tsConfirmedCount, effFields, effCustom,
-    changeReqId, changeRunning, startChange,
+    changeReqId, changeRunning, startChange, changeModel, setChangeModel,
     intakeOpen: intake.intakeOpen, setIntakeOpen: intake.setIntakeOpen,
     intakeQuery: intake.intakeQuery, setIntakeQuery: intake.setIntakeQuery,
     targetStep: intake.targetStep, setTargetStep: intake.setTargetStep,
+    intakeModel: intake.intakeModel, setIntakeModel: intake.setIntakeModel,
     intakeStatus: intake.intakeStatus, intakeError: intake.intakeError, startIntake: intake.startIntake,
     session: intake.session, sessionDocs: intake.sessionDocs, stepBusy: intake.stepBusy,
     viewStep: intake.viewStep, setViewStep: intake.setViewStep,

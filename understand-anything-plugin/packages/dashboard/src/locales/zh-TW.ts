@@ -277,6 +277,8 @@ export const zhTW = {
     alreadyRunning: "已有分析正在進行。完成後請重試。",
     errNoServer: "無法執行分析：不是可寫入的開發伺服器。",
     errGeneric: "啟動分析失敗。",
+    modelDefault: "工作階段模型（預設）",
+    modelAria: "選擇分析模型",
     toastDone: "影響分析完成 — 結果已在結構圖上醒目顯示。",
     toastFailed: "影響分析失敗。請查看主控台/日誌。",
   },

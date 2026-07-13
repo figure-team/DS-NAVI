@@ -118,6 +118,11 @@ export interface RunClaudeSkillOptions<Extra extends Record<string, unknown>> {
   tracker: ClaudeJobTracker<Extra>;
   /** 테스트/포팅용 CLI 이름 오버라이드(기본 "claude"). */
   command?: string;
+  /**
+   * 세션 기본 대신 사용할 모델(whitelist: opus/sonnet/haiku). 값이 있으면 spawn args 에
+   * `--model <model>` 을 덧붙이고, 없으면(기본) 플래그를 생략해 세션 모델을 그대로 쓴다.
+   */
+  model?: string;
   /** spawn 동기 실패로 failed 처리된 직후(현재 job 일 때만) 추가 후처리 — 예: 500 응답. */
   onSpawnError?: () => void;
   /** child 'error' 이벤트로 failed 처리된 직후 추가 후처리 — 예: 이력 기록. */
@@ -139,12 +144,11 @@ export function runClaudeSkill<Extra extends Record<string, unknown>>(
 ): boolean {
   const { prompt, cwd, jobId, tracker } = opts;
   let child: ReturnType<typeof spawn>;
+  const args = ["-p", prompt, "--permission-mode", "bypassPermissions"];
+  // 모델 미전달(기본) 이면 플래그 없이 세션 모델을 쓴다 — 프로젝트 공통 규약.
+  if (opts.model) args.push("--model", opts.model);
   try {
-    child = spawn(
-      opts.command ?? "claude",
-      ["-p", prompt, "--permission-mode", "bypassPermissions"],
-      { cwd, env: process.env },
-    );
+    child = spawn(opts.command ?? "claude", args, { cwd, env: process.env });
   } catch (err) {
     if (tracker.fail(jobId, err instanceof Error ? err.message : String(err))) {
       opts.onSpawnError?.();

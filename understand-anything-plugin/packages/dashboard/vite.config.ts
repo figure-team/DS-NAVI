@@ -1080,6 +1080,14 @@ function handleRtmReqOverridePost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
+// ── 헤드리스 모델 선택(공통) — 세 spawn 경로가 공유 ────────────────────────────
+// 규약: 기본=세션 모델(플래그 미전달), 선택지 whitelist [opus/sonnet/haiku]. 화이트리스트
+// 밖·비문자열은 조용히 null(기본) 로 폴백해 검증 실패를 만들지 않는다(프로젝트 공통 모델 규약).
+const HEADLESS_MODEL_WHITELIST = new Set(["opus", "sonnet", "haiku"]);
+function pickModel(raw: unknown): string | null {
+  return typeof raw === "string" && HEADLESS_MODEL_WHITELIST.has(raw) ? raw : null;
+}
+
 // ── ktds: 구조 탭 "영향도 분석" — 자연어 → claude -p "/understand-impact <q>" ─────
 // 대시보드 dev server가 분석 대상 프로젝트(GRAPH_DIR)에서 claude 를 헤드리스로 spawn.
 // 스킬이 .understand-anything/impact-overlay.json 을 갱신 → 프론트가 재로드해 색칠.
@@ -1094,10 +1102,13 @@ const IMPACT_AUTONOMY_DIRECTIVE = headlessDirective(
     "멈추지 말고 analyze 단계까지 끝까지 실행하여 .understand-anything/impact-overlay.json 을 반드시 생성하라.",
 );
 
-type ImpactJob = ClaudeJobBase & { query: string | null };
+type ImpactJob = ClaudeJobBase & { query: string | null; model: string | null };
 
 // 모듈 스코프 단일 job(서버 수명 동안 추적). 동시 실행은 409로 차단.
-const impactTracker = new ClaudeJobTracker<{ query: string | null }>({ query: null });
+const impactTracker = new ClaudeJobTracker<{ query: string | null; model: string | null }>({
+  query: null,
+  model: null,
+});
 
 /** 분석 대상 프로젝트 루트 — GRAPH_DIR 우선, 없으면 knowledge-graph.json 위치에서 유도. */
 function impactProjectRoot(): string | null {
@@ -1129,9 +1140,11 @@ function handleImpactAnalyzePost(
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
       let query = "";
+      let model: string | null = null;
       try {
-        const parsed = JSON.parse(body) as { query?: unknown };
+        const parsed = JSON.parse(body) as { query?: unknown; model?: unknown };
         query = typeof parsed.query === "string" ? parsed.query.trim() : "";
+        model = pickModel(parsed.model);
       } catch {
         query = "";
       }
@@ -1139,12 +1152,13 @@ function handleImpactAnalyzePost(
         sendJson(res, 400, { error: "Missing 'query'" });
         return;
       }
-      const jobId = impactTracker.begin({ query });
+      const jobId = impactTracker.begin({ query, model });
       // WAL: 스폰 전 pending 마커 — 서버가 job 도중 재시작해 close 핸들러를 잃어도
-      // /impact-history 조회 시 reconcile 이 산출물 mtime 으로 결과를 복원한다(질의문 보존).
+      // /impact-history 조회 시 reconcile 이 산출물 mtime 으로 결과를 복원한다(질의문·모델 보존).
       writePendingMarker(impactHistoryDir(projectRoot), {
         jobId,
         query,
+        model,
         startedAt: impactTracker.job.startedAt,
       });
       const launched = runClaudeSkill({
@@ -1152,6 +1166,7 @@ function handleImpactAnalyzePost(
         cwd: projectRoot,
         jobId,
         tracker: impactTracker,
+        model: model ?? undefined,
         onSpawnError: () =>
           sendJson(res, 500, { error: "Failed to launch claude", job: impactTracker.snapshot() }),
         onErrorSettled: () => recordImpactHistory(projectRoot, impactTracker.snapshot()),
@@ -1178,6 +1193,8 @@ const IMPACT_SNAPSHOT_FILES = new Set([
 interface ImpactHistoryEntry {
   jobId: string;
   query: string;
+  /** 실행에 쓴 모델(세션 기본이면 null) — 스키마 additive, 하위호환. */
+  model: string | null;
   startedAt: string | null;
   finishedAt: string | null;
   exitCode: number | null;
@@ -1242,6 +1259,7 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
     const entry: ImpactHistoryEntry = {
       jobId,
       query: job.query ?? "",
+      model: job.model ?? null,
       startedAt: job.startedAt,
       finishedAt: job.finishedAt,
       exitCode: job.exitCode,
@@ -1278,6 +1296,7 @@ function reconcileImpactHistory(projectRoot: string): void {
         status: fresh ? "done" : "failed",
         jobId: pending.jobId as string,
         query: typeof pending.query === "string" ? pending.query : "",
+        model: typeof pending.model === "string" ? pending.model : null,
         startedAt: typeof pending.startedAt === "string" ? pending.startedAt : null,
         finishedAt: fresh ? new Date(artifactMs).toISOString() : new Date().toISOString(),
         exitCode: null,
@@ -1306,12 +1325,14 @@ interface RtmStepExtra extends Record<string, unknown> {
   step: number | null; // 현재 실행 중/마지막 단계
   targetStep: number | null;
   request: string | null;
+  model: string | null; // 이 호출의 모든 단계에 쓸 모델(세션 기본이면 null)
 }
 const rtmTracker = new ClaudeJobTracker<RtmStepExtra>({
   sid: null,
   step: null,
   targetStep: null,
   request: null,
+  model: null,
 });
 
 // ── 세션 영속(.understand-anything/rtm-intake/<sid>/) ────────────────────────
@@ -1435,6 +1456,7 @@ function runRtmSteps(
   request: string,
   start: number,
   target: number,
+  model: string | null,
 ): void {
   const reqArg = request.replace(/[\r\n]+/g, " ").replace(/"/g, "'").trim();
   const setStepStatus = (k: number, status: RtmStepStatus): void => {
@@ -1454,6 +1476,7 @@ function runRtmSteps(
       cwd: projectRoot,
       jobId,
       tracker: rtmTracker,
+      model: model ?? undefined,
       onSpawnError: () => setStepStatus(k, "failed"),
       onClose: (code) => {
         if (code !== 0) {
@@ -1497,7 +1520,7 @@ function handleRtmIntakePost(
   }
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
-      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown } = {};
+      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown; model?: unknown } = {};
       try {
         parsed = JSON.parse(body);
       } catch {
@@ -1506,6 +1529,7 @@ function handleRtmIntakePost(
       }
       const wantTarget =
         typeof parsed.targetStep === "number" ? Math.floor(parsed.targetStep) : RTM_STEP_MAX;
+      const model = pickModel(parsed.model);
 
       let session: RtmSession;
       let startStep: number;
@@ -1551,8 +1575,9 @@ function handleRtmIntakePost(
         step: startStep,
         targetStep: target,
         request,
+        model,
       });
-      runRtmSteps(jobId, session.sid, projectRoot, request, startStep, target);
+      runRtmSteps(jobId, session.sid, projectRoot, request, startStep, target, model);
       sendJson(res, 202, { job: rtmTracker.snapshot(), session });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
@@ -1689,7 +1714,8 @@ function rtmChangeDirective(targetReq: string, kind: RtmChangeKind): string {
 const rtmChangeTracker = new ClaudeJobTracker<{
   targetReq: string | null;
   kind: RtmChangeKind | null;
-}>({ targetReq: null, kind: null });
+  model: string | null;
+}>({ targetReq: null, kind: null, model: null });
 
 /**
  * rtm.json 의 요청(REQ) id 집합 — RtmView.requestIdOf 규약: source.section 이 REQ- 면 그것,
@@ -1724,6 +1750,8 @@ interface RtmChangeHistoryEntry {
   jobId: string;
   targetReq: string;
   kind: string;
+  /** 실행에 쓴 모델(세션 기본이면 null) — 스키마 additive, 하위호환. */
+  model: string | null;
   startedAt: string | null;
   finishedAt: string | null;
   exitCode: number | null;
@@ -1772,7 +1800,7 @@ function readRtmChangeHistory(projectRoot: string): RtmChangeHistoryEntry[] {
  */
 function recordRtmChangeHistory(
   projectRoot: string,
-  job: ClaudeJobBase & { targetReq: string | null; kind: RtmChangeKind | null },
+  job: ClaudeJobBase & { targetReq: string | null; kind: RtmChangeKind | null; model: string | null },
 ): void {
   try {
     const jobId = job.jobId;
@@ -1786,6 +1814,7 @@ function recordRtmChangeHistory(
       jobId,
       targetReq: job.targetReq ?? "",
       kind: job.kind ?? "withdraw",
+      model: job.model ?? null,
       startedAt: job.startedAt,
       finishedAt: job.finishedAt,
       exitCode: job.exitCode,
@@ -1812,6 +1841,7 @@ function reconcileRtmChangeHistory(projectRoot: string): void {
         jobId: pending.jobId as string,
         targetReq: typeof pending.targetReq === "string" ? pending.targetReq : null,
         kind: pending.kind === "withdraw" ? "withdraw" : null,
+        model: typeof pending.model === "string" ? pending.model : null,
         startedAt: typeof pending.startedAt === "string" ? pending.startedAt : null,
         finishedAt: fresh ? new Date(artifactMs).toISOString() : new Date().toISOString(),
         exitCode: null,
@@ -1827,12 +1857,14 @@ function runRtmChange(
   projectRoot: string,
   targetReq: string,
   kind: RtmChangeKind,
+  model: string | null,
 ): void {
   runClaudeSkill({
     prompt: `/understand-rtm --change --target-req ${targetReq} --kind ${kind}${rtmChangeDirective(targetReq, kind)}`,
     cwd: projectRoot,
     jobId,
     tracker: rtmChangeTracker,
+    model: model ?? undefined,
     onErrorSettled: () => recordRtmChangeHistory(projectRoot, rtmChangeTracker.snapshot()),
     onCloseSettled: () => recordRtmChangeHistory(projectRoot, rtmChangeTracker.snapshot()),
   });
@@ -1860,13 +1892,14 @@ function handleRtmChangePost(
   }
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
-      let parsed: { targetReq?: unknown; kind?: unknown } = {};
+      let parsed: { targetReq?: unknown; kind?: unknown; model?: unknown } = {};
       try {
         parsed = JSON.parse(body);
       } catch {
         sendJson(res, 400, { error: "Invalid JSON body" });
         return;
       }
+      const model = pickModel(parsed.model);
       const targetReq = typeof parsed.targetReq === "string" ? parsed.targetReq.trim() : "";
       if (!/^REQ-\d+$/.test(targetReq)) {
         sendJson(res, 400, { error: "targetReq (REQ-00N) 형식이 필요합니다." });
@@ -1880,16 +1913,17 @@ function handleRtmChangePost(
         sendJson(res, 400, { error: `요청 ${targetReq} 에 귀속된 요구사항이 추적표에 없습니다.` });
         return;
       }
-      const jobId = rtmChangeTracker.begin({ targetReq, kind });
+      const jobId = rtmChangeTracker.begin({ targetReq, kind, model });
       // WAL: 스폰 전 pending 마커 — 서버 재시작 시 /rtm-change-status 의 reconcile 이
       // rtm.json mtime 으로 결과를 복원한다(impact 와 동일 규약).
       writePendingMarker(rtmChangeHistoryDir(projectRoot), {
         jobId,
         targetReq,
         kind,
+        model,
         startedAt: rtmChangeTracker.job.startedAt,
       });
-      runRtmChange(jobId, projectRoot, targetReq, kind);
+      runRtmChange(jobId, projectRoot, targetReq, kind, model);
       sendJson(res, 202, { job: rtmChangeTracker.snapshot() });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));

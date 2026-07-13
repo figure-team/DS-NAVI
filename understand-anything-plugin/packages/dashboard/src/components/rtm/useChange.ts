@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
+import type { ModelChoice } from "../ModelSelect";
+
 /**
  * P6 변경관리(절차 B) — 요청(REQ) 철회. RtmView 본문에서 기계적 이동.
  * 계약(불가침): startChange 의 window.confirm 철회 경고, 3초 폴링,
- * 마운트 복구, 완료 시 loadModel() 재로드.
+ * 마운트 복구, 완료 시 loadModel() 재로드. (모델 선택은 옵션 — body 에 additive.)
  */
 export function useChange({ accessToken, tokenQ, loadModel, setToast }: {
   accessToken: string | null;
@@ -13,6 +15,7 @@ export function useChange({ accessToken, tokenQ, loadModel, setToast }: {
 }) {
   const [changeReqId, setChangeReqId] = useState<string | null>(null); // 진행 중 대상 REQ
   const [changeRunning, setChangeRunning] = useState(false);
+  const [changeModel, setChangeModel] = useState<ModelChoice>(""); // "" = 세션 모델(기본)
 
   // 변경관리(절차 B) — 요청(REQ) 철회 시작. claude -p §C 가 CR 문서 생성·폐기표시·재bake 까지 수행한다.
   const startChange = useCallback(async (reqId: string) => {
@@ -23,12 +26,12 @@ export function useChange({ accessToken, tokenQ, loadModel, setToast }: {
     );
     if (!ok) return;
     try {
-      const res = await fetch(`/rtm-change?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetReq: reqId, kind: "withdraw" }) });
+      const res = await fetch(`/rtm-change?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(changeModel ? { targetReq: reqId, kind: "withdraw", model: changeModel } : { targetReq: reqId, kind: "withdraw" }) });
       const d = (await res.json().catch(() => null)) as { job?: unknown; error?: string } | null;
       if (res.status === 202) { setChangeReqId(reqId); setChangeRunning(true); setToast({ kind: "done", msg: `${reqId} 철회 진행 중 — CR 문서 생성·추적표 재생성 중입니다.` }); }
       else setToast({ kind: "failed", msg: d?.error ?? `변경요청 실패: HTTP ${res.status}` });
     } catch (e) { setToast({ kind: "failed", msg: String(e) }); }
-  }, [accessToken, changeRunning, setToast]);
+  }, [accessToken, changeRunning, changeModel, setToast]);
 
   // 마운트 시 진행 중 변경관리 job 복구(새로고침 후에도 진행 상태를 잇는다).
   useEffect(() => {
@@ -61,5 +64,5 @@ export function useChange({ accessToken, tokenQ, loadModel, setToast }: {
     return () => clearInterval(id);
   }, [changeRunning, tokenQ, changeReqId, loadModel, setToast]);
 
-  return { changeReqId, changeRunning, startChange };
+  return { changeReqId, changeRunning, startChange, changeModel, setChangeModel };
 }

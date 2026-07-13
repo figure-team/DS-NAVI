@@ -35,8 +35,8 @@ export interface OverlaySlice {
   impactJob: ImpactJobState;
   openImpactModal: () => void;
   closeImpactModal: () => void;
-  /** 자연어 query를 POST /impact-analyze로 보내 분석 시작(running). */
-  startImpactAnalysis: (query: string) => Promise<{ ok: boolean; error?: string }>;
+  /** 자연어 query를 POST /impact-analyze로 보내 분석 시작(running). model 미지정=세션 모델. */
+  startImpactAnalysis: (query: string, model?: string) => Promise<{ ok: boolean; error?: string }>;
   /** GET /impact-status 폴링 결과로 job 상태 동기화. */
   pollImpactStatus: () => Promise<void>;
   /** impact-overlay.json 재fetch → impact 채널 적재 + 명시 활성. */
@@ -105,7 +105,7 @@ export const createOverlaySlice: StateCreator<DashboardStore, [], [], OverlaySli
   openImpactModal: () => set({ impactModalOpen: true }),
   closeImpactModal: () => set({ impactModalOpen: false }),
 
-  startImpactAnalysis: async (query) => {
+  startImpactAnalysis: async (query, model) => {
     const q = query.trim();
     if (!q) return { ok: false, error: "empty-query" };
     const { accessToken } = get();
@@ -114,7 +114,8 @@ export const createOverlaySlice: StateCreator<DashboardStore, [], [], OverlaySli
       const res = await fetch(`/impact-analyze?token=${encodeURIComponent(accessToken)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q }),
+        // 기본(세션 모델)이면 model 필드를 생략한다 — 서버는 화이트리스트 밖 값을 무시하고 기본 사용.
+        body: JSON.stringify(model ? { query: q, model } : { query: q }),
       });
       const data = (await res.json().catch(() => null)) as
         | { job?: { jobId?: string | null; query?: string | null }; error?: string }

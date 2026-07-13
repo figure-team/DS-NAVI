@@ -1,6 +1,7 @@
 import { useSearchParams } from "react-router";
 
 import { useRtm } from "./context";
+import { ModelSelect } from "../ModelSelect";
 import { Hl, Pill, rowKeyHandler } from "./shared";
 import { AC_KIND, BAD, BORDER, FAINT, GOLD, GOLD_DIM, LIFECYCLE_LABEL, NFR, NFR_CAT, PRIORITY, STATE_LABEL, TEST_RES, UNGROUPED, VERB, requestIdOf, verbOf } from "./types";
 import type { Changeset, Requirement, TestResult } from "./types";
@@ -82,7 +83,7 @@ function ReqCard({ r, dead, nested, q }: { r: Requirement; dead?: boolean; neste
 }
 
 function RequestCard({ reqId, members, q, stateFilter }: { reqId: string; members: Requirement[]; q: string; stateFilter: "" | "active" | "dead" }) {
-  const { expandedRequests, setExpandedRequests, changeRunning, changeReqId, startChange } = useRtm();
+  const { expandedRequests, setExpandedRequests, changeRunning, changeReqId, startChange, changeModel, setChangeModel } = useRtm();
   const open = expandedRequests.has(reqId);
   const ungrouped = reqId === UNGROUPED;
   const selfReq = members.find((m) => m.id === reqId); // 요청-레벨 단일 요구사항(레거시 REQ-001 류)
@@ -107,6 +108,10 @@ function RequestCard({ reqId, members, q, stateFilter }: { reqId: string; member
         <span className="ml-auto flex items-center gap-3 text-text-muted" style={{ fontSize: 11.5 }}>
           <span style={{ fontFamily: "var(--font-mono)" }}>{Object.entries(catCount).map(([c, n]) => `${c} ${n}`).join(" · ") || "—"}</span>
           <span>요구사항 {members.length}{deadN ? ` · 폐기 ${deadN}` : ""}</span>
+          {canWithdraw && <span onClick={(e) => e.stopPropagation()}><ModelSelect value={changeModel} onChange={setChangeModel} disabled={changeRunning}
+            sessionDefaultLabel="세션 모델(기본)" ariaLabel="변경관리 실행 모델 선택"
+            className="rounded-md bg-elevated border border-border-medium text-text-secondary focus:outline-none focus:border-accent disabled:opacity-50"
+            style={{ padding: "2px 5px", fontSize: 10.5 }} /></span>}
           {canWithdraw && <button type="button" onClick={(e) => { e.stopPropagation(); void startChange(reqId); }} disabled={running}
             className="rounded-md border transition-colors disabled:opacity-60"
             style={{ padding: "3px 10px", fontSize: 11, borderColor: running ? FAINT : `${BAD}66`, color: running ? "var(--color-text-muted)" : BAD }}

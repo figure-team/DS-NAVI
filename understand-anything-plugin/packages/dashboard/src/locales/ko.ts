@@ -279,6 +279,8 @@ export const ko = {
     alreadyRunning: "이미 분석이 진행 중입니다. 완료 후 다시 실행하세요.",
     errNoServer: "쓰기 가능한 dev server가 아니어서 분석을 실행할 수 없습니다.",
     errGeneric: "분석 실행에 실패했습니다.",
+    modelDefault: "세션 모델(기본)",
+    modelAria: "분석 모델 선택",
     toastDone: "영향도 분석 완료 — 구조 그래프에 결과를 표시했습니다.",
     toastFailed: "영향도 분석에 실패했습니다. 콘솔/로그를 확인하세요.",
   },

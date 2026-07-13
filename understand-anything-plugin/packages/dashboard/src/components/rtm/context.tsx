@@ -5,6 +5,7 @@ import type {
   CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, ReqOverride,
   Requirement, RtmModel, RtmSession, RtmTab, SessionDoc, Signoff, TestRef, TestResult, TestScenario,
 } from "./types";
+import type { ModelChoice } from "../ModelSelect";
 
 /**
  * RTM 화면 공유 컨텍스트 — 상태·콜백·병합 helper 전부 RtmView(셸)가 소유하고,
@@ -87,6 +88,8 @@ export interface RtmCtx {
   changeReqId: string | null;
   changeRunning: boolean;
   startChange: (reqId: string) => Promise<void>;
+  changeModel: ModelChoice;
+  setChangeModel: (v: ModelChoice) => void;
 
   // 인테이크(P4)
   intakeOpen: boolean;
@@ -95,6 +98,8 @@ export interface RtmCtx {
   setIntakeQuery: (v: string) => void;
   targetStep: number;
   setTargetStep: (v: number) => void;
+  intakeModel: ModelChoice;
+  setIntakeModel: (v: ModelChoice) => void;
   intakeStatus: "idle" | "running" | "done" | "failed";
   intakeError: string | null;
   startIntake: () => Promise<void>;

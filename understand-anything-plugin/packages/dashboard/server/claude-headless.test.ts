@@ -141,6 +141,30 @@ describe("runClaudeSkill", () => {
     expect(settled).toBe(true);
   });
 
+  it("model 지정 시 spawn args 에 --model 을 덧붙인다(echo 셔임 tail 검증)", async () => {
+    const t = new ClaudeJobTracker<Record<string, never>>({});
+    const jobId = t.begin({});
+    runClaudeSkill({
+      prompt: "P",
+      cwd: process.cwd(),
+      jobId,
+      tracker: t,
+      command: "echo",
+      model: "sonnet",
+    });
+    await until(() => t.job.status !== "running");
+    expect(t.job.tail).toContain("--model sonnet");
+    expect(t.job.tail).toContain("--permission-mode bypassPermissions");
+  });
+
+  it("model 미지정(기본) 이면 --model 을 붙이지 않는다 — 세션 모델 사용", async () => {
+    const t = new ClaudeJobTracker<Record<string, never>>({});
+    const jobId = t.begin({});
+    runClaudeSkill({ prompt: "P", cwd: process.cwd(), jobId, tracker: t, command: "echo" });
+    await until(() => t.job.status !== "running");
+    expect(t.job.tail).not.toContain("--model");
+  });
+
   it("비 0 exit → failed", async () => {
     const t = new ClaudeJobTracker<Record<string, never>>({});
     const jobId = t.begin({});

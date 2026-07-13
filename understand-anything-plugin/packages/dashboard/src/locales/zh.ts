@@ -277,6 +277,8 @@ export const zh = {
     alreadyRunning: "已有分析正在进行。完成后请重试。",
     errNoServer: "无法运行分析：不是可写的开发服务器。",
     errGeneric: "启动分析失败。",
+    modelDefault: "会话模型（默认）",
+    modelAria: "选择分析模型",
     toastDone: "影响分析完成 — 结果已在结构图上高亮显示。",
     toastFailed: "影响分析失败。请查看控制台/日志。",
   },

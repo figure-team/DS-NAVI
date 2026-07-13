@@ -279,6 +279,8 @@ export const ja = {
     alreadyRunning: "すでに分析が進行中です。完了後に再実行してください。",
     errNoServer: "分析を実行できません：書き込み可能な開発サーバーではありません。",
     errGeneric: "分析の開始に失敗しました。",
+    modelDefault: "セッションモデル（既定）",
+    modelAria: "分析モデルを選択",
     toastDone: "影響分析が完了 — 結果を構造グラフ上にハイライトしました。",
     toastFailed: "影響分析に失敗しました。コンソール/ログを確認してください。",
   },

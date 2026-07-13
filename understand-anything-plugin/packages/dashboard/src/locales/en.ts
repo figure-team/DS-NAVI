@@ -279,6 +279,8 @@ export const en = {
     alreadyRunning: "An analysis is already running. Try again once it finishes.",
     errNoServer: "Cannot run analysis: not a writable dev server.",
     errGeneric: "Failed to start analysis.",
+    modelDefault: "Session model (default)",
+    modelAria: "Select analysis model",
     toastDone: "Impact analysis complete — results highlighted on the structure graph.",
     toastFailed: "Impact analysis failed. Check the console/logs.",
   },

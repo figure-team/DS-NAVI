@@ -11,6 +11,14 @@ import {
   runClaudeSkill,
   type ClaudeJobBase,
 } from "./server/claude-headless";
+import {
+  appendLedgerEntry,
+  artifactMtimeMs,
+  readLedger,
+  reconcilePendingJobs,
+  removePendingMarker,
+  writePendingMarker,
+} from "./server/job-ledger";
 
 // Generate a one-time token when the server process starts.
 // This token is printed to the terminal and must be in the URL
@@ -1132,19 +1140,13 @@ function handleImpactAnalyzePost(
         return;
       }
       const jobId = impactTracker.begin({ query });
-      // WAL: 스폰 전 pending 마커를 디스크에 남긴다 — 서버가 job 도중 재시작(config 리로드,
-      // ctrl-c 등)해 close 핸들러를 잃어도 /impact-history 조회 시 reconcile 이 산출물
-      // mtime 으로 결과를 복원한다(질의문 보존).
-      try {
-        fs.mkdirSync(impactHistoryDir(projectRoot), { recursive: true });
-        fs.writeFileSync(
-          path.join(impactHistoryDir(projectRoot), `pending-${jobId}.json`),
-          JSON.stringify({ jobId, query, startedAt: impactTracker.job.startedAt }, null, 2) + "\n",
-          "utf8",
-        );
-      } catch {
-        // pending 기록 실패는 무시(본 기록은 close 핸들러가 시도)
-      }
+      // WAL: 스폰 전 pending 마커 — 서버가 job 도중 재시작해 close 핸들러를 잃어도
+      // /impact-history 조회 시 reconcile 이 산출물 mtime 으로 결과를 복원한다(질의문 보존).
+      writePendingMarker(impactHistoryDir(projectRoot), {
+        jobId,
+        query,
+        startedAt: impactTracker.job.startedAt,
+      });
       const launched = runClaudeSkill({
         prompt: `/understand-impact ${query}${IMPACT_AUTONOMY_DIRECTIVE}`,
         cwd: projectRoot,
@@ -1191,14 +1193,7 @@ function impactHistoryDir(projectRoot: string): string {
 }
 
 function readImpactHistory(projectRoot: string): ImpactHistoryEntry[] {
-  try {
-    const raw = JSON.parse(
-      fs.readFileSync(path.join(impactHistoryDir(projectRoot), "ledger.json"), "utf-8"),
-    ) as { entries?: ImpactHistoryEntry[] };
-    return Array.isArray(raw.entries) ? raw.entries : [];
-  } catch {
-    return []; // 부재/파손 = 기록 없음(정직한 empty)
-  }
+  return readLedger<ImpactHistoryEntry>(impactHistoryDir(projectRoot));
 }
 
 /** job 종료 시점 산출물을 스냅샷하고 원장에 append(동일 jobId 재기록은 dedup). 실패는 로그만. */
@@ -1255,84 +1250,41 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
       gitCommit,
       files,
     };
-    const entries = [entry, ...readImpactHistory(projectRoot).filter((e) => e.jobId !== jobId)];
-    for (const drop of entries.slice(IMPACT_HISTORY_MAX)) {
+    for (const drop of appendLedgerEntry(dir, entry, IMPACT_HISTORY_MAX)) {
       try {
         fs.rmSync(path.join(dir, drop.jobId), { recursive: true, force: true });
       } catch {
         // 스냅샷 정리 실패는 무시(원장에서만 제거)
       }
     }
-    fs.writeFileSync(
-      path.join(dir, "ledger.json"),
-      JSON.stringify({ entries: entries.slice(0, IMPACT_HISTORY_MAX) }, null, 2) + "\n",
-      "utf8",
-    );
-    fs.rmSync(path.join(dir, `pending-${jobId}.json`), { force: true });
+    removePendingMarker(dir, jobId);
   } catch (err) {
     console.error("[understand-anything] Failed to record impact history:", err);
   }
 }
 
 /**
- * 서버 재시작으로 close 핸들러를 잃은 job 복원 — pending 마커와 산출물 mtime 으로 판정.
- * 산출물(impact.json)이 startedAt 이후 갱신됐으면 done 으로 원장 기록(스냅샷 포함),
- * 아직이면 고아 claude 가 돌고 있을 수 있어 30분 유예 후 failed 처리. /impact-history
- * 조회 시 lazy 하게 호출된다(별도 부팅 훅 불필요).
+ * 서버 재시작으로 close 핸들러를 잃은 impact job 복원 — 산출물(impact.json) mtime 기준.
+ * /impact-history 조회 시 lazy 하게 호출된다(별도 부팅 훅 불필요).
  */
 function reconcileImpactHistory(projectRoot: string): void {
-  const dir = impactHistoryDir(projectRoot);
-  let names: string[] = [];
-  try {
-    names = fs.readdirSync(dir).filter((n) => /^pending-[0-9a-f]{16}\.json$/.test(n));
-  } catch {
-    return; // 히스토리 디렉토리 자체가 없으면 복원할 것도 없음
-  }
-  if (names.length === 0) return;
   const ledger = readImpactHistory(projectRoot);
-  for (const n of names) {
-    const file = path.join(dir, n);
-    try {
-      const pending = JSON.parse(fs.readFileSync(file, "utf-8")) as {
-        jobId?: string;
-        query?: string;
-        startedAt?: string;
-      };
-      const jobId = typeof pending.jobId === "string" ? pending.jobId : "";
-      if (!jobId) {
-        fs.rmSync(file, { force: true });
-        continue;
-      }
-      if (impactTracker.isCurrent(jobId) && impactTracker.running) continue; // 현재 서버가 추적 중
-      if (ledger.some((e) => e.jobId === jobId)) {
-        fs.rmSync(file, { force: true }); // 이미 기록됨(정상 close) — 마커만 정리
-        continue;
-      }
-      const startedMs = pending.startedAt ? Date.parse(pending.startedAt) : Number.NaN;
-      let artifactMs = Number.NaN;
-      try {
-        artifactMs = fs.statSync(path.join(projectRoot, ".spec", "map", "impact.json")).mtimeMs;
-      } catch {
-        // 산출물 부재 — fresh=false 경로
-      }
-      const fresh =
-        !Number.isNaN(startedMs) && !Number.isNaN(artifactMs) && artifactMs >= startedMs - 1000;
-      if (!fresh && !Number.isNaN(startedMs) && Date.now() - startedMs < 30 * 60 * 1000) {
-        continue; // 아직 돌고 있을 수 있음 — 다음 조회 때 재판정
-      }
+  reconcilePendingJobs(impactHistoryDir(projectRoot), {
+    isTracking: (jobId) => impactTracker.isCurrent(jobId) && impactTracker.running,
+    isRecorded: (jobId) => ledger.some((e) => e.jobId === jobId),
+    artifactMtimeMs: () => artifactMtimeMs(path.join(projectRoot, ".spec", "map", "impact.json")),
+    record: (pending, fresh, artifactMs) => {
       recordImpactHistory(projectRoot, {
         status: fresh ? "done" : "failed",
-        jobId,
+        jobId: pending.jobId as string,
         query: typeof pending.query === "string" ? pending.query : "",
-        startedAt: pending.startedAt ?? null,
+        startedAt: typeof pending.startedAt === "string" ? pending.startedAt : null,
         finishedAt: fresh ? new Date(artifactMs).toISOString() : new Date().toISOString(),
         exitCode: null,
         tail: "",
       });
-    } catch {
-      // 개별 pending 파손은 건너뜀(다음 조회 때 재시도)
-    }
-  }
+    },
+  });
 }
 
 // ── P3: RTM 단계 인테이크 — 가이드 5단계를 단계당 claude -p 1회로 ─────
@@ -1762,6 +1714,113 @@ function rtmRequestIds(): Set<string> {
   return ids;
 }
 
+// ── rtm-change 이력/영속 — impact 와 동일 규약(WAL + 원장 + lazy reconcile) ─────
+// 변경관리 산출물(CR 문서·impact)은 change/<CR>/ 에 영구 보존되므로 스냅샷 복사는 없다 —
+// 원장은 실행 이력 + 이 실행이 갱신한 CR 디렉터리명만 기록한다. 신선도 판정 기준 산출물은
+// §C 가 끝까지 가면 반드시 재생성되는 추적표(rtm.json).
+const RTM_CHANGE_HISTORY_MAX = 50;
+
+interface RtmChangeHistoryEntry {
+  jobId: string;
+  targetReq: string;
+  kind: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  status: "done" | "failed";
+  /** 이 실행이 갱신한(mtime ≥ startedAt) change/<CR> 디렉터리명 — 문서 열람 연결용. */
+  crIds: string[];
+}
+
+function rtmChangeHistoryDir(projectRoot: string): string {
+  return path.join(projectRoot, ".understand-anything", "rtm-change-history");
+}
+
+function rtmBakedFile(projectRoot: string): string {
+  return path.join(projectRoot, ".understand-anything", "rtm.json");
+}
+
+/** 이 job 이 갱신한 change/<CR> 디렉터리 — mtime ≥ startedAt(1s 여유)로 판정. */
+function rtmChangeCrIds(projectRoot: string, startedAt: string | null): string[] {
+  const base = path.join(projectRoot, ".understand-anything", "change");
+  const startedMs = startedAt ? Date.parse(startedAt) : Number.NaN;
+  try {
+    return fs
+      .readdirSync(base)
+      .filter((n) => /^CR-\d+/.test(n))
+      .filter((n) => {
+        if (Number.isNaN(startedMs)) return true; // 시작 시각 미상이면 배제하지 않음
+        try {
+          return fs.statSync(path.join(base, n)).mtimeMs >= startedMs - 1000;
+        } catch {
+          return false;
+        }
+      })
+      .sort();
+  } catch {
+    return []; // change/ 부재 = 기록 없음
+  }
+}
+
+function readRtmChangeHistory(projectRoot: string): RtmChangeHistoryEntry[] {
+  return readLedger<RtmChangeHistoryEntry>(rtmChangeHistoryDir(projectRoot));
+}
+
+/**
+ * job 종료 시 원장 append. exit 0 이어도 이 job 이 재bake 한 rtm.json 이 없으면(스킬
+ * 미실행 등) 실질 실패로 기록 — impact 의 정직한 노출 규약과 동일. 실패는 로그만.
+ */
+function recordRtmChangeHistory(
+  projectRoot: string,
+  job: ClaudeJobBase & { targetReq: string | null; kind: RtmChangeKind | null },
+): void {
+  try {
+    const jobId = job.jobId;
+    if (!jobId) return;
+    const startedMs = job.startedAt ? Date.parse(job.startedAt) : Number.NaN;
+    const bakedMs = artifactMtimeMs(rtmBakedFile(projectRoot));
+    const fresh = Number.isNaN(startedMs)
+      ? !Number.isNaN(bakedMs) // 시작 시각 미상이면 존재만 요구
+      : !Number.isNaN(bakedMs) && bakedMs >= startedMs - 1000;
+    const entry: RtmChangeHistoryEntry = {
+      jobId,
+      targetReq: job.targetReq ?? "",
+      kind: job.kind ?? "withdraw",
+      startedAt: job.startedAt,
+      finishedAt: job.finishedAt,
+      exitCode: job.exitCode,
+      status: job.status === "done" && fresh ? "done" : "failed",
+      crIds: rtmChangeCrIds(projectRoot, job.startedAt),
+    };
+    appendLedgerEntry(rtmChangeHistoryDir(projectRoot), entry, RTM_CHANGE_HISTORY_MAX);
+    removePendingMarker(rtmChangeHistoryDir(projectRoot), jobId);
+  } catch (err) {
+    console.error("[understand-anything] Failed to record rtm-change history:", err);
+  }
+}
+
+/** 서버 재시작으로 close 핸들러를 잃은 변경관리 job 복원 — rtm.json mtime 기준. */
+function reconcileRtmChangeHistory(projectRoot: string): void {
+  const ledger = readRtmChangeHistory(projectRoot);
+  reconcilePendingJobs(rtmChangeHistoryDir(projectRoot), {
+    isTracking: (jobId) => rtmChangeTracker.isCurrent(jobId) && rtmChangeTracker.running,
+    isRecorded: (jobId) => ledger.some((e) => e.jobId === jobId),
+    artifactMtimeMs: () => artifactMtimeMs(rtmBakedFile(projectRoot)),
+    record: (pending, fresh, artifactMs) => {
+      recordRtmChangeHistory(projectRoot, {
+        status: fresh ? "done" : "failed",
+        jobId: pending.jobId as string,
+        targetReq: typeof pending.targetReq === "string" ? pending.targetReq : null,
+        kind: pending.kind === "withdraw" ? "withdraw" : null,
+        startedAt: typeof pending.startedAt === "string" ? pending.startedAt : null,
+        finishedAt: fresh ? new Date(artifactMs).toISOString() : new Date().toISOString(),
+        exitCode: null,
+        tail: "",
+      });
+    },
+  });
+}
+
 /** 변경관리 단일 실행기 — claude -p "/understand-rtm --change ..." 1회. jobId 교체 시 중단. */
 function runRtmChange(
   jobId: string,
@@ -1774,6 +1833,8 @@ function runRtmChange(
     cwd: projectRoot,
     jobId,
     tracker: rtmChangeTracker,
+    onErrorSettled: () => recordRtmChangeHistory(projectRoot, rtmChangeTracker.snapshot()),
+    onCloseSettled: () => recordRtmChangeHistory(projectRoot, rtmChangeTracker.snapshot()),
   });
 }
 
@@ -1820,6 +1881,14 @@ function handleRtmChangePost(
         return;
       }
       const jobId = rtmChangeTracker.begin({ targetReq, kind });
+      // WAL: 스폰 전 pending 마커 — 서버 재시작 시 /rtm-change-status 의 reconcile 이
+      // rtm.json mtime 으로 결과를 복원한다(impact 와 동일 규약).
+      writePendingMarker(rtmChangeHistoryDir(projectRoot), {
+        jobId,
+        targetReq,
+        kind,
+        startedAt: rtmChangeTracker.job.startedAt,
+      });
       runRtmChange(jobId, projectRoot, targetReq, kind);
       sendJson(res, 202, { job: rtmChangeTracker.snapshot() });
     })
@@ -2164,7 +2233,12 @@ export default defineConfig({
             return;
           }
           if (pathname === "/rtm-change-status") {
-            sendJson(res, 200, { job: rtmChangeTracker.snapshot() });
+            const historyRoot = impactProjectRoot();
+            if (historyRoot) reconcileRtmChangeHistory(historyRoot); // 재시작으로 잃은 job 복원
+            sendJson(res, 200, {
+              job: rtmChangeTracker.snapshot(),
+              history: historyRoot ? readRtmChangeHistory(historyRoot) : [],
+            });
             return;
           }
           if (pathname === "/rtm-intake-confirm") {

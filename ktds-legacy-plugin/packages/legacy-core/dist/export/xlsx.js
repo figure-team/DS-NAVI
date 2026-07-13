@@ -79,6 +79,7 @@ function xmlEscape(s) {
     return (s
         // XML 1.0 불법 제어문자 제거(탭/개행/CR 은 합법이라 보존) — RTM 요구사항 텍스트 등
         // 임의 입력이 셀에 오므로, 하나라도 남으면 파일 전체가 열리지 않는다.
+        // eslint-disable-next-line no-control-regex
         .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -183,7 +184,7 @@ export function sanitizeSheetNames(names) {
     const used = new Set();
     return names.map((raw, i) => {
         let name = raw
-            .replace(/[\\/:*?\[\]]/g, ' ')
+            .replace(/[\\/:*?[\]]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim()
             .replace(/^'+|'+$/g, '')

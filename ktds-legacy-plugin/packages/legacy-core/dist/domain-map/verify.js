@@ -88,7 +88,12 @@ export function isTrivialSnippet(normalized) {
         return true;
     return !/[A-Za-z_$][\w$]{2,}|[가-힣]{2,}/.test(normalized);
 }
-async function verifyCitation(projectRoot, citation, cache) {
+/**
+ * 인용 1건을 실파일과 대조한다 — 경로 실존/탈출/라인 범위/스니펫 텍스트 일치.
+ * 'ok' 외 상태는 전부 검증 실패(강등 근거). screen-capture fill-merge 가 조각이
+ * 가져온 handler.evidence 진위 검증에 재사용한다(검증 규칙 이원화 금지).
+ */
+export async function verifyCitation(projectRoot, citation, cache) {
     const snippet = normalizeCitationText(citation.snippet);
     if (isTrivialSnippet(snippet))
         return 'trivial-snippet';

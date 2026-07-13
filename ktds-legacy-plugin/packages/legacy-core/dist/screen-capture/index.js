@@ -8,4 +8,5 @@ export { normalizeActionPath, candidatePaths, joinRoutes } from './routes-join.j
 export { normalizeUrl, relativePath, screenKey, slugify, screenIdFor, capturePathFor, shouldVisit, detectFragments, listJspFilesFromGraph, domainForJsp, reconcileJsps, } from './discover.js';
 export { computeContentSignature, mechanicalProjection, computeMechanicalHash, buildScreensFile, serializeScreens, validateScreensFile, } from './assemble.js';
 export { loadPlaywright } from './playwright-loader.js';
+export { SCREEN_FILL_PREP_DIR, SCREEN_FILL_FRAG_DIR, SCREEN_FILL_PREP_INDEX_FILENAME, DEFAULT_CHUNK_SCREENS, ScreenFillChunkSchema, ScreenFillChunkIndexSchema, ScreenFillFragmentSchema, screenFillPrepDir, screenFillFragDir, readScreenFillChunkIndex, prepScreenFill, auditScreenFillFragments, mergeScreenFillFragments, } from './fill-fanout.js';
 //# sourceMappingURL=index.js.map

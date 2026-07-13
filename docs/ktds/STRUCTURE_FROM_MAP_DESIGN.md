@@ -1,140 +1,113 @@
-# 구조 그래프의 /understand-map 이관 — STRUCTURE_FROM_MAP
+# 구조 메뉴의 /understand-map 이관 — STRUCTURE_FROM_MAP (v2)
 
-> 2026-07-14 설계(사용자 결정: /understand 은퇴 + 구조 메뉴는 map 데이터로 유지).
-> 판정: **가능** — 소비처 전수 조사(2026-07-14, 본문 §2)와 map 산출물 실측 근거.
-> 관련: PIPELINE_ORDER.md(파이프라인 순서), DOMAIN_HIERARCHY_DESIGN.md(상단도메인),
-> domain-card-grounding(codegraph 차용 미래 항목 — §5에서 착수).
+> 2026-07-14 v2 — 사용자 정정 반영: 구조 메뉴는 파일/클래스 그래프 재생성이 아니라
+> **도메인 계층 4뎁스 드릴다운 그래프**다. v1(파일·클래스 KG 재생성안)의 소비처 조사·
+> 최소 KG emit 은 §6(트랙 B)으로 흡수. 판정: **가능**(뎁스별 재원 실측 §3).
+> 관련: PIPELINE_ORDER.md, DOMAIN_HIERARCHY_DESIGN.md, WORK_MAP_DESIGN.md.
 
-## §1 배경 / 사용자 결정
+## §1 사용자 확정 (2026-07-14)
 
 | # | 결정 |
 |---|---|
-| D1 | **/understand(U-A KG 생성)는 더 이상 사용하지 않는다.** 모든 기능의 데이터 기반을 /understand-map 산출물로 통일 |
-| D2 | **구조 메뉴 그래프는 유지**하되, 데이터를 /understand-map 이 만든 도메인·구조 정보로 대체 |
-
-동기: 데이터 일관성 — 두 파이프라인(/understand LLM 분석 ↔ /understand-map 결정론)이 서로 다른
-시점·커밋의 산출물을 만들면 하류(화면·RTM·영향도)가 어긋난다. 뿌리를 map 하나로 통일한다.
-
-## §2 가능 판정 근거 (소비처 전수 조사 요약)
-
-**KG 로드 진입점은 단 하나** — `dashboard/src/app/Root.tsx:92`가 `knowledge-graph.json`을
-fetch→`validateGraph`→store. 구조 탭·검색·코드뷰어 allowlist·홈 통계가 전부 이 스토어를 본다.
-따라서 **같은 파일명으로 스키마 호환 그래프를 emit하면 대시보드 수정이 거의 0**이다.
-
-**구조 탭 최소 데이터 계약**(실측): `nodes[{id,type,name,complexity,tags,filePath}]` +
-`edges[{source,target,type}]` + `layers[{id,name,nodeIds}]` + project 메타(name·languages·
-frameworks·description·analyzedAt·gitCommitHash) + 유효 노드 ≥ 1. 불변식 = **node.id 정합성**
-(엣지·레이어·오버레이·allowlist·편집 API 전부 id 참조; validateGraph 가 참조 무결성 강제).
-
-**map 산출물 ↔ 계약 충족 매트릭스**:
-
-| 계약 요소 | map 재원 | 판정 |
-|---|---|---|
-| file 노드(+filePath) | census.json(전 파일·lang — JSP 포함) | ✅ 결정론 |
-| class 노드 | method-calls.json callerClass/File | ✅ |
-| table 노드 | db-schema.json(DDL file:line — impact 엔진 요구 필드 일치) | ✅ |
-| 의존 엣지 | edges.json 6종(import/field-type/ctor-param/injection/mapper-xml/extends) | ✅ kind 매핑 |
-| calls 엣지 | method-calls.json(파일 단위 집계) | ✅ |
-| contains 엣지 | file→class(method-calls), 도메인→file(slices ownership) | ✅ |
-| layers | step-layer(api/service/dao/db) + routes(진입점) | ✅ |
-| project 메타 | census lang 집계·routes framework·gitCommit(Date) | ✅ 결정론 |
-| summary/tags/complexity | LLM 없음 → §5 전략(결정론 폴백+fill 차용) | ⚠️ 품질 트레이드오프 |
-| tour | 빈 배열 허용(fatal 아님) | ✅ |
-
-**엔진 측 KG 소비처**(전부 계속 동작): screens JSP 전수 대조(listJspFilesFromGraph — census가
-JSP를 포함하므로 오히려 커버리지 확대), impact table catalog(type:table — db-schema 재원이
-동일해 정합 향상), impact overlay id 조인(file id 규약 유지로 통과), orchestrator
-loadProjectGraph(파일이 존재하므로 통과), bundle KG 힌트(옵션 — 자기 산출 재귀 소비로 무해).
-
-**결론: 가능.** 유일한 실질 트레이드오프는 노드 요약·태그의 LLM 품질(§5)과
-diff 오버레이(/understand 재실행 diff 전제 — §7)다.
-
-## §3 아키텍처 결정 — 동일 경로 KG 호환 emit
-
-**채택**: `/understand-map`에 **구조 emit(S6.5)** 신설 — map 산출물에서 **U-A KG 스키마 호환**
-`knowledge-graph.json`을 결정론 생성해 **같은 경로**에 쓴다.
-
-- 근거: 소비처(대시보드 Root·검색·allowlist·screens·impact)가 전부 무수정 동작. 스키마는
-  U-A core의 validateGraph(4-티어 관용)를 그대로 통과시키는 것이 목표 — core 무접촉.
-- `project.description`에 생성 주체를 명기(`"ktds /understand-map 결정론 구조 그래프"`)하고
-  `ktdsStructure: { generatedFromCommit }` 확장 필드(passthrough)로 낡음 대조를 지원한다.
-- **기각한 대안**: ① 새 파일(structure-graph.json)+대시보드 로더 폴백 — 소비처 전부에 분기
-  추가(수정면 최대), dual-load·allowlist·오버레이 id 공간 이원화 위험. ② 구조 탭이
-  domain-graph를 직접 렌더 — 구조(파일/클래스/테이블) ≠ 도메인(업무 흐름) 관점이라
-  기능 상실, WT-A 구조 탭 UX(펼침·랭크) 재작업 필요.
-
-## §4 데이터 매핑 명세
-
-노드 id 규약(불변식 — 기존 소비처와 일치): file=`file:<relPath>`, class=`class:<relPath>#<Class>`,
-table=`table:<name>`, 도메인 컨테이너는 KG에 넣지 않음(도메인 관점은 domain-graph 담당,
-dual-load 병합이 이미 존재).
-
-| KG 요소 | 생성 규칙 |
-|---|---|
-| file 노드 | census 전 파일. type: lang 기반(java/jsp/js→file, xml·properties·yml→config, sql→schema, md→document). name=basename |
-| class 노드 | method-calls 의 callerClass 별 1개(파일당 다중 클래스 허용). contains: file→class |
-| table 노드 | db-schema 테이블. filePath=DDL 파일, lineRange=DDL 위치. defines_schema: schema파일→table |
-| 의존 엣지 | import→imports, extends→depends_on, field-type/ctor-param/injection→depends_on, mapper-xml→depends_on(mapper→xml) + references(dao파일→table, MyBatis 테이블 참조 시) |
-| calls 엣지 | method-calls를 (callerFile→calleeFile) 페어로 집계, weight=호출수 정규화 |
-| layers | step-layer 산식으로 파일별 계층(api/service/dao/db/기타) → layers[{id,name,nodeIds}] |
-| complexity | 결정론 근사: 파일별 (메서드 수 + 의존 엣지 수) 버킷 → low/medium/high (산식은 상수로 고정, 테스트 스냅샷) |
-| tags | 결정론: 진입점(routes 보유)="entry", 테스트 경로="test", 배치="batch" 등 census/routes 유도 |
-| summary | §5 |
-
-함수/메서드 노드는 **1차 제외**(스케일: mmobile 메서드 수만 개 — 구조 탭 성능·가독 리스크).
-후속 옵션으로 진입점 핸들러 메서드만 승격을 남긴다(§9 미결).
-
-## §5 summary 전략 — 결정론 폴백 + fill 차용
-
-1. **P1(결정론 폴백)**: 구조 사실 한 줄 — 예: `"OrderService — service 계층 · 메서드 12 ·
-   의존 4 · 도메인 order"`. 검색(name/tags/summary)과 노드 패널이 즉시 유의미.
-2. **P2(fill 차용 — domain-card-grounding 의 "codegraph 차용" 항목 착수)**: domain fill 의
-   step 설명은 file:line 인용을 갖는다 — 해당 파일 노드의 summary 로 차용(인용 검증 이미
-   통과한 텍스트만, `[차용]` 태그). LLM 신규 호출 0회로 품질 보강.
-
-## §6 파이프라인 통합 (PIPELINE_ORDER.md 갱신 대상)
+| D1 | /understand(U-A KG 생성)는 ktds 워크플로에서 은퇴 — 데이터 기반을 /understand-map 으로 통일 |
+| D2 | 구조 메뉴 그래프는 유지하되, **도메인 계층 드릴다운 그래프**로 재정의한다: |
 
 ```
-[3] /understand-map map   → 기존 산출 + knowledge-graph.json(구조, 결정론)   ← S6.5
-[4] bundle→fill→emit      → domain-graph.json 갱신 + (P2) summary 차용 시 KG 재emit
+뎁스1  상단도메인들이 연결된 그래프           (그룹 노드 + 그룹 간 의존선)
+뎁스2  누른 상단도메인 + 그 서브도메인 그래프   (그룹 → contains → 서브도메인 + 서브 간 의존선)
+뎁스3  누른 서브도메인 + 업무흐름도            (도메인 → businessFlows[] 노드)
+뎁스4  누른 업무흐름도 + 기능흐름도 그래프      (업무 순서도 + flowRef 로 연결된 코드 flow/step)
 ```
 
-- [0] /understand 단계는 파이프라인에서 제거. KG 는 [3]의 산출물이 된다 —
-  screens([5])의 "권장: knowledge-graph.json"이 자동 충족되는 순서가 됨(일관성 개선).
-- 재실행 결정론: 동일 commit re-run 시 byte-diff=0(analyzedAt=commit 시각 규약 재사용).
+**현재와의 차이(정확히)**: 지금 구조 메뉴는 /understand 산출 KG(파일·클래스·함수)를 렌더하고,
+도메인 계층은 업무 지도 메뉴에 **카드/리스트**로만 존재한다. 위 4뎁스 "그래프" 뷰는 현재 없다
+— 이번 개편으로 신설한다. (참고: "관계선 금지"는 업무 지도(/domains) 카드 랜딩에 대한 확정
+이었다 — 구조 메뉴는 그래프 뷰가 정체성이므로 연결선이 본질이고 이번 요구사항 자체가 연결
+그래프다.)
 
-## §7 /understand 은퇴 계획
+## §2 판정 — 가능
 
-1. 스킬 라우팅: understand-init/onboard/SKILL 문안에서 "/understand 선행 권장" 제거,
-   "구조 그래프는 map 이 생성" 으로 교체. /understand 명령 자체는 U-A 플러그인에 존치
-   (강제 삭제 아님 — 외부 사용자용), ktds 워크플로 문서에서만 제외.
-2. **diff 오버레이**: /understand 재실행 diff 전제 → ktds 트랙에서는 비활성 유지
-   (overlay json 404 시 토글 비활성 — 이미 개별 degrade). 필요해지면 map 재실행 diff 로 재설계.
-3. 기존 프로젝트 마이그레이션: map 재실행([3])이 KG 를 덮어씀 — jpetstore(데모)·egov·mmobile
-   순으로 재emit. 데모 벤더링 데이터 교체는 별도 커밋(demo 트랙).
-4. meta.json·fingerprints.json 등 /understand 부속 산출물: 소비처가 개별 degrade 하므로 방치
-   가능하나, 홈 타일 데이터 소스 점검 후 필요 시 map 산출로 대체(§9 미결).
+구조 메뉴가 요구하는 4뎁스가 전부 **/understand-map 산출물에 이미 존재**한다(§3 실측).
+LLM 재분석·신규 스캔 없이 렌더 계층만 만들면 된다. /understand 은퇴로 영향받는 나머지
+KG 소비처(코드뷰어·검색·홈 통계·screens 전수 대조·임팩트 카탈로그)는 트랙 B(§6)로 분리해
+해결한다 — 구조 메뉴와 독립적으로 진행 가능.
 
-## §8 검증 계획
+## §3 뎁스별 데이터 재원 (mmobile 실측, 2026-07-14)
 
-1. **스키마 게이트**: 생성 KG 가 core validateGraph 를 노드/엣지 드롭 0으로 통과(단위 테스트).
-2. **결정론**: 동일 commit 2회 emit byte-diff=0 스냅샷.
-3. **소비처 회귀**: ① 구조 탭 시각 QA(jpetstore·mmobile — 펼침/레이어/검색/코드뷰어)
-   ② screens validate 재실행(unmatchedJsps 전수 대조 소스 전환 후 통과 유지)
-   ③ impact 토글(overlay id 조인) ④ 홈 통계 타일.
-4. **스케일**: mmobile(파일 수천)·egov(6101파일) 구조 탭 렌더 성능 — WT-A 점진 공개가
-   감당하는지 실측.
+| 뎁스 | 노드 | 연결선 | 재원(실측) |
+|---|---|---|---|
+| 1 | 상단도메인 13개 | 그룹 간 의존 | `domain-graph.json ktdsMap.groups` + `domain-map.json crossDomain.edges`(도메인 간 의존·evidence 동봉)를 그룹 멤버십으로 집계 |
+| 2 | 그룹 1 + 서브도메인 N | 그룹→서브(contains) + 서브 간 의존 | groups.memberKeys + crossDomain.edges 를 그룹 내부로 필터 |
+| 3 | 서브도메인 1 + 업무흐름도 M | 도메인→흐름도(contains) | domain 노드 `domainMeta.businessFlows[]`(mmobile 84도메인 전부 채움·title 보유) |
+| 4 | 업무 순서도 + 기능흐름도 | 순서도 내부 edges + `flowRef` | businessFlow `{nodes(kind:start/activity/decision…, citations), edges}` + 노드별 `flowRef: "flow:…"` → flow 노드 → `flow_step` steps(8,511) |
 
-## §9 구현 단계 / 미결 질문
+부가 실측: domain-graph 의 `calls` 엣지(8,467)는 전부 도메인 내부(교차 0) — **도메인/그룹 간
+연결선의 유일한 재원은 domain-map.json crossDomain** 이므로 대시보드가 이 파일을 추가로
+읽어야 한다(신설 메뉴들과 같은 `.spec/map` 서빙 경로 이미 존재).
+
+## §4 뷰 설계 (구조 메뉴 재정의)
+
+**URL 규약**(URL이 진실 — FRONT_REDESIGN 원칙):
+
+```
+/structure                          → 뎁스1 (그룹 그래프)
+/structure?group=g:common           → 뎁스2 (그룹+서브도메인)
+/structure?domain=domain:com        → 뎁스3 (서브도메인+업무흐름도)
+/structure?domain=…&bf=<fillIndex>  → 뎁스4 (업무흐름도+기능흐름도)
+```
+
+- 노드 클릭 = 한 뎁스 아래로(드릴다운), 브레드크럼 = 위로(업무 지도와 동일 관례).
+  기존 `?node=&level=&overlay=` 파라미터는 KG 뷰 은퇴와 함께 제거(딥링크는 /structure 로 폴백).
+- **뎁스1·2 (신규 그래프)**: 노드 = 그룹/도메인 카드형 노드(이름·서브도메인/기능 수·근거율),
+  엣지 = 의존 방향·강도(evidence 수를 weight 로). 레이아웃은 기존 ELK 라우팅 재사용
+  (dashboard-edge-routing 교훈: ELK 포인트 직접 렌더).
+- **뎁스3**: 좌측 서브도메인 정보 + 업무흐름도 노드들(제목 카드) — 클릭 시 뎁스4.
+- **뎁스4 (기존 뷰 재사용)**: 업무 순서도는 **BusinessFlowView 그대로**, `flowRef` 배지 클릭
+  시 해당 기능흐름도(FlowSpineView, flow_step 스파인)를 같은 화면에 병렬/토글 렌더.
+  신규 렌더러 0개 — 재사용 2 + 신규 그래프 1(뎁스1·2 공용).
+- **groups 없는 프로젝트**(jpetstore 등): 뎁스1을 건너뛰고 뎁스2(서브도메인 그래프)에서 시작.
+- 업무 지도 메뉴와의 관계: 업무 지도 = 카드/목록 중심 워크스페이스(현행 유지), 구조 =
+  같은 데이터의 **그래프 관점** 드릴다운. 상호 딥링크(구조 뎁스3 ↔ 업무 지도 워크스페이스).
+
+## §5 데이터 로드 변경 (대시보드)
+
+- domain-graph.json(이미 로드) + **domain-map.json 추가 로드**(crossDomain — `.spec/map`
+  서빙 경로 기존 활용, 404 시 연결선 없는 노드만 렌더로 degrade).
+- **KG(knowledge-graph.json) 하드 의존 해제**: Root 의 로드 실패를 fatal 배너에서
+  "KG 없음 = 구조 KG 뷰 없음" 소프트 처리로 완화(트랙 B와 연동).
+
+## §6 트랙 B — /understand 은퇴에 따른 잔여 KG 소비처 처리
+
+구조 메뉴가 KG를 더 이상 렌더하지 않아도, 소비처 전수 조사(2026-07-14)에서 확인된
+잔여 의존이 남는다. **최소 결정론 KG emit**(v1 설계의 축소판)으로 해결한다:
+
+- map 이 census(파일·JSP)+db-schema(테이블)만으로 **최소 KG**(file/config/schema/table 노드,
+  contains/defines_schema 엣지, summary=결정론 한 줄)를 같은 경로에 emit.
+- 이것으로 유지되는 것: 코드뷰어 allowlist(filePath), 검색(파일 검색), 홈 통계,
+  screens JSP 전수 대조(listJspFilesFromGraph), 임팩트 테이블 카탈로그(type:table),
+  orchestrator loadProjectGraph(하드 throw 회피).
+- 파일 간 의존·클래스·계층(layers)은 넣지 않는다 — 구조 뷰가 KG 렌더를 은퇴했으므로 불필요.
+  (v1의 edges/method-calls/step-layer 매핑은 폐기 — 문서 이력은 git 에.)
+
+## §7 검증 계획
+
+1. 뎁스별 시각 QA(mmobile: 그룹 13 → g:common 6서브 → com 업무흐름도 → flowRef 기능흐름도;
+   jpetstore: 그룹 없음 → 뎁스2 시작 폴백).
+2. crossDomain 404·빈 그룹·businessFlows 없는 도메인(결정론 폴백 flow만) degrade 확인.
+3. 트랙 B: 최소 KG 가 validateGraph 통과 + screens validate·임팩트 토글·코드뷰어 회귀.
+4. 스케일: mmobile 뎁스2 최대 11서브(콘텐츠), 뎁스4 flow_step 스파인 — 기존 뷰 재사용이라
+   신규 리스크는 뎁스1·2 그래프뿐(노드 ≤ 15 — 위험 낮음).
+
+## §8 구현 단계 / 미결
 
 | 단계 | 내용 |
 |---|---|
-| P1 | 엔진 structure-emit(census/edges/method-calls/db-schema/step-layer→KG) + 스냅샷·검증 테스트 |
-| P2 | map CLI 통합([3]에서 자동 emit) + SKILL/PIPELINE_ORDER 문안 갱신 |
-| P3 | summary fill 차용([4] 연동) |
-| P4 | 소비처 회귀 QA(구조탭·screens·impact·홈) + 스케일 실측 |
-| P5 | /understand 은퇴 문안·데모 데이터 재생성·마이그레이션 |
+| P1 | 대시보드: 뎁스1·2 그래프 뷰 + URL 규약 + domain-map.json 로드 |
+| P2 | 뎁스3·4: businessFlows 목록 + BusinessFlowView/FlowSpineView 연결(flowRef 점프) |
+| P3 | 트랙 B: 엔진 최소 KG emit + Root 하드 의존 완화 |
+| P4 | /understand 은퇴 문안(스킬·PIPELINE_ORDER 갱신) + 기존 KG 뷰 제거·딥링크 폴백 |
+| P5 | 시각 QA(mmobile·jpetstore) + 데모 데이터 재생성 |
 
-**미결**: ① 진입점 핸들러 메서드 노드 승격 여부 ② complexity 산식 상수(버킷 경계)
-③ 홈 타일 중 meta.json 의존분의 대체 여부 ④ 데모(jpetstore) KG 교체 시점(구조 탭 화면
-검수 — WT-A 잔여 "화면 검수 미실시"와 묶어서 할지).
+**미결**: ① 뎁스1·2 엣지에 evidence 팝오버(어떤 파일 의존인지) 노출 여부 ② 기존 구조 탭
+KG 뷰(WT-A 펼침·랭크 작업)를 완전 제거할지 "코드 뷰" 토글로 잔존시킬지(트랙 B 최소 KG 로는
+파일 트리 수준만 가능) ③ 그룹 없는 프로젝트의 뎁스1 스킵 vs "전체" 가상 그룹 1개 표시.

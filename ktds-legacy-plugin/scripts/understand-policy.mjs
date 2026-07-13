@@ -44,11 +44,109 @@ const {
   renderMarkdown,
   evidenceRate,
   assembleDomainPolicies,
+  prepPolicyFill,
+  auditPolicyFillFragments,
+  mergePolicyFillFragments,
+  DEFAULT_MAX_FILL_ROWS,
 } = engine
 
 const PLUGIN_DOC_DIR = join(here, '..', 'templates', 'doc')
 const PROJECT_DOC_DIR = join(projectRoot, '.understand-anything', 'doc')
 const OUTPUT_DIR = join(projectRoot, '.understand-anything', 'doc-output')
+
+// ── 채움 팬아웃 서브커맨드(대규모 보강) ─────────────────────────────────────
+// 기존 생성 모드(1단계 결정론 앵커 표)와 별개다. 규모가 커진 LLM 보강을 청크 팬아웃으로
+// 전환한다: fill-prep(문서별 청크·행별 pre-cite 동봉) → 청크당 에이전트 → fill-audit
+// (커버리지·[확정]⇒인용≥1) → fill-merge(채움 섹션 덧붙임, 앵커 표 불변, 인용 진위 검증).
+// 모드: 기본 category(policy-signals.json), `--mode domain`(도메인 분기). fill-audit 는
+// 순수 JSON 1줄만 출력한다(Workflow 감사 에이전트가 verbatim 소비).
+const fillCommand = process.argv[3]
+if (fillCommand === 'fill-prep' || fillCommand === 'fill-audit' || fillCommand === 'fill-merge') {
+  const flags = process.argv.slice(4)
+  const flagValue = (name) => {
+    const i = flags.indexOf(name)
+    return i >= 0 && i + 1 < flags.length ? flags[i + 1] : null
+  }
+  const mode = flagValue('--mode') === 'domain' ? 'domain' : 'category'
+
+  if (fillCommand === 'fill-prep') {
+    const raw = flagValue('--max-rows')
+    const maxRows = raw ? Number.parseInt(raw, 10) : DEFAULT_MAX_FILL_ROWS
+    if (!Number.isInteger(maxRows) || maxRows < 1) {
+      console.error(`--max-rows 값이 잘못됐습니다: ${raw} (1 이상 정수)`)
+      process.exit(2)
+    }
+    let index
+    try {
+      ;({ index } = await prepPolicyFill(projectRoot, { mode, maxRows }))
+    } catch (err) {
+      console.error(`fill-prep 실패: ${err.message}`)
+      process.exit(2)
+    }
+    const t = index.totals
+    console.log(`정책서 채움 팬아웃 청크 준비 완료(${mode}) — ${projectRoot}`)
+    console.log(`  문서 ${t.docs}종 · 행 ${t.rows}건 → 청크 ${t.chunks}개 (청크당 행 상한 ${index.maxRows})`)
+    if (t.preCiteMissing > 0) {
+      console.log(
+        `  ⚠️ 앵커 pre-cite 미확보 ${t.preCiteMissing}건 — 해당 행은 에이전트가 슬라이스에서 직접 인용해야 합니다(실패 시 [추정] 강등).`,
+      )
+    }
+    if (index.skippedDocs.length > 0) {
+      console.log(`  ⚠️ 대상 md 없어 제외 ${index.skippedDocs.length}종(1단계 생성 선행 필요): ${index.skippedDocs.map((d) => d.docId).join(', ')}`)
+    }
+    console.log('  산출물: .spec/map/policy-fill-prep/<chunkId>.json + index.json')
+    console.log('')
+    console.log('다음 단계(팬아웃): Workflow 도구로 scripts/policy-fill-fanout.workflow.js 실행')
+    console.log('  (청크 id 목록은 policy-fill-prep/index.json 의 chunks[].chunkId)')
+    console.log('  에이전트가 policy-fill-frag/<chunkId>.json 을 쓰면: fill-audit(감사) → fill-merge(병합)')
+    process.exit(0)
+  }
+
+  if (fillCommand === 'fill-audit') {
+    const chunkFlag = flagValue('--chunk')
+    const only = chunkFlag ? chunkFlag.split(',').map((s) => s.trim()).filter(Boolean) : undefined
+    let audit
+    try {
+      audit = await auditPolicyFillFragments(projectRoot, only)
+    } catch (err) {
+      console.error(`fill-audit 실패: ${err.message}`)
+      process.exit(2)
+    }
+    console.log(JSON.stringify(audit))
+    process.exit(0)
+  }
+
+  // fill-merge
+  let result
+  try {
+    result = await mergePolicyFillFragments(projectRoot)
+  } catch (err) {
+    console.error(`fill-merge 실패: ${err.message}`)
+    process.exit(2)
+  }
+  console.log(`정책서 채움 조각 병합 완료 — ${projectRoot}`)
+  console.log(`  채움 반영 행 ${result.rowsFilled}건 → 문서 ${result.docPaths.length}종`)
+  if (result.missingRows.length > 0) {
+    console.log(`  ⚠️ 미반영 행 ${result.missingRows.length}건(완결 조각 없음 — 부분 병합).`)
+  }
+  if (result.droppedItems > 0) {
+    console.log(`  ⚠️ 청크 선언 밖 rowKey ${result.droppedItems}건 버림(유령 키 — 조용한 수용 금지).`)
+  }
+  if (result.citationsRemoved > 0 || result.tagsDemoted > 0) {
+    console.log(
+      `  ⚠️ 인용 진위 검증: 실파일 불일치 인용 ${result.citationsRemoved}건 제거` +
+        `, 근거 0 → [추정] 강등 ${result.tagsDemoted}건(fail-closed).`,
+    )
+  }
+  if (result.missingDocs.length > 0) {
+    console.log(`  ⚠️ 대상 md 없어 건너뜀: ${result.missingDocs.join(', ')}`)
+  }
+  if (result.staleSectionsCleared > 0) {
+    console.log(`  🧹 커버리지 소실로 낡은 채움 섹션 제거 ${result.staleSectionsCleared}종.`)
+  }
+  console.log('앵커 표(본체)는 불변 — 채움은 <!-- policy-fill --> 섹션에만 덧붙는다(재실행 멱등).')
+  process.exit(0)
+}
 
 // ── 도메인 정책서 모드(PD3): `understand-policy <root> domain` ──────────────
 // confirm/emit 이후 산출물(candidates + domain-graph)에서 도메인별 정책서를 만든다.

@@ -90,6 +90,11 @@ KG 소비처(코드뷰어·검색·홈 통계·screens 전수 대조·임팩트 
 - 이것으로 유지되는 것: 코드뷰어 allowlist(filePath), 검색(파일 검색), 홈 통계,
   screens JSP 전수 대조(listJspFilesFromGraph), 임팩트 테이블 카탈로그(type:table),
   orchestrator loadProjectGraph(하드 throw 회피).
+- **보안 표면 사인오프(적대 리뷰 C2, 2026-07-14)**: allowlist 가 "LLM 이 노드화한 부분집합"
+  에서 "census 전 파일"로 넓어진다. 하드 시크릿 캐리어(.env/.pem/.key/.jks/.p12/keystore/
+  id_rsa 류)는 **노드화 제외**로 원천 차단한다. `.properties`/`.yml` 은 레거시 분석의 중심
+  파일이라 유지(기존 LLM KG config 노드 관례와 패리티) — 접근은 원타임 토큰 게이트 뒤이며,
+  평문 크리덴셜이 든 프로젝트를 다룰 때는 토큰 유출(스크린샷·로그 공유)에 유의한다.
 - 파일 간 의존·클래스·계층(layers)은 넣지 않는다 — 구조 뷰가 KG 렌더를 은퇴했으므로 불필요.
   (v1의 edges/method-calls/step-layer 매핑은 폐기 — 문서 이력은 git 에.)
 

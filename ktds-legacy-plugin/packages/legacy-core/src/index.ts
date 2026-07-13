@@ -130,6 +130,29 @@ export type {
 export { runFillPipeline } from './domain-map/fill-pipeline.js'
 export type { FillPipelineResult } from './domain-map/fill-pipeline.js'
 export {
+  KNOWLEDGE_GRAPH_FILENAME,
+  ANALYZED_AT_SENTINEL,
+  SECRET_CARRIER_EXTENSIONS,
+  SECRET_CARRIER_NAME_PATTERNS,
+  TEMPLATE_SUFFIXES,
+  SOURCE_DOC_EXTENSIONS,
+  isSecretCarrierPath,
+  buildMinimalKg,
+  loadMinimalKgInputs,
+  writeMinimalKg,
+  emitMinimalKg,
+  MinimalKgInputMissingError,
+} from './domain-map/minimal-kg.js'
+export type {
+  MinimalKgNodeType,
+  MinimalKgNode,
+  MinimalKgEdge,
+  MinimalKg,
+  MinimalKgBuildInputs,
+  MinimalKgWriteAction,
+  MinimalKgWriteResult,
+} from './domain-map/minimal-kg.js'
+export {
   prepFillChunks,
   auditFillFragments,
   mergeFillFragments,

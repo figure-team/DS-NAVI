@@ -59,13 +59,17 @@ KG 소비처(코드뷰어·검색·홈 통계·screens 전수 대조·임팩트 
 - 노드 클릭 = 한 뎁스 아래로(드릴다운), 브레드크럼 = 위로(업무 지도와 동일 관례).
   기존 `?node=&level=&overlay=` 파라미터는 KG 뷰 은퇴와 함께 제거(딥링크는 /structure 로 폴백).
 - **뎁스1·2 (신규 그래프)**: 노드 = 그룹/도메인 카드형 노드(이름·서브도메인/기능 수·근거율),
-  엣지 = 의존 방향·강도(evidence 수를 weight 로). 레이아웃은 기존 ELK 라우팅 재사용
-  (dashboard-edge-routing 교훈: ELK 포인트 직접 렌더).
+  엣지 = 의존 방향·강도(evidence 수를 weight 로) + **클릭 시 evidence 팝오버**(어떤 파일이
+  어떤 파일에 의존하는지 crossDomain.edges.evidence 의 kind·source·target 나열 — 확정 ①).
+  레이아웃은 기존 ELK 라우팅 재사용(dashboard-edge-routing 교훈: ELK 포인트 직접 렌더).
 - **뎁스3**: 좌측 서브도메인 정보 + 업무흐름도 노드들(제목 카드) — 클릭 시 뎁스4.
 - **뎁스4 (기존 뷰 재사용)**: 업무 순서도는 **BusinessFlowView 그대로**, `flowRef` 배지 클릭
   시 해당 기능흐름도(FlowSpineView, flow_step 스파인)를 같은 화면에 병렬/토글 렌더.
   신규 렌더러 0개 — 재사용 2 + 신규 그래프 1(뎁스1·2 공용).
-- **groups 없는 프로젝트**(jpetstore 등): 뎁스1을 건너뛰고 뎁스2(서브도메인 그래프)에서 시작.
+- **groups 없는 프로젝트**(jpetstore 등): 뎁스1을 건너뛰고 뎁스2(서브도메인 그래프)에서 시작
+  (확정 ③ — 가상 "전체" 그룹은 만들지 않음).
+- **기존 파일/클래스 KG 뷰는 완전 제거**(확정 ② — "코드 뷰" 토글 잔존 없음). WT-A 의 펼침·
+  랭크 감기 코드는 KG 뷰와 함께 은퇴, 구 딥링크(`?node=&level=`)는 /structure 폴백.
 - 업무 지도 메뉴와의 관계: 업무 지도 = 카드/목록 중심 워크스페이스(현행 유지), 구조 =
   같은 데이터의 **그래프 관점** 드릴다운. 상호 딥링크(구조 뎁스3 ↔ 업무 지도 워크스페이스).
 
@@ -89,6 +93,19 @@ KG 소비처(코드뷰어·검색·홈 통계·screens 전수 대조·임팩트 
 - 파일 간 의존·클래스·계층(layers)은 넣지 않는다 — 구조 뷰가 KG 렌더를 은퇴했으므로 불필요.
   (v1의 edges/method-calls/step-layer 매핑은 폐기 — 문서 이력은 git 에.)
 
+**명령어별 호환 매트릭스 — "새 프로젝트에서 /understand-map 만 돌리면?"** (트랙 B 완료 기준):
+
+| 명령 | KG 의존 | 트랙 B 이후 |
+|---|---|---|
+| /understand-map | 자기 산출(bundle KG 힌트는 옵션) | ✅ 정상 |
+| /understand-screens | JSP 전수 대조(listJspFilesFromGraph) | ✅ 정상 — 최소 KG 가 census 전 파일 포함이라 대조 커버리지 오히려 확대. 단 Stage A 는 원래 별도 선행(understanding.config.json + 앱 기동) 필요 |
+| /understand-policy | 없음 | ✅ 정상 |
+| /understand-rtm | 없음(domain-graph·routes·method-calls) | ✅ 정상 |
+| /understand-impact | table 카탈로그(type:table)·overlay 인덱스·KG 유사도 | ✅ 동작 — table·file 노드는 최소 KG 가 제공. ⚠️ KG 유사도 가중(similar_to/related — /understand 산출 엣지)만 비활성 → 선례 검색은 도메인/토큰 매칭으로 동작(기존 폴백 경로) |
+| /understand-docs·report·onboard·init | 없음(문안만 갱신) | ✅ 정상 |
+| /understand-dashboard | Root 하드 의존·검색·홈 통계·코드뷰어 allowlist | ✅ 동작 — allowlist 는 census 기반이라 오히려 확대. ⚠️ 검색·홈 통계는 파일/테이블 수준으로 얇아짐(클래스·함수 노드 없음 — LLM KG 고유 가치의 의도된 포기) |
+| 구조탭 임팩트 오버레이 토글 | KG 뷰 위 하이라이트 | ⚠️ KG 뷰 제거와 함께 소멸 → **P2 에서 4뎁스 그래프의 도메인/흐름 하이라이트로 재이식**(impact.json 이 도메인×흐름 귀속을 이미 보유). 변경·영향 메뉴 자체는 무영향 |
+
 ## §7 검증 계획
 
 1. 뎁스별 시각 QA(mmobile: 그룹 13 → g:common 6서브 → com 업무흐름도 → flowRef 기능흐름도;
@@ -103,11 +120,10 @@ KG 소비처(코드뷰어·검색·홈 통계·screens 전수 대조·임팩트 
 | 단계 | 내용 |
 |---|---|
 | P1 | 대시보드: 뎁스1·2 그래프 뷰 + URL 규약 + domain-map.json 로드 |
-| P2 | 뎁스3·4: businessFlows 목록 + BusinessFlowView/FlowSpineView 연결(flowRef 점프) |
+| P2 | 뎁스3·4: businessFlows 목록 + BusinessFlowView/FlowSpineView 연결(flowRef 점프) + 임팩트 오버레이의 도메인/흐름 하이라이트 재이식 |
 | P3 | 트랙 B: 엔진 최소 KG emit + Root 하드 의존 완화 |
 | P4 | /understand 은퇴 문안(스킬·PIPELINE_ORDER 갱신) + 기존 KG 뷰 제거·딥링크 폴백 |
 | P5 | 시각 QA(mmobile·jpetstore) + 데모 데이터 재생성 |
 
-**미결**: ① 뎁스1·2 엣지에 evidence 팝오버(어떤 파일 의존인지) 노출 여부 ② 기존 구조 탭
-KG 뷰(WT-A 펼침·랭크 작업)를 완전 제거할지 "코드 뷰" 토글로 잔존시킬지(트랙 B 최소 KG 로는
-파일 트리 수준만 가능) ③ 그룹 없는 프로젝트의 뎁스1 스킵 vs "전체" 가상 그룹 1개 표시.
+**확정(2026-07-14 사용자)**: ① evidence 팝오버 포함 ② 기존 KG 뷰 완전 제거 ③ 그룹 없는
+프로젝트는 뎁스1 건너뛰기. 잔여 미결 없음 — 구현 착수 대기.

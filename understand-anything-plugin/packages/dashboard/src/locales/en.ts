@@ -137,6 +137,8 @@ export const en = {
     extScreenCount: "Captured screens",
     extScreensLink: "Screen specs →",
     supportDomains: "Technical / supporting",
+    unclassified: "Unclassified",
+    subDomainCount: "{count} sub-domains",
   },
   grounding: {
     rate: "Grounding",
@@ -195,6 +197,10 @@ export const en = {
       "The business flow was rejected by validation — showing a sequential approximation. Reason: {reason}",
     businessEmpty:
       "No business-flow data yet — the flowchart appears once the domain fill (businessFlow) is provided.",
+  },
+  groupWorkspace: {
+    navTitle: "Sub-domains",
+    searchPlaceholder: "Search sub-domains",
   },
   flowView: {
     selectedFlow: "Selected feature",

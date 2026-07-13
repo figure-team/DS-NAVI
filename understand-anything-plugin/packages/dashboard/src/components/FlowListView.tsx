@@ -30,6 +30,7 @@ import {
   type FlowMethod,
   type FlowVerdictKey,
 } from "../utils/domainData";
+import { findOwningGroup, resolveGroups } from "../utils/domainGroups";
 
 /**
  * 화면 B — 도메인 워크스페이스 (WORK_MAP §4).
@@ -130,11 +131,21 @@ function FilterChip({
 export default function FlowListView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
+  const domainGroupsRaw = useDashboardStore((s) => s.domainGroups);
   const navigate = useNavigate(); // P3: 지도 복귀는 URL로
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const { t } = useI18n();
+
+  // DOMAIN_HIERARCHY §7: 그룹 소속 도메인이면 브레드크럼에 그룹명을 끼우고 "업무 지도"
+  // 뒤로가기도 그룹 워크스페이스로 향한다(하위 워크스페이스 재사용 — 이 컴포넌트 자체는
+  // 그룹 인지가 없어도 되도록, 소속 그룹만 조회). groups 없는 프로젝트는 항상 null.
+  const owningGroup = useMemo(() => {
+    if (!domainGraph || !activeDomainId || domainGroupsRaw.length === 0) return null;
+    const resolved = resolveGroups(domainGraph, domainGroupsRaw, t.domainMap.unclassified);
+    return findOwningGroup(resolved, activeDomainId) ?? null;
+  }, [domainGraph, activeDomainId, domainGroupsRaw, t]);
 
   // 좌측 기능 목록 접기/펼치기 — 접으면 인라인 스파인이 폭 전체를 차지(화면3 전체화면 대체).
   // 기본 펼침: 도메인 재진입 시 FlowListView 가 remount 되며 자동으로 펼친 상태로 복귀.
@@ -377,6 +388,19 @@ export default function FlowListView() {
               >
                 {t.domainMap.breadcrumbRoot}
               </button>{" "}
+              {owningGroup && (
+                <>
+                  ›{" "}
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/domains/${owningGroup.key}`)}
+                    className="text-text-muted hover:text-accent transition-colors cursor-pointer font-bold"
+                    style={{ letterSpacing: "0.06em" }}
+                  >
+                    {owningGroup.name}
+                  </button>{" "}
+                </>
+              )}
               › {domainNode?.name ?? ""}
             </p>
             <h1 className="text-text-primary font-bold whitespace-nowrap" style={{ fontSize: 20, lineHeight: 1.25 }}>

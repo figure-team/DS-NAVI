@@ -137,6 +137,8 @@ export const ko = {
     extScreenCount: "캡처 화면",
     extScreensLink: "화면설계서 →",
     supportDomains: "기술·부속",
+    unclassified: "미분류",
+    subDomainCount: "서브도메인 {count}개",
   },
   grounding: {
     rate: "근거율",
@@ -195,6 +197,10 @@ export const ko = {
       "업무 흐름도가 검증 실패로 기각되었습니다 — 아래는 순차 근사입니다. 사유: {reason}",
     businessEmpty:
       "업무 흐름 데이터가 아직 없습니다 — 도메인 채움(businessFlow) 후 순서도가 제공됩니다.",
+  },
+  groupWorkspace: {
+    navTitle: "서브도메인",
+    searchPlaceholder: "서브도메인 검색",
   },
   flowView: {
     selectedFlow: "선택된 기능",

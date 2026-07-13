@@ -137,6 +137,8 @@ export const ru = {
     extScreenCount: "Снимки экранов",
     extScreensLink: "Спецификации экранов →",
     supportDomains: "Технические / вспомогательные",
+    unclassified: "Без категории",
+    subDomainCount: "Поддоменов: {count}",
   },
   grounding: {
     rate: "Обоснованность",
@@ -195,6 +197,10 @@ export const ru = {
       "Бизнес-процесс отклонён проверкой — показано последовательное приближение. Причина: {reason}",
     businessEmpty:
       "Данных бизнес-процесса пока нет — блок-схема появится после заполнения домена (businessFlow).",
+  },
+  groupWorkspace: {
+    navTitle: "Поддомены",
+    searchPlaceholder: "Поиск поддоменов",
   },
   flowView: {
     selectedFlow: "Выбранная функция",

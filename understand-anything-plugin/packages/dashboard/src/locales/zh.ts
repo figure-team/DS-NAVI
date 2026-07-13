@@ -137,6 +137,8 @@ export const zh = {
     extScreenCount: "截图界面",
     extScreensLink: "界面设计书 →",
     supportDomains: "技术／附属",
+    unclassified: "未分类",
+    subDomainCount: "{count} 个子领域",
   },
   grounding: {
     rate: "依据率",
@@ -193,6 +195,10 @@ export const zh = {
     bfMore: "…另有 {count} 项（详见功能标签页）",
     businessRejectedBanner: "业务流程图未通过校验而被拒绝 — 以下为顺序近似。原因：{reason}",
     businessEmpty: "暂无业务流程数据 — 域填充(businessFlow)后将显示流程图。",
+  },
+  groupWorkspace: {
+    navTitle: "子领域",
+    searchPlaceholder: "搜索子领域",
   },
   flowView: {
     selectedFlow: "选中的功能",

@@ -3,12 +3,21 @@
 import type { KnowledgeGraph } from "@understand-anything/core/types";
 import type { StateCreator } from "zustand";
 import type { DashboardStore } from "../index";
+import type { DomainGroup } from "../../utils/domainGroups";
 
 /** Maximum number of entries in the sidebar navigation history. */
 const MAX_HISTORY = 50;
 
 export interface DomainSlice {
   domainGraph: KnowledgeGraph | null;
+  /**
+   * 도메인 계층(DOMAIN_HIERARCHY §7) — `domain-graph.json` raw ktdsMap.groups 를
+   * 파싱한 결과. core 의 validateGraph 는 이 필드를 모르므로(passthrough 아님),
+   * Root.tsx 가 검증 *전* raw fetch 데이터에서 별도로 채운다. 빈 배열 = 그룹 없는
+   * 프로젝트(D2 폴백) — 소비측(DomainMapView/DomainsPage)의 유일한 분기점.
+   */
+  domainGroups: DomainGroup[];
+  setDomainGroups: (groups: DomainGroup[]) => void;
   activeDomainId: string | null;
   /** US-002: active flow sub-level within domain viewMode; null = flow list. */
   activeFlowId: string | null;
@@ -44,6 +53,8 @@ export interface DomainSlice {
 
 export const createDomainSlice: StateCreator<DashboardStore, [], [], DomainSlice> = (set, get) => ({
   domainGraph: null,
+  domainGroups: [],
+  setDomainGroups: (groups) => set({ domainGroups: groups }),
   activeDomainId: null,
   activeFlowId: null,
   selectedFlowId: null,

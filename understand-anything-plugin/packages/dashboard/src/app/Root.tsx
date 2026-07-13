@@ -8,6 +8,7 @@ import { DEMO_MODE, dataUrl, resolveInitialToken, storeToken } from "../shared/a
 import { ThemeProvider } from "../themes/index.ts";
 import type { ThemeConfig } from "../themes/index.ts";
 import { I18nProvider } from "../contexts/I18nContext.tsx";
+import { parseDomainGroups } from "../utils/domainGroups";
 
 /** Outlet context — 각 페이지가 useOutletContext로 받는다. */
 export interface ShellContext {
@@ -45,6 +46,7 @@ export default function Root() {
 function RootData({ accessToken }: { accessToken: string }) {
   const setGraph = useDashboardStore((s) => s.setGraph);
   const setDomainGraph = useDashboardStore((s) => s.setDomainGraph);
+  const setDomainGroups = useDashboardStore((s) => s.setDomainGroups);
   const setOverlayData = useDashboardStore((s) => s.setOverlayData);
   const setNodeOverrides = useDashboardStore((s) => s.setNodeOverrides); // P3
   const setApproverHandle = useDashboardStore((s) => s.setApproverHandle); // P3
@@ -202,6 +204,10 @@ function RootData({ accessToken }: { accessToken: string }) {
       })
       .then((data: unknown) => {
         if (!data) return;
+        // DOMAIN_HIERARCHY §7: ktdsMap.groups는 core 스키마가 모르는 additive 필드라
+        // validateGraph를 거치면 유실된다 — 검증 *전* raw 데이터에서 먼저 뽑아둔다.
+        const raw = data as { ktdsMap?: unknown };
+        setDomainGroups(parseDomainGroups(raw.ktdsMap));
         const result = validateGraph(data);
         if (result.success && result.data) {
           setDomainGraph(result.data);
@@ -210,7 +216,7 @@ function RootData({ accessToken }: { accessToken: string }) {
         }
       })
       .catch(() => {});
-  }, [setDomainGraph]);
+  }, [setDomainGraph, setDomainGroups]);
 
   return (
     <I18nProvider language={outputLanguage ?? "ko"}>

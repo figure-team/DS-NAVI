@@ -6,6 +6,7 @@ import { useI18n } from "../contexts/I18nContext";
 import { dataUrl } from "../shared/api/client";
 import { buildDomainCards } from "../utils/domainData";
 import { parseBusinessFlows, type BizProcess } from "../utils/businessFlow";
+import { buildGroupCards, resolveGroups } from "../utils/domainGroups";
 import DomainCardDetail from "./DomainCardDetail";
 import GroundedBar from "./GroundedBar";
 
@@ -114,6 +115,7 @@ function sectionTitle(key: ExtSectionKey, t: ReturnType<typeof useI18n>["t"]): s
 
 export default function DomainMapView() {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
+  const domainGroupsRaw = useDashboardStore((s) => s.domainGroups);
   const accessToken = useDashboardStore((s) => s.accessToken);
   const navigate = useNavigate();
   const { t } = useI18n();
@@ -187,6 +189,23 @@ export default function DomainMapView() {
     [processesByDomain],
   );
 
+  // DOMAIN_HIERARCHY §7 D2: 상단도메인(그룹) 랜딩 카드 — groups 부재/빈 배열이면
+  // resolveGroups가 항상 []을 반환하므로 hasGroups=false, 아래 렌더는 완전히 기존
+  // 평면 경로 그대로다(회귀 0).
+  const resolvedGroups = useMemo(
+    () => (domainGraph ? resolveGroups(domainGraph, domainGroupsRaw, t.domainMap.unclassified) : []),
+    [domainGraph, domainGroupsRaw, t],
+  );
+  const workCountByDomain = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const [id, list] of processesByDomain) m.set(id, list.length);
+    return m;
+  }, [processesByDomain]);
+  const groupCards = useMemo(
+    () => (data ? buildGroupCards(resolvedGroups, data.cards, workCountByDomain) : []),
+    [resolvedGroups, data, workCountByDomain],
+  );
+
   if (!domainGraph || !data) {
     return (
       <div className="h-full flex items-center justify-center text-text-muted text-sm px-6 text-center">
@@ -197,10 +216,12 @@ export default function DomainMapView() {
 
   const { stats, cards } = data;
   const detailCard = cards.find((c) => c.id === detailId) ?? null;
+  const hasGroups = resolvedGroups.length > 0;
 
   // 업무/부속 분리 — 업무(프로세스) 0개 도메인(web.xml 등 기술 도메인)은 하단
   // 스트립으로 강등한다(PM 관점 위계). 업무가 전혀 없는 프로젝트(fill 전)는 분리
-  // 자체가 무의미하므로 전 카드를 본 그리드에 유지.
+  // 자체가 무의미하므로 전 카드를 본 그리드에 유지. 그룹 랜딩(hasGroups)에서는
+  // 카드 자체가 상단도메인이라 이 분리를 적용하지 않는다(§7 D2 — 카드=상단도메인만).
   const hasAnyWork = totalWorks > 0;
   const businessCards = hasAnyWork
     ? cards.filter((c) => (processesByDomain.get(c.id)?.length ?? 0) > 0)
@@ -265,7 +286,75 @@ export default function DomainMapView() {
               alignContent: "start",
             }}
           >
-            {businessCards.map((card, i) => {
+            {hasGroups
+              ? /* DOMAIN_HIERARCHY §7 D2 — 카드 = 상단도메인(그룹). 서브도메인 집계
+                   (개수·기능 합계·근거율 합산) + 대표 서브도메인 칩(딥링크). */
+                groupCards.map((g, i) => (
+                  <div
+                    key={g.key}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => navigate(`/domains/${g.key}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        navigate(`/domains/${g.key}`);
+                      }
+                    }}
+                    className="domain-card rounded-[10px] bg-panel border border-border-subtle hover:border-accent cursor-pointer transition-colors"
+                    style={{
+                      padding: "13px 14px",
+                      animation: `fadeSlideIn 0.35s ease-out ${i * 0.05}s both`,
+                    }}
+                  >
+                    <div className="flex items-center gap-2 min-w-0" style={{ fontSize: 14, fontWeight: 650, marginBottom: 4 }}>
+                      <span aria-hidden className="select-none shrink-0" style={{ fontSize: 14, lineHeight: 1 }}>
+                        {g.icon}
+                      </span>
+                      <span className="text-text-primary truncate" title={g.name}>
+                        {g.name}
+                      </span>
+                      <span
+                        className="ml-auto text-text-muted whitespace-nowrap shrink-0"
+                        style={{ fontSize: 11.5, fontWeight: 500 }}
+                      >
+                        {t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} ·{" "}
+                        {t.domainMap.flowCount.replace("{count}", String(g.flowCount))}
+                      </span>
+                    </div>
+                    {g.filled && g.groundedPct !== null && (
+                      <div style={{ margin: "7px 0 9px" }}>
+                        <GroundedBar pct={g.groundedPct} grounded={g.groundedCount} review={g.reviewCount} />
+                      </div>
+                    )}
+                    <div className="flex flex-wrap" style={{ gap: 6, marginTop: g.filled ? 0 : 8 }}>
+                      {g.memberChips.map((chip) => (
+                        <button
+                          key={chip.id}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/domains/${g.key}/${chip.id}`);
+                          }}
+                          className="rounded-full bg-elevated text-text-secondary hover:text-accent transition-colors cursor-pointer truncate"
+                          style={{ padding: "3px 9px", fontSize: 12, maxWidth: "100%" }}
+                          title={chip.name}
+                        >
+                          {chip.name}
+                        </button>
+                      ))}
+                      {g.moreCount > 0 && (
+                        <span
+                          className="rounded-full bg-elevated text-text-muted"
+                          style={{ padding: "3px 9px", fontSize: 12 }}
+                        >
+                          {t.domainMap.moreFlows.replace("{count}", String(g.moreCount))}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              : businessCards.map((card, i) => {
               const processes = processesByDomain.get(card.id) ?? [];
               return (
                 /* 프로토 .dom — 카드 전체 클릭 = 워크스페이스 진입, hover 시 accent 테두리 */
@@ -340,7 +429,7 @@ export default function DomainMapView() {
           </div>
           {/* 기술·부속 도메인 — 업무 0개(배포 설정 등)는 본 그리드와 위계를 분리해
               하단 스트립으로. 근거율 바는 본 카드와 동일하게 유지(표기 일관성). */}
-          {supportCards.length > 0 && (
+          {!hasGroups && supportCards.length > 0 && (
             <div
               className="shrink-0 border-t border-border-subtle flex items-center flex-wrap"
               style={{ padding: "10px 18px", gap: 10 }}

@@ -28,6 +28,9 @@ export const router = createBrowserRouter(
         { path: "structure", element: <StructurePage /> },
         { path: "domains", element: <DomainsPage /> },
         { path: "domains/:domainId", element: <DomainsPage /> },
+        // DOMAIN_HIERARCHY §7: 상단도메인(그룹) 워크스페이스 — 좌측 내비의 선택된
+        // 서브도메인이 URL 진실(groupKey는 "g:" 접두 그룹 key, domainId는 그 안의 서브도메인).
+        { path: "domains/:groupKey/:domainId", element: <DomainsPage /> },
         { path: "deliverables/:docId?", element: <DeliverablesPage /> },
         { path: "rtm", element: <RtmPage /> },
         { path: "screens", element: <ScreenspecPage /> },

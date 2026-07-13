@@ -137,6 +137,8 @@ export const zhTW = {
     extScreenCount: "截圖畫面",
     extScreensLink: "畫面設計書 →",
     supportDomains: "技術／附屬",
+    unclassified: "未分類",
+    subDomainCount: "{count} 個子領域",
   },
   grounding: {
     rate: "依據率",
@@ -193,6 +195,10 @@ export const zhTW = {
     bfMore: "…另有 {count} 項（詳見功能分頁）",
     businessRejectedBanner: "業務流程圖未通過驗證而被拒絕 — 以下為順序近似。原因：{reason}",
     businessEmpty: "尚無業務流程資料 — 網域填充(businessFlow)後將顯示流程圖。",
+  },
+  groupWorkspace: {
+    navTitle: "子領域",
+    searchPlaceholder: "搜尋子領域",
   },
   flowView: {
     selectedFlow: "選中的功能",

@@ -137,6 +137,8 @@ export const ja = {
     extScreenCount: "キャプチャ画面",
     extScreensLink: "画面設計書 →",
     supportDomains: "技術・付属",
+    unclassified: "未分類",
+    subDomainCount: "サブドメイン {count}件",
   },
   grounding: {
     rate: "根拠率",
@@ -195,6 +197,10 @@ export const ja = {
       "業務フロー図は検証失敗により却下されました — 以下は順次近似です。理由: {reason}",
     businessEmpty:
       "業務フローのデータがまだありません — ドメインの入力(businessFlow)後にフローチャートが表示されます。",
+  },
+  groupWorkspace: {
+    navTitle: "サブドメイン",
+    searchPlaceholder: "サブドメインを検索",
   },
   flowView: {
     selectedFlow: "選択中の機能",

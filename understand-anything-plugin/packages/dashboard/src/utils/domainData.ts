@@ -497,7 +497,7 @@ const LAYER_SEGMENTS = new Set([
  * `domainId`(예: "domain:cop")에서 도메인 키("cop")를 파싱한다. 접두사가 없으면
  * 원본을 그대로 키로 취급(방어적 폴백).
  */
-function domainKeyFromId(domainId: string): string {
+export function domainKeyFromId(domainId: string): string {
   return domainId.startsWith("domain:") ? domainId.slice("domain:".length) : domainId;
 }
 

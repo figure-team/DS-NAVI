@@ -220,7 +220,7 @@ export const en = {
     rendererTabsLabel: "Renderer switch",
     rendererCard: "Card",
     rendererGraph: "Graph (U-A)",
-    clickToExplore: "Click to explore →",
+    chipSubDomains: "Subdomains",
   },
   flowView: {
     selectedFlow: "Selected feature",

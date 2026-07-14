@@ -12,7 +12,7 @@ import {
   type StructureRenderer,
 } from "../../utils/structureGraph";
 import StructureNetworkGraph, { type StructureGraphNode } from "./StructureNetworkGraph";
-import StructureContainerGraphUA from "./StructureContainerGraphUA";
+import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
 import EdgeEvidencePopover from "./EdgeEvidencePopover";
 
 /**
@@ -72,6 +72,28 @@ export default function StructureDepth2View({
 
   const nameById = useMemo(() => new Map(cards.map((c) => [c.id, c.name])), [cards]);
 
+  // 그래프형(U-A) — 원본 Domain 탭 카드(DomainClusterNode) 그대로: 요약=도메인 설명,
+  // 칩=엔티티, 하단=기능 수(+근거율). 임팩트는 테두리 글로우(개수 칩은 뎁스1 전용).
+  const uaNodes = useMemo<DomainStyleGraphNode[]>(
+    () =>
+      cards.map((c) => ({
+        id: c.id,
+        name: c.name,
+        icon: c.icon,
+        summary: c.desc,
+        // 채움(fill) 산출물의 엔티티는 "이름 — 설명" 프로즈일 수 있다 — 칩에는 이름만.
+        chips: c.entities.map((e) => e.split(" — ")[0]),
+        chipsLabel: t.nodeInfo.entities,
+        footer: `${t.domainMap.flowCount.replace("{count}", String(c.flowCount))}${
+          c.filled && c.groundedPct !== null ? ` · ${t.grounding.rate} ${c.groundedPct}%` : ""
+        }`,
+        impact: markFor(c.id, changedDomainIds, affectedDomainIds),
+        diffChangedCount: 0,
+        diffAffectedCount: 0,
+      })),
+    [cards, changedDomainIds, affectedDomainIds, t],
+  );
+
   const onOpenNode = (id: string) => {
     const suffix = renderer === "ua" ? "&renderer=ua" : "";
     navigate(`/structure?domain=${encodeURIComponent(id)}${suffix}`);
@@ -81,10 +103,8 @@ export default function StructureDepth2View({
   return (
     <div className="h-full w-full relative">
       {renderer === "ua" ? (
-        <StructureContainerGraphUA
-          groupKey={group?.key ?? null}
-          groupName={group?.name ?? null}
-          nodes={nodes}
+        <StructureDomainGraphUA
+          nodes={uaNodes}
           edges={edges}
           emptyLabel={emptyLabel}
           onOpenNode={onOpenNode}

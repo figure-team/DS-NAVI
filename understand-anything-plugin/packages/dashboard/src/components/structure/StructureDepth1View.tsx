@@ -12,7 +12,7 @@ import {
   type StructureRenderer,
 } from "../../utils/structureGraph";
 import StructureNetworkGraph, { type StructureGraphNode } from "./StructureNetworkGraph";
-import StructureNetworkGraphUA from "./StructureNetworkGraphUA";
+import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
 import EdgeEvidencePopover from "./EdgeEvidencePopover";
 
 /** 뎁스1 — 상단도메인(그룹) 그래프(설계 §3·§4). */
@@ -60,23 +60,33 @@ export default function StructureDepth1View({
         reviewCount: g.reviewCount,
         impact: groupImpactMark(groups.find((r) => r.key === g.key)!, changedDomainIds, affectedDomainIds),
       })),
-    [groupCards, groups, changedDomainIds, affectedDomainIds],
+    [groupCards, groups, changedDomainIds, affectedDomainIds, t],
   );
 
   const nameByKey = useMemo(() => new Map(groupCards.map((g) => [g.key, g.name])), [groupCards]);
 
-  // 그래프형(U-A) LayerClusterNode diff 칩 — 그룹당 changed/affected "개수"(단일
-  // ImpactMark 보다 정보량이 많다, 옛 컴포넌트의 칩 표시와 동일 형식).
-  const changedCounts = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const g of groups) m.set(g.key, g.memberDomainIds.filter((id) => changedDomainIds.has(id)).length);
-    return m;
-  }, [groups, changedDomainIds]);
-  const affectedCounts = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const g of groups) m.set(g.key, g.memberDomainIds.filter((id) => affectedDomainIds.has(id)).length);
-    return m;
-  }, [groups, affectedDomainIds]);
+  // 그래프형(U-A) — 원본 Domain 탭 카드(DomainClusterNode)에 맞춘 데이터: 요약=집계
+  // 한 줄, 칩=소속 서브도메인(원본의 Entities 자리), diff 칩=그룹당 changed/affected
+  // "개수"(단일 ImpactMark 보다 정보량이 많다 — DomainClusterNode ktds-fork 와 동일 형식).
+  const uaNodes = useMemo<DomainStyleGraphNode[]>(
+    () =>
+      groupCards.map((g) => {
+        const group = groups.find((r) => r.key === g.key)!;
+        return {
+          id: g.key,
+          name: g.name,
+          icon: g.icon,
+          summary: `${t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} · ${t.domainMap.flowCount.replace("{count}", String(g.flowCount))}`,
+          chips: g.allMemberChips.map((c) => c.name),
+          chipsLabel: t.structure.chipSubDomains,
+          footer: g.filled && g.groundedPct !== null ? `${t.grounding.rate} ${g.groundedPct}%` : "",
+          impact: groupImpactMark(group, changedDomainIds, affectedDomainIds),
+          diffChangedCount: group.memberDomainIds.filter((id) => changedDomainIds.has(id)).length,
+          diffAffectedCount: group.memberDomainIds.filter((id) => affectedDomainIds.has(id)).length,
+        };
+      }),
+    [groupCards, groups, changedDomainIds, affectedDomainIds, t],
+  );
 
   const onOpenNode = (id: string) => {
     const suffix = renderer === "ua" ? "&renderer=ua" : "";
@@ -87,11 +97,9 @@ export default function StructureDepth1View({
   return (
     <div className="h-full w-full relative">
       {renderer === "ua" ? (
-        <StructureNetworkGraphUA
-          nodes={nodes}
+        <StructureDomainGraphUA
+          nodes={uaNodes}
           edges={groupEdges}
-          changedCounts={changedCounts}
-          affectedCounts={affectedCounts}
           emptyLabel={emptyLabel}
           onOpenNode={onOpenNode}
           onEdgeClick={(edge, point) => setPopover({ edge, point })}

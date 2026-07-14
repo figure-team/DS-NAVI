@@ -3,8 +3,9 @@ import { useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
 import { Badge } from "../proto/Proto";
+import { fkComponent, fkEdgePairs } from "./erd-component";
 import RowSample, { ROW_SAMPLE_MAX } from "./RowSample";
-import { baseName, isPk, len } from "./types";
+import { baseName, isPk, len, originBadge } from "./types";
 import type { DbColumn, DbSchema, DbTable } from "./types";
 
 /**
@@ -110,6 +111,11 @@ function TableTree({
                 )}
               </span>
               <span className="st" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {originBadge(t) && (
+                  <Badge tone="warn" title="코드 역추론 근사 — DDL(.sql) 확보 시 자동 대체">
+                    역추론
+                  </Badge>
+                )}
                 {t.isCodeTable && (
                   <Badge tone="info" title={t.codeTableReason ?? undefined}>
                     코드성
@@ -144,6 +150,7 @@ export function TableDetail({
   knownTables,
   onSelectTable,
   fixedColumns = true,
+  erdComponent,
 }: {
   table: DbTable;
   tier: string;
@@ -152,6 +159,8 @@ export function TableDetail({
   knownTables: Map<string, string>;
   onSelectTable: (name: string) => void;
   fixedColumns?: boolean;
+  /** [ERD 연계 →] 버튼 — count=자기 제외 연계 테이블 수(0이면 비활성). 미전달 시 미표시. */
+  erdComponent?: { count: number; onOpen: () => void };
 }) {
   const rows = table.rowCount || table.rows.length;
   const hl = (c: DbColumn): React.CSSProperties | undefined =>
@@ -205,6 +214,11 @@ export function TableDetail({
             {table.name}
           </b>
           <Badge tone="ok">Tier {tier.toUpperCase()}</Badge>
+          {originBadge(table) && (
+            <Badge tone="warn" title="매퍼 SQL/엔티티 매핑에서 역추론한 구조 근사 — 타입·제약 없음, DDL(.sql) 확보 시 자동 대체">
+              {originBadge(table)}
+            </Badge>
+          )}
           {table.isCodeTable && (
             <Badge tone="info" title={table.codeTableReason ?? undefined}>
               코드성{table.codeTableReason ? ` · ${table.codeTableReason}` : ""}
@@ -217,6 +231,22 @@ export function TableDetail({
           )}
           <div className="flex-1" />
           {table.relPath && <EvLink relPath={table.relPath} line={table.line} />}
+          {erdComponent && (
+            <button
+              type="button"
+              disabled={erdComponent.count === 0}
+              onClick={erdComponent.onOpen}
+              title={
+                erdComponent.count === 0
+                  ? "FK 연계 없음 — 이 테이블과 연결된(선언·추정 FK) 테이블이 없습니다"
+                  : `이 테이블과 FK로 이어진 테이블 ${erdComponent.count}개를 ERD로 보기`
+              }
+              className="rounded-lg border border-border-medium bg-panel text-text-secondary hover:bg-elevated cursor-pointer disabled:opacity-40 disabled:cursor-default transition-colors font-semibold whitespace-nowrap"
+              style={{ padding: "5px 11px", fontSize: 11.5 }}
+            >
+              ERD 연계 {erdComponent.count > 0 ? erdComponent.count : 0} →
+            </button>
+          )}
         </div>
 
         <div className="overflow-x-auto" style={{ marginTop: 10 }}>
@@ -324,6 +354,14 @@ export default function TablesTab({ schema }: { schema: DbSchema }) {
     [schema.tables],
   );
 
+  // [ERD 연계 →] — 선택 테이블의 FK 연결 컴포넌트 크기(자기 제외). ERD 탭 '전체' 보기와
+  // 같은 엣지 규칙(선언+추정)이라 버튼 수치와 이동 후 화면이 일치한다.
+  const edgePairs = useMemo(() => fkEdgePairs(schema.tables), [schema.tables]);
+  const erdCount = useMemo(
+    () => (selected ? fkComponent(selected.name, edgePairs).tables.size - 1 : 0),
+    [selected, edgePairs],
+  );
+
   if (schema.tables.length === 0) return <EmptyCard>테이블이 없습니다.</EmptyCard>;
 
   return (
@@ -369,6 +407,16 @@ export default function TablesTab({ schema }: { schema: DbSchema }) {
               return prev;
             })
           }
+          erdComponent={{
+            count: erdCount,
+            onOpen: () =>
+              setSearchParams((prev) => {
+                prev.set("tab", "erd");
+                prev.set("table", selected.name);
+                prev.set("scope", "component");
+                return prev;
+              }),
+          }}
         />
       ) : (
         <EmptyCard>좌측에서 테이블을 선택하세요.</EmptyCard>

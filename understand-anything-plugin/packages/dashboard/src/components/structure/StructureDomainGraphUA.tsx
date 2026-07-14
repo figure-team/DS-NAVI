@@ -70,13 +70,14 @@ export interface DomainStyleGraphNode {
 
 interface CardData {
   n: DomainStyleGraphNode;
-  onOpen: (id: string) => void;
+  onSelect: (id: string) => void;
+  selected: boolean;
   [key: string]: unknown;
 }
 
 /** DomainClusterNode 시각 언어 무수정 클론 — 데이터 주입만 구조 탭용 prop 으로. */
 const DomainStyleCard = memo(function DomainStyleCard({ data }: NodeProps) {
-  const { n, onOpen } = data as CardData;
+  const { n, onSelect, selected } = data as CardData;
   const { lblChanged, lblAffected } = useDiffLabels();
 
   // ktds-fork (ADR-003): 변경 포함=적, 영향만=호박 (테두리+글로우 — DomainClusterNode 와 동일)
@@ -88,16 +89,22 @@ const DomainStyleCard = memo(function DomainStyleCard({ data }: NodeProps) {
         : undefined;
 
   return (
+    // 1클릭=선택(우측 정보 패널, onSelect), 더블클릭=드릴다운(ReactFlow onNodeDoubleClick).
+    // 선택 카드는 accent 실선 테두리로 도킹 패널과 시각적으로 묶는다. 마우스 클릭은
+    // ReactFlow 노드 핸들러가 잡으므로 카드 자체 onClick 은 두지 않는다(더블 발화 방지).
+    // 키보드(Enter/Space)만 접근성용으로 선택을 발화한다.
     <div
       role="button"
       tabIndex={0}
-      className="rounded-xl border-2 px-5 py-4 min-w-[280px] max-w-[360px] cursor-pointer transition-all border-accent/40 bg-surface hover:border-accent/70"
+      aria-pressed={selected}
+      className={`rounded-xl border-2 px-5 py-4 min-w-[280px] max-w-[360px] cursor-pointer transition-all bg-surface ${
+        selected ? "border-accent shadow-[0_0_0_2px_var(--color-accent)]" : "border-accent/40 hover:border-accent/70"
+      }`}
       style={impactStyle}
-      onClick={() => onOpen(n.id)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          onOpen(n.id);
+          onSelect(n.id);
         }
       }}
     >
@@ -150,12 +157,16 @@ function StructureDomainGraphUAInner({
   nodes,
   edges,
   onOpenNode,
+  onSelectNode,
   onEdgeClick,
+  selectedNodeId,
 }: {
   nodes: DomainStyleGraphNode[];
   edges: AggregatedEdge[];
   onOpenNode: (id: string) => void;
+  onSelectNode: (id: string) => void;
   onEdgeClick: (edge: MergedStructureEdge, point: { x: number; y: number }) => void;
+  selectedNodeId: string | null;
 }) {
   const { t } = useI18n();
   const rf = useReactFlow();
@@ -237,7 +248,7 @@ function StructureDomainGraphUAInner({
           id: n.id,
           type: "domain-cluster",
           position: layout?.positions.get(n.id) ?? { x: 0, y: 0 },
-          data: { n, onOpen: onOpenNode } satisfies CardData,
+          data: { n, onSelect: onSelectNode, selected: selectedNodeId === n.id } satisfies CardData,
           draggable: false,
           connectable: false,
           selectable: true,
@@ -251,7 +262,7 @@ function StructureDomainGraphUAInner({
             : { visibility: "hidden" as const },
         }),
       ),
-    [nodes, layout, onOpenNode, hoverNeighbors],
+    [nodes, layout, onSelectNode, selectedNodeId, hoverNeighbors],
   );
 
   // 병합 무방향 선 — accent 점선 + ELK 직각 라우팅(ElkEdge, 화살표 없음), 라벨은
@@ -297,10 +308,15 @@ function StructureDomainGraphUAInner({
           const src = merged.find((e) => e.id === edge.id);
           if (src) onEdgeClick(src, { x: evt.clientX, y: evt.clientY });
         }}
+        onNodeClick={(_, node) => onSelectNode(node.id)}
+        onNodeDoubleClick={(_, node) => onOpenNode(node.id)}
         onNodeMouseEnter={(_, node) => setHoveredId(node.id)}
         onNodeMouseLeave={() => setHoveredId(null)}
         minZoom={0.1}
         maxZoom={2}
+        // 노드 더블클릭 = 드릴다운(onNodeDoubleClick) — ReactFlow 기본 더블클릭 줌인과
+        // 충돌하면 줌만 먹으므로 캔버스 더블클릭 줌을 끈다(컨트롤·휠 줌은 유지).
+        zoomOnDoubleClick={false}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}
@@ -322,13 +338,17 @@ export default function StructureDomainGraphUA({
   nodes,
   edges,
   onOpenNode,
+  onSelectNode,
   onEdgeClick,
+  selectedNodeId = null,
   emptyLabel,
 }: {
   nodes: DomainStyleGraphNode[];
   edges: AggregatedEdge[];
   onOpenNode: (id: string) => void;
+  onSelectNode: (id: string) => void;
   onEdgeClick: (edge: MergedStructureEdge, point: { x: number; y: number }) => void;
+  selectedNodeId?: string | null;
   emptyLabel: string;
 }) {
   if (nodes.length === 0) {
@@ -341,7 +361,14 @@ export default function StructureDomainGraphUA({
   return (
     <div className="h-full w-full relative">
       <ReactFlowProvider>
-        <StructureDomainGraphUAInner nodes={nodes} edges={edges} onOpenNode={onOpenNode} onEdgeClick={onEdgeClick} />
+        <StructureDomainGraphUAInner
+          nodes={nodes}
+          edges={edges}
+          onOpenNode={onOpenNode}
+          onSelectNode={onSelectNode}
+          onEdgeClick={onEdgeClick}
+          selectedNodeId={selectedNodeId}
+        />
       </ReactFlowProvider>
     </div>
   );

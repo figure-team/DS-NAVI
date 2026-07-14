@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
-import { buildDomainFlows, domainIcon, findDomain, parseDomainClaims } from "../../utils/domainData";
+import { buildDomainFlows, findDomain } from "../../utils/domainData";
 import { parseBusinessFlows } from "../../utils/businessFlow";
 import {
   buildFlowFileMap,
@@ -12,7 +12,7 @@ import {
 } from "../../utils/structureGraph";
 import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
 import EdgeEvidencePanel from "./EdgeEvidencePanel";
-import GroundedBar from "../GroundedBar";
+import NodeInfoPanel from "./NodeInfoPanel";
 
 /**
  * 뎁스3 — 선택 서브도메인 + 업무 프로세스(businessFlows[]) 그래프(설계 §4, 사용자
@@ -28,12 +28,12 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
   const navigate = useNavigate();
   const { t } = useI18n();
   const [selectedEdge, setSelectedEdge] = useState<MergedStructureEdge | null>(null);
+  const [selectedNode, setSelectedNode] = useState<DomainStyleGraphNode | null>(null);
 
   const domainNode = useMemo(
     () => (domainGraph ? findDomain(domainGraph, domainId) : undefined),
     [domainGraph, domainId],
   );
-  const grounding = useMemo(() => (domainNode ? parseDomainClaims(domainNode) : null), [domainNode]);
   const processes = useMemo(() => parseBusinessFlows(domainNode), [domainNode]);
   const hasAnyFlow = useMemo(
     () => (domainGraph ? buildDomainFlows(domainGraph, domainId).length > 0 : false),
@@ -97,26 +97,6 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
-      <header className="shrink-0 border-b border-border-subtle bg-panel" style={{ padding: "16px 24px" }}>
-        <div className="flex items-center gap-2.5 min-w-0">
-          <span aria-hidden style={{ fontSize: 18, lineHeight: 1 }}>
-            {domainIcon(domainNode.name, domainNode.id)}
-          </span>
-          <h1 className="text-text-primary font-bold truncate" style={{ fontSize: 20 }}>
-            {domainNode.name}
-          </h1>
-          {grounding?.filled && grounding.groundedPct !== null && (
-            <div className="ml-auto shrink-0" style={{ width: 170 }}>
-              <GroundedBar pct={grounding.groundedPct} grounded={grounding.groundedCount} review={grounding.reviewCount} />
-            </div>
-          )}
-        </div>
-        {domainNode.summary && (
-          <p className="text-text-muted" style={{ fontSize: 13, marginTop: 6 }}>
-            {domainNode.summary}
-          </p>
-        )}
-      </header>
       {processes.length > 0 ? (
         <div className="flex-1 min-h-0 relative">
           <StructureDomainGraphUA
@@ -124,7 +104,15 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
             edges={uaEdges}
             emptyLabel={t.flowList.businessEmpty}
             onOpenNode={(id) => openBf(Number(id.slice(3)))}
-            onEdgeClick={(edge) => setSelectedEdge(edge)}
+            onSelectNode={(id) => {
+              setSelectedEdge(null);
+              setSelectedNode(uaNodes.find((n) => n.id === id) ?? null);
+            }}
+            onEdgeClick={(edge) => {
+              setSelectedNode(null);
+              setSelectedEdge(edge);
+            }}
+            selectedNodeId={selectedNode?.id ?? null}
           />
           {selectedEdge && (
             <EdgeEvidencePanel
@@ -133,6 +121,7 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
               onClose={() => setSelectedEdge(null)}
             />
           )}
+          {selectedNode && <NodeInfoPanel node={selectedNode} onClose={() => setSelectedNode(null)} />}
         </div>
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto" style={{ padding: 20 }}>

@@ -218,6 +218,7 @@ export const ja = {
     backToProcessList: "業務プロセス一覧へ",
     relatedFlowSpine: "関連する機能フロー",
     chipSubDomains: "サブドメイン",
+    nodeInfoTitle: "ノード情報",
   },
   flowView: {
     selectedFlow: "選択中の機能",

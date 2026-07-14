@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 
@@ -12,6 +12,7 @@ export default function MobileTabBar() {
   const graph = useDashboardStore((s) => s.graph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const { t } = useI18n();
+  const { pathname } = useLocation();
 
   const items: Array<{ to: string; label: string; icon: ReactNode }> = [
     { to: "/", label: "홈", icon: iconHome },
@@ -28,21 +29,25 @@ export default function MobileTabBar() {
       className="shrink-0 flex bg-surface border-t border-border-subtle"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      {items.map((item) => (
+      {items.map((item) => {
+        // 메뉴 병합: 구조 탭(/structure)은 업무 지도 소속 — 하단 탭바 활성도 승계.
+        const forceActive = item.to === "/domains" && pathname.startsWith("/structure");
+        return (
         <NavLink
           key={item.to}
           to={item.to}
           end={item.to === "/"}
           className={({ isActive }) =>
             `flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors ${
-              isActive ? "text-accent" : "text-text-muted"
+              isActive || forceActive ? "text-accent" : "text-text-muted"
             }`
           }
         >
           <span className="w-[19px] h-[19px]">{item.icon}</span>
           {item.label}
         </NavLink>
-      ))}
+        );
+      })}
     </nav>
   );
 }

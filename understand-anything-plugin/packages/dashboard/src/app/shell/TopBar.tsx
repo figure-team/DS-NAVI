@@ -20,7 +20,8 @@ export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
   const mode = useViewMode();
 
   const sectionLabel =
-    mode === "structural" ? t.drawer.structural
+    // 메뉴 병합(2026-07-14): 구조(/structure)는 업무 지도 안 탭 — 섹션명도 승계.
+    mode === "structural" ? t.drawer.domain
     : mode === "domain" ? t.drawer.domain
     : mode === "docs" ? "산출물"
     : mode === "rtm" ? "추적표"

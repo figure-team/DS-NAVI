@@ -65,21 +65,46 @@ export default function StructureDepth1View({
 
   const nameByKey = useMemo(() => new Map(groupCards.map((g) => [g.key, g.name])), [groupCards]);
 
+  // 그래프형(U-A) LayerClusterNode diff 칩 — 그룹당 changed/affected "개수"(단일
+  // ImpactMark 보다 정보량이 많다, 옛 컴포넌트의 칩 표시와 동일 형식).
+  const changedCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const g of groups) m.set(g.key, g.memberDomainIds.filter((id) => changedDomainIds.has(id)).length);
+    return m;
+  }, [groups, changedDomainIds]);
+  const affectedCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const g of groups) m.set(g.key, g.memberDomainIds.filter((id) => affectedDomainIds.has(id)).length);
+    return m;
+  }, [groups, affectedDomainIds]);
+
   const onOpenNode = (id: string) => {
     const suffix = renderer === "ua" ? "&renderer=ua" : "";
     navigate(`/structure?group=${encodeURIComponent(id)}${suffix}`);
   };
-  const GraphComponent = renderer === "ua" ? StructureNetworkGraphUA : StructureNetworkGraph;
+  const emptyLabel = crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges;
 
   return (
     <div className="h-full w-full relative">
-      <GraphComponent
-        nodes={nodes}
-        edges={groupEdges}
-        emptyLabel={crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges}
-        onOpenNode={onOpenNode}
-        onEdgeClick={(edge, point) => setPopover({ edge, point })}
-      />
+      {renderer === "ua" ? (
+        <StructureNetworkGraphUA
+          nodes={nodes}
+          edges={groupEdges}
+          changedCounts={changedCounts}
+          affectedCounts={affectedCounts}
+          emptyLabel={emptyLabel}
+          onOpenNode={onOpenNode}
+          onEdgeClick={(edge, point) => setPopover({ edge, point })}
+        />
+      ) : (
+        <StructureNetworkGraph
+          nodes={nodes}
+          edges={groupEdges}
+          emptyLabel={emptyLabel}
+          onOpenNode={onOpenNode}
+          onEdgeClick={(edge, point) => setPopover({ edge, point })}
+        />
+      )}
       {popover && (
         <EdgeEvidencePopover
           edge={popover.edge}

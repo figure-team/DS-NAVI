@@ -220,6 +220,7 @@ export const ru = {
     rendererTabsLabel: "Переключатель рендерера",
     rendererCard: "Карточки",
     rendererGraph: "Граф (U-A)",
+    clickToExplore: "Нажмите, чтобы изучить →",
   },
   flowView: {
     selectedFlow: "Выбранная функция",

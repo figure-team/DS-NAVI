@@ -220,6 +220,7 @@ export const en = {
     rendererTabsLabel: "Renderer switch",
     rendererCard: "Card",
     rendererGraph: "Graph (U-A)",
+    clickToExplore: "Click to explore →",
   },
   flowView: {
     selectedFlow: "Selected feature",

@@ -12,7 +12,7 @@ import {
   type StructureRenderer,
 } from "../../utils/structureGraph";
 import StructureNetworkGraph, { type StructureGraphNode } from "./StructureNetworkGraph";
-import StructureNetworkGraphUA from "./StructureNetworkGraphUA";
+import StructureContainerGraphUA from "./StructureContainerGraphUA";
 import EdgeEvidencePopover from "./EdgeEvidencePopover";
 
 /**
@@ -76,17 +76,29 @@ export default function StructureDepth2View({
     const suffix = renderer === "ua" ? "&renderer=ua" : "";
     navigate(`/structure?domain=${encodeURIComponent(id)}${suffix}`);
   };
-  const GraphComponent = renderer === "ua" ? StructureNetworkGraphUA : StructureNetworkGraph;
+  const emptyLabel = crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges;
 
   return (
     <div className="h-full w-full relative">
-      <GraphComponent
-        nodes={nodes}
-        edges={edges}
-        emptyLabel={crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges}
-        onOpenNode={onOpenNode}
-        onEdgeClick={(edge, point) => setPopover({ edge, point })}
-      />
+      {renderer === "ua" ? (
+        <StructureContainerGraphUA
+          groupKey={group?.key ?? null}
+          groupName={group?.name ?? null}
+          nodes={nodes}
+          edges={edges}
+          emptyLabel={emptyLabel}
+          onOpenNode={onOpenNode}
+          onEdgeClick={(edge, point) => setPopover({ edge, point })}
+        />
+      ) : (
+        <StructureNetworkGraph
+          nodes={nodes}
+          edges={edges}
+          emptyLabel={emptyLabel}
+          onOpenNode={onOpenNode}
+          onEdgeClick={(edge, point) => setPopover({ edge, point })}
+        />
+      )}
       {popover && (
         <EdgeEvidencePopover
           edge={popover.edge}

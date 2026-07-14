@@ -3,117 +3,57 @@ import {
   Background,
   BackgroundVariant,
   Controls,
-  Handle,
   MarkerType,
   MiniMap,
-  Position,
   ReactFlow,
   ReactFlowProvider,
   type Edge,
   type Node,
-  type NodeProps,
 } from "@xyflow/react";
-import { applyElkLayout } from "../../utils/elk-layout";
+import { applyElkLayout, elkEdgePointMap, type ElkPoint } from "../../utils/elk-layout";
+import { ELK_OVERVIEW_LAYOUT_OPTIONS, LAYER_CLUSTER_HEIGHT, LAYER_CLUSTER_WIDTH, mergeElkPositions, nodesToElkInput } from "../../utils/layout";
+import ElkEdge from "../ElkEdge";
+import LayerClusterNode, { type LayerClusterData } from "../LayerClusterNode";
+import { useI18n } from "../../contexts/I18nContext";
 import type { AggregatedEdge } from "../../utils/structureGraph";
 import type { StructureGraphNode } from "./StructureNetworkGraph";
 
+const NODE_TYPES = { "layer-cluster": LayerClusterNode };
+const EDGE_TYPES = { elk: ElkEdge };
+
 /**
- * 뎁스1·2 그래프 렌더러 — "그래프형(U-A)" 탭(사용자가 카드형과 비교 후 택1 예정).
- * 은퇴한 구 U-A KG 뷰(CustomNode/GraphView, c4e4856e 이전)의 시각 언어를 같은
- * 데이터(StructureNetworkGraph 와 동일한 nodes/edges)에 재적용한다:
- * 컴팩트 노드(아이콘+이름+최소 배지) + 곡선 관계선(화살표) + MiniMap/Controls +
- * 자유 드래그. 레이아웃 알고리즘(ELK)만 카드형과 공유하고, 노드·엣지 렌더링은
- * 전혀 다른 컴포넌트 — 카드형(StructureNetworkGraph)은 이 파일이 손대지 않는다.
+ * 뎁스1 그래프형(U-A) 탭 — 은퇴한 구 GraphView "오버뷰"(계층 클러스터) 화면의
+ * 실제 룩앤필을 부활(c4e4856e, GraphView 은퇴 직전 상태 — LayerClusterNode 는
+ * 무수정 스타일로 재사용, 도메인 데이터에 맞춘 최소 어댑터는 LayerClusterNode.tsx
+ * 자체 주석 참조). 상단도메인(그룹)마다 박스 하나, 그룹 간 집계 엣지는 ElkEdge
+ * 직각 라우팅 — 카드형(StructureNetworkGraph)과 같은 ELK 파이프라인
+ * (nodesToElkInput/applyElkLayout/mergeElkPositions, ELK_OVERVIEW_LAYOUT_OPTIONS)
+ * 을 그대로 재사용해 옛 오버뷰와 동일한 레이아웃 알고리즘으로 배치한다. 박스
+ * 클릭 = 뎁스2 드릴다운(onOpenNode).
  */
-
-const NODE_W = 168;
-const NODE_H = 48;
-
-interface CompactNodeData {
-  n: StructureGraphNode;
-  onOpen: (id: string) => void;
-  [key: string]: unknown;
-}
-
-function CompactNode({ data }: NodeProps) {
-  const { n, onOpen } = data as CompactNodeData;
-  const impactColor =
-    n.impact === "changed"
-      ? "var(--color-diff-changed)"
-      : n.impact === "affected"
-        ? "var(--color-diff-affected)"
-        : null;
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={() => onOpen(n.id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onOpen(n.id);
-        }
-      }}
-      className="cursor-pointer transition-shadow hover:shadow-md"
-      style={{
-        width: NODE_W,
-        height: NODE_H,
-        borderRadius: 8,
-        border: `1.5px solid ${impactColor ?? "var(--color-border-subtle)"}`,
-        background: "var(--color-elevated)",
-        boxShadow: impactColor
-          ? `0 0 0 2px color-mix(in srgb, ${impactColor} 25%, transparent)`
-          : "0 1px 2px rgba(26,27,31,.06)",
-        display: "flex",
-        overflow: "hidden",
-      }}
-    >
-      <Handle type="target" position={Position.Left} style={{ opacity: 0 }} />
-      <div style={{ width: 4, flexShrink: 0, background: n.color }} />
-      <div
-        style={{
-          minWidth: 0,
-          flex: 1,
-          padding: "5px 8px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: 2,
-        }}
-      >
-        <div className="flex items-center gap-1.5 min-w-0">
-          <span aria-hidden style={{ fontSize: 12, lineHeight: 1 }}>{n.icon}</span>
-          <span className="text-text-primary font-semibold truncate" style={{ fontSize: 12 }} title={n.name}>
-            {n.name}
-          </span>
-        </div>
-        {n.groundedPct !== null && (
-          <span className="text-text-muted tabular-nums" style={{ fontSize: 9.5 }} title={n.statLine}>
-            {n.groundedPct}%
-          </span>
-        )}
-      </div>
-      <Handle type="source" position={Position.Right} style={{ opacity: 0 }} />
-    </div>
-  );
-}
-
-const NODE_TYPES = { compact: CompactNode };
-
 export default function StructureNetworkGraphUA({
   nodes,
   edges,
+  changedCounts,
+  affectedCounts,
   onOpenNode,
   onEdgeClick,
   emptyLabel,
 }: {
   nodes: StructureGraphNode[];
   edges: AggregatedEdge[];
+  /** 그룹 key → 소속 서브도메인 중 changed/affected 개수(LayerClusterNode diff 칩). */
+  changedCounts: Map<string, number>;
+  affectedCounts: Map<string, number>;
   onOpenNode: (id: string) => void;
   onEdgeClick: (edge: AggregatedEdge, point: { x: number; y: number }) => void;
   emptyLabel: string;
 }) {
-  const [layout, setLayout] = useState<Map<string, { x: number; y: number }> | null>(null);
+  const { t } = useI18n();
+  const [layout, setLayout] = useState<{
+    positions: Map<string, { x: number; y: number }>;
+    edgePoints: Map<string, ElkPoint[]>;
+  } | null>(null);
 
   useEffect(() => {
     if (nodes.length === 0) {
@@ -121,23 +61,14 @@ export default function StructureNetworkGraphUA({
       return;
     }
     let cancelled = false;
-    const input = {
-      id: "structure-ua",
-      layoutOptions: {
-        "elk.algorithm": "layered",
-        "elk.direction": "RIGHT",
-        "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
-        "elk.spacing.nodeNode": "28",
-        "elk.layered.spacing.nodeNodeBetweenLayers": "64",
-        "elk.spacing.edgeNode": "20",
-        "elk.spacing.edgeEdge": "14",
-      },
-      children: nodes.map((n) => ({ id: n.id, width: NODE_W, height: NODE_H })),
-      edges: edges.map((e) => ({ id: e.id, sources: [e.from], targets: [e.to] })),
-    };
+    const rfNodes: Node[] = nodes.map((n) => ({ id: n.id, type: "layer-cluster", position: { x: 0, y: 0 }, data: {} }));
+    const rfEdges: Edge[] = edges.map((e) => ({ id: e.id, source: e.from, target: e.to }));
+    const dims = new Map(nodes.map((n) => [n.id, { width: LAYER_CLUSTER_WIDTH, height: LAYER_CLUSTER_HEIGHT }]));
+    const input = nodesToElkInput(rfNodes, rfEdges, dims, ELK_OVERVIEW_LAYOUT_OPTIONS);
     applyElkLayout(input).then(({ positioned }) => {
       if (cancelled) return;
-      setLayout(new Map((positioned.children ?? []).map((c) => [c.id, { x: c.x ?? 0, y: c.y ?? 0 }])));
+      const positions = new Map(mergeElkPositions(rfNodes, positioned).map((n) => [n.id, n.position]));
+      setLayout({ positions, edgePoints: elkEdgePointMap(positioned) });
     });
     return () => {
       cancelled = true;
@@ -146,18 +77,26 @@ export default function StructureNetworkGraphUA({
 
   const rfNodes = useMemo<Node[]>(() => {
     if (!layout) return [];
-    return nodes.map((n) => ({
-      id: n.id,
-      type: "compact",
-      position: layout.get(n.id) ?? { x: 0, y: 0 },
-      width: NODE_W,
-      height: NODE_H,
-      data: { n, onOpen: onOpenNode } satisfies CompactNodeData,
-      // draggable(기본값) — 조감도 느낌으로 자유 재배치 허용(카드형은 고정).
-      connectable: false,
-      selectable: true,
-    }));
-  }, [nodes, layout, onOpenNode]);
+    return nodes.map(
+      (n, i): Node => ({
+        id: n.id,
+        type: "layer-cluster",
+        position: layout.positions.get(n.id) ?? { x: 0, y: 0 },
+        data: {
+          layerId: n.id,
+          layerName: n.name,
+          layerDescription: n.statLine,
+          kindLabel: n.icon,
+          footerLabel: n.groundedPct !== null ? `${t.grounding.rate} ${n.groundedPct}%` : "",
+          hoverHint: t.structure.clickToExplore,
+          layerColorIndex: i,
+          diffChangedCount: changedCounts.get(n.id) ?? 0,
+          diffAffectedCount: affectedCounts.get(n.id) ?? 0,
+          onDrillIn: onOpenNode,
+        } satisfies LayerClusterData,
+      }),
+    );
+  }, [nodes, layout, changedCounts, affectedCounts, onOpenNode, t]);
 
   const rfEdges = useMemo<Edge[]>(() => {
     if (!layout) return [];
@@ -165,15 +104,12 @@ export default function StructureNetworkGraphUA({
       id: e.id,
       source: e.from,
       target: e.to,
-      // 기본(bezier) 곡선 — 카드형의 ELK 직각 라우팅과 대비되는 핵심 시각 차이.
-      type: "default",
+      type: "elk",
       label: String(e.weight),
-      markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16, color: "var(--color-accent)" },
-      style: { stroke: "var(--color-accent)", strokeWidth: Math.min(1 + Math.log2(e.weight + 1), 4), opacity: 0.75 },
-      labelStyle: { fill: "var(--color-text-muted)", fontSize: 10, fontWeight: 600 },
-      labelBgStyle: { fill: "var(--color-panel)", fillOpacity: 0.9 },
-      labelBgPadding: [4, 2] as [number, number],
-      labelBgBorderRadius: 4,
+      markerEnd: { type: MarkerType.ArrowClosed, width: 14, height: 14, color: "var(--color-border-medium)" },
+      style: { stroke: "var(--color-border-medium)", strokeWidth: Math.min(1 + Math.log2(e.weight + 1), 4) },
+      labelStyle: { fill: "var(--color-text-muted)", fontSize: 10.5, fontWeight: 600 },
+      data: { points: layout.edgePoints.get(e.id), labelChip: true },
     }));
   }, [edges, layout]);
 
@@ -193,21 +129,23 @@ export default function StructureNetworkGraphUA({
             nodes={rfNodes}
             edges={rfEdges}
             nodeTypes={NODE_TYPES}
+            edgeTypes={EDGE_TYPES}
             onEdgeClick={(evt, edge) => {
               const src = edges.find((e) => e.id === edge.id);
               if (src) onEdgeClick(src, { x: evt.clientX, y: evt.clientY });
             }}
-            onInit={(rf) => void rf.fitView({ padding: 0.25, maxZoom: 1.1 })}
+            onInit={(rf) => void rf.fitView({ padding: 0.15, maxZoom: 1 })}
             minZoom={0.1}
             maxZoom={2}
             proOptions={{ hideAttribution: true }}
+            nodesDraggable={false}
             nodesConnectable={false}
             elementsSelectable
           >
             <Background variant={BackgroundVariant.Dots} color="var(--color-edge-dot)" gap={20} size={1} />
             <Controls />
             <MiniMap
-              nodeColor={(node) => (node.data as unknown as CompactNodeData)?.n?.color ?? "var(--color-elevated)"}
+              nodeColor="var(--color-elevated)"
               maskColor="var(--glass-bg)"
               className="!bg-surface !border !border-border-subtle"
             />

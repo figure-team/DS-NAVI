@@ -220,6 +220,7 @@ export const ko = {
     rendererTabsLabel: "렌더러 전환",
     rendererCard: "카드형",
     rendererGraph: "그래프형(U-A)",
+    clickToExplore: "클릭하여 탐색 →",
   },
   flowView: {
     selectedFlow: "선택된 기능",

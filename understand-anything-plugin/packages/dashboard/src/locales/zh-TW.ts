@@ -218,6 +218,7 @@ export const zhTW = {
     rendererTabsLabel: "渲染器切換",
     rendererCard: "卡片式",
     rendererGraph: "圖形式(U-A)",
+    clickToExplore: "點擊探索 →",
   },
   flowView: {
     selectedFlow: "選中的功能",

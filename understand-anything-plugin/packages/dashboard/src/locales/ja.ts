@@ -220,6 +220,7 @@ export const ja = {
     rendererTabsLabel: "レンダラー切替",
     rendererCard: "カード型",
     rendererGraph: "グラフ型(U-A)",
+    clickToExplore: "クリックして探索 →",
   },
   flowView: {
     selectedFlow: "選択中の機能",

@@ -145,8 +145,9 @@ export default function StructurePage() {
       {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조, pmpl-proto .tabs) — 이
           페이지는 구조 탭. 오버레이 토글은 같은 행 우측 슬롯에. */}
       <WorkMapTabs active="structure" right={<DiffToggle />} />
-      {/* 뎁스1 은 루트("구조") 하나뿐 — 바로 위 탭 라벨과 중복이라 뎁스2+ 에서만 표시. */}
-      {crumbs.length > 1 && <StructureBreadcrumb crumbs={crumbs} />}
+      {/* 뎁스별 그래프 헤더를 제거(사용자 확정)하고 상단은 브레드크럼으로 통일 —
+          뎁스1도 "구조" 단일 크럼을 항상 표시해 뎁스2+("구조 › 장바구니")와 일관되게. */}
+      <StructureBreadcrumb crumbs={crumbs} />
       <div className="flex-1 min-h-0">
         {route.kind === "depth1" && (
           <StructureDepth1View

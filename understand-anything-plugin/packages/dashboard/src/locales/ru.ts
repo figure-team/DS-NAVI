@@ -218,6 +218,7 @@ export const ru = {
     backToProcessList: "Назад к списку процессов",
     relatedFlowSpine: "Связанный поток кода",
     chipSubDomains: "Поддомены",
+    nodeInfoTitle: "Сведения об узле",
   },
   flowView: {
     selectedFlow: "Выбранная функция",

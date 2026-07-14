@@ -218,6 +218,7 @@ export const en = {
     backToProcessList: "Back to process list",
     relatedFlowSpine: "Related code flow",
     chipSubDomains: "Subdomains",
+    nodeInfoTitle: "Node details",
   },
   flowView: {
     selectedFlow: "Selected feature",

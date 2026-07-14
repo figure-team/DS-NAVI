@@ -218,6 +218,7 @@ export const ko = {
     backToProcessList: "업무 프로세스 목록으로",
     relatedFlowSpine: "관련 기능흐름도",
     chipSubDomains: "서브도메인",
+    nodeInfoTitle: "노드 정보",
   },
   flowView: {
     selectedFlow: "선택된 기능",

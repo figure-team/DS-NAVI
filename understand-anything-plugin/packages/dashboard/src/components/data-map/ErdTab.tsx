@@ -24,6 +24,7 @@ import { applyElkLayout } from "../../utils/elk-layout";
 import { mergeElkPositions, nodesToElkInput } from "../../utils/layout";
 import { fkCardinality } from "./erd-cardinality";
 import type { FkCardinality } from "./erd-cardinality";
+import { COMPONENT_CAP_DEPTH, fkComponent } from "./erd-component";
 import { planErdExport } from "./erd-export";
 import { inferFkEdges } from "./erd-infer";
 import { TableDetail } from "./TablesTab";
@@ -35,6 +36,9 @@ import type { DbColumn, DbSchema, DbTable } from "./types";
  * 노드 클릭 = 1-hop 이웃 강조(비이웃 디밍, 구조 탭 관례) + 우측 사이드 패널 상세
  * (TableDetail 재사용). 선택은 ?table= URL 단일 소스 — 테이블 탭과 공유되어
  * 탭을 오가도 같은 테이블이 선택돼 있다.
+ * 연계 범위(?scope=component) — 선택 테이블의 FK 연결 컴포넌트(전이 폐쇄)만 렌더.
+ * 테이블 탭 [ERD 연계] 버튼 진입점, 컴포넌트 모드에선 디밍 없이 섬 전체를 보여주고
+ * 노드 클릭 시 그 테이블의 섬으로 갈아탄다(빈 캔버스 클릭 = 해제).
  * 엣지는 컬럼 앵커(FK 행 ↔ 참조 행에 직접 연결) + crow's foot 카디널리티
  * (erd-cardinality — 자식 0..N/0..1, 부모 1/0..1, 추정 FK 는 무표기 점선만).
  */
@@ -355,6 +359,15 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
     };
   }, [fkEdges, schema.tables, view]);
 
+  // 선택 테이블의 FK 연결 컴포넌트 — 사이드 패널 [연계 보기] 버튼 수치 + scope 필터 공용.
+  // 탐색은 현재 보기 모드의 엣지 기준(선언/추정 칩과 일관), CAP 초과 시 홉 제한 폴백.
+  const selComponent = useMemo(
+    () => (selected ? fkComponent(selected.name, visibleEdges) : null),
+    [selected, visibleEdges],
+  );
+  const scopeOn = searchParams.get("scope") === "component" && selComponent != null;
+  const component = scopeOn ? selComponent : null;
+
   // 선택 테이블에 닿는 관계별 색 배정 — 같은 색 = 같은 FK 관계(자식 FK 행 ↔ 부모 PK 행 ↔ 연결선).
   const highlight = useMemo(() => {
     if (!selected) return null;
@@ -393,9 +406,11 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
     const dims = new Map<string, { width: number; height: number }>();
     // 테이블별 노드에 실제 표시된 키 행(소문자) — 컬럼 앵커 핸들 존재 여부 판정.
     const shownCols = new Map<string, Set<string>>();
-    const shown = visibleTables
-      ? schema.tables.filter((t) => visibleTables.has(t.name))
-      : schema.tables;
+    // 연계 범위가 켜지면 보기 모드 위에 컴포넌트 필터를 겹친다(엣지도 양끝이 섬 안일 때만).
+    const inScope = (n: string) => (component ? component.tables.has(n) : true);
+    const shown = schema.tables.filter(
+      (t) => inScope(t.name) && (visibleTables ? visibleTables.has(t.name) : true),
+    );
     const nodes: ErdFlowNode[] = shown.map((t) => {
       const fkCols = new Set((t.foreignKeys ?? []).flatMap((fk) => fk.columns.map((c) => c.toLowerCase())));
       const { rows, more } = keyRowsOf(t, fkCols);
@@ -408,15 +423,17 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
         data: { name: t.name, isCodeTable: t.isCodeTable, keyRows: rows, moreCount: more, dimmed: false, active: false, colColors: {} },
       };
     });
-    const edges: Edge[] = visibleEdges.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      type: "smoothstep",
-      data: { inferred: !!e.inferred },
-    }));
+    const edges: Edge[] = visibleEdges
+      .filter((e) => inScope(e.source) && inScope(e.target))
+      .map((e) => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        type: "smoothstep",
+        data: { inferred: !!e.inferred },
+      }));
     return { nodes, edges, dims, shownCols };
-  }, [schema.tables, visibleTables, visibleEdges]);
+  }, [schema.tables, visibleTables, visibleEdges, component]);
 
   const [layouted, setLayouted] = useState<ErdFlowNode[] | null>(null);
   useEffect(() => {
@@ -447,6 +464,7 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
   }, [layouted, fitView]);
 
   // 선택/이웃 강조는 레이아웃 결과 위에 오버레이(위치 재계산 없음).
+  // 연계 범위 모드에선 디밍 없음 — 섬 전체(간접 연결 포함)를 보려는 모드라 1-hop 디밍이 목적과 상충.
   const nodes = useMemo(() => {
     const src = layouted ?? [];
     return src.map((n) => ({
@@ -454,11 +472,11 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       data: {
         ...n.data,
         active: n.id === selected?.name,
-        dimmed: neighborhood != null && !neighborhood.has(n.id),
+        dimmed: !scopeOn && neighborhood != null && !neighborhood.has(n.id),
         colColors: Object.fromEntries(highlight?.rowColors.get(n.id) ?? []),
       },
     }));
-  }, [layouted, selected, neighborhood, highlight]);
+  }, [layouted, selected, neighborhood, highlight, scopeOn]);
 
   const edges = useMemo(() => {
     const infoById = new Map(visibleEdges.map((e) => [e.id, e]));
@@ -505,18 +523,29 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
               stroke: "var(--color-border-medium)",
               strokeWidth: 1.2,
               strokeDasharray: dash,
-              opacity: neighborhood ? 0.15 : 1,
+              opacity: neighborhood && !scopeOn ? 0.15 : 1,
             },
         ...markers,
         zIndex: rel ? 10 : 0,
       };
     });
-  }, [base.edges, base.shownCols, visibleEdges, layouted, neighborhood, highlight, relPalette]);
+  }, [base.edges, base.shownCols, visibleEdges, layouted, neighborhood, highlight, relPalette, scopeOn]);
 
+  // 노드 클릭은 연계 범위를 유지한 채 그 테이블의 섬으로 갈아탄다(탐색 연속성).
+  // 선택 해제(빈 캔버스)는 범위도 함께 해제 — 선택 없는 scope 는 의미가 없다.
   const setTable = (name: string | null) =>
     setSearchParams((prev) => {
       if (name) prev.set("table", name);
-      else prev.delete("table");
+      else {
+        prev.delete("table");
+        prev.delete("scope");
+      }
+      return prev;
+    });
+  const setScope = (on: boolean) =>
+    setSearchParams((prev) => {
+      if (on) prev.set("scope", "component");
+      else prev.delete("scope");
       return prev;
     });
 
@@ -545,7 +574,7 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
       });
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = `erd-${view}.png`;
+      a.download = scopeOn && selected ? `erd-component-${selected.name}.png` : `erd-${view}.png`;
       a.click();
     } finally {
       setExporting(false);
@@ -591,6 +620,34 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
             );
           })}
         </div>
+        {scopeOn && selected && component && (
+          <div
+            className="flex items-center rounded-lg border card-shadow select-none"
+            style={{
+              gap: 7,
+              padding: "5px 8px 5px 11px",
+              fontSize: 11.5,
+              borderColor: "color-mix(in srgb, var(--color-status-info) 40%, transparent)",
+              background: "color-mix(in srgb, var(--color-status-info) 10%, transparent)",
+              color: "var(--color-status-info)",
+            }}
+          >
+            {/* 수치는 자기 제외 연계 테이블 수 — 테이블 탭 [ERD 연계 n →] 버튼과 동일 기준. */}
+            <b className="font-mono">{selected.name}</b> 연계 {component.tables.size - 1}
+            {component.capped && (
+              <span className="text-text-muted">· {COMPONENT_CAP_DEPTH}홉 제한</span>
+            )}
+            <button
+              type="button"
+              onClick={() => setScope(false)}
+              title="연계 보기 해제 — 전체 그래프로"
+              className="cursor-pointer bg-transparent border-0"
+              style={{ color: "inherit", fontSize: 12, padding: "0 2px", lineHeight: 1 }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
         {inferredCount > 0 && (
           <div className="flex items-center text-text-muted" style={{ gap: 6, fontSize: 11.5 }}>
             <svg width="24" height="8" aria-hidden>
@@ -638,7 +695,8 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
         >
           <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
           <Controls showInteractive={false} />
-          {schema.tables.length > 30 && <MiniMap pannable zoomable />}
+          {/* 미니맵은 실제 그려진 노드 기준 — 연계 범위(소규모 섬)에선 불필요한 시야 점유. */}
+          {base.nodes.length > 30 && <MiniMap pannable zoomable />}
           {/* 마커 defs 는 뷰포트 내부에 있어야 PNG 내보내기(뷰포트 서브트리 클론)에서 url(#) 참조가 살아남는다. */}
           <ViewportPortal>
             <ErdMarkerDefs palette={relPalette} />
@@ -655,6 +713,11 @@ function ErdCanvas({ schema }: { schema: DbSchema }) {
             fixedColumns={false}
             knownTables={knownTables}
             onSelectTable={(name) => setTable(name)}
+            erdComponent={
+              scopeOn
+                ? undefined // 이미 연계 보기 중 — 해제는 툴바 칩(✕)이 담당.
+                : { count: (selComponent?.tables.size ?? 1) - 1, onOpen: () => setScope(true) }
+            }
           />
           <div style={{ marginTop: 10, textAlign: "right" }}>
             <button

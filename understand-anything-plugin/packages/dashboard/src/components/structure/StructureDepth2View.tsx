@@ -7,11 +7,11 @@ import type { ResolvedGroup } from "../../utils/domainGroups";
 import {
   filterEdgesAmong,
   markFor,
-  type AggregatedEdge,
   type CrossDomainEdge,
+  type MergedStructureEdge,
 } from "../../utils/structureGraph";
 import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
-import EdgeEvidencePopover from "./EdgeEvidencePopover";
+import EdgeEvidencePanel from "./EdgeEvidencePanel";
 
 /**
  * 뎁스2 — 선택 그룹 + 서브도메인 그래프, U-A Domain 탭 룩앤필(택1 확정).
@@ -32,7 +32,7 @@ export default function StructureDepth2View({
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const navigate = useNavigate();
   const { t } = useI18n();
-  const [popover, setPopover] = useState<{ edge: AggregatedEdge; point: { x: number; y: number } } | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<MergedStructureEdge | null>(null);
 
   const cards = useMemo(() => {
     if (!domainGraph) return [];
@@ -85,15 +85,13 @@ export default function StructureDepth2View({
         edges={edges}
         emptyLabel={emptyLabel}
         onOpenNode={onOpenNode}
-        onEdgeClick={(edge, point) => setPopover({ edge, point })}
+        onEdgeClick={(edge) => setSelectedEdge(edge)}
       />
-      {popover && (
-        <EdgeEvidencePopover
-          edge={popover.edge}
-          anchor={popover.point}
-          fromLabel={nameById.get(popover.edge.from) ?? popover.edge.from}
-          toLabel={nameById.get(popover.edge.to) ?? popover.edge.to}
-          onClose={() => setPopover(null)}
+      {selectedEdge && (
+        <EdgeEvidencePanel
+          edge={selectedEdge}
+          labelOf={(id) => nameById.get(id) ?? id}
+          onClose={() => setSelectedEdge(null)}
         />
       )}
     </div>

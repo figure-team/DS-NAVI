@@ -13,31 +13,40 @@ import {
   type Node,
   type NodeProps,
 } from "@xyflow/react";
-import { applyElkLayout } from "../../utils/elk-layout";
+import { applyElkLayout, elkEdgePointMap, type ElkPoint } from "../../utils/elk-layout";
 import { mergeElkPositions, nodesToElkInput } from "../../utils/layout";
+import ElkEdge from "../ElkEdge";
 import { useDiffLabels } from "../../hooks/useDiffLabels";
 import { useI18n } from "../../contexts/I18nContext";
-import type { AggregatedEdge, ImpactMark } from "../../utils/structureGraph";
+import {
+  mergeBidirectionalEdges,
+  type AggregatedEdge,
+  type ImpactMark,
+  type MergedStructureEdge,
+} from "../../utils/structureGraph";
 
 /**
- * 뎁스1·2 공용 그래프형(U-A) 렌더러 — understand-anything.com/demo 의 "Domain" 탭
- * (은퇴한 DomainGraphView + DomainClusterNode, c4e4856e 직전 상태)의 실제 룩앤필을
+ * 뎁스1·2·3 공용 그래프형(U-A) 렌더러 — understand-anything.com/demo 의 "Domain" 탭
+ * (은퇴한 DomainGraphView + DomainClusterNode, c4e4856e 직전 상태)의 카드 룩앤필을
  * 부활: 도메인 클러스터 카드(accent 테두리 라운드 박스 + 요약 + 칩 + 하단 통계) +
- * accent 점선 애니메이션 엣지 + ELK direction=RIGHT + 점 배경/컨트롤/미니맵.
- * 카드 스타일·엣지 스타일은 원본 무수정, 데이터만 4뎁스 구조(그룹/서브도메인)에
- * 맞춰 주입한다(뎁스1=그룹 카드+서브도메인 칩, 뎁스2=서브도메인 카드+엔티티 칩).
- * 원본의 클릭=선택/더블클릭=드릴다운 대신, 다른 구조 렌더러와 동일하게
- * 클릭=드릴다운(onOpenNode) 하나로 통일한다.
+ * accent 점선 엣지 + 점 배경/컨트롤/미니맵. 데이터만 4뎁스 구조에 맞춰 주입한다
+ * (뎁스1=그룹 카드+서브도메인 칩, 뎁스2=서브도메인 카드+엔티티 칩, 뎁스3=업무
+ * 프로세스 카드+기능 칩). 클릭=드릴다운(onOpenNode) 하나로 통일.
+ *
+ * 엣지 규약(2026-07-14 사용자 확정 4건):
+ * ① 양방향(A→B/B→A)은 선 하나로 병합(mergeBidirectionalEdges — 방향별 근거 보존)
+ * ② 선 클릭 = 우측 근거 패널(onEdgeClick 에 병합 엣지 전달 — 방향별 섹션 표시)
+ * ③④ 원본 베지어 대신 ELK ORTHOGONAL 라우팅(ElkEdge) — 선이 노드를 피해 직각으로
+ *     꺾이고, 끝점을 공유하지 않는 선끼리는 전용 트랙(spacing.edgeEdge)으로 분리.
  */
 
 /** 원본 DomainClusterNode 의 Entities 칩 표시 상한. */
 const CHIP_CAP = 5;
 
 /**
- * 밀집 그래프 판정 — 평균 차수(2E/N)가 이 값을 넘으면 위계가 사실상 없는
- * 그래프(예: mmobile 그룹 13개·엣지 100개)라 레이어드 랭크 배치가 "흩어진"
- * 모양이 된다. 이때는 rectpacking 정격자 배치 + 엣지 라벨 생략(라벨 소음
- * 방지, 근거는 여전히 엣지 클릭 팝오버)으로 전환한다.
+ * 밀집 그래프 판정 — 평균 차수(2E/N, 병합 후)가 이 값을 넘으면(예: mmobile 그룹
+ * 13개) 상시 라벨이 소음이 된다. 밀집이면 라벨은 호버 포커스 시에만 복원하고,
+ * 휴지 상태 불투명도를 가중치에 비례시켜 강한 연결만 도드라지게 한다.
  */
 const DENSE_AVG_DEGREE = 5;
 
@@ -117,7 +126,7 @@ const DomainStyleCard = memo(function DomainStyleCard({ data }: NodeProps) {
           <div className="flex flex-wrap gap-1">
             {n.chips.slice(0, CHIP_CAP).map((c, i) => (
               // truncate — 엔티티가 "이름 — 설명" 프로즈일 수 있어(칩이 문단으로
-              // 불어나면 ELK 추정 높이 180 을 초과해 카드가 겹친다) 한 줄로 자른다.
+              // 불어나면 실측 높이가 폭주해 카드가 비대해진다) 한 줄로 자른다.
               <span key={`${i}-${c}`} className="text-[10px] px-1.5 py-0.5 rounded bg-elevated text-text-secondary max-w-[140px] truncate" title={c}>
                 {c}
               </span>
@@ -135,6 +144,7 @@ const DomainStyleCard = memo(function DomainStyleCard({ data }: NodeProps) {
 });
 
 const NODE_TYPES = { "domain-cluster": DomainStyleCard };
+const EDGE_TYPES = { elk: ElkEdge };
 
 function StructureDomainGraphUAInner({
   nodes,
@@ -145,39 +155,46 @@ function StructureDomainGraphUAInner({
   nodes: DomainStyleGraphNode[];
   edges: AggregatedEdge[];
   onOpenNode: (id: string) => void;
-  onEdgeClick: (edge: AggregatedEdge, point: { x: number; y: number }) => void;
+  onEdgeClick: (edge: MergedStructureEdge, point: { x: number; y: number }) => void;
 }) {
   const { t } = useI18n();
   const rf = useReactFlow();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [positions, setPositions] = useState<Map<string, { x: number; y: number }> | null>(null);
-  const dense = nodes.length > 0 && (2 * edges.length) / nodes.length > DENSE_AVG_DEGREE;
+  const [layout, setLayout] = useState<{
+    positions: Map<string, { x: number; y: number }>;
+    edgePoints: Map<string, ElkPoint[]>;
+  } | null>(null);
+
+  // ① 양방향 병합 — 화면의 선 개수 기준은 이후 전부 merged.
+  const merged = useMemo(() => mergeBidirectionalEdges(edges), [edges]);
+  const dense = nodes.length > 0 && (2 * merged.length) / nodes.length > DENSE_AVG_DEGREE;
 
   // 호버 포커스 — 밀집 그래프에서 "어디에 어디가 연결됐는지"는 전체 동시 표시로는
-  // 못 읽는다(교차 다발 + 카드 밑을 지나는 선). 카드 호버 시 그 카드의 엣지만
-  // 선명하게(+카드 위로 올려 추적 가능, 라벨 복원) 나머지는 흐린다.
+  // 못 읽는다. 카드 호버 시 그 카드의 엣지만 선명하게(+카드 위로 승격, 라벨 복원)
+  // 나머지는 흐린다.
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const hoverNeighbors = useMemo(() => {
     if (!hoveredId) return null;
     const s = new Set<string>([hoveredId]);
-    for (const e of edges) {
+    for (const e of merged) {
       if (e.from === hoveredId) s.add(e.to);
       if (e.to === hoveredId) s.add(e.from);
     }
     return s;
-  }, [hoveredId, edges]);
+  }, [hoveredId, merged]);
 
   // 데이터가 바뀌면 재측정·재배치(뎁스 전환 시 스테일 좌표 방지).
   useEffect(() => {
-    setPositions(null);
-  }, [nodes, edges]);
+    setLayout(null);
+  }, [nodes, merged]);
 
-  // 2패스 레이아웃 — 카드는 내용(요약 줄수·칩 행수)에 따라 280~360×가변 높이라
-  // 고정 추정치(320×180)를 ELK 에 먹이면 겹치거나 랭크가 어긋난다. 1패스에서
-  // 숨김 렌더한 카드를 DOM 에서 직접 실측(offsetWidth/Height — 뷰포트 transform
-  // 무관)한 뒤, 실측 크기로 ELK 를 돌린다(layout.ts 의 "near-real sizes" 교훈).
+  // 2패스 레이아웃 — 카드는 내용에 따라 280~360×가변 높이라 고정 추정치를 ELK 에
+  // 먹이면 겹친다. 1패스에서 숨김 렌더한 카드를 DOM 에서 직접 실측(offsetWidth —
+  // 뷰포트 transform 무관, rAF 재시도)한 뒤, 실측 크기로 ELK 를 돌린다(layout.ts 의
+  // "near-real sizes" 교훈). ORTHOGONAL 라우팅 포인트도 이때 함께 받아 ElkEdge 로
+  // 그대로 그린다(③ 노드 회피·④ 엣지별 전용 트랙 — [[dashboard-edge-routing]]).
   useEffect(() => {
-    if (positions || nodes.length === 0) return;
+    if (layout || nodes.length === 0) return;
     let cancelled = false;
     let raf = 0;
     const tryMeasure = () => {
@@ -191,21 +208,14 @@ function StructureDomainGraphUAInner({
         els.map((el) => [el.getAttribute("data-id") ?? "", { width: el.offsetWidth, height: el.offsetHeight }]),
       );
       const rfNodes: Node[] = nodes.map((n) => ({ id: n.id, type: "domain-cluster", position: { x: 0, y: 0 }, data: {} }));
-      const rfEdges: Edge[] = edges.map((e) => ({ id: e.id, source: e.from, target: e.to }));
-      // 희소 그래프 = 원본 DomainGraphView 와 동일(레이어드 + direction=RIGHT).
-      // 밀집 그래프 = rectpacking 정격자(엣지 무시, 카드가 행·열로 가지런히) —
-      // 위계 없는 완전연결형 데이터에서 레이어드가 만드는 사선 산개를 막는다.
-      const input = nodesToElkInput(
-        rfNodes,
-        rfEdges,
-        measured,
-        dense
-          ? { algorithm: "rectpacking", "elk.spacing.nodeNode": "48" }
-          : { "elk.direction": "RIGHT" },
-      );
+      const rfEdges: Edge[] = merged.map((e) => ({ id: e.id, source: e.from, target: e.to }));
+      const input = nodesToElkInput(rfNodes, rfEdges, measured, { "elk.direction": "RIGHT" });
       applyElkLayout(input).then(({ positioned }) => {
         if (cancelled) return;
-        setPositions(new Map(mergeElkPositions(rfNodes, positioned).map((n) => [n.id, n.position])));
+        setLayout({
+          positions: new Map(mergeElkPositions(rfNodes, positioned).map((n) => [n.id, n.position])),
+          edgePoints: elkEdgePointMap(positioned),
+        });
       });
     };
     raf = requestAnimationFrame(tryMeasure);
@@ -213,12 +223,12 @@ function StructureDomainGraphUAInner({
       cancelled = true;
       cancelAnimationFrame(raf);
     };
-  }, [positions, nodes, edges, dense]);
+  }, [layout, nodes, merged]);
 
   // 배치 확정 후 1회 fitView — fitView prop 은 위치 갱신에 재반응하지 않는다.
   useEffect(() => {
-    if (positions) rf.fitView({ padding: 0.2, maxZoom: 1 });
-  }, [positions, rf]);
+    if (layout) rf.fitView({ padding: 0.2, maxZoom: 1 });
+  }, [layout, rf]);
 
   const rfNodes = useMemo<Node[]>(
     () =>
@@ -226,15 +236,14 @@ function StructureDomainGraphUAInner({
         (n): Node => ({
           id: n.id,
           type: "domain-cluster",
-          position: positions?.get(n.id) ?? { x: 0, y: 0 },
+          position: layout?.positions.get(n.id) ?? { x: 0, y: 0 },
           data: { n, onOpen: onOpenNode } satisfies CardData,
           draggable: false,
           connectable: false,
           selectable: true,
           // 측정 패스(위치 미확정) 동안 숨김 — visibility 는 레이아웃 크기를 유지해
-          // ResizeObserver 실측이 가능하다(display:none 불가). 호버 포커스 중엔
-          // 무관 카드를 흐려 연결 상대만 남긴다.
-          style: positions
+          // 실측이 가능하다(display:none 불가). 호버 포커스 중엔 무관 카드를 흐린다.
+          style: layout
             ? {
                 opacity: hoverNeighbors && !hoverNeighbors.has(n.id) ? 0.3 : 1,
                 transition: "opacity 120ms",
@@ -242,19 +251,17 @@ function StructureDomainGraphUAInner({
             : { visibility: "hidden" as const },
         }),
       ),
-    [nodes, positions, onOpenNode, hoverNeighbors],
+    [nodes, layout, onOpenNode, hoverNeighbors],
   );
 
-  // 원본 cross_domain 엣지 스타일 무수정(accent 점선 + 애니메이션 + 라벨 칩) —
-  // 라벨만 description 대신 근거 파일 수(클릭 시 EdgeEvidencePopover 와 동일 어휘).
-  // 측정 패스 동안엔 비표시(0,0 에 뭉친 노드 사이 엣지 잔상 방지). 밀집 모드는
-  // 라벨 생략 + 가중치 비례 불투명도(강한 연결만 도드라지게, 근거는 클릭 팝오버).
-  // 호버 포커스 중엔 해당 카드의 엣지만 선명 + zIndex 로 카드 위에 올려 끝점까지
-  // 추적 가능(라벨도 이때 복원), 나머지 엣지는 거의 지운다.
+  // 병합 무방향 선 — accent 점선 + ELK 직각 라우팅(ElkEdge, 화살표 없음), 라벨은
+  // 근거 파일 수 칩(노드 위 레이어라 가려지지 않음). 밀집 모드는 라벨을 호버
+  // 포커스 시에만 복원하고 휴지 불투명도를 가중치 비례로. 포커스 엣지는 zIndex 로
+  // 카드 위 승격 + 이벤트 통과(index.css .workmap-focus-edge — 호버 깜빡임 방지).
   const rfEdges = useMemo<Edge[]>(() => {
-    if (!positions) return [];
-    const maxWeight = Math.max(1, ...edges.map((e) => e.weight));
-    return edges.map((e) => {
+    if (!layout) return [];
+    const maxWeight = Math.max(1, ...merged.map((e) => e.weight));
+    return merged.map((e) => {
       const focused = hoveredId !== null && (e.from === hoveredId || e.to === hoveredId);
       const restingOpacity = dense ? 0.25 + 0.75 * (e.weight / maxWeight) : 1;
       const showLabel = !dense || focused;
@@ -262,15 +269,8 @@ function StructureDomainGraphUAInner({
         id: e.id,
         source: e.from,
         target: e.to,
-        ...(showLabel
-          ? {
-              label: t.structure.evidenceWeight.replace("{count}", String(e.weight)),
-              labelStyle: { fill: "var(--color-text-muted)", fontSize: 10 },
-              labelBgStyle: { fill: "var(--color-surface)", fillOpacity: 0.9 },
-              labelBgPadding: [6, 4] as [number, number],
-              labelBgBorderRadius: 4,
-            }
-          : {}),
+        type: "elk",
+        label: showLabel ? t.structure.evidenceWeight.replace("{count}", String(e.weight)) : undefined,
         style: {
           stroke: "var(--color-accent)",
           strokeDasharray: "6 3",
@@ -278,42 +278,42 @@ function StructureDomainGraphUAInner({
           opacity: hoveredId === null ? restingOpacity : focused ? 1 : 0.05,
           transition: "opacity 120ms",
         },
-        // 카드 위로 승격 + 이벤트 통과(index.css .workmap-focus-edge) — 끝점 추적용.
         zIndex: focused ? 1000 : 0,
         className: focused ? "workmap-focus-edge" : undefined,
-        animated: true,
+        data: { points: layout.edgePoints.get(e.id), labelChip: true },
       };
     });
-  }, [edges, positions, dense, hoveredId, t]);
+  }, [merged, layout, dense, hoveredId, t]);
 
   return (
     // data-hover — 헤드리스 QA 가 호버 포커스 상태를 결정론적으로 검증하는 훅.
     <div ref={containerRef} className="h-full w-full" data-hover={hoveredId ?? ""}>
-    <ReactFlow
-      nodes={rfNodes}
-      edges={rfEdges}
-      nodeTypes={NODE_TYPES}
-      onEdgeClick={(evt, edge) => {
-        const src = edges.find((e) => e.id === edge.id);
-        if (src) onEdgeClick(src, { x: evt.clientX, y: evt.clientY });
-      }}
-      onNodeMouseEnter={(_, node) => setHoveredId(node.id)}
-      onNodeMouseLeave={() => setHoveredId(null)}
-      minZoom={0.1}
-      maxZoom={2}
-      proOptions={{ hideAttribution: true }}
-      nodesDraggable={false}
-      nodesConnectable={false}
-      elementsSelectable
-    >
-      <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--color-border-subtle)" />
-      <Controls />
-      <MiniMap
-        nodeColor="var(--color-accent)"
-        maskColor="var(--glass-bg)"
-        className="!bg-surface !border !border-border-subtle"
-      />
-    </ReactFlow>
+      <ReactFlow
+        nodes={rfNodes}
+        edges={rfEdges}
+        nodeTypes={NODE_TYPES}
+        edgeTypes={EDGE_TYPES}
+        onEdgeClick={(evt, edge) => {
+          const src = merged.find((e) => e.id === edge.id);
+          if (src) onEdgeClick(src, { x: evt.clientX, y: evt.clientY });
+        }}
+        onNodeMouseEnter={(_, node) => setHoveredId(node.id)}
+        onNodeMouseLeave={() => setHoveredId(null)}
+        minZoom={0.1}
+        maxZoom={2}
+        proOptions={{ hideAttribution: true }}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable
+      >
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--color-border-subtle)" />
+        <Controls />
+        <MiniMap
+          nodeColor="var(--color-accent)"
+          maskColor="var(--glass-bg)"
+          className="!bg-surface !border !border-border-subtle"
+        />
+      </ReactFlow>
     </div>
   );
 }
@@ -328,7 +328,7 @@ export default function StructureDomainGraphUA({
   nodes: DomainStyleGraphNode[];
   edges: AggregatedEdge[];
   onOpenNode: (id: string) => void;
-  onEdgeClick: (edge: AggregatedEdge, point: { x: number; y: number }) => void;
+  onEdgeClick: (edge: MergedStructureEdge, point: { x: number; y: number }) => void;
   emptyLabel: string;
 }) {
   if (nodes.length === 0) {

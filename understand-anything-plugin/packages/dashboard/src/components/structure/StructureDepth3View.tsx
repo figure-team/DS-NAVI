@@ -8,9 +8,10 @@ import {
   buildFlowFileMap,
   deriveProcessSharedFileEdges,
   type AggregatedEdge,
+  type MergedStructureEdge,
 } from "../../utils/structureGraph";
 import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
-import EdgeEvidencePopover from "./EdgeEvidencePopover";
+import EdgeEvidencePanel from "./EdgeEvidencePanel";
 import GroundedBar from "../GroundedBar";
 
 /**
@@ -26,7 +27,7 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const navigate = useNavigate();
   const { t } = useI18n();
-  const [popover, setPopover] = useState<{ edge: AggregatedEdge; point: { x: number; y: number } } | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<MergedStructureEdge | null>(null);
 
   const domainNode = useMemo(
     () => (domainGraph ? findDomain(domainGraph, domainId) : undefined),
@@ -123,15 +124,13 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
             edges={uaEdges}
             emptyLabel={t.flowList.businessEmpty}
             onOpenNode={(id) => openBf(Number(id.slice(3)))}
-            onEdgeClick={(edge, point) => setPopover({ edge, point })}
+            onEdgeClick={(edge) => setSelectedEdge(edge)}
           />
-          {popover && (
-            <EdgeEvidencePopover
-              edge={popover.edge}
-              anchor={popover.point}
-              fromLabel={processTitle(Number(popover.edge.from.slice(3)))}
-              toLabel={processTitle(Number(popover.edge.to.slice(3)))}
-              onClose={() => setPopover(null)}
+          {selectedEdge && (
+            <EdgeEvidencePanel
+              edge={selectedEdge}
+              labelOf={(id) => processTitle(Number(id.slice(3)))}
+              onClose={() => setSelectedEdge(null)}
             />
           )}
         </div>

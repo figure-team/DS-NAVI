@@ -8,6 +8,7 @@ import {
   groupImpactMark,
   mapImpactToDomains,
   markFor,
+  mergeBidirectionalEdges,
   parseCrossDomainGraph,
   resolveStructureRoute,
   type CrossDomainEdge,
@@ -155,6 +156,25 @@ describe("buildFlowFileMap / deriveProcessSharedFileEdges (뎁스3 프로세스 
       new Map(),
     );
     expect(out).toEqual([]);
+  });
+});
+
+describe("mergeBidirectionalEdges", () => {
+  it("merges A->B and B->A into one line, summing weight, keeping per-direction originals", () => {
+    const merged = mergeBidirectionalEdges(aggregateGroupEdges(GROUPS, EDGES));
+    // g:shop->g:account(3) + g:account->g:shop(1) → 한 선.
+    expect(merged).toHaveLength(1);
+    expect(merged[0]).toMatchObject({ id: "g:account g:shop", weight: 4 });
+    expect(merged[0].directions.map((d) => `${d.from}>${d.to}`)).toEqual(["g:account>g:shop", "g:shop>g:account"]);
+  });
+
+  it("keeps a one-way edge as-is (single direction)", () => {
+    const merged = mergeBidirectionalEdges([
+      { id: "a b", from: "a", to: "b", weight: 2, evidence: [] },
+    ]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].directions).toHaveLength(1);
+    expect(merged[0].weight).toBe(2);
   });
 });
 

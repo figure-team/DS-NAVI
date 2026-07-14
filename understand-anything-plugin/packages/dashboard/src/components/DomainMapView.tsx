@@ -207,10 +207,21 @@ export default function DomainMapView() {
     [resolvedGroups, data, workCountByDomain],
   );
 
-  // 그룹 카드 행별 크기 정렬(§ 그룹 카드 그리드 전용) — 평면 카드는 영향 없음
-  // (groupCards가 [] 이면 hook 내부에서 사실상 no-op).
-  const groupCardKeys = useMemo(() => groupCards.map((g) => g.key), [groupCards]);
-  const groupSizing = useGroupCardRowSizing(groupCardKeys);
+  // 행별 크기 정렬 — 그룹 카드(§ 그룹 카드 그리드)와 평면 도메인 카드(사용자 확정:
+  // jpetstore 류 그룹 미구성 프로젝트에도 동일 규칙) 공용. 평면은 "업무 전체 펼치기"
+  // 중에는 클램프하지 않고(펼침 = 전량 노출 의미 보존), 업무 칩이 전혀 없는 프로젝트
+  // (fill 전)는 측정 대상이 없어 제외한다.
+  const flatBusinessCardIds = useMemo(() => {
+    if (!data || totalWorks === 0) return [];
+    return data.cards
+      .filter((c) => (processesByDomain.get(c.id)?.length ?? 0) > 0)
+      .map((c) => c.id);
+  }, [data, processesByDomain, totalWorks]);
+  const rowSizingKeys = useMemo(() => {
+    if (groupCards.length > 0) return groupCards.map((g) => g.key);
+    return worksExpanded ? [] : flatBusinessCardIds;
+  }, [groupCards, worksExpanded, flatBusinessCardIds]);
+  const groupSizing = useGroupCardRowSizing(rowSizingKeys);
 
   if (!domainGraph || !data) {
     return (
@@ -284,7 +295,7 @@ export default function DomainMapView() {
           style={{ boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)" }}
         >
           <div
-            ref={hasGroups ? groupSizing.containerRef : undefined}
+            ref={groupSizing.containerRef}
             className="flex-1 min-h-0 overflow-y-auto grid"
             style={{
               padding: "16px 18px",
@@ -385,6 +396,7 @@ export default function DomainMapView() {
                 /* 프로토 .dom — 카드 전체 클릭 = 워크스페이스 진입, hover 시 accent 테두리 */
                 <div
                   key={card.id}
+                  ref={groupSizing.registerCard(card.id)}
                   role="button"
                   tabIndex={0}
                   onClick={() => navigate(`/domains/${card.id}`)}
@@ -446,6 +458,9 @@ export default function DomainMapView() {
                       onOpen={(p) =>
                         navigate(`/domains/${card.id}?view=business&bf=${p.index}`)
                       }
+                      chipsRef={groupSizing.registerChips(card.id)}
+                      rowSized={worksExpanded ? undefined : groupSizing.sizing.get(card.id)}
+                      externallySized={!worksExpanded && flatBusinessCardIds.length > 0}
                     />
                   </div>
                 </div>
@@ -752,11 +767,20 @@ function ProcessChips({
   expanded,
   defaultTitle,
   onOpen,
+  chipsRef,
+  rowSized,
+  externallySized = false,
 }: {
   processes: BizProcess[];
   expanded: boolean;
   defaultTitle: string;
   onOpen: (p: BizProcess) => void;
+  /** 행별 크기 정렬(useGroupCardRowSizing) 측정용 칩 컨테이너 ref — 외부 사이징 시. */
+  chipsRef?: (el: HTMLDivElement | null) => void;
+  /** 외부(행 단위) 클램프 결과 — undefined 면 측정 패스(전량 렌더). */
+  rowSized?: { visible: number; hidden: number };
+  /** true 면 내부 2줄 클램프 측정을 끄고 rowSized 를 따른다(행별 크기 정렬 공용화). */
+  externallySized?: boolean;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   // null = 측정 패스(전량 렌더 후 클램프 계산 전).
@@ -767,7 +791,7 @@ function ProcessChips({
   }, [processes, expanded]);
 
   useLayoutEffect(() => {
-    if (expanded || visible !== null) return;
+    if (externallySized || expanded || visible !== null) return;
     const el = ref.current;
     if (!el) return;
     const chips = Array.from(el.children) as HTMLElement[];
@@ -796,6 +820,7 @@ function ProcessChips({
   }, [expanded, visible, processes]);
 
   useEffect(() => {
+    if (externallySized) return; // 리사이즈 재측정도 외부 훅(ResizeObserver) 소관.
     const el = ref.current;
     if (!el || typeof ResizeObserver === "undefined") return;
     let lastW = el.clientWidth;
@@ -807,19 +832,27 @@ function ProcessChips({
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [externallySized]);
 
   if (processes.length === 0) return null;
-  const measuring = !expanded && visible === null;
+  const measuring = externallySized
+    ? !expanded && rowSized === undefined
+    : !expanded && visible === null;
   const shown =
-    expanded || measuring ? processes : processes.slice(0, visible ?? processes.length);
+    expanded || measuring
+      ? processes
+      : processes.slice(0, externallySized ? (rowSized?.visible ?? processes.length) : (visible ?? processes.length));
   const rest = processes.length - shown.length;
   return (
     <div
-      ref={ref}
+      ref={(el) => {
+        ref.current = el;
+        chipsRef?.(el);
+      }}
       className="flex flex-wrap"
-      // 측정 패스 동안만 2줄 높이로 클립 — 카드 높이 출렁임 방지(측정엔 무영향).
-      style={{ gap: 6, ...(measuring ? { maxHeight: 58, overflow: "hidden" } : {}) }}
+      // 측정 패스 동안만 클립(내부 2줄=58, 외부 행별=3줄 상한 90) — 카드 높이
+      // 출렁임 방지(측정엔 무영향).
+      style={{ gap: 6, ...(measuring ? { maxHeight: externallySized ? 90 : 58, overflow: "hidden" } : {}) }}
     >
       {shown.map((p) => {
         const label = p.title ?? defaultTitle.replace("{n}", String(p.index + 1));

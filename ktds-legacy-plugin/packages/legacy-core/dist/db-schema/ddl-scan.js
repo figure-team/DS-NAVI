@@ -139,6 +139,7 @@ function parseCreateTable(name, relPath, tableLine, body, options, source, bodyS
         codeTableReason: null,
         rows: [],
         rowCount: 0,
+        origin: 'sql',
     };
 }
 /** 한 .sql 소스에서 DDL(테이블 + COMMENT ON) 추출. */

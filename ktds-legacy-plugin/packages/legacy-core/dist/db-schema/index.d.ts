@@ -1,7 +1,9 @@
 import type { DbSchemaModel } from './types.js';
-export { DB_SCHEMA_FILENAME, DATALOAD_ROW_CAP, EMBEDDED_DB_VENDORS, DbSchemaModelSchema, DbTableSchema, DbColumnSchema, DbForeignKeySchema, DbCheckSchema, DbIndexSchema, DbRowSchema, DbSchemaTierSchema, LiveDbSignalSchema, } from './types.js';
-export type { DbSchemaModel, DbTable, DbColumn, DbForeignKey, DbCheck, DbIndex, DbRow, DbSchemaTier, LiveDbSignal, } from './types.js';
+export { DB_SCHEMA_FILENAME, DATALOAD_ROW_CAP, EMBEDDED_DB_VENDORS, DbSchemaModelSchema, DbTableSchema, DbColumnSchema, DbForeignKeySchema, DbCheckSchema, DbIndexSchema, DbRowSchema, DbSchemaTierSchema, DbTableOriginSchema, LiveDbSignalSchema, } from './types.js';
+export type { DbSchemaModel, DbTable, DbColumn, DbForeignKey, DbCheck, DbIndex, DbRow, DbSchemaTier, DbTableOrigin, LiveDbSignal, } from './types.js';
 export { extractDbSchema } from './extract.js';
+export { inferTablesFromCode } from './code-infer.js';
+export type { CodeInferResult } from './code-infer.js';
 export { discoverLiveDbSignals } from './discover.js';
 export { extractDdlFromSource } from './ddl-scan.js';
 export type { DdlScanResult, CommentOn } from './ddl-scan.js';

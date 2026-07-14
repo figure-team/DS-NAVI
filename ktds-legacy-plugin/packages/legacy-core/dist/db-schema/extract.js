@@ -3,7 +3,9 @@
  *
  * 3-Tier 자산 게이팅:
  *  - 사용 가능한 구조(테이블)가 하나라도 추출되면 tier = 'ddl+data'(데이터 행 있음) | 'ddl'.
- *  - .sql 이 없거나 추출 0이면 tier = 'code-only' → 소비자(정책 신호 스캐너)가 JPA/MyBatis 폴백.
+ *  - .sql 이 없거나 추출 0이면 JPA/MyBatis 코드 역추론 폴백(code-infer.ts)으로 tables 를
+ *    채우고 tier = 'code-inferred'(근사·origin 표기). 역추론도 빈손이면 'code-only'.
+ *    DDL 이 생기면 역추론은 실행되지 않는다(상위 = 진실 소스, 하위 = 임시 근사).
  *
  * 정직성: 파일별 파싱 실패는 throw 하지 않고 unresolved 로 격리(jpa/extract 와 동일 규약).
  * 결정론: 테이블은 name 정렬, 컬럼·제약·행은 등장 순서 보존, unresolved 정렬.
@@ -11,12 +13,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { gitCommitHash } from '../domain-map/persist.js';
+import { inferTablesFromCode } from './code-infer.js';
 import { extractDdlFromSource } from './ddl-scan.js';
 import { extractDataloadFromSource } from './dataload-scan.js';
 import { discoverLiveDbSignals } from './discover.js';
 import { DbSchemaModelSchema, DATALOAD_ROW_CAP } from './types.js';
-/** W8 캐시 섹션 salt — ddl-scan/dataload-scan 의 파싱 의미가 바뀌면 bump. v2: DbTable.codeTableReason 추가. */
-const SQL_FACTS_SALT = 'v2';
+/** W8 캐시 섹션 salt — ddl-scan/dataload-scan 의 파싱 의미가 바뀌면 bump. v3: DbTable.origin 추가. */
+const SQL_FACTS_SALT = 'v3';
 function cmp(a, b) {
     return a < b ? -1 : a > b ? 1 : 0;
 }
@@ -91,8 +94,11 @@ function diffTableDefs(kept, dup) {
         diffs.push('INDEX 상이');
     return diffs;
 }
-/** census 의 .sql 파일을 파싱해 DB 스키마 모델 생성. */
-export function extractDbSchema(projectRoot, census, cache) {
+/**
+ * census 의 .sql 파일을 파싱해 DB 스키마 모델 생성.
+ * jpaModel 은 code-inferred 폴백의 JPA 소스(선택 — 없으면 MyBatis 역추론만).
+ */
+export function extractDbSchema(projectRoot, census, cache, jpaModel) {
     const tableByKey = new Map();
     const unresolved = [];
     let sqlFileCount = 0;
@@ -227,6 +233,7 @@ export function extractDbSchema(projectRoot, census, cache) {
                     codeTableReason: null,
                     rows: [],
                     rowCount: 0,
+                    origin: 'sql',
                 };
                 tableByKey.set(k, t);
             }
@@ -241,15 +248,31 @@ export function extractDbSchema(projectRoot, census, cache) {
             }
         }
     }
-    const tables = [...tableByKey.values()];
+    let tables = [...tableByKey.values()];
+    let tier;
+    if (tables.length === 0) {
+        // Tier 3 폴백 — .sql 자산 전무 시에만 JPA/MyBatis 역추론(상위 tier 게이팅).
+        const inferred = inferTablesFromCode(projectRoot, census, jpaModel, cache);
+        tables = inferred.tables;
+        tier = tables.length === 0 ? 'code-only' : 'code-inferred';
+        if (tables.length > 0) {
+            unresolved.push({
+                ref: '(code-infer)',
+                reason: `.sql 부재 — 테이블 ${tables.length}개 역추론(MyBatis ${inferred.fromMyBatis}개/매퍼 XML ${inferred.mapperCount}개 · JPA 엔티티 ${inferred.fromJpa}개). 구조 근사이며 DDL 확보 시 자동 대체.`,
+                severity: 'info',
+            });
+        }
+    }
+    else {
+        const hasData = tables.some((t) => t.rowCount > 0);
+        tier = hasData ? 'ddl+data' : 'ddl';
+    }
     for (const t of tables) {
         t.codeTableReason = codeTableReasonOf(t);
         t.isCodeTable = t.codeTableReason !== null;
     }
     tables.sort((a, b) => cmp(a.name, b.name) || cmp(a.relPath, b.relPath));
     unresolved.sort((a, b) => cmp(a.ref, b.ref) || cmp(a.reason, b.reason));
-    const hasData = tables.some((t) => t.rowCount > 0);
-    const tier = tables.length === 0 ? 'code-only' : hasData ? 'ddl+data' : 'ddl';
     // 라이브 DB 연결 신호(정적 탐지, 무연결) — .sql 유무와 별개로 항상 수집.
     const liveDbSignals = discoverLiveDbSignals(projectRoot, census);
     return DbSchemaModelSchema.parse({

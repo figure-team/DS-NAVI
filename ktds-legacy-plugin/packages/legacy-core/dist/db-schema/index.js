@@ -5,8 +5,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { specMapDir, stableJson } from '../domain-map/persist.js';
 import { DB_SCHEMA_FILENAME, DbSchemaModelSchema } from './types.js';
-export { DB_SCHEMA_FILENAME, DATALOAD_ROW_CAP, EMBEDDED_DB_VENDORS, DbSchemaModelSchema, DbTableSchema, DbColumnSchema, DbForeignKeySchema, DbCheckSchema, DbIndexSchema, DbRowSchema, DbSchemaTierSchema, LiveDbSignalSchema, } from './types.js';
+export { DB_SCHEMA_FILENAME, DATALOAD_ROW_CAP, EMBEDDED_DB_VENDORS, DbSchemaModelSchema, DbTableSchema, DbColumnSchema, DbForeignKeySchema, DbCheckSchema, DbIndexSchema, DbRowSchema, DbSchemaTierSchema, DbTableOriginSchema, LiveDbSignalSchema, } from './types.js';
 export { extractDbSchema } from './extract.js';
+export { inferTablesFromCode } from './code-infer.js';
 export { discoverLiveDbSignals } from './discover.js';
 // readDbSchema/writeDbSchema 는 본 파일 하단에 정의(export 키워드 동반).
 export { extractDdlFromSource } from './ddl-scan.js';

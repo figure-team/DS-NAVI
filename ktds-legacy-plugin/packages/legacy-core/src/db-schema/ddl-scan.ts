@@ -178,6 +178,7 @@ function parseCreateTable(
     codeTableReason: null,
     rows: [],
     rowCount: 0,
+    origin: 'sql',
   }
 }
 

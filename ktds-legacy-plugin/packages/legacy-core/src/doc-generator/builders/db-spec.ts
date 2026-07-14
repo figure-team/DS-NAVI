@@ -66,12 +66,16 @@ function jpaSections(input: DocInput): Section[] {
 
 /**
  * DDL 스키마(PA3, db-schema.json) — 그래프 노드 목록보다 깊은 **물리 스키마**를
- * grounding 으로 싣는다. 모든 행은 .sql 의 file:line 근거를 동반(CONFIRMED, 합성 아님).
+ * grounding 으로 싣는다. .sql 유래 행은 file:line 근거 동반(CONFIRMED, 합성 아님);
+ * code-inferred 폴백(origin=jpa/mybatis)의 역추론 테이블은 INFERRED([추정])로 강등.
  * db-schema 없으면(맵 미실행/code-only) 섹션 생략 — 기존 노드 기반 목록은 유지.
  */
 function ddlSchemaSections(input: DocInput): Section[] {
   const m = input.dbSchema
   if (!m || m.tables.length === 0) return []
+
+  // 역추론 테이블(코드 근사)은 CONFIRMED 로 실을 수 없다 — 근거는 매퍼 SQL/엔티티지 DDL 이 아님.
+  const conf = (t: { origin?: string }) => (t.origin === 'jpa' || t.origin === 'mybatis' ? 'INFERRED' : 'CONFIRMED')
 
   const tableClaims: Claim[] = m.tables.map((t) =>
     claim(
@@ -79,8 +83,9 @@ function ddlSchemaSections(input: DocInput): Section[] {
         `${t.primaryKey.length ? `, PK ${t.primaryKey.join('+')}` : ''}` +
         `${t.foreignKeys.length ? `, FK ${t.foreignKeys.length}` : ''}` +
         `${t.checks.length ? `, CHECK ${t.checks.length}` : ''}` +
-        `${t.isCodeTable ? ', 코드테이블' : ''})`,
-      'CONFIRMED',
+        `${t.isCodeTable ? ', 코드테이블' : ''}` +
+        `${t.origin === 'jpa' || t.origin === 'mybatis' ? `, ${t.origin} 역추론` : ''})`,
+      conf(t),
       [{ file: t.relPath, line: t.line }],
     ),
   )
@@ -91,7 +96,7 @@ function ddlSchemaSections(input: DocInput): Section[] {
           `${c.primaryKey ? ' [PK]' : ''}${!c.nullable ? ' [NOT NULL]' : ''}` +
           `${c.unique ? ' [UNIQUE]' : ''}${c.default !== null ? ` [기본값 ${c.default}]` : ''}` +
           `${c.comment ? ` — ${c.comment}` : ''}`,
-        'CONFIRMED',
+        conf(t),
         [{ file: t.relPath, line: c.line }],
       ),
     ),
@@ -113,8 +118,10 @@ function ddlSchemaSections(input: DocInput): Section[] {
     ),
   ]
 
+  // code-inferred 는 DDL 이 아니라 코드 역추론 — 헤딩에서 DDL 을 참칭하지 않는다.
+  const label = m.tier === 'code-inferred' ? '코드 역추론' : 'DDL'
   const sections: Section[] = [
-    { heading: `DB 스키마 — 테이블 (DDL, tier=${m.tier})`, claims: tableClaims },
+    { heading: `DB 스키마 — 테이블 (${label}, tier=${m.tier})`, claims: tableClaims },
   ]
   if (columnClaims.length > 0) sections.push({ heading: 'DB 스키마 — 컬럼 (DDL)', claims: columnClaims })
   if (constraintClaims.length > 0) {

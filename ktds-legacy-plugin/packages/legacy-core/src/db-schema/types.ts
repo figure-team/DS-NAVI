@@ -4,7 +4,8 @@
  * 소스 트리의 .sql 을 정적 파싱한 결과(라이브 DB 커넥터 없음). 3-Tier 신뢰 모델:
  *  - Tier 1 (DDL): CREATE TABLE → 컬럼/제약/FK/인덱스/주석. CONFIRMED 가능.
  *  - Tier 2 (dataload): INSERT → 공통코드/상태/요율 행. CONFIRMED 가능.
- *  - Tier 3 (없음): .sql 부재 → 소비자(정책 신호 스캐너)가 JPA/MyBatis 코드역추론 폴백.
+ *  - Tier 3 (code-inferred): .sql 부재 → 추출기가 JPA/MyBatis 코드역추론으로 tables 를
+ *    채움(구조 근사·비권위, DbTable.origin 으로 표기). 역추론도 빈손이면 code-only.
  *
  * 결정론: 모든 배열은 생산자에서 명시 키로 정렬(컬럼은 선언 순서 보존). 라인은 1-기반.
  * 신뢰도/근거 모델은 JpaModel(보완 B)과 동형(schemaVersion·gitCommit·unresolved).
@@ -14,9 +15,16 @@ import { z } from 'zod'
 /** `.spec/map/` 정규 산출물 파일명. */
 export const DB_SCHEMA_FILENAME = 'db-schema.json'
 
-/** 분석 등급 — 발견한 .sql 자산에 따라 결정(자산 게이팅). */
-export const DbSchemaTierSchema = z.enum(['ddl+data', 'ddl', 'code-only'])
+/**
+ * 분석 등급 — 발견한 자산에 따라 결정(자산 게이팅). ddl+data > ddl > code-inferred > code-only.
+ * code-inferred 는 .sql 부재 시 JPA/MyBatis 역추론으로 채운 근사 — DDL 이 생기면 자동 대체.
+ */
+export const DbSchemaTierSchema = z.enum(['ddl+data', 'ddl', 'code-inferred', 'code-only'])
 export type DbSchemaTier = z.infer<typeof DbSchemaTierSchema>
+
+/** 테이블 출처 — sql(.sql DDL/dataload, 권위) | jpa/mybatis(코드 역추론, 근사). */
+export const DbTableOriginSchema = z.enum(['sql', 'jpa', 'mybatis'])
+export type DbTableOrigin = z.infer<typeof DbTableOriginSchema>
 
 /** 컬럼 한 개 — DDL 컬럼 정의에서 파싱. line 은 컬럼 선언 라인(1-기반). */
 export const DbColumnSchema = z.object({
@@ -87,6 +95,8 @@ export const DbTableSchema = z.object({
   /** dataload INSERT 행(캡 적용). rowCount 가 실제 총 행수(캡 초과 보고). */
   rows: z.array(DbRowSchema),
   rowCount: z.number().int().nonnegative(),
+  /** 출처(code-inferred 폴백 표기). 구버전 산출물 부재 허용 — 기본 'sql'. */
+  origin: DbTableOriginSchema.default('sql'),
 })
 export type DbTable = z.infer<typeof DbTableSchema>
 
@@ -116,9 +126,9 @@ export const EMBEDDED_DB_VENDORS = new Set(['h2', 'hsqldb', 'sqlite', 'derby'])
 export const DbSchemaModelSchema = z.object({
   schemaVersion: z.literal(1),
   gitCommit: z.string().nullable(),
-  /** 분석 등급(자산 게이팅 결과). code-only 면 tables 는 비고 소비자가 코드역추론. */
+  /** 분석 등급(자산 게이팅 결과). code-inferred 면 tables 는 JPA/MyBatis 역추론 근사. */
   tier: DbSchemaTierSchema,
-  /** 파싱한 .sql 파일 수(0 이면 tier=code-only). */
+  /** 파싱한 .sql 파일 수(0 이면 tier=code-inferred|code-only). */
   sqlFileCount: z.number().int().nonnegative(),
   tables: z.array(DbTableSchema),
   /** 라이브 DB 연결 신호(정적 탐지, 무연결). 비어있지 않으면 SKILL 이 .sql 덤프를 권장. */

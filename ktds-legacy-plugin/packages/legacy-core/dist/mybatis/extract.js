@@ -16,22 +16,33 @@ function plainSql(body) {
         .replace(/[#$]\{[^}]*\}/g, '?') // #{...}/${...} → 플레이스홀더.
         .replace(/\s+/g, ' ');
 }
-/** SQL 에서 참조 테이블 추출(FROM 다중·JOIN·INSERT INTO·UPDATE·DELETE FROM). */
+/**
+ * 테이블 위치에 올 수 없는 예약어 — `MERGE … WHEN MATCHED THEN UPDATE SET` 의 SET 등
+ * 키워드가 테이블로 오탐되는 것 차단(mmobile CommCodeMapper 실측).
+ */
+const SQL_KEYWORDS = new Set(['SET', 'SELECT', 'WHERE', 'VALUES', 'DISTINCT', 'ALL']);
+/**
+ * SQL 에서 참조 테이블 추출(FROM 다중·JOIN·INSERT INTO·UPDATE·DELETE FROM).
+ * 스키마 한정 이름(OWNER.TABLE)은 마지막 세그먼트 채택 — 접두어만 잡으면 스키마명이
+ * 가짜 테이블로 들어가고 실테이블이 누락된다(mmobile RateAddMapper 실측).
+ */
 function tablesInSql(sql) {
     const out = [];
     const ident = '[A-Za-z_][A-Za-z0-9_]*';
+    const qident = `${ident}(?:\\s*\\.\\s*${ident})?`;
+    const lastSeg = (t) => (t.split('.').pop() ?? t).trim();
     // FROM a, b, c  (서브쿼리 "FROM (" 는 ident 불일치로 자연 제외)
-    for (const m of sql.matchAll(new RegExp(`\\bFROM\\s+(${ident}(?:\\s*,\\s*${ident})*)`, 'gi'))) {
+    for (const m of sql.matchAll(new RegExp(`\\bFROM\\s+(${qident}(?:\\s*,\\s*${qident})*)`, 'gi'))) {
         for (const t of m[1].split(','))
-            out.push(t.trim());
+            out.push(lastSeg(t));
     }
-    for (const m of sql.matchAll(new RegExp(`\\bJOIN\\s+(${ident})`, 'gi')))
-        out.push(m[1]);
-    for (const m of sql.matchAll(new RegExp(`\\bINTO\\s+(${ident})`, 'gi')))
-        out.push(m[1]);
-    for (const m of sql.matchAll(new RegExp(`\\bUPDATE\\s+(${ident})`, 'gi')))
-        out.push(m[1]);
-    return uniqSort(out.map((t) => t.toUpperCase()));
+    for (const m of sql.matchAll(new RegExp(`\\bJOIN\\s+(${qident})`, 'gi')))
+        out.push(lastSeg(m[1]));
+    for (const m of sql.matchAll(new RegExp(`\\bINTO\\s+(${qident})`, 'gi')))
+        out.push(lastSeg(m[1]));
+    for (const m of sql.matchAll(new RegExp(`\\bUPDATE\\s+(${qident})`, 'gi')))
+        out.push(lastSeg(m[1]));
+    return uniqSort(out.map((t) => t.toUpperCase()).filter((t) => !SQL_KEYWORDS.has(t)));
 }
 /** INSERT 컬럼리스트 + UPDATE SET 컬럼에서 컬럼명 추출(베스트에포트). */
 function columnsInSql(sql, crud) {

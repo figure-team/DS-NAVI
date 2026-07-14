@@ -29,6 +29,18 @@ const ORDER_XML = `<mapper namespace="com.shop.OrderMapper">
   </select>
 </mapper>`
 
+// mmobile 실측 오탐 2종 — 스키마 한정 이름(OWNER.TABLE) + MERGE 의 UPDATE SET.
+const QUALIFIED_XML = `<mapper namespace="com.shop.RateMapper">
+  <select id="countReview">
+    SELECT COUNT(1) AS CNT FROM A.MCP_REQUEST_REVIEW A WHERE A.RATE_CD = #{rateCd}
+  </select>
+  <update id="mergeCode">
+    MERGE INTO NMCP_CD_DTL USING DUAL ON (DTL_CD = #{dtlCd})
+    WHEN MATCHED THEN UPDATE SET DTL_CD_NM = #{dtlCdNm}
+    WHEN NOT MATCHED THEN INSERT (DTL_CD) VALUES (#{dtlCd})
+  </update>
+</mapper>`
+
 describe('parseMapperXml', () => {
   const m = parseMapperXml(ACCOUNT_XML, 'mapper/AccountMapper.xml')!
 
@@ -60,6 +72,16 @@ describe('parseMapperXml', () => {
     const om = parseMapperXml(ORDER_XML, 'OrderMapper.xml')!
     const s = om.statements[0]
     expect(s.tables).toEqual(['LINEITEM', 'ORDERS', 'SEQUENCE'])
+  })
+
+  it('스키마 한정 이름(OWNER.TABLE) — 마지막 세그먼트 채택(접두어 오탐·실테이블 누락 방지)', () => {
+    const qm = parseMapperXml(QUALIFIED_XML, 'RateMapper.xml')!
+    expect(qm.statements.find((s) => s.id === 'countReview')!.tables).toEqual(['MCP_REQUEST_REVIEW'])
+  })
+
+  it('MERGE … WHEN MATCHED THEN UPDATE SET — 키워드 SET 오탐 제외, INTO 대상만', () => {
+    const qm = parseMapperXml(QUALIFIED_XML, 'RateMapper.xml')!
+    expect(qm.statements.find((s) => s.id === 'mergeCode')!.tables).toEqual(['NMCP_CD_DTL'])
   })
 
   it('매퍼 XML 아니면 null', () => {

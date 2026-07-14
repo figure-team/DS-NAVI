@@ -103,14 +103,9 @@ export default function DomainsPage() {
   // 리다이렉트 판정도 같은 이유로 빈 화면(전이 상태) — 목적지가 즉시 이펙트로 반영된다.
   return (
     <div className="h-full w-full flex flex-col bg-root text-text-primary">
-      {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조) — 구조 탭은 /structure 로
-          라우트 전환(StructurePage 가 같은 스트립을 렌더해 탭이 이어져 보인다). */}
-      <div
-        className="shrink-0 flex items-center border-b border-border-subtle bg-surface"
-        style={{ padding: "0 20px" }}
-      >
-        <WorkMapTabs active="map" />
-      </div>
+      {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조, pmpl-proto .tabs) — 구조
+          탭은 /structure 로 라우트 전환(StructurePage 가 같은 행을 렌더해 이어져 보인다). */}
+      <WorkMapTabs active="map" />
       <div className="flex-1 min-h-0 relative">
         {resolved.kind === "landing" && <DomainMapView />}
         {resolved.kind === "flat" && (activeDomainId ? <FlowListView /> : null)}

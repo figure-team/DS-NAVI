@@ -142,17 +142,11 @@ export default function StructurePage() {
 
   return (
     <div className="h-full w-full flex flex-col bg-root text-text-primary overflow-hidden">
-      {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조) — 이 페이지는 구조 탭. */}
-      <div
-        className="shrink-0 flex items-center justify-between border-b border-border-subtle bg-surface"
-        style={{ padding: "0 20px" }}
-      >
-        <WorkMapTabs active="structure" />
-        <div className="flex items-center gap-3">
-          <DiffToggle />
-        </div>
-      </div>
-      <StructureBreadcrumb crumbs={crumbs} />
+      {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조, pmpl-proto .tabs) — 이
+          페이지는 구조 탭. 오버레이 토글은 같은 행 우측 슬롯에. */}
+      <WorkMapTabs active="structure" right={<DiffToggle />} />
+      {/* 뎁스1 은 루트("구조") 하나뿐 — 바로 위 탭 라벨과 중복이라 뎁스2+ 에서만 표시. */}
+      {crumbs.length > 1 && <StructureBreadcrumb crumbs={crumbs} />}
       <div className="flex-1 min-h-0">
         {route.kind === "depth1" && (
           <StructureDepth1View

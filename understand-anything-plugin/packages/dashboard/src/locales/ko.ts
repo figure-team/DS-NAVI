@@ -216,6 +216,9 @@ export const ko = {
     sequentialFallbackCard: "순차 근사 (전체 기능)",
     backToProcessList: "업무 프로세스 목록으로",
     relatedFlowSpine: "관련 기능흐름도",
+    rendererTabsLabel: "렌더러 전환",
+    rendererCard: "카드형",
+    rendererGraph: "그래프형(U-A)",
   },
   flowView: {
     selectedFlow: "선택된 기능",

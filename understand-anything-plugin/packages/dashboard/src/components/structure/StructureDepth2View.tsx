@@ -9,8 +9,10 @@ import {
   markFor,
   type AggregatedEdge,
   type CrossDomainEdge,
+  type StructureRenderer,
 } from "../../utils/structureGraph";
 import StructureNetworkGraph, { type StructureGraphNode } from "./StructureNetworkGraph";
+import StructureNetworkGraphUA from "./StructureNetworkGraphUA";
 import EdgeEvidencePopover from "./EdgeEvidencePopover";
 
 /**
@@ -22,11 +24,15 @@ export default function StructureDepth2View({
   crossDomainEdges,
   changedDomainIds,
   affectedDomainIds,
+  renderer,
 }: {
   group: ResolvedGroup | null;
   crossDomainEdges: CrossDomainEdge[] | null;
   changedDomainIds: Set<string>;
   affectedDomainIds: Set<string>;
+  /** `?renderer=` 탭 — 카드형(기본)/그래프형(U-A). 뎁스3 은 무관하지만 브레드크럼으로
+   * 돌아왔을 때 탭이 복원되도록 드릴다운 URL 에도 그대로 실어 보낸다. */
+  renderer: StructureRenderer;
 }) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const navigate = useNavigate();
@@ -66,13 +72,19 @@ export default function StructureDepth2View({
 
   const nameById = useMemo(() => new Map(cards.map((c) => [c.id, c.name])), [cards]);
 
+  const onOpenNode = (id: string) => {
+    const suffix = renderer === "ua" ? "&renderer=ua" : "";
+    navigate(`/structure?domain=${encodeURIComponent(id)}${suffix}`);
+  };
+  const GraphComponent = renderer === "ua" ? StructureNetworkGraphUA : StructureNetworkGraph;
+
   return (
     <div className="h-full w-full relative">
-      <StructureNetworkGraph
+      <GraphComponent
         nodes={nodes}
         edges={edges}
         emptyLabel={crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges}
-        onOpenNode={(id) => navigate(`/structure?domain=${encodeURIComponent(id)}`)}
+        onOpenNode={onOpenNode}
         onEdgeClick={(edge, point) => setPopover({ edge, point })}
       />
       {popover && (

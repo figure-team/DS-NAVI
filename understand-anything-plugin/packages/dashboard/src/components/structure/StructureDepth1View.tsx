@@ -9,8 +9,10 @@ import {
   groupImpactMark,
   type AggregatedEdge,
   type CrossDomainEdge,
+  type StructureRenderer,
 } from "../../utils/structureGraph";
 import StructureNetworkGraph, { type StructureGraphNode } from "./StructureNetworkGraph";
+import StructureNetworkGraphUA from "./StructureNetworkGraphUA";
 import EdgeEvidencePopover from "./EdgeEvidencePopover";
 
 /** 뎁스1 — 상단도메인(그룹) 그래프(설계 §3·§4). */
@@ -19,11 +21,14 @@ export default function StructureDepth1View({
   crossDomainEdges,
   changedDomainIds,
   affectedDomainIds,
+  renderer,
 }: {
   groups: ResolvedGroup[];
   crossDomainEdges: CrossDomainEdge[] | null;
   changedDomainIds: Set<string>;
   affectedDomainIds: Set<string>;
+  /** `?renderer=` 탭 — 카드형(기본)/그래프형(U-A). 뎁스1·2 전환 시 URL에 유지된다. */
+  renderer: StructureRenderer;
 }) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const navigate = useNavigate();
@@ -60,13 +65,19 @@ export default function StructureDepth1View({
 
   const nameByKey = useMemo(() => new Map(groupCards.map((g) => [g.key, g.name])), [groupCards]);
 
+  const onOpenNode = (id: string) => {
+    const suffix = renderer === "ua" ? "&renderer=ua" : "";
+    navigate(`/structure?group=${encodeURIComponent(id)}${suffix}`);
+  };
+  const GraphComponent = renderer === "ua" ? StructureNetworkGraphUA : StructureNetworkGraph;
+
   return (
     <div className="h-full w-full relative">
-      <StructureNetworkGraph
+      <GraphComponent
         nodes={nodes}
         edges={groupEdges}
         emptyLabel={crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges}
-        onOpenNode={(id) => navigate(`/structure?group=${encodeURIComponent(id)}`)}
+        onOpenNode={onOpenNode}
         onEdgeClick={(edge, point) => setPopover({ edge, point })}
       />
       {popover && (

@@ -7,6 +7,7 @@ import {
   mapImpactToDomains,
   markFor,
   parseCrossDomainGraph,
+  resolveRenderer,
   resolveStructureRoute,
   type CrossDomainEdge,
 } from "../structureGraph";
@@ -181,5 +182,23 @@ describe("resolveStructureRoute", () => {
   it("?domain=<id>&bf=<non-numeric> -> falls back to depth3", () => {
     const route = resolveStructureRoute({ group: null, domain: "domain:cart", bf: "nope", node: null, level: null }, GROUPS, domainIds);
     expect(route).toEqual({ kind: "depth3", domainId: "domain:cart" });
+  });
+});
+
+describe("resolveRenderer — 뎁스1·2 렌더러 탭(?renderer=)", () => {
+  it("renderer=ua -> 그래프형(U-A)", () => {
+    expect(resolveRenderer("ua")).toBe("ua");
+  });
+
+  it("param 없음(null) -> 카드형 기본값", () => {
+    expect(resolveRenderer(null)).toBe("card");
+  });
+
+  it("renderer=card -> 카드형", () => {
+    expect(resolveRenderer("card")).toBe("card");
+  });
+
+  it("알 수 없는 값 -> 카드형으로 안전 폴백", () => {
+    expect(resolveRenderer("bogus")).toBe("card");
   });
 });

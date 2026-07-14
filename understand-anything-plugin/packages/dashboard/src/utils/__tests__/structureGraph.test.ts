@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   aggregateGroupEdges,
   buildFileToDomainId,
+  buildFlowFileMap,
+  deriveProcessSharedFileEdges,
   filterEdgesAmong,
   groupImpactMark,
   mapImpactToDomains,
@@ -102,6 +104,57 @@ describe("buildFileToDomainId / mapImpactToDomains", () => {
     expect(map.get("src/Shared.java")).toEqual(new Set(["domain:cart", "domain:account"]));
     const changed = mapImpactToDomains(map, ["file:src/Shared.java"]);
     expect(changed).toEqual(new Set(["domain:cart", "domain:account"]));
+  });
+});
+
+describe("buildFlowFileMap / deriveProcessSharedFileEdges (뎁스3 프로세스 연결)", () => {
+  const nodes = [
+    { id: "flow:add", type: "flow", filePath: "src/CartAction.java" },
+    { id: "flow:view", type: "flow", filePath: "src/CartAction.java" },
+    { id: "flow:search", type: "flow", filePath: "src/CatalogAction.java" },
+    { id: "step:1", type: "step", filePath: "src/Cart.java" },
+    { id: "step:2", type: "step", filePath: null },
+  ];
+  const edges = [
+    { type: "flow_step", source: "flow:add", target: "step:1" },
+    { type: "flow_step", source: "flow:add", target: "step:2" },
+    { type: "contains_flow", source: "domain:cart", target: "flow:add" },
+  ];
+
+  it("maps flow id -> own filePath + step filePaths, deduped, null-safe", () => {
+    const map = buildFlowFileMap(nodes, edges);
+    expect(map.get("flow:add")).toEqual(["src/CartAction.java", "src/Cart.java"]);
+    expect(map.get("flow:view")).toEqual(["src/CartAction.java"]);
+    expect(map.has("step:1")).toBe(false);
+  });
+
+  it("links two processes sharing files (flowRef + citations union), sorted evidence", () => {
+    const map = buildFlowFileMap(nodes, edges);
+    const out = deriveProcessSharedFileEdges(
+      [
+        { id: "bf:0", flowRefs: ["flow:add"], citationFiles: [] },
+        { id: "bf:1", flowRefs: ["flow:view"], citationFiles: ["src/Cart.java"] },
+        { id: "bf:2", flowRefs: ["flow:search"], citationFiles: [] },
+      ],
+      map,
+    );
+    // bf:0(CartAction, Cart) ∩ bf:1(CartAction, Cart) = 2 / bf:2 는 어느 쪽과도 0.
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ id: "bf:0 bf:1", from: "bf:0", to: "bf:1", weight: 2 });
+    expect(out[0].evidence.map((e) => e.source)).toEqual(["src/Cart.java", "src/CartAction.java"]);
+    expect(out[0].evidence[0]).toMatchObject({ kind: "shared", line: null });
+    expect(out[0].evidence[0].target).toBe(out[0].evidence[0].source);
+  });
+
+  it("unknown flowRef contributes nothing (no throw)", () => {
+    const out = deriveProcessSharedFileEdges(
+      [
+        { id: "bf:0", flowRefs: ["flow:ghost"], citationFiles: [] },
+        { id: "bf:1", flowRefs: [], citationFiles: [] },
+      ],
+      new Map(),
+    );
+    expect(out).toEqual([]);
   });
 });
 

@@ -1,13 +1,23 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 import { buildDomainFlows, domainIcon, findDomain, parseDomainClaims } from "../../utils/domainData";
 import { parseBusinessFlows } from "../../utils/businessFlow";
+import {
+  buildFlowFileMap,
+  deriveProcessSharedFileEdges,
+  type AggregatedEdge,
+} from "../../utils/structureGraph";
+import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
+import EdgeEvidencePopover from "./EdgeEvidencePopover";
 import GroundedBar from "../GroundedBar";
 
 /**
- * 뎁스3 — 선택 서브도메인 + 업무 프로세스(businessFlows[]) 제목 카드(설계 §4).
+ * 뎁스3 — 선택 서브도메인 + 업무 프로세스(businessFlows[]) 그래프(설계 §4, 사용자
+ * 요청으로 제목 카드 그리드 → 뎁스1·2와 같은 연결 그래프로 승격). 노드 = 업무
+ * 프로세스 카드(활동 요약 + 참조 기능 칩), 엣지 = 두 프로세스가 같은 파일을 만질 때
+ * (공유 파일 수 = weight, 클릭 = 근거 팝오버 — deriveProcessSharedFileEdges).
  * 카드 클릭 = 뎁스4(`&bf=<index>`). 프로세스가 전무해도 이 도메인에 기능(flow)이
  * 있으면 결정론 순차 근사 1건으로 진입 가능하게 한다(FlowListView 의 폴백 관례와
  * 동일 — "미채움"과 "그릴 것이 아예 없음"을 구분).
@@ -16,6 +26,7 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const navigate = useNavigate();
   const { t } = useI18n();
+  const [popover, setPopover] = useState<{ edge: AggregatedEdge; point: { x: number; y: number } } | null>(null);
 
   const domainNode = useMemo(
     () => (domainGraph ? findDomain(domainGraph, domainId) : undefined),
@@ -27,6 +38,51 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
     () => (domainGraph ? buildDomainFlows(domainGraph, domainId).length > 0 : false),
     [domainGraph, domainId],
   );
+
+  const flowNameById = useMemo(
+    () => new Map((domainGraph?.nodes ?? []).filter((n) => n.type === "flow").map((n) => [n.id, n.name])),
+    [domainGraph],
+  );
+
+  const processTitle = (index: number) =>
+    processes.find((p) => p.index === index)?.title ??
+    t.flowList.bizProcessDefault.replace("{n}", String(index + 1));
+
+  // 그래프 노드 — 카드 본문은 활동 체인 요약, 칩은 참조 기능(코드 근거의 축).
+  const uaNodes = useMemo<DomainStyleGraphNode[]>(
+    () =>
+      processes.map((p) => {
+        const activities = p.flow.nodes.filter((n) => n.kind === "activity" || n.kind === "decision");
+        const flowRefs = [...new Set(p.flow.nodes.map((n) => n.flowRef).filter((r): r is string => !!r))];
+        return {
+          id: `bf:${p.index}`,
+          name: p.title ?? t.flowList.bizProcessDefault.replace("{n}", String(p.index + 1)),
+          icon: "",
+          summary: activities.map((n) => n.label).join(" → "),
+          chips: flowRefs.map((r) => flowNameById.get(r) ?? r),
+          chipsLabel: t.nodeInfo.flows,
+          footer: t.structure.bfNodeCount.replace("{count}", String(p.flow.nodes.length)),
+          impact: null,
+          diffChangedCount: 0,
+          diffAffectedCount: 0,
+        };
+      }),
+    [processes, flowNameById, t],
+  );
+
+  // 프로세스 간 엣지 — 공유 파일(citations + flowRef→기능·스텝 파일) 결정론 도출.
+  const uaEdges = useMemo<AggregatedEdge[]>(() => {
+    if (!domainGraph || processes.length < 2) return [];
+    const fileMap = buildFlowFileMap(domainGraph.nodes, domainGraph.edges);
+    return deriveProcessSharedFileEdges(
+      processes.map((p) => ({
+        id: `bf:${p.index}`,
+        flowRefs: p.flow.nodes.map((n) => n.flowRef).filter((r): r is string => !!r),
+        citationFiles: p.flow.nodes.flatMap((n) => n.citations.map((c) => c.filePath)),
+      })),
+      fileMap,
+    );
+  }, [domainGraph, processes]);
 
   if (!domainGraph || !domainNode) {
     return (
@@ -60,44 +116,46 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
           </p>
         )}
       </header>
-      <div className="flex-1 min-h-0 overflow-y-auto" style={{ padding: 20 }}>
-        {processes.length > 0 ? (
-          <div className="grid" style={{ gap: 12, gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
-            {processes.map((p) => (
-              <button
-                key={p.index}
-                type="button"
-                onClick={() => openBf(p.index)}
-                className="text-left rounded-[10px] border border-border-subtle bg-panel hover:border-accent cursor-pointer transition-colors"
-                style={{ padding: "14px 16px" }}
-              >
-                <span className="text-text-primary font-semibold" style={{ fontSize: 13.5 }}>
-                  {p.title ?? t.flowList.bizProcessDefault.replace("{n}", String(p.index + 1))}
-                </span>
-                <p className="text-text-muted" style={{ fontSize: 11, marginTop: 4 }}>
-                  {t.structure.bfNodeCount.replace("{count}", String(p.flow.nodes.length))}
-                </p>
-              </button>
-            ))}
-          </div>
-        ) : hasAnyFlow ? (
-          <button
-            type="button"
-            onClick={() => openBf(0)}
-            className="text-left rounded-[10px] border border-border-subtle bg-panel hover:border-accent cursor-pointer transition-colors"
-            style={{ padding: "14px 16px", maxWidth: 320 }}
-          >
-            <span className="text-text-primary font-semibold" style={{ fontSize: 13.5 }}>
-              {t.structure.sequentialFallbackCard}
-            </span>
-            <p className="text-text-muted" style={{ fontSize: 11, marginTop: 4 }}>
-              {t.flowList.businessFallbackBanner}
-            </p>
-          </button>
-        ) : (
-          <p className="text-text-muted" style={{ fontSize: 13 }}>{t.flowList.businessEmpty}</p>
-        )}
-      </div>
+      {processes.length > 0 ? (
+        <div className="flex-1 min-h-0 relative">
+          <StructureDomainGraphUA
+            nodes={uaNodes}
+            edges={uaEdges}
+            emptyLabel={t.flowList.businessEmpty}
+            onOpenNode={(id) => openBf(Number(id.slice(3)))}
+            onEdgeClick={(edge, point) => setPopover({ edge, point })}
+          />
+          {popover && (
+            <EdgeEvidencePopover
+              edge={popover.edge}
+              anchor={popover.point}
+              fromLabel={processTitle(Number(popover.edge.from.slice(3)))}
+              toLabel={processTitle(Number(popover.edge.to.slice(3)))}
+              onClose={() => setPopover(null)}
+            />
+          )}
+        </div>
+      ) : (
+        <div className="flex-1 min-h-0 overflow-y-auto" style={{ padding: 20 }}>
+          {hasAnyFlow ? (
+            <button
+              type="button"
+              onClick={() => openBf(0)}
+              className="text-left rounded-[10px] border border-border-subtle bg-panel hover:border-accent cursor-pointer transition-colors"
+              style={{ padding: "14px 16px", maxWidth: 320 }}
+            >
+              <span className="text-text-primary font-semibold" style={{ fontSize: 13.5 }}>
+                {t.structure.sequentialFallbackCard}
+              </span>
+              <p className="text-text-muted" style={{ fontSize: 11, marginTop: 4 }}>
+                {t.flowList.businessFallbackBanner}
+              </p>
+            </button>
+          ) : (
+            <p className="text-text-muted" style={{ fontSize: 13 }}>{t.flowList.businessEmpty}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

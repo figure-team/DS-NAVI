@@ -107,16 +107,21 @@ export default function EdgeEvidencePopover({
               >
                 {ev.source}
               </button>
-              <span className="text-text-muted" style={{ fontSize: 9 }}>↓</span>
-              <button
-                type="button"
-                onClick={() => openCodeViewerAt(ev.target, 1)}
-                className="text-left truncate text-text-secondary hover:text-accent transition-colors cursor-pointer"
-                style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}
-                title={ev.target}
-              >
-                {ev.target}
-              </button>
+              {/* 공유 파일 근거(뎁스3, source==target)는 단일 행 — 방향 화살표 무의미. */}
+              {ev.target !== ev.source && (
+                <>
+                  <span className="text-text-muted" style={{ fontSize: 9 }}>↓</span>
+                  <button
+                    type="button"
+                    onClick={() => openCodeViewerAt(ev.target, 1)}
+                    className="text-left truncate text-text-secondary hover:text-accent transition-colors cursor-pointer"
+                    style={{ fontFamily: "var(--font-mono)", fontSize: 10.5 }}
+                    title={ev.target}
+                  >
+                    {ev.target}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ))}

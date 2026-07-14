@@ -90,7 +90,7 @@ const DomainStyleCard = memo(function DomainStyleCard({ data }: NodeProps) {
       <Handle type="source" position={Position.Right} className="!bg-accent/60 !w-2 !h-2" />
 
       <div className="flex items-center gap-1.5 mb-1">
-        <span aria-hidden className="shrink-0 text-sm leading-none">{n.icon}</span>
+        {n.icon && <span aria-hidden className="shrink-0 text-sm leading-none">{n.icon}</span>}
         <span className="font-heading text-sm text-accent font-semibold truncate">{n.name}</span>
         {n.diffChangedCount > 0 && (
           <span className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap bg-[var(--color-diff-changed-dim)] text-[var(--color-diff-changed)]">

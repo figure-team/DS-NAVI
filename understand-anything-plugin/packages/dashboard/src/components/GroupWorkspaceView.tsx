@@ -15,14 +15,12 @@ import {
 } from "../utils/groupWorkspaceTree";
 
 /**
- * 상단도메인(그룹) 워크스페이스 (DOMAIN_HIERARCHY §7 D3, 2026-07-14 트리 통합) —
- * 좌측을 **서브도메인▸업무흐름도 2레벨 트리 1단**으로 통합한다(구 [서브도메인 목록] |
- * [업무 프로세스 목록] | [순서도] 3단에서, 앞의 두 컬럼을 트리 하나로 합침). 리프
- * (흐름) 클릭 시 본문에 **기존 도메인 워크스페이스(FlowListView, 화면 B)를 그대로**
- * 렌더한다 — 새 그래프/레이아웃 없음(회귀 0, 관계선·분산배치 재도입 금지 준수).
- * FlowListView 내부의 구 프로세스 목록(중간 컬럼)은 `hideProcessList` 로 숨겨
- * 트리와 중복 표시되지 않게 한다 — **기능(코드 흐름) 탭은 그대로**(선택된
- * 서브도메인 기준 현행 유지, 트리 밖 영역).
+ * 상단도메인(그룹) 워크스페이스 (DOMAIN_HIERARCHY §7 D3, 2026-07-14 트리 통합 v2) —
+ * 서브도메인▸업무흐름도 2레벨 트리를 **기존 업무 프로세스 목록 패널 자리**
+ * (FlowListView 업무 흐름도 탭 내부, processPanel 주입)에 넣는다. 별도 외곽
+ * 컬럼은 없다(사용자 확정: "트리는 기존 업무흐름도 목록에 들어간다") — 화면은
+ * FlowListView 단일 레이아웃 그대로이고, 그 안의 좌측 패널만 목록→트리가 된다.
+ * 기능(코드 흐름) 탭은 완전히 그대로(트리는 업무 흐름도 탭 전용 패널).
  *
  * 서브도메인/흐름 선택은 URL(`/domains/:groupKey/:domainId?view=&bf=`)이 진실 —
  * 트리는 그 상태의 표시일 뿐이다(리프 클릭이 navigate 를 호출, store 동기화는
@@ -107,39 +105,27 @@ export default function GroupWorkspaceView({
 
   const groupIcon = group.isUnclassified ? "🗂️" : domainIcon(group.name, group.key);
 
-  return (
-    <div className="h-full w-full flex overflow-hidden">
-      {/* 좌측 트리 — 그룹 소속 서브도메인 ▸ 업무흐름도 2레벨(§7 D3, 트리 통합). */}
-      <nav
-        className="w-[280px] shrink-0 border-r border-border-subtle bg-panel flex flex-col overflow-hidden"
+  // 트리 패널 — FlowListView 업무 흐름도 탭의 프로세스 목록 자리(processPanel)에
+  // 주입된다. 그룹명/뒤로가기는 상단 브레드크럼이 담당하므로 패널 헤더는
+  // 그룹 컨텍스트 1줄 + 검색으로 최소화.
+  const treePanel = (
+    <>
+      <div
+        className="shrink-0 flex items-center gap-2 min-w-0"
         aria-label={t.groupWorkspace.navTitle}
+        style={{ padding: "12px 16px 6px" }}
       >
-        <div className="shrink-0" style={{ padding: "12px 14px 8px" }}>
-          <button
-            type="button"
-            onClick={() => navigate("/domains")}
-            className="text-text-muted hover:text-accent transition-colors cursor-pointer font-bold"
-            style={{ fontSize: 11.5, letterSpacing: "0.06em" }}
-          >
-            {t.domainMap.breadcrumbRoot}
-          </button>
-          <div className="flex items-center gap-2 min-w-0" style={{ marginTop: 4 }}>
-            <span aria-hidden className="shrink-0" style={{ fontSize: 15, lineHeight: 1 }}>
-              {groupIcon}
-            </span>
-            <span
-              className="text-text-primary font-bold truncate"
-              style={{ fontSize: 15 }}
-              title={group.name}
-            >
-              {group.name}
-            </span>
-          </div>
-          <p className="text-text-muted" style={{ fontSize: 11.5, marginTop: 2 }}>
-            {t.domainMap.subDomainCount.replace("{count}", String(treeDomains.length))}
-          </p>
-        </div>
-        <div className="shrink-0" style={{ padding: "0 14px 8px" }}>
+        <span aria-hidden className="shrink-0" style={{ fontSize: 13, lineHeight: 1 }}>
+          {groupIcon}
+        </span>
+        <span className="text-text-primary font-bold truncate" style={{ fontSize: 12.5 }} title={group.name}>
+          {group.name}
+        </span>
+        <span className="ml-auto shrink-0 text-text-muted tabular-nums" style={{ fontSize: 11 }}>
+          {t.domainMap.subDomainCount.replace("{count}", String(treeDomains.length))}
+        </span>
+      </div>
+      <div className="shrink-0" style={{ padding: "0 12px 8px" }}>
           <input
             type="text"
             value={query}
@@ -150,7 +136,7 @@ export default function GroupWorkspaceView({
             style={{ fontSize: 12.5, padding: "5px 9px" }}
           />
         </div>
-        <ul className="flex-1 min-h-0 overflow-y-auto" style={{ padding: "0 6px 10px" }}>
+      <ul className="flex-1 min-h-0 overflow-y-auto" style={{ padding: "0 6px 10px" }}>
           {filteredDomains.map((d) => {
             const expanded = isExpanded(d.id);
             const isSelectedDomain = d.id === selectedDomainId;
@@ -230,18 +216,20 @@ export default function GroupWorkspaceView({
               </li>
             );
           })}
-          {filteredDomains.length === 0 && (
-            <li className="text-text-muted" style={{ fontSize: 12, padding: "10px 8px" }}>
-              {t.flowList.noMatches}
-            </li>
-          )}
-        </ul>
-      </nav>
-      {/* 본문 — 기존 도메인 워크스페이스(FlowListView) 그대로 재사용, 구 프로세스
-          목록만 숨김(트리와 중복). 기능(코드) 탭은 완전히 그대로 동작. */}
-      <div className="flex-1 min-w-0 min-h-0">
-        {activeDomainId === selectedDomainId ? <FlowListView hideProcessList /> : null}
-      </div>
+        {filteredDomains.length === 0 && (
+          <li className="text-text-muted" style={{ fontSize: 12, padding: "10px 8px" }}>
+            {t.flowList.noMatches}
+          </li>
+        )}
+      </ul>
+    </>
+  );
+
+  // 화면 = 기존 도메인 워크스페이스(FlowListView) 단일 레이아웃. 업무 흐름도 탭의
+  // 프로세스 목록 자리에만 트리가 들어간다(기능 탭은 그대로).
+  return (
+    <div className="h-full w-full min-h-0">
+      {activeDomainId === selectedDomainId ? <FlowListView processPanel={treePanel} /> : null}
     </div>
   );
 }

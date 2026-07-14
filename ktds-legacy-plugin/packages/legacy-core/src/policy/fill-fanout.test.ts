@@ -255,7 +255,6 @@ describe('policy fill-fanout', () => {
       signal({ category: 'glossary', subject: 'member.password', anchor: { file: 'src/main/java/shop/domain/Member.java', line: 5 } }),
     ])
     await prepPolicyFill(root)
-    const index = await readPolicyFillChunkIndex(root)
     const chunk = PolicyFillChunkSchema.parse(
       JSON.parse(await readFile(join(root, '.spec/map/policy-fill-prep/pol-000.json'), 'utf8')),
     )

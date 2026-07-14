@@ -19,6 +19,7 @@ export {
   DbIndexSchema,
   DbRowSchema,
   DbSchemaTierSchema,
+  DbTableOriginSchema,
   LiveDbSignalSchema,
 } from './types.js'
 export type {
@@ -30,9 +31,12 @@ export type {
   DbIndex,
   DbRow,
   DbSchemaTier,
+  DbTableOrigin,
   LiveDbSignal,
 } from './types.js'
 export { extractDbSchema } from './extract.js'
+export { inferTablesFromCode } from './code-infer.js'
+export type { CodeInferResult } from './code-infer.js'
 export { discoverLiveDbSignals } from './discover.js'
 // readDbSchema/writeDbSchema 는 본 파일 하단에 정의(export 키워드 동반).
 export { extractDdlFromSource } from './ddl-scan.js'

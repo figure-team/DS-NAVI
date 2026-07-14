@@ -480,7 +480,8 @@ export async function scanDomainMap(
   writeMapArtifact(projectRoot, JPA_MODEL_FILENAME, jpaModel)
   // PA1: db-schema(정적 .sql DDL/dataload + 라이브 신호 정적 탐지) — map 이 단독 소유.
   // jpa-model 과 동형(census 파생·scan 시점·.spec/map/ 기록). 소비자(docs/policy)는 로드만.
-  const dbSchema = extractDbSchema(projectRoot, census, scanCache)
+  // jpaModel 은 .sql 부재 시 code-inferred 폴백(JPA/MyBatis 역추론)의 JPA 소스.
+  const dbSchema = extractDbSchema(projectRoot, census, scanCache, jpaModel)
   writeDbSchema(projectRoot, dbSchema)
   // W1: 대외 인터페이스(송신/라우트 외 수신) 스캔 — interfaces.json. 소비자(docs)는 로드만.
   const interfaces = await extractInterfaces(projectRoot, census, scanCache)

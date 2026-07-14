@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { buildCensus } from '../domain-map/census.js'
 import type { CensusReport } from '../domain-map/types.js'
+import type { JpaModel } from '../jpa/types.js'
 import { extractDbSchema } from './extract.js'
 import type { DbTable } from './types.js'
 
@@ -105,6 +106,86 @@ describe('db-schema 스캐너 (P0)', () => {
     const a = extractDbSchema(fixtureDir, baseCensus)
     const b = extractDbSchema(fixtureDir, baseCensus)
     expect(a).toEqual(b)
+  })
+
+  describe('Tier 3 — code-inferred(.sql 없음, MyBatis/JPA 역추론)', () => {
+    const mbDir = join(here, '..', '..', 'fixtures', 'db-schema-mybatis')
+    const mbCensus = buildCensus(mbDir)
+
+    /** JPA 엔티티 1개(mcp_user) — 매퍼와 동일 테이블(대소문자 무시)로 우선순위 검증. */
+    const jpaModel: JpaModel = {
+      schemaVersion: 1,
+      gitCommit: null,
+      entities: [
+        {
+          className: 'McpUser',
+          relPath: 'src/McpUser.java',
+          line: 10,
+          tableName: 'mcp_user',
+          tableExplicit: true,
+          tableConfidence: 'CONFIRMED',
+          idField: 'userId',
+          columns: [
+            { fieldName: 'userId', columnName: 'user_id', explicit: true, line: 12, confidence: 'CONFIRMED' },
+            { fieldName: 'userNm', columnName: 'user_nm', explicit: false, line: 13, confidence: 'INFERRED' },
+          ],
+          relations: [],
+        },
+      ],
+      repositories: [],
+      unresolved: [],
+    }
+
+    it('tier=code-inferred — 매퍼 테이블 역추론(비매퍼 XML·DUAL 제외)', () => {
+      const model = extractDbSchema(mbDir, mbCensus)
+      expect(model.tier).toBe('code-inferred')
+      expect(model.sqlFileCount).toBe(0)
+      // FAKE_TABLE(config.xml 비매퍼)·DUAL(의사 테이블) 제외, name 정렬.
+      expect(model.tables.map((t) => t.name)).toEqual(['MCP_USER', 'MSP_RATE_MST', 'NMCP_SNTY_PROD_BAS'])
+      expect(model.tables.every((t) => t.origin === 'mybatis')).toBe(true)
+    })
+
+    it('컬럼 귀속 — 단일 테이블 문(INSERT/UPDATE SET)만, 다중 테이블 문은 테이블명만', () => {
+      const model = extractDbSchema(mbDir, mbCensus)
+      const user = table(model, 'MCP_USER')!
+      expect(user.relPath).toBe('RateMapper.xml') // 앵커 = 최소 (relPath,line) 문
+      expect(user.columns.map((c) => c.name)).toEqual(['STATUS_CD', 'UPD_DT', 'USER_ID', 'USER_NM'])
+      expect(user.columns.every((c) => c.type === 'UNKNOWN' && c.nullable && !c.primaryKey)).toBe(true)
+      // JOIN 문에서만 등장한 테이블 — 컬럼 소속 불명이라 비움(합성 금지).
+      expect(table(model, 'NMCP_SNTY_PROD_BAS')!.columns).toEqual([])
+    })
+
+    it('info 안내 — 역추론 사실을 unresolved 로 표면화(침묵 금지)', () => {
+      const model = extractDbSchema(mbDir, mbCensus)
+      const note = model.unresolved.find((u) => u.ref === '(code-infer)')!
+      expect(note.severity).toBe('info')
+      expect(note.reason).toContain('역추론')
+    })
+
+    it('JPA 엔티티 우선 — 동일 테이블은 jpa origin·컬럼·PK 채택', () => {
+      const model = extractDbSchema(mbDir, mbCensus, undefined, jpaModel)
+      expect(model.tier).toBe('code-inferred')
+      const user = table(model, 'mcp_user')! // JPA 표기 이름 채택(매퍼 MCP_USER 대체)
+      expect(user.origin).toBe('jpa')
+      expect(user.primaryKey).toEqual(['user_id'])
+      expect(user.columns.find((c) => c.name === 'user_id')!.primaryKey).toBe(true)
+      expect(model.tables.some((t) => t.name === 'MCP_USER')).toBe(false)
+      // 매퍼 전용 테이블은 그대로 mybatis origin 유지.
+      expect(table(model, 'MSP_RATE_MST')!.origin).toBe('mybatis')
+    })
+
+    it('.sql 존재 시 역추론 미실행 — 상위 tier 게이팅(DDL = 진실 소스)', () => {
+      const model = extractDbSchema(fixtureDir, baseCensus, undefined, jpaModel)
+      expect(model.tier).toBe('ddl+data')
+      expect(model.tables.every((t) => t.origin === 'sql')).toBe(true)
+      expect(model.unresolved.some((u) => u.ref === '(code-infer)')).toBe(false)
+    })
+
+    it('결정론 — 동일 입력 동일 출력(역추론 경로)', () => {
+      const a = extractDbSchema(mbDir, mbCensus, undefined, jpaModel)
+      const b = extractDbSchema(mbDir, mbCensus, undefined, jpaModel)
+      expect(a).toEqual(b)
+    })
   })
 
   describe('중복 CREATE TABLE 구조 diff (데이터 맵 개편 ①)', () => {

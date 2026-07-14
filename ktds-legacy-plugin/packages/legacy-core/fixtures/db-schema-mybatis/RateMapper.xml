@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.dao.RateMapper">
+  <select id="selectRate" resultType="map">
+    SELECT RATE_ID, RATE_NM FROM MSP_RATE_MST WHERE RATE_ID = #{rateId}
+  </select>
+  <select id="selectRateWithProd" resultType="map">
+    SELECT R.RATE_ID, P.PROD_CD
+    FROM MSP_RATE_MST R
+    JOIN NMCP_SNTY_PROD_BAS P ON P.RATE_ID = R.RATE_ID
+    <if test="prodCd != null">AND P.PROD_CD = #{prodCd}</if>
+  </select>
+  <insert id="insertUser">
+    INSERT INTO MCP_USER (USER_ID, USER_NM, STATUS_CD)
+    VALUES (#{userId}, #{userNm}, #{statusCd})
+  </insert>
+  <update id="updateUser">
+    UPDATE MCP_USER SET USER_NM = #{userNm}, UPD_DT = SYSDATE WHERE USER_ID = #{userId}
+  </update>
+  <select id="now" resultType="date">SELECT SYSDATE FROM DUAL</select>
+</mapper>

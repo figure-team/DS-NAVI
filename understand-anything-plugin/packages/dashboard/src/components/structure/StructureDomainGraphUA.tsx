@@ -153,6 +153,20 @@ function StructureDomainGraphUAInner({
   const [positions, setPositions] = useState<Map<string, { x: number; y: number }> | null>(null);
   const dense = nodes.length > 0 && (2 * edges.length) / nodes.length > DENSE_AVG_DEGREE;
 
+  // 호버 포커스 — 밀집 그래프에서 "어디에 어디가 연결됐는지"는 전체 동시 표시로는
+  // 못 읽는다(교차 다발 + 카드 밑을 지나는 선). 카드 호버 시 그 카드의 엣지만
+  // 선명하게(+카드 위로 올려 추적 가능, 라벨 복원) 나머지는 흐린다.
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const hoverNeighbors = useMemo(() => {
+    if (!hoveredId) return null;
+    const s = new Set<string>([hoveredId]);
+    for (const e of edges) {
+      if (e.from === hoveredId) s.add(e.to);
+      if (e.to === hoveredId) s.add(e.from);
+    }
+    return s;
+  }, [hoveredId, edges]);
+
   // 데이터가 바뀌면 재측정·재배치(뎁스 전환 시 스테일 좌표 방지).
   useEffect(() => {
     setPositions(null);
@@ -218,45 +232,63 @@ function StructureDomainGraphUAInner({
           connectable: false,
           selectable: true,
           // 측정 패스(위치 미확정) 동안 숨김 — visibility 는 레이아웃 크기를 유지해
-          // ResizeObserver 실측이 가능하다(display:none 불가).
-          style: positions ? undefined : { visibility: "hidden" as const },
+          // ResizeObserver 실측이 가능하다(display:none 불가). 호버 포커스 중엔
+          // 무관 카드를 흐려 연결 상대만 남긴다.
+          style: positions
+            ? {
+                opacity: hoverNeighbors && !hoverNeighbors.has(n.id) ? 0.3 : 1,
+                transition: "opacity 120ms",
+              }
+            : { visibility: "hidden" as const },
         }),
       ),
-    [nodes, positions, onOpenNode],
+    [nodes, positions, onOpenNode, hoverNeighbors],
   );
 
   // 원본 cross_domain 엣지 스타일 무수정(accent 점선 + 애니메이션 + 라벨 칩) —
   // 라벨만 description 대신 근거 파일 수(클릭 시 EdgeEvidencePopover 와 동일 어휘).
   // 측정 패스 동안엔 비표시(0,0 에 뭉친 노드 사이 엣지 잔상 방지). 밀집 모드는
   // 라벨 생략 + 가중치 비례 불투명도(강한 연결만 도드라지게, 근거는 클릭 팝오버).
+  // 호버 포커스 중엔 해당 카드의 엣지만 선명 + zIndex 로 카드 위에 올려 끝점까지
+  // 추적 가능(라벨도 이때 복원), 나머지 엣지는 거의 지운다.
   const rfEdges = useMemo<Edge[]>(() => {
     if (!positions) return [];
     const maxWeight = Math.max(1, ...edges.map((e) => e.weight));
-    return edges.map((e) => ({
-      id: e.id,
-      source: e.from,
-      target: e.to,
-      ...(dense
-        ? {}
-        : {
-            label: t.structure.evidenceWeight.replace("{count}", String(e.weight)),
-            labelStyle: { fill: "var(--color-text-muted)", fontSize: 10 },
-            labelBgStyle: { fill: "var(--color-surface)", fillOpacity: 0.9 },
-            labelBgPadding: [6, 4] as [number, number],
-            labelBgBorderRadius: 4,
-          }),
-      style: {
-        stroke: "var(--color-accent)",
-        strokeDasharray: "6 3",
-        strokeWidth: 2,
-        opacity: dense ? 0.25 + 0.75 * (e.weight / maxWeight) : 1,
-      },
-      animated: true,
-    }));
-  }, [edges, positions, dense, t]);
+    return edges.map((e) => {
+      const focused = hoveredId !== null && (e.from === hoveredId || e.to === hoveredId);
+      const restingOpacity = dense ? 0.25 + 0.75 * (e.weight / maxWeight) : 1;
+      const showLabel = !dense || focused;
+      return {
+        id: e.id,
+        source: e.from,
+        target: e.to,
+        ...(showLabel
+          ? {
+              label: t.structure.evidenceWeight.replace("{count}", String(e.weight)),
+              labelStyle: { fill: "var(--color-text-muted)", fontSize: 10 },
+              labelBgStyle: { fill: "var(--color-surface)", fillOpacity: 0.9 },
+              labelBgPadding: [6, 4] as [number, number],
+              labelBgBorderRadius: 4,
+            }
+          : {}),
+        style: {
+          stroke: "var(--color-accent)",
+          strokeDasharray: "6 3",
+          strokeWidth: focused ? 2.5 : 2,
+          opacity: hoveredId === null ? restingOpacity : focused ? 1 : 0.05,
+          transition: "opacity 120ms",
+        },
+        // 카드 위로 승격 + 이벤트 통과(index.css .workmap-focus-edge) — 끝점 추적용.
+        zIndex: focused ? 1000 : 0,
+        className: focused ? "workmap-focus-edge" : undefined,
+        animated: true,
+      };
+    });
+  }, [edges, positions, dense, hoveredId, t]);
 
   return (
-    <div ref={containerRef} className="h-full w-full">
+    // data-hover — 헤드리스 QA 가 호버 포커스 상태를 결정론적으로 검증하는 훅.
+    <div ref={containerRef} className="h-full w-full" data-hover={hoveredId ?? ""}>
     <ReactFlow
       nodes={rfNodes}
       edges={rfEdges}
@@ -265,6 +297,8 @@ function StructureDomainGraphUAInner({
         const src = edges.find((e) => e.id === edge.id);
         if (src) onEdgeClick(src, { x: evt.clientX, y: evt.clientY });
       }}
+      onNodeMouseEnter={(_, node) => setHoveredId(node.id)}
+      onNodeMouseLeave={() => setHoveredId(null)}
       minZoom={0.1}
       maxZoom={2}
       proOptions={{ hideAttribution: true }}

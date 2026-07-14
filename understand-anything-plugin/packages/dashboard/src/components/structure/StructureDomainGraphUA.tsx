@@ -33,6 +33,14 @@ import type { AggregatedEdge, ImpactMark } from "../../utils/structureGraph";
 /** 원본 DomainClusterNode 의 Entities 칩 표시 상한. */
 const CHIP_CAP = 5;
 
+/**
+ * 밀집 그래프 판정 — 평균 차수(2E/N)가 이 값을 넘으면 위계가 사실상 없는
+ * 그래프(예: mmobile 그룹 13개·엣지 100개)라 레이어드 랭크 배치가 "흩어진"
+ * 모양이 된다. 이때는 rectpacking 정격자 배치 + 엣지 라벨 생략(라벨 소음
+ * 방지, 근거는 여전히 엣지 클릭 팝오버)으로 전환한다.
+ */
+const DENSE_AVG_DEGREE = 5;
+
 export interface DomainStyleGraphNode {
   id: string;
   name: string;
@@ -143,6 +151,7 @@ function StructureDomainGraphUAInner({
   const rf = useReactFlow();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [positions, setPositions] = useState<Map<string, { x: number; y: number }> | null>(null);
+  const dense = nodes.length > 0 && (2 * edges.length) / nodes.length > DENSE_AVG_DEGREE;
 
   // 데이터가 바뀌면 재측정·재배치(뎁스 전환 시 스테일 좌표 방지).
   useEffect(() => {
@@ -169,8 +178,17 @@ function StructureDomainGraphUAInner({
       );
       const rfNodes: Node[] = nodes.map((n) => ({ id: n.id, type: "domain-cluster", position: { x: 0, y: 0 }, data: {} }));
       const rfEdges: Edge[] = edges.map((e) => ({ id: e.id, source: e.from, target: e.to }));
-      // 원본 DomainGraphView 와 동일 — 공용 기본 옵션 위에 direction=RIGHT 만 덮어쓴다.
-      const input = nodesToElkInput(rfNodes, rfEdges, measured, { "elk.direction": "RIGHT" });
+      // 희소 그래프 = 원본 DomainGraphView 와 동일(레이어드 + direction=RIGHT).
+      // 밀집 그래프 = rectpacking 정격자(엣지 무시, 카드가 행·열로 가지런히) —
+      // 위계 없는 완전연결형 데이터에서 레이어드가 만드는 사선 산개를 막는다.
+      const input = nodesToElkInput(
+        rfNodes,
+        rfEdges,
+        measured,
+        dense
+          ? { algorithm: "rectpacking", "elk.spacing.nodeNode": "48" }
+          : { "elk.direction": "RIGHT" },
+      );
       applyElkLayout(input).then(({ positioned }) => {
         if (cancelled) return;
         setPositions(new Map(mergeElkPositions(rfNodes, positioned).map((n) => [n.id, n.position])));
@@ -181,7 +199,7 @@ function StructureDomainGraphUAInner({
       cancelled = true;
       cancelAnimationFrame(raf);
     };
-  }, [positions, nodes, edges]);
+  }, [positions, nodes, edges, dense]);
 
   // 배치 확정 후 1회 fitView — fitView prop 은 위치 갱신에 재반응하지 않는다.
   useEffect(() => {
@@ -209,22 +227,33 @@ function StructureDomainGraphUAInner({
 
   // 원본 cross_domain 엣지 스타일 무수정(accent 점선 + 애니메이션 + 라벨 칩) —
   // 라벨만 description 대신 근거 파일 수(클릭 시 EdgeEvidencePopover 와 동일 어휘).
-  // 측정 패스 동안엔 비표시(0,0 에 뭉친 노드 사이 엣지 잔상 방지).
+  // 측정 패스 동안엔 비표시(0,0 에 뭉친 노드 사이 엣지 잔상 방지). 밀집 모드는
+  // 라벨 생략 + 가중치 비례 불투명도(강한 연결만 도드라지게, 근거는 클릭 팝오버).
   const rfEdges = useMemo<Edge[]>(() => {
     if (!positions) return [];
+    const maxWeight = Math.max(1, ...edges.map((e) => e.weight));
     return edges.map((e) => ({
       id: e.id,
       source: e.from,
       target: e.to,
-      label: t.structure.evidenceWeight.replace("{count}", String(e.weight)),
-      style: { stroke: "var(--color-accent)", strokeDasharray: "6 3", strokeWidth: 2 },
-      labelStyle: { fill: "var(--color-text-muted)", fontSize: 10 },
-      labelBgStyle: { fill: "var(--color-surface)", fillOpacity: 0.9 },
-      labelBgPadding: [6, 4] as [number, number],
-      labelBgBorderRadius: 4,
+      ...(dense
+        ? {}
+        : {
+            label: t.structure.evidenceWeight.replace("{count}", String(e.weight)),
+            labelStyle: { fill: "var(--color-text-muted)", fontSize: 10 },
+            labelBgStyle: { fill: "var(--color-surface)", fillOpacity: 0.9 },
+            labelBgPadding: [6, 4] as [number, number],
+            labelBgBorderRadius: 4,
+          }),
+      style: {
+        stroke: "var(--color-accent)",
+        strokeDasharray: "6 3",
+        strokeWidth: 2,
+        opacity: dense ? 0.25 + 0.75 * (e.weight / maxWeight) : 1,
+      },
       animated: true,
     }));
-  }, [edges, positions, t]);
+  }, [edges, positions, dense, t]);
 
   return (
     <div ref={containerRef} className="h-full w-full">

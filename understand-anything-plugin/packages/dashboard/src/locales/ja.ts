@@ -217,9 +217,6 @@ export const ja = {
     sequentialFallbackCard: "順次近似(全機能)",
     backToProcessList: "業務プロセス一覧へ",
     relatedFlowSpine: "関連する機能フロー",
-    rendererTabsLabel: "レンダラー切替",
-    rendererCard: "カード型",
-    rendererGraph: "グラフ型(U-A)",
     chipSubDomains: "サブドメイン",
   },
   flowView: {

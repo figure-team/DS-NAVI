@@ -215,9 +215,6 @@ export const zhTW = {
     sequentialFallbackCard: "順序近似(全部功能)",
     backToProcessList: "返回業務流程列表",
     relatedFlowSpine: "相關功能流程圖",
-    rendererTabsLabel: "渲染器切換",
-    rendererCard: "卡片式",
-    rendererGraph: "圖形式(U-A)",
     chipSubDomains: "子領域",
   },
   flowView: {

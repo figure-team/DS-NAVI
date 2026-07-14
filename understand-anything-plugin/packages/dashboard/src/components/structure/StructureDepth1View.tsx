@@ -9,26 +9,21 @@ import {
   groupImpactMark,
   type AggregatedEdge,
   type CrossDomainEdge,
-  type StructureRenderer,
 } from "../../utils/structureGraph";
-import StructureNetworkGraph, { type StructureGraphNode } from "./StructureNetworkGraph";
 import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
 import EdgeEvidencePopover from "./EdgeEvidencePopover";
 
-/** 뎁스1 — 상단도메인(그룹) 그래프(설계 §3·§4). */
+/** 뎁스1 — 상단도메인(그룹) 그래프(설계 §3·§4), U-A Domain 탭 룩앤필(택1 확정). */
 export default function StructureDepth1View({
   groups,
   crossDomainEdges,
   changedDomainIds,
   affectedDomainIds,
-  renderer,
 }: {
   groups: ResolvedGroup[];
   crossDomainEdges: CrossDomainEdge[] | null;
   changedDomainIds: Set<string>;
   affectedDomainIds: Set<string>;
-  /** `?renderer=` 탭 — 카드형(기본)/그래프형(U-A). 뎁스1·2 전환 시 URL에 유지된다. */
-  renderer: StructureRenderer;
 }) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const navigate = useNavigate();
@@ -45,22 +40,6 @@ export default function StructureDepth1View({
   const groupEdges = useMemo(
     () => (crossDomainEdges ? aggregateGroupEdges(groups, crossDomainEdges) : []),
     [groups, crossDomainEdges],
-  );
-
-  const nodes = useMemo<StructureGraphNode[]>(
-    () =>
-      groupCards.map((g) => ({
-        id: g.key,
-        name: g.name,
-        icon: g.icon,
-        color: g.color,
-        statLine: `${t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} · ${t.domainMap.flowCount.replace("{count}", String(g.flowCount))}`,
-        groundedPct: g.filled ? g.groundedPct : null,
-        groundedCount: g.groundedCount,
-        reviewCount: g.reviewCount,
-        impact: groupImpactMark(groups.find((r) => r.key === g.key)!, changedDomainIds, affectedDomainIds),
-      })),
-    [groupCards, groups, changedDomainIds, affectedDomainIds, t],
   );
 
   const nameByKey = useMemo(() => new Map(groupCards.map((g) => [g.key, g.name])), [groupCards]);
@@ -89,30 +68,19 @@ export default function StructureDepth1View({
   );
 
   const onOpenNode = (id: string) => {
-    const suffix = renderer === "ua" ? "&renderer=ua" : "";
-    navigate(`/structure?group=${encodeURIComponent(id)}${suffix}`);
+    navigate(`/structure?group=${encodeURIComponent(id)}`);
   };
   const emptyLabel = crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges;
 
   return (
     <div className="h-full w-full relative">
-      {renderer === "ua" ? (
-        <StructureDomainGraphUA
-          nodes={uaNodes}
-          edges={groupEdges}
-          emptyLabel={emptyLabel}
-          onOpenNode={onOpenNode}
-          onEdgeClick={(edge, point) => setPopover({ edge, point })}
-        />
-      ) : (
-        <StructureNetworkGraph
-          nodes={nodes}
-          edges={groupEdges}
-          emptyLabel={emptyLabel}
-          onOpenNode={onOpenNode}
-          onEdgeClick={(edge, point) => setPopover({ edge, point })}
-        />
-      )}
+      <StructureDomainGraphUA
+        nodes={uaNodes}
+        edges={groupEdges}
+        emptyLabel={emptyLabel}
+        onOpenNode={onOpenNode}
+        onEdgeClick={(edge, point) => setPopover({ edge, point })}
+      />
       {popover && (
         <EdgeEvidencePopover
           edge={popover.edge}

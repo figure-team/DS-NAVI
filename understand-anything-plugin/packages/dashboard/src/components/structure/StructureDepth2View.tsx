@@ -9,30 +9,25 @@ import {
   markFor,
   type AggregatedEdge,
   type CrossDomainEdge,
-  type StructureRenderer,
 } from "../../utils/structureGraph";
-import StructureNetworkGraph, { type StructureGraphNode } from "./StructureNetworkGraph";
 import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
 import EdgeEvidencePopover from "./EdgeEvidencePopover";
 
 /**
- * 뎁스2 — 선택 그룹 + 서브도메인 그래프. `group === null` 은 groups 없는 프로젝트의
- * 전체 도메인 그래프(확정 ③ 폴백, 뎁스1 건너뛰기).
+ * 뎁스2 — 선택 그룹 + 서브도메인 그래프, U-A Domain 탭 룩앤필(택1 확정).
+ * `group === null` 은 groups 없는 프로젝트의 전체 도메인 그래프(확정 ③ 폴백,
+ * 뎁스1 건너뛰기).
  */
 export default function StructureDepth2View({
   group,
   crossDomainEdges,
   changedDomainIds,
   affectedDomainIds,
-  renderer,
 }: {
   group: ResolvedGroup | null;
   crossDomainEdges: CrossDomainEdge[] | null;
   changedDomainIds: Set<string>;
   affectedDomainIds: Set<string>;
-  /** `?renderer=` 탭 — 카드형(기본)/그래프형(U-A). 뎁스3 은 무관하지만 브레드크럼으로
-   * 돌아왔을 때 탭이 복원되도록 드릴다운 URL 에도 그대로 실어 보낸다. */
-  renderer: StructureRenderer;
 }) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const navigate = useNavigate();
@@ -52,22 +47,6 @@ export default function StructureDepth2View({
   const edges = useMemo(
     () => (crossDomainEdges ? filterEdgesAmong(domainIds, crossDomainEdges) : []),
     [domainIds, crossDomainEdges],
-  );
-
-  const nodes = useMemo<StructureGraphNode[]>(
-    () =>
-      cards.map((c) => ({
-        id: c.id,
-        name: c.name,
-        icon: c.icon,
-        color: c.color,
-        statLine: t.domainMap.flowCount.replace("{count}", String(c.flowCount)),
-        groundedPct: c.filled ? c.groundedPct : null,
-        groundedCount: c.groundedCount,
-        reviewCount: c.reviewCount,
-        impact: markFor(c.id, changedDomainIds, affectedDomainIds),
-      })),
-    [cards, changedDomainIds, affectedDomainIds, t],
   );
 
   const nameById = useMemo(() => new Map(cards.map((c) => [c.id, c.name])), [cards]);
@@ -95,30 +74,19 @@ export default function StructureDepth2View({
   );
 
   const onOpenNode = (id: string) => {
-    const suffix = renderer === "ua" ? "&renderer=ua" : "";
-    navigate(`/structure?domain=${encodeURIComponent(id)}${suffix}`);
+    navigate(`/structure?domain=${encodeURIComponent(id)}`);
   };
   const emptyLabel = crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges;
 
   return (
     <div className="h-full w-full relative">
-      {renderer === "ua" ? (
-        <StructureDomainGraphUA
-          nodes={uaNodes}
-          edges={edges}
-          emptyLabel={emptyLabel}
-          onOpenNode={onOpenNode}
-          onEdgeClick={(edge, point) => setPopover({ edge, point })}
-        />
-      ) : (
-        <StructureNetworkGraph
-          nodes={nodes}
-          edges={edges}
-          emptyLabel={emptyLabel}
-          onOpenNode={onOpenNode}
-          onEdgeClick={(edge, point) => setPopover({ edge, point })}
-        />
-      )}
+      <StructureDomainGraphUA
+        nodes={uaNodes}
+        edges={edges}
+        emptyLabel={emptyLabel}
+        onOpenNode={onOpenNode}
+        onEdgeClick={(edge, point) => setPopover({ edge, point })}
+      />
       {popover && (
         <EdgeEvidencePopover
           edge={popover.edge}

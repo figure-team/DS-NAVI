@@ -217,9 +217,6 @@ export const ru = {
     sequentialFallbackCard: "Последовательное приближение (все функции)",
     backToProcessList: "Назад к списку процессов",
     relatedFlowSpine: "Связанный поток кода",
-    rendererTabsLabel: "Переключатель рендерера",
-    rendererCard: "Карточки",
-    rendererGraph: "Граф (U-A)",
     chipSubDomains: "Поддомены",
   },
   flowView: {

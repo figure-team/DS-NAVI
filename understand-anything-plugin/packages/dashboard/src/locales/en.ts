@@ -217,9 +217,6 @@ export const en = {
     sequentialFallbackCard: "Sequential approximation (all features)",
     backToProcessList: "Back to process list",
     relatedFlowSpine: "Related code flow",
-    rendererTabsLabel: "Renderer switch",
-    rendererCard: "Card",
-    rendererGraph: "Graph (U-A)",
     chipSubDomains: "Subdomains",
   },
   flowView: {

@@ -9,12 +9,10 @@ import { parseBusinessFlows } from "../../utils/businessFlow";
 import {
   buildFileToDomainId,
   mapImpactToDomains,
-  resolveRenderer,
   resolveStructureRoute,
 } from "../../utils/structureGraph";
 import DiffToggle from "../../components/DiffToggle";
 import StructureBreadcrumb, { type StructureCrumb } from "../../components/structure/StructureBreadcrumb";
-import StructureRendererTabs from "../../components/structure/StructureRendererTabs";
 import StructureDepth1View from "../../components/structure/StructureDepth1View";
 import StructureDepth2View from "../../components/structure/StructureDepth2View";
 import StructureDepth3View from "../../components/structure/StructureDepth3View";
@@ -32,7 +30,7 @@ import StructureDepth4View from "../../components/structure/StructureDepth4View"
  * useOverlayParam 이 계속 담당하는 별개 관례, 뎁스와 무관하게 유효).
  */
 export default function StructurePage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t } = useI18n();
   const domainGraph = useDashboardStore((s) => s.domainGraph);
@@ -70,24 +68,6 @@ export default function StructurePage() {
     [searchParams, resolvedGroups, domainIds],
   );
 
-  // `?renderer=` 탭(뎁스1·2 전용) — overlay 와 같은 뎁스-직교 관례. depth3/4 는 이
-  // 값을 무시하지만, 뎁스 전환 시 URL 에 실어 보내 되돌아왔을 때 탭을 복원한다.
-  const renderer = resolveRenderer(searchParams.get("renderer"));
-  const setRenderer = (next: typeof renderer) => {
-    setSearchParams(
-      (prev) => {
-        const nextParams = new URLSearchParams(prev);
-        if (next === "ua") nextParams.set("renderer", "ua");
-        else nextParams.delete("renderer");
-        return nextParams;
-      },
-      { replace: true },
-    );
-  };
-  /** 브레드크럼 등 뎁스1·2 로 되돌아가는 링크에 현재 renderer 탭을 그대로 실어 보낸다. */
-  const withRenderer = (href: string) =>
-    renderer === "ua" ? `${href}${href.includes("?") ? "&" : "?"}renderer=ua` : href;
-
   useEffect(() => {
     // domainGraph 로딩 전(첫 마운트)엔 resolvedGroups/domainIds 가 항상 빈 값이라
     // 어떤 group=/domain= 도 "존재하지 않음"으로 오판된다 — 데이터 도착 전 성급한
@@ -121,7 +101,7 @@ export default function StructurePage() {
   const crumbs = useMemo<StructureCrumb[]>(() => {
     const root: StructureCrumb = {
       label: t.structure.root,
-      href: route.kind === "depth1" ? null : withRenderer("/structure"),
+      href: route.kind === "depth1" ? null : "/structure",
     };
     if (route.kind === "depth1") return [{ ...root, href: null }];
     if (route.kind === "depth2") {
@@ -133,14 +113,14 @@ export default function StructurePage() {
       const owning = findOwningGroup(resolvedGroups, route.domainId);
       const list: StructureCrumb[] = [root];
       if (owning) {
-        list.push({ label: owning.name, href: withRenderer(`/structure?group=${encodeURIComponent(owning.key)}`) });
+        list.push({ label: owning.name, href: `/structure?group=${encodeURIComponent(owning.key)}` });
       }
       if (route.kind === "depth3") {
         list.push({ label: domainNode?.name ?? route.domainId, href: null });
       } else {
         list.push({
           label: domainNode?.name ?? route.domainId,
-          href: withRenderer(`/structure?domain=${encodeURIComponent(route.domainId)}`),
+          href: `/structure?domain=${encodeURIComponent(route.domainId)}`,
         });
         const procs = domainNode ? parseBusinessFlows(domainNode) : [];
         const title = procs[route.bf]?.title ?? t.flowList.bizProcessDefault.replace("{n}", String(route.bf + 1));
@@ -149,8 +129,7 @@ export default function StructurePage() {
       return list;
     }
     return [root];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route, domainGraph, resolvedGroups, t, renderer]);
+  }, [route, domainGraph, resolvedGroups, t]);
 
   if (!domainGraph) {
     return (
@@ -170,9 +149,6 @@ export default function StructurePage() {
           {t.structure.menuTitle}
         </span>
         <div className="flex items-center gap-3">
-          {(route.kind === "depth1" || route.kind === "depth2") && (
-            <StructureRendererTabs renderer={renderer} onChange={setRenderer} />
-          )}
           <DiffToggle />
         </div>
       </div>
@@ -184,7 +160,6 @@ export default function StructurePage() {
             crossDomainEdges={crossDomainEdges ?? null}
             changedDomainIds={changedDomainIds}
             affectedDomainIds={affectedDomainIds}
-            renderer={renderer}
           />
         )}
         {route.kind === "depth2" && (
@@ -193,7 +168,6 @@ export default function StructurePage() {
             crossDomainEdges={crossDomainEdges ?? null}
             changedDomainIds={changedDomainIds}
             affectedDomainIds={affectedDomainIds}
-            renderer={renderer}
           />
         )}
         {route.kind === "depth3" && <StructureDepth3View domainId={route.domainId} />}

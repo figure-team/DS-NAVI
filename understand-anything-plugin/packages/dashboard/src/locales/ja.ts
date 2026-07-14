@@ -200,7 +200,8 @@ export const ja = {
   },
   groupWorkspace: {
     navTitle: "サブドメイン",
-    searchPlaceholder: "サブドメインを検索",
+    searchPlaceholder: "サブドメイン・業務フローを検索",
+    noFlows: "業務フローなし",
   },
   structure: {
     menuTitle: "構造",

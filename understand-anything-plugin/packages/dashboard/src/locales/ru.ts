@@ -200,7 +200,8 @@ export const ru = {
   },
   groupWorkspace: {
     navTitle: "Поддомены",
-    searchPlaceholder: "Поиск поддоменов",
+    searchPlaceholder: "Поиск поддоменов и процессов",
+    noFlows: "Нет бизнес-процессов",
   },
   structure: {
     menuTitle: "СТРУКТУРА",

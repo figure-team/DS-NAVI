@@ -200,7 +200,8 @@ export const ko = {
   },
   groupWorkspace: {
     navTitle: "서브도메인",
-    searchPlaceholder: "서브도메인 검색",
+    searchPlaceholder: "서브도메인·업무 흐름 검색",
+    noFlows: "업무 흐름 없음",
   },
   structure: {
     menuTitle: "구조",

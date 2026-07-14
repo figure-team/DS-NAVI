@@ -128,7 +128,7 @@ function FilterChip({
   );
 }
 
-export default function FlowListView() {
+export default function FlowListView({ hideProcessList = false }: { hideProcessList?: boolean } = {}) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
   const domainGroupsRaw = useDashboardStore((s) => s.domainGroups);
@@ -497,8 +497,10 @@ export default function FlowListView() {
           {bizFlow && activeDomainId ? (
             <>
               {/* B안: 업무 프로세스 목록 — 2개 이상일 때만. 기능 탭 좌측 목록과
-                  동일한 카드 언어(pmpl-proto .fl-list). 선택은 ?bf= 딥링크. */}
-              {bizProcesses.length > 1 && (
+                  동일한 카드 언어(pmpl-proto .fl-list). 선택은 ?bf= 딥링크.
+                  그룹 워크스페이스(GroupWorkspaceView)는 좌측 트리가 이미 이
+                  선택을 담당하므로 hideProcessList 로 중복 표시를 숨긴다. */}
+              {!hideProcessList && bizProcesses.length > 1 && (
                 <aside
                   className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
                   style={{

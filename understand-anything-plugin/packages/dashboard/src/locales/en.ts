@@ -200,7 +200,8 @@ export const en = {
   },
   groupWorkspace: {
     navTitle: "Sub-domains",
-    searchPlaceholder: "Search sub-domains",
+    searchPlaceholder: "Search sub-domains & flows",
+    noFlows: "No business flows",
   },
   structure: {
     menuTitle: "STRUCTURE",

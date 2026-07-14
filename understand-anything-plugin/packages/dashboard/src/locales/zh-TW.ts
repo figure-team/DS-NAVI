@@ -198,7 +198,8 @@ export const zhTW = {
   },
   groupWorkspace: {
     navTitle: "子領域",
-    searchPlaceholder: "搜尋子領域",
+    searchPlaceholder: "搜尋子領域·業務流程",
+    noFlows: "無業務流程",
   },
   structure: {
     menuTitle: "結構",

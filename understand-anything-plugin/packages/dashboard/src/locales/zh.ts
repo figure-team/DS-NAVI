@@ -198,7 +198,8 @@ export const zh = {
   },
   groupWorkspace: {
     navTitle: "子领域",
-    searchPlaceholder: "搜索子领域",
+    searchPlaceholder: "搜索子领域·业务流程",
+    noFlows: "无业务流程",
   },
   structure: {
     menuTitle: "结构",

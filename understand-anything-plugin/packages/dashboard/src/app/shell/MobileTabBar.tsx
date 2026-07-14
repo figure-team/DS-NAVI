@@ -17,8 +17,8 @@ export default function MobileTabBar() {
     { to: "/", label: "홈", icon: iconHome },
   ];
   if (graph) {
+    // 메뉴 병합(2026-07-14): 구조는 업무 지도 안 탭 — 별도 항목 없음(NavRail 과 동일).
     if (domainGraph) items.push({ to: "/domains", label: t.drawer.domain, icon: iconDomain });
-    items.push({ to: "/structure", label: t.drawer.structural, icon: iconStructure });
     items.push({ to: "/rtm", label: "추적표", icon: iconRtm });
     items.push({ to: "/deliverables", label: "산출물", icon: iconDocs });
   }
@@ -66,14 +66,6 @@ const iconDomain = (
     <circle cx="17" cy="7" r="3.2" />
     <circle cx="12" cy="17" r="3.2" />
     <path d="M9 9.5 11 14M15 9.5 13 14" />
-  </svg>
-);
-const iconStructure = (
-  <svg {...svgProps}>
-    <rect x="3" y="3" width="7" height="7" rx="1.5" />
-    <rect x="14" y="3" width="7" height="7" rx="1.5" />
-    <rect x="8.5" y="14" width="7" height="7" rx="1.5" />
-    <path d="M6.5 10v2.5h5.5M17.5 10v2.5h-5.5" />
   </svg>
 );
 const iconRtm = (

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import DomainMapView from "../../components/DomainMapView"; // ktds-fork: 도메인 지도 (화면 1)
+import WorkMapTabs from "../../components/WorkMapTabs"; // 메뉴 병합: 시스템 구성도/구조 탭
 import FlowListView from "../../components/FlowListView"; // ktds-fork: 기능 목록 + 인라인 스파인 (화면 2)
 import GroupWorkspaceView from "../../components/GroupWorkspaceView"; // DOMAIN_HIERARCHY §7: 그룹 워크스페이스
 import { resolveDomainRoute, resolveGroups } from "../../utils/domainGroups";
@@ -101,12 +102,22 @@ export default function DomainsPage() {
   // DomainMapView 의 system-map fetch 가 토큰 해석 전에 발사되는 transient 403 방지.
   // 리다이렉트 판정도 같은 이유로 빈 화면(전이 상태) — 목적지가 즉시 이펙트로 반영된다.
   return (
-    <div className="h-full w-full relative bg-root text-text-primary">
-      {resolved.kind === "landing" && <DomainMapView />}
-      {resolved.kind === "flat" && (activeDomainId ? <FlowListView /> : null)}
-      {resolved.kind === "group" && (
-        <GroupWorkspaceView group={resolved.group} selectedDomainId={resolved.domainId} />
-      )}
+    <div className="h-full w-full flex flex-col bg-root text-text-primary">
+      {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조) — 구조 탭은 /structure 로
+          라우트 전환(StructurePage 가 같은 스트립을 렌더해 탭이 이어져 보인다). */}
+      <div
+        className="shrink-0 flex items-center border-b border-border-subtle bg-surface"
+        style={{ padding: "0 20px" }}
+      >
+        <WorkMapTabs active="map" />
+      </div>
+      <div className="flex-1 min-h-0 relative">
+        {resolved.kind === "landing" && <DomainMapView />}
+        {resolved.kind === "flat" && (activeDomainId ? <FlowListView /> : null)}
+        {resolved.kind === "group" && (
+          <GroupWorkspaceView group={resolved.group} selectedDomainId={resolved.domainId} />
+        )}
+      </div>
     </div>
   );
 }

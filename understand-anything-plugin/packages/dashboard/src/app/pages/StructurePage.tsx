@@ -12,6 +12,7 @@ import {
   resolveStructureRoute,
 } from "../../utils/structureGraph";
 import DiffToggle from "../../components/DiffToggle";
+import WorkMapTabs from "../../components/WorkMapTabs";
 import StructureBreadcrumb, { type StructureCrumb } from "../../components/structure/StructureBreadcrumb";
 import StructureDepth1View from "../../components/structure/StructureDepth1View";
 import StructureDepth2View from "../../components/structure/StructureDepth2View";
@@ -141,13 +142,12 @@ export default function StructurePage() {
 
   return (
     <div className="h-full w-full flex flex-col bg-root text-text-primary overflow-hidden">
+      {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조) — 이 페이지는 구조 탭. */}
       <div
         className="shrink-0 flex items-center justify-between border-b border-border-subtle bg-surface"
-        style={{ padding: "6px 20px" }}
+        style={{ padding: "0 20px" }}
       >
-        <span className="text-text-muted font-semibold uppercase" style={{ fontSize: 10.5, letterSpacing: "0.06em" }}>
-          {t.structure.menuTitle}
-        </span>
+        <WorkMapTabs active="structure" />
         <div className="flex items-center gap-3">
           <DiffToggle />
         </div>

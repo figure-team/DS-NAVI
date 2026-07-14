@@ -22,8 +22,9 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-init.mjs <projectRoot>
 
 ## 선행/후속
 
-- 선행: U-A 플러그인으로 `/understand` 를 먼저 실행해 `.understand-anything/knowledge-graph.json` 을 만들어 두면 이후 분석이 풍부해진다(없어도 동작).
-- 후속: `/understand-map scan` 으로 결정론 도메인 맵을 스캔한다.
+- 후속: `/understand-map scan` 으로 결정론 도메인 맵을 스캔한다. **`/understand`(U-A KG 생성)
+  선행은 불필요** — 구조 메뉴는 map 산출(도메인 드릴다운)로 렌더되고, 잔여 소비처용 최소
+  `knowledge-graph.json` 도 map 이 자동 생성한다(STRUCTURE_FROM_MAP).
 
 ## 출력 해석
 

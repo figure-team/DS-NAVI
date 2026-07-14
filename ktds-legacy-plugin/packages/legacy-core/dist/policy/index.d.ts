@@ -9,4 +9,6 @@ export { reconcilePolicy, scanPolicyReconcile } from './reconcile.js';
 export declare function writePolicySignals(projectRoot: string, set: PolicySignalSet): void;
 /** policy-reconcile.json 기록(`.spec/map/` mkdir -p 선행). */
 export declare function writePolicyReconcile(projectRoot: string, result: ReconcileResult): void;
+export { POLICY_FILL_PREP_DIR, POLICY_FILL_FRAG_DIR, POLICY_FILL_PREP_INDEX_FILENAME, DEFAULT_MAX_FILL_ROWS, POLICY_FILL_TAGS, FILL_SECTION_START, FILL_SECTION_END, PolicyFillModeSchema, PolicyFillRowSchema, PolicyFillChunkSchema, PolicyFillChunkIndexSchema, PolicyFillFragmentRowSchema, PolicyFillFragmentSchema, policyFillPrepDir, policyFillFragDir, readPolicyFillChunkIndex, prepPolicyFill, auditPolicyFillFragments, mergePolicyFillFragments, } from './fill-fanout.js';
+export type { PolicyFillMode, PolicyFillTag, PolicyFillRow, PolicyFillChunk, PolicyFillChunkIndex, PolicyFillFragmentRow, PolicyFillFragment, PrepPolicyFillOptions, PolicyFragmentAudit, MergePolicyFillResult, } from './fill-fanout.js';
 //# sourceMappingURL=index.d.ts.map

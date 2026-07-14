@@ -13,12 +13,11 @@
 //   { projectRoot: string,   // absolute path of the analyzed project
 //     cliScript: string,     // absolute path to understand-map.mjs
 //     chunkIds: string[],    // fill-prep/index.json chunks[].chunkId
-//     model?: string,        // fill-writer model: 'sonnet' (default, egov-proven)
-//                            // | 'inherit' (session model) | 'haiku' | any model id
+//     model?: string,        // fill-writer model: 'inherit' (session, default —
+//                            // 공통 규약) | 'sonnet' (egov-proven) | 'haiku' | any model id
 //     effort?: string,       // fill-writer reasoning effort (default 'low')
 //     language?: string }    // output language for names/summaries (default '한국어')
 
-/* global args, agent, pipeline, parallel, phase, log -- Workflow-tool DSL injects these */
 
 export const meta = {
   name: 'ktds-map-fill-fanout',
@@ -32,7 +31,7 @@ export const meta = {
 
 // Tolerate hosts that deliver args as a JSON-encoded string instead of an object.
 const A = typeof args === 'string' ? JSON.parse(args) : args
-const { projectRoot, cliScript, chunkIds, model = 'sonnet', effort = 'low', language = '한국어' } = A ?? {}
+const { projectRoot, cliScript, chunkIds, model = 'inherit', effort = 'low', language = '한국어' } = A ?? {}
 if (!projectRoot || !cliScript || !Array.isArray(chunkIds) || chunkIds.length === 0) {
   throw new Error('args must provide { projectRoot, cliScript, chunkIds: [least one chunk id] }')
 }

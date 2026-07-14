@@ -1,7 +1,7 @@
 ---
 name: understand-map
 description: 결정론 도메인 맵 — 전수 census/라우트/콜체인/도달성 스캔 + 도메인 경계 확정 + 요약 (.spec/map/*.json, 동일 commit byte-diff=0)
-argument-hint: ["[projectRoot]", "[scan|plan|confirm|map|bundle|fill-prep|fill-audit|fill-merge|emit|templates]"]
+argument-hint: ["[projectRoot]", "[scan|plan|confirm|group-input|map|bundle|fill-prep|fill-audit|fill-merge|emit|templates]"]
 ---
 
 # /understand-map
@@ -59,11 +59,41 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> confirm --au
   { "op": "merge", "from": "my", "into": "mypage" },
   { "op": "move", "root": "src/…/FooController.java", "to": "board" },
   { "op": "exclude", "key": "kimtest" },
-  { "op": "rename", "key": "cs", "name": "고객센터" }
+  { "op": "rename", "key": "cs", "name": "고객센터" },
+  { "op": "group", "key": "g:common", "name": "공통", "members": ["com", "comm", "commcode"] },
+  { "op": "ungroup", "key": "g:common" }
 ]
 ```
 
 산출: `.spec/map/domain-plan.confirmed.json` (재실행 결정론의 닻).
+
+### 3-B) 상단도메인 그룹 분류 — group-classify (LLM, DOMAIN_HIERARCHY)
+
+서브도메인(경로 기반 결정론)이 수십 개로 많거나 공통/유틸 계열이 최상위에 병렬할 때,
+**업무 대분류(상단도메인)** 층을 얹는다. 경로 규약이 어긋난 SI 코드에서도 의미 기준으로
+묶이도록 **묶음 판단은 호스트(LLM)가**, **확정은 사람 게이트가** 맡는다. 그룹은 비파괴
+오버레이 — 서브도메인 key·파일 귀속·fill 산출물은 불변이다.
+
+```
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-map.mjs <projectRoot> group-input
+```
+
+1. 위 명령이 서브도메인 요약(key/name/roots/파일 수/대표 파일)을
+   `.spec/map/group-input.json` 에 쓴다(전 소스를 읽지 않는다 — 이 요약이 판단 입력의 전부).
+2. 호스트가 group-input.json 을 읽고 **업무 의미 기준**으로 그룹 ops 초안을
+   `.spec/map/group-ops.suggested.json` 에 쓴다. 규율:
+   - 상단도메인 6~15개 목표, 그룹당 서브도메인 **2개 이상**(1개짜리 그룹 남발 금지).
+   - 그룹 key 는 `g:` 접두(예: `g:common`), name 은 한국어 대분류명(공통/고객/관리자/주문·결제…).
+   - 확신 없는 서브도메인은 **어느 그룹에도 넣지 않는다**(미분류 허용, 지어내기 금지).
+   - 각 그룹에 배정 근거 1줄을 함께 보고한다(사람 검토용 — ops 파일에는 넣지 않는다).
+   - 비업무 디렉터리(temp/sample/example 류)는 그룹이 아니라 `exclude` 대상이다.
+3. 사람 검토 후 확정: `confirm --auto-approve --by <담당자> --ops .spec/map/group-ops.suggested.json`
+   (merge/exclude/rename 과 같은 ops 파일에 섞어도 된다 — 순서대로 적용).
+4. 재실행 결정론: 확정 후에는 플랜의 `groups` 가 닻이다 — LLM 재호출 없이 재생된다.
+   재분류가 필요할 때만 group-input 부터 다시 밟는다.
+
+산출: 확정 플랜 `groups[]` → emit 시 `domain-graph.json` 의 `ktdsMap.groups` 로 투영 →
+대시보드 업무 지도가 상단도메인 랜딩 + 서브도메인 좌측 내비로 렌더한다(그룹 없으면 평면 렌더).
 
 > ⚠️ **낡은 플랜 재사용 금지**: 기존 확정 플랜이 있어도 분류기 개선·코드 변경으로 현재 후보와 어긋날 수 있다(`map` 이 "확정 플랜 드리프트" 경고로 표면화). **드리프트가 보고되면 낡은 플랜을 결정론 닻이라며 그대로 쓰지 말고 반드시 confirm 을 재실행해 재확정**한 뒤 map→bundle→fill 을 진행한다 — 낡은 경계로 bundle/fill 을 돌리면 도메인 수십 개 분량의 LLM 작업이 헛돈다.
 
@@ -134,12 +164,12 @@ skeleton 이 있어야 한다(없으면 안내 후 종료). 도메인별로 **LL
 
 egov 실증 방법론(1,255흐름·104청크 팬아웃, 근거율 100%)의 정식 경로. 핵심 = **인용 생산을 LLM 에서 제거**: fill-prep 이 흐름·단계마다 검증 통과가 보장된 pre-cite(실파일 결정론 추출)를 청크에 동봉하고, 에이전트는 그것을 **verbatim 복사**만 한다. 청크 페이로드는 메인 컨텍스트를 절대 거치지 않는다(에이전트가 각자 디스크에서 읽는다).
 
-1. **모델 게이트** — 시간이 걸리는 실행이니 플랫폼이 대화형 질문(AskUserQuestion 등)을 지원하면 채움 모델을 한 번 묻는다:
-   - **sonnet (권장)** — egov 1,255흐름 실증: 근거율 100%, 7.5M 토큰/27분. "품질·비용 균형" → `model: "sonnet"`
-   - **세션 모델** — 요약문 품질 최고, 비용·시간 최대 → `model: "inherit"`
+1. **모델 게이트** — 공통 모델 질문 규약(understand·screens·policy 채움과 동일 문안): 플랫폼이 대화형 질문(AskUserQuestion 등)을 지원하면 실행 시작 시 한 번 묻는다:
+   - **세션 모델 (권장·기본)** — 요약문 품질 최우선, 현재 세션과 동일 모델 → `model: "inherit"`
+   - **sonnet** — 품질·비용 균형. egov 1,255흐름 실증: 근거율 100%, 7.5M 토큰/27분 → `model: "sonnet"`
    - **haiku** — 최대 절감. 요약 품질·verbatim 인용 준수 위험이 있으나 감사 재디스패치가 보정 → `model: "haiku"`
 
-   대화형 질문이 불가한 플랫폼이면 묻지 말고 `sonnet` 으로 진행한다. effort 는 `low` 고정을 권장한다(채움은 pre-cite 위 명명·요약이지 열린 분석이 아니다).
+   대화형 질문이 불가한 플랫폼이면 묻지 말고 기본값(세션 모델)으로 진행한다. effort 는 `low` 고정을 권장한다(채움은 pre-cite 위 명명·요약이지 열린 분석이 아니다).
 
 2. 청크 준비:
    ```

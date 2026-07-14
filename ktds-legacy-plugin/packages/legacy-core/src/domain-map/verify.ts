@@ -100,13 +100,18 @@ export function isTrivialSnippet(normalized: string): boolean {
   return !/[A-Za-z_$][\w$]{2,}|[가-힣]{2,}/.test(normalized)
 }
 
-interface FileCache {
+export interface FileCache {
   lines: string[] | null // null = 읽기 실패
   /** 심볼릭 링크 실경로가 루트 밖 — path-escape 로 보고. */
   escaped?: boolean
 }
 
-async function verifyCitation(
+/**
+ * 인용 1건을 실파일과 대조한다 — 경로 실존/탈출/라인 범위/스니펫 텍스트 일치.
+ * 'ok' 외 상태는 전부 검증 실패(강등 근거). screen-capture fill-merge 가 조각이
+ * 가져온 handler.evidence 진위 검증에 재사용한다(검증 규칙 이원화 금지).
+ */
+export async function verifyCitation(
   projectRoot: string,
   citation: Citation,
   cache: Map<string, FileCache>,

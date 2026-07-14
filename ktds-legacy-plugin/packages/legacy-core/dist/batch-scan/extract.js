@@ -71,13 +71,6 @@ export function extractSpringBatchXmlJobs(rawText, filePath) {
     return out;
 }
 // ── Java: quartz-java / executor / timer ────────────────────────────────
-function child(node, type) {
-    for (const c of node.namedChildren) {
-        if (c && c.type === type)
-            return c;
-    }
-    return null;
-}
 function* walk(root) {
     const stack = [root];
     while (stack.length > 0) {
@@ -298,7 +291,7 @@ export function extractShellBatchEntries(rawText, filePath) {
 export function extractCrontabEntries(rawText, filePath) {
     const out = [];
     const lines = rawText.split('\n');
-    const cronRe = /^\s*((?:[\d*\/,\-]+\s+){4}[\d*\/,\-]+)\s+(\S.*)$/;
+    const cronRe = /^\s*((?:[\d*/,-]+\s+){4}[\d*/,-]+)\s+(\S.*)$/;
     const atRe = /^\s*(@(?:reboot|yearly|annually|monthly|weekly|daily|midnight|hourly))\s+(\S.*)$/;
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];

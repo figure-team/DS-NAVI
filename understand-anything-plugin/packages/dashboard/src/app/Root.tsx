@@ -8,6 +8,7 @@ import { DEMO_MODE, dataUrl, resolveInitialToken, storeToken } from "../shared/a
 import { ThemeProvider } from "../themes/index.ts";
 import type { ThemeConfig } from "../themes/index.ts";
 import { I18nProvider } from "../contexts/I18nContext.tsx";
+import { parseDomainGroups } from "../utils/domainGroups";
 
 /** Outlet context — 각 페이지가 useOutletContext로 받는다. */
 export interface ShellContext {
@@ -45,7 +46,7 @@ export default function Root() {
 function RootData({ accessToken }: { accessToken: string }) {
   const setGraph = useDashboardStore((s) => s.setGraph);
   const setDomainGraph = useDashboardStore((s) => s.setDomainGraph);
-  const setWikiGraph = useDashboardStore((s) => s.setWikiGraph); // ktds-fork (ADR-004)
+  const setDomainGroups = useDashboardStore((s) => s.setDomainGroups);
   const setOverlayData = useDashboardStore((s) => s.setOverlayData);
   const setNodeOverrides = useDashboardStore((s) => s.setNodeOverrides); // P3
   const setApproverHandle = useDashboardStore((s) => s.setApproverHandle); // P3
@@ -94,6 +95,11 @@ function RootData({ accessToken }: { accessToken: string }) {
         // metadata" 로 오인된다. dev server 재시작으로 토큰이 회전하면 흔히 발생 →
         // 정직한 메시지로 분기(특히 401/403 = 토큰 만료).
         if (!res.ok) {
+          // STRUCTURE_FROM_MAP_DESIGN §5/§6: /understand 은퇴 이후 KG 부재는 흔한
+          // 정상 상태다(구조 메뉴가 더 이상 KG를 렌더하지 않음, 트랙 B의 최소 KG가
+          // 없을 수도 있음) — 404는 조용히 degrade(graph=null), 배너 없음. 토큰
+          // 거부(401/403)나 그 외 서버 오류는 여전히 진단이 유용하므로 배너 유지.
+          if (res.status === 404) return null;
           throw new Error(
             res.status === 401 || res.status === 403
               ? `access token rejected (HTTP ${res.status}) — reopen the dashboard with the current ?token= URL printed by the dev server`
@@ -103,14 +109,11 @@ function RootData({ accessToken }: { accessToken: string }) {
         return res.json();
       })
       .then((data: unknown) => {
+        if (data === null) return; // 404 soft-degrade(위) — graph 는 null 유지, 배너 없음.
         const result = validateGraph(data);
         if (result.success && result.data) {
           setGraph(result.data);
           setGraphIssues(result.issues);
-          if ((data as Record<string, unknown>).kind === "knowledge") {
-            // P2: /knowledge로의 이동은 StructurePage의 isKnowledgeGraph 리다이렉트가 담당.
-            useDashboardStore.getState().setIsKnowledgeGraph(true);
-          }
           for (const issue of result.issues) {
             if (issue.level === "auto-corrected") {
               console.warn(`[graph] auto-corrected: ${issue.message}`);
@@ -207,6 +210,10 @@ function RootData({ accessToken }: { accessToken: string }) {
       })
       .then((data: unknown) => {
         if (!data) return;
+        // DOMAIN_HIERARCHY §7: ktdsMap.groups는 core 스키마가 모르는 additive 필드라
+        // validateGraph를 거치면 유실된다 — 검증 *전* raw 데이터에서 먼저 뽑아둔다.
+        const raw = data as { ktdsMap?: unknown };
+        setDomainGroups(parseDomainGroups(raw.ktdsMap));
         const result = validateGraph(data);
         if (result.success && result.data) {
           setDomainGraph(result.data);
@@ -215,23 +222,7 @@ function RootData({ accessToken }: { accessToken: string }) {
         }
       })
       .catch(() => {});
-  }, [setDomainGraph]);
-
-  // ktds-fork (ADR-004): 세분화 위키 그래프 로드 → "문서" 토글 소스. 없으면 토글 미표시.
-  useEffect(() => {
-    fetch(dataUrl("wiki-graph.json", accessToken))
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: unknown) => {
-        if (!data) return;
-        const result = validateGraph(data);
-        if (result.success && result.data) {
-          setWikiGraph(result.data);
-        } else if (result.fatal) {
-          console.warn(`[wiki-graph] validation failed: ${result.fatal}`);
-        }
-      })
-      .catch(() => {});
-  }, [setWikiGraph]);
+  }, [setDomainGraph, setDomainGroups]);
 
   return (
     <I18nProvider language={outputLanguage ?? "ko"}>

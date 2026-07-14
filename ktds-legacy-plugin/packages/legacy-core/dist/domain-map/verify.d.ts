@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { type DomainFill } from './fill.js';
+import { type Citation, type DomainFill } from './fill.js';
 /** 검증 리포트 파일명(`.spec/map/` 하위). */
 export declare const VERIFY_REPORT_FILENAME = "verify-report.json";
 export declare const CITATION_STATUS: readonly ["ok", "path-escape", "no-file", "line-out-of-range", "text-mismatch", "trivial-snippet"];
@@ -146,6 +146,17 @@ export declare function normalizeCitationText(s: string): string;
  * fill-fanout 의 pre-cite 추출이 같은 함수를 공유한다(검증 규칙 이원화 금지).
  */
 export declare function isTrivialSnippet(normalized: string): boolean;
+export interface FileCache {
+    lines: string[] | null;
+    /** 심볼릭 링크 실경로가 루트 밖 — path-escape 로 보고. */
+    escaped?: boolean;
+}
+/**
+ * 인용 1건을 실파일과 대조한다 — 경로 실존/탈출/라인 범위/스니펫 텍스트 일치.
+ * 'ok' 외 상태는 전부 검증 실패(강등 근거). screen-capture fill-merge 가 조각이
+ * 가져온 handler.evidence 진위 검증에 재사용한다(검증 규칙 이원화 금지).
+ */
+export declare function verifyCitation(projectRoot: string, citation: Citation, cache: Map<string, FileCache>): Promise<CitationStatus>;
 /**
  * fill 전체를 실파일과 대조 — 결과 구조를 반환한다(쓰기는 writeVerifyReport).
  * `rejectedBusinessFlows` = applyFills 가 그래프 정합 실패로 기각한 프로세스 ref

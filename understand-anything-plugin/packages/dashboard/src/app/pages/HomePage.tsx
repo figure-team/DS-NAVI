@@ -61,7 +61,6 @@ export default function HomePage() {
   const { accessToken } = useOutletContext<ShellContext>();
   const graph = useDashboardStore((s) => s.graph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const wikiGraph = useDashboardStore((s) => s.wikiGraph);
   const impactOverlay = useDashboardStore((s) => s.impactOverlayData);
   const diffOverlay = useDashboardStore((s) => s.diffOverlayData);
   const { t } = useI18n();
@@ -375,8 +374,8 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* 2행 — 프로토 grid3 2단: 이번 주 실적 + 위험 모듈 + 산출물 진행 (+위키). */}
-        {(work || risk || docCounts || wikiGraph) && (
+        {/* 2행 — 프로토 grid3 2단: 이번 주 실적 + 위험 모듈 + 산출물 진행. */}
+        {(work || risk || docCounts) && (
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-3.5">
             {work && (
               <EntryCard
@@ -425,21 +424,6 @@ export default function HomePage() {
                   <Badge tone="ok">확정 {docCounts.confirmed}</Badge>
                   <Badge tone="info">초안 {docCounts.draft}</Badge>
                   {docCounts.xlsx > 0 && <span>xlsx {docCounts.xlsx}종</span>}
-                </div>
-              </EntryCard>
-            )}
-            {wikiGraph && (
-              <EntryCard
-                to="/wiki"
-                icon={iconWiki}
-                title="위키 문서"
-                description="세분화 위키 — 도메인·개념 단위 문서를 폴더 트리로 탐색합니다."
-              >
-                <div className="text-[12.5px] text-text-muted">
-                  문서{" "}
-                  <b className="text-text-primary font-semibold">
-                    {wikiGraph.nodes.filter((n) => n.type === "article").length}
-                  </b>
                 </div>
               </EntryCard>
             )}
@@ -609,12 +593,6 @@ const iconDocs = (
   <svg {...svgProps}>
     <path d="M6 2.5h9L20 8v13.5H6zM14.5 3v5.5H20" />
     <path d="M9 13h7M9 17h5" />
-  </svg>
-);
-const iconWiki = (
-  <svg {...svgProps}>
-    <path d="M4 5a2.5 2.5 0 0 1 2.5-2.5H20V19H6.5A2.5 2.5 0 0 0 4 21.5z" />
-    <path d="M4 19a2.5 2.5 0 0 1 2.5-2.5H20" />
   </svg>
 );
 const iconReport = (

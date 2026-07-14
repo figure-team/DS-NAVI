@@ -134,6 +134,19 @@ interface VerifyReport {
   };
 }
 
+/** GET /impact-history 원장 항목 — 대시보드가 띄운 자연어 분석의 기록(서버가 job 종료 시 append). */
+interface HistoryEntry {
+  jobId: string;
+  query: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  status: "done" | "failed";
+  gitCommit: string | null;
+  /** 스냅샷으로 확보된 파일명 — impact.json 없으면 열람 불가(실패 job 등). */
+  files: string[];
+}
+
 type Status = "loading" | "ready" | "empty" | "error";
 
 /** relPath 를 마지막 2세그먼트로 축약(전체는 title 로). */
@@ -142,6 +155,17 @@ const short2 = (p: string): string => p.split("/").slice(-2).join("/");
 const baseName = (p: string): string => p.split("/").pop() ?? p;
 /** flowId → 사람이 읽는 라우트 표기("flow:ANY /x" → "/x"). */
 const shortFlow = (id: string): string => id.replace(/^flow:/, "").replace(/^ANY\s+/, "");
+/** ISO 시각 → "MM-DD HH:mm"(로컬) — 기록 목록용 축약. */
+const fmtTime = (iso: string | null): string =>
+  iso
+    ? new Date(iso).toLocaleString("ko-KR", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+    : "";
 
 const CARD = "rounded-[10px] border border-border-subtle bg-panel card-shadow";
 const GRP_LABEL: CSSProperties = {
@@ -362,6 +386,14 @@ export default function ChangeImpactView() {
   const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
   const dataBase = import.meta.env.BASE_URL;
   const tokenQ = accessToken && !DEMO_MODE ? `?token=${encodeURIComponent(accessToken)}` : "";
+  const jobStatus = useDashboardStore((s) => s.impactJob.status);
+
+  // 분석 기록(히스토리) — 라이브 dev 서버 전용(demo 번들엔 원장·스냅샷 엔드포인트 없음).
+  // ?run=<jobId> 로 과거 스냅샷 열람, 없으면 최신(live impact.json).
+  const historyEnabled = !DEMO_MODE && !!accessToken;
+  const rawRun = searchParams.get("run");
+  const activeRun = historyEnabled && rawRun && /^[0-9a-f]{16}$/.test(rawRun) ? rawRun : null;
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
 
   const [data, setData] = useState<ImpactData | null>(null);
   const [verify, setVerify] = useState<VerifyReport | null>(null);
@@ -372,8 +404,11 @@ export default function ChangeImpactView() {
     let alive = true;
     setStatus("loading");
     setVerify(null);
+    const snapQ = (name: string) =>
+      `/impact-history-item?id=${activeRun}&name=${name}&token=${encodeURIComponent(accessToken ?? "")}`;
     // 필수 — impact.json. 404 는 "아직 분석 없음"(빈 상태), 그 외 실패는 오류 상태로 구분.
-    fetch(`${dataBase}impact.json${tokenQ}`)
+    // 기록 열람(activeRun) 시엔 해당 job 스냅샷을 대신 조회.
+    fetch(activeRun ? snapQ("impact.json") : `${dataBase}impact.json${tokenQ}`)
       .then(async (r) => {
         if (r.status === 404) return { kind: "empty" as const };
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -396,7 +431,9 @@ export default function ChangeImpactView() {
         setStatus("error");
       });
     // 선택 — 검증 리포트. 부재/실패는 조용히 무시(정직: 없으면 미표기).
-    fetch(`${dataBase}impact-verify-report.json${tokenQ}`)
+    fetch(
+      activeRun ? snapQ("impact-verify-report.json") : `${dataBase}impact-verify-report.json${tokenQ}`,
+    )
       .then((r) => (r.ok ? r.json() : null))
       .then((v: VerifyReport | null) => {
         if (alive && v && Array.isArray(v.items) && v.overall) setVerify(v);
@@ -405,7 +442,23 @@ export default function ChangeImpactView() {
     return () => {
       alive = false;
     };
-  }, [dataBase, tokenQ]);
+    // jobStatus: 자연어 분석 완료(running→done) 시 최신 결과 자동 재조회.
+  }, [dataBase, tokenQ, activeRun, accessToken, jobStatus]);
+
+  // 분석 기록 원장 — 마운트 시 + job 종료(done/failed 전이) 시 재조회. 부재/실패 = 기록 없음.
+  useEffect(() => {
+    if (!historyEnabled || jobStatus === "running") return;
+    let alive = true;
+    fetch(`/impact-history?token=${encodeURIComponent(accessToken ?? "")}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { entries?: HistoryEntry[] } | null) => {
+        if (alive && d && Array.isArray(d.entries)) setHistory(d.entries);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [historyEnabled, accessToken, jobStatus]);
 
   const verdictOf = useMemo(() => {
     const m = new Map<string, string>();
@@ -455,6 +508,68 @@ export default function ChangeImpactView() {
     />
   );
 
+  // 좌측 트리 — 최신(live) 1건 + 분석 기록 원장. 빈/오류 상태에서도 기록 열람은 가능해야
+  // 하므로 ready 분기 밖에서 만들어 공유한다.
+  const selectedEntry = activeRun ? (history.find((e) => e.jobId === activeRun) ?? null) : null;
+  const tree = (
+    <div className={`${CARD} proto-tree`}>
+      <div className="fold">현재</div>
+      <button
+        type="button"
+        className={`doc${activeRun ? "" : " on"}`}
+        onClick={() => setParam("run", null)}
+      >
+        <span className="truncate" style={{ minWidth: 0 }}>
+          최신 분석{!activeRun && data ? ` · ${data.gitCommit.slice(0, 7)}` : ""}
+        </span>
+        <span className="st">
+          <Badge tone="info">최신</Badge>
+        </span>
+      </button>
+      {historyEnabled && (
+        <>
+          <div className="fold">분석 기록 ({history.length})</div>
+          {history.length === 0 ? (
+            <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "4px 8px", lineHeight: 1.5 }}>
+              아직 기록 없음 — 자연어 영향 분석을 실행하면 여기 쌓입니다.
+            </div>
+          ) : (
+            history.map((e) => {
+              const openable = e.files.includes("impact.json");
+              return (
+                <button
+                  key={e.jobId}
+                  type="button"
+                  className={`doc${activeRun === e.jobId ? " on" : ""}`}
+                  disabled={!openable}
+                  title={`${e.query}\n${fmtTime(e.finishedAt)}${openable ? "" : " · 결과 스냅샷 없음"}`}
+                  style={openable ? undefined : { opacity: 0.55, cursor: "default" }}
+                  onClick={() => setParam("run", e.jobId)}
+                >
+                  <span style={{ minWidth: 0, flex: "1 1 auto" }}>
+                    <span className="truncate" style={{ display: "block" }}>
+                      {e.query || "(질의 미상)"}
+                    </span>
+                    <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{fmtTime(e.finishedAt)}</span>
+                  </span>
+                  <span className="st">
+                    <Badge tone={e.status === "done" ? "ok" : "err"}>
+                      {e.status === "done" ? "완료" : "실패"}
+                    </Badge>
+                  </span>
+                </button>
+              );
+            })
+          )}
+        </>
+      )}
+      <div className="fold">안내</div>
+      <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "6px 8px", lineHeight: 1.5 }}>
+        RTM 새 요청 인테이크 또는 자연어 영향 분석으로 새 분석을 시작합니다.
+      </div>
+    </div>
+  );
+
   if (status !== "ready" || !data) {
     return (
       <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
@@ -463,23 +578,30 @@ export default function ChangeImpactView() {
           <p className="text-text-muted" style={{ fontSize: 13, padding: "4px 2px" }}>
             불러오는 중…
           </p>
-        ) : status === "error" ? (
-          <div
-            className={CARD}
-            style={{ padding: "20px 24px", borderLeft: "3px solid var(--color-status-error)" }}
-          >
-            <p className="text-text-primary" style={{ fontSize: 13.5, fontWeight: 650, marginBottom: 6 }}>
-              영향 분석을 불러오지 못했습니다
-            </p>
-            <p className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.6 }}>
-              사유: <code>{errorMsg}</code> — 네트워크 또는 접근 토큰을 확인한 뒤 새로고침하세요.
-            </p>
-          </div>
         ) : (
-          <div className={CARD} style={{ padding: "28px", textAlign: "center" }}>
-            <p className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
-              영향 분석 결과 없음 — <code>/understand-impact</code> 또는 RTM 인테이크에서 분석을 실행하면 여기 나타납니다
-            </p>
+          <div className="grid items-start grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]" style={{ gap: 14 }}>
+            {tree}
+            {status === "error" ? (
+              <div
+                className={CARD}
+                style={{ padding: "20px 24px", borderLeft: "3px solid var(--color-status-error)" }}
+              >
+                <p className="text-text-primary" style={{ fontSize: 13.5, fontWeight: 650, marginBottom: 6 }}>
+                  영향 분석을 불러오지 못했습니다
+                </p>
+                <p className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.6 }}>
+                  사유: <code>{errorMsg}</code> — 네트워크 또는 접근 토큰을 확인한 뒤 새로고침하세요.
+                </p>
+              </div>
+            ) : (
+              <div className={CARD} style={{ padding: "28px", textAlign: "center" }}>
+                <p className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
+                  {activeRun
+                    ? "이 기록의 결과 스냅샷을 찾을 수 없습니다 — 좌측에서 다른 기록이나 최신 분석을 선택하세요"
+                    : "영향 분석 결과 없음 — 자연어 영향 분석, /understand-impact 또는 RTM 인테이크에서 분석을 실행하면 여기 나타납니다"}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -520,22 +642,8 @@ export default function ChangeImpactView() {
 
       {/* 프로토 .docs — 좌 260px 트리 카드 + 우 콘텐츠 */}
       <div className="grid items-start grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]" style={{ gap: 14 }}>
-        {/* 좌 트리 — CR 원장이 아니라 최신 분석 1건이므로 정직하게 (1) */}
-        <div className={`${CARD} proto-tree`}>
-          <div className="fold">분석 결과 (1)</div>
-          <div className="doc on">
-            <span className="truncate" style={{ minWidth: 0 }}>
-              영향 분석 · {sha7}
-            </span>
-            <span className="st">
-              <Badge tone="info">분석 완료</Badge>
-            </span>
-          </div>
-          <div className="fold">안내</div>
-          <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "6px 8px", lineHeight: 1.5 }}>
-            RTM 새 요청 인테이크 또는 자연어 영향 분석으로 새 분석을 시작합니다.
-          </div>
-        </div>
+        {/* 좌 트리 — 최신 1건 + 분석 기록 원장(impact-history) */}
+        {tree}
 
         {/* 우 콘텐츠 */}
         <div style={{ minWidth: 0 }}>
@@ -545,11 +653,38 @@ export default function ChangeImpactView() {
               <b style={{ fontSize: 15 }}>
                 영향 분석 — 앵커 commit <span style={{ fontFamily: "var(--font-mono)" }}>{sha7}</span>
               </b>
-              <Badge tone="ok">분석 완료</Badge>
+              {activeRun ? <Badge tone="warn">기록 열람</Badge> : <Badge tone="ok">분석 완료</Badge>}
               <div className="flex-1" />
-              <LinkBtn to="/deliverables/09_impact-analysis">변경영향분석서(09) 보기</LinkBtn>
-              <LinkBtn to="/structure?overlay=impact">그래프 오버레이 →</LinkBtn>
+              {activeRun ? (
+                <button
+                  type="button"
+                  onClick={() => setParam("run", null)}
+                  className="rounded-md border border-border-medium bg-panel text-text-secondary hover:bg-elevated transition-colors font-semibold cursor-pointer"
+                  style={{ padding: "4px 10px", fontSize: 12, borderRadius: 6, flex: "none" }}
+                >
+                  최신 결과 보기
+                </button>
+              ) : (
+                <>
+                  <LinkBtn to="/deliverables/09_impact-analysis">변경영향분석서(09) 보기</LinkBtn>
+                  <LinkBtn to="/structure?overlay=impact">그래프 오버레이 →</LinkBtn>
+                </>
+              )}
             </div>
+            {activeRun && (
+              <div className="flex items-center flex-wrap" style={{ gap: 8, marginTop: 8 }}>
+                <span
+                  className="text-text-secondary truncate"
+                  style={{ fontSize: 12.5, minWidth: 0, maxWidth: 640 }}
+                  title={selectedEntry?.query}
+                >
+                  질의: {selectedEntry?.query || "(질의 미상)"}
+                </span>
+                <span className="text-text-muted" style={{ fontSize: 11.5, flex: "none" }}>
+                  {fmtTime(selectedEntry?.finishedAt ?? null)} 분석 — 과거 스냅샷이며 문서(09)·구조 오버레이는 최신 기준
+                </span>
+              </div>
+            )}
             <div style={{ marginTop: 12 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
                 변경 기점 (seeds {data.seeds.length})

@@ -1,15 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
+  getNodesBounds,
   Handle,
   MarkerType,
+  MiniMap,
+  Panel,
   Position,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
   type Edge,
   type Node,
   type NodeProps,
 } from "@xyflow/react";
+import { toPng } from "html-to-image";
 import { useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
@@ -86,7 +91,13 @@ function BizNode({ data }: NodeProps) {
   }
 
   if (biz.kind === "decision") {
-    const stroke = selected ? accent : "var(--color-status-warn)";
+    // 판단은 중립색(info) — warn(주황)은 "문제 있는 단계"로 오독되고(PM/PL 리뷰),
+    // 진짜 [확인 필요](⚠) 노드와도 구분이 안 됐다. 검토 필요만 warn 유지.
+    const stroke = selected
+      ? accent
+      : review
+        ? "var(--color-status-warn)"
+        : "var(--color-status-info)";
     return (
       <div className="relative" style={{ width: w, height: h }}>
         <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
@@ -117,7 +128,7 @@ function BizNode({ data }: NodeProps) {
           style={{
             fontSize: 12,
             fontWeight: 650,
-            color: "var(--color-status-warn)",
+            color: review ? "var(--color-status-warn)" : "var(--color-status-info)",
             padding: "0 30px",
             lineHeight: 1.3,
             wordBreak: "keep-all",
@@ -164,8 +175,10 @@ function BizNode({ data }: NodeProps) {
             fontSize: 10,
             padding: "1px 6px",
             fontFamily: "var(--font-mono)",
-            color: "var(--color-status-info)",
-            background: "color-mix(in srgb, var(--color-status-info) 10%, transparent)",
+            // 기능(코드) 연결 색 언어 = 보라(layer-dao 재사용, 다크 변형 보유) —
+            // 판단 노드가 info 파랑을 가져가면서 겹쳐 분리(사용자 결정).
+            color: "var(--color-layer-dao)",
+            background: "color-mix(in srgb, var(--color-layer-dao) 10%, transparent)",
           }}
         >
           flow: {flowRefShort(biz.flowRef)}
@@ -179,20 +192,310 @@ function BizNode({ data }: NodeProps) {
 const NODE_TYPES = { biz: BizNode };
 const EDGE_TYPES = { elk: ElkEdge };
 
+/** 내보내기 여백(px) — 노드 경계 사각형 밖 숨통. */
+const EXPORT_PAD = 32;
+/** 내보내기 배율 — 문서 첨부용 선명도. */
+const EXPORT_RATIO = 2;
+/** 내보내기 상단 제목 밴드 높이(css px) — "도메인 — 프로세스" 스탬프. */
+const EXPORT_STAMP_H = 56;
+/** 초기 표시 배율 하한 — 큰 흐름의 전체 맞춤이 글자를 뭉개면 이 배율로 상단부터. */
+const INIT_MIN_ZOOM = 0.7;
+/** 미니맵 표시 선택 저장 키 — 프로세스 전환(key remount)·재방문에도 유지. */
+const MINIMAP_PREF_KEY = "ua-bizflow-minimap";
+
+/**
+ * 순서도 래스터 위에 제목 밴드를 얹는다 — 여러 장 내보내면 파일명만으로 구분이
+ * 안 된다(PM/PL 리뷰). 캔버스 fillText 는 문서에 로드된 웹폰트를 그대로 쓴다.
+ */
+async function stampTitleBand(
+  dataUrl: string,
+  stamp: string,
+  background: string,
+): Promise<string> {
+  const img = new Image();
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error("export image decode failed"));
+    img.src = dataUrl;
+  });
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height + EXPORT_STAMP_H * EXPORT_RATIO;
+  const c = canvas.getContext("2d");
+  if (!c) return dataUrl; // 컨텍스트 불가 환경 — 스탬프 없이 원본 유지(다운로드 우선).
+  c.fillStyle = background;
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  const textColor = getComputedStyle(document.body).color;
+  const midY = (EXPORT_STAMP_H / 2 + 4) * EXPORT_RATIO;
+  c.textBaseline = "middle";
+  c.fillStyle = textColor;
+  c.font = `700 ${15 * EXPORT_RATIO}px Pretendard, 'Malgun Gothic', sans-serif`;
+  c.fillText(stamp, EXPORT_PAD * EXPORT_RATIO, midY);
+  c.globalAlpha = 0.55;
+  c.font = `400 ${11.5 * EXPORT_RATIO}px Pretendard, 'Malgun Gothic', sans-serif`;
+  c.textAlign = "right";
+  c.fillText(new Date().toISOString().slice(0, 10), canvas.width - EXPORT_PAD * EXPORT_RATIO, midY);
+  // 제목 밴드 아래 얇은 구분선.
+  c.globalAlpha = 0.15;
+  c.textAlign = "left";
+  c.fillRect(
+    EXPORT_PAD * EXPORT_RATIO,
+    (EXPORT_STAMP_H - 6) * EXPORT_RATIO,
+    canvas.width - EXPORT_PAD * 2 * EXPORT_RATIO,
+    EXPORT_RATIO,
+  );
+  c.globalAlpha = 1;
+  c.drawImage(img, 0, EXPORT_STAMP_H * EXPORT_RATIO);
+  return canvas.toDataURL("image/png");
+}
+
+/** 범례 행 — 미니 글리프(실물 축소판) + 설명 한 줄. */
+function LegendRow({ glyph, text }: { glyph: React.ReactNode; text: string }) {
+  return (
+    <div className="flex items-center" style={{ gap: 9 }}>
+      <span className="shrink-0 flex items-center justify-center" style={{ width: 30 }}>
+        {glyph}
+      </span>
+      <span className="text-text-secondary" style={{ fontSize: 11, lineHeight: 1.45 }}>
+        {text}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * 범례 — 도형(시작/종료·활동·판단)과 색 표식(보라 코드 연결·주황 확인 필요·
+ * 녹색 검증 통과) 설명(PM/PL 요청). 기본 접힘 토글 — 항상 펼치면 캔버스 소음.
+ * 글리프는 실제 노드 스타일의 축소판이라 색·형태가 본편과 자동 일치하지는
+ * 않으므로, 노드 어휘를 바꿀 때 여기도 함께 갱신할 것.
+ */
+function LegendPanel() {
+  const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  return (
+    <Panel position="top-left">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="rounded-md border border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+        style={{ fontSize: 11.5, padding: "4px 10px" }}
+      >
+        ⓘ {t.flowList.bfLegend}
+      </button>
+      {open && (
+        <div
+          className="rounded-lg border border-border-medium bg-surface shadow-xl flex flex-col"
+          style={{ marginTop: 6, padding: "10px 12px", width: 250, gap: 7 }}
+        >
+          <LegendRow
+            glyph={
+              <span
+                aria-hidden
+                style={{
+                  width: 24,
+                  height: 11,
+                  borderRadius: 6,
+                  border: "1.5px solid var(--color-border-medium)",
+                  background: "var(--color-surface)",
+                  display: "block",
+                }}
+              />
+            }
+            text={t.flowList.bfLegendStartEnd}
+          />
+          <LegendRow
+            glyph={
+              <span
+                aria-hidden
+                style={{
+                  width: 26,
+                  height: 14,
+                  borderRadius: 4,
+                  border: "1px solid var(--color-border-subtle)",
+                  background: "var(--color-panel)",
+                  boxShadow: "0 1px 2px rgba(26,27,31,.08)",
+                  display: "block",
+                }}
+              />
+            }
+            text={t.flowList.bfLegendActivity}
+          />
+          <LegendRow
+            glyph={
+              <svg width={26} height={16} viewBox="0 0 26 16" aria-hidden>
+                <polygon
+                  points="13,1 25,8 13,15 1,8"
+                  fill="var(--color-panel)"
+                  stroke="var(--color-status-info)"
+                  strokeWidth={1.2}
+                />
+              </svg>
+            }
+            text={t.flowList.bfLegendDecision}
+          />
+          <LegendRow
+            glyph={
+              <span
+                aria-hidden
+                className="rounded font-bold"
+                style={{
+                  fontSize: 8.5,
+                  padding: "1px 4px",
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--color-layer-dao)",
+                  background: "color-mix(in srgb, var(--color-layer-dao) 10%, transparent)",
+                }}
+              >
+                flow:
+              </span>
+            }
+            text={t.flowList.bfLegendFlowRef}
+          />
+          <LegendRow
+            glyph={
+              <span aria-hidden style={{ color: "var(--color-status-warn)", fontSize: 13 }}>
+                ⚠
+              </span>
+            }
+            text={t.flowList.bfLegendReview}
+          />
+          <LegendRow
+            glyph={
+              <span aria-hidden style={{ color: "var(--color-status-ok)", fontSize: 13 }}>
+                ✓
+              </span>
+            }
+            text={t.flowList.bfLegendGrounded}
+          />
+          {/* 근거 확인 안내 — 캔버스 상시 문구에서 이동(사용자 결정, 소음 제거). */}
+          <p
+            className="text-text-muted border-t border-border-subtle"
+            style={{ fontSize: 10.5, lineHeight: 1.5, paddingTop: 7, marginTop: 2 }}
+          >
+            {t.flowList.bfClickHint}
+          </p>
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+/**
+ * PNG 내보내기 — React Flow 공식 패턴: `.react-flow__viewport`(노드+엣지+라벨 칩)를
+ * html-to-image 로 노드 경계 사각형에 맞춰 래스터화(pixelRatio 2). 화면 줌/팬과
+ * 무관하게 전체 순서도가 담기고, 배경 점·컨트롤·근거 바는 viewport 밖이라 제외된다.
+ * Panel(우상단)은 ReactFlow 자식이어야 하므로 버튼을 여기로 분리(useReactFlow 필요).
+ */
+function ExportPngButton({
+  containerRef,
+  fileName,
+  stamp,
+  label,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  fileName: string;
+  /** 이미지 상단 제목 밴드 텍스트 — "도메인 — 프로세스". */
+  stamp: string;
+  label: string;
+}) {
+  const { getNodes } = useReactFlow();
+  const [busy, setBusy] = useState(false);
+
+  const onExport = async () => {
+    const viewport = containerRef.current?.querySelector<HTMLElement>(".react-flow__viewport");
+    if (!viewport || busy) return;
+    setBusy(true);
+    try {
+      const bounds = getNodesBounds(getNodes());
+      const width = Math.ceil(bounds.width) + EXPORT_PAD * 2;
+      const height = Math.ceil(bounds.height) + EXPORT_PAD * 2;
+      // 테마(라이트/다크) 배경을 그대로 — 투명 PNG 는 문서 붙여넣기에서 깨져 보인다.
+      const background = getComputedStyle(document.body).backgroundColor;
+      const dataUrl = await toPng(viewport, {
+        backgroundColor: background,
+        // 폰트 임베드는 켠 채로 둔다 — 같은 출처(vite) Pretendard @font-face 가
+        // 임베드돼야 화면과 동일한 줄바꿈이 유지된다(skipFonts 로 껐더니 대체
+        // 폰트 폭 차이로 노드 라벨 끝이 잘렸음). 크로스오리진 CDN 시트 2건의
+        // SecurityError 콘솔 로그는 무해(해당 시트만 건너뛰고 계속 진행).
+        width,
+        height,
+        pixelRatio: EXPORT_RATIO,
+        style: {
+          width: `${width}px`,
+          height: `${height}px`,
+          transform: `translate(${EXPORT_PAD - bounds.x}px, ${EXPORT_PAD - bounds.y}px) scale(1)`,
+        },
+      });
+      const a = document.createElement("a");
+      a.href = await stampTitleBand(dataUrl, stamp, background);
+      a.download = fileName;
+      a.click();
+    } catch (err) {
+      console.error("business-flow PNG export failed", err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Panel 래핑은 호출측(우상단 툴바) — 미니맵 토글과 한 줄에 놓기 위해 버튼만 반환.
+  return (
+    <button
+      type="button"
+      onClick={onExport}
+      disabled={busy}
+      title={label}
+      className="rounded-md border border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+      style={{ fontSize: 11.5, padding: "4px 10px", opacity: busy ? 0.5 : 1 }}
+    >
+      ⤓ {label}
+    </button>
+  );
+}
+
 export default function BusinessFlowView({
   domainId,
   biz,
   rejectedReason,
+  title,
+  domainName,
 }: {
   domainId: string;
   biz: BizFlow;
   /** emit 이 businessFlow 를 기각한 사유 — "미채움"과 구별해 배너 분기(리뷰 C2). */
   rejectedReason?: string | null;
+  /** 선택된 업무 프로세스 제목 — PNG 파일명·제목 스탬프용(없으면 도메인 키 폴백). */
+  title?: string | null;
+  /** 도메인 표시명 — PNG 제목 스탬프용(없으면 도메인 키 폴백). */
+  domainName?: string | null;
 }) {
   const { t } = useI18n();
   const [, setSearchParams] = useSearchParams();
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const flowAreaRef = useRef<HTMLDivElement | null>(null);
+
+  // 미니맵 — 사용자 선택(localStorage) 우선, 미선택(null)이면 자동: 흐름이
+  // 화면을 넘쳐 줌 하한이 발동했을 때만 기본 열림(작은 흐름에선 소음).
+  const [miniMapPref, setMiniMapPref] = useState<boolean | null>(() => {
+    try {
+      const v = localStorage.getItem(MINIMAP_PREF_KEY);
+      return v === null ? null : v === "1";
+    } catch {
+      return null;
+    }
+  });
+  const [overflows, setOverflows] = useState(false);
+  const miniMapVisible = miniMapPref ?? overflows;
+  const toggleMiniMap = () => {
+    const next = !miniMapVisible;
+    setMiniMapPref(next);
+    try {
+      localStorage.setItem(MINIMAP_PREF_KEY, next ? "1" : "0");
+    } catch {
+      /* storage 불가 환경 — 세션 상태만 유지 */
+    }
+  };
   const [layout, setLayout] = useState<{
     positions: Map<string, { x: number; y: number }>;
     edgePoints: Map<string, ElkPoint[]>;
@@ -340,7 +643,7 @@ export default function BusinessFlowView({
             : t.flowList.businessFallbackBanner}
         </div>
       )}
-      <div className="flex-1 min-h-0 relative">
+      <div ref={flowAreaRef} className="flex-1 min-h-0 relative">
         {layout && (
           <ReactFlowProvider>
             <ReactFlow
@@ -350,8 +653,23 @@ export default function BusinessFlowView({
               edgeTypes={EDGE_TYPES}
               onNodeClick={(_, n) => setSelectedId(n.id)}
               onPaneClick={() => setSelectedId(null)}
-              fitView
-              fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
+              onInit={async (rf) => {
+                // 기본은 전체 맞춤 — 단, 큰 흐름에서 글자가 뭉개지는 배율까지
+                // 내려가면(PM/PL 리뷰) 판독 하한(INIT_MIN_ZOOM)으로 올리고
+                // 상단(시작 노드)부터 보여준다. 전체 조망은 스크롤/축소로.
+                // fitView 는 v12에서 비동기 — 적용 전 getZoom() 은 스테일.
+                await rf.fitView({ padding: 0.15, maxZoom: 1 });
+                if (rf.getZoom() >= INIT_MIN_ZOOM) return;
+                // 하한 발동 = 흐름이 화면을 넘침 → 미니맵 자동 표시 신호.
+                setOverflows(true);
+                const bounds = getNodesBounds(rf.getNodes());
+                const w = flowAreaRef.current?.getBoundingClientRect().width ?? 800;
+                rf.setViewport({
+                  x: w / 2 - (bounds.x + bounds.width / 2) * INIT_MIN_ZOOM,
+                  y: 28 - bounds.y * INIT_MIN_ZOOM,
+                  zoom: INIT_MIN_ZOOM,
+                });
+              }}
               minZoom={0.2}
               proOptions={{ hideAttribution: true }}
               nodesDraggable={false}
@@ -359,6 +677,46 @@ export default function BusinessFlowView({
               elementsSelectable
             >
               <Background gap={24} size={1} />
+              <LegendPanel />
+              {/* 우상단 툴바 — 미니맵 토글 + PNG 내보내기(한 슬롯, Panel 중복 방지). */}
+              <Panel position="top-right" className="flex items-center" style={{ gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={toggleMiniMap}
+                  aria-pressed={miniMapVisible}
+                  className={`rounded-md border transition-colors cursor-pointer ${
+                    miniMapVisible
+                      ? "border-border-medium bg-elevated text-text-primary"
+                      : "border-border-subtle bg-panel text-text-secondary hover:text-accent hover:border-border-medium"
+                  }`}
+                  style={{ fontSize: 11.5, padding: "4px 10px" }}
+                >
+                  {t.flowList.bfMiniMap}
+                </button>
+                <ExportPngButton
+                  containerRef={flowAreaRef}
+                  // 파일명 금지 문자만 치환 — 한글 제목 유지(문서 첨부 시 식별성).
+                  fileName={`업무흐름도_${(title ?? domainId.replace(/^domain:/, "")).replace(/[\\/:*?"<>|]/g, "-")}.png`}
+                  stamp={`${domainName ?? domainId.replace(/^domain:/, "")}${title ? ` — ${title}` : ""}`}
+                  label={t.flowList.bfExportPng}
+                />
+              </Panel>
+              {miniMapVisible && (
+                <MiniMap
+                  pannable
+                  zoomable
+                  position="bottom-right"
+                  style={{ width: 150, height: 110 }}
+                  bgColor="var(--color-panel)"
+                  maskColor="color-mix(in srgb, var(--color-root) 55%, transparent)"
+                  nodeColor={(n) =>
+                    (n.data as BizNodeData | undefined)?.biz.kind === "decision"
+                      ? "var(--color-status-info)"
+                      : "var(--color-border-medium)"
+                  }
+                  nodeStrokeWidth={0}
+                />
+              )}
             </ReactFlow>
           </ReactFlowProvider>
         )}
@@ -393,9 +751,9 @@ export default function BusinessFlowView({
               style={{
                 fontSize: 11,
                 padding: "2px 10px",
-                // 노드의 flow: 칩(status-info)과 동일 색 — 기능 연결 표식의 색 언어 통일.
-                color: "var(--color-status-info)",
-                background: "color-mix(in srgb, var(--color-status-info) 10%, transparent)",
+                // 노드의 flow: 칩(layer-dao 보라)과 동일 색 — 기능 연결 표식의 색 언어 통일.
+                color: "var(--color-layer-dao)",
+                background: "color-mix(in srgb, var(--color-layer-dao) 10%, transparent)",
               }}
             >
               {t.flowList.bfOpenFlow}

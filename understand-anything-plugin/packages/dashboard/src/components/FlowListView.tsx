@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { useDashboardStore } from "../store";
 import { useNavigate, useSearchParams } from "react-router";
@@ -30,6 +30,7 @@ import {
   type FlowMethod,
   type FlowVerdictKey,
 } from "../utils/domainData";
+import { findOwningGroup, resolveGroups } from "../utils/domainGroups";
 
 /**
  * 화면 B — 도메인 워크스페이스 (WORK_MAP §4).
@@ -127,14 +128,24 @@ function FilterChip({
   );
 }
 
-export default function FlowListView() {
+export default function FlowListView({ processPanel }: { processPanel?: ReactNode } = {}) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
+  const domainGroupsRaw = useDashboardStore((s) => s.domainGroups);
   const navigate = useNavigate(); // P3: 지도 복귀는 URL로
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const { t } = useI18n();
+
+  // DOMAIN_HIERARCHY §7: 그룹 소속 도메인이면 브레드크럼에 그룹명을 끼우고 "업무 지도"
+  // 뒤로가기도 그룹 워크스페이스로 향한다(하위 워크스페이스 재사용 — 이 컴포넌트 자체는
+  // 그룹 인지가 없어도 되도록, 소속 그룹만 조회). groups 없는 프로젝트는 항상 null.
+  const owningGroup = useMemo(() => {
+    if (!domainGraph || !activeDomainId || domainGroupsRaw.length === 0) return null;
+    const resolved = resolveGroups(domainGraph, domainGroupsRaw, t.domainMap.unclassified);
+    return findOwningGroup(resolved, activeDomainId) ?? null;
+  }, [domainGraph, activeDomainId, domainGroupsRaw, t]);
 
   // 좌측 기능 목록 접기/펼치기 — 접으면 인라인 스파인이 폭 전체를 차지(화면3 전체화면 대체).
   // 기본 펼침: 도메인 재진입 시 FlowListView 가 remount 되며 자동으로 펼친 상태로 복귀.
@@ -377,6 +388,19 @@ export default function FlowListView() {
               >
                 {t.domainMap.breadcrumbRoot}
               </button>{" "}
+              {owningGroup && (
+                <>
+                  ›{" "}
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/domains/${owningGroup.key}`)}
+                    className="text-text-muted hover:text-accent transition-colors cursor-pointer font-bold"
+                    style={{ letterSpacing: "0.06em" }}
+                  >
+                    {owningGroup.name}
+                  </button>{" "}
+                </>
+              )}
               › {domainNode?.name ?? ""}
             </p>
             <h1 className="text-text-primary font-bold whitespace-nowrap" style={{ fontSize: 20, lineHeight: 1.25 }}>
@@ -472,9 +496,22 @@ export default function FlowListView() {
         >
           {bizFlow && activeDomainId ? (
             <>
-              {/* B안: 업무 프로세스 목록 — 2개 이상일 때만. 기능 탭 좌측 목록과
-                  동일한 카드 언어(pmpl-proto .fl-list). 선택은 ?bf= 딥링크. */}
-              {bizProcesses.length > 1 && (
+              {/* B안: 업무 프로세스 목록 패널 — 그룹 워크스페이스는 이 자리에
+                  서브도메인▸업무흐름도 트리(processPanel)를 주입한다(사용자 확정:
+                  트리는 별도 외곽 컬럼이 아니라 기존 목록 위치). 주입이 없으면
+                  기존 단일 도메인 프로세스 목록(2개 이상일 때만) 그대로. */}
+              {processPanel ? (
+                <aside
+                  className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
+                  style={{
+                    width: 300,
+                    margin: "12px 0 12px 12px",
+                    boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
+                  }}
+                >
+                  {processPanel}
+                </aside>
+              ) : bizProcesses.length > 1 && (
                 <aside
                   className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
                   style={{
@@ -534,6 +571,8 @@ export default function FlowListView() {
                     domainId={activeDomainId}
                     biz={bizFlow}
                     rejectedReason={bizRejected}
+                    title={bizProcesses[bfIdx]?.title ?? null}
+                    domainName={domainNode?.name ?? null}
                   />
                 </div>
               </div>

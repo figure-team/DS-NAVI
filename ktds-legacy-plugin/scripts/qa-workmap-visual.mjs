@@ -1,3 +1,4 @@
+/* global document */
 /**
  * WORK_MAP P1 시각 QA — 구성도 랜딩.
  * 검사: AC-1(페이지 무스크롤), AC-2(메뉴 라벨 "업무 지도" + 기존 딥링크), AC-3(연동 패널 degrade),

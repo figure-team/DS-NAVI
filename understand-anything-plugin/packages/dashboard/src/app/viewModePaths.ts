@@ -8,11 +8,9 @@ import type { ViewMode } from "../store";
 export const MODE_TO_PATH: Record<ViewMode, string> = {
   structural: "/structure",
   domain: "/domains",
-  wiki: "/wiki",
   docs: "/deliverables",
   rtm: "/rtm",
   screenspec: "/screens",
-  knowledge: "/knowledge",
   data: "/data",
   change: "/change",
   programs: "/programs",

@@ -464,3 +464,11 @@ table.proto-tbl {
 .spine-node-selected {
   box-shadow: 0 0 0 1px var(--node-accent, var(--color-accent)), 0 0 14px -2px var(--node-accent, var(--color-accent));
 }
+
+/* 구조 그래프 호버 포커스(StructureDomainGraphUA) — 포커스된 엣지는 zIndex 로
+   카드 위에 올라오는데, 그 클릭 영역(edge-interaction)이 카드의 마우스 이벤트를
+   가로채면 카드 안에서 커서가 선을 지날 때마다 호버가 끊겨 깜빡인다. 승격 중엔
+   이벤트를 통과시킨다(근거 팝오버는 호버 해제 상태에서 기존대로 클릭). */
+.react-flow__edge.workmap-focus-edge {
+  pointer-events: none;
+}

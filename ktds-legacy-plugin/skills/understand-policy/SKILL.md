@@ -1,7 +1,7 @@
 ---
 name: understand-policy
 description: 정책서(.md) 생성 — 코드/DB 신호에서 정책 앵커 추출 후 LLM 보강. 카테고리 4종(용어/데이터/검증/권한) + 도메인별 정책서(흐름·조건 분기), 모든 행 file:line 근거
-argument-hint: ["[projectRoot]", "[domain]"]
+argument-hint: ["[projectRoot]", "[domain|fill-prep|fill-audit|fill-merge]"]
 ---
 
 # /understand-policy
@@ -39,6 +39,61 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot>
 스크립트가 만든 각 `policy-*.md` 와 `.spec/map/policy-signals.json` 을 읽고, **각 행의 앵커
 (`file:line`)를 직접 열어** 결정론이 담지 못한 규범 내용을 채운다. 각 정책서 섹션 아래에
 "정책 진술" 산문을 덧붙이거나 설명 셀을 채운다.
+
+### 규모 게이트 — 인라인 vs 팬아웃
+
+채움 대상 **행 총수**(카테고리 4종 표 행 + 도메인 §4 의사결정 테이블 분기 행)로 판정한다:
+
+- **≤ 60행**(소규모): 아래 인라인 절차를 그대로 쓴다 — 메인 세션이 각 앵커를 직접 열어
+  `policy-*.md` 를 보강한다.
+- **> 60행**(대규모): **팬아웃 경로**(아래 "팬아웃 절차")를 쓴다 — 메인 세션이 전 신호를
+  통째로 읽지 않고, 청크당 에이전트가 pre-cite 를 실어 채운다. `fill-prep` 출력의 문서·행
+  수로 게이트를 판정한다.
+
+### 팬아웃 절차 (대규모)
+
+1. `fill-prep` — 신호를 문서(docId)별 자립 청크로 분해한다(문서 우선, 문서 내 행이 상한을
+   넘으면 행 수로 분할). 각 행에 앵커 pre-cite(±40라인 verbatim, 검증 통과 보장)와 소스
+   슬라이스를 동봉한다. 병합 대상 md 가 없는 문서는 제외·보고(1단계 생성 선행 필요).
+
+   ```
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot> fill-prep            # 카테고리 모드
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot> fill-prep --mode domain   # 도메인 모드
+   ```
+   산출: `.spec/map/policy-fill-prep/<chunkId>.json` + `index.json`(청크 id 목록 = `chunks[].chunkId`).
+
+2. **모델 질문**(아래 공통 문안) 후 Workflow 도구로 `scripts/policy-fill-fanout.workflow.js`
+   실행 — 인자 `{ projectRoot, cliScript: understand-policy.mjs 절대경로, chunkIds, mode, model, effort:"low" }`.
+   각 에이전트는 청크 1개를 읽고 `policy-fill-frag/<chunkId>.json` 에 행 단위 채움
+   ({rowKey, statement, confidence, citations[]})만 쓴다(앵커 표는 안 건드린다).
+
+3. `fill-audit` — 조각 완결성 감사(존재 ∧ 스키마 ∧ 커버리지 ∧ `[확정]`⇒인용≥1). Workflow 가
+   초기 감사 + 최대 2회 재디스패치 후 잔여 미완결을 `failed[]` 로 보고한다(조용히 버리지 않음).
+
+4. `fill-merge` — 완결 조각을 각 `policy-*.md` 에 **`## 규범 진술` 섹션으로 덧붙인다**. 기존
+   결정론 앵커 표는 **불변**(센티넬 `<!-- policy-fill -->` 사이만 재생성 → 재실행 멱등).
+   **기계 검증기가 fill-merge 에서 `[확정]` 인용을 실파일 대조 — 불일치 인용은 제거하고 근거
+   0 이 된 `[확정]`은 `[추정]`으로 강등한다**(fail-closed). 미완결 문서 행은 부분 병합으로 보고.
+
+   ```
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot> fill-audit    # 순수 JSON 1줄
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-policy.mjs <projectRoot> fill-merge
+   ```
+
+#### 모델 질문 (공통 규약)
+
+팬아웃 디스패치 전, fill-writer 모델을 사용자에게 묻는다(비대화형/헤드리스면 묻지 말고
+**세션 모델**로 진행). effort 는 항상 `low`(pre-cite 슬라이스 위 템플릿 유도 판단이라
+개방형 분석이 아니다 — map/screens fill 과 동일).
+
+1순위 **세션 모델 (권장·기본)** — 품질 최우선, 현재 세션과 동일 모델 → `model:"inherit"`
+2순위 **sonnet** — 품질·비용 균형(map fill 에서 egov 1,255흐름 근거율 100% 실증) → `model:"sonnet"`
+3순위 **haiku** — 최대 절감, verbatim 준수 위험은 감사 재디스패치로 보정 → `model:"haiku"`
+
+> 팬아웃도 인라인과 **동일한 신뢰도 3단 규칙·"앵커 보존—보강은 덧붙이기" 규약**을 따른다
+> (아래 "보강 규약"). 차이는 산출 경로뿐 — 채움을 md 직접 수정이 아니라 조각(frag) 경유로 쓴다.
+
+### 인라인 절차 (소규모)
 
 카테고리별 보강 지침:
 

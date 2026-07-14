@@ -13,7 +13,7 @@
 import { basename, resolve } from 'node:path'
 import { writeDomainGraph } from './persist.js'
 import { SKELETON_BLANK } from './types.js'
-import type { SkeletonReport, UaGraphEdge, UaGraphNode } from './types.js'
+import type { ConfirmedGroup, SkeletonReport, UaGraphEdge, UaGraphNode } from './types.js'
 import type { VerifyReport, VerifiedItem } from './verify.js'
 
 /** NEEDS_REVIEW 강등 마커 — 검증 실패 항목 텍스트 앞에 붙인다(삭제 금지). */
@@ -82,6 +82,16 @@ export interface EmitOptions {
   projectName?: string
   /** 분석 시각(ISO) — 기본 now. 테스트는 고정값을 주입해 byte-identical 보장. */
   analyzedAt?: string
+  /**
+   * 상단도메인 계층(DOMAIN_HIERARCHY) — confirmed plan.groups 를 ktdsMap.groups 로
+   * additive 투영한다(노드/엣지 스키마 무접촉). 부재/빈 배열 = 평면 그래프(기존 렌더).
+   */
+  groups?: ConfirmedGroup[]
+}
+
+/** plan.groups → ktdsMap.groups 투영(부재·빈 배열은 필드 생략 — 기존 그래프와 byte 동일). */
+function ktdsMapGroups(groups: ConfirmedGroup[] | undefined): { groups?: ConfirmedGroup[] } {
+  return groups && groups.length > 0 ? { groups } : {}
 }
 
 /**
@@ -111,9 +121,10 @@ export function emitDomainGraph(
     edges: skeleton.edges,
     layers: [] as unknown[],
     tour: [] as unknown[],
-    // ktds 확장 (U-A 스키마 passthrough) — freshness 대조용.
+    // ktds 확장 (U-A 스키마 passthrough) — freshness 대조용 + 상단도메인 계층.
     ktdsMap: {
       generatedFromCommit: skeleton.gitCommit ?? '',
+      ...ktdsMapGroups(options.groups),
     },
   }
   writeDomainGraph(projectRoot, graph)
@@ -288,6 +299,7 @@ export function emitFilledDomainGraph(
     tour: [] as unknown[],
     ktdsMap: {
       generatedFromCommit: skeleton.gitCommit ?? '',
+      ...ktdsMapGroups(options.groups),
     },
   }
   writeDomainGraph(projectRoot, graph)

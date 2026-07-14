@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 
@@ -10,18 +10,16 @@ import { useI18n } from "../../contexts/I18nContext";
  */
 export default function MobileTabBar() {
   const graph = useDashboardStore((s) => s.graph);
-  const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const { t } = useI18n();
+  const { pathname } = useLocation();
 
   const items: Array<{ to: string; label: string; icon: ReactNode }> = [
     { to: "/", label: "홈", icon: iconHome },
   ];
-  if (graph && isKnowledgeGraph) {
-    items.push({ to: "/knowledge", label: "지식", icon: iconDomain });
-  } else if (graph) {
+  if (graph) {
+    // 메뉴 병합(2026-07-14): 구조는 업무 지도 안 탭 — 별도 항목 없음(NavRail 과 동일).
     if (domainGraph) items.push({ to: "/domains", label: t.drawer.domain, icon: iconDomain });
-    items.push({ to: "/structure", label: t.drawer.structural, icon: iconStructure });
     items.push({ to: "/rtm", label: "추적표", icon: iconRtm });
     items.push({ to: "/deliverables", label: "산출물", icon: iconDocs });
   }
@@ -31,21 +29,25 @@ export default function MobileTabBar() {
       className="shrink-0 flex bg-surface border-t border-border-subtle"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      {items.map((item) => (
+      {items.map((item) => {
+        // 메뉴 병합: 구조 탭(/structure)은 업무 지도 소속 — 하단 탭바 활성도 승계.
+        const forceActive = item.to === "/domains" && pathname.startsWith("/structure");
+        return (
         <NavLink
           key={item.to}
           to={item.to}
           end={item.to === "/"}
           className={({ isActive }) =>
             `flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors ${
-              isActive ? "text-accent" : "text-text-muted"
+              isActive || forceActive ? "text-accent" : "text-text-muted"
             }`
           }
         >
           <span className="w-[19px] h-[19px]">{item.icon}</span>
           {item.label}
         </NavLink>
-      ))}
+        );
+      })}
     </nav>
   );
 }
@@ -69,14 +71,6 @@ const iconDomain = (
     <circle cx="17" cy="7" r="3.2" />
     <circle cx="12" cy="17" r="3.2" />
     <path d="M9 9.5 11 14M15 9.5 13 14" />
-  </svg>
-);
-const iconStructure = (
-  <svg {...svgProps}>
-    <rect x="3" y="3" width="7" height="7" rx="1.5" />
-    <rect x="14" y="3" width="7" height="7" rx="1.5" />
-    <rect x="8.5" y="14" width="7" height="7" rx="1.5" />
-    <path d="M6.5 10v2.5h5.5M17.5 10v2.5h-5.5" />
   </svg>
 );
 const iconRtm = (

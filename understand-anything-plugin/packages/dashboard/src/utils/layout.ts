@@ -201,6 +201,10 @@ export function applyForceLayout(
 export const ELK_DEFAULT_LAYOUT_OPTIONS: Record<string, string> = {
   algorithm: "layered",
   "elk.direction": "DOWN",
+  // 비연결 컴포넌트(고립 노드가 많은 문서·설정성 레이어)가 한 줄로 길게 늘어서지
+  // 않도록 화면 비율에 맞춰 여러 행으로 감아 배치한다(ELK component packing).
+  "elk.aspectRatio": "1.7",
+  "elk.spacing.componentComponent": "60",
   "elk.layered.spacing.nodeNodeBetweenLayers": "100",
   "elk.spacing.nodeNode": "80",
   "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
@@ -237,15 +241,19 @@ export const ELK_OVERVIEW_LAYOUT_OPTIONS: Record<string, string> = {
 };
 
 /**
- * Layer-detail options. `hierarchyHandling: INCLUDE_CHILDREN` lets a single
- * ELK pass lay out expanded containers (as parent nodes holding their file
- * children) AND route the edges that cross between containers — so file→file
- * connections get their own orthogonal track instead of all collapsing onto a
- * shared centre channel. Container padding leaves room for the header chrome.
+ * Layer-detail options. Containers are ELK *leaf* atoms — expanded ones get a
+ * pre-computed fixed size from the internal child grid (utils/expandBudget),
+ * so no hierarchical (`INCLUDE_CHILDREN`) pass is needed anymore. This restores
+ * ELK's connected-component packing (aspectRatio wrapping), and cross-atom
+ * edges keep their own orthogonal tracks; file-level edges into/inside expanded
+ * containers render via ElkEdge's smooth-step fallback instead.
+ *
+ * 이력: 구 INCLUDE_CHILDREN 단일 패스는 펼친 컨테이너 내부를 ELK layered가
+ * 배치했는데, 같은 랭크(JSP 13개)가 한 줄로 깔려 극단적 가로비가 나왔다
+ * (2026-07-10 반려). 내부 배치를 의존 무시 그리드로 대체하며 계층 패스 제거.
  */
 export const ELK_DETAIL_LAYOUT_OPTIONS: Record<string, string> = {
   ...ELK_DEFAULT_LAYOUT_OPTIONS,
-  "elk.hierarchyHandling": "INCLUDE_CHILDREN",
 };
 
 export function nodesToElkInput(

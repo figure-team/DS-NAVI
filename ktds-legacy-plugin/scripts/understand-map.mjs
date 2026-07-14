@@ -8,6 +8,8 @@
  *   plan     candidates 의 도메인 경계 표(한국어, 사람 게이트 제시용). 쓰기 없음.
  *   confirm  도메인 경계 확정. NON-TTY 안전: 플래그 없으면 표 + 안내만 출력하고,
  *            `--auto-approve --by <handle>` 가 있을 때만 확정 플랜을 기록한다.
+ *   group-input  상단도메인(DOMAIN_HIERARCHY) LLM 그룹 분류 입력 조립 —
+ *            서브도메인 요약을 .spec/map/group-input.json 에 쓴다(판단은 호스트 LLM).
  *   map      도메인 맵 요약(우선순위 랭킹 + 교차 도메인 엣지, 한국어). 확정 플랜 필요.
  *   bundle   도메인별 LLM 채움 입력 묶음(.spec/map/bundle/<key>.json) 조립. skeleton 필요.
  *   fill-prep  대규모 팬아웃용 청크 준비 — 번들을 흐름 N개 단위 자립 청크로 분해
@@ -15,6 +17,12 @@
  *   fill-audit 팬아웃 조각(fill-frag) 완결성 감사 — 순수 JSON 1줄 출력(기계 소비).
  *   fill-merge 조각을 도메인별 fill/<key>.json 으로 결정론 병합. emit 선행 단계.
  *   emit     채움 파이프라인 — fill/<key>.json 적용 + 인용 기계검증 + domain-graph.json emit.
+ *   emit-kg  최소 결정론 KG emit(트랙 B) — census+db-schema 만으로 `.understand-anything/
+ *            knowledge-graph.json` 을 기록(코드뷰어 allowlist·screens JSP 대조·임팩트
+ *            table 카탈로그·orchestrator loadProjectGraph 잔여 소비처 유지용). map 이
+ *            요약 출력 뒤 자동 실행하는 것과 동일 — 단독으로도 재실행 가능(멱등).
+ *            기존 knowledge-graph.json 이 /understand 산출(ktdsStructure 마커 없음)로
+ *            보이면 보존하고 경고만 낸다 — 교체하려면 --overwrite-kg.
  *
  * 모든 출력은 결정론·한국어. 동일 commit 재실행 시 산출물 byte-diff=0.
  */
@@ -69,6 +77,9 @@ switch (sub) {
   case 'confirm':
     await runConfirm()
     break
+  case 'group-input':
+    await runGroupInput()
+    break
   case 'map':
     await runMap()
     break
@@ -87,12 +98,15 @@ switch (sub) {
   case 'emit':
     await runEmit()
     break
+  case 'emit-kg':
+    runEmitKg()
+    break
   case 'templates':
     runTemplates()
     break
   default:
     console.error(
-      `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | map | bundle | fill-prep | fill-audit | fill-merge | emit | templates.`,
+      `'${sub}' 은 지원하지 않는 서브커맨드입니다. 사용 가능: scan | plan | confirm | group-input | map | bundle | fill-prep | fill-audit | fill-merge | emit | emit-kg | templates.`,
     )
     process.exit(2)
 }
@@ -245,7 +259,45 @@ async function runPlan() {
   reportClassifySignals(candidates)
   console.log('확정하려면: confirm --auto-approve --by <담당자>')
   console.log('경계를 고쳐 확정하려면: confirm --auto-approve --by <담당자> --ops <ops.json>')
-  console.log('  (ops: [{"op":"merge","from":…,"into":…} | {"op":"move","root":…,"to":…} | {"op":"exclude","key":…} | {"op":"rename","key":…,"name":…}])')
+  console.log('  (ops: [{"op":"merge","from":…,"into":…} | {"op":"move","root":…,"to":…} | {"op":"exclude","key":…} | {"op":"rename","key":…,"name":…} | {"op":"group","key":"g:…","name":…,"members":[…]} | {"op":"ungroup","key":"g:…"}])')
+  console.log('상단도메인 계층(LLM 그룹 분류)을 만들려면: group-input → SKILL group-classify 절차 참조')
+}
+
+/**
+ * group-classify(LLM) 입력 조립 — 서브도메인별 자립 요약을 .spec/map/group-input.json 에
+ * 쓴다. LLM(호스트)이 이를 읽어 그룹 ops 초안(group-ops.suggested.json)을 만들고, 사람이
+ * 검토 후 confirm --ops 로 확정한다(DOMAIN_HIERARCHY §5 — 판단은 LLM, 승인은 사람).
+ * 확정 플랜이 있으면 name(한국어 개명)·기존 groups 를 동봉해 재분류 맥락을 준다.
+ */
+async function runGroupInput() {
+  const { scanDomainMap, readConfirmedPlan, writeMapArtifact } = engine
+  const { candidates } = await scanDomainMap(projectRoot)
+  const confirmed = readConfirmedPlan(projectRoot)
+  const nameByKey = new Map((confirmed?.domains ?? []).map((d) => [d.key, d.name]))
+  const SAMPLE_FILES_MAX = 8
+  const domains = candidates.candidates
+    .map((c) => ({
+      key: c.key,
+      name: nameByKey.get(c.key) ?? c.key,
+      roots: c.roots,
+      fileCount: c.files.length + c.roots.length,
+      sampleFiles: c.files.slice(0, SAMPLE_FILES_MAX).map((f) => f.relPath),
+    }))
+    .sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0))
+  const input = {
+    schemaVersion: 1,
+    gitCommit: candidates.gitCommit,
+    domains,
+    existingGroups: confirmed?.groups ?? [],
+    excludedKeys: confirmed?.excludedKeys ?? [],
+  }
+  const path = writeMapArtifact(projectRoot, 'group-input.json', input)
+  console.log(`group-classify 입력 조립 완료 — 서브도메인 ${domains.length}개`)
+  console.log(`  산출물: ${path}`)
+  console.log('')
+  console.log('다음 단계(SKILL group-classify): 호스트(LLM)가 위 파일을 읽어 상단도메인 그룹')
+  console.log('ops 초안(.spec/map/group-ops.suggested.json)을 만들고, 사람 검토 후:')
+  console.log('  confirm --auto-approve --by <담당자> --ops .spec/map/group-ops.suggested.json')
 }
 
 /** 분류 신호 보고 — 격리(_review)·관용 접두어를 표면화한다(조용한 누락 금지). */
@@ -315,6 +367,17 @@ async function runConfirm() {
   if (plan.excludedKeys.length > 0) {
     console.log(`  제외 key: ${plan.excludedKeys.join(', ')}`)
   }
+  if (plan.groups && plan.groups.length > 0) {
+    console.log(`  상단도메인(그룹) ${plan.groups.length}개:`)
+    for (const g of plan.groups) {
+      console.log(`    - ${g.key} (이름: ${g.name}, 서브도메인 ${g.memberKeys.length}개)`)
+    }
+    const grouped = new Set(plan.groups.flatMap((g) => g.memberKeys))
+    const ungrouped = plan.domains.filter((d) => !grouped.has(d.key))
+    if (ungrouped.length > 0) {
+      console.log(`  미분류 서브도메인 ${ungrouped.length}개: ${ungrouped.map((d) => d.key).join(', ')}`)
+    }
+  }
   console.log(`  산출물: ${path}`)
   console.log('다음 단계: map(요약 + 우선순위 랭킹).')
 }
@@ -355,6 +418,46 @@ async function runMap() {
   }
   console.log('')
   console.log('산출물: .spec/map/domain-map.json (동일 commit 재실행 byte-diff=0)')
+  runEmitKg({ silentIfMissingInputs: true })
+}
+
+/**
+ * 최소 결정론 KG emit(트랙 B) — census+db-schema 로 `.understand-anything/
+ * knowledge-graph.json` 을 기록(가드 포함). map 이 요약 뒤 자동 호출하고,
+ * 단독 서브커맨드(emit-kg)로도 재실행 가능(멱등).
+ * silentIfMissingInputs: map 의 사후 호출 컨텍스트 — map 본체는 이미 성공했으므로
+ * emit-kg 실패를 map 전체의 실패로 번지게 하지 않는다(exit 0 유지):
+ *   - scan 미실행(MinimalKgInputMissingError) → 조용히 건너뜀(실무에선 scan 이 이미
+ *     census/db-schema 를 만들었을 것이므로 거의 발생하지 않는 방어적 경로).
+ *   - 그 외 에러(IO 등) → 비치명 경고로 표면화하고 emit-kg 단독 재시도를 안내(적대
+ *     리뷰 P3 — 원래는 "최소 KG emit 실패"로만 찍혀 map 실패처럼 오독될 여지가 있었음).
+ * 단독 emit-kg 호출(silentIfMissingInputs 없음)은 어떤 에러든 치명(exit 2).
+ */
+function runEmitKg(opts = {}) {
+  const { emitMinimalKg, MinimalKgInputMissingError } = engine
+  const overwriteKg = hasFlag('--overwrite-kg')
+  let result
+  try {
+    result = emitMinimalKg(projectRoot, { overwriteKg })
+  } catch (err) {
+    if (err instanceof MinimalKgInputMissingError) {
+      if (opts.silentIfMissingInputs) return
+      console.error(`최소 KG emit 실패: ${err.message}`)
+      process.exit(2)
+    }
+    if (opts.silentIfMissingInputs) {
+      console.error(`⚠️ 최소 KG emit 실패(비치명, map 산출은 유효) — emit-kg 로 단독 재시도: ${err.message}`)
+      return
+    }
+    console.error(`최소 KG emit 실패: ${err.message}`)
+    process.exit(2)
+  }
+  if (result.action === 'skipped-existing-llm-kg' || result.action === 'skipped-invalid-target') {
+    console.log(`⚠️ 최소 KG emit 건너뜀 — ${result.message}`)
+  } else {
+    console.log(`최소 KG emit 완료 — ${result.message}`)
+    console.log(`  산출물: ${result.path}`)
+  }
 }
 
 /**

@@ -10,11 +10,9 @@ import { useViewMode } from "../../hooks/useViewMode";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 import type { KeyboardShortcut } from "../../hooks/useKeyboardShortcuts";
 import { useI18n } from "../../contexts/I18nContext";
-import { currentMode } from "../viewModePaths";
 import type { ShellContext } from "../Root";
 
 const CodeViewer = lazy(() => import("../../components/CodeViewer"));
-const PathFinderModal = lazy(() => import("../../components/PathFinderModal"));
 const ImpactAnalysisModal = lazy(() => import("../../components/ImpactAnalysisModal"));
 const KeyboardShortcutsHelp = lazy(
   () => import("../../components/KeyboardShortcutsHelp"),
@@ -42,10 +40,7 @@ export default function ShellLayout(ctx: ShellContext) {
   const codeViewerExpanded = useDashboardStore((s) => s.codeViewerExpanded);
   const expandCodeViewer = useDashboardStore((s) => s.expandCodeViewer);
   const collapseCodeViewer = useDashboardStore((s) => s.collapseCodeViewer);
-  const pathFinderOpen = useDashboardStore((s) => s.pathFinderOpen);
-  const togglePathFinder = useDashboardStore((s) => s.togglePathFinder);
   const impactModalOpen = useDashboardStore((s) => s.impactModalOpen);
-  const layoutIssues = useDashboardStore((s) => s.layoutIssues);
   const resetTransientOnSectionChange = useDashboardStore(
     (s) => s.resetTransientOnSectionChange,
   );
@@ -68,14 +63,11 @@ export default function ShellLayout(ctx: ShellContext) {
     setShowOnboarding(false);
   }, []);
 
-  const allIssues = useMemo(
-    () => [...graphIssues, ...layoutIssues],
-    [graphIssues, layoutIssues],
-  );
+  const allIssues = graphIssues;
 
   // 구 setViewMode의 정리 동작 계승 — 섹션이 바뀌면 선택/흐름/코드뷰어를 닫는다.
-  // 마운트(딥링크 최초 진입)에는 발화하지 않고, "선택을 들고 점프"(openWikiDoc,
-  // 도메인 점프)가 preserveTransientOnce를 켠 경우 1회 건너뛴다.
+  // 마운트(딥링크 최초 진입)에는 발화하지 않고, "선택을 들고 점프"(도메인 점프)가
+  // preserveTransientOnce를 켠 경우 1회 건너뛴다.
   const prevMode = useRef(mode);
   useEffect(() => {
     if (prevMode.current !== mode) {
@@ -107,13 +99,7 @@ export default function ShellLayout(ctx: ShellContext) {
         action: () => {
           // Read from store at invocation time to avoid stale closures
           const state = useDashboardStore.getState();
-          if (state.pathFinderOpen) {
-            state.togglePathFinder();
-          } else if (state.filterPanelOpen) {
-            state.toggleFilterPanel();
-          } else if (state.exportMenuOpen) {
-            state.toggleExportMenu();
-          } else if (state.codeViewerExpanded) {
+          if (state.codeViewerExpanded) {
             state.collapseCodeViewer();
           } else if (state.codeViewerOpen) {
             state.closeCodeViewer();
@@ -122,10 +108,6 @@ export default function ShellLayout(ctx: ShellContext) {
           } else if (state.activeFlowId) {
             // ktds-fork: 선택 없는 흐름 스파인에서 Escape → 흐름 목록(도메인)으로 복귀
             state.clearActiveFlow();
-          } else if (state.navigationLevel === "layer-detail") {
-            state.navigateToOverview();
-          } else if (state.tourActive) {
-            state.stopTour();
           } else {
             setShowKeyboardHelp(false);
           }
@@ -143,35 +125,11 @@ export default function ShellLayout(ctx: ShellContext) {
         },
         category: "Navigation",
       },
-      // Tour controls
-      {
-        key: "ArrowRight",
-        description: t.keyboardShortcuts.nextStep,
-        action: () => {
-          const state = useDashboardStore.getState();
-          if (state.tourActive) {
-            state.nextTourStep();
-          }
-        },
-        category: "Tour",
-      },
-      {
-        key: "ArrowLeft",
-        description: t.keyboardShortcuts.prevStep,
-        action: () => {
-          const state = useDashboardStore.getState();
-          if (state.tourActive) {
-            state.prevTourStep();
-          }
-        },
-        category: "Tour",
-      },
       // View toggles
       {
         key: "d",
         description: t.keyboardShortcuts.toggleDiff,
         action: () => {
-          if (currentMode() === "wiki") return; // ktds-fork (ADR-004): 문서 모드는 오버레이 비해당
           useDashboardStore.getState().toggleOverlay("diff");
         },
         category: "View",
@@ -180,7 +138,6 @@ export default function ShellLayout(ctx: ShellContext) {
         key: "i",
         description: t.keyboardShortcuts.toggleImpact,
         action: () => {
-          if (currentMode() === "wiki") return; // ktds-fork (ADR-004): 문서 모드는 오버레이 비해당
           useDashboardStore.getState().toggleOverlay("impact");
         },
         category: "View",
@@ -189,32 +146,7 @@ export default function ShellLayout(ctx: ShellContext) {
         key: "r",
         description: "위험 오버레이 토글",
         action: () => {
-          if (currentMode() === "wiki") return; // 문서 모드는 오버레이 비해당
           useDashboardStore.getState().toggleOverlay("risk");
-        },
-        category: "View",
-      },
-      {
-        key: "f",
-        description: t.keyboardShortcuts.toggleFilter,
-        action: () => {
-          useDashboardStore.getState().toggleFilterPanel();
-        },
-        category: "View",
-      },
-      {
-        key: "e",
-        description: t.keyboardShortcuts.toggleExport,
-        action: () => {
-          useDashboardStore.getState().toggleExportMenu();
-        },
-        category: "View",
-      },
-      {
-        key: "p",
-        description: t.keyboardShortcuts.openPathFinder,
-        action: () => {
-          useDashboardStore.getState().togglePathFinder();
         },
         category: "View",
       },
@@ -286,13 +218,6 @@ export default function ShellLayout(ctx: ShellContext) {
             shortcuts={shortcuts}
             onClose={() => setShowKeyboardHelp(false)}
           />
-        </Suspense>
-      )}
-
-      {/* Path Finder Modal — only mounted when open so its chunk is lazy-loaded on demand. */}
-      {pathFinderOpen && (
-        <Suspense fallback={null}>
-          <PathFinderModal isOpen={pathFinderOpen} onClose={togglePathFinder} />
         </Suspense>
       )}
 

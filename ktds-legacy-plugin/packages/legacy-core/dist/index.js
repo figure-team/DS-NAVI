@@ -21,13 +21,15 @@ export { buildBundles, safeKeyFilename, bundleDir, BUNDLE_DIR, DEFAULT_SLICE_LIN
 export { readFills, applyFills, unfilledNodes, fillDir, fillPathFor, FILL_DIR, CitationSchema, ClaimSchema as FillClaimSchema, DomainFillSchema, } from './domain-map/fill.js';
 export { verifyFills, writeVerifyReport, VERIFY_REPORT_FILENAME, CITATION_STATUS, VerifiedCitationSchema, VerifiedItemSchema, DomainVerifyResultSchema, VerifyReportSchema, } from './domain-map/verify.js';
 export { runFillPipeline } from './domain-map/fill-pipeline.js';
+export { KNOWLEDGE_GRAPH_FILENAME, ANALYZED_AT_SENTINEL, SECRET_CARRIER_EXTENSIONS, SECRET_CARRIER_NAME_PATTERNS, TEMPLATE_SUFFIXES, SOURCE_DOC_EXTENSIONS, isSecretCarrierPath, buildMinimalKg, loadMinimalKgInputs, writeMinimalKg, emitMinimalKg, MinimalKgInputMissingError, } from './domain-map/minimal-kg.js';
 export { prepFillChunks, auditFillFragments, mergeFillFragments, readFillChunkIndex, fillPrepDir, fillFragDir, FILL_PREP_DIR, FILL_FRAG_DIR, FILL_PREP_INDEX_FILENAME, DEFAULT_CHUNK_FLOWS, DEFAULT_CHUNK_CHAR_CAP, FillChunkSchema, FillChunkIndexSchema, FillFragmentSchema, } from './domain-map/fill-fanout.js';
 export { buildCrossDomainGraph, scoreDomains, buildDomainMapSummary, buildNameSuggestionContext, W_COMPLEXITY, W_COUPLING, W_SIZE, DEFAULT_SAMPLE_ANCHOR_CAP, DEFAULT_SAMPLE_FILE_CAP, } from './domain-map/domain-map.js';
 export { extractJavaFacts } from './domain-map/java-facts.js';
 export { extractEdges } from './domain-map/edges.js';
 export { buildSlices, DEFAULT_DEPTH_CAP } from './domain-map/slices.js';
 export { buildCandidates, classifyByDirectory, tokenizeBasename, prefixToken, } from './domain-map/classify.js';
-export { buildAutoPlan, renameDomain, mergeDomains, moveRoot, excludeDomain, detectPlanDrift, planTable, parsePlanOps, applyOps, } from './domain-map/confirm.js';
+export { buildAutoPlan, renameDomain, mergeDomains, moveRoot, excludeDomain, groupDomains, ungroupDomains, detectPlanDrift, planTable, parsePlanOps, applyOps, } from './domain-map/confirm.js';
+export { GROUP_KEY_PREFIX } from './domain-map/types.js';
 export { deriveStepLayer, buildLayerSignals, assignLayers } from './domain-map/step-layer.js';
 export { loadProjectGraph, mergeOverlay, readDomainGraphOverlay, normalizeKgPath, } from './orchestrator/index.js';
 export { claim, confidenceTag, evidenceRate, inferredRatio, renderMarkdown, renderSkeleton, CLAIMS_FENCE_OPEN, CLAIMS_FENCE_CLOSE, EMPTY_SECTION, buildTechStack, buildArchitecture, buildFeatureSpec, buildApiSpec, buildDbSpec, buildProgramList, buildCrudMatrix, buildBatchList, buildImpactAnalysis, detectCycles, parseDocTemplate, applyDocTemplate, DocTemplateSchema, DocTemplateSectionSchema, DOC_SET, buildDocSet, MethodologySchema, DocStatusSchema, EvidenceSchema, ClaimSchema, TableRowSchema, TableSchema, SectionSchema, GeneratedDocSchema, DocMetaSchema, asBuiltMethodology, siStandardMethodology, getMethodology, listMethodologies, DEFAULT_METHODOLOGY, } from './doc-generator/index.js';

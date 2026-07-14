@@ -68,6 +68,10 @@ export function applyDeterministicLabels(nodes, edges) {
         return node;
     });
 }
+/** plan.groups → ktdsMap.groups 투영(부재·빈 배열은 필드 생략 — 기존 그래프와 byte 동일). */
+function ktdsMapGroups(groups) {
+    return groups && groups.length > 0 ? { groups } : {};
+}
 /**
  * skeleton 으로부터 구조 오버레이를 emit 한다.
  * `.understand-anything/domain-graph.json` 에 U-A KG envelope(version/project/
@@ -91,9 +95,10 @@ export function emitDomainGraph(projectRoot, skeleton, options = {}) {
         edges: skeleton.edges,
         layers: [],
         tour: [],
-        // ktds 확장 (U-A 스키마 passthrough) — freshness 대조용.
+        // ktds 확장 (U-A 스키마 passthrough) — freshness 대조용 + 상단도메인 계층.
         ktdsMap: {
             generatedFromCommit: skeleton.gitCommit ?? '',
+            ...ktdsMapGroups(options.groups),
         },
     };
     writeDomainGraph(projectRoot, graph);
@@ -258,6 +263,7 @@ export function emitFilledDomainGraph(projectRoot, skeleton, filledNodes, option
         tour: [],
         ktdsMap: {
             generatedFromCommit: skeleton.gitCommit ?? '',
+            ...ktdsMapGroups(options.groups),
         },
     };
     writeDomainGraph(projectRoot, graph);

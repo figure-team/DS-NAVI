@@ -21,4 +21,6 @@ export function writePolicyReconcile(projectRoot, result) {
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, POLICY_RECONCILE_FILENAME), stableJson(result), 'utf8');
 }
+// ── 채움 팬아웃(정책서 LLM 보강 대규모 채움) ────────────────────────────────
+export { POLICY_FILL_PREP_DIR, POLICY_FILL_FRAG_DIR, POLICY_FILL_PREP_INDEX_FILENAME, DEFAULT_MAX_FILL_ROWS, POLICY_FILL_TAGS, FILL_SECTION_START, FILL_SECTION_END, PolicyFillModeSchema, PolicyFillRowSchema, PolicyFillChunkSchema, PolicyFillChunkIndexSchema, PolicyFillFragmentRowSchema, PolicyFillFragmentSchema, policyFillPrepDir, policyFillFragDir, readPolicyFillChunkIndex, prepPolicyFill, auditPolicyFillFragments, mergePolicyFillFragments, } from './fill-fanout.js';
 //# sourceMappingURL=index.js.map

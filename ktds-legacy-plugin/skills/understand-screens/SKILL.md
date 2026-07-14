@@ -1,7 +1,7 @@
 ---
 name: understand-screens
 description: 화면설계서 생성 — 실제 앱 기동·캡처(Stage A) 후 이벤트별 동작을 근거 기반으로 채움(Stage B), 대시보드 화면설계서 탭 데이터
-argument-hint: ["[projectRoot]", "[capture|fill|validate|status]"]
+argument-hint: ["[projectRoot]", "[capture|fill-prep|fill-audit|fill-merge|validate|status]"]
 ---
 
 # /understand-screens
@@ -15,10 +15,13 @@ argument-hint: ["[projectRoot]", "[capture|fill|validate|status]"]
 ## 실행
 
 ```
-node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> capture   # Stage A
-# → Stage B: 아래 "채움 계약"대로 screens.json 을 직접 채운다
-node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> validate  # 게이트
-node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status    # 요약
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> capture     # Stage A
+# → Stage B: 규모 게이트에 따라 인라인 채움 또는 팬아웃(아래 "Stage B 채움 계약")
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-prep    # 팬아웃 청크 준비
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-audit   # 조각 감사(JSON)
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> fill-merge   # 조각 병합
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> validate     # 게이트
+node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status       # 요약
 ```
 
 - 선행: `understanding.config.json` 의 `screens` 섹션(baseUrl, startCommand, scenarios 등).
@@ -41,7 +44,17 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
 
 입력: `screens.json` + `.spec/map/{routes,method-calls}.json` + 컨트롤러/ActionBean 소스.
 **수정 금지**: `annotations[].{no,kind,selector,bbox,eventType,mechanical}` — mechanicalHash
-로 기계 검증되며 변조 시 validate 실패. 채울 것:
+로 기계 검증되며 변조 시 validate 실패.
+
+### 규모 게이트 — 인라인 vs 팬아웃
+
+- **화면 ≤ 10 이고 주석 총수 ≤ 60**: 인라인 채움(호스트가 screens.json 을 직접 읽고
+  아래 채움 필드 계약대로 채운다 — 현행 절차). 소규모는 이 경로가 가장 단순하다.
+- **초과**(대규모): **팬아웃 경로**를 쓴다 — screens.json 전체를 메인 세션이 읽지
+  않도록 청크로 쪼개 청크당 에이전트가 조각을 쓰고 결정론 병합한다(컨텍스트 폭증 방지).
+  `fill-prep` 출력의 화면·주석 수로 게이트를 판정한다(jpetstore: 22화면·369주석 → 팬아웃).
+
+채울 필드(양 경로 공통):
 
 1. **화면 단위**: `jspFile`(핸들러 메서드의 ForwardResolution/뷰 반환을 코드로 확인 —
    근거 file:line 을 `summary.text` 에 포함), `graphNodeId`(`file:<jspFile>`, KG 에 실존할
@@ -58,6 +71,38 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
    정적 페이지)는 handler 를 **null 로 유지**하고 설명만 기재한다(근거 없는 신뢰도 태깅 금지).
 5. jspFile 매핑 후 `unmatchedJsps` 를 재계산해 기록한다(엔진 `reconcileJsps` +
    `listJspFilesFromGraph`). validate 가 KG 기준 재계산과 대조해 낡은 값을 실패 처리한다.
+   (팬아웃 경로에서는 `fill-merge` 가 이 재계산을 자동 수행한다.)
+
+### 팬아웃 경로 절차 (대규모)
+
+1. `fill-prep` — screens.json 을 화면 N개 자립 청크로 분해한다(도메인 우선 그룹핑,
+   화면 단위로만 자름 — 주석은 화면에서 분리하지 않는다). 각 청크에 **핸들러 사전**
+   (routes/method-calls 결정론 조인의 pre-cite: file:line + verbatim 스니펫)과 컨트롤러/
+   서비스 소스 슬라이스를 동봉한다. 산출: `.spec/map/screens-fill-prep/<chunkId>.json` +
+   `index.json`(청크 id 목록 `chunks[].chunkId`).
+2. **모델 질문**(아래 공통 문안) 후 Workflow 도구로 `scripts/screens-fill-fanout.workflow.js`
+   실행 — 인자 `{ projectRoot, cliScript: understand-screens.mjs 절대경로, chunkIds, model, effort:"low" }`.
+   청크당 fill-writer 에이전트가 `screens-fill-frag/<chunkId>.json` 을 쓴다(멱등 skip 가드:
+   에이전트가 먼저 `fill-audit --chunk <id>` 로 완료 여부 확인 후 skip). 인용은 에이전트가
+   **생산하지 않고** 청크의 pre-cite 를 verbatim 복사한다(근거율 보증). 봉인 필드는 조각에
+   담지 않는다(병합이 본체 유지).
+3. `fill-audit` — 조각 완결성 감사(존재 ∧ 스키마 ∧ 화면·주석 커버리지 ∧ CONFIRMED⇒
+   evidence≥1). Workflow 가 초기 감사 + 최대 2회 재디스패치 후 잔여 미완결을 `failed[]` 로
+   표면화한다(조용한 누락 없음). 요약을 사용자에게 보고한다.
+4. `fill-merge` — 조각의 **채움 필드만** screens.json 본체에 병합한다(봉인 필드는 본체 값
+   유지, 선언 밖 화면/주석 id 는 버리고 보고). 병합 후 `unmatchedJsps` 재계산 +
+   mechanicalHash 재검증 + `validateScreensFile` 게이트를 자동 실행한다.
+5. `validate` — 최종 게이트 재확인 후 결과를 한국어로 보고한다.
+
+### 모델 질문 (공통 규약)
+
+팬아웃 디스패치 전, fill-writer 모델을 사용자에게 묻는다(비대화형/헤드리스면 묻지 말고
+**세션 모델**로 진행). effort 는 항상 `low`(pre-cite 슬라이스 위 템플릿 유도 판단이라
+개방형 분석이 아니다 — map fill 과 동일).
+
+1순위 **세션 모델 (권장·기본)** — 품질 최우선, 현재 세션과 동일 모델 → `model:"inherit"`
+2순위 **sonnet** — 품질·비용 균형(map fill 에서 egov 1,255흐름 근거율 100% 실증) → `model:"sonnet"`
+3순위 **haiku** — 최대 절감, verbatim 준수 위험은 감사 재디스패치로 보정 → `model:"haiku"`
 
 ## 검증 게이트 (validate)
 

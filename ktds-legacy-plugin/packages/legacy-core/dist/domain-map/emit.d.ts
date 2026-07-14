@@ -1,4 +1,4 @@
-import type { SkeletonReport, UaGraphEdge, UaGraphNode } from './types.js';
+import type { ConfirmedGroup, SkeletonReport, UaGraphEdge, UaGraphNode } from './types.js';
 import type { VerifyReport } from './verify.js';
 /** NEEDS_REVIEW 강등 마커 — 검증 실패 항목 텍스트 앞에 붙인다(삭제 금지). */
 export declare const NEEDS_REVIEW_MARKER = "[\uD655\uC778 \uD544\uC694] ";
@@ -14,6 +14,11 @@ export interface EmitOptions {
     projectName?: string;
     /** 분석 시각(ISO) — 기본 now. 테스트는 고정값을 주입해 byte-identical 보장. */
     analyzedAt?: string;
+    /**
+     * 상단도메인 계층(DOMAIN_HIERARCHY) — confirmed plan.groups 를 ktdsMap.groups 로
+     * additive 투영한다(노드/엣지 스키마 무접촉). 부재/빈 배열 = 평면 그래프(기존 렌더).
+     */
+    groups?: ConfirmedGroup[];
 }
 /**
  * skeleton 으로부터 구조 오버레이를 emit 한다.

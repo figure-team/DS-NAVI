@@ -15,7 +15,7 @@ function parseProperties(text, relPath, out) {
         const line = lines[i];
         if (/^\s*[#!]/.test(line))
             continue;
-        const m = line.match(/^\s*([\w.\-\[\]]+)\s*[=:]\s*(.*?)\s*$/);
+        const m = line.match(/^\s*([\w.\-[\]]+)\s*[=:]\s*(.*?)\s*$/);
         if (!m)
             continue;
         const key = m[1];
@@ -36,7 +36,7 @@ function parseYamlFlat(text, relPath, out) {
             stack.length = 0;
             continue;
         }
-        const m = raw.match(/^(\s*)([\w.\-]+)\s*:\s*(.*?)\s*$/);
+        const m = raw.match(/^(\s*)([\w.-]+)\s*:\s*(.*?)\s*$/);
         if (!m)
             continue; // 리스트 항목/멀티라인 등 미지원 — 건너뜀(키 없음 → unresolved).
         const indent = m[1].length;

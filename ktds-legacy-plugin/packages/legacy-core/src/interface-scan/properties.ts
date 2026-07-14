@@ -24,7 +24,7 @@ function parseProperties(text: string, relPath: string, out: PropertyIndex): voi
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     if (/^\s*[#!]/.test(line)) continue
-    const m = line.match(/^\s*([\w.\-\[\]]+)\s*[=:]\s*(.*?)\s*$/)
+    const m = line.match(/^\s*([\w.\-[\]]+)\s*[=:]\s*(.*?)\s*$/)
     if (!m) continue
     const key = m[1]
     if (!out.has(key)) out.set(key, { value: m[2], file: relPath, line: i + 1 })
@@ -43,7 +43,7 @@ function parseYamlFlat(text: string, relPath: string, out: PropertyIndex): void 
       stack.length = 0
       continue
     }
-    const m = raw.match(/^(\s*)([\w.\-]+)\s*:\s*(.*?)\s*$/)
+    const m = raw.match(/^(\s*)([\w.-]+)\s*:\s*(.*?)\s*$/)
     if (!m) continue // 리스트 항목/멀티라인 등 미지원 — 건너뜀(키 없음 → unresolved).
     const indent = m[1].length
     const key = m[2]

@@ -77,3 +77,26 @@ export type {
   ScreensValidationResult,
 } from './assemble.js'
 export { loadPlaywright } from './playwright-loader.js'
+export {
+  SCREEN_FILL_PREP_DIR,
+  SCREEN_FILL_FRAG_DIR,
+  SCREEN_FILL_PREP_INDEX_FILENAME,
+  DEFAULT_CHUNK_SCREENS,
+  ScreenFillChunkSchema,
+  ScreenFillChunkIndexSchema,
+  ScreenFillFragmentSchema,
+  screenFillPrepDir,
+  screenFillFragDir,
+  readScreenFillChunkIndex,
+  prepScreenFill,
+  auditScreenFillFragments,
+  mergeScreenFillFragments,
+} from './fill-fanout.js'
+export type {
+  ScreenFillChunk,
+  ScreenFillChunkIndex,
+  ScreenFillFragment,
+  PrepScreenFillOptions,
+  ScreenFragmentAudit,
+  MergeScreenFillResult,
+} from './fill-fanout.js'

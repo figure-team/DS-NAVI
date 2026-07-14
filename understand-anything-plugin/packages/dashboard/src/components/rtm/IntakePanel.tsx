@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import { useRtm } from "./context";
 import { MD, useEscClose } from "./shared";
 import { BAD, BORDER, CIRCLED, FAINT, GOLD, OK, PRIORITY, STEP_DEFS, WARN, stripFrontmatter } from "./types";
+import { ModelSelect } from "../ModelSelect";
 
 // ── P4: 단계 진행 스테퍼 ──
 export function IntakeStepper() {
@@ -125,7 +126,7 @@ export function IntakeStepPanel() {
 
 /** 인테이크 모달 — 자연어 요청 입력 + 목표 단계 선택. */
 export function IntakeModal() {
-  const { setIntakeOpen, intakeQuery, setIntakeQuery, targetStep, setTargetStep, intakeError, startIntake } = useRtm();
+  const { setIntakeOpen, intakeQuery, setIntakeQuery, targetStep, setTargetStep, intakeModel, setIntakeModel, intakeError, startIntake } = useRtm();
   useEscClose(() => setIntakeOpen(false));
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-root/80 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setIntakeOpen(false); }}>
@@ -153,6 +154,8 @@ export function IntakeModal() {
           {intakeError && <p style={{ fontSize: 11.5, marginTop: 8, color: BAD }}>{intakeError}</p>}
         </div>
         <div className="flex items-center justify-end gap-2 border-t border-border-subtle" style={{ padding: "12px 20px" }}>
+          <ModelSelect value={intakeModel} onChange={setIntakeModel} sessionDefaultLabel="세션 모델(기본)" ariaLabel="실행 모델 선택"
+            className="mr-auto rounded-lg bg-elevated border border-border-medium text-text-secondary focus:outline-none focus:border-accent" style={{ padding: "5px 8px", fontSize: 12 }} />
           <button onClick={() => setIntakeOpen(false)} className="rounded-lg text-text-secondary hover:text-text-primary" style={{ padding: "6px 12px", fontSize: 13 }}>취소</button>
           <button onClick={() => void startIntake()} disabled={!intakeQuery.trim()} className="rounded-lg font-medium bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-40" style={{ padding: "6px 16px", fontSize: 13 }}>실행 ▸</button>
         </div>

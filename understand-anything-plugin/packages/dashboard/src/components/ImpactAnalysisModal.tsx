@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDashboardStore } from "../store";
 import { useI18n } from "../contexts/I18nContext";
+import { ModelSelect, type ModelChoice } from "./ModelSelect";
 
 // ktds: 구조 탭 "영향도 분석" 자연어 입력 모달. 제출 시 store.startImpactAnalysis 가
 // POST /impact-analyze → 서버가 claude -p "/understand-impact <query>" 실행. job 상태는
@@ -12,6 +13,7 @@ export default function ImpactAnalysisModal() {
   const { t } = useI18n();
 
   const [query, setQuery] = useState("");
+  const [model, setModel] = useState<ModelChoice>("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -33,7 +35,7 @@ export default function ImpactAnalysisModal() {
     if (!q || submitting || running) return;
     setSubmitting(true);
     setError(null);
-    const result = await startImpactAnalysis(q);
+    const result = await startImpactAnalysis(q, model || undefined);
     setSubmitting(false);
     if (result.ok) {
       close();
@@ -44,7 +46,7 @@ export default function ImpactAnalysisModal() {
         ? t.impactAnalyze.errNoServer
         : (result.error ?? t.impactAnalyze.errGeneric),
     );
-  }, [query, submitting, running, startImpactAnalysis, close, t]);
+  }, [query, model, submitting, running, startImpactAnalysis, close, t]);
 
   return (
     <div
@@ -99,6 +101,15 @@ export default function ImpactAnalysisModal() {
         </div>
 
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border-subtle">
+          <ModelSelect
+            value={model}
+            onChange={setModel}
+            disabled={running || submitting}
+            sessionDefaultLabel={t.impactAnalyze.modelDefault}
+            ariaLabel={t.impactAnalyze.modelAria}
+            className="mr-auto rounded-lg bg-elevated border border-border-medium text-sm text-text-secondary focus:outline-none focus:border-accent disabled:opacity-50"
+            style={{ padding: "5px 8px" }}
+          />
           <button
             onClick={close}
             className="px-3 py-1.5 rounded-lg text-sm text-text-secondary hover:text-text-primary transition-colors"

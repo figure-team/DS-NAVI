@@ -5,7 +5,20 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
-import { spawn } from "child_process";
+import {
+  ClaudeJobTracker,
+  headlessDirective,
+  runClaudeSkill,
+  type ClaudeJobBase,
+} from "./server/claude-headless";
+import {
+  appendLedgerEntry,
+  artifactMtimeMs,
+  readLedger,
+  reconcilePendingJobs,
+  removePendingMarker,
+  writePendingMarker,
+} from "./server/job-ledger";
 
 // Generate a one-time token when the server process starts.
 // This token is printed to the terminal and must be in the URL
@@ -46,6 +59,7 @@ function findSpecMapFile(fileName: string): string | null {
 
 /** `.spec/map/` 읽기 전용 서빙 대상 — pathname(=파일명) 화이트리스트. */
 const SPEC_MAP_ENDPOINTS = new Set([
+  "/domain-map.json",
   "/db-schema.json",
   "/crud-matrix.json",
   "/program-inventory.json",
@@ -1067,41 +1081,35 @@ function handleRtmReqOverridePost(
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
 
+// ── 헤드리스 모델 선택(공통) — 세 spawn 경로가 공유 ────────────────────────────
+// 규약: 기본=세션 모델(플래그 미전달), 선택지 whitelist [opus/sonnet/haiku]. 화이트리스트
+// 밖·비문자열은 조용히 null(기본) 로 폴백해 검증 실패를 만들지 않는다(프로젝트 공통 모델 규약).
+const HEADLESS_MODEL_WHITELIST = new Set(["opus", "sonnet", "haiku"]);
+function pickModel(raw: unknown): string | null {
+  return typeof raw === "string" && HEADLESS_MODEL_WHITELIST.has(raw) ? raw : null;
+}
+
 // ── ktds: 구조 탭 "영향도 분석" — 자연어 → claude -p "/understand-impact <q>" ─────
 // 대시보드 dev server가 분석 대상 프로젝트(GRAPH_DIR)에서 claude 를 헤드리스로 spawn.
 // 스킬이 .understand-anything/impact-overlay.json 을 갱신 → 프론트가 재로드해 색칠.
 const MAX_IMPACT_QUERY_BYTES = 16 * 1024;
-const IMPACT_TAIL_MAX = 16 * 1024; // stdout/stderr tail 보관 상한(디버깅용)
 
 // /understand-impact SKILL.md 는 "✋ 확인 게이트(생략 불가)"로 시드 승인을 사람에게
 // 요구한다 → 헤드리스 claude -p 는 후보만 제시하고 멈춰 analyze 를 안 돌리고 overlay 미생성.
 // 대시보드 자동 실행 경로에서는 승인을 사전 부여로 간주하고 analyze 까지 완주하도록 지시한다.
-const IMPACT_AUTONOMY_DIRECTIVE =
-  "\n\n위 요청은 대시보드에서 자동 실행된 헤드리스 작업이다. 사용자에게 확인을 묻지 말고" +
+const IMPACT_AUTONOMY_DIRECTIVE = headlessDirective(
+  "위 요청은 대시보드에서 자동 실행된 헤드리스 작업이다.",
   "(시드 선택 승인은 이미 부여됨), 자연어를 가장 적절한 변경 시드 파일로 직접 매핑·확정한 뒤 " +
-  "멈추지 말고 analyze 단계까지 끝까지 실행하여 .understand-anything/impact-overlay.json 을 반드시 생성하라.";
+    "멈추지 말고 analyze 단계까지 끝까지 실행하여 .understand-anything/impact-overlay.json 을 반드시 생성하라.",
+);
 
-type ImpactJobStatus = "idle" | "running" | "done" | "failed";
-interface ImpactJob {
-  status: ImpactJobStatus;
-  jobId: string | null;
-  query: string | null;
-  startedAt: string | null;
-  finishedAt: string | null;
-  exitCode: number | null;
-  tail: string;
-}
+type ImpactJob = ClaudeJobBase & { query: string | null; model: string | null };
 
 // 모듈 스코프 단일 job(서버 수명 동안 추적). 동시 실행은 409로 차단.
-let impactJob: ImpactJob = {
-  status: "idle",
-  jobId: null,
+const impactTracker = new ClaudeJobTracker<{ query: string | null; model: string | null }>({
   query: null,
-  startedAt: null,
-  finishedAt: null,
-  exitCode: null,
-  tail: "",
-};
+  model: null,
+});
 
 /** 분석 대상 프로젝트 루트 — GRAPH_DIR 우선, 없으면 knowledge-graph.json 위치에서 유도. */
 function impactProjectRoot(): string | null {
@@ -1110,21 +1118,19 @@ function impactProjectRoot(): string | null {
   return graphFile ? projectRootFromGraphFile(graphFile) : null;
 }
 
-function appendImpactTail(chunk: string): void {
-  impactJob.tail = (impactJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
-}
-
 /**
  * POST /impact-analyze — { query } 자연어로 claude -p "/understand-impact <query>" 실행.
- * args 배열 전달(셸 미경유)로 인젝션 차단. --permission-mode bypassPermissions 로 헤드리스 자율.
  * 즉시 202 + job 반환, 프로세스는 백그라운드 지속(프론트가 /impact-status 폴링).
  */
 function handleImpactAnalyzePost(
   req: import("http").IncomingMessage,
   res: import("http").ServerResponse,
 ): void {
-  if (impactJob.status === "running") {
-    sendJson(res, 409, { error: "An impact analysis is already running", job: { ...impactJob } });
+  if (impactTracker.running) {
+    sendJson(res, 409, {
+      error: "An impact analysis is already running",
+      job: impactTracker.snapshot(),
+    });
     return;
   }
   const projectRoot = impactProjectRoot();
@@ -1135,9 +1141,11 @@ function handleImpactAnalyzePost(
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
       let query = "";
+      let model: string | null = null;
       try {
-        const parsed = JSON.parse(body) as { query?: unknown };
+        const parsed = JSON.parse(body) as { query?: unknown; model?: unknown };
         query = typeof parsed.query === "string" ? parsed.query.trim() : "";
+        model = pickModel(parsed.model);
       } catch {
         query = "";
       }
@@ -1145,96 +1153,188 @@ function handleImpactAnalyzePost(
         sendJson(res, 400, { error: "Missing 'query'" });
         return;
       }
-      const jobId = crypto.randomBytes(8).toString("hex");
-      impactJob = {
-        status: "running",
+      const jobId = impactTracker.begin({ query, model });
+      // WAL: 스폰 전 pending 마커 — 서버가 job 도중 재시작해 close 핸들러를 잃어도
+      // /impact-history 조회 시 reconcile 이 산출물 mtime 으로 결과를 복원한다(질의문·모델 보존).
+      writePendingMarker(impactHistoryDir(projectRoot), {
         jobId,
         query,
-        startedAt: new Date().toISOString(),
-        finishedAt: null,
-        exitCode: null,
-        tail: "",
-      };
-      let child: ReturnType<typeof spawn>;
-      try {
-        child = spawn(
-          "claude",
-          [
-            "-p",
-            `/understand-impact ${query}${IMPACT_AUTONOMY_DIRECTIVE}`,
-            "--permission-mode",
-            "bypassPermissions",
-          ],
-          { cwd: projectRoot, env: process.env },
-        );
-      } catch (err) {
-        impactJob.status = "failed";
-        impactJob.finishedAt = new Date().toISOString();
-        appendImpactTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
-        sendJson(res, 500, { error: "Failed to launch claude", job: { ...impactJob } });
-        return;
-      }
-      child.stdout?.on("data", (c: Buffer) => appendImpactTail(c.toString("utf8")));
-      child.stderr?.on("data", (c: Buffer) => appendImpactTail(c.toString("utf8")));
-      child.on("error", (err) => {
-        if (impactJob.jobId !== jobId) return; // 다음 job 이 시작됐으면 무시
-        impactJob.status = "failed";
-        impactJob.finishedAt = new Date().toISOString();
-        appendImpactTail(`\n[spawn error] ${err.message}\n`);
+        model,
+        startedAt: impactTracker.job.startedAt,
       });
-      child.on("close", (code) => {
-        if (impactJob.jobId !== jobId) return;
-        impactJob.status = code === 0 ? "done" : "failed";
-        impactJob.exitCode = code;
-        impactJob.finishedAt = new Date().toISOString();
+      const launched = runClaudeSkill({
+        prompt: `/understand-impact ${query}${IMPACT_AUTONOMY_DIRECTIVE}`,
+        cwd: projectRoot,
+        jobId,
+        tracker: impactTracker,
+        model: model ?? undefined,
+        onSpawnError: () =>
+          sendJson(res, 500, { error: "Failed to launch claude", job: impactTracker.snapshot() }),
+        onErrorSettled: () => recordImpactHistory(projectRoot, impactTracker.snapshot()),
+        onCloseSettled: () => recordImpactHistory(projectRoot, impactTracker.snapshot()),
       });
-      sendJson(res, 202, { job: { ...impactJob } });
+      if (!launched) return;
+      sendJson(res, 202, { job: impactTracker.snapshot() });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+// ── ktds(WT-E): 영향 분석 히스토리 — job 종료 시 원장 append + 산출물 스냅샷 ─────
+// 대시보드가 띄운 분석만 기록한다(CLI 직접 실행은 서버가 관찰하지 못함 — 정직한 범위).
+// 원장: <root>/.understand-anything/impact-history/ledger.json (최신이 앞, 상한 초과분 삭제)
+// 스냅샷: <root>/.understand-anything/impact-history/<jobId>/{impact,impact-verify-report,impact-overlay}.json
+const IMPACT_HISTORY_MAX = 50;
+/** /impact-history-item 이 서빙하는 스냅샷 파일 화이트리스트. */
+const IMPACT_SNAPSHOT_FILES = new Set([
+  "impact.json",
+  "impact-verify-report.json",
+  "impact-overlay.json",
+]);
+
+interface ImpactHistoryEntry {
+  jobId: string;
+  query: string;
+  /** 실행에 쓴 모델(세션 기본이면 null) — 스키마 additive, 하위호환. */
+  model: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  status: "done" | "failed";
+  /** 스냅샷 impact.json 의 앵커 커밋(파싱 실패/부재 시 null). */
+  gitCommit: string | null;
+  /** 스냅샷으로 확보된 파일명 — 프론트가 열람 가능 여부를 판단. */
+  files: string[];
+}
+
+function impactHistoryDir(projectRoot: string): string {
+  return path.join(projectRoot, ".understand-anything", "impact-history");
+}
+
+function readImpactHistory(projectRoot: string): ImpactHistoryEntry[] {
+  return readLedger<ImpactHistoryEntry>(impactHistoryDir(projectRoot));
+}
+
+/** job 종료 시점 산출물을 스냅샷하고 원장에 append(동일 jobId 재기록은 dedup). 실패는 로그만. */
+function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
+  try {
+    const jobId = job.jobId;
+    if (!jobId) return;
+    const dir = impactHistoryDir(projectRoot);
+    const snapDir = path.join(dir, jobId);
+    fs.mkdirSync(snapDir, { recursive: true });
+    // 존재하고 "이 job 이 갱신한"(mtime ≥ startedAt) 산출물만 복사 — exit 0 이어도 스킬이
+    // 실행되지 않은 경우(예: 커맨드 미등록) 낡은 결과를 이 질의의 스냅샷처럼 기록하지 않는다.
+    // 실패/무산 job 은 files 가 비어 UI 에서 열람 비활성(정직한 노출).
+    const startedMs = job.startedAt ? Date.parse(job.startedAt) : Number.NaN;
+    const freshEnough = (src: string): boolean => {
+      if (Number.isNaN(startedMs)) return true; // 시작 시각 미상이면 배제하지 않음
+      try {
+        return fs.statSync(src).mtimeMs >= startedMs - 1000; // 파일시스템 mtime 해상도 여유 1s
+      } catch {
+        return false;
+      }
+    };
+    const sources: Array<[string, string]> = [
+      [path.join(projectRoot, ".spec", "map", "impact.json"), "impact.json"],
+      [
+        path.join(projectRoot, ".spec", "map", "impact-verify-report.json"),
+        "impact-verify-report.json",
+      ],
+      [path.join(projectRoot, ".understand-anything", "impact-overlay.json"), "impact-overlay.json"],
+    ];
+    const files: string[] = [];
+    let gitCommit: string | null = null;
+    for (const [src, name] of sources) {
+      if (!fs.existsSync(src) || !freshEnough(src)) continue;
+      fs.copyFileSync(src, path.join(snapDir, name));
+      files.push(name);
+      if (name === "impact.json") {
+        try {
+          const parsed = JSON.parse(fs.readFileSync(src, "utf-8")) as { gitCommit?: unknown };
+          if (typeof parsed.gitCommit === "string") gitCommit = parsed.gitCommit;
+        } catch {
+          // 파싱 실패 → gitCommit null 유지
+        }
+      }
+    }
+    const entry: ImpactHistoryEntry = {
+      jobId,
+      query: job.query ?? "",
+      model: job.model ?? null,
+      startedAt: job.startedAt,
+      finishedAt: job.finishedAt,
+      exitCode: job.exitCode,
+      // exit 0 이어도 이 job 이 갱신한 impact.json 이 없으면(스킬 미실행 등) 실질 실패로 기록.
+      status: job.status === "done" && files.includes("impact.json") ? "done" : "failed",
+      gitCommit,
+      files,
+    };
+    for (const drop of appendLedgerEntry(dir, entry, IMPACT_HISTORY_MAX)) {
+      try {
+        fs.rmSync(path.join(dir, drop.jobId), { recursive: true, force: true });
+      } catch {
+        // 스냅샷 정리 실패는 무시(원장에서만 제거)
+      }
+    }
+    removePendingMarker(dir, jobId);
+  } catch (err) {
+    console.error("[understand-anything] Failed to record impact history:", err);
+  }
+}
+
+/**
+ * 서버 재시작으로 close 핸들러를 잃은 impact job 복원 — 산출물(impact.json) mtime 기준.
+ * /impact-history 조회 시 lazy 하게 호출된다(별도 부팅 훅 불필요).
+ */
+function reconcileImpactHistory(projectRoot: string): void {
+  const ledger = readImpactHistory(projectRoot);
+  reconcilePendingJobs(impactHistoryDir(projectRoot), {
+    isTracking: (jobId) => impactTracker.isCurrent(jobId) && impactTracker.running,
+    isRecorded: (jobId) => ledger.some((e) => e.jobId === jobId),
+    artifactMtimeMs: () => artifactMtimeMs(path.join(projectRoot, ".spec", "map", "impact.json")),
+    record: (pending, fresh, artifactMs) => {
+      recordImpactHistory(projectRoot, {
+        status: fresh ? "done" : "failed",
+        jobId: pending.jobId as string,
+        query: typeof pending.query === "string" ? pending.query : "",
+        model: typeof pending.model === "string" ? pending.model : null,
+        startedAt: typeof pending.startedAt === "string" ? pending.startedAt : null,
+        finishedAt: fresh ? new Date(artifactMs).toISOString() : new Date().toISOString(),
+        exitCode: null,
+        tail: "",
+      });
+    },
+  });
 }
 
 // ── P3: RTM 단계 인테이크 — 가이드 5단계를 단계당 claude -p 1회로 ─────
 // 한 POST 가 start..target 단계를 순차 spawn(중간 컨펌 없이 자동진행), target 에서 멈춤. 단계마다
 // claude -p "/understand-rtm --intake --session <sid> --step <k>". 세션 상태는 디스크(session.json)에
-// 영속, 인메모리 rtmJob 은 실행 추적(409 차단). 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §5.
+// 영속, 인메모리 rtmTracker 는 실행 추적(409 차단). 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §5.
 const RTM_STEP_MIN = 1;
 const RTM_STEP_MAX = 5;
 function rtmStepDirective(step: number): string {
-  return (
-    `\n\n위 작업은 대시보드 추적표에서 자동 실행된 헤드리스 단계 ${step} 이다. 사용자에게 확인을 묻지 말고 ` +
-    `SKILL.md §B 의 --step ${step} 지침만 끝까지 수행한 뒤 보고하고 멈춰라. 다음 단계는 사용자 컨펌 후 별도로 ` +
-    `진행된다. 신규는 전부 [추정]이며 확정은 사람이 대시보드에서 한다.`
+  return headlessDirective(
+    `위 작업은 대시보드 추적표에서 자동 실행된 헤드리스 단계 ${step} 이다.`,
+    ` SKILL.md §B 의 --step ${step} 지침만 끝까지 수행한 뒤 보고하고 멈춰라. 다음 단계는 사용자 컨펌 후 별도로 ` +
+      `진행된다. 신규는 전부 [추정]이며 확정은 사람이 대시보드에서 한다.`,
   );
 }
 
-interface RtmStepJob {
-  status: "idle" | "running" | "done" | "failed";
-  jobId: string | null;
+interface RtmStepExtra extends Record<string, unknown> {
   sid: string | null;
   step: number | null; // 현재 실행 중/마지막 단계
   targetStep: number | null;
   request: string | null;
-  startedAt: string | null;
-  finishedAt: string | null;
-  exitCode: number | null;
-  tail: string;
+  model: string | null; // 이 호출의 모든 단계에 쓸 모델(세션 기본이면 null)
 }
-const RTM_JOB_IDLE: RtmStepJob = {
-  status: "idle",
-  jobId: null,
+const rtmTracker = new ClaudeJobTracker<RtmStepExtra>({
   sid: null,
   step: null,
   targetStep: null,
   request: null,
-  startedAt: null,
-  finishedAt: null,
-  exitCode: null,
-  tail: "",
-};
-let rtmJob: RtmStepJob = { ...RTM_JOB_IDLE };
-function appendRtmTail(chunk: string): void {
-  rtmJob.tail = (rtmJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
-}
+  model: null,
+});
 
 // ── 세션 영속(.understand-anything/rtm-intake/<sid>/) ────────────────────────
 type RtmStepStatus = "pending" | "running" | "produced" | "confirmed" | "failed";
@@ -1357,69 +1457,41 @@ function runRtmSteps(
   request: string,
   start: number,
   target: number,
+  model: string | null,
 ): void {
   const reqArg = request.replace(/[\r\n]+/g, " ").replace(/"/g, "'").trim();
+  const setStepStatus = (k: number, status: RtmStepStatus): void => {
+    const s = readRtmSession(sid);
+    if (!s) return;
+    s.steps[String(k)] = { status };
+    if (status === "produced") s.producedStep = Math.max(s.producedStep, k);
+    writeRtmSession(s);
+  };
   const runOne = (k: number): void => {
-    if (rtmJob.jobId !== jobId) return; // 후속 job 으로 교체됨
-    rtmJob.step = k;
-    const s0 = readRtmSession(sid);
-    if (s0) {
-      s0.steps[String(k)] = { status: "running" };
-      writeRtmSession(s0);
-    }
+    if (!rtmTracker.isCurrent(jobId)) return; // 후속 job 으로 교체됨
+    rtmTracker.job.step = k;
+    setStepStatus(k, "running");
     const requestArg = k === RTM_STEP_MIN ? ` --request "${reqArg}"` : "";
-    const prompt = `/understand-rtm --intake --session ${sid} --step ${k}${requestArg}${rtmStepDirective(k)}`;
-    let child: ReturnType<typeof spawn>;
-    try {
-      child = spawn("claude", ["-p", prompt, "--permission-mode", "bypassPermissions"], {
-        cwd: projectRoot,
-        env: process.env,
-      });
-    } catch (err) {
-      if (rtmJob.jobId !== jobId) return;
-      rtmJob.status = "failed";
-      rtmJob.finishedAt = new Date().toISOString();
-      appendRtmTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
-      const s = readRtmSession(sid);
-      if (s) {
-        s.steps[String(k)] = { status: "failed" };
-        writeRtmSession(s);
-      }
-      return;
-    }
-    child.stdout?.on("data", (c: Buffer) => appendRtmTail(c.toString("utf8")));
-    child.stderr?.on("data", (c: Buffer) => appendRtmTail(c.toString("utf8")));
-    child.on("error", (err) => {
-      if (rtmJob.jobId !== jobId) return;
-      rtmJob.status = "failed";
-      rtmJob.finishedAt = new Date().toISOString();
-      appendRtmTail(`\n[spawn error] ${err.message}\n`);
-    });
-    child.on("close", (code) => {
-      if (rtmJob.jobId !== jobId) return;
-      const s = readRtmSession(sid);
-      if (code !== 0) {
-        rtmJob.status = "failed";
-        rtmJob.exitCode = code;
-        rtmJob.finishedAt = new Date().toISOString();
-        if (s) {
-          s.steps[String(k)] = { status: "failed" };
-          writeRtmSession(s);
+    runClaudeSkill({
+      prompt: `/understand-rtm --intake --session ${sid} --step ${k}${requestArg}${rtmStepDirective(k)}`,
+      cwd: projectRoot,
+      jobId,
+      tracker: rtmTracker,
+      model: model ?? undefined,
+      onSpawnError: () => setStepStatus(k, "failed"),
+      onClose: (code) => {
+        if (code !== 0) {
+          rtmTracker.finish(jobId, code);
+          setStepStatus(k, "failed");
+          return;
         }
-        return;
-      }
-      if (s) {
-        s.steps[String(k)] = { status: "produced" };
-        s.producedStep = Math.max(s.producedStep, k);
-        writeRtmSession(s);
-      }
-      if (k >= target) {
-        rtmJob.status = "done";
-        rtmJob.exitCode = 0;
-        rtmJob.finishedAt = new Date().toISOString();
-        return;
-      }
-      runOne(k + 1); // 다음 단계 자동진행(같은 호출의 N까지 구간)
+        setStepStatus(k, "produced");
+        if (k >= target) {
+          rtmTracker.finish(jobId, 0);
+          return;
+        }
+        runOne(k + 1); // 다음 단계 자동진행(같은 호출의 N까지 구간)
+      },
     });
   };
   runOne(start);
@@ -1434,8 +1506,8 @@ function handleRtmIntakePost(
   req: import("http").IncomingMessage,
   res: import("http").ServerResponse,
 ): void {
-  if (rtmJob.status === "running") {
-    sendJson(res, 409, { error: "An RTM intake is already running", job: { ...rtmJob } });
+  if (rtmTracker.running) {
+    sendJson(res, 409, { error: "An RTM intake is already running", job: rtmTracker.snapshot() });
     return;
   }
   const projectRoot = impactProjectRoot();
@@ -1449,7 +1521,7 @@ function handleRtmIntakePost(
   }
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
-      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown } = {};
+      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown; model?: unknown } = {};
       try {
         parsed = JSON.parse(body);
       } catch {
@@ -1458,6 +1530,7 @@ function handleRtmIntakePost(
       }
       const wantTarget =
         typeof parsed.targetStep === "number" ? Math.floor(parsed.targetStep) : RTM_STEP_MAX;
+      const model = pickModel(parsed.model);
 
       let session: RtmSession;
       let startStep: number;
@@ -1498,19 +1571,15 @@ function handleRtmIntakePost(
       session.targetStep = target;
       writeRtmSession(session);
 
-      const jobId = crypto.randomBytes(8).toString("hex");
-      rtmJob = {
-        ...RTM_JOB_IDLE,
-        status: "running",
-        jobId,
+      const jobId = rtmTracker.begin({
         sid: session.sid,
         step: startStep,
         targetStep: target,
         request,
-        startedAt: new Date().toISOString(),
-      };
-      runRtmSteps(jobId, session.sid, projectRoot, request, startStep, target);
-      sendJson(res, 202, { job: { ...rtmJob }, session });
+        model,
+      });
+      runRtmSteps(jobId, session.sid, projectRoot, request, startStep, target, model);
+      sendJson(res, 202, { job: rtmTracker.snapshot(), session });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
@@ -1558,8 +1627,8 @@ function handleRtmDiscardPost(
   req: import("http").IncomingMessage,
   res: import("http").ServerResponse,
 ): void {
-  if (rtmJob.status === "running") {
-    sendJson(res, 409, { error: "실행 중에는 폐기할 수 없습니다.", job: { ...rtmJob } });
+  if (rtmTracker.running) {
+    sendJson(res, 409, { error: "실행 중에는 폐기할 수 없습니다.", job: rtmTracker.snapshot() });
     return;
   }
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
@@ -1634,38 +1703,20 @@ function handleRtmDocPost(
 const RTM_CHANGE_KINDS = ["withdraw"] as const;
 type RtmChangeKind = (typeof RTM_CHANGE_KINDS)[number];
 function rtmChangeDirective(targetReq: string, kind: RtmChangeKind): string {
-  return (
-    `\n\n위 작업은 대시보드 추적표에서 자동 실행된 변경관리(${kind === "withdraw" ? "철회" : kind})다. ` +
-    `대상 요청은 ${targetReq} 이다. 사용자에게 확인을 묻지 말고 SKILL.md §C 절차를 끝까지 수행한 뒤 ` +
-    `보고하고 멈춰라. **삭제 금지·이력 보존**(상태를 폐기로만), CR 문서(과업내용변경요청서·변경영향분석서)를 ` +
-    `생성하고 추적표를 재생성한다. 확정·후속조치 수행은 사람이 한다.`
+  return headlessDirective(
+    `위 작업은 대시보드 추적표에서 자동 실행된 변경관리(${kind === "withdraw" ? "철회" : kind})다. ` +
+      `대상 요청은 ${targetReq} 이다.`,
+    ` SKILL.md §C 절차를 끝까지 수행한 뒤 ` +
+      `보고하고 멈춰라. **삭제 금지·이력 보존**(상태를 폐기로만), CR 문서(과업내용변경요청서·변경영향분석서)를 ` +
+      `생성하고 추적표를 재생성한다. 확정·후속조치 수행은 사람이 한다.`,
   );
 }
 
-interface RtmChangeJob {
-  status: "idle" | "running" | "done" | "failed";
-  jobId: string | null;
+const rtmChangeTracker = new ClaudeJobTracker<{
   targetReq: string | null;
   kind: RtmChangeKind | null;
-  startedAt: string | null;
-  finishedAt: string | null;
-  exitCode: number | null;
-  tail: string;
-}
-const RTM_CHANGE_JOB_IDLE: RtmChangeJob = {
-  status: "idle",
-  jobId: null,
-  targetReq: null,
-  kind: null,
-  startedAt: null,
-  finishedAt: null,
-  exitCode: null,
-  tail: "",
-};
-let rtmChangeJob: RtmChangeJob = { ...RTM_CHANGE_JOB_IDLE };
-function appendRtmChangeTail(chunk: string): void {
-  rtmChangeJob.tail = (rtmChangeJob.tail + chunk).slice(-IMPACT_TAIL_MAX);
-}
+  model: string | null;
+}>({ targetReq: null, kind: null, model: null });
 
 /**
  * rtm.json 의 요청(REQ) id 집합 — RtmView.requestIdOf 규약: source.section 이 REQ- 면 그것,
@@ -1690,40 +1741,133 @@ function rtmRequestIds(): Set<string> {
   return ids;
 }
 
+// ── rtm-change 이력/영속 — impact 와 동일 규약(WAL + 원장 + lazy reconcile) ─────
+// 변경관리 산출물(CR 문서·impact)은 change/<CR>/ 에 영구 보존되므로 스냅샷 복사는 없다 —
+// 원장은 실행 이력 + 이 실행이 갱신한 CR 디렉터리명만 기록한다. 신선도 판정 기준 산출물은
+// §C 가 끝까지 가면 반드시 재생성되는 추적표(rtm.json).
+const RTM_CHANGE_HISTORY_MAX = 50;
+
+interface RtmChangeHistoryEntry {
+  jobId: string;
+  targetReq: string;
+  kind: string;
+  /** 실행에 쓴 모델(세션 기본이면 null) — 스키마 additive, 하위호환. */
+  model: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  exitCode: number | null;
+  status: "done" | "failed";
+  /** 이 실행이 갱신한(mtime ≥ startedAt) change/<CR> 디렉터리명 — 문서 열람 연결용. */
+  crIds: string[];
+}
+
+function rtmChangeHistoryDir(projectRoot: string): string {
+  return path.join(projectRoot, ".understand-anything", "rtm-change-history");
+}
+
+function rtmBakedFile(projectRoot: string): string {
+  return path.join(projectRoot, ".understand-anything", "rtm.json");
+}
+
+/** 이 job 이 갱신한 change/<CR> 디렉터리 — mtime ≥ startedAt(1s 여유)로 판정. */
+function rtmChangeCrIds(projectRoot: string, startedAt: string | null): string[] {
+  const base = path.join(projectRoot, ".understand-anything", "change");
+  const startedMs = startedAt ? Date.parse(startedAt) : Number.NaN;
+  try {
+    return fs
+      .readdirSync(base)
+      .filter((n) => /^CR-\d+/.test(n))
+      .filter((n) => {
+        if (Number.isNaN(startedMs)) return true; // 시작 시각 미상이면 배제하지 않음
+        try {
+          return fs.statSync(path.join(base, n)).mtimeMs >= startedMs - 1000;
+        } catch {
+          return false;
+        }
+      })
+      .sort();
+  } catch {
+    return []; // change/ 부재 = 기록 없음
+  }
+}
+
+function readRtmChangeHistory(projectRoot: string): RtmChangeHistoryEntry[] {
+  return readLedger<RtmChangeHistoryEntry>(rtmChangeHistoryDir(projectRoot));
+}
+
+/**
+ * job 종료 시 원장 append. exit 0 이어도 이 job 이 재bake 한 rtm.json 이 없으면(스킬
+ * 미실행 등) 실질 실패로 기록 — impact 의 정직한 노출 규약과 동일. 실패는 로그만.
+ */
+function recordRtmChangeHistory(
+  projectRoot: string,
+  job: ClaudeJobBase & { targetReq: string | null; kind: RtmChangeKind | null; model: string | null },
+): void {
+  try {
+    const jobId = job.jobId;
+    if (!jobId) return;
+    const startedMs = job.startedAt ? Date.parse(job.startedAt) : Number.NaN;
+    const bakedMs = artifactMtimeMs(rtmBakedFile(projectRoot));
+    const fresh = Number.isNaN(startedMs)
+      ? !Number.isNaN(bakedMs) // 시작 시각 미상이면 존재만 요구
+      : !Number.isNaN(bakedMs) && bakedMs >= startedMs - 1000;
+    const entry: RtmChangeHistoryEntry = {
+      jobId,
+      targetReq: job.targetReq ?? "",
+      kind: job.kind ?? "withdraw",
+      model: job.model ?? null,
+      startedAt: job.startedAt,
+      finishedAt: job.finishedAt,
+      exitCode: job.exitCode,
+      status: job.status === "done" && fresh ? "done" : "failed",
+      crIds: rtmChangeCrIds(projectRoot, job.startedAt),
+    };
+    appendLedgerEntry(rtmChangeHistoryDir(projectRoot), entry, RTM_CHANGE_HISTORY_MAX);
+    removePendingMarker(rtmChangeHistoryDir(projectRoot), jobId);
+  } catch (err) {
+    console.error("[understand-anything] Failed to record rtm-change history:", err);
+  }
+}
+
+/** 서버 재시작으로 close 핸들러를 잃은 변경관리 job 복원 — rtm.json mtime 기준. */
+function reconcileRtmChangeHistory(projectRoot: string): void {
+  const ledger = readRtmChangeHistory(projectRoot);
+  reconcilePendingJobs(rtmChangeHistoryDir(projectRoot), {
+    isTracking: (jobId) => rtmChangeTracker.isCurrent(jobId) && rtmChangeTracker.running,
+    isRecorded: (jobId) => ledger.some((e) => e.jobId === jobId),
+    artifactMtimeMs: () => artifactMtimeMs(rtmBakedFile(projectRoot)),
+    record: (pending, fresh, artifactMs) => {
+      recordRtmChangeHistory(projectRoot, {
+        status: fresh ? "done" : "failed",
+        jobId: pending.jobId as string,
+        targetReq: typeof pending.targetReq === "string" ? pending.targetReq : null,
+        kind: pending.kind === "withdraw" ? "withdraw" : null,
+        model: typeof pending.model === "string" ? pending.model : null,
+        startedAt: typeof pending.startedAt === "string" ? pending.startedAt : null,
+        finishedAt: fresh ? new Date(artifactMs).toISOString() : new Date().toISOString(),
+        exitCode: null,
+        tail: "",
+      });
+    },
+  });
+}
+
 /** 변경관리 단일 실행기 — claude -p "/understand-rtm --change ..." 1회. jobId 교체 시 중단. */
 function runRtmChange(
   jobId: string,
   projectRoot: string,
   targetReq: string,
   kind: RtmChangeKind,
+  model: string | null,
 ): void {
-  const prompt = `/understand-rtm --change --target-req ${targetReq} --kind ${kind}${rtmChangeDirective(targetReq, kind)}`;
-  let child: ReturnType<typeof spawn>;
-  try {
-    child = spawn("claude", ["-p", prompt, "--permission-mode", "bypassPermissions"], {
-      cwd: projectRoot,
-      env: process.env,
-    });
-  } catch (err) {
-    if (rtmChangeJob.jobId !== jobId) return;
-    rtmChangeJob.status = "failed";
-    rtmChangeJob.finishedAt = new Date().toISOString();
-    appendRtmChangeTail(`\n[spawn error] ${err instanceof Error ? err.message : String(err)}\n`);
-    return;
-  }
-  child.stdout?.on("data", (c: Buffer) => appendRtmChangeTail(c.toString("utf8")));
-  child.stderr?.on("data", (c: Buffer) => appendRtmChangeTail(c.toString("utf8")));
-  child.on("error", (err) => {
-    if (rtmChangeJob.jobId !== jobId) return;
-    rtmChangeJob.status = "failed";
-    rtmChangeJob.finishedAt = new Date().toISOString();
-    appendRtmChangeTail(`\n[spawn error] ${err.message}\n`);
-  });
-  child.on("close", (code) => {
-    if (rtmChangeJob.jobId !== jobId) return;
-    rtmChangeJob.status = code === 0 ? "done" : "failed";
-    rtmChangeJob.exitCode = code;
-    rtmChangeJob.finishedAt = new Date().toISOString();
+  runClaudeSkill({
+    prompt: `/understand-rtm --change --target-req ${targetReq} --kind ${kind}${rtmChangeDirective(targetReq, kind)}`,
+    cwd: projectRoot,
+    jobId,
+    tracker: rtmChangeTracker,
+    model: model ?? undefined,
+    onErrorSettled: () => recordRtmChangeHistory(projectRoot, rtmChangeTracker.snapshot()),
+    onCloseSettled: () => recordRtmChangeHistory(projectRoot, rtmChangeTracker.snapshot()),
   });
 }
 
@@ -1735,8 +1879,11 @@ function handleRtmChangePost(
   req: import("http").IncomingMessage,
   res: import("http").ServerResponse,
 ): void {
-  if (rtmChangeJob.status === "running") {
-    sendJson(res, 409, { error: "A change request is already running", job: { ...rtmChangeJob } });
+  if (rtmChangeTracker.running) {
+    sendJson(res, 409, {
+      error: "A change request is already running",
+      job: rtmChangeTracker.snapshot(),
+    });
     return;
   }
   const projectRoot = impactProjectRoot();
@@ -1746,13 +1893,14 @@ function handleRtmChangePost(
   }
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
-      let parsed: { targetReq?: unknown; kind?: unknown } = {};
+      let parsed: { targetReq?: unknown; kind?: unknown; model?: unknown } = {};
       try {
         parsed = JSON.parse(body);
       } catch {
         sendJson(res, 400, { error: "Invalid JSON body" });
         return;
       }
+      const model = pickModel(parsed.model);
       const targetReq = typeof parsed.targetReq === "string" ? parsed.targetReq.trim() : "";
       if (!/^REQ-\d+$/.test(targetReq)) {
         sendJson(res, 400, { error: "targetReq (REQ-00N) 형식이 필요합니다." });
@@ -1766,17 +1914,18 @@ function handleRtmChangePost(
         sendJson(res, 400, { error: `요청 ${targetReq} 에 귀속된 요구사항이 추적표에 없습니다.` });
         return;
       }
-      const jobId = crypto.randomBytes(8).toString("hex");
-      rtmChangeJob = {
-        ...RTM_CHANGE_JOB_IDLE,
-        status: "running",
+      const jobId = rtmChangeTracker.begin({ targetReq, kind, model });
+      // WAL: 스폰 전 pending 마커 — 서버 재시작 시 /rtm-change-status 의 reconcile 이
+      // rtm.json mtime 으로 결과를 복원한다(impact 와 동일 규약).
+      writePendingMarker(rtmChangeHistoryDir(projectRoot), {
         jobId,
         targetReq,
         kind,
-        startedAt: new Date().toISOString(),
-      };
-      runRtmChange(jobId, projectRoot, targetReq, kind);
-      sendJson(res, 202, { job: { ...rtmChangeJob } });
+        model,
+        startedAt: rtmChangeTracker.job.startedAt,
+      });
+      runRtmChange(jobId, projectRoot, targetReq, kind, model);
+      sendJson(res, 202, { job: rtmChangeTracker.snapshot() });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
@@ -1786,7 +1935,8 @@ export default defineConfig({
     environment: "node",
     // Collect ALL test files under src (not only those in __tests__/), so ktds
     // views (src/ktds/*.test.ts) are not silently skipped by the gate.
-    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    // server/ 는 dev-server 전용 노드 모듈(claude 헤드리스 잡 실행기) 테스트.
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx", "server/**/*.test.ts"],
   },
 
   // FIX 1 — bind only to localhost, not 0.0.0.0
@@ -1881,6 +2031,8 @@ export default defineConfig({
             pathname === "/doc-xlsx" ||
             pathname === "/impact-analyze" ||
             pathname === "/impact-status" ||
+            pathname === "/impact-history" ||
+            pathname === "/impact-history-item" ||
             pathname === "/rtm.json" ||
             pathname === "/rtm-overrides.json" ||
             pathname === "/rtm-override" ||
@@ -2061,7 +2213,35 @@ export default defineConfig({
             return;
           }
           if (pathname === "/impact-status") {
-            sendJson(res, 200, { job: { ...impactJob } });
+            sendJson(res, 200, { job: impactTracker.snapshot() });
+            return;
+          }
+          // ktds(WT-E): 영향 분석 히스토리 — 원장 목록 + 스냅샷 열람(읽기 전용).
+          if (pathname === "/impact-history") {
+            const historyRoot = impactProjectRoot();
+            if (historyRoot) reconcileImpactHistory(historyRoot); // 재시작으로 잃은 job 복원
+            sendJson(res, 200, { entries: historyRoot ? readImpactHistory(historyRoot) : [] });
+            return;
+          }
+          if (pathname === "/impact-history-item") {
+            const historyRoot = impactProjectRoot();
+            const id = url.searchParams.get("id") ?? "";
+            const name = url.searchParams.get("name") ?? "impact.json";
+            // jobId 는 crypto.randomBytes(8).hex = 16자 소문자 hex — 경로 조작 원천 차단.
+            if (!historyRoot || !/^[0-9a-f]{16}$/.test(id) || !IMPACT_SNAPSHOT_FILES.has(name)) {
+              sendJson(res, 400, { error: "Invalid snapshot id or name" });
+              return;
+            }
+            const snapFile = path.join(impactHistoryDir(historyRoot), id, name);
+            if (!fs.existsSync(snapFile)) {
+              sendJson(res, 404, { error: "Snapshot not found" });
+              return;
+            }
+            try {
+              sendJson(res, 200, JSON.parse(fs.readFileSync(snapFile, "utf-8")));
+            } catch {
+              sendJson(res, 500, { error: "Failed to read snapshot" });
+            }
             return;
           }
           if (pathname === "/rtm-intake") {
@@ -2071,12 +2251,12 @@ export default defineConfig({
           }
           if (pathname === "/rtm-intake-status") {
             const qSid = url.searchParams.get("sid");
-            const sid = qSid ?? rtmJob.sid;
+            const sid = qSid ?? rtmTracker.job.sid;
             let session = sid ? readRtmSession(sid) : null;
             // 명시 sid 없이 조회(로드 시) + 인메모리 job 도 없으면 디스크에서 최근 활성 세션 복구.
             if (!session && !qSid) session = latestRtmSession();
             sendJson(res, 200, {
-              job: { ...rtmJob },
+              job: rtmTracker.snapshot(),
               session,
               docs: session ? listRtmSessionDocs(session.sid) : [],
             });
@@ -2088,7 +2268,12 @@ export default defineConfig({
             return;
           }
           if (pathname === "/rtm-change-status") {
-            sendJson(res, 200, { job: { ...rtmChangeJob } });
+            const historyRoot = impactProjectRoot();
+            if (historyRoot) reconcileRtmChangeHistory(historyRoot); // 재시작으로 잃은 job 복원
+            sendJson(res, 200, {
+              job: rtmChangeTracker.snapshot(),
+              history: historyRoot ? readRtmChangeHistory(historyRoot) : [],
+            });
             return;
           }
           if (pathname === "/rtm-intake-confirm") {

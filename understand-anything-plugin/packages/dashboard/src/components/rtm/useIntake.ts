@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { CIRCLED, STEP_DOC_KIND } from "./types";
 import type { RtmSession, SessionDoc } from "./types";
+import type { ModelChoice } from "../ModelSelect";
 
 interface Identified { requirements?: { id: string; category: string; name: string; priority?: string; derivedFrom?: string | null }[]; questions?: string[]; request?: { id: string; name: string } }
 
@@ -19,6 +20,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [intakeQuery, setIntakeQuery] = useState("");
   const [targetStep, setTargetStep] = useState(5);
+  const [intakeModel, setIntakeModel] = useState<ModelChoice>(""); // "" = 세션 모델(기본)
   const [intakeStatus, setIntakeStatus] = useState<"idle" | "running" | "done" | "failed">("idle");
   const [intakeError, setIntakeError] = useState<string | null>(null);
   const [sid, setSid] = useState<string | null>(null);
@@ -39,26 +41,26 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     if (!accessToken) { setIntakeError("읽기전용(라이브 서버 없음) — 인테이크는 dev 서버가 필요합니다."); return; }
     setIntakeError(null);
     try {
-      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ request: q, targetStep }) });
+      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(intakeModel ? { request: q, targetStep, model: intakeModel } : { request: q, targetStep }) });
       const d = (await res.json().catch(() => null)) as { job?: { sid?: string }; session?: RtmSession; error?: string } | null;
       if (res.status === 202 && d?.session) {
         setSid(d.session.sid); setSession(d.session); setIntakeStatus("running");
         setIntakeOpen(false); setIntakeQuery(""); setPreviewName(null); setIdentified(null);
       } else { setIntakeError(d?.error ?? `HTTP ${res.status}`); }
     } catch (e) { setIntakeError(String(e)); }
-  }, [intakeQuery, targetStep, accessToken]);
+  }, [intakeQuery, targetStep, intakeModel, accessToken]);
 
   // start..target 진행(다음 단계 / ⑤까지). 컨펌 게이트 미통과면 409 토스트.
   const advance = useCallback(async (toStep: number) => {
     if (!sid || !accessToken) return;
     setStepBusy(true);
     try {
-      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid, targetStep: toStep }) });
+      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(intakeModel ? { sid, targetStep: toStep, model: intakeModel } : { sid, targetStep: toStep }) });
       const d = (await res.json().catch(() => null)) as { session?: RtmSession; error?: string } | null;
       if (res.status === 202 && d?.session) { setSession(d.session); setIntakeStatus("running"); setPreviewName(null); }
       else setToast({ kind: "failed", msg: d?.error ?? `진행 실패: HTTP ${res.status}` });
     } catch (e) { setToast({ kind: "failed", msg: String(e) }); } finally { setStepBusy(false); }
-  }, [sid, accessToken, setToast]);
+  }, [sid, accessToken, intakeModel, setToast]);
 
   const confirmStep = useCallback(async (step: number) => {
     if (!sid || !accessToken) return;
@@ -170,6 +172,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
 
   return {
     intakeOpen, setIntakeOpen, intakeQuery, setIntakeQuery, targetStep, setTargetStep,
+    intakeModel, setIntakeModel,
     intakeStatus, intakeError, setIntakeError, sid, session, sessionDocs, stepBusy, viewStep, setViewStep,
     previewName, previewMd, identified, editingDoc, setEditingDoc, draftDoc, setDraftDoc,
     startIntake, advance, confirmStep, saveDoc, discardSession, loadPreview,

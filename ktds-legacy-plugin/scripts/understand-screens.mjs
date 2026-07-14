@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 /**
  * /understand-screens CLI 오케스트레이터 — 화면설계서 파이프라인.
- * 사용: node understand-screens.mjs <projectRoot> [capture|validate|status]
+ * 사용: node understand-screens.mjs <projectRoot> [capture|fill-prep|fill-audit|fill-merge|validate|status]
  *
- *  capture  : Stage A 결정론 캡처(러너 위임 — 앱 기동/크롤/시나리오/screens.json).
- *  validate : Stage B 이후 게이트 — 스키마/mechanicalHash 불변/CONFIRMED⇒근거/채움률.
- *  status   : 화면 수·확정율·미채움·미매핑 요약(한국어, 기본값).
+ *  capture    : Stage A 결정론 캡처(러너 위임 — 앱 기동/크롤/시나리오/screens.json).
+ *  fill-prep  : Stage B 대규모 팬아웃용 청크 준비 — screens.json 을 화면 N개 자립
+ *               청크로 분해(+핸들러 사전 pre-cite 동봉, .spec/map/screens-fill-prep/).
+ *  fill-audit : 팬아웃 조각(screens-fill-frag) 완결성 감사 — 순수 JSON 1줄(기계 소비).
+ *  fill-merge : 조각의 채움 필드만 screens.json 본체에 병합 + validate 재게이트.
+ *  validate   : Stage B 이후 게이트 — 스키마/mechanicalHash 불변/CONFIRMED⇒근거/채움률.
+ *  status     : 화면 수·확정율·미채움·미매핑 요약(한국어, 기본값).
  */
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
@@ -24,6 +28,18 @@ if (!existsSync(distEntry)) {
 
 const projectRoot = process.argv[2] || process.cwd()
 const command = process.argv[3] || 'status'
+// 알 수 없는 모드는 거부한다 — 조용히 status 로 떨어지면 오타(예: fill-merg)가 무해한 요약
+// 출력으로 위장돼 단계 누락을 눈치채지 못한다(policy 쪽 1단계 폴스루 사고와 동일 계열).
+const KNOWN_COMMANDS = ['capture', 'fill-prep', 'fill-audit', 'fill-merge', 'validate', 'status']
+if (!KNOWN_COMMANDS.includes(command)) {
+  console.error(`알 수 없는 모드: ${command} — 사용 가능: ${KNOWN_COMMANDS.join(' | ')}`)
+  process.exit(2)
+}
+const flags = process.argv.slice(4)
+function flagValue(name) {
+  const i = flags.indexOf(name)
+  return i >= 0 && i + 1 < flags.length ? flags[i + 1] : null
+}
 const engine = await import(distEntry)
 const { validateScreensFile, reconcileJsps, listJspFilesFromGraph, SCREENS_FILENAME } = engine
 const screensPath = join(projectRoot, '.understand-anything', SCREENS_FILENAME)
@@ -60,6 +76,102 @@ try {
 } catch (err) {
   console.error(`screens.json 파싱 실패: ${err.message}`)
   process.exit(2)
+}
+
+// ── Stage B 팬아웃 서브커맨드(대규모 채움) ─────────────────────────────────
+// fill-audit 는 순수 JSON 1줄만 출력한다(Workflow 감사 에이전트가 verbatim 소비).
+if (command === 'fill-prep') {
+  const { prepScreenFill, DEFAULT_CHUNK_SCREENS } = engine
+  const raw = flagValue('--chunk-screens')
+  const chunkScreens = raw ? Number.parseInt(raw, 10) : DEFAULT_CHUNK_SCREENS
+  if (!Number.isInteger(chunkScreens) || chunkScreens < 1) {
+    console.error(`--chunk-screens 값이 잘못됐습니다: ${raw} (1 이상 정수)`)
+    process.exit(2)
+  }
+  let index
+  try {
+    ;({ index } = await prepScreenFill(projectRoot, { chunkScreens }))
+  } catch (err) {
+    console.error(`fill-prep 실패: ${err.message}`)
+    process.exit(2)
+  }
+  const t = index.totals
+  console.log(`화면 채움 팬아웃 청크 준비 완료 — ${projectRoot}`)
+  console.log(`  화면 ${t.screens}개 → 청크 ${t.chunks}개 (청크당 화면 ${index.chunkScreens}개)`)
+  console.log(`  주석 ${t.annotations}건`)
+  if (t.handlerPreCiteMissing > 0) {
+    console.log(
+      `  ⚠️ 핸들러 pre-cite 미확보 ${t.handlerPreCiteMissing}건 — 해당 핸들러는 에이전트가 슬라이스에서 직접 인용해야 합니다(실패 시 신뢰도 강등).`,
+    )
+  }
+  console.log('  산출물: .spec/map/screens-fill-prep/<chunkId>.json + index.json')
+  console.log('')
+  console.log('다음 단계(팬아웃): Workflow 도구로 scripts/screens-fill-fanout.workflow.js 실행')
+  console.log('  (청크 id 목록은 screens-fill-prep/index.json 의 chunks[].chunkId)')
+  console.log('  에이전트가 screens-fill-frag/<chunkId>.json 을 쓰면: fill-audit(감사) → fill-merge(병합) → validate')
+  process.exit(0)
+}
+
+if (command === 'fill-audit') {
+  const { auditScreenFillFragments } = engine
+  const chunkFlag = flagValue('--chunk')
+  const only = chunkFlag ? chunkFlag.split(',').map((s) => s.trim()).filter(Boolean) : undefined
+  let audit
+  try {
+    audit = await auditScreenFillFragments(projectRoot, only)
+  } catch (err) {
+    console.error(`fill-audit 실패: ${err.message}`)
+    process.exit(2)
+  }
+  console.log(JSON.stringify(audit))
+  process.exit(0)
+}
+
+if (command === 'fill-merge') {
+  const { mergeScreenFillFragments } = engine
+  let result
+  try {
+    result = await mergeScreenFillFragments(projectRoot)
+  } catch (err) {
+    console.error(`fill-merge 실패: ${err.message}`)
+    process.exit(2)
+  }
+  const pct = (x) => (x === null ? '-' : `${Math.round(x * 100)}%`)
+  console.log(`화면 채움 조각 병합 완료 — ${projectRoot}`)
+  console.log(`  채움 반영 화면 ${result.screensFilled}개`)
+  if (result.missingScreens.length > 0) {
+    console.log(
+      `  ⚠️ 미반영 화면 ${result.missingScreens.length}개(완결 조각 없음 — 부분 병합): ${result.missingScreens.join(', ')}`,
+    )
+  }
+  if (result.droppedItems > 0) {
+    console.log(`  ⚠️ 청크 선언 밖 화면/주석 항목 ${result.droppedItems}건 버림(유령 id — 조용한 수용 금지).`)
+  }
+  if (result.citationsRemoved > 0 || result.handlersDemoted > 0) {
+    console.log(
+      `  ⚠️ 인용 진위 검증: 실파일 불일치 evidence ${result.citationsRemoved}건 제거` +
+        `, 근거 0 → INFERRED 강등 handler ${result.handlersDemoted}건(fail-closed).`,
+    )
+  }
+  const st = result.validation.stats
+  if (st) {
+    console.log(
+      `  검증: 화면 ${st.screenCount} / 주석 ${st.annotationCount} / 확정율 ${pct(st.confirmedActionRate)} / 설명 채움률 ${pct(st.descriptionRate)} / JSP 매핑률 ${pct(st.jspMappedRate)}`,
+    )
+  }
+  if (result.validation.issues.length > 0) {
+    console.log(`  ⚠️ 검증 이슈 ${result.validation.issues.length}건:`)
+    for (const i of result.validation.issues) {
+      console.log(`    - [${i.code}]${i.screenId ? ` ${i.screenId}` : ''} ${i.message}`)
+    }
+  }
+  if (result.unmatchedJsps.length > 0) {
+    console.log(`  미매핑 JSP ${result.unmatchedJsps.length}건: ${result.unmatchedJsps.join(', ')}`)
+  }
+  console.log('')
+  console.log(`  산출물: ${result.screensPath}`)
+  console.log('다음 단계: validate (게이트 재확인) → /understand-dashboard 화면설계서 탭 열람.')
+  process.exit(result.validation.ok ? 0 : 1)
 }
 
 const v = validateScreensFile(file)

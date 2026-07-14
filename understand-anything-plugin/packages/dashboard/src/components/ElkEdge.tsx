@@ -199,13 +199,16 @@ export default function ElkEdge({
                 transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
                 pointerEvents: "none",
                 zIndex: 1000,
-                fontSize: 10.5,
+                // 분기 라벨(성공/실패 등)은 업무 판독의 핵심 — 본문급 대비로 올린다
+                // (PM/PL 리뷰: 축소 시 가장 먼저 사라지던 요소).
+                fontSize: 11.5,
                 fontWeight: 700,
-                color: "var(--color-text-secondary)",
+                color: "var(--color-text-primary)",
                 background: "var(--color-panel)",
-                border: "1px solid var(--color-border-subtle)",
-                borderRadius: 5,
-                padding: "1px 6px",
+                border: "1px solid var(--color-border-medium)",
+                borderRadius: 6,
+                padding: "2px 8px",
+                boxShadow: "0 1px 2px rgba(26,27,31,.06)",
                 whiteSpace: "nowrap",
               }}
             >

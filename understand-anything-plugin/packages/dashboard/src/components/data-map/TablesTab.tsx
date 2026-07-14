@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { Link, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
 import { Badge } from "../proto/Proto";
-import RowSample from "./RowSample";
+import RowSample, { ROW_SAMPLE_MAX } from "./RowSample";
 import { baseName, isPk, len } from "./types";
 import type { DbColumn, DbSchema, DbTable } from "./types";
 
@@ -143,7 +143,6 @@ export function TableDetail({
   highlightCols,
   knownTables,
   onSelectTable,
-  onSeeCrud,
   fixedColumns = true,
 }: {
   table: DbTable;
@@ -152,7 +151,6 @@ export function TableDetail({
   /** 소문자 테이블명 → 실제 테이블명 — FK 참조 대상 존재 확인·이동용. */
   knownTables: Map<string, string>;
   onSelectTable: (name: string) => void;
-  onSeeCrud: () => void;
   fixedColumns?: boolean;
 }) {
   const rows = table.rowCount || table.rows.length;
@@ -268,21 +266,6 @@ export function TableDetail({
           {rows > 0 && <Chip>행 데이터 {rows}행 실측</Chip>}
         </div>
 
-        <div className="text-text-muted" style={{ fontSize: 12, marginTop: 10 }}>
-          사용처:{" "}
-          <button
-            type="button"
-            onClick={onSeeCrud}
-            className="cursor-pointer bg-transparent border-0 font-inherit"
-            style={{ color: "var(--color-status-info)", padding: 0, font: "inherit" }}
-          >
-            CRUD 매트릭스에서 보기
-          </button>{" "}
-          ·{" "}
-          <Link to="/structure" style={{ color: "var(--color-status-info)" }}>
-            구조 그래프
-          </Link>
-        </div>
       </div>
 
       {/* 행 데이터 샘플 — 테이블 표와 분리된 별도 카드, 근거는 표 카드와 동일하게 우측 상단 */}
@@ -292,9 +275,9 @@ export function TableDetail({
             <b className="text-text-primary" style={{ fontSize: 13 }}>
               행 데이터 샘플
             </b>
-            {table.rowCount > Math.min(table.rows.length, 5) && (
+            {table.rowCount > Math.min(table.rows.length, ROW_SAMPLE_MAX) && (
               <span className="text-text-muted" style={{ fontSize: 11.5 }}>
-                총 {table.rowCount}행 중 {Math.min(table.rows.length, 5)}행 표시
+                총 {table.rowCount}행 중 {Math.min(table.rows.length, ROW_SAMPLE_MAX)}행 표시
               </span>
             )}
             <div className="flex-1" />
@@ -383,13 +366,6 @@ export default function TablesTab({ schema }: { schema: DbSchema }) {
           onSelectTable={(name) =>
             setSearchParams((prev) => {
               prev.set("table", name);
-              return prev;
-            })
-          }
-          onSeeCrud={() =>
-            setSearchParams((prev) => {
-              prev.set("tab", "crud");
-              prev.set("crudTable", selected.name);
               return prev;
             })
           }

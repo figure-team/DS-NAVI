@@ -2,13 +2,16 @@ import { Ev } from "../proto/Proto";
 import { baseName } from "./types";
 import type { DbTable } from "./types";
 
+/** 행 샘플 기본 표시 상한 — 테이블 상세 헤더의 "총 N행 중 n행 표시" 문구와 공유. */
+export const ROW_SAMPLE_MAX = 3;
+
 /**
  * dataload 실측 행 샘플(최대 max행) — 코드 탭 카드·테이블 상세에서 공용.
  * showEvidence=false 면 하단 근거 표기를 생략(테이블 탭은 카드 헤더 우측에 클릭형 근거를 둔다).
  */
 export default function RowSample({
   table,
-  max = 5,
+  max = ROW_SAMPLE_MAX,
   showEvidence = true,
 }: {
   table: DbTable;

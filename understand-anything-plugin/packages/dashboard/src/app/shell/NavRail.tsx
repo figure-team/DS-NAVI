@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 import { ThemePicker } from "../../components/ThemePicker";
@@ -23,35 +23,26 @@ interface Props {
  */
 export default function NavRail({ onShowKeyboardHelp }: Props) {
   const graph = useDashboardStore((s) => s.graph);
-  const isKnowledgeGraph = useDashboardStore((s) => s.isKnowledgeGraph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const wikiGraph = useDashboardStore((s) => s.wikiGraph);
   const { t } = useI18n();
+  const { pathname } = useLocation();
 
-  // 프로토(pmpl-proto) 그룹·순서 — 이해(업무 지도·구조·데이터·화면설계서) /
+  // 프로토(pmpl-proto) 그룹·순서 — 이해(업무 지도[구성도+구조 탭]·데이터·화면설계서) /
   // 요구·변경(추적표·변경·영향) / 정량·보고(프로그램·품질·위험·보고서) /
-  // 정책·산출·참고(정책서·산출물·문서). 메뉴 개편 2차: 신설 6메뉴 포함 전체.
+  // 정책·산출(정책서·산출물). 메뉴 병합(2026-07-14): 구조 메뉴는 업무 지도 안
+  // 탭으로 흡수 — /structure 경로에서도 업무 지도 항목이 활성(아래 forceActive).
   const items: NavItem[] = [{ to: "/", label: "홈", icon: iconHome }];
-  if (graph && isKnowledgeGraph) {
-    items.push({ to: "/knowledge", label: "지식그래프", icon: iconDomain });
-  } else if (graph) {
+  if (graph) {
     if (domainGraph) items.push({ to: "/domains", label: t.drawer.domain, icon: iconDomain, group: "이해" });
-    items.push({
-      to: "/structure",
-      label: t.drawer.structural,
-      icon: iconStructure,
-      group: domainGraph ? undefined : "이해",
-    });
-    items.push({ to: "/data", label: "데이터", icon: iconData });
+    items.push({ to: "/data", label: "데이터", icon: iconData, group: domainGraph ? undefined : "이해" });
     items.push({ to: "/screens", label: "화면설계서", icon: iconScreens });
     items.push({ to: "/rtm", label: "추적표", icon: iconRtm, group: "요구 · 변경" });
     items.push({ to: "/change", label: "변경·영향", icon: iconChange });
     items.push({ to: "/programs", label: "프로그램", icon: iconPrograms, group: "정량 · 보고" });
     items.push({ to: "/quality", label: "품질·위험", icon: iconQuality });
     items.push({ to: "/report", label: "보고서", icon: iconReport });
-    items.push({ to: "/policy", label: "정책서", icon: iconPolicy, group: "정책 · 산출 · 참고" });
+    items.push({ to: "/policy", label: "정책서", icon: iconPolicy, group: "정책 · 산출" });
     items.push({ to: "/deliverables", label: "산출물", icon: iconDocs });
-    if (wikiGraph) items.push({ to: "/wiki", label: "문서", icon: iconWiki });
   }
 
   return (
@@ -59,7 +50,10 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
       <div className="flex items-baseline gap-1.5 px-2.5 pt-1 pb-4">
         <span className="text-[17px] font-bold text-text-primary tracking-[-0.2px]">DS-NAVI</span>
       </div>
-      {items.map((item) => (
+      {items.map((item) => {
+        // 메뉴 병합: 구조 탭(/structure)은 업무 지도 메뉴 소속 — 레일 활성도 승계.
+        const forceActive = item.to === "/domains" && pathname.startsWith("/structure");
+        return (
         <div key={item.to} className="contents">
           {item.group && (
             <div
@@ -74,7 +68,7 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
           end={item.to === "/"}
           className={({ isActive }) =>
             `relative flex items-center gap-2.5 px-3 py-[9px] my-px rounded-lg text-sm transition-colors ${
-              isActive
+              isActive || forceActive
                 ? "bg-elevated text-text-primary font-semibold"
                 : "font-medium text-text-secondary hover:text-text-primary hover:bg-elevated"
             }`
@@ -82,10 +76,10 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
         >
           {({ isActive }) => (
             <>
-              {isActive && (
+              {(isActive || forceActive) && (
                 <span className="absolute -left-2.5 top-2 bottom-2 w-[3px] rounded-r bg-accent" />
               )}
-              <span className={`w-[17px] h-[17px] shrink-0 ${isActive ? "text-accent" : ""}`}>
+              <span className={`w-[17px] h-[17px] shrink-0 ${isActive || forceActive ? "text-accent" : ""}`}>
                 {item.icon}
               </span>
               {item.label}
@@ -93,7 +87,8 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
           )}
         </NavLink>
         </div>
-      ))}
+        );
+      })}
       <div className="flex-1" />
       {/* 하단 유틸 — 시안: border-t 위에 테마·단축키 도움말. */}
       <div className="border-t border-border-subtle pt-2 mt-2 flex flex-col gap-0.5">
@@ -134,14 +129,6 @@ const iconDomain = (
     <path d="M9 9.5 11 14M15 9.5 13 14" />
   </svg>
 );
-const iconStructure = (
-  <svg {...svgProps}>
-    <rect x="3" y="3" width="7" height="7" rx="1.5" />
-    <rect x="14" y="3" width="7" height="7" rx="1.5" />
-    <rect x="8.5" y="14" width="7" height="7" rx="1.5" />
-    <path d="M6.5 10v2.5h5.5M17.5 10v2.5h-5.5" />
-  </svg>
-);
 const iconRtm = (
   <svg {...svgProps}>
     <path d="M4 5h16M4 12h16M4 19h10" />
@@ -159,12 +146,6 @@ const iconScreens = (
     <rect x="3" y="4" width="18" height="12" rx="1.8" />
     <path d="M9 20h6M12 16v4" />
     <circle cx="7" cy="8" r="1.1" fill="currentColor" stroke="none" />
-  </svg>
-);
-const iconWiki = (
-  <svg {...svgProps}>
-    <path d="M4 5a2.5 2.5 0 0 1 2.5-2.5H20V19H6.5A2.5 2.5 0 0 0 4 21.5z" />
-    <path d="M4 19a2.5 2.5 0 0 1 2.5-2.5H20" />
   </svg>
 );
 // 신설 6메뉴 아이콘 — pmpl-proto nav SVG 그대로.

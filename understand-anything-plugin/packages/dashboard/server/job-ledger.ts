@@ -8,7 +8,7 @@ import fs from "fs";
 import path from "path";
 
 /** 산출물이 아직이면 고아 claude 가 돌고 있을 수 있어 실패 판정을 미루는 유예. */
-const RECONCILE_GRACE_MS = 30 * 60 * 1000;
+export const RECONCILE_GRACE_MS = 30 * 60 * 1000;
 /** 파일시스템 mtime 해상도 여유 — startedAt 직후 갱신된 산출물을 배제하지 않는다. */
 const MTIME_SLACK_MS = 1000;
 

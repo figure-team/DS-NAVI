@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import DomainMapView from "../../components/DomainMapView"; // ktds-fork: 도메인 지도 (화면 1)
 import WorkMapTabs from "../../components/WorkMapTabs"; // 메뉴 병합: 시스템 구성도/구조 탭
-import FlowListView from "../../components/FlowListView"; // ktds-fork: 기능 목록 + 인라인 스파인 (화면 2)
+import FlatWorkspaceView from "../../components/FlatWorkspaceView"; // 평면(그룹 미구성) 워크스페이스 — 트리 통일
 import GroupWorkspaceView from "../../components/GroupWorkspaceView"; // DOMAIN_HIERARCHY §7: 그룹 워크스페이스
 import StructureBreadcrumb, {
   type StructureCrumb,
@@ -193,7 +193,9 @@ export default function DomainsPage() {
           />
           <div className="flex-1 min-h-0 relative">
             {resolved.kind === "landing" && <DomainMapView worksExpanded={worksExpanded} />}
-            {resolved.kind === "flat" && (activeDomainId ? <FlowListView /> : null)}
+            {resolved.kind === "flat" && activeDomainId && (
+              <FlatWorkspaceView domainId={resolved.domainId} />
+            )}
             {resolved.kind === "group" && (
               <GroupWorkspaceView group={resolved.group} selectedDomainId={resolved.domainId} />
             )}

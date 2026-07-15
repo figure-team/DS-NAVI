@@ -1330,11 +1330,32 @@ function reconcileImpactHistory(projectRoot: string): void {
 // 영속, 인메모리 rtmTracker 는 실행 추적(409 차단). 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §5.
 const RTM_STEP_MIN = 1;
 const RTM_STEP_MAX = 5;
-function rtmStepDirective(step: number): string {
+/**
+ * ①식별 전용 근거 계약 — 여기 주입 컨텍스트가 **0바이트**여서 인테이크가 근거 없이 설계를 지어내고
+ * 있었다(RTM_IMPACT_GATE_DESIGN.md §1.1 "주입 컨텍스트 0바이트"). 번들 **경로와 계약**만 싣는다:
+ * 번들 *생성*은 SKILL 이 `rtm-intake.mjs intake-input` 으로 한다(§9 P5 — next-req/validate 와 같은
+ * 관례. 대시보드는 claude 만 spawn 하고 플러그인 스크립트를 직접 부르지 않으며 CLAUDE_PLUGIN_ROOT 를
+ * 해석하지도 않는다). 여기서 경로를 못 박는 이유는 LLM 이 번들을 **건너뛰고** rtm.json 을 직접 읽는
+ * 이탈을 막기 위해서다 — 그게 정확히 고치려는 결함이다.
+ */
+function rtmIdentifyGroundingDirective(sid: string): string {
+  return (
+    ` ①식별의 근거 입력은 **근거 번들**이다: \`.understand-anything/rtm-intake/${sid}/intake-input.json\`. ` +
+    `SKILL.md §B --step 1 의 1번 지침대로 \`rtm-intake.mjs intake-input … --session ${sid}\` 로 **먼저 생성**한 뒤 ` +
+    `그 파일을 읽어라(최소집합 부재면 exit 2 로 차단된다 — 그러면 보고하고 멈춰라). ` +
+    `**이 번들이 판단 입력의 전부다** — domain-graph.json·screens.json·정책서 원문을 직접 읽지 마라. ` +
+    `**인용은 생산하지 말고 번들의 pre-cite 를 verbatim 복사**해 AC·changeset 의 \`evidence\` 에 채워라. ` +
+    `근거가 없으면 CONFIRMED 를 쓰지 마라(\`evidence: []\` + CONFIRMED 는 검증기가 막는다). ` +
+    `화면·정책 축이 번들에 있으면 \`screenRefs\`/\`policyRefs\` 로 귀속하고, 축이 생략됐거나(\`reducedMode\`) ` +
+    `커밋이 어긋나면(\`commits.consistent:false\`) 그 축에 의존하는 결론은 [추정]으로 강등하라.`
+  );
+}
+function rtmStepDirective(step: number, sid: string): string {
   return headlessDirective(
     `위 작업은 대시보드 추적표에서 자동 실행된 헤드리스 단계 ${step} 이다.`,
     ` SKILL.md §B 의 --step ${step} 지침만 끝까지 수행한 뒤 보고하고 멈춰라. 다음 단계는 사용자 컨펌 후 별도로 ` +
-      `진행된다. 신규는 전부 [추정]이며 확정은 사람이 대시보드에서 한다.`,
+      `진행된다. 신규는 전부 [추정]이며 확정은 사람이 대시보드에서 한다.` +
+      (step === RTM_STEP_MIN ? rtmIdentifyGroundingDirective(sid) : ""),
   );
 }
 
@@ -1461,7 +1482,7 @@ function runRtmSteps(
     setStepStatus(k, "running");
     const requestArg = k === RTM_STEP_MIN ? ` --request "${reqArg}"` : "";
     runClaudeSkill({
-      prompt: `/understand-rtm --intake --session ${sid} --step ${k}${requestArg}${rtmStepDirective(k)}`,
+      prompt: `/understand-rtm --intake --session ${sid} --step ${k}${requestArg}${rtmStepDirective(k, sid)}`,
       cwd: projectRoot,
       jobId,
       tracker: rtmTracker,

@@ -44,6 +44,8 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
 ### 0) 전제 · 세션
 - `.understand-anything/rtm.json` 이 있어야 한다(없으면 §A 를 먼저 안내하고 멈춤). 이게 현재 **도메인/기능
   인벤토리 + 기존 요구사항**의 단일 소스다.
+  ※ **①식별은 rtm.json 을 직접 읽지 않는다** — `intake-input` 근거 번들(§`--step 1`.1)이 rtm.json 을 포함한
+  6축을 요청에 맞게 필터해 준다. 최소집합(도메인·데이터·추적표) 부재는 그 CLI 가 exit 2 로 차단한다.
 - 세션 디렉터리: **`.understand-anything/rtm-intake/<sid>/`** (없으면 만든다). 단계 산출물을 여기에 쌓는다.
 - 누적 중간산출: **`identified.json`** (2계층: `request` + `requirements[]` + `questions[]`). 단계마다 보강한다.
 - 템플릿 로드: 프로젝트 override `.understand-anything/templates/requirements/0X_*.md` → 없으면 플러그인
@@ -61,33 +63,81 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
       "spec": { "details": [], "inputs": "", "outputs": "", "flow": "",
                 "preceding": [], "exceptions": [], "acceptance": [], "verify": "" }, // ④ 명세서에서 보강
       "acceptanceCriteria": [ { "id": "AC-1", "text": "...", "kind": "rule",
-                                "fnIds": ["to-be:auth/naver-callback"], "confidence": "INFERRED", "tests": [] } ],
-      "changeset": { "added": [], "modified": [], "removed": [], "revived": [] } }
+                                "fnIds": ["to-be:auth/naver-callback"], "confidence": "INFERRED", "tests": [],
+                                // ↓ ① 근거 축 — 번들 pre-cite 를 verbatim 복사(생산 금지)
+                                "evidence": [ { "file": "src/…/AccountActionBean.java", "line": 149, "snippet": "@DefaultHandler" } ],
+                                "screenRefs": [ { "screenId": "screen:actions/Account.action__signonForm", "annotationNo": 2, "note": "" } ],
+                                "policyRefs": [ { "doc": "policy-domain-account.md", "section": "8", "ruleId": null, "note": "" } ] } ],
+      "changeset": { "added": [], "modified": [], "removed": [], "revived": [],
+                     "evidence": [] },         // 이 묶음 도출의 근거(pre-cite 복사)
+      "screenRefs": [], "policyRefs": [] }     // 요구사항 단위 화면·정책 귀속(AC 단위와 둘 다 가능)
   ],
   "questions": []                               // ① [확인필요]
 }
 ```
 규약: priority 는 `HIGH|MEDIUM|LOW`(렌더 시 상/중/하). 신규(TO-BE)는 전부 `[추정]`(INFERRED) — `[확정]` 불가.
 `AC.fnIds` 는 그 요구사항 `changeset` 에 등장한 기능과 일치(유령 매핑 금지). 시험결과·고객검수는 인테이크가 안 적는다.
+**근거↔신뢰도 불변식**: `evidence: []`(명시적 빈 배열) + `CONFIRMED` 는 `uncited-confirmed` **error** 다.
+근거가 있으면 싣고, 없으면 `INFERRED` 로 둔다 — 둘 중 하나이지 "근거 없는 확정"은 없다.
 
 ### --step 1 식별 (요청 → 요구사항 분해)
 0. **요청ID 부여**: `node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs next-req <projectRoot>` 로 충돌 없는 다음
    `REQ-00N` 을 받아 `request.id` 로 쓴다. (요청ID는 요구사항 id 가 아니라 `source.section` 에만 존재할 수 있으므로
    요구사항 id 만 보고 번호를 매기면 충돌한다 — 반드시 이 명령으로 받는다.)
-1. `rtm.json` 의 `domains[]`/`functions[]`/`requirements[]` 와 기존 목록표(있으면)를 읽어 인벤토리·번호를 파악.
-2. 요청을 **요구사항(SFR/SIR/DAR/SER…)으로 분해**한다. 기능 본체(SFR) + 파생(API연계 SIR / 데이터 DAR / 보안 SER 등).
+1. **근거 번들 생성 · 로드 (필수 — 이게 판단 입력의 전부다)**
+   ```
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs intake-input <projectRoot> --request "<원문>" --session <sid>
+   ```
+   → `<세션>/intake-input.json` 이 생긴다. **이 파일을 읽어** 인벤토리·번호를 파악한다. 분석 산출물 6축
+   (도메인·스키마·CRUD·추적표·화면·정책)을 요청 원문으로 사전 필터한 **유계 요약**이다.
+   - **전 소스를 직접 읽지 마라** — `domain-graph.json`·`screens.json`·정책서 원문은 수백 KB다. 번들이
+     이미 요약·인용해 뒀다(`understand-map/SKILL.md:82` 와 동일 계약).
+   - 최소집합(도메인·데이터·추적표) 부재면 이 명령이 **exit 2 로 차단**한다 → §A 를 안내하고 멈춘다.
+
+   **번들 읽는 법:**
+   - `axes.{domain, data.schema, data.crud, rtm, screens, policy}` — 축별 선정 항목.
+   - `axes.*.evidence{rate,cited,total}` · `items[].rowCount` — **0건은 "없음"이 아니라 "못 봄"이다.**
+     예: `policy-authz.md` 행 0건은 "권한 통제가 없다"가 **아니라** 스캐너가 못 본 것이다.
+     빈 산출물을 근거로 "통제 없음"류 결론을 내지 마라.
+   - `warnings[]` · `omitted[]` · `filter.fallbacks[]` — 정직한 생략 보고. 읽고 판단에 반영한다.
+2. **★ 인용은 생산하지 않는다 — 번들의 pre-cite 를 verbatim 복사한다.**
+   번들의 인용(`axes.domain.items[].claims[].citations[]`, `axes.screens.items[].annotations[].handler.evidence[]`,
+   `axes.data.crud.items[].evidence[]`, `axes.rtm.items[]` 의 축별 `evidence[]`)은 **이미 `{file,line,snippet}`
+   모양이라 `evidence` 에 그대로 복사된다.** file 경로·line 번호·snippet 을 **한 글자도 바꾸지 마라.**
+   **번들에 없는 인용을 지어내지 마라** — 기억이나 추측으로 `file:line` 을 쓰는 순간 그게 §1.2 의 결함이다.
+   ※ **예외 하나** — 정책 축(`axes.policy.items[].sections[].rows[].evidence[]`)은 `snippet: null` 로 실린다.
+   `evidence` 스키마의 `snippet` 은 `string | 없음` 이라 **null 은 검증에서 튕긴다** → 이때만 `snippet` **키를
+   통째로 빼고** `{file, line}` 만 복사한다(값 변조 아님 — 없는 걸 없다고 적는 것).
+3. 요청을 **요구사항(SFR/SIR/DAR/SER…)으로 분해**한다. 기능 본체(SFR) + 파생(API연계 SIR / 데이터 DAR / 보안 SER 등).
    각 요구사항에 구분·우선순위·`derivedFrom`(파생이면)·AC 골격·`changeset`(기존 기능 `modified` / 신규 `added`)을 부여.
    기존 기능 입도에 맞춰 분해(과도 분할 금지). 애매하면 신규 대신 가장 가까운 기존 기능에 `modified`.
-3. 모호점은 `questions[]` 에 `[확인필요]` 질문으로 남긴다(임의 가정 금지).
-4. 기존 요구사항과 **모순**되면 supersede 후보를 `questions` 에 적어 사람이 판단하게 한다.
-5. `identified.json` 을 세션 디렉터리에 쓴다(②③④ 필드는 비워 둔다 — default 로 통과).
-6. **검증**: `node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs validate <세션>/identified.json` 실행.
+   **근거를 반드시 기록한다:**
+   - `acceptanceCriteria[].evidence` · `changeset.evidence` 에 위 pre-cite 를 복사해 채운다.
+   - **근거가 없으면 `CONFIRMED` 를 쓰지 마라.** `evidence: []`(빈 배열) + `CONFIRMED` 는 검증기가
+     `uncited-confirmed` **error** 로 막는다. 근거 없는 판단은 `INFERRED`(`[추정]`)다.
+     신규(TO-BE)는 어차피 전부 `[추정]` — `[확정]` 불가.
+   - **화면 축**이 번들에 있으면 `screenRefs: [{screenId, annotationNo, note}]` 로 귀속한다.
+     (예: AC "로그인 폼에 카카오 버튼 노출" → `screenId: "screen:actions/Account.action__signonForm"` +
+     해당 `annotations[].no`). 참조만 담고 `selector`·`bbox` 는 **복제하지 마라**(재생성마다 낡는다).
+   - **정책 축**이 번들에 있으면 `policyRefs: [{doc, section, ruleId, note}]` 로 귀속한다
+     (예: 평문 password 쟁점 → `policy-domain-account.md` §8).
+4. **★ 축 생략·낡은 커밋 → 그 축에 의존하는 결론은 `[추정]` 강등**
+   - `reducedMode.active === true` 면 `reducedMode.omittedAxes` 의 축은 **못 본 것**이다. 그 축에 의존하는
+     결론(예: 화면 축 생략인데 "어느 화면에 버튼을 단다")은 **`INFERRED` 로 강등**하고, 생략 사실을
+     `questions[]` 에 `[확인필요]` 로 올린다.
+   - `commits.consistent === false` 면 축별 커밋이 어긋난 것이다(`commits.note` 참조). **차단하지 않되**,
+     낡은 축에 의존하는 결론은 **`INFERRED` 로 강등**한다.
+5. 모호점은 `questions[]` 에 `[확인필요]` 질문으로 남긴다(임의 가정 금지).
+6. 기존 요구사항과 **모순**되면 supersede 후보를 `questions` 에 적어 사람이 판단하게 한다.
+7. `identified.json` 을 세션 디렉터리에 쓴다(②③④ 필드는 비워 둔다 — default 로 통과).
+8. **검증**: `node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs validate <세션>/identified.json` 실행.
    스키마 위반(비0 종료)이면 고쳐 다시 쓴다. 일관성 경고는 검토 후 반영.
    **실재 대조 게이트(exit 2)** — `changeset` 의 기능 id 는 `rtm.json functions[].id` 에, 데이터 귀속
    표기(`ACCOUNT(CR)` 형태)의 테이블명은 `db-schema.json tables[].name` 에 **실재해야** 한다.
    신규 기능은 `added` 에 `to-be:` 접두로만 넣는다(면제). **없는 테이블·기능을 지어내면 차단된다** —
    신규 테이블이 정말 필요하면 `questions[]` 에 `[확인필요]` 로 올려 사람이 판단하게 한다.
-7. 보고: 요청ID → 요구사항ID 매핑표 + `[확인필요]` 질문. **여기서 멈춘다.**
+9. 보고: 요청ID → 요구사항ID 매핑표 + `[확인필요]` 질문 + **근거 요약**(AC/changeset 중 근거가 붙은 비율,
+   생략된 축, 커밋 불일치로 강등한 결론). **여기서 멈춘다.**
 
 ### --step 2 목록표
 1. `identified.json` 로드. 템플릿 `01_요구사항목록표.md` 로드.

@@ -58,9 +58,19 @@ FN-025 카카오-계정연동-자동가입
 
 각 항목이 **왜 틀렸는지 분석 산출물이 이미 답을 갖고 있다**:
 
+> **⚠ 2026-07-16 교정**: 초판은 `OAUTH_ACCOUNT` 를 "없는 테이블 **발명**"으로 규정했으나 **이 프레이밍은
+> 틀렸다.** 신규 기능(카카오 로그인)에 새 테이블을 제안하는 것 자체는 **정당하다** — OAuth 연동 정보를
+> 어딘가엔 저장해야 한다. 죄는 신규 제안이 아니라 **db-schema 를 보지 않고** 제안한 것이다(ACCOUNT
+> 확장으로 될지, 기존 패턴이 있는지 확인 없이). 그리고 **"안 봤음"은 게이트로 검출할 수 없다** —
+> 스키마를 먹여주고(P3) 인용을 요구해야(P2/P5) 풀린다. 게이트가 할 수 있는 유일한 일은
+> **"신규 제안을 `[확정]` 으로 단언하는 것"을 막는 것**이다(impact 엔진 `supplement-a.ts:250-274`
+> `checkCreationL1` 의 "net-new CONFIRMED 금지"와 동일 철학, 근거↔신뢰도 불변식의 귀결).
+> P1 초안이 이 구분 없이 `NAME(CRUD)` ∉ db-schema 를 무조건 exit 2 로 막아 **정당한 제안까지
+> 오차단**했고, **P1b 에서 교정**했다.
+
 | 지어낸 것 | 산출물이 아는 사실 | 근거 |
 |---|---|---|
-| `OAUTH_ACCOUNT(C)` — 없는 테이블 발명 | `db-schema.json` 에 실존 테이블 **13개**, OAUTH_ACCOUNT 없음 | `.spec/map/db-schema.json` |
+| `OAUTH_ACCOUNT(C)` 를 **db-schema 조회 없이** 제안 (제안 자체는 정당 — 위 교정 참조) | `db-schema.json` 에 실존 테이블 **13개**. ACCOUNT 확장 가능성·기존 패턴을 검토한 흔적 없음 | `.spec/map/db-schema.json` |
 | `SIGNON(CR)` — Create 주장 | `crud-matrix.json`: "로그인 처리"는 SIGNON 을 **R(읽기)만**, `CONFIRMED` | `crud-matrix.json` rows, evidence `AccountMapper.xml:26,52` |
 | `+KakaoOAuthService` — 클래스명 발명 | impact 엔진엔 **L1 하드게이트**(선례 없으면 파일명 생성 금지, `supplement-a.ts:203`)가 있으나 **인테이크엔 없음** | — |
 | (누락) password 처리 미설계 | `policy-domain-account.md` §8: **"SIGNON.PASSWORD 는 varchar(25) 평문, 해시/솔트 로직 없음"** — OAuth 자동가입 설계의 핵심 쟁점 | `schema.sql:30-34`, `AccountMapper.xml:52-77` |
@@ -161,7 +171,14 @@ jpetstore 가 Stripes `@Validate` 를 쓰는데 스캐너는 `@PreAuthorize`/bea
 let model = buildRtm(input, graph.gitCommit ?? null)
 // scripts/understand-docs.mjs:259
 const sourceCommit = graph.gitCommit ?? null
+// scripts/export-crud-matrix.mjs:79   ← 2026-07-16 추가 발견(P0c). 초판 조사가 놓친 3번째 현장
+gitCommit: graph.gitCommit ?? null
 ```
+
+> **현장은 2곳이 아니라 3곳이었다.** `crud-matrix.json.gitCommit = null` 을 P3 실행자가 발견했을 때
+> 처음엔 P0b 류(미배선)로 분류했으나, 파생 관계를 조사하니 **동일한 "없는 키 읽기" 버그**였다.
+> **교훈: 이 버그는 `graph.gitCommit` 을 읽는 전 지점을 grep 해야 한다** — 개별 발견에 의존하면
+> 또 놓친다.
 
 `graph` 는 `domain-graph.json` 인데 **최상위에 `gitCommit` 키가 없다**
 (실제 키: `edges, ktdsMap, layers, nodes, project, tour, version`).

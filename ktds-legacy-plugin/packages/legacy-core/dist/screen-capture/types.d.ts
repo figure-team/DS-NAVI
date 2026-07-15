@@ -38,8 +38,8 @@ export declare const EventTypeSchema: z.ZodEnum<{
     click: "click";
     link: "link";
     none: "none";
-    submit: "submit";
     change: "change";
+    submit: "submit";
 }>;
 export type EventType = z.infer<typeof EventTypeSchema>;
 /** Stage A 기계 사실 — Stage B 수정 금지 대상(mechanicalHash 에 포함). */
@@ -102,8 +102,8 @@ export declare const AnnotationSchema: z.ZodObject<{
         click: "click";
         link: "link";
         none: "none";
-        submit: "submit";
         change: "change";
+        submit: "submit";
     }>;
     mechanical: z.ZodObject<{
         tag: z.ZodString;
@@ -188,8 +188,8 @@ export declare const ScreenSchema: z.ZodObject<{
             click: "click";
             link: "link";
             none: "none";
-            submit: "submit";
             change: "change";
+            submit: "submit";
         }>;
         mechanical: z.ZodObject<{
             tag: z.ZodString;
@@ -282,8 +282,8 @@ export declare const ScreensFileSchema: z.ZodObject<{
                 click: "click";
                 link: "link";
                 none: "none";
-                submit: "submit";
                 change: "change";
+                submit: "submit";
             }>;
             mechanical: z.ZodObject<{
                 tag: z.ZodString;

@@ -13,11 +13,13 @@ export { computeCoverage } from './coverage.js';
 export { computeDiagnostics, natCmp } from './validate.js';
 export { REQUIREMENT_TEMPLATES, CHANGE_TEMPLATES, requirementTemplateEntry, changeTemplateEntry, requirementTemplateFile, changeTemplateFile, resolveRequirementTemplatePath, loadRequirementTemplate, loadChangeTemplate, } from './requirement-templates.js';
 export type { RequirementDocKind, ChangeDocKind, RequirementTemplateEntry, ChangeTemplateEntry, RequirementTemplateDirs, ResolvedRequirementTemplate, LoadedRequirementTemplate, } from './requirement-templates.js';
-export { RequirementCategorySchema, IntakeReqStatusSchema, IntakeRequestSchema, IntakeSpecSchema, IntakeRequirementSchema, IdentifiedIntakeSchema, parseIdentifiedIntake, diagnoseIntake, } from './intake-types.js';
-export type { RequirementCategory, IntakeReqStatus, IntakeRequest, IntakeSpec, IntakeRequirement, IdentifiedIntake, } from './intake-types.js';
+export { RequirementCategorySchema, IntakeReqStatusSchema, IntakeRequestSchema, IntakeSpecSchema, IntakeRequirementSchema, IdentifiedIntakeSchema, parseIdentifiedIntake, diagnoseIntake, checkIntakeGrounding, extractTableRefs, IntakeEvidenceSchema, IntakeScreenRefSchema, IntakePolicyRefSchema, IntakeAcceptanceCriterionSchema, IntakeChangesetSchema, } from './intake-types.js';
+export type { RequirementCategory, IntakeReqStatus, IntakeRequest, IntakeSpec, IntakeRequirement, IdentifiedIntake, IntakeInventory, IntakeGroundingViolation, IntakeEvidence, IntakeScreenRef, IntakePolicyRef, IntakeAcceptanceCriterion, IntakeChangeset, } from './intake-types.js';
 export { intakeReqToRtmRequirement, intakeFnStub, fnDomainKey, } from './project-intake.js';
 export { withdrawRequest, requestIdOf } from './withdraw-request.js';
 export type { WithdrawOptions, WithdrawResult } from './withdraw-request.js';
 export { computeChangeImpact } from './change-impact.js';
 export type { ChangeImpactReport, ChangeImpactFunction, ChangeImpactClass } from './change-impact.js';
+export { buildIntakeInputBundle, serializeIntakeBundle, checkMinimalSet, tokenizeRequest, SAMPLE_FILES_MAX, DEFAULT_BUNDLE_CHAR_CAP, AXIS_CAPS, FALLBACK_TOP_N, AXIS_BUDGET, POLICY_SECTION_PRIORITY, allocateAxisBudget, parsePolicyMarkdown, } from './intake-bundle.js';
+export type { IntakeBundleSources, BuildIntakeInputOptions, IntakeInputBundle, IntakeAxis, IntakeBundleDomain, IntakeBundleTable, IntakeBundleCrudRow, IntakeBundleFunction, EvidenceStat, DomainGraphNode, AxisBudgetKey, AxisBudgetReport, IntakePolicyDoc, IntakePreCite, IntakeBundleClaim, IntakeBundleScreen, IntakeBundleAnnotation, IntakeBundlePolicyDoc, IntakeBundlePolicySection, IntakeBundlePolicyRow, } from './intake-bundle.js';
 //# sourceMappingURL=index.d.ts.map

@@ -11,8 +11,15 @@ export { applyOverlay } from './apply-overlay.js';
 export { computeCoverage } from './coverage.js';
 export { computeDiagnostics, natCmp } from './validate.js';
 export { REQUIREMENT_TEMPLATES, CHANGE_TEMPLATES, requirementTemplateEntry, changeTemplateEntry, requirementTemplateFile, changeTemplateFile, resolveRequirementTemplatePath, loadRequirementTemplate, loadChangeTemplate, } from './requirement-templates.js';
-export { RequirementCategorySchema, IntakeReqStatusSchema, IntakeRequestSchema, IntakeSpecSchema, IntakeRequirementSchema, IdentifiedIntakeSchema, parseIdentifiedIntake, diagnoseIntake, } from './intake-types.js';
+export { RequirementCategorySchema, IntakeReqStatusSchema, IntakeRequestSchema, IntakeSpecSchema, IntakeRequirementSchema, IdentifiedIntakeSchema, parseIdentifiedIntake, diagnoseIntake, checkIntakeGrounding, extractTableRefs, 
+// P2 근거 스키마 — 인용 + 화면·정책 축
+IntakeEvidenceSchema, IntakeScreenRefSchema, IntakePolicyRefSchema, IntakeAcceptanceCriterionSchema, IntakeChangesetSchema, } from './intake-types.js';
 export { intakeReqToRtmRequirement, intakeFnStub, fnDomainKey, } from './project-intake.js';
 export { withdrawRequest, requestIdOf } from './withdraw-request.js';
 export { computeChangeImpact } from './change-impact.js';
+// 근거 번들 — 유계 요약. RTM_IMPACT_GATE_DESIGN.md §6.2.
+//  v1(P3): 3축(도메인·데이터·추적표). **v2(P4): + 화면·정책 축 + pre-cite + 축별 예산 배분.**
+export { buildIntakeInputBundle, serializeIntakeBundle, checkMinimalSet, tokenizeRequest, SAMPLE_FILES_MAX, DEFAULT_BUNDLE_CHAR_CAP, AXIS_CAPS, FALLBACK_TOP_N, 
+// P4
+AXIS_BUDGET, POLICY_SECTION_PRIORITY, allocateAxisBudget, parsePolicyMarkdown, } from './intake-bundle.js';
 //# sourceMappingURL=index.js.map

@@ -83,6 +83,10 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
 5. `identified.json` 을 세션 디렉터리에 쓴다(②③④ 필드는 비워 둔다 — default 로 통과).
 6. **검증**: `node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs validate <세션>/identified.json` 실행.
    스키마 위반(비0 종료)이면 고쳐 다시 쓴다. 일관성 경고는 검토 후 반영.
+   **실재 대조 게이트(exit 2)** — `changeset` 의 기능 id 는 `rtm.json functions[].id` 에, 데이터 귀속
+   표기(`ACCOUNT(CR)` 형태)의 테이블명은 `db-schema.json tables[].name` 에 **실재해야** 한다.
+   신규 기능은 `added` 에 `to-be:` 접두로만 넣는다(면제). **없는 테이블·기능을 지어내면 차단된다** —
+   신규 테이블이 정말 필요하면 `questions[]` 에 `[확인필요]` 로 올려 사람이 판단하게 한다.
 7. 보고: 요청ID → 요구사항ID 매핑표 + `[확인필요]` 질문. **여기서 멈춘다.**
 
 ### --step 2 목록표

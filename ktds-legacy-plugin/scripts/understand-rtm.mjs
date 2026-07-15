@@ -26,6 +26,10 @@ if (!existsSync(distEntry)) {
 const projectRoot = process.argv[2] || process.cwd()
 const engine = await import(distEntry)
 const { buildRtm, applyRequirements, applyOverlay, attachTestScenarios, buildMyBatisModel, isMapperXmlDocument } = engine
+// P1c 근거 게이트 — 배럴(rtm/index.ts)이 동시 편집 중이라 아직 export 를 못 얹었다. 파일 경로
+// 직접 import 라 패키지 exports 맵을 타지 않고, Node 가 해석경로로 캐싱하므로 dist/index.js 가
+// 쓰는 것과 **동일한 모듈 인스턴스**다. 배럴에 `checkCellGrounding` 이 추가되면 위 구조분해로 합칠 것.
+const { checkCellGrounding } = await import(join(here, '..', 'packages', 'legacy-core', 'dist', 'rtm', 'validate.js'))
 
 // 입력은 디스크의 fill 완료 그래프(비파괴). buildMap 호출 금지(채움 소실).
 const graphPath = join(projectRoot, '.understand-anything', 'domain-graph.json')
@@ -146,6 +150,35 @@ if (existsSync(overlayPath)) {
     console.error(`rtm-overrides.json 파싱 실패(무시): ${err.message}`)
   }
 }
+
+// ★ P1c 근거 게이트 — ⑤ 재bake 표면(rtm-requirements.json 이 투영된 기능 셀)을 db-schema 와 대조한다.
+//
+// 실측 `OAUTH_ACCOUNT` 는 identified.json 을 거치지 않아(intakeFnStub 이 4축 셀을 빈 값으로 만든다)
+// P1 게이트(rtm-intake.mjs validate)가 보는 표면 밖이다 — 여기가 그 구멍을 막는 자리다.
+// 규칙은 P1b 확정분 재사용: 신규 테이블 제안은 정당(warn·표면화만), `[확정]` 단언은 위반(error).
+//
+// **차단하지 않는다**(진단만) — validate.ts 의 dangling-changeset-fn 주석 참조. 요약하면 재bake 실패는
+// fail-closed 가 아니라 fail-stale(낡은 rtm.json 이 무신호로 남는다)이라, 재생성하고 error 를 남기는
+// 편이 엄격히 낫다. 차단은 생산자(P1 게이트, exit 2)의 몫이다.
+//
+// db-schema.json 이 없으면 인벤토리를 주입하지 않는다 → 이 축의 대조는 생략된다(하위호환).
+let dbTables = null
+const dbSchemaPath = join(projectRoot, '.spec', 'map', 'db-schema.json')
+if (existsSync(dbSchemaPath)) {
+  try {
+    const dbSchema = JSON.parse(readFileSync(dbSchemaPath, 'utf8'))
+    if (Array.isArray(dbSchema.tables)) {
+      dbTables = dbSchema.tables.map((t) => t?.name).filter((n) => typeof n === 'string' && n.length > 0)
+    }
+  } catch (err) {
+    // 손상 시 미주입(축 생략) — 파싱 실패를 "테이블 0개"로 읽으면 전건이 신규 제안으로 오탐된다.
+    console.error(`db-schema.json 파싱 실패(테이블 대조 생략): ${err.message}`)
+  }
+}
+// 정렬된 진단 블록을 뒤에 잇는다(apply-overlay.ts 의 `[...computeDiagnostics(merged), ...warns]` 관례).
+// 각 블록이 결정론 정렬이라 재실행 byte-identical 이 유지된다.
+const cellDiags = dbTables ? checkCellGrounding(model, { tables: dbTables }) : []
+if (cellDiags.length > 0) model = { ...model, diagnostics: [...(model.diagnostics ?? []), ...cellDiags] }
 
 const OUTPUT_DIR = join(projectRoot, '.understand-anything')
 mkdirSync(OUTPUT_DIR, { recursive: true })

@@ -701,7 +701,7 @@ export default function ChangeImpactView() {
             불러오는 중…
           </p>
         ) : (
-          <div className="grid items-start grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]" style={{ gap: 14 }}>
+          <div className="grid items-start grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)]" style={{ gap: 14 }}>
             {tree}
             {status === "error" ? (
               <div
@@ -767,7 +767,7 @@ export default function ChangeImpactView() {
       {head}
 
       {/* 프로토 .docs — 좌 260px 트리 카드 + 우 콘텐츠 */}
-      <div className="grid items-start grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]" style={{ gap: 14 }}>
+      <div className="grid items-start grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)]" style={{ gap: 14 }}>
         {/* 좌 트리 — 최신 1건 + 분석 기록 원장(impact-history) */}
         {tree}
 

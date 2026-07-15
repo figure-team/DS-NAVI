@@ -809,7 +809,7 @@ export default function ScreenSpecView() {
       </TopBarSlot>
 
       {/* 프로토 .scr — 좌 260px 트리 카드 + 우 상세 카드 */}
-      <div className="grid items-start grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]" style={{ gap: 14 }}>
+      <div className="grid items-start grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)]" style={{ gap: 14 }}>
         <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow proto-tree">
           {/* 통합 검색 — 제목·URL·JSP·주석 매칭(?q= 이관, 히스토리 오염 방지 replace) */}
           <div style={{ padding: "8px 8px 4px" }}>

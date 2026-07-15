@@ -20,6 +20,11 @@ import type { BadgeTone } from "./proto/Proto";
  * 원장 최신 done 항목의 스냅샷과 대조해 그 항목에 [최신] 배지를 붙이고 질의문을 표기한다.
  * 대조 실패 = 원장에 없는 실행(CLI /understand-impact 직접 실행 등)이 슬롯을 덮어쓴 상태이므로
  * "기록 없는 분석" 으로 분리해 노출한다(감추면 오래된 분석이 [최신] 로 위장된다 — 실제 사고 이력).
+ *
+ * 앵커 커밋은 화면에 띄우지 않는다 — 사용자가 판단에 쓸 수 없는 내부 식별자라서, 제목엔 질의문이
+ * 간다. 대신 앵커를 현재 census 와 대조해 재스캔 여부만 배지로 알린다(앵커의 출처가 곧 census —
+ * engine.ts:120 `gitCommit: census.gitCommit`). **스캔 대비** 신선도이지 코드(HEAD) 대비가
+ * 아니므로 "최신" 이라 말하지 않는다 — 코드만 바뀌고 재스캔을 안 한 경우는 잡지 못한다.
  */
 interface Citation {
   filePath: string;
@@ -519,6 +524,23 @@ export default function ChangeImpactView() {
     };
   }, [newestDone, accessToken]);
 
+  // 현재 census 의 커밋 — 앵커의 출처가 곧 census 다(engine.ts:120 `gitCommit: census.gitCommit`).
+  // 앵커와 대조하면 "분석 이후 재스캔됐나 = 낡은 입력으로 계산된 분석인가" 를 정확히 판정할 수 있다.
+  // 주의: 이건 **스캔 대비** 신선도다. 코드(HEAD)가 앞서갔는지는 알 수 없으므로 주장하지 않는다.
+  const [censusCommit, setCensusCommit] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetch(`${dataBase}census.json${tokenQ}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { gitCommit?: string } | null) => {
+        if (alive) setCensusCommit(typeof d?.gitCommit === "string" ? d.gitCommit : null);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [dataBase, tokenQ, jobStatus]);
+
   /** 루트 슬롯을 낳은 원장 항목 — 대조 실패 시 null(= 원장 밖 실행이 슬롯을 점유). */
   const currentJobId =
     rootMeta && newestIdent && rootMeta.ident === newestIdent ? (newestDone?.jobId ?? null) : null;
@@ -610,10 +632,7 @@ export default function ChangeImpactView() {
                     <span className="truncate" style={{ display: "block" }}>
                       {e.query || "(질의 미상)"}
                     </span>
-                    <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>
-                      {fmtTime(e.finishedAt)}
-                      {isCurrent && e.gitCommit ? ` · ${e.gitCommit.slice(0, 7)}` : ""}
-                    </span>
+                    <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{fmtTime(e.finishedAt)}</span>
                   </span>
                   <span className="st">
                     {isCurrent && <Badge tone="info">최신</Badge>}
@@ -708,7 +727,14 @@ export default function ChangeImpactView() {
     );
   }
 
-  const sha7 = data.gitCommit.slice(0, 7);
+  // 스캔 대비 신선도 — 앵커(=분석이 소비한 census 의 커밋) vs 현재 census 의 커밋.
+  // 기록 열람 중엔 판정하지 않는다(과거 스냅샷은 낡은 게 당연 — 배지가 의미 없다).
+  const scanState: "current" | "stale" | "unknown" =
+    activeRun || !censusCommit || !data.gitCommit
+      ? "unknown"
+      : censusCommit === data.gitCommit
+        ? "current"
+        : "stale";
   const api = data.upstream.api ?? [];
   const domains = data.upstream.domains ?? [];
   const flows = data.upstream.flows ?? [];
@@ -750,10 +776,15 @@ export default function ChangeImpactView() {
           {/* 헤더 카드 — 앵커 commit + 액션 + seeds 칩 */}
           <div className={CARD} style={{ padding: "16px 20px", marginBottom: 14 }}>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <b style={{ fontSize: 15 }}>
-                영향 분석 — 앵커 commit <span style={{ fontFamily: "var(--font-mono)" }}>{sha7}</span>
+              {/* 제목 = 질의문(사람 언어). 앵커 커밋은 사용자가 판단에 쓸 수 없는 내부 식별자라
+                  화면에서 뺐고, 신선도 판정 재료로만 쓴다. 질의문을 모르면(원장 밖 실행) 총칭. */}
+              <b className="truncate" style={{ fontSize: 15, minWidth: 0, maxWidth: 620 }} title={headerEntry?.query}>
+                {headerEntry?.query || "영향 분석"}
               </b>
               {activeRun ? <Badge tone="warn">기록 열람</Badge> : <Badge tone="ok">분석 완료</Badge>}
+              {/* 스캔 대비 신선도 — "코드 최신" 은 검사하지 않았으므로 주장하지 않는다. */}
+              {scanState === "current" && <Badge tone="mut">현재 스캔 기준</Badge>}
+              {scanState === "stale" && <Badge tone="warn">스캔 갱신됨 · 재분석 권장</Badge>}
               <div className="flex-1" />
               {activeRun ? (
                 <button
@@ -771,30 +802,27 @@ export default function ChangeImpactView() {
                 </>
               )}
             </div>
-            {/* impact.json 은 질의문을 담지 않으므로 원장 항목에서 가져온다(대조 실패 시 미표기 — 정직). */}
-            {headerEntry && (
-              <div className="flex items-center flex-wrap" style={{ gap: 8, marginTop: 8 }}>
-                <span
-                  className="text-text-secondary truncate"
-                  style={{ fontSize: 12.5, minWidth: 0, maxWidth: 640 }}
-                  title={headerEntry.query}
-                >
-                  질의: {headerEntry.query || "(질의 미상)"}
-                </span>
-                <span className="text-text-muted" style={{ fontSize: 11.5, flex: "none" }}>
+            {/* 분석 시각 + 상태 주석. 질의문은 제목으로 올라갔다(원장 항목에서만 알 수 있음). */}
+            <div className="flex items-center flex-wrap" style={{ gap: 8, marginTop: 8 }}>
+              {headerEntry && (
+                <span className="text-text-muted" style={{ fontSize: 11.5 }}>
                   {fmtTime(headerEntry.finishedAt)} 분석
                   {activeRun ? " — 과거 스냅샷이며 문서(09)·구조 오버레이는 최신 기준" : ""}
                 </span>
-              </div>
-            )}
-            {/* 원장 밖 실행이 슬롯을 점유 — 질의문이 유실된 상태임을 감추지 않는다. */}
-            {!activeRun && orphanRoot && (
-              <div className="flex items-center flex-wrap" style={{ gap: 8, marginTop: 8 }}>
+              )}
+              {/* 원장 밖 실행이 슬롯을 점유 — 질의문이 유실된 상태임을 감추지 않는다. */}
+              {!activeRun && orphanRoot && (
                 <span className="text-text-muted" style={{ fontSize: 11.5 }}>
                   질의 미상 — 원장에 기록되지 않은 실행(CLI 직접 실행 등)의 결과입니다.
                 </span>
-              </div>
-            )}
+              )}
+              {/* 낡은 입력으로 계산된 분석 — 무엇이 어긋났는지까지 밝힌다. */}
+              {scanState === "stale" && (
+                <span className="text-text-muted" style={{ fontSize: 11.5 }}>
+                  이 분석 이후 코드 스캔(census)이 갱신됐습니다 — 결과가 현재 스캔과 다를 수 있습니다.
+                </span>
+              )}
+            </div>
             <div style={{ marginTop: 12 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>
                 변경 기점 (seeds {data.seeds.length})

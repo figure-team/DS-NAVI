@@ -112,6 +112,7 @@ export const zh = {
     nodeCount: "{count} 个节点",
     empty: "暂无领域图。请运行 /understand-domain 生成。",
     breadcrumbRoot: "业务地图",
+    breadcrumbLabel: "业务地图面包屑导航",
     viewFeatures: "查看功能",
     detail: "详情",
     systemSuffix: "系统",

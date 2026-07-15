@@ -112,6 +112,7 @@ export const en = {
     nodeCount: "{count} nodes",
     empty: "No domain graph available. Run /understand-domain to generate one.",
     breadcrumbRoot: "Work Map",
+    breadcrumbLabel: "Work map breadcrumb",
     viewFeatures: "View features",
     detail: "Details",
     systemSuffix: "System",

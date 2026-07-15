@@ -112,6 +112,7 @@ export const ko = {
     nodeCount: "노드 {count}개",
     empty: "도메인 그래프가 없습니다. /understand-domain 으로 생성하세요.",
     breadcrumbRoot: "업무 지도",
+    breadcrumbLabel: "업무 지도 브레드크럼",
     viewFeatures: "기능 보기",
     detail: "상세보기",
     systemSuffix: "시스템",

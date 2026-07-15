@@ -1,11 +1,15 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import DomainMapView from "../../components/DomainMapView"; // ktds-fork: 도메인 지도 (화면 1)
 import WorkMapTabs from "../../components/WorkMapTabs"; // 메뉴 병합: 시스템 구성도/구조 탭
 import FlowListView from "../../components/FlowListView"; // ktds-fork: 기능 목록 + 인라인 스파인 (화면 2)
 import GroupWorkspaceView from "../../components/GroupWorkspaceView"; // DOMAIN_HIERARCHY §7: 그룹 워크스페이스
+import StructureBreadcrumb, {
+  type StructureCrumb,
+} from "../../components/structure/StructureBreadcrumb"; // 헤더 통일: 구조 탭과 동일 브레드크럼
 import { resolveDomainRoute, resolveGroups } from "../../utils/domainGroups";
+import { findDomain, hasBusinessFlow, resolveWorkspaceView } from "../../utils/domainData";
 import { useI18n } from "../../contexts/I18nContext";
 
 /**
@@ -46,6 +50,53 @@ export default function DomainsPage() {
 
   const effectiveDomainId =
     resolved.kind === "flat" || resolved.kind === "group" ? resolved.domainId : null;
+
+  // 하위탭 승격: 「기능」이 상단 탭이 되면서 ?view= 해석·전환이 이 페이지로 올라왔다.
+  // 해석 규칙은 FlowListView/GroupWorkspaceView 와 **동일한 순수 함수**를 같은 인자로
+  // 부르는 것이라(URL+그래프의 함수) 세 곳이 항상 같은 답을 낸다 — 기존 관례 그대로.
+  const domainNode = useMemo(
+    () => (domainGraph && effectiveDomainId ? findDomain(domainGraph, effectiveDomainId) : undefined),
+    [domainGraph, effectiveDomainId],
+  );
+  const view = resolveWorkspaceView(
+    searchParams.get("view"),
+    searchParams.get("flow"),
+    hasBusinessFlow(domainNode),
+  );
+  const switchView = (next: "business" | "code") => {
+    // 라이브 location 기준 + replace + 토큰 차단 — 아래 ?flow= 동기화 이펙트와 동일 규약
+    // (렌더 스냅샷 기반 함수형 updater 는 직전 틱 navigate 를 스테일 값으로 덮어쓴다).
+    const p = new URLSearchParams(window.location.search);
+    p.set("view", next);
+    p.delete("token");
+    setSearchParams(p, { replace: true });
+  };
+
+  // "업무 전체 펼치기" — DomainMapView 헤더가 제거되면서 토글이 브레드크럼 행 우측
+  // 슬롯으로 옮겨왔고(사용자 확정), 그래서 상태도 여기로 올라왔다. 랜딩에서만 의미가
+  // 있으므로 버튼도 랜딩에서만 낸다.
+  const [worksExpanded, setWorksExpanded] = useState(false);
+
+  // 헤더 통일(2026-07-15 사용자 요청) — 구조 탭과 **같은 컴포넌트**(StructureBreadcrumb)를
+  // 쓴다. 크럼 구성도 구조와 대칭: 루트 크럼 = **탭 이름**("시스템 구성도" ↔ 구조 탭의
+  // "구조"), 랜딩은 뎁스1처럼 루트 단독, 그 아래는 탭 › [그룹] › 도메인.
+  // 제거된 워크스페이스 헤더의 상향 내비가 여기로 대체된다.
+  const crumbs = useMemo<StructureCrumb[]>(() => {
+    const root: StructureCrumb = {
+      label: t.domainMap.title,
+      href: effectiveDomainId ? "/domains" : null,
+    };
+    if (!effectiveDomainId) return [root];
+    const name = domainNode?.name ?? effectiveDomainId;
+    if (resolved.kind === "group") {
+      return [
+        root,
+        { label: resolved.group.name, href: `/domains/${resolved.group.key}` },
+        { label: name, href: null },
+      ];
+    }
+    return [root, { label: name, href: null }];
+  }, [t, effectiveDomainId, domainNode, resolved]);
 
   // 딥링크 리다이렉트(§7): 그룹 랜딩(/domains/g:x)의 첫 서브도메인 자동 선택,
   // 구 딥링크(/domains/domain:x)의 소속 그룹 워크스페이스로 이동. ?flow=/?view=
@@ -104,10 +155,32 @@ export default function DomainsPage() {
   return (
     <div className="h-full w-full flex flex-col bg-root text-text-primary">
       {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조, pmpl-proto .tabs) — 구조
-          탭은 /structure 로 라우트 전환(StructurePage 가 같은 행을 렌더해 이어져 보인다). */}
-      <WorkMapTabs active="map" />
+          탭은 /structure 로 라우트 전환(StructurePage 가 같은 행을 렌더해 이어져 보인다).
+          도메인 진입 중에만 「기능」 탭이 붙는다(하위탭 승격, 사용자 확정). */}
+      <WorkMapTabs
+        active={effectiveDomainId && view === "code" ? "code" : "map"}
+        onDomainView={effectiveDomainId ? switchView : undefined}
+      />
+      {/* 구조 탭과 동일한 헤더 — 탭 바로 아래 브레드크럼 한 줄(사용자 요청). */}
+      <StructureBreadcrumb
+        crumbs={crumbs}
+        label={t.domainMap.breadcrumbLabel}
+        right={
+          resolved.kind === "landing" ? (
+            <button
+              type="button"
+              onClick={() => setWorksExpanded((v) => !v)}
+              aria-pressed={worksExpanded}
+              className="shrink-0 rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+              style={{ fontSize: 11.5, padding: "4px 10px" }}
+            >
+              {worksExpanded ? t.domainMap.collapseAllWorks : t.domainMap.expandAllWorks}
+            </button>
+          ) : null
+        }
+      />
       <div className="flex-1 min-h-0 relative">
-        {resolved.kind === "landing" && <DomainMapView />}
+        {resolved.kind === "landing" && <DomainMapView worksExpanded={worksExpanded} />}
         {resolved.kind === "flat" && (activeDomainId ? <FlowListView /> : null)}
         {resolved.kind === "group" && (
           <GroupWorkspaceView group={resolved.group} selectedDomainId={resolved.domainId} />

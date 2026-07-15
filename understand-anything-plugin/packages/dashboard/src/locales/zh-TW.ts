@@ -112,6 +112,7 @@ export const zhTW = {
     nodeCount: "{count} 個節點",
     empty: "尚無領域圖。請執行 /understand-domain 產生。",
     breadcrumbRoot: "業務地圖",
+    breadcrumbLabel: "業務地圖麵包屑導覽",
     viewFeatures: "查看功能",
     detail: "詳情",
     systemSuffix: "系統",

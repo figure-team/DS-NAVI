@@ -112,6 +112,7 @@ export const ja = {
     nodeCount: "ノード {count}件",
     empty: "ドメイングラフがありません。/understand-domain で生成してください。",
     breadcrumbRoot: "業務マップ",
+    breadcrumbLabel: "業務マップ パンくずリスト",
     viewFeatures: "機能を見る",
     detail: "詳細",
     systemSuffix: "システム",

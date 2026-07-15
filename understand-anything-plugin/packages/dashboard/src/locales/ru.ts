@@ -112,6 +112,7 @@ export const ru = {
     nodeCount: "Узлов: {count}",
     empty: "Граф доменов недоступен. Запустите /understand-domain для генерации.",
     breadcrumbRoot: "Бизнес-карта",
+    breadcrumbLabel: "Хлебные крошки бизнес-карты",
     viewFeatures: "Показать функции",
     detail: "Подробнее",
     systemSuffix: "система",

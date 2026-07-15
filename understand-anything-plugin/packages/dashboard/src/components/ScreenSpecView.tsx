@@ -4,6 +4,8 @@ import { useDashboardStore } from "../store";
 import { parseBusinessFlows } from "../utils/businessFlow";
 import TrustBadge from "./TrustBadge";
 import { Badge, BtnAccent, BtnOutline, ConfBadge, Ev, PageHead, type ConfKind } from "./proto/Proto";
+import { computeCommonHrefs, displayLabel } from "./screenSpecAnnotations";
+import type { Annotation, LabelSource, Screen } from "./screenSpecAnnotations";
 
 /**
  * ktds-fork (S4): 화면설계서 뷰 — SI 화면설계서 슬라이드 재현.
@@ -12,40 +14,10 @@ import { Badge, BtnAccent, BtnOutline, ConfBadge, Ev, PageHead, type ConfKind } 
  * 데이터: screens.json(생성물, 불변) + screen-overrides.json(사람 편집) 클라이언트 병합.
  * 배지는 PNG 에 굽지 않고 bbox(문서 좌표)를 %로 환산해 오버레이한다.
  * 선택·검색은 URL(?screen=&q=)로 이관 — 딥링크·새로고침·뒤로가기 동작(데이터 맵 관례).
+ * 항목표는 종류 세그먼트로 캡처 배지와 함께 좁히고, 전 화면 반복 GNB 링크는 접는다
+ * (판정·라벨 유도는 screenSpecAnnotations.ts).
  */
 
-interface BBox { x: number; y: number; width: number; height: number }
-interface Handler {
-  target: string | null;
-  chain: string[];
-  evidence: Array<{ file: string; line: number }>;
-  confidence: "CONFIRMED" | "CONFIRMED_AI" | "INFERRED" | "UNVERIFIED";
-}
-interface Annotation {
-  no: number;
-  kind: "field" | "action" | "link" | "region";
-  selector: string;
-  bbox: BBox;
-  label: string;
-  eventType: string;
-  mechanical: { name: string | null; href: string | null; formAction: string | null; required: boolean };
-  handler: Handler | null;
-  description: string | null;
-  note: string | null;
-}
-interface Screen {
-  id: string;
-  title: string;
-  url: string;
-  jspFile: string | null;
-  domain: string | null;
-  scenario: string | null;
-  openedFrom: string | null;
-  graphNodeId: string | null;
-  capture: { path: string; width: number; height: number; capturedAt: string };
-  summary: { text: string; confidence: string } | null;
-  annotations: Annotation[];
-}
 interface ScreensFile {
   baseUrl: string;
   screens: Screen[];
@@ -307,6 +279,65 @@ function Highlight({ text, q }: { text: string; q: string }) {
   );
 }
 
+/** 항목명 출처별 표기 — name/href 는 기계 식별자라 mono, href 유도는 검토 대상이라 muted. */
+const LABEL_SOURCE_STYLE: Partial<Record<LabelSource, { className: string; title: string }>> = {
+  name: {
+    className: "",
+    title: "입력 파라미터명(name) — 캡처가 읽어 올린 입력값 대신 정식 항목명을 표시합니다. 편집으로 업무 명칭을 넣을 수 있습니다",
+  },
+  href: {
+    className: "text-text-muted",
+    title: "캡처에서 링크 텍스트를 찾지 못해 주소에서 유도한 이름 — 편집으로 실제 명칭을 넣을 수 있습니다",
+  },
+};
+
+/**
+ * 근거 칩 접이 — 저장소 전체 경로(src/main/java/…/CatalogActionBean.java:190)가 동작 열
+ * 폭을 독식해 항목 열 글자가 세로로 쪼개지므로, 기본은 건수만 보이고 펼치면 파일명:줄로 준다.
+ * 전체 경로는 칩 툴팁에 남긴다(근거는 접어도 사라지지 않는다).
+ */
+function EvidenceFold({
+  evidence,
+  onOpen,
+}: {
+  evidence: Array<{ file: string; line: number }>;
+  onOpen: (file: string, line: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  if (evidence.length === 0) return null;
+  return (
+    <div style={{ marginTop: 2 }}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 text-text-muted"
+        style={{ font: "inherit", fontSize: 10.5, padding: 0 }}
+        title="이 판정의 코드 근거 — 펼치면 파일:줄, 클릭하면 코드 뷰어로 엽니다"
+      >
+        <span style={{ fontSize: 8, width: 8 }}>{open ? "▾" : "▸"}</span>
+        근거 {evidence.length}
+      </button>
+      {open && (
+        <div>
+          {evidence.map((ev) => (
+            <button
+              key={`${ev.file}:${ev.line}`}
+              type="button"
+              onClick={() => onOpen(ev.file, ev.line)}
+              title={`코드 뷰어에서 열기 — ${ev.file}:${ev.line}`}
+              className="inline-block mt-0.5 mr-1 px-1 rounded bg-elevated break-all cursor-pointer border-0"
+              style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)" }}
+            >
+              {ev.file.split("/").pop()}:{ev.line}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /**
  * 미매핑 JSP·도달 실패 배너(데이터 맵 UnresolvedBanner 패턴을 이 파일에 로컬 복제).
  * severity 접이식 카드로 침묵 누락 대신 건수를 항상 표면화한다.
@@ -381,8 +412,11 @@ export default function ScreenSpecView() {
   const [trim, setTrim] = useState<CaptureCrop | null>(null);
   // 좌측 목록 — 도메인 그룹 접기(기본 전부 접힘). 검색 중에는 강제 전개.
   const [openDomains, setOpenDomains] = useState<ReadonlySet<string>>(new Set());
-  // 배지 색상 키 토글 — 켜진 종류만 캡처 위에 배지를 그린다(표는 전수 유지).
-  const [hiddenKinds, setHiddenKinds] = useState<ReadonlySet<string>>(new Set());
+  // 종류 세그먼트 필터 — null=전체(검수·인쇄용 전수 뷰). 캡처 배지와 아래 표를 같은
+  // 값으로 필터해 "지금 보는 것"을 일치시킨다(색상 키 토글이 배지만 끄던 desync 해소).
+  const [kindFilter, setKindFilter] = useState<string | null>(null);
+  // 공통 네비게이션 링크 접기 — 기본 접힘. 링크 세그먼트를 고른 경우엔 강제 전개한다.
+  const [commonOpen, setCommonOpen] = useState(false);
   // 캡처 배지 클릭 → 범례 표 해당 행으로 스크롤 + 잠깐 강조(flash).
   const rowRefs = useRef(new Map<string, HTMLTableRowElement>());
   const [flashKey, setFlashKey] = useState<string | null>(null);
@@ -392,7 +426,8 @@ export default function ScreenSpecView() {
   }, []);
   const jumpToRow = (key: string) => {
     setHoverKey(key);
-    rowRefs.current.get(key)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // 공통 네비 접이를 여는 클릭이면 행이 아직 DOM 에 없다 — 커밋 뒤 프레임에서 스크롤.
+    requestAnimationFrame(() => rowRefs.current.get(key)?.scrollIntoView({ behavior: "smooth", block: "center" }));
     setFlashKey(key);
     if (flashTimer.current) clearTimeout(flashTimer.current);
     flashTimer.current = setTimeout(() => setFlashKey(null), 1600);
@@ -404,6 +439,8 @@ export default function ScreenSpecView() {
     setHoverKey(null);
     setImgError(false);
     setFlashKey(null);
+    setKindFilter(null);
+    setCommonOpen(false);
   }, [selId]);
 
   const load = useCallback(() => {
@@ -431,18 +468,23 @@ export default function ScreenSpecView() {
   const title = (s: Screen) => overrides[s.id]?.titleOverride ?? s.title;
 
   // 통합 검색 대상 — 제목·URL·JSP·주석 label/target(각 화면 자신의 override 반영).
+  // 라벨은 표시값 기준이라 href 유도 이름("viewCart")으로도 검색된다.
   const screenHay = useCallback(
     (s: Screen) => {
       const ov = overrides[s.id];
       const parts = [ov?.titleOverride ?? s.title, s.url, s.jspFile ?? ""];
       for (const a of s.annotations) {
-        parts.push(ov?.annotations?.[annKey(a)]?.label ?? a.label);
+        parts.push(displayLabel(a, ov?.annotations?.[annKey(a)]?.label).text);
         if (a.handler?.target) parts.push(a.handler.target);
       }
       return parts.join("\n").toLowerCase();
     },
     [overrides],
   );
+
+  // 공통 네비게이션 href 집합 — 전 화면을 한 번 스캔해 구한다(screens.json 전체가
+  // 이미 로드돼 있어 엔진·데이터 변경 없이 계산 가능).
+  const commonHrefs = useMemo(() => computeCommonHrefs(file?.screens ?? []), [file]);
 
   const ql = q.trim().toLowerCase();
   const groups = useMemo(() => {
@@ -664,9 +706,111 @@ export default function ScreenSpecView() {
   }
 
   const visibleAnns = sel.annotations.filter((a) => !merged(a).hidden);
-  // 캡처 위에 실제로 그릴 배지 — 색상 키 토글로 꺼진 종류는 제외(표·통계는 전수 유지).
-  const overlayAnns = visibleAnns.filter((a) => !hiddenKinds.has(kindGroup(a.kind)));
+  // 캡처 위에 그릴 배지 — 표와 같은 세그먼트 값으로 필터한다(둘이 어긋나지 않게).
+  const overlayAnns = visibleAnns.filter((a) => !kindFilter || kindGroup(a.kind) === kindFilter);
   const notes = visibleAnns.filter((a) => merged(a).note);
+  /** 이 행이 전 화면 반복 GNB·푸터 링크인가 — 표에서 접기 대상. */
+  const isCommonNav = (a: Annotation) =>
+    a.kind === "link" && !!a.mechanical.href && commonHrefs.has(a.mechanical.href);
+  // 링크만 보려고 세그먼트를 고른 사용자에게 "고유 1건"만 남기면 빈 표로 읽힌다 — 강제 전개.
+  const linkFoldOpen = commonOpen || kindFilter === "link";
+  // 세그먼트 카운트 — 배지 전수 기준(공통 링크 접기와 무관하게 캡처엔 다 그려진다).
+  const segments = KIND_ORDER.filter((k) => k !== "region")
+    .map((k) => ({ kind: k, n: visibleAnns.filter((a) => kindGroup(a.kind) === k).length }))
+    .filter((s) => s.n > 0);
+  /** 표·배지 공용 표시 라벨 — 사람 override > 파서 라벨 > href 유도. */
+  const dispLabel = (a: Annotation) => displayLabel(a, selOv?.annotations?.[annKey(a)]?.label);
+
+  const renderRow = (a: Annotation) => {
+    const key = annKey(a);
+    const m = merged(a);
+    const dl = dispLabel(a);
+    const d = draftAnn[key];
+    return (
+      <tr
+        key={key}
+        ref={(el) => {
+          if (el) rowRefs.current.set(key, el);
+          else rowRefs.current.delete(key);
+        }}
+        onMouseEnter={() => setHoverKey(key)}
+        onMouseLeave={() => setHoverKey(null)}
+        style={
+          flashKey === key
+            ? { background: "color-mix(in srgb, var(--color-accent) 16%, transparent)", transition: "background 0.3s ease" }
+            : hoverKey === key
+              ? { background: "color-mix(in srgb, var(--color-accent) 7%, transparent)" }
+              : { transition: "background 0.3s ease" }
+        }
+      >
+        <td className="font-semibold" style={{ color: kindSwatch(a.kind) }}>
+          {badgeGlyph(a.kind, a.no)}
+        </td>
+        <td className="text-text-muted whitespace-nowrap">{KIND_LABEL[a.kind] ?? a.kind}</td>
+        <td className="break-all">
+          {(() => {
+            const st = LABEL_SOURCE_STYLE[dl.source];
+            return st ? (
+              <span className={st.className} style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, cursor: "help" }} title={st.title}>
+                {dl.text}
+              </span>
+            ) : (
+              dl.text
+            );
+          })()}
+          {a.mechanical.required && <span style={{ color: "var(--color-status-error)", marginLeft: 2 }}>*</span>}
+        </td>
+        <td className="text-text-muted">{a.eventType}</td>
+        <td className="text-text-secondary">
+          {a.handler?.target && (
+            <div
+              style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, cursor: a.handler.chain.length > 0 ? "help" : undefined }}
+              // 호출 체인은 한 줄로 펴면 이 열이 표 폭을 독식한다 — 툴팁으로 옮기고 ⋯ 로 존재만 알린다.
+              title={a.handler.chain.length > 0 ? `호출 체인 — ${a.handler.chain.join(" → ")}` : undefined}
+            >
+              {a.handler.target}
+              {a.handler.chain.length > 0 && (
+                <span className="text-text-muted" style={{ marginLeft: 4 }}>
+                  ⋯
+                </span>
+              )}
+            </div>
+          )}
+          {a.handler && <EvidenceFold evidence={a.handler.evidence} onOpen={openCodeViewerAt} />}
+        </td>
+        <td className="text-text-secondary">
+          {editing ? (
+            <div className="space-y-1">
+              <textarea
+                value={d?.description ?? ""}
+                onChange={(e) => setDraftAnn((prev) => ({ ...prev, [key]: { ...prev[key], description: e.target.value } }))}
+                rows={2}
+                className="w-full min-w-40 bg-elevated border border-border-subtle rounded px-1.5 py-1 text-text-primary"
+                style={{ fontSize: 12 }}
+              />
+              <label className="flex items-center gap-1 text-text-muted" style={{ fontSize: 10.5 }}>
+                <input
+                  type="checkbox"
+                  checked={d?.hidden ?? false}
+                  onChange={(e) => setDraftAnn((prev) => ({ ...prev, [key]: { ...prev[key], hidden: e.target.checked } }))}
+                />
+                숨김
+              </label>
+            </div>
+          ) : (
+            m.description
+          )}
+        </td>
+        <td>
+          {a.handler &&
+            (() => {
+              const mc = mechConf(a.handler.confidence);
+              return <ConfBadge kind={mc.kind} label={mc.label} title={mc.title} />;
+            })()}
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
@@ -915,49 +1059,61 @@ export default function ScreenSpecView() {
             )}
           </div>
 
-          {/* 배지 색상 키 = 표시 토글 — 클릭한 종류만 캡처 위 배지를 끄고 켠다(표는 전수 유지) */}
-          <div className="flex items-center gap-3 text-text-muted" style={{ fontSize: 11, marginBottom: 10 }}>
-            {KIND_ORDER.filter((k) => k !== "region").map((k) => {
-              const off = hiddenKinds.has(k);
+          {/* 종류 세그먼트 = 색상 키 겸 필터 — 캡처 배지와 아래 표를 동시에 좁힌다.
+              "전체"를 항상 남겨 검수·인쇄용 전수 뷰를 보존한다(탭 분할과의 차이). */}
+          <div
+            className="inline-flex items-center rounded-full bg-elevated"
+            role="group"
+            aria-label="항목 종류 필터"
+            style={{ padding: 2, gap: 2, marginBottom: 10 }}
+          >
+            {[{ kind: null as string | null, n: visibleAnns.length }, ...segments].map(({ kind, n }) => {
+              const on = kindFilter === kind;
               return (
                 <button
-                  key={k}
+                  key={kind ?? "all"}
                   type="button"
-                  aria-pressed={!off}
-                  onClick={() =>
-                    setHiddenKinds((prev) => {
-                      const next = new Set(prev);
-                      if (next.has(k)) next.delete(k);
-                      else next.add(k);
-                      return next;
-                    })
-                  }
-                  className="inline-flex items-center gap-1.5 cursor-pointer bg-transparent rounded-full"
+                  aria-pressed={on}
+                  onClick={() => setKindFilter(kind)}
+                  className="inline-flex items-center gap-1.5 cursor-pointer rounded-full whitespace-nowrap"
                   style={{
                     font: "inherit",
-                    color: "inherit",
-                    padding: "2px 8px 2px 3px",
-                    border: `1px solid ${off ? "transparent" : "var(--color-border-subtle)"}`,
-                    opacity: off ? 0.4 : 1,
-                    textDecoration: off ? "line-through" : "none",
-                    transition: "opacity 0.12s ease",
+                    fontSize: 11,
+                    fontWeight: on ? 700 : 500,
+                    padding: kind ? "3px 9px 3px 4px" : "3px 11px",
+                    border: "1px solid transparent",
+                    background: on ? "var(--color-panel)" : "transparent",
+                    borderColor: on ? "var(--color-border-medium)" : "transparent",
+                    color: on ? "var(--color-text-primary)" : "var(--color-text-muted)",
+                    boxShadow: on ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+                    transition: "background 0.12s ease, color 0.12s ease",
                   }}
-                  title={`클릭 — 캡처 위 ${KIND_SECTION[k] ?? k} 배지 ${off ? "표시" : "숨김"}`}
+                  title={
+                    kind
+                      ? `${KIND_SECTION[kind] ?? kind}만 — 캡처 배지와 아래 표를 함께 좁힙니다`
+                      : "모든 항목 — 검수·인쇄용 전수 보기"
+                  }
                 >
-                  <span
-                    className="inline-flex items-center justify-center rounded-full font-bold"
-                    style={{
-                      width: 16,
-                      height: 16,
-                      fontSize: 10,
-                      background: kindStyle(k).bg,
-                      color: kindStyle(k).fg,
-                      border: `1px solid ${kindStyle(k).border}`,
-                    }}
-                  >
-                    {badgeGlyph(k, 1)}
+                  {kind && (
+                    <span
+                      className="inline-flex items-center justify-center rounded-full font-bold"
+                      style={{
+                        width: 16,
+                        height: 16,
+                        fontSize: 10,
+                        flex: "none",
+                        background: kindStyle(kind).bg,
+                        color: kindStyle(kind).fg,
+                        border: `1px solid ${kindStyle(kind).border}`,
+                      }}
+                    >
+                      {badgeGlyph(kind as Annotation["kind"], 1)}
+                    </span>
+                  )}
+                  {kind ? (KIND_SECTION[kind] ?? kind) : "전체"}
+                  <span className="tabular-nums" style={{ opacity: 0.65 }}>
+                    {n}
                   </span>
-                  {KIND_SECTION[k] ?? k}
                 </button>
               );
             })}
@@ -1013,6 +1169,7 @@ export default function ScreenSpecView() {
                       const active = hoverKey === key;
                       const st = kindStyle(a.kind);
                       const m = merged(a);
+                      const dl = dispLabel(a);
                       return (
                         <button
                           key={key}
@@ -1021,9 +1178,13 @@ export default function ScreenSpecView() {
                           onMouseLeave={() => setHoverKey(null)}
                           onFocus={() => setHoverKey(key)}
                           onBlur={() => setHoverKey(null)}
-                          onClick={() => jumpToRow(key)}
-                          aria-label={`${badgeGlyph(a.kind, a.no)} ${m.label}${m.description ? ` — ${m.description}` : ""}`}
-                          title={`${m.label} — ${m.description ?? ""} (클릭: 아래 표에서 보기)`}
+                          onClick={() => {
+                            // 접혀 있는 공통 네비 행을 가리키면 먼저 펼쳐야 스크롤 대상이 생긴다.
+                            if (isCommonNav(a)) setCommonOpen(true);
+                            jumpToRow(key);
+                          }}
+                          aria-label={`${badgeGlyph(a.kind, a.no)} ${dl.text}${m.description ? ` — ${m.description}` : ""}`}
+                          title={`${dl.text} — ${m.description ?? ""} (클릭: 아래 표에서 보기)`}
                           className="absolute flex items-center justify-center rounded-full font-bold cursor-pointer transition-transform p-0"
                           style={{
                             left: `${((a.bbox.x + a.bbox.width - cropX) / cropW) * 100}%`,
@@ -1056,18 +1217,24 @@ export default function ScreenSpecView() {
               <thead>
                 <tr>
                   <th style={{ width: 40 }}>번호</th>
-                  <th style={{ width: 48 }}>구분</th>
-                  <th>항목</th>
+                  {/* "이벤트"가 두 줄로 접히지 않는 폭 */}
+                  <th style={{ width: 62, whiteSpace: "nowrap" }}>구분</th>
+                  {/* 항목명이 세로로 쪼개지지 않게 최소폭 확보 — account.favouriteCategoryId(27자) 가 최장 */}
+                  <th style={{ minWidth: 218 }}>항목</th>
                   <th style={{ width: 56 }}>이벤트</th>
-                  <th>동작(핸들러)</th>
-                  <th>설명</th>
+                  <th style={{ minWidth: 150 }}>동작(핸들러)</th>
+                  <th style={{ minWidth: 160 }}>설명</th>
                   <th style={{ width: 72 }}>신뢰도</th>
                 </tr>
               </thead>
               <tbody>
                 {KIND_ORDER.flatMap((kind) => {
-                  const rows = visibleAnns.filter((a) => a.kind === kind);
-                  if (rows.length === 0) return [];
+                  if (kindFilter && kindGroup(kind) !== kindFilter) return [];
+                  const all = visibleAnns.filter((a) => a.kind === kind);
+                  if (all.length === 0) return [];
+                  // 공통 네비게이션은 섹션 본문에서 빼고 아래 접이 행으로 몰아 넣는다.
+                  const rows = all.filter((a) => !isCommonNav(a));
+                  const commons = all.filter(isCommonNav);
                   const header = (
                     <tr key={`sec:${kind}`}>
                       <td colSpan={7} style={{ paddingTop: 12, paddingBottom: 4, borderBottom: "none" }}>
@@ -1076,99 +1243,35 @@ export default function ScreenSpecView() {
                             className="inline-block w-2.5 h-2.5 rounded-full"
                             style={{ background: kindSwatch(kind) }}
                           />
-                          {KIND_SECTION[kind] ?? kind} ({rows.length})
+                          {KIND_SECTION[kind] ?? kind} ({rows.length}
+                          {commons.length > 0 && <span className="text-text-muted"> + 공통 {commons.length}</span>})
                         </span>
                       </td>
                     </tr>
                   );
-                  const items = rows.map((a) => {
-                    const key = annKey(a);
-                    const m = merged(a);
-                    const d = draftAnn[key];
-                    return (
-                      <tr
-                        key={key}
-                        ref={(el) => {
-                          if (el) rowRefs.current.set(key, el);
-                          else rowRefs.current.delete(key);
-                        }}
-                        onMouseEnter={() => setHoverKey(key)}
-                        onMouseLeave={() => setHoverKey(null)}
-                        style={
-                          flashKey === key
-                            ? { background: "color-mix(in srgb, var(--color-accent) 16%, transparent)", transition: "background 0.3s ease" }
-                            : hoverKey === key
-                              ? { background: "color-mix(in srgb, var(--color-accent) 7%, transparent)" }
-                              : { transition: "background 0.3s ease" }
-                        }
-                      >
-                        <td className="font-semibold" style={{ color: kindSwatch(a.kind) }}>
-                          {badgeGlyph(a.kind, a.no)}
-                        </td>
-                        <td className="text-text-muted">{KIND_LABEL[a.kind] ?? a.kind}</td>
-                        <td className="break-all">
-                          {m.label}
-                          {a.mechanical.required && <span style={{ color: "var(--color-status-error)", marginLeft: 2 }}>*</span>}
-                        </td>
-                        <td className="text-text-muted">{a.eventType}</td>
-                        <td className="text-text-secondary">
-                          {a.handler?.target && <div style={{ fontFamily: "var(--font-mono)", fontSize: 11.5 }}>{a.handler.target}</div>}
-                          {a.handler && a.handler.chain.length > 0 && (
-                            <div className="text-text-muted break-all" style={{ fontSize: 10.5 }}>
-                              {a.handler.chain.join(" → ")}
-                            </div>
-                          )}
-                          {a.handler?.evidence.map((ev) => (
-                            <button
-                              key={`${ev.file}:${ev.line}`}
-                              type="button"
-                              onClick={() => openCodeViewerAt(ev.file, ev.line)}
-                              title="코드 뷰어에서 열기"
-                              className="inline-block mt-0.5 mr-1 px-1 rounded bg-elevated break-all cursor-pointer border-0"
-                              style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)" }}
-                            >
-                              {ev.file}:{ev.line}
-                            </button>
-                          ))}
-                        </td>
-                        <td className="text-text-secondary">
-                          {editing ? (
-                            <div className="space-y-1">
-                              <textarea
-                                value={d?.description ?? ""}
-                                onChange={(e) =>
-                                  setDraftAnn((prev) => ({ ...prev, [key]: { ...prev[key], description: e.target.value } }))
-                                }
-                                rows={2}
-                                className="w-full min-w-40 bg-elevated border border-border-subtle rounded px-1.5 py-1 text-text-primary"
-                                style={{ fontSize: 12 }}
-                              />
-                              <label className="flex items-center gap-1 text-text-muted" style={{ fontSize: 10.5 }}>
-                                <input
-                                  type="checkbox"
-                                  checked={d?.hidden ?? false}
-                                  onChange={(e) =>
-                                    setDraftAnn((prev) => ({ ...prev, [key]: { ...prev[key], hidden: e.target.checked } }))
-                                  }
-                                />
-                                숨김
-                              </label>
-                            </div>
-                          ) : (
-                            m.description
-                          )}
-                        </td>
-                        <td>
-                          {a.handler &&
-                            (() => {
-                              const mc = mechConf(a.handler.confidence);
-                              return <ConfBadge kind={mc.kind} label={mc.label} title={mc.title} />;
-                            })()}
-                        </td>
-                      </tr>
-                    );
-                  });
-                  return [header, ...items];
+                  const fold =
+                    commons.length > 0
+                      ? [
+                          <tr key={`fold:${kind}`}>
+                            <td colSpan={7} style={{ borderBottom: "none", padding: "2px 0 2px 4px" }}>
+                              <button
+                                type="button"
+                                onClick={() => setCommonOpen((v) => !v)}
+                                aria-expanded={linkFoldOpen}
+                                className="inline-flex items-center gap-1.5 cursor-pointer bg-transparent border-0 text-text-muted"
+                                style={{ font: "inherit", fontSize: 11.5, padding: "3px 0" }}
+                                title="전 화면에 반복 등장하는 공통 네비게이션·푸터 링크 — 이 화면 고유 사양이 아니라 기본으로 접어 둡니다"
+                              >
+                                <span style={{ fontSize: 9, width: 10 }}>{linkFoldOpen ? "▾" : "▸"}</span>
+                                공통 네비게이션 {commons.length}건
+                                <span style={{ opacity: 0.7 }}>— 전 화면 반복</span>
+                              </button>
+                            </td>
+                          </tr>,
+                          ...(linkFoldOpen ? commons.map(renderRow) : []),
+                        ]
+                      : [];
+                  return [header, ...rows.map(renderRow), ...fold];
                 })}
               </tbody>
             </table>

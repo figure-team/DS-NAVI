@@ -95,7 +95,7 @@
 | system-map.json | `.understand-anything/` | `generatedFromCommit` |
 | screens.json | `.understand-anything/` | `gitCommit`, `mechanicalHash` |
 | policy-*.md(카테고리) | `.understand-anything/doc-output/` | `sourceCommit`(메타 — `signals.gitCommit`), 앵커 file:line |
-| **policy-domain-*.md** | `.understand-anything/doc-output/` | **`sourceCommit: null` 하드코딩 — 미배선**(`understand-policy.mjs:200`). 어느 커밋을 쓸지 미결(candidates `a741cce` vs domain-graph `dfbb982`) |
+| policy-domain-*.md | `.understand-anything/doc-output/` | `sourceCommit` — **2026-07-16 배선**(P0b, `understand-policy.mjs:200`). `gitCommitHash(projectRoot)` = 생성 시점 HEAD(도메인 모드는 `branch-scanner` 로 소스를 직접 읽으므로 HEAD 가 실제 유래) |
 | rtm.json | `.understand-anything/` | `gitCommit` — **2026-07-16 복구**. 이전엔 필드는 있으나 `understand-rtm.mjs:106` 이 domain-graph 의 없는 키(`graph.gitCommit`)를 읽어 항상 `null` 이었다 |
 | rtm-requirements.json | `.understand-anything/` | (스탬프 없음 — 공백) |
 | SI/as-built 문서 | `.understand-anything/doc-output/` | `sourceCommit` — **2026-07-16 복구**(`understand-docs.mjs:259` 동일 버그) |

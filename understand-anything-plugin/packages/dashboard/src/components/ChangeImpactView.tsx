@@ -12,9 +12,14 @@ import type { BadgeTone } from "./proto/Proto";
  * 진입점(라우트)·도메인·플로우·영속성(매퍼/테이블) 영향까지 그대로 노출하고,
  * 변경영향분석서(09)/구조 오버레이(?overlay=impact)/도메인 딥링크로 연결한다.
  *
- * 데이터: dev 서버 GET /impact.json (토큰 게이트). 이 파일은 CR 원장이 아니라 최신 분석 1건이므로
- * 좌측 트리는 "분석 결과 (1)" 만 정직하게 표기한다. 404 → 빈 상태, 그 외 실패 → 오류 상태.
+ * 데이터: dev 서버 GET /impact.json (토큰 게이트). 404 → 빈 상태, 그 외 실패 → 오류 상태.
  * 검증: impact-verify-report.json 이 있으면 GROUNDED 근거를 표면화(부재 시 미표기 — 정직).
+ *
+ * 좌측 트리는 원장(/impact-history) 단일 목록이다. impact.json 은 질의문을 담지 않으므로
+ * 루트 슬롯만으로는 "무슨 질의였나" 를 알 수 없다 — 그래서 슬롯 지문(앵커 커밋 + 시드 집합)을
+ * 원장 최신 done 항목의 스냅샷과 대조해 그 항목에 [최신] 배지를 붙이고 질의문을 표기한다.
+ * 대조 실패 = 원장에 없는 실행(CLI /understand-impact 직접 실행 등)이 슬롯을 덮어쓴 상태이므로
+ * "기록 없는 분석" 으로 분리해 노출한다(감추면 오래된 분석이 [최신] 로 위장된다 — 실제 사고 이력).
  */
 interface Citation {
   filePath: string;
@@ -155,6 +160,16 @@ const short2 = (p: string): string => p.split("/").slice(-2).join("/");
 const baseName = (p: string): string => p.split("/").pop() ?? p;
 /** flowId → 사람이 읽는 라우트 표기("flow:ANY /x" → "/x"). */
 const shortFlow = (id: string): string => id.replace(/^flow:/, "").replace(/^ANY\s+/, "");
+/**
+ * impact.json 동일성 지문 — 앵커 커밋 + 시드 집합.
+ * 루트 슬롯이 어느 원장 항목의 산출인지 대조하는 용도(슬롯엔 jobId·query 가 없다).
+ */
+const identOf = (d: ImpactData): string =>
+  `${d.gitCommit}|${d.seeds
+    .map((s) => s.relPath)
+    .sort()
+    .join(",")}`;
+
 /** ISO 시각 → "MM-DD HH:mm"(로컬) — 기록 목록용 축약. */
 const fmtTime = (iso: string | null): string =>
   iso
@@ -460,6 +475,56 @@ export default function ChangeImpactView() {
     };
   }, [historyEnabled, accessToken, jobStatus]);
 
+  // 루트 슬롯 지문 — 기록 열람(activeRun) 중에도 "어느 항목이 최신인가" 를 알아야 하므로
+  // data(=열람 대상)와 별개로 항상 조회한다. 부재/실패 = 슬롯 없음(빈 상태와 동일).
+  const [rootMeta, setRootMeta] = useState<{ ident: string; gitCommit: string } | null>(null);
+  useEffect(() => {
+    if (!historyEnabled) return;
+    let alive = true;
+    fetch(`${dataBase}impact.json${tokenQ}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: ImpactData | null) => {
+        if (!alive) return;
+        setRootMeta(d && Array.isArray(d.seeds) && d.gitCommit ? { ident: identOf(d), gitCommit: d.gitCommit } : null);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [historyEnabled, dataBase, tokenQ, jobStatus]);
+
+  // 원장 최신 done 항목(원장은 최신이 앞). 루트 슬롯은 정의상 "가장 최근 성공 job 의 산출" 이라
+  // 이 한 건만 대조하면 충분하다 — 어긋나면 원장 밖 실행이 슬롯을 덮어쓴 것.
+  const newestDone = useMemo(
+    () => history.find((e) => e.status === "done" && e.files.includes("impact.json")) ?? null,
+    [history],
+  );
+  const [newestIdent, setNewestIdent] = useState<string | null>(null);
+  useEffect(() => {
+    if (!newestDone) {
+      setNewestIdent(null);
+      return;
+    }
+    let alive = true;
+    fetch(
+      `/impact-history-item?id=${newestDone.jobId}&name=impact.json&token=${encodeURIComponent(accessToken ?? "")}`,
+    )
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: ImpactData | null) => {
+        if (alive) setNewestIdent(d && Array.isArray(d.seeds) && d.gitCommit ? identOf(d) : null);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [newestDone, accessToken]);
+
+  /** 루트 슬롯을 낳은 원장 항목 — 대조 실패 시 null(= 원장 밖 실행이 슬롯을 점유). */
+  const currentJobId =
+    rootMeta && newestIdent && rootMeta.ident === newestIdent ? (newestDone?.jobId ?? null) : null;
+  /** 슬롯은 있는데 원장에 대응이 없음 → "기록 없는 분석" 으로 분리 노출. */
+  const orphanRoot = historyEnabled && !!rootMeta && !currentJobId;
+
   const verdictOf = useMemo(() => {
     const m = new Map<string, string>();
     for (const it of verify?.items ?? []) m.set(it.ref, it.verdict);
@@ -508,25 +573,16 @@ export default function ChangeImpactView() {
     />
   );
 
-  // 좌측 트리 — 최신(live) 1건 + 분석 기록 원장. 빈/오류 상태에서도 기록 열람은 가능해야
-  // 하므로 ready 분기 밖에서 만들어 공유한다.
+  // 좌측 트리 — 원장 단일 목록(최신 항목에 [최신] 배지). 빈/오류 상태에서도 기록 열람은
+  // 가능해야 하므로 ready 분기 밖에서 만들어 공유한다.
   const selectedEntry = activeRun ? (history.find((e) => e.jobId === activeRun) ?? null) : null;
+  /** 우측 헤더에 질의문을 띄울 대상 — 기록 열람이면 그 항목, 아니면 슬롯을 낳은 항목. */
+  const headerEntry = activeRun
+    ? selectedEntry
+    : (history.find((e) => e.jobId === currentJobId) ?? null);
   const tree = (
     <div className={`${CARD} proto-tree`}>
-      <div className="fold">현재</div>
-      <button
-        type="button"
-        className={`doc${activeRun ? "" : " on"}`}
-        onClick={() => setParam("run", null)}
-      >
-        <span className="truncate" style={{ minWidth: 0 }}>
-          최신 분석{!activeRun && data ? ` · ${data.gitCommit.slice(0, 7)}` : ""}
-        </span>
-        <span className="st">
-          <Badge tone="info">최신</Badge>
-        </span>
-      </button>
-      {historyEnabled && (
+      {historyEnabled ? (
         <>
           <div className="fold">분석 기록 ({history.length})</div>
           {history.length === 0 ? (
@@ -536,23 +592,31 @@ export default function ChangeImpactView() {
           ) : (
             history.map((e) => {
               const openable = e.files.includes("impact.json");
+              const isCurrent = e.jobId === currentJobId;
+              const on = activeRun ? activeRun === e.jobId : isCurrent;
               return (
                 <button
                   key={e.jobId}
                   type="button"
-                  className={`doc${activeRun === e.jobId ? " on" : ""}`}
+                  className={`doc${on ? " on" : ""}`}
                   disabled={!openable}
                   title={`${e.query}\n${fmtTime(e.finishedAt)}${openable ? "" : " · 결과 스냅샷 없음"}`}
                   style={openable ? undefined : { opacity: 0.55, cursor: "default" }}
-                  onClick={() => setParam("run", e.jobId)}
+                  // 최신 항목은 루트 슬롯(문서 09·구조 오버레이와 같은 기준)을 그대로 보여주므로
+                  // ?run= 없이 연다 — 스냅샷 열람 배너 대신 문서/오버레이 링크가 뜬다.
+                  onClick={() => setParam("run", isCurrent ? null : e.jobId)}
                 >
                   <span style={{ minWidth: 0, flex: "1 1 auto" }}>
                     <span className="truncate" style={{ display: "block" }}>
                       {e.query || "(질의 미상)"}
                     </span>
-                    <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{fmtTime(e.finishedAt)}</span>
+                    <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>
+                      {fmtTime(e.finishedAt)}
+                      {isCurrent && e.gitCommit ? ` · ${e.gitCommit.slice(0, 7)}` : ""}
+                    </span>
                   </span>
                   <span className="st">
+                    {isCurrent && <Badge tone="info">최신</Badge>}
                     <Badge tone={e.status === "done" ? "ok" : "err"}>
                       {e.status === "done" ? "완료" : "실패"}
                     </Badge>
@@ -561,6 +625,42 @@ export default function ChangeImpactView() {
               );
             })
           )}
+          {orphanRoot && rootMeta && (
+            <>
+              <div className="fold">기록 없는 분석</div>
+              <button
+                type="button"
+                className={`doc${activeRun ? "" : " on"}`}
+                title={`원장에 기록이 없는 분석입니다 — CLI 직접 실행(/understand-impact) 등이 최신 슬롯을 덮어썼습니다.\n앵커 commit ${rootMeta.gitCommit}`}
+                onClick={() => setParam("run", null)}
+              >
+                <span style={{ minWidth: 0, flex: "1 1 auto" }}>
+                  <span className="truncate" style={{ display: "block" }}>
+                    질의 미상 · {rootMeta.gitCommit.slice(0, 7)}
+                  </span>
+                  <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>
+                    CLI 직접 실행 등 — 원장 미기록
+                  </span>
+                </span>
+                <span className="st">
+                  <Badge tone="info">최신</Badge>
+                </span>
+              </button>
+            </>
+          )}
+        </>
+      ) : (
+        // 원장 없음(demo 번들 — 엔드포인트 미포함) → 슬롯 1건만 표기.
+        <>
+          <div className="fold">현재</div>
+          <button type="button" className="doc on" style={{ cursor: "default" }}>
+            <span className="truncate" style={{ minWidth: 0 }}>
+              최신 분석{data ? ` · ${data.gitCommit.slice(0, 7)}` : ""}
+            </span>
+            <span className="st">
+              <Badge tone="info">최신</Badge>
+            </span>
+          </button>
         </>
       )}
       <div className="fold">안내</div>
@@ -671,17 +771,27 @@ export default function ChangeImpactView() {
                 </>
               )}
             </div>
-            {activeRun && (
+            {/* impact.json 은 질의문을 담지 않으므로 원장 항목에서 가져온다(대조 실패 시 미표기 — 정직). */}
+            {headerEntry && (
               <div className="flex items-center flex-wrap" style={{ gap: 8, marginTop: 8 }}>
                 <span
                   className="text-text-secondary truncate"
                   style={{ fontSize: 12.5, minWidth: 0, maxWidth: 640 }}
-                  title={selectedEntry?.query}
+                  title={headerEntry.query}
                 >
-                  질의: {selectedEntry?.query || "(질의 미상)"}
+                  질의: {headerEntry.query || "(질의 미상)"}
                 </span>
                 <span className="text-text-muted" style={{ fontSize: 11.5, flex: "none" }}>
-                  {fmtTime(selectedEntry?.finishedAt ?? null)} 분석 — 과거 스냅샷이며 문서(09)·구조 오버레이는 최신 기준
+                  {fmtTime(headerEntry.finishedAt)} 분석
+                  {activeRun ? " — 과거 스냅샷이며 문서(09)·구조 오버레이는 최신 기준" : ""}
+                </span>
+              </div>
+            )}
+            {/* 원장 밖 실행이 슬롯을 점유 — 질의문이 유실된 상태임을 감추지 않는다. */}
+            {!activeRun && orphanRoot && (
+              <div className="flex items-center flex-wrap" style={{ gap: 8, marginTop: 8 }}>
+                <span className="text-text-muted" style={{ fontSize: 11.5 }}>
+                  질의 미상 — 원장에 기록되지 않은 실행(CLI 직접 실행 등)의 결과입니다.
                 </span>
               </div>
             )}

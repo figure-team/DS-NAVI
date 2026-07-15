@@ -341,7 +341,7 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
                 <aside
                   className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
                   style={{
-                    width: 300,
+                    width: 270,
                     // 바깥 24px = 탭 헤더·랜딩 카드와 같은 기준선(메뉴 내 격자 통일).
                     margin: "0 0 18px 24px",
                     boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
@@ -353,7 +353,7 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
                 <aside
                   className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
                   style={{
-                    width: 300,
+                    width: 270,
                     // 바깥 24px = 탭 헤더·랜딩 카드와 같은 기준선(메뉴 내 격자 통일).
                     margin: "0 0 18px 24px",
                     boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
@@ -381,7 +381,7 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
                             fontSize: 12.5,
                             fontWeight: active ? 600 : 400,
                             background: active
-                              ? "color-mix(in srgb, var(--color-accent) 8%, transparent)"
+                              ? "color-mix(in srgb, var(--color-accent) 9%, transparent)"
                               : undefined,
                           }}
                         >
@@ -484,7 +484,7 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
       <aside
         className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
         style={{
-          width: 300,
+          width: 270,
           margin: "0 0 18px 24px",
           boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
         }}
@@ -591,7 +591,7 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
                     style={{ fontSize: 11, fontWeight: 700, padding: "4px 6px 2px" }}
                   >
                     <span aria-hidden style={{ fontSize: 8 }}>
-                      {item.collapsed ? "▶" : "▼"}
+                      {item.collapsed ? "▸" : "▾"}
                     </span>
                     <span>
                       {/* 서브그룹 섹션은 label 이 채워져 그대로 렌더, entryType 폴백은
@@ -619,7 +619,7 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
                         padding: "7px 8px",
                         fontWeight: isSelected ? 600 : 400,
                         background: isSelected
-                          ? "color-mix(in srgb, var(--color-accent) 8%, transparent)"
+                          ? "color-mix(in srgb, var(--color-accent) 9%, transparent)"
                           : undefined,
                       }}
                     >

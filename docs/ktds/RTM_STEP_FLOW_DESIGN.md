@@ -137,11 +137,17 @@ claude -p "/understand-rtm --change --target-req <REQ> --kind withdraw --reason 
 
 ## 4. 산출물 · 세션 모델
 
+> **정정(W1, 2026-07-16)**: 아래 트리는 최초 설계 당시 "활성 세션 1개"를 전제로 `session.json`을
+> `rtm-intake/` 직하 단일 파일로 그렸으나, **실제 구현은 `rtm-intake/<sid>/session.json`** —
+> 세션 디렉터리마다 1개다(`understand-anything-plugin/packages/dashboard/server/rtm-sessions.ts`).
+> W1이 이 위에 **복수 세션 원장**(목록·reconcile·상한)을 얹었다 — "세션은 하나"의 근거로 이 트리를
+> 오독하지 말 것. 자세한 원장 모델은 `RTM_INTAKE_WORKSPACE_DESIGN.md` §1.1·§5(W1) 참조.
+
 ```
 .understand-anything/
   rtm-intake/
-    session.json                  # 활성 세션 1개(단일 job과 1:1)
     <sid>/
+      session.json                 # 세션별 진행상태(§4.2) — 세션마다 1개, base 직하 단일 파일 아님
       identified.json             # ① 2계층 누적 중간산출
       요구사항목록표.md            # ②
       요구사항정의서.md            # ③
@@ -235,6 +241,12 @@ claude -p "/understand-rtm --change --target-req <REQ> --kind withdraw --reason 
 
 ## 7. UI 설계 (`RtmView.tsx`)
 
+> **정정(W6, 2026-07-16)**: 본 §7은 `RTM_INTAKE_WORKSPACE_DESIGN.md`가 대체했다.
+> **7.1 모달 목업은 유효**(단발 실행 파라미터 입력이라 존치 — `RTM_INTAKE_WORKSPACE_DESIGN.md` §2.2)하지만,
+> **7.2 "헤더 아래 stepper + 드로어" 구조는 폐기**됐다 — 추적표 "요청 세션" 탭의 좌 270px 세션 원장 +
+> 우 스테퍼·산출물 레이아웃으로 재설계(W1~W4 랜딩). 자세한 배경·레이아웃은
+> `RTM_INTAKE_WORKSPACE_DESIGN.md` §0·§2 참조.
+
 ### 7.1 새 요청 모달 — 목표 단계 선택
 
 ```
@@ -245,7 +257,10 @@ claude -p "/understand-rtm --change --target-req <REQ> --kind withdraw --reason 
 └───────────────────────────────────────────────┘
 ```
 
-### 7.2 단계 진행 패널
+### 7.2 단계 진행 패널 — **폐기(W6, 2026-07-16)**
+
+> `RTM_INTAKE_WORKSPACE_DESIGN.md` §2.2 로 대체됨(요청 세션 탭의 좌 원장/우 콘텐츠). 아래는
+> 폐기된 원안(참고용 보존).
 
 헤더 아래 stepper(①~⑤, 상태색) + 현재 산출 미리보기 드로어:
 

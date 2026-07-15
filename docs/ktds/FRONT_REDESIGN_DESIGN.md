@@ -54,7 +54,7 @@
 | `/structure` | 구조 그래프 | `viewMode="structural"` |
 | `/structure?level=class&node=<id>&overlay=diff` | 상세도·선택·오버레이 | `detailLevel`, `selectedNodeId`, overlay 토글 |
 | `/rtm` | 추적표 원장 | `viewMode="rtm"` |
-| `/rtm/intake/:sid` | 새요청 5단계 인테이크 | RtmView 내부 상태 |
+| `/rtm/intake/:sid` | 새요청 5단계 인테이크 | RtmView 내부 상태 — **§8.12(:290)가 이미 뒤집었다**: 리마운트 회피를 위해 `?sid=` 쿼리로 결정됐고, `RTM_INTAKE_WORKSPACE_DESIGN.md` §1.3·N2가 그 결정을 재확인한다. 이 라우트는 채택되지 않았다 |
 | `/rtm/requests/:reqId` | 요구사항 상세 | RtmView 내부 상태 |
 | `/deliverables` | 산출물 목록 | `viewMode="docs"` |
 | `/deliverables/:docId` | 문서 편집/확정 | DocsView 내부 상태 |

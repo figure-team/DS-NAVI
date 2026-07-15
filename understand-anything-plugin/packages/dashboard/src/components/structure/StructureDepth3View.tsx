@@ -93,7 +93,7 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
     );
   }
 
-  const openBf = (index: number) => navigate(`/structure?domain=${encodeURIComponent(domainId)}&bf=${index}`);
+  const openBf = (index: number) => navigate(`/domains?tab=structure&domain=${encodeURIComponent(domainId)}&bf=${index}`);
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">

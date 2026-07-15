@@ -6,7 +6,6 @@ import type { ViewMode } from "../store";
  * 섹션 전환은 navigate(MODE_TO_PATH[...])로 한다.
  */
 export const MODE_TO_PATH: Record<ViewMode, string> = {
-  structural: "/structure",
   domain: "/domains",
   docs: "/deliverables",
   rtm: "/rtm",

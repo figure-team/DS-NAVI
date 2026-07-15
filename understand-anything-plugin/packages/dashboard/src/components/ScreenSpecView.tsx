@@ -3,7 +3,11 @@ import { Link, useSearchParams } from "react-router";
 import { useDashboardStore } from "../store";
 import { parseBusinessFlows } from "../utils/businessFlow";
 import TrustBadge from "./TrustBadge";
-import { Badge, BtnAccent, BtnOutline, ConfBadge, Ev, PageHead, type ConfKind } from "./proto/Proto";
+import { Badge, BtnAccent, BtnOutline, ConfBadge, type ConfKind } from "./proto/Proto";
+import TopBarSlot from "../app/shell/TopBarSlot";
+import InfoPopover from "./InfoPopover";
+import { Chip } from "./data-map/UnresolvedChips";
+import type { DbUnresolved } from "./data-map/types";
 import { computeCommonHrefs, displayLabel } from "./screenSpecAnnotations";
 import type { Annotation, LabelSource, Screen } from "./screenSpecAnnotations";
 // 근거 popover — RTM 기능표(FunctionView)와 같은 컴포넌트를 그대로 쓴다. 세 번째 복제본을
@@ -294,44 +298,6 @@ const LABEL_SOURCE_STYLE: Partial<Record<LabelSource, { className: string; title
     title: "캡처에서 링크 텍스트를 찾지 못해 주소에서 유도한 이름 — 편집으로 실제 명칭을 넣을 수 있습니다",
   },
 };
-
-/**
- * 미매핑 JSP·도달 실패 배너(데이터 맵 UnresolvedBanner 패턴을 이 파일에 로컬 복제).
- * severity 접이식 카드로 침묵 누락 대신 건수를 항상 표면화한다.
- */
-function SpecFold({ title, sub, entries }: { title: string; sub: string; entries: string[] }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div
-      className="rounded-lg border border-border-subtle bg-panel"
-      style={{ borderLeft: "3px solid var(--color-status-warn)", padding: "8px 14px", marginBottom: 10 }}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 w-full text-left cursor-pointer bg-transparent border-0"
-        style={{ font: "inherit" }}
-      >
-        <span style={{ fontSize: 9, width: 10 }}>{open ? "▾" : "▸"}</span>
-        <span className="text-text-primary" style={{ fontSize: 13, fontWeight: 650 }}>
-          {title}
-        </span>
-        <span className="text-text-muted" style={{ fontSize: 12 }}>
-          {sub}
-        </span>
-      </button>
-      {open && (
-        <ul style={{ margin: "8px 0 4px", paddingLeft: 24 }} className="space-y-0.5">
-          {entries.map((e) => (
-            <li key={e} className="break-all">
-              <Ev>{e}</Ev>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
 
 export default function ScreenSpecView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
@@ -801,38 +767,45 @@ export default function ScreenSpecView() {
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-      {/* pmpl-proto page-head — 미매핑·도달 실패·프래그먼트는 침묵 누락 대신 헤더 메타로 표면화 */}
-      <PageHead
-        title="화면설계서"
-        meta={
-          <>
-            화면 <b className="text-text-primary tabular-nums">{file.screens.length}</b>
-            {" · "}도달 실패 <b className="text-text-primary tabular-nums">{file.missing.length}</b>건
-            {" · "}미매핑 <b className="text-text-primary tabular-nums">{file.unmatchedJsps.length}</b>건
-            {" · "}프래그먼트 <b className="text-text-primary tabular-nums">{file.fragments?.length ?? 0}</b>건
-          </>
-        }
-      />
-
-      {/* 미매핑 JSP·도달 실패 — severity 접이식 배너(데이터 맵 패턴 로컬 복제) */}
-      {(file.unmatchedJsps.length > 0 || file.missing.length > 0) && (
-        <div style={{ marginBottom: 14 }}>
-          {file.unmatchedJsps.length > 0 && (
-            <SpecFold
-              title={`미매핑 JSP ${file.unmatchedJsps.length}건`}
-              sub="— 화면 URL 로 도달하지 못해 캡처가 없는 JSP"
-              entries={file.unmatchedJsps}
-            />
-          )}
+      {/* 메뉴 헤더 제거(2026-07-15) — 카운트 메타는 TopBar 정보 팝오버(ⓘ)로 이관.
+          도달 실패는 데이터 맵 '미해결' 칩과 동일하게 warn 칩(건수 클릭 → 사유·근거 모달)으로. */}
+      <TopBarSlot>
+        <span className="inline-flex items-center gap-2">
+          <InfoPopover
+            title="화면설계 정보"
+            rows={[
+              { label: "화면", value: `${file.screens.length}` },
+              { label: "프래그먼트", value: `${file.fragments?.length ?? 0}건` },
+            ]}
+          />
           {file.missing.length > 0 && (
-            <SpecFold
+            <Chip
+              tone="warn"
+              label={`⚠ 도달 실패 ${file.missing.length}`}
               title={`도달 실패 ${file.missing.length}건`}
               sub="— 요청했으나 응답에 실패한 URL"
-              entries={file.missing.map((m) => `${m.url} — ${m.reason}`)}
+              items={file.missing.map(
+                (m): DbUnresolved => ({ ref: m.url, reason: m.reason, severity: "warn" }),
+              )}
             />
           )}
-        </div>
-      )}
+          {file.unmatchedJsps.length > 0 && (
+            <Chip
+              tone="warn"
+              label={`⚠ 미매핑 ${file.unmatchedJsps.length}`}
+              title={`미매핑 JSP ${file.unmatchedJsps.length}건`}
+              sub="— 화면 URL 로 도달하지 못해 캡처가 없는 JSP"
+              items={file.unmatchedJsps.map(
+                (jsp): DbUnresolved => ({
+                  ref: jsp,
+                  reason: "화면 URL 미도달(캡처 없음)",
+                  severity: "warn",
+                }),
+              )}
+            />
+          )}
+        </span>
+      </TopBarSlot>
 
       {/* 프로토 .scr — 좌 260px 트리 카드 + 우 상세 카드 */}
       <div className="grid items-start grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)]" style={{ gap: 14 }}>

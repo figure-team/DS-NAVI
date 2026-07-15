@@ -8,7 +8,6 @@ export type EdgeCategory = "structural" | "behavioral" | "data-flow" | "dependen
 // 신설 6메뉴(pmpl-proto 메뉴 개편 2차): data/change/programs/quality/report/policy.
 // wiki("문서")·knowledge(지식그래프) 모드는 2026-07-11 은퇴 — 내용은 업무지도·데이터·산출물이 흡수.
 export type ViewMode =
-  | "structural"
   | "domain"
   | "docs"
   | "rtm"

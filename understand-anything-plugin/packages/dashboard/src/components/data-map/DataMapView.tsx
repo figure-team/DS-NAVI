@@ -1,8 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
-import { PageHead, ProtoTabs } from "../proto/Proto";
+import TopBarSlot from "../../app/shell/TopBarSlot";
+import { ProtoTabs } from "../proto/Proto";
 import CrudTab from "./CrudTab";
 import SchemaMetaInfo from "./SchemaMetaInfo";
 import TablesTab from "./TablesTab";
@@ -79,13 +80,13 @@ export default function DataMapView() {
   // db-schema 자체가 없으면 화면 전체를 안내(테이블·ERD 탭이 모두 이것에 의존).
   const schemaMissing = !schema && schemaErr != null;
 
-  // meta 줄에는 [미해결/참고] 칩만 남기고, 서술 정보(산출물·Tier·테이블·SQL 파일)는
-  // ⓘ 뒤로 접는다 — 칩이 헤더에서 묻히지 않게. PageHead.meta 는 ReactNode 라
-  // Proto.tsx(공통 금지 파일) 수정 없이 얹힌다.
+  // 메뉴 헤더 제거(2026-07-15) — ⓘ 스캔정보 + [미해결/참고] 칩을 전역 TopBar 슬롯으로 이관.
+  // ⓘ 뒤로 서술 정보(산출물·Tier·테이블·SQL 파일)를 접어 칩이 묻히지 않게 한다.
   const meta = schema ? (
     <span className="inline-flex items-center gap-2">
       <SchemaMetaInfo schema={schema} />
-      <UnresolvedChips unresolved={schema.unresolved ?? []} />
+      {/* 미해결(경고)만 TopBar 에 노출 — 참고(info)는 ⓘ 팝오버 안으로 접었다(SchemaMetaInfo). */}
+      <UnresolvedChips unresolved={schema.unresolved ?? []} severity="warn" />
     </span>
   ) : undefined;
 
@@ -99,30 +100,9 @@ export default function DataMapView() {
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-      <PageHead
-        title="데이터 맵"
-        meta={meta}
-        actions={
-          <>
-            <Link
-              to="/deliverables/si-테이블정의서"
-              className="rounded-lg border border-border-medium bg-panel text-text-secondary hover:bg-elevated transition-colors font-semibold"
-              style={{ padding: "7px 14px", fontSize: 13, textDecoration: "none", display: "inline-block" }}
-            >
-              테이블 정의서 md
-            </Link>
-            <button
-              type="button"
-              disabled
-              title="후속 예정"
-              className="rounded-lg border border-border-medium bg-panel text-text-secondary font-semibold disabled:opacity-50 disabled:cursor-default"
-              style={{ padding: "7px 14px", fontSize: 13 }}
-            >
-              xlsx
-            </button>
-          </>
-        }
-      />
+      {/* 메뉴 헤더("데이터 맵" 제목) 제거(2026-07-15) — ⓘ·미해결/참고 칩은 TopBar 슬롯으로 이관,
+          테이블정의서 md·xlsx 버튼은 미사용이라 헤더와 함께 삭제. */}
+      {meta && <TopBarSlot>{meta}</TopBarSlot>}
 
       {schemaMissing ? (
         <EmptyCard>

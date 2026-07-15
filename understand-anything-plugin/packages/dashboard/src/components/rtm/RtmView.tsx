@@ -13,6 +13,7 @@ import RequirementView from "./RequirementView";
 import ScenarioDrawer from "./ScenarioDrawer";
 import ScenarioView from "./ScenarioView";
 import StatusView from "./StatusView";
+import TopBarSlot from "../../app/shell/TopBarSlot";
 import { useChange } from "./useChange";
 import { useIntake } from "./useIntake";
 import {
@@ -374,15 +375,20 @@ export default function RtmView() {
         {/* P4: 단계 진행 스테퍼 */}
         <IntakeStepper />
 
-        {/* 진단 배너 (#7) — pmpl-proto .banner(좌측 3px 상태 보더) */}
+        {/* 진단 배너 → TopBar warn 칩으로 이관(2026-07-15). 클릭 동작(커버리지 현황 탭 이동)은
+            그대로 유지 — 상세는 현황 탭 무결성 진단 목록에서 본다(모달 중복 없음). */}
         {diags.length > 0 && (
-          <button type="button" onClick={() => setView("status")} className="flex items-center gap-2.5 text-left bg-panel hover:bg-elevated transition-colors cursor-pointer"
-            style={{ margin: "12px 24px 0", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--color-border-subtle)", borderLeft: `3px solid ${errCount > 0 ? BAD : WARN}` }}>
-            <span className="inline-flex items-center whitespace-nowrap font-bold" style={{ fontSize: 11, padding: "2px 7px", borderRadius: 5, color: errCount > 0 ? BAD : WARN, background: `color-mix(in srgb, ${errCount > 0 ? BAD : WARN} 12%, transparent)` }}>무결성 {diags.length}건</span>
-            <span style={{ fontSize: 13, fontWeight: 650, color: "var(--color-text-primary)" }}>진단:</span>
-            <span className="text-text-muted" style={{ fontSize: 13 }}>{diags[0].message}{diags.length > 1 ? ` 외 ${diags.length - 1}건` : ""}{errCount > 0 ? ` (error ${errCount})` : ""} — 커버리지 현황 탭에서 확인</span>
-            <span className="text-text-muted ml-auto" style={{ fontSize: 11 }}>›</span>
-          </button>
+          <TopBarSlot>
+            <button
+              type="button"
+              onClick={() => setView("status")}
+              title={`무결성 진단 ${diags.length}건${errCount > 0 ? ` · 오류 ${errCount}` : ""} — 커버리지 현황 탭에서 확인`}
+              className="rounded-full border cursor-pointer transition-colors hover:bg-elevated whitespace-nowrap"
+              style={{ font: "inherit", fontSize: 11.5, fontWeight: 650, lineHeight: 1.7, padding: "0 8px", background: "transparent", borderColor: errCount > 0 ? BAD : WARN, color: errCount > 0 ? BAD : WARN }}
+            >
+              ⚠ 무결성 {diags.length}
+            </button>
+          </TopBarSlot>
         )}
 
         {/* pmpl-proto .tabs — 기준(기능/요청)·시험 시나리오·커버리지 현황 (count 병기) */}

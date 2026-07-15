@@ -3,7 +3,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
-import { Badge, ConfBadge, PageHead, ProtoTabs, StatTile } from "./proto/Proto";
+import { Badge, ConfBadge, ProtoTabs, StatTile } from "./proto/Proto";
+import TopBarSlot from "../app/shell/TopBarSlot";
+import InfoPopover from "./InfoPopover";
 
 /**
  * 프로그램 목록 뷰(pmpl-proto pg-programs) — 엔진 산출물을 전용 화면으로 승격한다.
@@ -483,20 +485,35 @@ export default function ProgramsView() {
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-      <PageHead
-        title="프로그램 목록"
-        meta={
-          <>
-            program-inventory · 동일 commit 결정론 ·{" "}
-            <span style={{ fontFamily: "var(--font-mono)" }}>{gitShort}</span>
-          </>
-        }
-        actions={
-          <OutlineLink to={DELIVERABLE_LINK} title="산출물 문서로 이동(xlsx 병기 확인)">
-            xlsx 다운로드
-          </OutlineLink>
-        }
-      />
+      {/* 메뉴 헤더 제거(2026-07-15) — 정보는 TopBar 정보 팝오버(ⓘ), xlsx 링크는 액션 슬롯으로.
+          미해석 엔드포인트·핸들러 카운트는 warn 배지로 표면화(상세 리스트가 없어 비클릭). */}
+      <TopBarSlot>
+        <span className="inline-flex items-center gap-2">
+          <InfoPopover
+            title="프로그램 정보"
+            rows={[
+              { label: "산출물", value: "program-inventory" },
+              { label: "결정성", value: "동일 commit 결정론" },
+              { label: "commit", value: gitShort },
+            ]}
+          />
+          {(interfaces?.stats.unresolvedEndpoints ?? 0) > 0 && (
+            <Badge tone="warn" title="엔드포인트를 확정하지 못한 연계 신호 — 표면화">
+              ⚠ 미해석 엔드포인트 {interfaces!.stats.unresolvedEndpoints}
+            </Badge>
+          )}
+          {(batch?.stats.unresolvedHandlers ?? 0) > 0 && (
+            <Badge tone="warn" title="핸들러를 확정하지 못한 배치 신호 — 표면화">
+              ⚠ 미해석 핸들러 {batch!.stats.unresolvedHandlers}
+            </Badge>
+          )}
+        </span>
+      </TopBarSlot>
+      <TopBarSlot slot="actions">
+        <OutlineLink to={DELIVERABLE_LINK} title="산출물 문서로 이동(xlsx 병기 확인)">
+          xlsx 다운로드
+        </OutlineLink>
+      </TopBarSlot>
 
       {invError ? (
         <PanelCard>
@@ -1085,10 +1102,9 @@ function DomainCell({ domain, via, q }: { domain: string | null; via?: string | 
   );
 }
 
-/** 인터페이스 unresolved 표면화 — 총계·프로토콜 분포·미해석 엔드포인트(침묵 누락 금지). */
+/** 인터페이스 통계 라인 — 총계·프로토콜 분포(미해석 엔드포인트는 TopBar warn 배지로 이관). */
 function IfStatLine({ stats }: { stats: InterfacesFile["stats"] }) {
   const byProtocol = stats.byProtocol ?? [];
-  const unresolved = stats.unresolvedEndpoints ?? 0;
   return (
     <div className="flex flex-wrap items-center text-text-muted" style={{ gap: 10, fontSize: 12 }}>
       <span className="tabular-nums">연계 총 {stats.total}건</span>
@@ -1098,19 +1114,13 @@ function IfStatLine({ stats }: { stats: InterfacesFile["stats"] }) {
           {p.protocol} {p.count}
         </span>
       ))}
-      {unresolved > 0 && (
-        <Badge tone="warn" title="엔드포인트를 확정하지 못한 연계 신호 — 표면화">
-          미해석 엔드포인트 {unresolved}
-        </Badge>
-      )}
     </div>
   );
 }
 
-/** 배치 unresolved 표면화 — 총계·트리거 분포·미해석 핸들러(침묵 누락 금지). */
+/** 배치 통계 라인 — 총계·트리거 분포(미해석 핸들러는 TopBar warn 배지로 이관). */
 function BatchStatLine({ stats }: { stats: BatchFile["stats"] }) {
   const byTrigger = stats.byTrigger ?? [];
-  const unresolved = stats.unresolvedHandlers ?? 0;
   return (
     <div className="flex flex-wrap items-center text-text-muted" style={{ gap: 10, fontSize: 12 }}>
       <span className="tabular-nums">잡 총 {stats.total}건</span>
@@ -1119,11 +1129,6 @@ function BatchStatLine({ stats }: { stats: BatchFile["stats"] }) {
           {t.trigger} {t.count}
         </span>
       ))}
-      {unresolved > 0 && (
-        <Badge tone="warn" title="핸들러를 확정하지 못한 배치 신호 — 표면화">
-          미해석 핸들러 {unresolved}
-        </Badge>
-      )}
     </div>
   );
 }

@@ -198,13 +198,13 @@ describe("markFor / groupImpactMark", () => {
 describe("resolveStructureRoute", () => {
   const domainIds = new Set(["domain:cart", "domain:catalog", "domain:account"]);
 
-  it("old KG deep link (node/level) always redirects to bare /structure", () => {
+  it("old KG deep link (node/level) always redirects to bare /domains?tab=structure", () => {
     const route = resolveStructureRoute(
       { group: null, domain: null, bf: null, node: "file:x", level: "layer-detail" },
       GROUPS,
       domainIds,
     );
-    expect(route).toEqual({ kind: "redirect", to: "/structure" });
+    expect(route).toEqual({ kind: "redirect", to: "/domains?tab=structure" });
   });
 
   it("node/level redirect wins even if domain/group are also present", () => {
@@ -233,7 +233,7 @@ describe("resolveStructureRoute", () => {
 
   it("?group=<unknown> -> redirect to landing", () => {
     const route = resolveStructureRoute({ group: "g:ghost", domain: null, bf: null, node: null, level: null }, GROUPS, domainIds);
-    expect(route).toEqual({ kind: "redirect", to: "/structure" });
+    expect(route).toEqual({ kind: "redirect", to: "/domains?tab=structure" });
   });
 
   it("?domain=<id> -> depth3", () => {
@@ -243,7 +243,7 @@ describe("resolveStructureRoute", () => {
 
   it("?domain=<unknown> -> redirect", () => {
     const route = resolveStructureRoute({ group: null, domain: "domain:ghost", bf: null, node: null, level: null }, GROUPS, domainIds);
-    expect(route).toEqual({ kind: "redirect", to: "/structure" });
+    expect(route).toEqual({ kind: "redirect", to: "/domains?tab=structure" });
   });
 
   it("?domain=<id>&bf=<n> -> depth4", () => {

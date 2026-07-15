@@ -76,7 +76,7 @@ function EvidencePane({ group }: { group: ReasonGroup }) {
   );
 }
 
-function UnresolvedModal({
+export function UnresolvedModal({
   title,
   sub,
   items,
@@ -184,7 +184,7 @@ function UnresolvedModal({
   );
 }
 
-function Chip({
+export function Chip({
   tone,
   label,
   title,
@@ -233,10 +233,17 @@ function Chip({
  * 배너가 탭 바 위에서 46px 을 상시 먹고, db-schema 신호가 crud-matrix 기반 CRUD 탭에서도
  * 뜨던 스코프 누수를 함께 정리. meta 는 ReactNode 라 Proto.tsx(공통 금지 파일) 수정 없이 얹힌다.
  */
-export default function UnresolvedChips({ unresolved }: { unresolved: DbUnresolved[] }) {
-  const warns = unresolved.filter((u) => u.severity !== "info");
-  const infos = unresolved.filter((u) => u.severity === "info");
-  if (unresolved.length === 0) return null;
+export default function UnresolvedChips({
+  unresolved,
+  severity = "all",
+}: {
+  unresolved: DbUnresolved[];
+  /** 렌더할 심각도 — "warn"(경고만) | "info"(참고만) | "all"(둘 다, 기본). */
+  severity?: "warn" | "info" | "all";
+}) {
+  const warns = severity === "info" ? [] : unresolved.filter((u) => u.severity !== "info");
+  const infos = severity === "warn" ? [] : unresolved.filter((u) => u.severity === "info");
+  if (warns.length === 0 && infos.length === 0) return null;
   return (
     <span className="inline-flex items-center gap-1.5" style={{ marginLeft: 2 }}>
       {warns.length > 0 && (

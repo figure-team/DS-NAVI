@@ -3,7 +3,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
-import { Badge, BtnAccent, Ev, PageHead, StatTile } from "./proto/Proto";
+import { Badge, BtnAccent, Ev, StatTile } from "./proto/Proto";
+import TopBarSlot from "../app/shell/TopBarSlot";
+import InfoPopover, { type InfoRow } from "./InfoPopover";
+import { Chip, UnresolvedModal } from "./data-map/UnresolvedChips";
+import type { DbUnresolved } from "./data-map/types";
 import type { BadgeTone } from "./proto/Proto";
 
 /**
@@ -348,56 +352,6 @@ function FileGroups({
   );
 }
 
-/** needsReview 배너 — reason 그룹핑 fold + severity(warn/info) 분리(UnresolvedBanner 패턴 로컬 복제). */
-function ReviewFold({ tone, title, sub, items }: { tone: "warn" | "info"; title: string; sub: string; items: NeedsReviewItem[] }) {
-  const [open, setOpen] = useState(false);
-  const borderColor = tone === "warn" ? "var(--color-status-warn)" : "var(--color-border-medium)";
-  const groups = useMemo(() => {
-    const m = new Map<string, string[]>();
-    for (const it of items) m.set(it.reason, [...(m.get(it.reason) ?? []), it.ref]);
-    return [...m.entries()].map(([reason, refs]) => ({ reason, refs }));
-  }, [items]);
-  return (
-    <div
-      className="rounded-lg border border-border-subtle bg-panel"
-      style={{ borderLeft: `3px solid ${borderColor}`, padding: "8px 14px", marginBottom: 10 }}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 w-full text-left cursor-pointer bg-transparent border-0"
-        style={{ font: "inherit" }}
-      >
-        <span style={{ fontSize: 9, width: 10 }}>{open ? "▾" : "▸"}</span>
-        <span className="text-text-primary" style={{ fontSize: 13, fontWeight: 650 }}>
-          {title}
-        </span>
-        <span className="text-text-muted" style={{ fontSize: 12 }}>
-          {sub}
-        </span>
-      </button>
-      {open && (
-        <div style={{ margin: "8px 0 4px", paddingLeft: 20 }}>
-          {groups.map((g) => (
-            <div key={g.reason} style={{ marginBottom: 6 }}>
-              <div className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.5 }}>
-                {g.reason} <span className="text-text-muted">×{g.refs.length}</span>
-              </div>
-              <ul style={{ margin: "2px 0 0", paddingLeft: 16 }}>
-                {g.refs.map((ref) => (
-                  <li key={ref} style={{ marginBottom: 1 }}>
-                    <Ev>{ref}</Ev>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function ChangeImpactView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
   const openImpactModal = useDashboardStore((s) => s.openImpactModal);
@@ -587,12 +541,60 @@ export default function ChangeImpactView() {
       { replace },
     );
 
+  // 확인 필요(warn)·참고(info) 신호 — 데이터 맵 미해결/참고와 동일하게 TopBar 로 이관.
+  // data 이전(로딩/오류)엔 빈 배열이라 칩·행·모달이 자연히 안 뜬다.
+  const needsReview = data?.needsReview ?? [];
+  const warnReview = needsReview.filter((r) => r.severity !== "info");
+  const infoReview = needsReview.filter((r) => r.severity === "info");
+  const [reviewInfoOpen, setReviewInfoOpen] = useState(false);
+
+  const infoRows: InfoRow[] = [
+    { label: "산출물", value: "impact.json" },
+    { label: "범위", value: "CR 단위 상·하류 도달성" },
+    { label: "용도", value: "변경영향분석서(09) 원천" },
+  ];
+  if (infoReview.length > 0) {
+    infoRows.push({
+      label: "참고",
+      value: `${infoReview.length}건`,
+      onClick: () => setReviewInfoOpen(true),
+    });
+  }
+
+  // 메뉴 헤더 제거(2026-07-15) — 정보/확인필요/참고는 TopBar, '자연어 영향 분석'은 액션 슬롯으로.
+  // head 는 각 렌더 상태에서 그대로 렌더되며 포털이라 인라인 레이아웃은 차지하지 않는다.
   const head = (
-    <PageHead
-      title="변경 · 영향 분석"
-      meta="impact.json · CR 단위 상·하류 도달성 — 변경영향분석서(09)의 원천"
-      actions={<BtnAccent onClick={openImpactModal}>자연어 영향 분석</BtnAccent>}
-    />
+    <>
+      <TopBarSlot>
+        <span className="inline-flex items-center gap-2">
+          <InfoPopover title="변경·영향 정보" rows={infoRows} />
+          {warnReview.length > 0 && (
+            <Chip
+              tone="warn"
+              label={`⚠ 확인 필요 ${warnReview.length}`}
+              title={`확인 필요 ${warnReview.length}건`}
+              sub="— 정합 확인이 필요한 신호"
+              items={warnReview.map(
+                (r): DbUnresolved => ({ ref: r.ref, reason: r.reason, severity: "warn" }),
+              )}
+            />
+          )}
+        </span>
+      </TopBarSlot>
+      <TopBarSlot slot="actions">
+        <BtnAccent onClick={openImpactModal}>자연어 영향 분석</BtnAccent>
+      </TopBarSlot>
+      {reviewInfoOpen && (
+        <UnresolvedModal
+          title={`참고 ${infoReview.length}건`}
+          sub="— 무해 신호"
+          items={infoReview.map(
+            (r): DbUnresolved => ({ ref: r.ref, reason: r.reason, severity: "info" }),
+          )}
+          onClose={() => setReviewInfoOpen(false)}
+        />
+      )}
+    </>
   );
 
   // 좌측 트리 — 원장 단일 목록(최신 항목에 [최신] 배지). 빈/오류 상태에서도 기록 열람은
@@ -759,9 +761,6 @@ export default function ChangeImpactView() {
     tables.sort((a, b) => a.name.toUpperCase().localeCompare(b.name.toUpperCase()));
   }
 
-  const warnReview = data.needsReview.filter((r) => r.severity !== "info");
-  const infoReview = data.needsReview.filter((r) => r.severity === "info");
-
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
       {head}
@@ -798,7 +797,7 @@ export default function ChangeImpactView() {
               ) : (
                 <>
                   <LinkBtn to="/deliverables/09_impact-analysis">변경영향분석서(09) 보기</LinkBtn>
-                  <LinkBtn to="/structure?overlay=impact">그래프 오버레이 →</LinkBtn>
+                  <LinkBtn to="/domains?tab=structure&overlay=impact">그래프 오버레이 →</LinkBtn>
                 </>
               )}
             </div>
@@ -1084,32 +1083,8 @@ export default function ChangeImpactView() {
 
             {/* 우 — 확인 필요 · 후속 조치 */}
             <div className={CARD} style={{ padding: "16px 18px" }}>
-              <h3 style={PANEL_H3}>확인 필요 · 후속 조치</h3>
-              {data.needsReview.length === 0 ? (
-                <p className="text-text-muted" style={{ fontSize: 12.5, padding: "4px 2px" }}>
-                  확인 필요 항목 없음
-                </p>
-              ) : (
-                <>
-                  {warnReview.length > 0 && (
-                    <ReviewFold
-                      tone="warn"
-                      title={`확인 필요 ${warnReview.length}건`}
-                      sub="— 정합 확인이 필요한 신호"
-                      items={warnReview}
-                    />
-                  )}
-                  {infoReview.length > 0 && (
-                    <ReviewFold
-                      tone="info"
-                      title={`참고 ${infoReview.length}건`}
-                      sub="— 무해 신호"
-                      items={infoReview}
-                    />
-                  )}
-                </>
-              )}
-
+              {/* 확인 필요(warn)·참고(info)는 TopBar 칩/행으로 이관(2026-07-15) — 아래는 영향 산출물. */}
+              <h3 style={PANEL_H3}>후속 조치</h3>
               <div style={GRP_LABEL}>영향 산출물</div>
               <div className="flex items-center gap-2" style={ROW}>
                 <span style={{ fontSize: 13, color: "var(--color-text-primary)", flex: "1 1 auto" }}>
@@ -1123,7 +1098,7 @@ export default function ChangeImpactView() {
                 <span style={{ fontSize: 13, color: "var(--color-text-primary)", flex: "1 1 auto" }}>
                   구조 그래프 오버레이
                 </span>
-                <Link to="/structure?overlay=impact" style={LINK_TEXT}>
+                <Link to="/domains?tab=structure&overlay=impact" style={LINK_TEXT}>
                   열기 →
                 </Link>
               </div>

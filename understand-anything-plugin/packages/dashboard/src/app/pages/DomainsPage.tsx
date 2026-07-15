@@ -8,6 +8,9 @@ import GroupWorkspaceView from "../../components/GroupWorkspaceView"; // DOMAIN_
 import StructureBreadcrumb, {
   type StructureCrumb,
 } from "../../components/structure/StructureBreadcrumb"; // 헤더 통일: 구조 탭과 동일 브레드크럼
+import StructureTab from "../../components/structure/StructureTab"; // 라우트 통일: 구조 탭 본문(?tab=structure)
+import DiffToggle from "../../components/DiffToggle";
+import WorkMapInfoPopover from "../../components/WorkMapInfoPopover";
 import { resolveDomainRoute, resolveGroups } from "../../utils/domainGroups";
 import { findDomain, hasBusinessFlow, resolveWorkspaceView } from "../../utils/domainData";
 import { useI18n } from "../../contexts/I18nContext";
@@ -28,6 +31,8 @@ export default function DomainsPage() {
   const params = useParams<{ domainId?: string; groupKey?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  // 라우트 통일(2026-07-15): 구조는 이 페이지의 ?tab=structure 탭 — 별도 /structure 라우트 은퇴.
+  const tab = searchParams.get("tab") === "structure" ? "structure" : "map";
   const { t } = useI18n();
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
   const graph = useDashboardStore((s) => s.graph);
@@ -154,38 +159,47 @@ export default function DomainsPage() {
   // 리다이렉트 판정도 같은 이유로 빈 화면(전이 상태) — 목적지가 즉시 이펙트로 반영된다.
   return (
     <div className="h-full w-full flex flex-col bg-root text-text-primary">
-      {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조, pmpl-proto .tabs) — 구조
-          탭은 /structure 로 라우트 전환(StructurePage 가 같은 행을 렌더해 이어져 보인다).
-          도메인 진입 중에만 「기능」 탭이 붙는다(하위탭 승격, 사용자 확정). */}
+      {/* 정보 팝오버(ⓘ) — 시스템 구성도/구조 두 탭 공통(셸이 소유, 탭 전환에도 유지). */}
+      <WorkMapInfoPopover />
+      {/* 업무 지도 상단 탭(시스템 구성도/구조, pmpl-proto .tabs). 라우트 통일:
+          구조 탭은 같은 /domains 의 ?tab=structure 라 페이지 언마운트가 없다.
+          도메인 진입 중에만(구조 탭 아닐 때) 「기능」 탭이 붙는다. */}
       <WorkMapTabs
-        active={effectiveDomainId && view === "code" ? "code" : "map"}
-        onDomainView={effectiveDomainId ? switchView : undefined}
+        active={tab === "structure" ? "structure" : effectiveDomainId && view === "code" ? "code" : "map"}
+        right={tab === "structure" ? <DiffToggle /> : undefined}
+        onDomainView={tab !== "structure" && effectiveDomainId ? switchView : undefined}
       />
-      {/* 구조 탭과 동일한 헤더 — 탭 바로 아래 브레드크럼 한 줄(사용자 요청). */}
-      <StructureBreadcrumb
-        crumbs={crumbs}
-        label={t.domainMap.breadcrumbLabel}
-        right={
-          resolved.kind === "landing" ? (
-            <button
-              type="button"
-              onClick={() => setWorksExpanded((v) => !v)}
-              aria-pressed={worksExpanded}
-              className="shrink-0 rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
-              style={{ fontSize: 11.5, padding: "4px 10px" }}
-            >
-              {worksExpanded ? t.domainMap.collapseAllWorks : t.domainMap.expandAllWorks}
-            </button>
-          ) : null
-        }
-      />
-      <div className="flex-1 min-h-0 relative">
-        {resolved.kind === "landing" && <DomainMapView worksExpanded={worksExpanded} />}
-        {resolved.kind === "flat" && (activeDomainId ? <FlowListView /> : null)}
-        {resolved.kind === "group" && (
-          <GroupWorkspaceView group={resolved.group} selectedDomainId={resolved.domainId} />
-        )}
-      </div>
+      {tab === "structure" ? (
+        <StructureTab />
+      ) : (
+        <>
+          {/* 구조 탭과 동일한 헤더 — 탭 바로 아래 브레드크럼 한 줄(사용자 요청). */}
+          <StructureBreadcrumb
+            crumbs={crumbs}
+            label={t.domainMap.breadcrumbLabel}
+            right={
+              resolved.kind === "landing" ? (
+                <button
+                  type="button"
+                  onClick={() => setWorksExpanded((v) => !v)}
+                  aria-pressed={worksExpanded}
+                  className="shrink-0 rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
+                  style={{ fontSize: 11.5, padding: "4px 10px" }}
+                >
+                  {worksExpanded ? t.domainMap.collapseAllWorks : t.domainMap.expandAllWorks}
+                </button>
+              ) : null
+            }
+          />
+          <div className="flex-1 min-h-0 relative">
+            {resolved.kind === "landing" && <DomainMapView worksExpanded={worksExpanded} />}
+            {resolved.kind === "flat" && (activeDomainId ? <FlowListView /> : null)}
+            {resolved.kind === "group" && (
+              <GroupWorkspaceView group={resolved.group} selectedDomainId={resolved.domainId} />
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

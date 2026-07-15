@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router";
 import { useDashboardStore } from "../../store";
 import { PageHead, ProtoTabs } from "../proto/Proto";
 import CrudTab from "./CrudTab";
+import SchemaMetaInfo from "./SchemaMetaInfo";
 import TablesTab from "./TablesTab";
 import UnresolvedChips from "./UnresolvedChips";
 import type { CrudMatrix, DbSchema } from "./types";
@@ -78,13 +79,12 @@ export default function DataMapView() {
   // db-schema 자체가 없으면 화면 전체를 안내(테이블·ERD 탭이 모두 이것에 의존).
   const schemaMissing = !schema && schemaErr != null;
 
-  // unresolved 는 meta 줄에 칩으로 얹는다 — 이 줄이 서술하는 대상이 곧 db-schema.json 이라
-  // 신호의 출처가 붙고, 배너로 쓰던 수직 공간(46px)이 회수된다. PageHead.meta 는 ReactNode.
+  // meta 줄에는 [미해결/참고] 칩만 남기고, 서술 정보(산출물·Tier·테이블·SQL 파일)는
+  // ⓘ 뒤로 접는다 — 칩이 헤더에서 묻히지 않게. PageHead.meta 는 ReactNode 라
+  // Proto.tsx(공통 금지 파일) 수정 없이 얹힌다.
   const meta = schema ? (
-    <span className="inline-flex items-center gap-2 flex-wrap">
-      <span>
-        {`db-schema.json · Tier ${schema.tier?.toUpperCase() ?? "?"} · 테이블 ${schema.tables.length} · SQL ${schema.sqlFileCount ?? "?"}파일`}
-      </span>
+    <span className="inline-flex items-center gap-2">
+      <SchemaMetaInfo schema={schema} />
       <UnresolvedChips unresolved={schema.unresolved ?? []} />
     </span>
   ) : undefined;

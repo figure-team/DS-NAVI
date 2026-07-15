@@ -292,53 +292,6 @@ const LABEL_SOURCE_STYLE: Partial<Record<LabelSource, { className: string; title
 };
 
 /**
- * 근거 칩 접이 — 저장소 전체 경로(src/main/java/…/CatalogActionBean.java:190)가 동작 열
- * 폭을 독식해 항목 열 글자가 세로로 쪼개지므로, 기본은 건수만 보이고 펼치면 파일명:줄로 준다.
- * 전체 경로는 칩 툴팁에 남긴다(근거는 접어도 사라지지 않는다).
- */
-function EvidenceFold({
-  evidence,
-  onOpen,
-}: {
-  evidence: Array<{ file: string; line: number }>;
-  onOpen: (file: string, line: number) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  if (evidence.length === 0) return null;
-  return (
-    <div style={{ marginTop: 2 }}>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        className="inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 text-text-muted"
-        style={{ font: "inherit", fontSize: 10.5, padding: 0 }}
-        title="이 판정의 코드 근거 — 펼치면 파일:줄, 클릭하면 코드 뷰어로 엽니다"
-      >
-        <span style={{ fontSize: 8, width: 8 }}>{open ? "▾" : "▸"}</span>
-        근거 {evidence.length}
-      </button>
-      {open && (
-        <div>
-          {evidence.map((ev) => (
-            <button
-              key={`${ev.file}:${ev.line}`}
-              type="button"
-              onClick={() => onOpen(ev.file, ev.line)}
-              title={`코드 뷰어에서 열기 — ${ev.file}:${ev.line}`}
-              className="inline-block mt-0.5 mr-1 px-1 rounded bg-elevated break-all cursor-pointer border-0"
-              style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)" }}
-            >
-              {ev.file.split("/").pop()}:{ev.line}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/**
  * 미매핑 JSP·도달 실패 배너(데이터 맵 UnresolvedBanner 패턴을 이 파일에 로컬 복제).
  * severity 접이식 카드로 침묵 누락 대신 건수를 항상 표면화한다.
  */
@@ -417,6 +370,16 @@ export default function ScreenSpecView() {
   const [kindFilter, setKindFilter] = useState<string | null>(null);
   // 공통 네비게이션 링크 접기 — 기본 접힘. 링크 세그먼트를 고른 경우엔 강제 전개한다.
   const [commonOpen, setCommonOpen] = useState(false);
+  // 근거 펼침(annKey 단위) — 신뢰도 배지가 토글한다. 배지 등급과 근거는 같은 handler 를
+  // 설명하므로(등급은 살아남은 evidence 로 정해진다) 별도 접이를 두지 않고 배지에 합쳤다.
+  const [openEvidence, setOpenEvidence] = useState<ReadonlySet<string>>(new Set());
+  const toggleEvidence = (key: string) =>
+    setOpenEvidence((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   // 캡처 배지 클릭 → 범례 표 해당 행으로 스크롤 + 잠깐 강조(flash).
   const rowRefs = useRef(new Map<string, HTMLTableRowElement>());
   const [flashKey, setFlashKey] = useState<string | null>(null);
@@ -441,6 +404,7 @@ export default function ScreenSpecView() {
     setFlashKey(null);
     setKindFilter(null);
     setCommonOpen(false);
+    setOpenEvidence(new Set());
   }, [selId]);
 
   const load = useCallback(() => {
@@ -721,12 +685,14 @@ export default function ScreenSpecView() {
   /** 표·배지 공용 표시 라벨 — 사람 override > 파서 라벨 > href 유도. */
   const dispLabel = (a: Annotation) => displayLabel(a, selOv?.annotations?.[annKey(a)]?.label);
 
-  const renderRow = (a: Annotation) => {
+  const renderRow = (a: Annotation): ReactNode[] => {
     const key = annKey(a);
     const m = merged(a);
     const dl = dispLabel(a);
     const d = draftAnn[key];
-    return (
+    const evidence = a.handler?.evidence ?? [];
+    const evOpen = openEvidence.has(key);
+    const main = (
       <tr
         key={key}
         ref={(el) => {
@@ -776,7 +742,6 @@ export default function ScreenSpecView() {
               )}
             </div>
           )}
-          {a.handler && <EvidenceFold evidence={a.handler.evidence} onOpen={openCodeViewerAt} />}
         </td>
         <td className="text-text-secondary">
           {editing ? (
@@ -805,11 +770,52 @@ export default function ScreenSpecView() {
           {a.handler &&
             (() => {
               const mc = mechConf(a.handler.confidence);
-              return <ConfBadge kind={mc.kind} label={mc.label} title={mc.title} />;
+              // 근거가 없으면 펼 것도 없다 — 배지만(등급 자체는 근거 유무로 정해지므로 사실상 하위 등급).
+              if (evidence.length === 0) return <ConfBadge kind={mc.kind} label={mc.label} title={mc.title} />;
+              return (
+                <button
+                  type="button"
+                  onClick={() => toggleEvidence(key)}
+                  aria-expanded={evOpen}
+                  className="inline-flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
+                  style={{ font: "inherit" }}
+                  title={`${mc.title} — 클릭하면 이 판정의 근거 ${evidence.length}건(파일:줄)을 폅니다`}
+                >
+                  <ConfBadge kind={mc.kind} label={`${mc.label} ${evidence.length}`} />
+                  <span className="text-text-muted" style={{ fontSize: 8 }}>
+                    {evOpen ? "▾" : "▸"}
+                  </span>
+                </button>
+              );
             })()}
         </td>
       </tr>
     );
+    if (!evOpen || evidence.length === 0) return [main];
+    // 근거 칩 하위 행 — 신뢰도 열(우측 끝)은 좁아 칩을 담을 수 없다. 표 폭을 써서
+    // 항목 열 아래에 들여쓴다(클릭 위치와 내용이 같은 행 묶음 안에 있게).
+    return [
+      main,
+      <tr key={`${key}:ev`} style={{ background: "var(--color-elevated)" }}>
+        <td colSpan={7} style={{ padding: "5px 10px 7px 112px" }}>
+          <span className="text-text-muted" style={{ fontSize: 10.5, marginRight: 6 }}>
+            근거
+          </span>
+          {evidence.map((ev) => (
+            <button
+              key={`${ev.file}:${ev.line}`}
+              type="button"
+              onClick={() => openCodeViewerAt(ev.file, ev.line)}
+              title={`코드 뷰어에서 열기 — ${ev.file}:${ev.line}`}
+              className="inline-block mt-0.5 mr-1 px-1 rounded bg-panel break-all cursor-pointer border-0"
+              style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)" }}
+            >
+              {ev.file.split("/").pop()}:{ev.line}
+            </button>
+          ))}
+        </td>
+      </tr>,
+    ];
   };
 
   return (
@@ -1224,7 +1230,8 @@ export default function ScreenSpecView() {
                   <th style={{ width: 56 }}>이벤트</th>
                   <th style={{ minWidth: 150 }}>동작(핸들러)</th>
                   <th style={{ minWidth: 160 }}>설명</th>
-                  <th style={{ width: 72 }}>신뢰도</th>
+                  {/* 배지가 근거 건수·펼침 셰브런까지 안고 있어 폭을 넓힌다 */}
+                  <th style={{ width: 104 }}>신뢰도</th>
                 </tr>
               </thead>
               <tbody>
@@ -1286,10 +1293,10 @@ export default function ScreenSpecView() {
                               </button>
                             </td>
                           </tr>,
-                          ...(linkFoldOpen ? commons.map(renderRow) : []),
+                          ...(linkFoldOpen ? commons.flatMap(renderRow) : []),
                         ]
                       : [];
-                  return [...spacer, header, ...rows.map(renderRow), ...fold];
+                  return [...spacer, header, ...rows.flatMap(renderRow), ...fold];
                 })}
               </tbody>
             </table>

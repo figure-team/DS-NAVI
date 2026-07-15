@@ -7,6 +7,7 @@ import { Badge, ConfBadge, ProtoTabs, StatTile } from "./proto/Proto";
 import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
 import SearchInput from "./ui/SearchInput";
+import EvidenceLink from "./ui/EvidenceLink";
 
 /**
  * 프로그램 목록 뷰(pmpl-proto pg-programs) — 엔진 산출물을 전용 화면으로 승격한다.
@@ -192,35 +193,6 @@ function Highlight({ text, q }: { text: string; q: string }) {
   return <>{parts}</>;
 }
 
-/**
- * 근거(file:line) 클릭 → 코드 뷰어. Proto.Ev(표기 전용) 대신 로컬 클릭형 버튼.
- * 프로그램 행은 line 미보유 → filePath:1 로 열되 표기는 경로만(showLine=false).
- * 코드 뷰어 allowlist(그래프 밖 파일)로 실제 열람이 실패해도 UI 는 깨지지 않는다(툴팁 유지).
- */
-function EvBtn({
-  file,
-  line,
-  showLine = true,
-  onOpen,
-}: {
-  file: string;
-  line: number;
-  showLine?: boolean;
-  onOpen: (file: string, line: number) => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onOpen(file, line)}
-      title={`코드 열기 — ${file}:${line}`}
-      className="cursor-pointer bg-transparent border-0 text-text-muted hover:text-accent transition-colors"
-      style={{ fontFamily: "var(--font-mono)", fontSize: 11, padding: 0, textAlign: "left", wordBreak: "break-all" }}
-    >
-      {showLine ? `${file}:${line}` : file}
-    </button>
-  );
-}
-
 /** BtnOutline 과 동일한 외형을 갖는 라우터 링크. */
 function OutlineLink({ to, title, children }: { to: string; title?: string; children: ReactNode }) {
   return (
@@ -351,7 +323,6 @@ const STICKY_HEAD: CSSProperties = { position: "sticky", top: 0, background: "va
 
 export default function ProgramsView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
-  const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
   const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === "true";
   const dataBase = import.meta.env.BASE_URL;
   const tokenQ = accessToken && !DEMO_MODE ? `?token=${encodeURIComponent(accessToken)}` : "";
@@ -651,7 +622,7 @@ export default function ProgramsView() {
                           </td>
                           <td className="num">{p.loc}</td>
                           <td>
-                            <EvBtn file={p.filePath} line={1} showLine={false} onOpen={openCodeViewerAt} />
+                            <EvidenceLink file={p.filePath} line={1} showLine={false} />
                           </td>
                         </tr>
                       ))}
@@ -767,7 +738,7 @@ export default function ProgramsView() {
                             </td>
                             <td>
                               {d.evidence ? (
-                                <EvBtn file={d.evidence.file} line={d.evidence.line} onOpen={openCodeViewerAt} />
+                                <EvidenceLink file={d.evidence.file} line={d.evidence.line} />
                               ) : (
                                 <span className="text-text-muted" style={{ fontSize: 11 }}>
                                   —
@@ -824,7 +795,7 @@ export default function ProgramsView() {
                             </td>
                             <td>
                               {t.evidence ? (
-                                <EvBtn file={t.evidence.file} line={t.evidence.line} onOpen={openCodeViewerAt} />
+                                <EvidenceLink file={t.evidence.file} line={t.evidence.line} />
                               ) : (
                                 <span className="text-text-muted" style={{ fontSize: 11 }}>
                                   —
@@ -915,7 +886,7 @@ export default function ProgramsView() {
                           </td>
                           <td>
                             {it.evidence ? (
-                              <EvBtn file={it.evidence.file} line={it.evidence.line} onOpen={openCodeViewerAt} />
+                              <EvidenceLink file={it.evidence.file} line={it.evidence.line} />
                             ) : (
                               <span className="text-text-muted" style={{ fontSize: 11 }}>
                                 —
@@ -1013,7 +984,7 @@ export default function ProgramsView() {
                           </td>
                           <td>
                             {j.evidence ? (
-                              <EvBtn file={j.evidence.file} line={j.evidence.line} onOpen={openCodeViewerAt} />
+                              <EvidenceLink file={j.evidence.file} line={j.evidence.line} />
                             ) : (
                               <span className="text-text-muted" style={{ fontSize: 11 }}>
                                 —

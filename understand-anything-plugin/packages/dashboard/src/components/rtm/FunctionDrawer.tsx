@@ -1,6 +1,7 @@
 import TrustBadge from "../TrustBadge";
+import EvidenceLink from "../ui/EvidenceLink";
 import { useRtm } from "./context";
-import { EvidenceLink, Pill, confChip, useEscClose } from "./shared";
+import { Pill, confChip, useEscClose } from "./shared";
 import { AC_KIND, BORDER, CONF, CONF_TITLE, COLS, FAINT, GOLD, GOLD_DIM, NFR, STATE_COLOR, STATE_LABEL, VERB, WARN, verbOf } from "./types";
 import type { CellKey } from "./types";
 
@@ -43,7 +44,7 @@ export default function FunctionDrawer() {
                     <span className="text-text-secondary" style={{ fontSize: 12.5 }}>{effCell(f, key).length > 0 ? effCell(f, key) : <span style={{ color: FAINT }}>—</span>}{cell && confChip(isEdited(f, key) ? "확정" : CONF[cell.confidence].label, isEdited(f, key) ? GOLD : CONF[cell.confidence].color, isEdited(f, key) ? undefined : CONF_TITLE[cell.confidence])}</span>
                   )}
                   {/* gap2: 근거는 평문 대신 클릭 → 코드 뷰어(file:line). */}
-                  {!editing && cell && cell.evidence.length > 0 && <div className="flex flex-wrap items-center" style={{ gap: 4, marginTop: 3 }}><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT }}>근거:</span>{cell.evidence.map((e, i) => <EvidenceLink key={i} e={e} />)}</div>}
+                  {!editing && cell && cell.evidence.length > 0 && <div className="flex flex-wrap items-center" style={{ gap: 4, marginTop: 3 }}><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT }}>근거:</span>{cell.evidence.map((e, i) => <EvidenceLink key={i} file={e.file} line={e.line ?? 1} stopPropagation />)}</div>}
                 </td></tr>;
             })}
             {/* R7: 사용자 정의 필드 값 — 편집·확정 경로는 기존 셀과 동일(custom:* 키). */}

@@ -1432,6 +1432,7 @@ export function buildIntakeInputBundle(sources, options) {
     //   내보내면 폴백이 세탁돼 스키마 축만 근거 있는 선정인 척한다. 조인을 끊어 스키마도
     //   정직하게 폴백시킨다(§7 C7 "필터 실패 시 상위 N + 정직한 생략 보고").
     const schema = buildSchemaAxis(sources.dbSchema, tokens, crud.fallback === null ? crud.touchedTables : new Map(), mentionText);
+    const head = options.headCommit ?? null;
     const commits = {
         domainGraph: domain.axis.gitCommit,
         dbSchema: schema.axis.gitCommit,
@@ -1439,7 +1440,9 @@ export function buildIntakeInputBundle(sources, options) {
         rtm: rtm.axis.gitCommit,
         screens: screens.axis.gitCommit,
         policy: policy.axis.gitCommit,
+        head,
         consistent: true,
+        staleAxes: [],
         note: null,
     };
     // ★ 커밋 불일치는 **차단하지 않는다**(§10-2). 사실만 싣고 강등 규칙은 P5 소관.
@@ -1451,14 +1454,35 @@ export function buildIntakeInputBundle(sources, options) {
         ['화면', commits.screens],
         ['정책', commits.policy],
     ].filter(([, c]) => c !== null);
-    const distinct = [...new Set(present.map(([, c]) => c))];
-    commits.consistent = distinct.length <= 1;
-    if (!commits.consistent) {
-        const newest = distinct.slice().sort(natCmp).join(' vs ');
-        commits.note =
-            `축 커밋 ${distinct.length}종 공존(${newest}) — 차단하지 않습니다. ` +
-                `축별 커밋: ${present.map(([n, c]) => `${n}=${c.slice(0, 8)}`).join(' · ')}. ` +
-                `서로 다른 커밋의 축은 낡았을 수 있습니다(이 축에 의존하는 결론은 [추정]으로 다루십시오).`;
+    const axisList = (pairs) => pairs.map(([n, c]) => `${n}=${c.slice(0, 8)}`).join(' · ');
+    if (head !== null) {
+        // ★ HEAD 대조(P7) — **축끼리만 재면 전 축이 같은 옛 커밋에 멈춰 있을 때도 "정합"이 된다**.
+        //   §9.2 가 실증한 사고(데모 산출물이 코드보다 낡았는데 아무 장치도 안 알림)가 정확히 그 경우다.
+        //   기준을 소스(HEAD)로 잡아야 어느 축이 낡았는지 **지목**할 수 있다.
+        const stale = present.filter(([, c]) => c !== head);
+        commits.staleAxes = stale.map(([n]) => n);
+        commits.consistent = stale.length === 0;
+        if (stale.length > 0) {
+            // 전 축이 낡았으면 "낡은 축"과 "축별 커밋"이 같은 목록이 된다 — 두 번 적지 않는다.
+            const fresh = stale.length === present.length ? '' : `최신 축: ${axisList(present.filter(([, c]) => c === head))}. `;
+            commits.note =
+                `산출물 ${stale.length}/${present.length}축이 현재 소스(HEAD=${head.slice(0, 8)})보다 뒤에 있습니다 — 차단하지 않습니다. ` +
+                    `낡은 축: ${axisList(stale)}. ${fresh}` +
+                    `그 사이 커밋이 이 축의 입력을 바꿨을 수 있습니다(반드시 낡았다는 뜻은 아닙니다 — 재분석 없이는 모릅니다). ` +
+                    `낡은 축에 의존하는 결론은 [추정]으로 다루십시오.`;
+        }
+    }
+    else {
+        // HEAD 미주입 — 대조 기준이 없어 **축끼리만** 잰다. 어느 쪽이 낡았는지는 지목할 수 없다.
+        const distinct = [...new Set(present.map(([, c]) => c))];
+        commits.consistent = distinct.length <= 1;
+        if (!commits.consistent) {
+            const newest = distinct.slice().sort(natCmp).join(' vs ');
+            commits.note =
+                `축 커밋 ${distinct.length}종 공존(${newest}) — 차단하지 않습니다. ` +
+                    `축별 커밋: ${axisList(present)}. ` +
+                    `서로 다른 커밋의 축은 낡았을 수 있습니다(이 축에 의존하는 결론은 [추정]으로 다루십시오).`;
+        }
     }
     const warnings = [];
     if (!crud.axis.present)

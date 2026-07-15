@@ -154,6 +154,13 @@ export interface BuildIntakeInputOptions {
     request: string;
     /** 번들 문자 예산(기본 `DEFAULT_BUNDLE_CHAR_CAP`). */
     charCap?: number;
+    /**
+     * **현재 소스의 HEAD 커밋**(P7 완료 게이트, §10-2). 미지정(기본 `null`)이면 축끼리만 대조한다 —
+     * 그러면 **전 축이 같은 옛 커밋에 멈춰 있어도 `consistent:true`** 가 된다. 즉 "산출물이 코드보다
+     * 낡았는데 아무 장치도 알리지 않는" §9.2 의 사고를 그대로 통과시킨다. HEAD 를 주면 축 커밋을
+     * **소스 기준으로** 대조해 낡은 축을 지목한다. IO(git) 는 호출자 몫(이 모듈은 순수).
+     */
+    headCommit?: string | null;
 }
 /** 근거율 — 분자·분모를 **함께** 싣는다. 비율만 주면 "0/0"과 "0/100"을 구분할 수 없다(§4.1). */
 export interface EvidenceStat {
@@ -418,8 +425,23 @@ export interface IntakeInputBundle {
         rtm: string | null;
         screens: string | null;
         policy: string | null;
-        /** 축 커밋이 전부 같은가. **불일치는 차단하지 않는다**(§10-2) — 사실만 싣는다. */
+        /**
+         * 현재 소스의 HEAD(P7). 호출자가 `options.headCommit` 으로 주입하지 않으면 `null` —
+         * 그러면 대조 기준이 없어 **축끼리만** 비교한다(아래 `consistent` 의 의미가 달라진다).
+         */
+        head: string | null;
+        /**
+         * 정합한가. **불일치는 차단하지 않는다**(§10-2) — 사실만 싣는다.
+         * - `head !== null`: 전 축이 HEAD 와 같은가(= 산출물이 현재 소스 기준으로 최신인가).
+         * - `head === null`: 축끼리 같은가(HEAD 를 모르면 이것밖에 못 잰다).
+         */
         consistent: boolean;
+        /**
+         * HEAD 와 커밋이 다른 축의 이름(정렬). **`head === null` 이면 항상 빈 배열** — 대조 기준이
+         * 없으면 어느 쪽이 낡았는지 지목할 수 없다(축끼리 다르다는 사실만 `note` 에 적는다).
+         * `reducedMode.omittedAxes` 와 같은 규약: 이 축에 의존하는 결론은 P5 가 `[추정]` 강등한다.
+         */
+        staleAxes: string[];
         /** 낡은 축 서술(강등 규칙 적용은 P5 소관 — 여기선 사실 기술만). */
         note: string | null;
     };

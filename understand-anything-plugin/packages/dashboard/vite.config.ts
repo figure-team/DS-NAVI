@@ -19,6 +19,17 @@ import {
   removePendingMarker,
   writePendingMarker,
 } from "./server/job-ledger";
+import {
+  isValidSid,
+  latestRtmSession as latestRtmSessionIn,
+  listRtmSessions as listRtmSessionsIn,
+  pruneRtmSessions,
+  readRtmSession as readRtmSessionIn,
+  reconcileRtmSessions,
+  writeRtmSession as writeRtmSessionIn,
+  type RtmSession,
+  type RtmStepStatus,
+} from "./server/rtm-sessions";
 
 // Generate a one-time token when the server process starts.
 // This token is printed to the terminal and must be in the URL
@@ -1343,25 +1354,16 @@ const rtmTracker = new ClaudeJobTracker<RtmStepExtra>({
 });
 
 // ── 세션 영속(.understand-anything/rtm-intake/<sid>/) ────────────────────────
-type RtmStepStatus = "pending" | "running" | "produced" | "confirmed" | "failed";
-interface RtmSession {
-  sid: string;
-  request: string;
-  createdAt: string;
-  producedStep: number; // 산출물이 존재하는 최고 단계(0=없음)
-  confirmedStep: number; // 사용자가 컨펌한 최고 단계
-  targetStep: number;
-  discarded: boolean;
-  steps: Record<string, { status: RtmStepStatus }>;
-}
+// 원장 조작(목록·복원·상한)은 server/rtm-sessions.ts 가 base 디렉터리를 받아 수행한다 —
+// 여기서는 rtmIntakeBaseDir() 해석과 rtmTracker(실행 판정)만 얹는다.
 /** 인테이크 세션 베이스 디렉터리(.understand-anything/rtm-intake). 프로젝트 미발견이면 null. */
 function rtmIntakeBaseDir(): string | null {
   const graphFile = findGraphFile("domain-graph.json") ?? findGraphFile("rtm.json");
   return graphFile ? path.join(path.dirname(graphFile), "rtm-intake") : null;
 }
-/** sid 형식 검증(경로 traversal 방지) — 16진 8~32자. */
-function isValidSid(sid: string): boolean {
-  return /^[a-f0-9]{8,32}$/.test(sid);
+/** 이 sid 를 지금 rtmTracker 가 돌리는 중인가 — 전역 뮤텍스라 참인 sid 는 최대 1개다(C1). */
+function isRtmSessionRunning(sid: string): boolean {
+  return rtmTracker.running && rtmTracker.job.sid === sid;
 }
 function rtmSessionDir(sid: string): string | null {
   const base = rtmIntakeBaseDir();
@@ -1383,37 +1385,17 @@ function newRtmSession(sid: string, request: string, targetStep: number): RtmSes
   };
 }
 function readRtmSession(sid: string): RtmSession | null {
-  const dir = rtmSessionDir(sid);
-  if (!dir) return null;
-  try {
-    const raw = JSON.parse(fs.readFileSync(path.join(dir, "session.json"), "utf-8"));
-    return raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as RtmSession) : null;
-  } catch {
-    return null;
-  }
+  const base = rtmIntakeBaseDir();
+  return base ? readRtmSessionIn(base, sid) : null;
 }
 function writeRtmSession(s: RtmSession): void {
-  const dir = rtmSessionDir(s.sid);
-  if (!dir) return;
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, "session.json"), JSON.stringify(s, null, 2) + "\n", "utf8");
+  const base = rtmIntakeBaseDir();
+  if (base) writeRtmSessionIn(base, s);
 }
 /** 로드 시 복구용 — 가장 최근 생성된 비폐기 세션(createdAt 최대). 없으면 null. */
 function latestRtmSession(): RtmSession | null {
   const base = rtmIntakeBaseDir();
-  if (!base || !fs.existsSync(base)) return null;
-  let best: RtmSession | null = null;
-  try {
-    for (const name of fs.readdirSync(base)) {
-      if (!isValidSid(name)) continue;
-      const s = readRtmSession(name);
-      if (!s || s.discarded) continue;
-      if (!best || (s.createdAt ?? "") > (best.createdAt ?? "")) best = s;
-    }
-  } catch {
-    /* 디렉터리 읽기 실패 → null */
-  }
-  return best;
+  return base ? latestRtmSessionIn(base) : null;
 }
 /** 세션 디렉터리의 산출 문서 목록(.md) + 종류. identified.json 존재 여부도 함께. */
 function listRtmSessionDocs(sid: string): { name: string; kind: string }[] {
@@ -1567,6 +1549,9 @@ function handleRtmIntakePost(
         const sid = crypto.randomBytes(8).toString("hex");
         session = newRtmSession(sid, request, wantTarget);
         startStep = RTM_STEP_MIN;
+        // 세션이 늘어나는 유일한 지점 — 여기서 상한 정리(impact 가 원장 append 시 자르는 것과 동형).
+        const base = rtmIntakeBaseDir();
+        if (base) pruneRtmSessions(base, isRtmSessionRunning);
       }
 
       if (startStep > RTM_STEP_MAX) {
@@ -2047,6 +2032,7 @@ export default defineConfig({
             pathname === "/rtm-field" ||
             pathname === "/rtm-intake" ||
             pathname === "/rtm-intake-status" ||
+            pathname === "/rtm-intake-sessions" ||
             pathname === "/rtm-intake-confirm" ||
             pathname === "/rtm-intake-discard" ||
             pathname === "/rtm-intake-doc" ||
@@ -2266,6 +2252,19 @@ export default defineConfig({
               session,
               docs: session ? listRtmSessionDocs(session.sid) : [],
             });
+            return;
+          }
+          // W1: 세션 원장 — createdAt 내림차순 전체(폐기 포함). impact 의 /impact-history 와 동형으로
+          // 조회 시 lazy reconcile(재시작으로 "running" 고착된 단계 복원)을 먼저 돌린다.
+          // running 은 목록 전체에서 최대 1건 — 전역 뮤텍스라 나머지 미완 세션은 대기가 아니라 중단됨(C1).
+          if (pathname === "/rtm-intake-sessions") {
+            const base = rtmIntakeBaseDir();
+            if (!base) {
+              sendJson(res, 200, { sessions: [] });
+              return;
+            }
+            reconcileRtmSessions(base, isRtmSessionRunning);
+            sendJson(res, 200, { sessions: listRtmSessionsIn(base, isRtmSessionRunning) });
             return;
           }
           if (pathname === "/rtm-change") {

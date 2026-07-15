@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CIRCLED, STEP_DOC_KIND } from "./types";
 import type { RtmSession, SessionDoc } from "./types";
@@ -34,6 +34,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const [identified, setIdentified] = useState<Identified | null>(null);
   const [editingDoc, setEditingDoc] = useState(false);
   const [draftDoc, setDraftDoc] = useState("");
+  const loadSeq = useRef(0); // 세션 조회 순번 — 늦게 온 응답이 최신 선택을 덮어쓰지 않게(W2).
 
   const startIntake = useCallback(async () => {
     const q = intakeQuery.trim();
@@ -89,26 +90,56 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); setIntakeStatus("idle");
   }, [sid, accessToken]);
 
-  // 마운트 시 진행 중 세션 복구 — 새로고침/다른 탭에서도 단계 진행을 이어 본다.
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        // URL의 ?sid=가 있으면 그 세션을 명시 복원(딥링크), 없으면 서버의 현재 세션.
-        const urlSid = new URLSearchParams(window.location.search).get("sid");
-        const r = await fetch(
-          `/rtm-intake-status${tokenQ}${urlSid ? `&sid=${encodeURIComponent(urlSid)}` : ""}`,
-        );
-        const data = (await r.json()) as { job?: { status?: string; sid?: string | null }; session?: RtmSession | null; docs?: SessionDoc[] };
-        if (cancelled || !data.session || data.session.discarded) return;
-        setSid(data.session.sid);
-        setSession(data.session);
-        setSessionDocs(data.docs ?? []);
-        if (data.job?.status === "running" && data.job?.sid === data.session.sid) setIntakeStatus("running");
-      } catch { /* 복구 실패 무시 */ }
-    })();
-    return () => { cancelled = true; };
+  /**
+   * W4: "닫기" — 선택 해제만. discardSession 과 달리 **서버 호출이 없다** — 세션은 원장에 그대로
+   * 남고 나중에 다시 선택해 이어갈 수 있다. RtmView 의 URL→상태 effect 가 `?sid=` 소실(닫기 클릭 ·
+   * 뒤로가기 둘 다)을 감지하면 이 함수로 로컬 상태만 지운다.
+   */
+  const clearSession = useCallback(() => {
+    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null);
+    setEditingDoc(false); setViewStep(null); setIntakeStatus("idle");
+  }, []);
+
+  /**
+   * 세션 1건을 서버에서 읽어 현재 세션으로 앉힌다. sid=null 이면 서버의 현재 세션(마운트 복구).
+   * W2: 원장에서 고른 세션으로 갈아타는 경로이자, 종전 마운트 복구의 본체다 — 두 경로가 같은
+   * 응답 계약(job/session/docs)을 쓰므로 하나로 합쳤다. 폐기 세션도 원장에서 열람은 되어야 하나
+   * 마운트 복구는 종전대로 건너뛴다(explicit=false 일 때만).
+   */
+  const loadSession = useCallback(async (target: string | null, explicit: boolean): Promise<boolean> => {
+    const seq = ++loadSeq.current;
+    try {
+      const r = await fetch(`/rtm-intake-status${tokenQ}${target ? `&sid=${encodeURIComponent(target)}` : ""}`);
+      const data = (await r.json()) as { job?: { status?: string; sid?: string | null }; session?: RtmSession | null; docs?: SessionDoc[] };
+      // 원장에서 빠르게 두 세션을 연달아 고르면 먼저 띄운 요청이 나중에 도착할 수 있다 — 늦게 온
+      // 응답이 최신 선택을 덮어쓰지 않도록 순번으로 폐기한다.
+      if (seq !== loadSeq.current) return false;
+      if (!data.session) return false;
+      if (!explicit && data.session.discarded) return false;
+      setSid(data.session.sid);
+      setSession(data.session);
+      setSessionDocs(data.docs ?? []);
+      setPreviewName(null);
+      setIdentified(null);
+      setEditingDoc(false);
+      const running = data.job?.status === "running" && data.job?.sid === data.session.sid;
+      setIntakeStatus(running ? "running" : "idle");
+      return true;
+    } catch {
+      return false; // 복구/전환 실패 무시 — 현재 세션 유지
+    }
   }, [tokenQ]);
+
+  /** W2: `?sid=` 라우팅 키 → 세션 전환. URL→상태 effect(RtmView)가 호출한다. */
+  const selectSession = useCallback((target: string) => { void loadSession(target, true); }, [loadSession]);
+
+  // 마운트 시 진행 중 세션 복구 — 새로고침/다른 탭에서도 단계 진행을 이어 본다.
+  // ?sid= 딥링크는 종전대로 우선하되(FRONT_REDESIGN_DESIGN.md:290), 이제 그 경로는 RtmView 의
+  // URL→상태 effect 가 selectSession 으로 처리한다(N2) — 여기서 또 조회하면 중복 왕복이 된다.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("sid")) return;
+    void loadSession(null, false);
+  }, [loadSession]);
 
   // 폴링 — 실행 중이면 세션·문서 갱신. done 이면 멈추고, ⑤ 산출이면 추적표 재로드.
   useEffect(() => {
@@ -175,6 +206,6 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     intakeModel, setIntakeModel,
     intakeStatus, intakeError, setIntakeError, sid, session, sessionDocs, stepBusy, viewStep, setViewStep,
     previewName, previewMd, identified, editingDoc, setEditingDoc, draftDoc, setDraftDoc,
-    startIntake, advance, confirmStep, saveDoc, discardSession, loadPreview,
+    startIntake, advance, confirmStep, saveDoc, discardSession, clearSession, loadPreview, selectSession,
   };
 }

@@ -1,14 +1,19 @@
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { useRtm } from "./context";
+import DiscardConfirmDialog from "./DiscardConfirmDialog";
 import { MD, useEscClose } from "./shared";
 import { BAD, BORDER, CIRCLED, FAINT, GOLD, OK, PRIORITY, STEP_DEFS, WARN, stripFrontmatter } from "./types";
 import { ModelSelect } from "../ModelSelect";
 
 // ── P4: 단계 진행 스테퍼 ──
 export function IntakeStepper() {
-  const { session, intakeStatus, viewStep, setViewStep, discardSession } = useRtm();
+  const { session, intakeStatus, viewStep, setViewStep, discardSession, closeSession, setView } = useRtm();
+  // W4: 폐기 확인 다이얼로그 pending 상태 — 이 컴포넌트는 모듈 레벨(gap4/8 무관, 부모 리렌더에도
+  // 타입이 안 바뀜)이라 로컬 useState 로 충분하다.
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   if (!session || session.discarded) return null;
   const running = intakeStatus === "running";
   return (
@@ -23,7 +28,9 @@ export function IntakeStepper() {
         return (
           <span key={s.n} className="flex items-center">
             {i > 0 && <span style={{ width: 14, height: 1, background: "var(--color-border-subtle)", margin: "0 2px" }} />}
-            <button type="button" disabled={!clickable} onClick={() => setViewStep(s.n)} className="flex items-center gap-1.5 rounded-md transition-colors" title={clickable ? `${s.label} 보기` : undefined}
+            {/* W3: 산출물이 요청 세션 탭 본문으로 옮겨왔으므로 단계 선택은 그 탭으로 데려간다 —
+                안 그러면 다른 탭의 상단 스트립에서 단계를 눌러도 보여줄 자리가 없어 죽은 클릭이 된다. */}
+            <button type="button" disabled={!clickable} onClick={() => { setViewStep(s.n); setView("session"); }} className="flex items-center gap-1.5 rounded-md transition-colors" title={clickable ? `${s.label} 보기` : undefined}
               style={{ padding: "3px 8px", border: `1px solid ${active ? color : `${color}40`}`, background: active ? `${color}26` : `${color}14`, opacity: clickable || isRunningStep ? 1 : 0.5, cursor: clickable ? "pointer" : "default" }}>
               <span style={{ color, fontSize: 12 }}>{CIRCLED[i]}</span>
               <span style={{ fontSize: 11, color: st === "pending" ? FAINT : "var(--color-text-secondary)" }}>{s.label}</span>
@@ -33,7 +40,22 @@ export function IntakeStepper() {
           </span>
         );
       })}
-      <button type="button" onClick={() => void discardSession()} disabled={running} className="ml-auto text-text-muted hover:text-text-primary disabled:opacity-40" style={{ fontSize: 11 }} title="이 세션 닫기">닫기 ×</button>
+      {/* W4(C2): 닫기(선택 해제만)와 폐기(영구 tombstone)를 분리한다 — 종전엔 "닫기 ×" 라벨로
+          discardSession 을 호출해 문구·동작이 어긋났다(RTM_INTAKE_WORKSPACE_DESIGN.md §4 C2).
+          자리 배치: 습관적으로 클릭하는 우측 끝은 안전한 "닫기"가 갖고, 되돌릴 수 없는 "폐기"는
+          구분선을 두어 왼쪽으로 떨어뜨린 뒤 확인 다이얼로그로 한 번 더 막는다. */}
+      <span className="ml-auto flex items-center gap-1.5">
+        <button type="button" onClick={() => setConfirmDiscard(true)} disabled={running} className="text-text-muted hover:text-status-error disabled:opacity-40" style={{ fontSize: 10.5 }} title="세션 폐기 — 되돌릴 수 없습니다(닫기와 다름)">폐기</button>
+        <span style={{ width: 1, height: 11, background: "var(--color-border-subtle)" }} />
+        <button type="button" onClick={closeSession} disabled={running} className="text-text-muted hover:text-text-primary disabled:opacity-40" style={{ fontSize: 11 }} title="닫기 — 세션 원장 목록으로 돌아갑니다(세션은 유지됩니다)">닫기 ×</button>
+      </span>
+      {confirmDiscard && (
+        <DiscardConfirmDialog
+          request={session.request}
+          onCancel={() => setConfirmDiscard(false)}
+          onConfirm={() => { setConfirmDiscard(false); void discardSession(); }}
+        />
+      )}
     </div>
   );
 }
@@ -85,8 +107,21 @@ function IdentifiedView() {
   );
 }
 
-// ── P4: 단계 산출 미리보기/컨펌 패널(하단 드로어) ──
-export function IntakeStepPanel() {
+// ── W3: 단계 산출물 본문 — 미리보기 · md 편집 · 컨펌 · 진행 ──
+/**
+ * 종전 `IntakeStepPanel`(fixed 52vh 하단 드로어)의 내용을 그대로 이식했다. 드로어를 걷어낸 이유는
+ * 설계 §0(RTM_INTAKE_WORKSPACE_DESIGN.md): 나머지 드로어 3종(Function/Requirement/Scenario)은 전부
+ * "표에서 고른 한 행의 상세"라 `absolute` + 선택 종속인데, 이것만 `fixed` 이면서 선택이 아니라
+ * **세션 수명**에 묶여 있었다 — 형태만 드로어이고 성격이 달랐다. 이제 요청 세션 탭 우측 카드
+ * (SessionView)의 본문으로 산다.
+ *
+ * 마운트 게이트(세션 있음 · 미폐기 · 미실행 · producedStep>=1)는 호출부(SessionView)가 진다 —
+ * 종전 RtmView 의 `intakePanelOpen` 과 같은 조건이다.
+ *
+ * 높이를 확정값(52vh flex column)으로 두는 이유: 편집 textarea 가 `h-full` 이라 부모 높이가
+ * 확정이어야 한다(auto 면 기본 2행으로 접힌다). 드로어 시절의 내부 비율을 그대로 보존한다.
+ */
+export function IntakeStepContent() {
   const { session, viewStep, previewName, previewMd, editingDoc, setEditingDoc, draftDoc, setDraftDoc, stepBusy, confirmStep, advance, saveDoc } = useRtm();
   if (!session) return null;
   const frontier = session.producedStep;
@@ -97,8 +132,8 @@ export function IntakeStepPanel() {
   const canAdvance = isFrontier && session.confirmedStep >= frontier && frontier < 5;
   const isDoc = ps >= 2 && ps <= 4;
   return (
-    <div className="fixed left-0 right-0 bottom-0 z-[90] bg-panel border-t border-border-medium shadow-2xl" style={{ height: "52vh", display: "flex", flexDirection: "column" }}>
-      <div className="flex items-center gap-3 shrink-0 border-b border-border-subtle" style={{ padding: "10px 22px" }}>
+    <div className="flex flex-col" style={{ height: "52vh" }}>
+      <div className="flex items-center gap-3 shrink-0 border-b border-border-subtle" style={{ padding: "10px 20px" }}>
         <span style={{ fontFamily: "var(--font-heading)", fontSize: 14, color: "var(--color-text-primary)" }}>{CIRCLED[ps - 1]} {STEP_DEFS[ps - 1].label}</span>
         {confirmed ? <span style={{ fontSize: 11, color: GOLD }}>✓ 컨펌됨</span> : <span style={{ fontSize: 11, color: WARN }}>검토 필요</span>}
         {!isFrontier && <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>· 이전 단계 보기</span>}
@@ -113,7 +148,7 @@ export function IntakeStepPanel() {
           {canAdvance && frontier < 4 && <button type="button" onClick={() => void advance(5)} disabled={stepBusy} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent disabled:opacity-50" style={{ padding: "5px 11px", fontSize: 12 }}>⑤까지 ▸</button>}
         </span>
       </div>
-      <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "14px 22px" }}>
+      <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "14px 20px" }}>
         {ps === 1 ? <IdentifiedView />
           : ps === 5 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑤ RTM 반영 완료 — <b style={{ color: "var(--color-text-primary)" }}>요청 기준</b> 탭에서 분해된 요청·요구사항과 추적 결과를 확인하세요. <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
           : editingDoc ? <textarea value={draftDoc} onChange={(e) => setDraftDoc(e.target.value)} spellCheck={false} className="w-full h-full resize-none rounded-lg bg-elevated border border-border-medium text-text-primary focus:outline-none focus:border-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.55, padding: "10px 12px" }} />

@@ -5,7 +5,7 @@
 export type Confidence = "CONFIRMED" | "CONFIRMED_AI" | "INFERRED" | "UNVERIFIED";
 export type TestResult = "PASS" | "FAIL" | "NA" | "UNTESTED";
 export type AcKind = "branch" | "precondition" | "postcondition" | "exception" | "rule";
-export type RtmTab = "function" | "requirement" | "scenario" | "status";
+export type RtmTab = "function" | "requirement" | "scenario" | "session" | "status";
 
 export interface Evidence { file: string; line: number | null }
 export interface TraceCell { value: string; confidence: Confidence; evidence: Evidence[] }
@@ -132,6 +132,32 @@ export interface RtmSession {
   targetStep: number; discarded: boolean; steps: Record<string, { status: string }>;
 }
 export interface SessionDoc { name: string; kind: string }
+/**
+ * W2: GET /rtm-intake-sessions 원장 행 — server/rtm-sessions.ts 의 `RtmSessionSummary` 프론트 사본.
+ * server/ 는 Node 전용(fs/path)이라 src/ 에서 import 하지 않는다 — ChangeImpactView 의 `HistoryEntry`
+ * (impact-history 응답)와 동일 관례. 설계: RTM_INTAKE_WORKSPACE_DESIGN.md §3(N1).
+ * `running` 은 목록 전체에서 최대 1건만 true — 전역 뮤텍스라 큐가 없다(§4 C1).
+ */
+export interface SessionRow {
+  sid: string; request: string; createdAt: string;
+  producedStep: number; confirmedStep: number; targetStep: number;
+  discarded: boolean; running: boolean;
+}
+/**
+ * 원장 행의 상태 — C1 을 오해시키지 않는 것이 이 함수의 존재 이유다. 동시 실행이 전역 1개이므로
+ * 미완 세션은 **대기가 아니라 중단됨**이고(큐가 없다), 완료는 ⑤ RTM 반영뿐이다(IntakePanel ps===5).
+ */
+export const sessionStateOf = (s: SessionRow): "discarded" | "running" | "done" | "stopped" =>
+  s.discarded ? "discarded" : s.running ? "running" : s.producedStep >= 5 ? "done" : "stopped";
+export const SESSION_STATE: Record<ReturnType<typeof sessionStateOf>, { label: string; tone: "ok" | "warn" | "mut"; title: string }> = {
+  running: { label: "진행 중", tone: "warn", title: "지금 실행 중 — 동시 실행은 전역 1건뿐입니다." },
+  done: { label: "완료", tone: "ok", title: "⑤ RTM 반영까지 완료 — 요청 기준 탭에서 결과를 봅니다." },
+  stopped: { label: "중단됨", tone: "mut", title: "실행 중이 아닙니다 — 대기열이 아니라 멈춘 상태입니다(동시 실행 1건). 선택해 이어서 진행하세요." },
+  discarded: { label: "폐기", tone: "mut", title: "폐기된 세션 — 산출물은 디스크에 남아 있으나 진행할 수 없습니다." },
+};
+/** ISO → "MM-DD HH:mm"(로컬) — 원장 목록용 축약(ChangeImpactView fmtTime 과 동형). */
+export const fmtSessionTime = (iso: string): string =>
+  iso ? new Date(iso).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }) : "";
 export const STEP_DEFS: { n: number; label: string }[] = [
   { n: 1, label: "식별" }, { n: 2, label: "목록표" }, { n: 3, label: "정의서" }, { n: 4, label: "명세서" }, { n: 5, label: "RTM" },
 ];

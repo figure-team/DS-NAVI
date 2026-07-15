@@ -7,11 +7,12 @@ import { RtmContext } from "./context";
 import type { RtmCtx } from "./context";
 import FunctionDrawer from "./FunctionDrawer";
 import FunctionView from "./FunctionView";
-import { IntakeModal, IntakeStepPanel, IntakeStepper } from "./IntakePanel";
+import { IntakeModal, IntakeStepper } from "./IntakePanel";
 import RequirementDrawer from "./RequirementDrawer";
 import RequirementView from "./RequirementView";
 import ScenarioDrawer from "./ScenarioDrawer";
 import ScenarioView from "./ScenarioView";
+import SessionView from "./SessionView";
 import StatusView from "./StatusView";
 import TopBarSlot from "../../app/shell/TopBarSlot";
 import { useChange } from "./useChange";
@@ -21,7 +22,7 @@ import {
 } from "./types";
 import type {
   CellKey, CustomField, FnOverride, FunctionRow, ReqOverride, Requirement, RtmModel, RtmTab,
-  Signoff, TestRef, TestResult, TestScenario,
+  SessionRow, Signoff, TestRef, TestResult, TestScenario,
 } from "./types";
 
 /**
@@ -107,13 +108,37 @@ export default function RtmView() {
   // 단계 인테이크(P4) · 변경관리(P6) — 상태·폴링·복구는 훅으로 이동(기계적 이동, 계약 불변).
   const intake = useIntake({ accessToken, tokenQ, loadModel, setToast });
   const { sid } = intake;
+
+  // W2: 세션 원장(N1) — 응답은 dev 서버 전용이라 demo/읽기전용에선 빈 목록이 정직한 상태다.
+  const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+  const loadSessions = useCallback(() => {
+    if (!canWrite) { setSessions([]); setSessionsError(null); return; }
+    fetch(`/rtm-intake-sessions${tokenQ}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((d: { sessions?: SessionRow[] }) => { setSessions(Array.isArray(d?.sessions) ? d.sessions : []); setSessionsError(null); })
+      .catch((e) => setSessionsError(String(e instanceof Error ? e.message : e)));
+  }, [canWrite, tokenQ]);
+  // 새 세션 생성(sid 변경)·실행 종료(intakeStatus 변경)마다 원장을 다시 읽는다 — 방금 만든
+  // 세션이 목록에 없으면 orphan 결함(§1.1)을 그대로 재현하는 꼴이 된다.
+  useEffect(() => { loadSessions(); }, [loadSessions, intake.intakeStatus, sid]);
   const { changeReqId, changeRunning, startChange, changeModel, setChangeModel } = useChange({ accessToken, tokenQ, loadModel, setToast });
 
-  // URL(?view=&req=&fn=&ts=) → 상태 — 딥링크·뒤로가기 복원. ?req= 는 기존 계약 그대로
+  // URL(?view=&req=&fn=&ts=&sid=) → 상태 — 딥링크·뒤로가기 복원. ?req= 는 기존 계약 그대로
   // 요청 기준 탭을 강제한다(검증 딥링크).
   useEffect(() => {
     const v = searchParams.get("view");
-    if ((v === "function" || v === "requirement" || v === "scenario" || v === "status") && v !== view) setView(v);
+    if ((v === "function" || v === "requirement" || v === "scenario" || v === "session" || v === "status") && v !== view) setView(v);
+    // N2: ?sid= 를 라우팅 키로 승격 — 종전엔 마운트 복구 키라서 뒤로가기로 세션이 안 바뀌었다.
+    // 이는 결함 수정이 아니라 의도된 설계 변경이며(RTM_INTAKE_WORKSPACE_DESIGN.md §3 N2),
+    // FRONT_REDESIGN_DESIGN.md:290 의 논거(별도 라우트면 RtmView 리마운트)와는 충돌하지 않는다 —
+    // 같은 페이지 쿼리 전환이라 언마운트가 없다(변경·영향의 ?run= 과 동형).
+    // W4: 빈 sid 로의 뒤로가기(닫기 클릭 포함)는 이제 안전하다 — "닫기"가 discardSession(폐기)과
+    // 분리돼(C2) 선택 해제만 하므로, sid 가 사라지면 clearSession 으로 로컬 상태만 지운다(서버
+    // 호출 없음). 종전엔 닫기=폐기가 한 몸이라 뒤로가기가 서버 세션을 지웠다.
+    const urlSid = searchParams.get("sid");
+    if (urlSid && urlSid !== sid) intake.selectSession(urlSid);
+    else if (!urlSid && sid) intake.clearSession();
     const req = searchParams.get("req");
     if (req && req !== selReq) {
       setView("requirement");
@@ -254,6 +279,19 @@ export default function RtmView() {
 
   const openFunction = useCallback((id: string) => { setView("function"); setSelReq(null); setSelFn(id); setEditing(false); setSaveError(null); }, []);
 
+  // W2/N2: 원장에서 세션 열기 — 미러 effect 는 replace 라 히스토리가 안 쌓인다. 세션 전환은
+  // 사용자의 이동이므로 여기서 직접 push 하고(변경·영향 setParam("run", …) 과 동형), 실제 전환은
+  // URL→상태 effect 가 selectSession 으로 처리한다 — URL 이 단일 진실이 되도록 한 방향으로만 흐른다.
+  const openSession = useCallback((next: string) => {
+    setSearchParams((prev) => { const p = new URLSearchParams(prev); p.set("sid", next); return p; }, { replace: false });
+  }, [setSearchParams]);
+
+  // W4: 닫기 — openSession 의 대칭. push 로 sid 를 지워 뒤로가기로 되돌아올 수 있게 하고, 실제
+  // 로컬 상태 정리는 URL→상태 effect 의 clearSession 호출이 한다(단일 방향 흐름 유지).
+  const closeSession = useCallback(() => {
+    setSearchParams((prev) => { const p = new URLSearchParams(prev); p.delete("sid"); return p; }, { replace: false });
+  }, [setSearchParams]);
+
   const beginEdit = useCallback(() => {
     if (!selectedFn) return;
     const base: Record<string, string> = { name: effCell(selectedFn, "name"), entryPoint: effCell(selectedFn, "entryPoint"), implementation: effCell(selectedFn, "implementation"), data: effCell(selectedFn, "data"), test: effCell(selectedFn, "test") };
@@ -303,7 +341,6 @@ export default function RtmView() {
   const cov = model?.coverage;
   const diags = model?.diagnostics ?? [];
   const errCount = diags.filter((d) => d.level === "error").length;
-  const intakePanelOpen = !!intake.session && !intake.session.discarded && intake.intakeStatus !== "running" && intake.session.producedStep >= 1;
 
   const ctx: RtmCtx = {
     model, cov, diags, errCount, canWrite, fnOv, reqOv, scOv,
@@ -321,7 +358,8 @@ export default function RtmView() {
     targetStep: intake.targetStep, setTargetStep: intake.setTargetStep,
     intakeModel: intake.intakeModel, setIntakeModel: intake.setIntakeModel,
     intakeStatus: intake.intakeStatus, intakeError: intake.intakeError, startIntake: intake.startIntake,
-    session: intake.session, sessionDocs: intake.sessionDocs, stepBusy: intake.stepBusy,
+    session: intake.session, sid, sessions, sessionsError, openSession, closeSession,
+    sessionDocs: intake.sessionDocs, stepBusy: intake.stepBusy,
     viewStep: intake.viewStep, setViewStep: intake.setViewStep,
     advance: intake.advance, confirmStep: intake.confirmStep, saveDoc: intake.saveDoc,
     discardSession: intake.discardSession,
@@ -382,8 +420,9 @@ export default function RtmView() {
           </span>
         </div>
 
-        {/* P4: 단계 진행 스테퍼 */}
-        <IntakeStepper />
+        {/* P4: 단계 진행 스테퍼 — 요청 세션 탭에선 우측 콘텐츠 카드 안에 들어간다(설계 §2.2 목업).
+            같은 컴포넌트를 두 번 렌더하면 스테퍼가 둘이 되므로 여기선 건다. */}
+        {view !== "session" && <IntakeStepper />}
 
         {/* 진단 배너 → TopBar warn 칩으로 이관(2026-07-15). 클릭 동작(커버리지 현황 탭 이동)은
             그대로 유지 — 상세는 현황 탭 무결성 진단 목록에서 본다(모달 중복 없음). */}
@@ -405,13 +444,23 @@ export default function RtmView() {
         <div className="shrink-0 flex border-b border-border-subtle" style={{ margin: "10px 24px 0", gap: 2 }}>
           {tabBtn("function", "기능 기준", model?.functions.length)}
           {tabBtn("requirement", "요청 기준", model?.requirements.length)}
+          {/* W2: 라벨은 작업("새 요청")이 아니라 대상 명사 — 탭=렌즈 관례(RTM_TAB_DESIGN.md:108)를
+              지키기 위한 것으로, 액션 어포던스는 헤더의 ＋ 새 요청 버튼이 진다(설계 §2.1). */}
+          {tabBtn("session", "요청 세션", sessions.length)}
           {tabBtn("scenario", "시험 시나리오", model?.testScenarios?.length)}
           {tabBtn("status", "커버리지 현황")}
         </div>
 
         {/* 본문 */}
-        <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq || selectedTs) ? "50vh" : intakePanelOpen ? "55vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
-          {error ? (
+        {/* W3: 인테이크 드로어가 사라져 하단 여백 예약도 사라진다 — 남은 예약은 선택 종속
+            드로어 3종(Function/Requirement/Scenario)의 몫이다. */}
+        <div className="flex-1 min-h-0 overflow-auto" style={{ padding: 24, paddingBottom: (selectedFn || selectedReq || selectedTs) ? "50vh" : 24, maxWidth: 1340, width: "100%", margin: "0 auto" }}>
+          {/* 세션 원장은 rtm.json 과 독립이다 — 오히려 ⑤ 가 rtm.json 을 만든다. 모델 게이트 안에
+              두면 rtm.json 이 없는 새 프로젝트에서 그걸 만들어 낼 탭이 가려진다(변경·영향이 오류
+              상태에서도 원장 트리를 공유하는 것과 같은 이유). */}
+          {view === "session" ? (
+            <SessionView />
+          ) : error ? (
             <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>요구사항 추적표를 불러오지 못했습니다 ({error}).<br /><code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>understand-rtm</code> 을 먼저 실행하세요.</div>
           ) : !model ? (
             <div className="text-text-muted" style={{ fontSize: 13 }}>불러오는 중…</div>
@@ -430,10 +479,8 @@ export default function RtmView() {
         {selectedReq && view === "requirement" && model && <RequirementDrawer />}
         {selectedTs && view === "scenario" && model && <ScenarioDrawer />}
 
-        {/* P4: 단계 산출 미리보기/컨펌 패널 */}
-        {intakePanelOpen && <IntakeStepPanel />}
-
-        {/* 인테이크 모달 */}
+        {/* 인테이크 모달 — 단발 실행 파라미터 입력이라 관례상 모달이 맞다(설계 §2.2). 단계
+            산출물은 여기 있지 않다: 요청 세션 탭 우측 카드 본문이 그 자리다(W3). */}
         {intake.intakeOpen && <IntakeModal />}
 
         {/* gap9: 확정자 인라인 입력(window.prompt 대체) */}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
 import ApproverDialog from "./ApproverDialog";
@@ -355,6 +355,16 @@ export default function RtmView() {
                 {CIRCLED[Math.min(intake.session?.producedStep ?? 0, 4)]} 단계 생성 중…
               </span>
             )}
+            {/* 코드 영향 분석은 이 탭이 하지 않는다(인테이크 5단계는 impact 미호출) — 짝이 되는
+                메뉴로 나가는 길만 열어 둔다. 버튼 3개는 과하므로 조용한 텍스트 링크. */}
+            <Link
+              to="/change"
+              className="text-text-muted hover:text-text-secondary transition-colors font-semibold whitespace-nowrap"
+              style={{ fontSize: 12.5, textDecoration: "none" }}
+              title="코드 영향 범위(파일·API·DB) 분석 — 자연어 영향 분석은 변경·영향 메뉴에서 실행한다"
+            >
+              변경·영향 →
+            </Link>
             {canWrite && (
               <a
                 href={`/doc-xlsx?token=${encodeURIComponent(accessToken ?? "")}&docId=rtm`}

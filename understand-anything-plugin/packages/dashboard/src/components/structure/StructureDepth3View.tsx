@@ -98,7 +98,8 @@ export default function StructureDepth3View({ domainId }: { domainId: string }) 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
       {processes.length > 0 ? (
-        <div className="flex-1 min-h-0 relative">
+        // relative 없음 — 도킹 패널이 탭 헤더까지 덮도록(StructureDepth1View 와 동일 규약).
+        <div className="flex-1 min-h-0">
           <StructureDomainGraphUA
             nodes={uaNodes}
             edges={uaEdges}

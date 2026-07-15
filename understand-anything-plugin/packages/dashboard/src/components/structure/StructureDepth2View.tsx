@@ -81,7 +81,8 @@ export default function StructureDepth2View({
   const emptyLabel = crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges;
 
   return (
-    <div className="h-full w-full relative">
+    // relative 없음 — 도킹 패널이 탭 헤더까지 덮도록(StructureDepth1View 와 동일 규약).
+    <div className="h-full w-full">
       <StructureDomainGraphUA
         nodes={uaNodes}
         edges={edges}

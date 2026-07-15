@@ -145,6 +145,12 @@ export default function StructurePage() {
       {/* 메뉴 병합: 업무 지도 상단 탭(시스템 구성도/구조, pmpl-proto .tabs) — 이
           페이지는 구조 탭. 오버레이 토글은 같은 행 우측 슬롯에. */}
       <WorkMapTabs active="structure" right={<DiffToggle />} />
+      {/* 탭 헤더 + 본문을 한 relative 박스로 묶는다 — 노드/엣지 클릭 시 뜨는 우측
+          도킹 패널(NodeInfoPanel·EdgeEvidencePanel)이 이 박스를 기준으로 inset-y-0
+          하므로 탭 헤더 높이까지 덮는다(2026-07-15 사용자 요청). 뎁스 뷰가 자체
+          relative 를 들고 있으면 패널이 거기 갇히므로, 뎁스1~3 은 그 relative 를
+          뺐다(그래프는 StructureDomainGraphUA 내부에 자체 relative 가 있어 무관). */}
+      <div className="flex-1 min-h-0 flex flex-col relative">
       {/* 뎁스별 그래프 헤더를 제거(사용자 확정)하고 상단은 브레드크럼으로 통일 —
           뎁스1도 "구조" 단일 크럼을 항상 표시해 뎁스2+("구조 › 장바구니")와 일관되게. */}
       <StructureBreadcrumb crumbs={crumbs} />
@@ -167,6 +173,7 @@ export default function StructurePage() {
         )}
         {route.kind === "depth3" && <StructureDepth3View domainId={route.domainId} />}
         {route.kind === "depth4" && <StructureDepth4View domainId={route.domainId} bf={route.bf} />}
+      </div>
       </div>
     </div>
   );

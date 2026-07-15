@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useI18n } from "../contexts/I18nContext";
+import SearchInput from "./ui/SearchInput";
 import { filterTreeDomains, type TreeDomainNode, type TreeFlowItem } from "../utils/groupWorkspaceTree";
 
 /**
  * 업무 지도 워크스페이스 좌측 트리 패널(공용) — 서브도메인/도메인 ▸ 업무흐름 2레벨.
- * 그룹(GroupWorkspaceView, 서브도메인 여러 개)과 평면(FlatWorkspaceView, 도메인 1개)이
- * 같은 트리 UI를 쓰도록 GroupWorkspaceView 에서 추출(2026-07-15, 평면도 mmobile 트리 형식 통일).
- * 검색·펼침 상태는 이 패널이 소유하고, 리프 클릭 내비게이션(openLeaf)만 호출측이 주입한다.
+ * 그룹(GroupWorkspaceView, 서브도메인 여러 개)과 평면(FlatWorkspaceView, 도메인 1개)이 공유.
+ * 디자인 통일(2026-07-15 사용자 결정): 좌측 내비 디자인을 화면설계서(ScreenSpecView) 계열
+ * (.proto-tree/.doc)로 맞춘다 — 그룹 헤더=회전 셰브런+볼드 라벨+카운트 알약, 리프=.doc 행,
+ * 검색=공용 SearchInput. 동작(선택 도메인 자동 펼침·검색 필터·리프 내비)은 유지.
  */
 export default function WorkMapTreePanel({
   treeDomains,
@@ -29,7 +31,7 @@ export default function WorkMapTreePanel({
   const [query, setQuery] = useState("");
   const filteredDomains = useMemo(() => filterTreeDomains(treeDomains, query), [treeDomains, query]);
 
-  // 펼침 상태 — 선택 도메인은 항상 펼침(딥링크 하위호환), 사용자 토글 다중 허용.
+  // 펼침 상태 — 선택 도메인은 항상 펼침(딥링크 하위호환·현재 흐름이 바로 보이게), 토글 다중 허용.
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set([selectedDomainId]));
   useEffect(() => {
     setExpandedIds((prev) => (prev.has(selectedDomainId) ? prev : new Set(prev).add(selectedDomainId)));
@@ -41,7 +43,7 @@ export default function WorkMapTreePanel({
       else next.add(id);
       return next;
     });
-  // 검색 중엔 결과 도메인 강제 펼침(매칭 흐름이 바로 보이게), 지우면 토글 상태 복귀.
+  // 검색 중엔 결과 도메인 강제 펼침, 지우면 토글 상태 복귀.
   const searching = query.trim().length > 0;
   const isExpanded = (id: string) => searching || expandedIds.has(id);
 
@@ -49,102 +51,83 @@ export default function WorkMapTreePanel({
     <>
       {header}
       <div className="shrink-0" style={{ padding: header ? "0 12px 8px" : "12px 12px 8px" }}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={searchPlaceholder}
-          aria-label={searchPlaceholder}
-          className="w-full rounded-md border border-border-subtle bg-elevated text-text-primary placeholder:text-text-muted"
-          style={{ fontSize: 12.5, padding: "5px 9px" }}
-        />
+        <SearchInput value={query} onChange={setQuery} placeholder={searchPlaceholder} width="full" />
       </div>
-      <ul className="flex-1 min-h-0 overflow-y-auto" style={{ padding: "0 6px 10px" }}>
+      {/* 화면설계서(ScreenSpecView) 계열 — .proto-tree 컨텍스트에서 .doc 리프 스타일 적용. */}
+      <div className="flex-1 min-h-0 overflow-y-auto proto-tree" style={{ padding: "0 8px 10px" }}>
         {filteredDomains.map((d) => {
           const expanded = isExpanded(d.id);
-          const isSelectedDomain = d.id === selectedDomainId;
           const expandable = d.items.length > 0;
           return (
-            <li key={d.id}>
+            <div key={d.id} style={{ marginTop: 2 }}>
+              {/* 그룹 헤더 — 회전 셰브런 + 도메인명(볼드) + 우측 카운트 알약(화면설계서 그룹 행). */}
               <button
                 type="button"
                 onClick={() => toggleExpand(d.id)}
+                className="flex items-center w-full text-left cursor-pointer bg-transparent border-0 rounded-[7px] hover:bg-elevated"
+                style={{ padding: "6px 8px", gap: 7, fontFamily: "inherit" }}
                 aria-expanded={expandable ? expanded : undefined}
-                aria-current={isSelectedDomain ? "page" : undefined}
-                className="w-full flex items-center gap-1.5 rounded-md text-left transition-colors cursor-pointer"
-                style={{
-                  padding: "7px 8px",
-                  fontSize: 12.5,
-                  marginBottom: 2,
-                  background: isSelectedDomain
-                    ? "color-mix(in srgb, var(--color-accent) 9%, transparent)"
-                    : "transparent",
-                  color: isSelectedDomain ? "var(--color-accent)" : "var(--color-text-secondary)",
-                  fontWeight: isSelectedDomain ? 600 : 400,
-                }}
+                aria-current={d.id === selectedDomainId ? "true" : undefined}
               >
                 <span
-                  aria-hidden
-                  className="shrink-0"
-                  style={{ width: 10, fontSize: 9, opacity: expandable ? 1 : 0, textAlign: "center" }}
+                  className="inline-flex justify-center text-text-muted"
+                  style={{
+                    fontSize: 9,
+                    width: 10,
+                    flex: "none",
+                    transition: "transform 0.12s ease",
+                    transform: expanded ? "rotate(90deg)" : "none",
+                    opacity: expandable ? 1 : 0,
+                  }}
                 >
-                  {expanded ? "▼" : "▶"}
+                  ▸
                 </span>
-                <span aria-hidden className="shrink-0" style={{ fontSize: 13, lineHeight: 1 }}>
-                  {d.icon}
-                </span>
-                <span className="truncate flex-1" title={d.name}>
+                <span className="truncate text-text-primary" style={{ fontSize: 12.5, fontWeight: 650 }} title={d.name}>
                   {d.name}
                 </span>
-                <span className="shrink-0 text-text-muted tabular-nums" style={{ fontSize: 11 }}>
+                <span
+                  className="tabular-nums text-text-muted bg-elevated rounded-full"
+                  style={{ marginLeft: "auto", flex: "none", fontSize: 10.5, fontWeight: 600, padding: "1px 7px" }}
+                >
                   {d.flowCount}
                 </span>
               </button>
+              {/* 자식(업무흐름 리프) — 셰브런 축 가이드 라인 + .doc 행. */}
               {expanded && (
-                <ul style={{ paddingLeft: 26 }}>
+                <div style={{ margin: "2px 0 6px 12px", paddingLeft: 6, borderLeft: "1px solid var(--color-border-subtle)" }}>
                   {d.items.map((item) => {
-                    const active = isSelectedDomain && item.key === activeKey;
+                    const active = d.id === selectedDomainId && item.key === activeKey;
                     return (
-                      <li key={item.key}>
-                        <button
-                          type="button"
-                          onClick={() => onOpenLeaf(item)}
-                          aria-current={active ? "page" : undefined}
-                          className="w-full flex items-center text-left rounded-md transition-colors cursor-pointer"
-                          style={{
-                            padding: "5px 8px",
-                            fontSize: 11.5,
-                            marginBottom: 1,
-                            background: active
-                              ? "color-mix(in srgb, var(--color-accent) 9%, transparent)"
-                              : "transparent",
-                            color: active ? "var(--color-accent)" : "var(--color-text-muted)",
-                            fontWeight: active ? 600 : 400,
-                          }}
-                        >
-                          <span className="truncate" title={item.title}>
-                            {item.title}
-                          </span>
-                        </button>
-                      </li>
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => onOpenLeaf(item)}
+                        className={`doc ${active ? "on" : ""}`}
+                        aria-current={active ? "page" : undefined}
+                        title={item.title}
+                      >
+                        <span className="truncate" style={{ minWidth: 0 }}>
+                          {item.title}
+                        </span>
+                      </button>
                     );
                   })}
                   {d.items.length === 0 && (
-                    <li className="text-text-muted" style={{ fontSize: 11, padding: "4px 8px" }}>
+                    <div className="text-text-muted" style={{ fontSize: 11, padding: "4px 8px" }}>
                       {t.groupWorkspace.noFlows}
-                    </li>
+                    </div>
                   )}
-                </ul>
+                </div>
               )}
-            </li>
+            </div>
           );
         })}
         {filteredDomains.length === 0 && (
-          <li className="text-text-muted" style={{ fontSize: 12, padding: "10px 8px" }}>
+          <div className="text-text-muted" style={{ fontSize: 12, padding: "10px 8px" }}>
             {t.flowList.noMatches}
-          </li>
+          </div>
         )}
-      </ul>
+      </div>
     </>
   );
 }

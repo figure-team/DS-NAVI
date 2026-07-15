@@ -137,6 +137,9 @@ export function IntakeModal() {
         </div>
         <div style={{ padding: "16px 20px" }}>
           <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 10 }}>고객 요청을 자연어로 입력하세요. 요청(REQ)을 요구사항(SFR/SIR/DAR/SER…)으로 분해해 가이드 5단계로 문서화합니다.<span className="text-text-muted"> 결과는 전부 <code style={{ fontFamily: "var(--font-mono)" }}>[추정]</code> — 단계마다 검토·컨펌하세요.</span></p>
+          {/* 범위 경계 — 인테이크는 impact 엔진을 호출하지 않는다. 자연어를 받는 입구가 둘이라
+              (여기 · 변경·영향의 "자연어 영향 분석") 사용자가 코드 영향 분석을 여기서 기대한다. */}
+          <p className="text-text-muted" style={{ fontSize: 11.5, lineHeight: 1.6, marginBottom: 10 }}>코드 영향 범위(어떤 파일·API·DB가 바뀌는지)는 여기서 분석하지 않습니다 — <b className="text-text-secondary">변경·영향</b> 메뉴에서 따로 실행하세요.</p>
           <textarea value={intakeQuery} onChange={(e) => setIntakeQuery(e.target.value)} onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void startIntake(); }} placeholder="예) 네이버 로그인 추가해주세요." rows={3} autoFocus className="w-full resize-y rounded-lg bg-elevated border border-border-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" style={{ fontSize: 13, padding: "8px 11px" }} />
           <div style={{ marginTop: 14 }}>
             <div className="text-text-muted" style={{ fontSize: 11, marginBottom: 7 }}>어디까지 진행할까요? <span style={{ color: "var(--color-text-secondary)" }}>(선택 단계까지 한 번에 생성 후 멈춤)</span></div>

@@ -686,8 +686,14 @@ export default function ChangeImpactView() {
         </>
       )}
       <div className="fold">안내</div>
+      {/* 인테이크는 impact 엔진을 호출하지 않는다(요구사항 문서 + RTM 행만 산출) — 여기서
+          "RTM 인테이크로도 분석이 시작된다" 고 안내하면 오지 않을 결과를 기다리게 된다. */}
       <div style={{ fontSize: 12, color: "var(--color-text-muted)", padding: "6px 8px", lineHeight: 1.5 }}>
-        RTM 새 요청 인테이크 또는 자연어 영향 분석으로 새 분석을 시작합니다.
+        새 분석은 우상단 <b className="text-text-secondary">자연어 영향 분석</b> 또는 CLI{" "}
+        <code>/understand-impact</code>로 시작합니다.
+        <div style={{ marginTop: 6 }}>
+          요구사항 접수·추적은 <Link to="/rtm" style={LINK_TEXT}>추적표</Link>에서 합니다.
+        </div>
       </div>
     </div>
   );
@@ -720,7 +726,7 @@ export default function ChangeImpactView() {
                 <p className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
                   {activeRun
                     ? "이 기록의 결과 스냅샷을 찾을 수 없습니다 — 좌측에서 다른 기록이나 최신 분석을 선택하세요"
-                    : "영향 분석 결과 없음 — 자연어 영향 분석, /understand-impact 또는 RTM 인테이크에서 분석을 실행하면 여기 나타납니다"}
+                    : "영향 분석 결과 없음 — 우상단 자연어 영향 분석 또는 /understand-impact 를 실행하면 여기 나타납니다"}
                 </p>
               </div>
             )}
@@ -1098,6 +1104,17 @@ export default function ChangeImpactView() {
                   구조 그래프 오버레이
                 </span>
                 <Link to="/domains?tab=structure&overlay=impact" style={LINK_TEXT}>
+                  열기 →
+                </Link>
+              </div>
+              {/* 여정(FRONT_REDESIGN_DESIGN.md:29) 마무리 — 영향 확인 후 추적표에서 확정한다.
+                  추적표는 이 분석의 산출물이 아니므로 그룹을 나눈다. */}
+              <div style={GRP_LABEL}>다음 단계</div>
+              <div className="flex items-center gap-2" style={ROW}>
+                <span style={{ fontSize: 13, color: "var(--color-text-primary)", flex: "1 1 auto" }}>
+                  요구사항 추적표
+                </span>
+                <Link to="/rtm" style={LINK_TEXT} title="영향 범위를 확인했다면 추적표에서 요구사항을 확정한다">
                   열기 →
                 </Link>
               </div>

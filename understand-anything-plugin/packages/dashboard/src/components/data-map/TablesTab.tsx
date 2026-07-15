@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { Badge } from "../proto/Proto";
@@ -43,16 +43,28 @@ function TableTree({
   matches,
   selected,
   onSelect,
+  searchActive,
 }: {
   matches: TableMatch[];
   selected: string | null;
   onSelect: (name: string) => void;
+  searchActive: boolean;
 }) {
   const biz = matches.filter((m) => !m.table.isCodeTable);
   const code = matches.filter((m) => m.table.isCodeTable);
-  const groups: Array<{ label: string; items: TableMatch[] }> = [];
-  if (biz.length > 0) groups.push({ label: `업무 테이블 (${biz.length})`, items: biz });
-  if (code.length > 0) groups.push({ label: `코드성 테이블 (${code.length})`, items: code });
+  const groups: Array<{ key: string; label: string; count: number; items: TableMatch[] }> = [];
+  if (biz.length > 0) groups.push({ key: "biz", label: "업무 테이블", count: biz.length, items: biz });
+  if (code.length > 0) groups.push({ key: "code", label: "코드성 테이블", count: code.length, items: code });
+
+  // 접이식(화면설계서 계열) — 기본 펼침, 사용자 토글로 접기. 검색 중엔 결과가 바로 보이게 강제 펼침.
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const toggle = (key: string) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
 
   // 무의존 가상화 — 항목별 content-visibility 로 오프스크린 렌더 비용 상수화(수천 테이블 대응).
   const itemStyle: React.CSSProperties = { contentVisibility: "auto", containIntrinsicBlockSize: "34px" };
@@ -62,9 +74,36 @@ function TableTree({
       className="rounded-[10px] border border-border-subtle bg-panel card-shadow proto-tree"
       style={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto" }}
     >
-      {groups.map((g) => (
-        <div key={g.label}>
-          <div className="fold">{g.label}</div>
+      {groups.map((g) => {
+        const open = searchActive || !collapsed.has(g.key);
+        return (
+        <div key={g.key} style={{ marginTop: 2 }}>
+          {/* 그룹 헤더 — 화면설계서 계열: 회전 셰브런 + 라벨 + 카운트 알약. */}
+          <button
+            type="button"
+            onClick={() => toggle(g.key)}
+            className="flex items-center w-full text-left cursor-pointer bg-transparent border-0 rounded-[7px] hover:bg-elevated"
+            style={{ padding: "6px 8px", gap: 7, fontFamily: "inherit" }}
+            aria-expanded={open}
+          >
+            <span
+              className="inline-flex justify-center text-text-muted"
+              style={{ fontSize: 9, width: 10, flex: "none", transition: "transform 0.12s ease", transform: open ? "rotate(90deg)" : "none" }}
+            >
+              ▸
+            </span>
+            <span className="truncate text-text-primary" style={{ fontSize: 12.5, fontWeight: 650 }}>
+              {g.label}
+            </span>
+            <span
+              className="tabular-nums text-text-muted bg-elevated rounded-full"
+              style={{ marginLeft: "auto", flex: "none", fontSize: 10.5, fontWeight: 600, padding: "1px 7px" }}
+            >
+              {g.count}
+            </span>
+          </button>
+          {open && (
+          <div style={{ margin: "2px 0 6px 12px", paddingLeft: 6, borderLeft: "1px solid var(--color-border-subtle)" }}>
           {g.items.map(({ table: t, nameHit, colHits }) => (
             <button
               key={t.name}
@@ -102,8 +141,11 @@ function TableTree({
               </span>
             </button>
           ))}
+          </div>
+          )}
         </div>
-      ))}
+        );
+      })}
       {matches.length === 0 && (
         <div className="text-text-muted" style={{ padding: "14px 8px", fontSize: 12.5 }}>
           검색 결과 없음
@@ -349,6 +391,7 @@ export default function TablesTab({ schema }: { schema: DbSchema }) {
         <TableTree
           matches={matches}
           selected={selected?.name ?? null}
+          searchActive={q.trim().length > 0}
           onSelect={(name) =>
             setSearchParams((prev) => {
               prev.set("table", name);

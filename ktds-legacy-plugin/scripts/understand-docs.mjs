@@ -256,7 +256,10 @@ const buildDeps = findBuildDeps(projectRoot)
 // 없으면(맵 미실행/code-only) null → db-spec 은 기존 노드 기반 목록만(우아한 degrade).
 const dbSchema = readDbSchema(projectRoot)
 const input = { nodes: graph.nodes, edges: graph.edges, routes, interfaces, batchJobs, programInventory, riskReport, rtm, workSummary, mybatisModel, methodCallGraph, project, buildDeps, fileEdges, dbSchema }
-const sourceCommit = graph.gitCommit ?? null
+// domain-graph.json 은 최상위 gitCommit 을 갖지 않는다 — 스탬프는 ktdsMap.generatedFromCommit
+// (emit 이 skeleton.gitCommit 에서 투영, 없으면 빈 문자열)과 project.gitCommitHash 에 있다.
+// `||` 인 이유: emit.ts 가 `?? ''` 로 쓰므로 빈 문자열을 유효값으로 받으면 안 된다.
+const sourceCommit = graph.ktdsMap?.generatedFromCommit || graph.project?.gitCommitHash || null
 const graphSource = 'domain-graph.json(채움)'
 
 /** 한 문서의 템플릿 로드 — 프로젝트 override → 플러그인 동봉. 없으면 null(빌더 기본 구조). */

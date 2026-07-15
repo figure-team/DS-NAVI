@@ -43,9 +43,11 @@ export function Badge({
 /* ── .conf — 신뢰도 배지: 확정(fix) / 확정·AI(ai) / 추정(est) / 확인 필요(chk) ── */
 export type ConfKind = "fix" | "ai" | "est" | "chk";
 
+// 라벨 통일(2026-07-15 사용자 결정): 자동판정 신뢰도는 사람 '확정'과 구분해 "근거확보".
+// 단일 소스는 components/confidence.ts — 여기 기본 라벨도 그에 맞춘다.
 const CONF: Record<ConfKind, { label: string; color: string; bg: string }> = {
-  fix: { label: "확정", color: "var(--color-status-ok)", bg: "color-mix(in srgb, var(--color-status-ok) 12%, transparent)" },
-  ai: { label: "확정·AI", color: "var(--color-conf-ai)", bg: "color-mix(in srgb, var(--color-conf-ai) 12%, transparent)" },
+  fix: { label: "근거확보", color: "var(--color-status-ok)", bg: "color-mix(in srgb, var(--color-status-ok) 12%, transparent)" },
+  ai: { label: "근거확보(추정)", color: "var(--color-conf-ai)", bg: "color-mix(in srgb, var(--color-conf-ai) 12%, transparent)" },
   est: { label: "추정", color: "var(--color-status-warn)", bg: "color-mix(in srgb, var(--color-status-warn) 12%, transparent)" },
   chk: { label: "확인 필요", color: "var(--color-status-error)", bg: "color-mix(in srgb, var(--color-status-error) 11%, transparent)" },
 };

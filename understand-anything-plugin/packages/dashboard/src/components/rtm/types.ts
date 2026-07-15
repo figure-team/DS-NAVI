@@ -62,10 +62,11 @@ export const GOLD = "var(--color-accent)";
 export const OK = "var(--color-status-ok)", BAD = "var(--color-status-error)", WARN = "var(--color-status-warn)",
   NFR = "var(--color-status-info)", FAINT = "var(--color-border-medium)", GOLD_DIM = "var(--color-accent-dim)";
 
-// pmpl-proto .conf 톤 — 확정=녹색 / 확정·AI=청록 / 추정=주황 / 확인 필요=적색.
+// pmpl-proto .conf 톤 — 근거확보=녹색 / 근거확보(추정)=청록 / 추정=주황 / 확인 필요=적색.
+// 라벨은 components/confidence.ts 결정(자동판정 신뢰도는 사람 '확정'과 구분).
 export const CONF: Record<Confidence, { label: string; color: string }> = {
-  CONFIRMED: { label: "확정", color: OK },
-  CONFIRMED_AI: { label: "확정·AI", color: "var(--color-conf-ai)" },
+  CONFIRMED: { label: "근거확보", color: OK },
+  CONFIRMED_AI: { label: "근거확보(추정)", color: "var(--color-conf-ai)" },
   INFERRED: { label: "추정", color: WARN },
   UNVERIFIED: { label: "확인 필요", color: BAD },
 };

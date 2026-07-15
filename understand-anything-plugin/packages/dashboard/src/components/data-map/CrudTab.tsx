@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router";
 
 import { Badge, BtnOutline } from "../proto/Proto";
 import type { BadgeTone } from "../proto/Proto";
+import { confMeta, confTone } from "../confidence";
 import { EvidencePopover } from "../rtm/shared";
 import type { EvPopoverState } from "../rtm/shared";
 import type { CrudMatrix, CrudRow } from "./types";
@@ -16,16 +17,6 @@ import SearchInput from "../ui/SearchInput";
 
 /** CRUD 셀 문자 → 배지 톤(C 생성 / R 조회 / U 수정 / D 삭제 / ○ 접근확인). */
 const CELL_TONE: Record<string, BadgeTone> = { C: "ok", R: "info", U: "warn", D: "err", "○": "mut" };
-
-/**
- * 행 단위 신뢰도 표시 — 전부 정적 분석 자동 판정(사람 확정 아님)이라 "확정" 계열 라벨을 쓰지 않는다.
- * CONFIRMED = SQL 문 근거(file:line) 추적됨, INFERRED = DB 접근 미검출/메서드명 추론.
- */
-const CONF_DISPLAY: Record<string, { label: string; tone: BadgeTone; title: string }> = {
-  CONFIRMED: { label: "근거확보", tone: "ok", title: "SQL 문 근거(file:line)가 호출그래프로 추적됨 — 기계 판정" },
-  INFERRED: { label: "추정", tone: "warn", title: "DB 접근 미검출 또는 메서드명 추론 — 기계 판정" },
-  UNVERIFIED: { label: "확인 필요", tone: "err", title: "근거 없음 — 확인 필요" },
-};
 
 const rowIsEmpty = (r: CrudRow): boolean => r.evidence.length === 0 && r.cells.slice(1).every((c) => !c);
 
@@ -161,7 +152,7 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
             </thead>
             <tbody>
               {viewRows.map((row, ri) => {
-                const conf = CONF_DISPLAY[row.confidence] ?? CONF_DISPLAY.INFERRED;
+                const conf = confMeta(row.confidence);
                 const rowKey = `${row.cells[0] ?? ri}`;
                 return (
                   <tr key={rowKey}>
@@ -177,7 +168,7 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
                       );
                     })}
                     <td>
-                      <Badge tone={conf.tone} title={conf.title}>
+                      <Badge tone={confTone(conf.kind)} title={conf.title}>
                         {conf.label}
                       </Badge>
                     </td>

@@ -50,6 +50,8 @@ const SPEC_FILES = [
   "coverage.json",
   "work-summary.json",
   "impact.json",
+  // impact.json 의 검증 리포트 — 없으면 demo 에서도 GROUNDED 배지가 통째로 빠진다.
+  "impact-verify-report.json",
   "policy-signals.json",
   "policy-reconcile.json",
 ];

@@ -105,6 +105,14 @@ export {
   IdentifiedIntakeSchema,
   parseIdentifiedIntake,
   diagnoseIntake,
+  checkIntakeGrounding,
+  extractTableRefs,
+  // P2 근거 스키마 — 인용 + 화면·정책 축
+  IntakeEvidenceSchema,
+  IntakeScreenRefSchema,
+  IntakePolicyRefSchema,
+  IntakeAcceptanceCriterionSchema,
+  IntakeChangesetSchema,
 } from './intake-types.js'
 export type {
   RequirementCategory,
@@ -113,6 +121,14 @@ export type {
   IntakeSpec,
   IntakeRequirement,
   IdentifiedIntake,
+  IntakeInventory,
+  IntakeGroundingViolation,
+  // P2 근거 스키마
+  IntakeEvidence,
+  IntakeScreenRef,
+  IntakePolicyRef,
+  IntakeAcceptanceCriterion,
+  IntakeChangeset,
 } from './intake-types.js'
 export {
   intakeReqToRtmRequirement,
@@ -123,3 +139,43 @@ export { withdrawRequest, requestIdOf } from './withdraw-request.js'
 export type { WithdrawOptions, WithdrawResult } from './withdraw-request.js'
 export { computeChangeImpact } from './change-impact.js'
 export type { ChangeImpactReport, ChangeImpactFunction, ChangeImpactClass } from './change-impact.js'
+// 근거 번들 — 유계 요약. RTM_IMPACT_GATE_DESIGN.md §6.2.
+//  v1(P3): 3축(도메인·데이터·추적표). **v2(P4): + 화면·정책 축 + pre-cite + 축별 예산 배분.**
+export {
+  buildIntakeInputBundle,
+  serializeIntakeBundle,
+  checkMinimalSet,
+  tokenizeRequest,
+  SAMPLE_FILES_MAX,
+  DEFAULT_BUNDLE_CHAR_CAP,
+  AXIS_CAPS,
+  FALLBACK_TOP_N,
+  // P4
+  AXIS_BUDGET,
+  POLICY_SECTION_PRIORITY,
+  allocateAxisBudget,
+  parsePolicyMarkdown,
+} from './intake-bundle.js'
+export type {
+  IntakeBundleSources,
+  BuildIntakeInputOptions,
+  IntakeInputBundle,
+  IntakeAxis,
+  IntakeBundleDomain,
+  IntakeBundleTable,
+  IntakeBundleCrudRow,
+  IntakeBundleFunction,
+  EvidenceStat,
+  DomainGraphNode,
+  // P4
+  AxisBudgetKey,
+  AxisBudgetReport,
+  IntakePolicyDoc,
+  IntakePreCite,
+  IntakeBundleClaim,
+  IntakeBundleScreen,
+  IntakeBundleAnnotation,
+  IntakeBundlePolicyDoc,
+  IntakeBundlePolicySection,
+  IntakeBundlePolicyRow,
+} from './intake-bundle.js'

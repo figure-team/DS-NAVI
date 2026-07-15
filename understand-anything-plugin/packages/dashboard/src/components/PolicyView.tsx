@@ -9,6 +9,9 @@ import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
 import type { BadgeTone, ConfKind } from "./proto/Proto";
 import CitationChip from "./CitationChip";
+import SearchInput from "./ui/SearchInput";
+import EmptyCard from "./ui/EmptyCard";
+import { Pill } from "./ui/Pill";
 
 /**
  * 정책서 뷰(신설, pmpl-proto pg-policy 1416~1512행) — 정적 추출한 정책 "신호"를
@@ -273,60 +276,8 @@ function GroupLabel({ children }: { children: ReactNode }) {
   );
 }
 
-/** chips 한 칸(프로토 .chip). on=강조, muted=신호 없음. */
-function Chip({ children, on, muted }: { children: ReactNode; on?: boolean; muted?: boolean }) {
-  return (
-    <span
-      className="inline-flex items-center whitespace-nowrap"
-      style={{
-        fontSize: 12,
-        fontWeight: on ? 650 : 500,
-        padding: "3px 10px",
-        borderRadius: 999,
-        border: "1px solid var(--color-border-subtle)",
-        color: on ? "var(--color-accent)" : "var(--color-text-muted)",
-        background: on ? "color-mix(in srgb, var(--color-accent) 8%, transparent)" : "var(--color-panel)",
-        opacity: muted ? 0.7 : 1,
-      }}
-    >
-      {children}
-    </span>
-  );
-}
-
 const CARD = "rounded-[10px] border border-border-subtle bg-panel card-shadow";
 const TH_STICKY: CSSProperties = { position: "sticky", top: 0, background: "var(--color-panel)" };
-
-/** 검색 입력(통합) — 신호·대조 공통. */
-function SearchBar({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
-  return (
-    <input
-      type="search"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      aria-label={placeholder}
-      className="w-full rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-      style={{ padding: "7px 12px", fontSize: 13, marginBottom: 14, maxWidth: 420 }}
-    />
-  );
-}
-
-/** 정직한 부재/오류 안내 카드. */
-function NoticeCard({ title, children }: { title: ReactNode; children?: ReactNode }) {
-  return (
-    <div className={CARD} style={{ padding: "28px 24px", textAlign: "center" }}>
-      <p className="text-text-primary" style={{ fontSize: 14, fontWeight: 650, marginBottom: 6 }}>
-        {title}
-      </p>
-      {children && (
-        <p className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
-          {children}
-        </p>
-      )}
-    </div>
-  );
-}
 
 export default function PolicyView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
@@ -431,13 +382,13 @@ export default function PolicyView() {
       <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
         {/* 메뉴 헤더 제거(2026-07-15) — 신호 부재/오류 상태라 TopBar 정보 팝오버도 생략. */}
         {signalsErr ? (
-          <NoticeCard title="정책 신호를 불러오지 못했습니다">
+          <EmptyCard title="정책 신호를 불러오지 못했습니다">
             <code>policy-signals.json</code> 응답 오류 ({signalsErr}). understand-map 스캔·dev 서버 상태를 확인하세요.
-          </NoticeCard>
+          </EmptyCard>
         ) : (
-          <NoticeCard title="정책 신호 없음">
+          <EmptyCard title="정책 신호 없음">
             CLI에서 <code>/understand-policy</code>를 실행해 신호를 먼저 추출하세요.
-          </NoticeCard>
+          </EmptyCard>
         )}
       </div>
     );
@@ -447,9 +398,9 @@ export default function PolicyView() {
     return (
       <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
         {/* 메뉴 헤더 제거(2026-07-15) — 신호 부재/오류 상태라 TopBar 정보 팝오버도 생략. */}
-        <NoticeCard title="정책 신호 없음">
+        <EmptyCard title="정책 신호 없음">
           CLI에서 <code>/understand-policy</code>를 실행해 신호를 먼저 추출하세요.
-        </NoticeCard>
+        </EmptyCard>
       </div>
     );
   }
@@ -569,9 +520,9 @@ function CategoryTab({
   return (
     <>
       <div className="flex flex-wrap items-center" style={{ gap: 8, marginBottom: 12 }}>
-        <Chip on>검증·권한 {codeSignals.length}</Chip>
-        <Chip on>용어 {glossary.length}</Chip>
-        <Chip muted>데이터 무결성 {dataSignals.length}</Chip>
+        <Pill active>검증·권한 {codeSignals.length}</Pill>
+        <Pill active>용어 {glossary.length}</Pill>
+        <Pill muted>데이터 무결성 {dataSignals.length}</Pill>
         <span className="text-text-muted inline-flex items-center flex-wrap" style={{ gap: 8, fontSize: 12 }}>
           <span className="inline-flex items-center" style={{ gap: 5 }}>
             <ConfBadge kind="fix" /> 근거확보 = 코드/DDL 원문
@@ -582,7 +533,7 @@ function CategoryTab({
         </span>
       </div>
 
-      <SearchBar value={query} onChange={onQuery} placeholder="신호 검색 (대상·내용·근거)" />
+      <SearchInput value={query} onChange={onQuery} placeholder="신호 검색 (대상·내용·근거)" width="full" style={{ maxWidth: 420, marginBottom: 14 }} />
 
       <div className="grid grid-cols-1 items-start lg:grid-cols-[minmax(0,1fr)_320px]" style={{ gap: 14 }}>
         {/* 좌: 카테고리 정책서(LLM 보강 산출물) → 검증·권한 코드 신호 → 용어 사전 */}
@@ -729,9 +680,9 @@ function CategoryTab({
             </p>
             <div className="flex flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
               {dataCounts.map((c) => (
-                <Chip key={c.label}>
+                <Pill key={c.label}>
                   {c.label} {c.count}
-                </Chip>
+                </Pill>
               ))}
             </div>
             <Link
@@ -750,9 +701,9 @@ function CategoryTab({
             </p>
             <div className="flex flex-wrap" style={{ gap: 8 }}>
               {NOT_EXTRACTED_CATEGORIES.map((c) => (
-                <Chip key={c} muted>
+                <Pill key={c} muted>
                   {c}
-                </Chip>
+                </Pill>
               ))}
             </div>
           </div>
@@ -869,9 +820,9 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
 
   if (statsErr) {
     return (
-      <NoticeCard title="정책서 본문을 불러오지 못했습니다">
+      <EmptyCard title="정책서 본문을 불러오지 못했습니다">
         <code>doc-content.json</code> 응답 오류 ({statsErr}). dev 서버 상태를 확인하세요.
-      </NoticeCard>
+      </EmptyCard>
     );
   }
   if (stats === null) {
@@ -976,7 +927,7 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
                     title={`${s.domain} 정책서 §8 원문 보기`}
                     style={{ textDecoration: "none" }}
                   >
-                    <Chip muted>{s.domain} →</Chip>
+                    <Pill muted>{s.domain} →</Pill>
                   </Link>
                 ))}
               </span>
@@ -1064,7 +1015,7 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
                           title={`${domainShortName(s.title)} 정책서 §4 원문 보기`}
                           style={{ textDecoration: "none" }}
                         >
-                          <Chip muted>{domainShortName(s.title)} →</Chip>
+                          <Pill muted>{domainShortName(s.title)} →</Pill>
                         </Link>
                       </td>
                       <td>
@@ -1094,9 +1045,9 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
             {stats
               .filter((s) => s.policies.length > 0)
               .map((s) => (
-                <Chip key={s.docId} on={s.namedCount < s.policies.length}>
+                <Pill key={s.docId} active={s.namedCount < s.policies.length}>
                   {domainShortName(s.title)} {s.namedCount}/{s.policies.length}
-                </Chip>
+                </Pill>
               ))}
           </div>
           {totalNamed === totalPl ? (
@@ -1123,7 +1074,7 @@ function DomainTab({ docs, accessToken }: { docs: DocListItem[]; accessToken: st
                       to={`/deliverables/${encodeURIComponent(s.docId)}`}
                       style={{ textDecoration: "none" }}
                     >
-                      <Chip muted>{domainShortName(s.title)} →</Chip>
+                      <Pill muted>{domainShortName(s.title)} →</Pill>
                     </Link>
                   </div>
                 )),
@@ -1262,7 +1213,7 @@ function ReconcileTab({
           목록을 변경요청(CR) 후보로 추적표에 연결.
         </p>
 
-        <SearchBar value={query} onChange={onQuery} placeholder="대조 검색 (대상·신호)" />
+        <SearchInput value={query} onChange={onQuery} placeholder="대조 검색 (대상·신호)" width="full" style={{ maxWidth: 420, marginBottom: 14 }} />
 
         <div className="flex flex-wrap items-center" style={{ gap: 10, marginBottom: 10 }}>
           <span className="text-text-muted tabular-nums" style={{ fontSize: 12 }}>

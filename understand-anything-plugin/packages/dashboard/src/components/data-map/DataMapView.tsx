@@ -9,6 +9,7 @@ import SchemaMetaInfo from "./SchemaMetaInfo";
 import TablesTab from "./TablesTab";
 import UnresolvedChips from "./UnresolvedChips";
 import type { CrudMatrix, DbSchema } from "./types";
+import EmptyCard from "../ui/EmptyCard";
 
 // ERD 탭은 @xyflow/react + elkjs 를 끌고 오므로 진입 시점 분리 로드.
 const ErdTab = lazy(() => import("./ErdTab"));
@@ -24,18 +25,6 @@ const ErdTab = lazy(() => import("./ErdTab"));
 // 그룹·배지·판정 사유·행 샘플이 전부 테이블 탭에 흡수돼 고유 가치가 소멸(설계문서 §7 결정 뒤집음).
 type TabKey = "tables" | "erd" | "crud";
 const TAB_KEYS: TabKey[] = ["tables", "erd", "crud"];
-
-/** 정직한 부재/오류 안내 카드. */
-function EmptyCard({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className="rounded-[10px] border border-border-subtle bg-panel card-shadow text-text-muted"
-      style={{ padding: "28px 26px", fontSize: 13, lineHeight: 1.7 }}
-    >
-      {children}
-    </div>
-  );
-}
 
 export default function DataMapView() {
   const accessToken = useDashboardStore((s) => s.accessToken);

@@ -14,6 +14,7 @@ import type { Annotation, LabelSource, Screen } from "./screenSpecAnnotations";
 // 만들지 않으려는 것(data-map CrudTab 이 이미 같은 패턴을 로컬 복제해 뒀다).
 import { EvidencePopover } from "./rtm/shared";
 import type { EvPopoverState } from "./rtm/shared";
+import SearchInput from "./ui/SearchInput";
 
 /**
  * ktds-fork (S4): 화면설계서 뷰 — SI 화면설계서 슬라이드 재현.
@@ -812,13 +813,11 @@ export default function ScreenSpecView() {
         <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow proto-tree">
           {/* 통합 검색 — 제목·URL·JSP·주석 매칭(?q= 이관, 히스토리 오염 방지 replace) */}
           <div style={{ padding: "8px 8px 4px" }}>
-            <input
-              type="search"
+            <SearchInput
               value={q}
-              onChange={(e) => setParam("q", e.target.value || null, true)}
+              onChange={(v) => setParam("q", v || null, true)}
               placeholder="화면·URL·항목 검색"
-              className="w-full rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-              style={{ padding: "6px 10px", fontSize: 12.5 }}
+              width="full"
             />
           </div>
           {groups.map(([domain, screens]) => {

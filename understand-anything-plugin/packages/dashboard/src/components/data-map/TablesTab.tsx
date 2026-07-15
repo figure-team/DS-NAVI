@@ -7,6 +7,9 @@ import { fkComponent, fkEdgePairs } from "./erd-component";
 import RowSample, { ROW_SAMPLE_MAX } from "./RowSample";
 import { baseName, isPk, len, originBadge } from "./types";
 import type { DbColumn, DbSchema, DbTable } from "./types";
+import SearchInput from "../ui/SearchInput";
+import EmptyCard from "../ui/EmptyCard";
+import { Tag } from "../ui/Tag";
 
 /**
  * 테이블 탭(개편 ②) — 검색(테이블명·comment·컬럼명·컬럼 comment) + 무의존 가상화
@@ -50,18 +53,6 @@ function matchTables(tables: DbTable[], query: string): TableMatch[] {
     if (nameHit || colHits.length > 0) out.push({ table: t, nameHit, colHits });
   }
   return out;
-}
-
-/** 하단 카운트 칩(FK/UNIQUE/CHECK/INDEX/행). */
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span
-      className="border border-border-subtle text-text-muted rounded-md whitespace-nowrap"
-      style={{ fontSize: 11.5, padding: "3px 9px" }}
-    >
-      {children}
-    </span>
-  );
 }
 
 function TableTree({
@@ -289,11 +280,11 @@ export function TableDetail({
         </div>
 
         <div className="flex flex-wrap gap-2" style={{ marginTop: 12 }}>
-          <Chip>FK {len(table.foreignKeys)}</Chip>
-          <Chip>UNIQUE {len(table.uniques)}</Chip>
-          <Chip>CHECK {len(table.checks)}</Chip>
-          <Chip>INDEX {len(table.indexes)}</Chip>
-          {rows > 0 && <Chip>행 데이터 {rows}행 실측</Chip>}
+          <Tag>FK {len(table.foreignKeys)}</Tag>
+          <Tag>UNIQUE {len(table.uniques)}</Tag>
+          <Tag>CHECK {len(table.checks)}</Tag>
+          <Tag>INDEX {len(table.indexes)}</Tag>
+          {rows > 0 && <Tag>행 데이터 {rows}행 실측</Tag>}
         </div>
 
       </div>
@@ -316,18 +307,6 @@ export function TableDetail({
           <RowSample table={table} showEvidence={false} />
         </div>
       )}
-    </div>
-  );
-}
-
-/** 정직한 부재/오류 안내 카드. */
-function EmptyCard({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className="rounded-[10px] border border-border-subtle bg-panel card-shadow text-text-muted"
-      style={{ padding: "28px 26px", fontSize: 13, lineHeight: 1.7 }}
-    >
-      {children}
     </div>
   );
 }
@@ -367,13 +346,12 @@ export default function TablesTab({ schema }: { schema: DbSchema }) {
   return (
     <div className="grid items-start grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)]" style={{ gap: 14 }}>
       <div className="min-w-0">
-        <input
-          type="search"
+        <SearchInput
           value={q}
-          onChange={(e) =>
+          onChange={(v) =>
             setSearchParams(
               (prev) => {
-                if (e.target.value) prev.set("q", e.target.value);
+                if (v) prev.set("q", v);
                 else prev.delete("q");
                 return prev;
               },
@@ -381,8 +359,8 @@ export default function TablesTab({ schema }: { schema: DbSchema }) {
             )
           }
           placeholder="테이블·컬럼 검색"
-          className="w-full rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-          style={{ padding: "7px 12px", fontSize: 13, marginBottom: 10 }}
+          width="full"
+          style={{ marginBottom: 10 }}
         />
         <TableTree
           matches={matches}

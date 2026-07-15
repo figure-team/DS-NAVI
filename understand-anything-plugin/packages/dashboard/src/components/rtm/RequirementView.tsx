@@ -5,6 +5,7 @@ import { ModelSelect } from "../ModelSelect";
 import { Hl, Pill, rowKeyHandler } from "./shared";
 import { AC_KIND, BAD, BORDER, FAINT, GOLD, GOLD_DIM, LIFECYCLE_LABEL, NFR, NFR_CAT, PRIORITY, STATE_LABEL, TEST_RES, UNGROUPED, VERB, requestIdOf, verbOf } from "./types";
 import type { Changeset, Requirement, TestResult } from "./types";
+import SearchInput from "../ui/SearchInput";
 
 function AcMatrix({ r, targets }: { r: Requirement; targets: string[] }) {
   const { fnById, effTest } = useRtm();
@@ -169,13 +170,11 @@ export default function RequirementView() {
   return (
     <>
       <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 16 }}>
-        <input
-          type="search"
+        <SearchInput
           value={q}
-          onChange={(e) => setParam("q", e.target.value || null, true)}
+          onChange={(v) => setParam("q", v || null, true)}
           placeholder="요청·요구사항 검색"
-          className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-          style={{ padding: "6px 12px", fontSize: 12.5, width: 200 }}
+          width={200}
         />
         <select value={stateFilter} onChange={(e) => setParam("rstate", e.target.value || null)} className="rounded-lg border border-border-medium bg-panel text-text-secondary" style={{ padding: "6px 10px", fontSize: 12.5 }}>
           <option value="">상태 전체</option>

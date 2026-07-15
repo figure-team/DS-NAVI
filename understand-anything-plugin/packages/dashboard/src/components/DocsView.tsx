@@ -8,6 +8,7 @@ import { useDashboardStore } from "../store";
 import { Badge, BtnAccent, BtnOutline } from "./proto/Proto";
 import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
+import SearchInput from "./ui/SearchInput";
 
 type MdComponents = ComponentProps<typeof ReactMarkdown>["components"];
 
@@ -452,14 +453,13 @@ export default function DocsView() {
       <div className="grid items-start grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)]" style={{ gap: 14 }}>
         <div className="min-w-0">
           {/* 검색 + 상태 칩 필터 */}
-          <input
-            type="search"
+          <SearchInput
             value={q}
-            onChange={(e) => setParam("q", e.target.value || null)}
+            onChange={(v) => setParam("q", v || null)}
             placeholder="제목·ID·방법론 검색"
-            aria-label="산출물 검색"
-            className="w-full rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-            style={{ padding: "7px 12px", fontSize: 13, marginBottom: 8 }}
+            ariaLabel="산출물 검색"
+            width="full"
+            style={{ marginBottom: 8 }}
           />
           <div className="flex flex-wrap" style={{ gap: 6, marginBottom: 10 }} role="group" aria-label="상태 필터">
             {statusChips.map((c) => {

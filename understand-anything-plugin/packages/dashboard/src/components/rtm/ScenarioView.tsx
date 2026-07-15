@@ -5,6 +5,7 @@ import { useRtm } from "./context";
 import { Hl, STICKY_TH, Tile, confChip, rowKeyHandler } from "./shared";
 import { BORDER, CONF_TITLE, GOLD, GOLD_DIM, TS_KIND, WARN, pct } from "./types";
 import type { TestScenario } from "./types";
+import SearchInput from "../ui/SearchInput";
 
 const TH_STYLE: React.CSSProperties = { ...STICKY_TH, padding: "8px 12px", borderBottom: "1px solid var(--color-border-medium)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 11.5, fontWeight: 650 };
 
@@ -47,13 +48,11 @@ export default function ScenarioView() {
         <Tile lbl="보강 필요" n={scenarios.filter((s) => s.notes.length > 0).length} d=" 건" />
       </div>
       <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
-        <input
-          type="search"
+        <SearchInput
           value={q}
-          onChange={(e) => setParam("q", e.target.value || null, true)}
+          onChange={(v) => setParam("q", v || null, true)}
           placeholder="제목·Given/When/Then 검색"
-          className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-          style={{ padding: "6px 12px", fontSize: 12.5, width: 220 }}
+          width={220}
         />
         <select value={tskind ?? ""} onChange={(e) => setParam("tskind", e.target.value || null)} className="rounded-lg border border-border-medium bg-panel text-text-secondary" style={{ padding: "6px 10px", fontSize: 12.5 }}>
           <option value="">구분 전체</option>

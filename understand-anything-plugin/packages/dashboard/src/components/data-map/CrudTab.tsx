@@ -5,6 +5,7 @@ import { useDashboardStore } from "../../store";
 import { Badge, BtnOutline } from "../proto/Proto";
 import type { BadgeTone } from "../proto/Proto";
 import type { CrudEvidence, CrudMatrix, CrudRow } from "./types";
+import SearchInput from "../ui/SearchInput";
 
 /**
  * CRUD 매트릭스 탭(개편 ③) — 빈 행 접기 · 기능 검색 · 테이블 필터 · 전치(테이블 기준) ·
@@ -106,16 +107,14 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
     <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "14px 16px" }}>
       {/* 툴바 — 축 따라가는 검색(기능/테이블) · 테이블 필터 · 전치 토글 */}
       <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
-        <input
-          type="search"
+        <SearchInput
           value={qInput}
-          onChange={(e) => {
-            setQInput(e.target.value);
-            setParam("crudq", e.target.value || null, true);
+          onChange={(v) => {
+            setQInput(v);
+            setParam("crudq", v || null, true);
           }}
           placeholder={pivot ? "테이블 검색" : "기능 검색"}
-          className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-          style={{ padding: "6px 12px", fontSize: 12.5, width: 180 }}
+          width={180}
         />
         <select
           value={tableFilter ?? ""}

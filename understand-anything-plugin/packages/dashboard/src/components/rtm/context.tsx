@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 
 import type {
   CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, ReqOverride,
-  Requirement, RtmModel, RtmSession, RtmTab, SessionDoc, Signoff, TestRef, TestResult, TestScenario,
+  Requirement, RtmModel, RtmSession, RtmTab, SessionDoc, SessionRow, Signoff, TestRef, TestResult, TestScenario,
 } from "./types";
 import type { ModelChoice } from "../ModelSelect";
 
@@ -104,6 +104,15 @@ export interface RtmCtx {
   intakeError: string | null;
   startIntake: () => Promise<void>;
   session: RtmSession | null;
+  /** 현재 세션의 sid = `?sid=` 라우팅 키(W2/N2). 원장 선택 강조의 기준. */
+  sid: string | null;
+  /** W2: 세션 원장(GET /rtm-intake-sessions) — createdAt 내림차순, 폐기 포함. */
+  sessions: SessionRow[];
+  sessionsError: string | null;
+  /** 원장에서 세션 열기 — `?sid=` 를 push 해 뒤로가기로 되돌아올 수 있게 한다(N2). */
+  openSession: (sid: string) => void;
+  /** W4: 닫기 — 선택 해제만(서버 호출 없음). `?sid=` 를 push 로 제거 — openSession 과 대칭. */
+  closeSession: () => void;
   sessionDocs: SessionDoc[];
   stepBusy: boolean;
   viewStep: number | null;

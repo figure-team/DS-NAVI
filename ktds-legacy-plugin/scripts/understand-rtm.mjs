@@ -103,7 +103,11 @@ if (existsSync(mcgPath)) {
 }
 
 const input = { nodes: graph.nodes, edges: graph.edges, routes, mybatisModel, methodCallGraph }
-let model = buildRtm(input, graph.gitCommit ?? null)
+// domain-graph.json 은 최상위 gitCommit 을 갖지 않는다 — 스탬프는 ktdsMap.generatedFromCommit
+// (emit 이 skeleton.gitCommit 에서 투영, 없으면 빈 문자열)과 project.gitCommitHash 에 있다.
+// `||` 인 이유: emit.ts 가 `?? ''` 로 쓰므로 빈 문자열을 유효값으로 받으면 안 된다.
+const graphCommit = graph.ktdsMap?.generatedFromCommit || graph.project?.gitCommitHash || null
+let model = buildRtm(input, graphCommit)
 
 // 요구사항 오버레이(.understand-anything/rtm-requirements.json) — 있으면 적용해 기능 상태/이력 재계산.
 // { requirements: RtmRequirement[], functions?: RtmFunctionRow[](신규 TO-BE 행) }. 수동 작성(R4) 또는

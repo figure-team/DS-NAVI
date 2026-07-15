@@ -50,6 +50,8 @@ interface BizNodeData {
   biz: BizFlowNode;
   accent: string;
   selected: boolean;
+  /** flowRef 표시 라벨 — 연결된 기능(flow) 노드의 이름(사람 이름). 미해석 시 핸들러 꼬리 폴백. */
+  flowLabel?: string;
   [key: string]: unknown;
 }
 
@@ -63,7 +65,7 @@ function flowRefShort(flowRef: string): string {
 }
 
 function BizNode({ data }: NodeProps) {
-  const { biz, accent, selected } = data as BizNodeData;
+  const { biz, accent, selected, flowLabel } = data as BizNodeData;
   const { w, h } = SIZE[biz.kind];
   const review = biz.verdict === "NEEDS_REVIEW";
 
@@ -181,7 +183,7 @@ function BizNode({ data }: NodeProps) {
             background: "color-mix(in srgb, var(--color-layer-dao) 10%, transparent)",
           }}
         >
-          flow: {flowRefShort(biz.flowRef)}
+          flow: {flowLabel ?? flowRefShort(biz.flowRef)}
         </span>
       )}
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
@@ -472,6 +474,7 @@ export default function BusinessFlowView({
   const { t } = useI18n();
   const [, setSearchParams] = useSearchParams();
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
+  const domainGraph = useDashboardStore((s) => s.domainGraph);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const flowAreaRef = useRef<HTMLDivElement | null>(null);
 
@@ -573,6 +576,16 @@ export default function BusinessFlowView({
     };
   }, [biz]);
 
+  // flowRef → 연결된 기능(flow) 노드의 사람 이름. 활동 노드의 "flow: …" 배지를
+  // 핸들러 꼬리(versionList.do) 대신 이름(앱 버전 목록 조회)으로 표기하기 위함(2026-07-15).
+  const flowNameByRef = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const node of domainGraph?.nodes ?? []) {
+      if (node.type === "flow" && node.name) m.set(node.id, node.name);
+    }
+    return m;
+  }, [domainGraph]);
+
   const rfNodes = useMemo<Node[]>(() => {
     if (!layout) return [];
     return biz.nodes.map((n) => ({
@@ -581,12 +594,17 @@ export default function BusinessFlowView({
       position: layout.positions.get(n.id) ?? { x: 0, y: 0 },
       width: SIZE[n.kind].w,
       height: SIZE[n.kind].h,
-      data: { biz: n, accent, selected: n.id === selectedId } satisfies BizNodeData,
+      data: {
+        biz: n,
+        accent,
+        selected: n.id === selectedId,
+        flowLabel: n.flowRef ? (flowNameByRef.get(n.flowRef) ?? flowRefShort(n.flowRef)) : undefined,
+      } satisfies BizNodeData,
       draggable: false,
       connectable: false,
       selectable: true,
     }));
-  }, [biz, layout, accent, selectedId]);
+  }, [biz, layout, accent, selectedId, flowNameByRef]);
 
   const rfEdges = useMemo<Edge[]>(() => {
     if (!layout) return [];

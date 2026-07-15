@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
 import type {
-  CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, ReqOverride,
+  CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, Identified, ReqOverride,
   Requirement, RtmModel, RtmSession, RtmTab, SessionDoc, SessionRow, Signoff, TestRef, TestResult, TestScenario,
 } from "./types";
 import type { ModelChoice } from "../ModelSelect";
@@ -124,7 +124,7 @@ export interface RtmCtx {
   previewName: string | null;
   previewMd: string;
   loadPreview: (name: string) => Promise<void>;
-  identified: { requirements?: { id: string; category: string; name: string; priority?: string; derivedFrom?: string | null }[]; questions?: string[]; request?: { id: string; name: string } } | null;
+  identified: Identified | null;
   editingDoc: boolean;
   setEditingDoc: (v: boolean) => void;
   draftDoc: string;

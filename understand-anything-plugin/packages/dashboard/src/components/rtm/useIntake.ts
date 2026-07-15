@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CIRCLED, STEP_DOC_KIND } from "./types";
-import type { RtmSession, SessionDoc } from "./types";
+import type { Identified, RtmSession, SessionDoc } from "./types";
 import type { ModelChoice } from "../ModelSelect";
-
-interface Identified { requirements?: { id: string; category: string; name: string; priority?: string; derivedFrom?: string | null }[]; questions?: string[]; request?: { id: string; name: string } }
 
 /**
  * P4 단계 인테이크(가이드 5단계) 상태·진행 — RtmView 본문에서 기계적 이동.

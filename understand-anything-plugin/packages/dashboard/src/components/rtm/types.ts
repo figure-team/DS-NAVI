@@ -132,6 +132,49 @@ export interface RtmSession {
   targetStep: number; discarded: boolean; steps: Record<string, { status: string }>;
 }
 export interface SessionDoc { name: string; kind: string }
+
+// ── P9: identified.json 근거 6축(프론트 사본) ────────────────────────────────
+/**
+ * 스키마 원본은 `ktds-legacy-plugin/packages/legacy-core/src/rtm/intake-types.ts`(P2).
+ * legacy-core 는 대시보드의 의존이 아니므로 **필요한 필드만 재선언**한다 — 아래 `SessionRow`
+ * (server/ 사본)·`ChangeImpactView` 의 `HistoryEntry`(impact-history 사본)와 같은 관례다.
+ * 소비처가 읽기만 하므로 생산자 default 가 채우는 필드도 전부 optional 로 둔다(구 산출 방어).
+ */
+export interface IntakeEvidence extends Evidence { snippet?: string }
+/** 화면 축 — screens.json 의 (screenId, annotationNo) 조인 키. annotationNo=null 은 화면 전체. */
+export interface IntakeScreenRef { screenId: string; annotationNo?: number | null; note?: string }
+/** 정책 축 — doc-output 의 `policy-*.md` 절/규칙 행. ruleId=null 은 절 전체. */
+export interface IntakePolicyRef { doc: string; section?: string; ruleId?: string | null; note?: string }
+export interface IntakeAC {
+  id: string; text: string; kind?: AcKind; confidence?: Confidence; fnIds?: string[];
+  /**
+   * ★ 3상태다 — `undefined`=근거를 기록하지 않는 스키마 시대의 산출(**못 봄**) / `[]`=찾았는데
+   * 없음(**없음**) / `[…]`=근거 있음. intake-types.ts `CitationField` 주석이 이 계약의 원본이고,
+   * 화면도 이 셋을 서로 다르게 그려야 한다(RTM_IMPACT_GATE_DESIGN.md §4.1 "없음 vs 못 봄").
+   */
+  evidence?: IntakeEvidence[];
+  screenRefs?: IntakeScreenRef[];
+  policyRefs?: IntakePolicyRef[];
+}
+export interface IntakeChangeset extends Partial<Changeset> { evidence?: IntakeEvidence[] }
+export interface IntakeRequirement {
+  id: string; category: string; name: string; priority?: string; derivedFrom?: string | null;
+  acceptanceCriteria?: IntakeAC[]; changeset?: IntakeChangeset;
+  screenRefs?: IntakeScreenRef[]; policyRefs?: IntakePolicyRef[];
+}
+/** GET /rtm-intake-doc?name=identified.json 응답 본문. */
+export interface Identified {
+  request?: { id: string; name: string };
+  requirements?: IntakeRequirement[];
+  questions?: string[];
+}
+/**
+ * 정책 축 → 문서 뷰어 링크. `/policy` 에는 문서 단위 딥링크 파라미터가 없고(탭 `?tab=cat|dom|rec`
+ * 뿐), 정책서 본문은 `/deliverables/:docId` 가 연다 — PolicyView 자신이 그렇게 링크한다
+ * (PolicyView.tsx:473). doc-list 의 docId 는 확장자 없는 파일명이다(vite.config.ts `docOutputIds`).
+ */
+export const policyDocId = (doc: string): string => doc.replace(/\.md$/, "");
+
 /**
  * W2: GET /rtm-intake-sessions 원장 행 — server/rtm-sessions.ts 의 `RtmSessionSummary` 프론트 사본.
  * server/ 는 Node 전용(fs/path)이라 src/ 에서 import 하지 않는다 — ChangeImpactView 의 `HistoryEntry`

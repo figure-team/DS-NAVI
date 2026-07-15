@@ -1,6 +1,3 @@
-import { useMemo } from "react";
-import { useNavigate } from "react-router";
-import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 import { useViewMode } from "../../hooks/useViewMode";
 import ImpactJobIndicator from "../../components/ImpactJobIndicator";
@@ -43,13 +40,11 @@ export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
         <span className="shrink-0 w-[18px] h-[18px] flex items-center justify-center text-text-secondary">
           {iconForMode(mode)}
         </span>
-        {mode === "domain" ? (
-          <DomainBreadcrumb />
-        ) : (
-          <span className="text-sm font-semibold text-text-primary whitespace-nowrap">
-            {sectionLabel}
-          </span>
-        )}
+        {/* 모든 메뉴 동일 — 섹션명(메뉴 이름)만. 도메인 드릴다운(도메인·흐름)은 본문
+            브레드크럼(StructureBreadcrumb)이 담당하므로 TopBar 에는 중복 표기하지 않는다. */}
+        <span className="text-sm font-semibold text-text-primary whitespace-nowrap">
+          {sectionLabel}
+        </span>
       </div>
       {/* 페이지별 메타/액션 슬롯 — 각 메뉴가 자기 페이지 헤더 대신 여기로 텔레포트(2026-07-15). */}
       <div id={TOPBAR_SLOT_ID} className="min-w-0 flex items-center gap-2" />
@@ -75,63 +70,5 @@ export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
         </svg>
       </button>
     </header>
-  );
-}
-
-/** ktds-fork: 도메인 3화면(지도→흐름목록→스파인) 브레드크럼 — 구 레거시 헤더에서 이관. */
-function DomainBreadcrumb() {
-  const domainGraph = useDashboardStore((s) => s.domainGraph);
-  const activeDomainId = useDashboardStore((s) => s.activeDomainId);
-  const activeFlowId = useDashboardStore((s) => s.activeFlowId);
-  const clearActiveFlow = useDashboardStore((s) => s.clearActiveFlow);
-  const navigate = useNavigate(); // P3: 지도 복귀는 URL로
-  const { t } = useI18n();
-
-  const activeDomainName = useMemo(() => {
-    if (!domainGraph || !activeDomainId) return null;
-    return domainGraph.nodes.find((n) => n.id === activeDomainId)?.name ?? null;
-  }, [domainGraph, activeDomainId]);
-  const activeFlowName = useMemo(() => {
-    if (!domainGraph || !activeFlowId) return null;
-    return domainGraph.nodes.find((n) => n.id === activeFlowId)?.name ?? null;
-  }, [domainGraph, activeFlowId]);
-
-  return (
-    <nav
-      className="min-w-0 overflow-x-auto scrollbar-hide flex items-center gap-1.5 text-sm font-medium"
-      aria-label="breadcrumb"
-    >
-      <button
-        type="button"
-        onClick={() => navigate("/domains")}
-        className={`whitespace-nowrap font-semibold transition-colors ${
-          activeDomainId ? "text-text-muted hover:text-text-secondary" : "text-text-primary"
-        }`}
-      >
-        {t.domainMap.breadcrumbRoot}
-      </button>
-      {activeDomainName && (
-        <>
-          <span className="text-text-muted/50 select-none">›</span>
-          <button
-            type="button"
-            onClick={() => clearActiveFlow()}
-            className={`whitespace-nowrap transition-colors truncate max-w-[200px] ${
-              activeFlowId ? "text-text-muted hover:text-text-secondary" : "text-text-primary font-semibold"
-            }`}
-          >
-            {activeDomainName}
-          </button>
-        </>
-      )}
-      {activeFlowName && (
-        <>
-          <span className="text-text-muted/50 select-none">›</span>
-          <span className="whitespace-nowrap text-accent truncate max-w-[260px]">
-            {activeFlowName}
-          </span>
-        </>
-      )}
-    </nav>
   );
 }

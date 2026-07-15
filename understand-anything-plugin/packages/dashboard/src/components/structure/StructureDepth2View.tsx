@@ -12,6 +12,7 @@ import {
 } from "../../utils/structureGraph";
 import StructureDomainGraphUA, { type DomainStyleGraphNode } from "./StructureDomainGraphUA";
 import EdgeEvidencePanel from "./EdgeEvidencePanel";
+import NodeInfoPanel from "./NodeInfoPanel";
 
 /**
  * 뎁스2 — 선택 그룹 + 서브도메인 그래프, U-A Domain 탭 룩앤필(택1 확정).
@@ -33,6 +34,7 @@ export default function StructureDepth2View({
   const navigate = useNavigate();
   const { t } = useI18n();
   const [selectedEdge, setSelectedEdge] = useState<MergedStructureEdge | null>(null);
+  const [selectedNode, setSelectedNode] = useState<DomainStyleGraphNode | null>(null);
 
   const cards = useMemo(() => {
     if (!domainGraph) return [];
@@ -85,7 +87,15 @@ export default function StructureDepth2View({
         edges={edges}
         emptyLabel={emptyLabel}
         onOpenNode={onOpenNode}
-        onEdgeClick={(edge) => setSelectedEdge(edge)}
+        onSelectNode={(id) => {
+          setSelectedEdge(null);
+          setSelectedNode(uaNodes.find((n) => n.id === id) ?? null);
+        }}
+        onEdgeClick={(edge) => {
+          setSelectedNode(null);
+          setSelectedEdge(edge);
+        }}
+        selectedNodeId={selectedNode?.id ?? null}
       />
       {selectedEdge && (
         <EdgeEvidencePanel
@@ -94,6 +104,7 @@ export default function StructureDepth2View({
           onClose={() => setSelectedEdge(null)}
         />
       )}
+      {selectedNode && <NodeInfoPanel node={selectedNode} onClose={() => setSelectedNode(null)} />}
     </div>
   );
 }

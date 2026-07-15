@@ -216,6 +216,7 @@ export const zh = {
     backToProcessList: "返回业务流程列表",
     relatedFlowSpine: "相关功能流程图",
     chipSubDomains: "子领域",
+    nodeInfoTitle: "节点信息",
   },
   flowView: {
     selectedFlow: "选中的功能",

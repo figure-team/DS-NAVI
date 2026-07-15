@@ -216,6 +216,7 @@ export const zhTW = {
     backToProcessList: "返回業務流程列表",
     relatedFlowSpine: "相關功能流程圖",
     chipSubDomains: "子領域",
+    nodeInfoTitle: "節點資訊",
   },
   flowView: {
     selectedFlow: "選中的功能",

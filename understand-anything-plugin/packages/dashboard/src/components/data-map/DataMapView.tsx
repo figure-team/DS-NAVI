@@ -5,7 +5,7 @@ import { useDashboardStore } from "../../store";
 import { PageHead, ProtoTabs } from "../proto/Proto";
 import CrudTab from "./CrudTab";
 import TablesTab from "./TablesTab";
-import UnresolvedBanner from "./UnresolvedBanner";
+import UnresolvedChips from "./UnresolvedChips";
 import type { CrudMatrix, DbSchema } from "./types";
 
 // ERD 탭은 @xyflow/react + elkjs 를 끌고 오므로 진입 시점 분리 로드.
@@ -78,9 +78,16 @@ export default function DataMapView() {
   // db-schema 자체가 없으면 화면 전체를 안내(테이블·ERD 탭이 모두 이것에 의존).
   const schemaMissing = !schema && schemaErr != null;
 
-  const meta = schema
-    ? `db-schema.json · Tier ${schema.tier?.toUpperCase() ?? "?"} · 테이블 ${schema.tables.length} · SQL ${schema.sqlFileCount ?? "?"}파일`
-    : undefined;
+  // unresolved 는 meta 줄에 칩으로 얹는다 — 이 줄이 서술하는 대상이 곧 db-schema.json 이라
+  // 신호의 출처가 붙고, 배너로 쓰던 수직 공간(46px)이 회수된다. PageHead.meta 는 ReactNode.
+  const meta = schema ? (
+    <span className="inline-flex items-center gap-2 flex-wrap">
+      <span>
+        {`db-schema.json · Tier ${schema.tier?.toUpperCase() ?? "?"} · 테이블 ${schema.tables.length} · SQL ${schema.sqlFileCount ?? "?"}파일`}
+      </span>
+      <UnresolvedChips unresolved={schema.unresolved ?? []} />
+    </span>
+  ) : undefined;
 
   // 배지는 전 탭 상시 표시 — ERD 는 테이블 탭과 같은 대상(테이블 수)을 센다
   // (FK 관계 수를 넣었더니 "테이블 190 vs ERD 62"로 오독됨). 데이터 부재는 0.
@@ -128,8 +135,6 @@ export default function DataMapView() {
         </EmptyCard>
       ) : (
         <>
-          <UnresolvedBanner unresolved={schema?.unresolved ?? []} />
-
           <ProtoTabs
             tabs={tabs}
             active={tab}

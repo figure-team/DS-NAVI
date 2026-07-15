@@ -78,10 +78,12 @@ function EvidencePane({ group }: { group: ReasonGroup }) {
 
 function UnresolvedModal({
   title,
+  sub,
   items,
   onClose,
 }: {
   title: string;
+  sub: string;
   items: DbUnresolved[];
   onClose: () => void;
 }) {
@@ -114,8 +116,13 @@ function UnresolvedModal({
         // eGov(436건)처럼 많을 때만 70vh에서 잘려 내부 스크롤로 넘어간다.
         style={{ maxHeight: "70vh" }}
       >
-        <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border-subtle">
-          <h2 className="text-base font-semibold text-text-primary">{title}</h2>
+        <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border-subtle">
+          <div>
+            <h2 className="text-base font-semibold text-text-primary">{title}</h2>
+            <p className="text-text-muted" style={{ fontSize: 12.5, marginTop: 2 }}>
+              {sub}
+            </p>
+          </div>
           <button
             type="button"
             onClick={onClose}
@@ -177,67 +184,79 @@ function UnresolvedModal({
   );
 }
 
-function BannerRow({
+function Chip({
   tone,
+  label,
   title,
   sub,
   items,
 }: {
   tone: "warn" | "info";
+  label: string;
   title: string;
   sub: string;
   items: DbUnresolved[];
 }) {
   const [open, setOpen] = useState(false);
-  const borderColor = tone === "warn" ? "var(--color-status-warn)" : "var(--color-border-medium)";
+  const warn = tone === "warn";
   return (
-    <div
-      className="rounded-lg border border-border-subtle bg-panel"
-      style={{ borderLeft: `3px solid ${borderColor}`, marginBottom: 10 }}
-    >
+    <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 w-full text-left cursor-pointer bg-transparent border-0"
-        style={{ font: "inherit", padding: "8px 14px" }}
+        // 배너에 있던 부연(sub)은 칩에 자리가 없어 aria-label·title 로 보존 — 모달 부제에도 동일하게 남김.
+        aria-label={`${title} ${sub} — 클릭하면 사유·근거`}
+        title={`${title} ${sub}`}
+        className="rounded-full border cursor-pointer transition-colors hover:bg-elevated whitespace-nowrap"
+        style={{
+          font: "inherit",
+          fontSize: 11.5,
+          fontWeight: 650,
+          lineHeight: 1.7,
+          padding: "0 8px",
+          background: "transparent",
+          borderColor: warn ? "var(--color-status-warn)" : "var(--color-border-medium)",
+          color: warn ? "var(--color-status-warn)" : "var(--color-text-muted)",
+        }}
       >
-        <span className="text-text-primary" style={{ fontSize: 13, fontWeight: 650 }}>
-          {title}
-        </span>
-        <span className="text-text-muted" style={{ fontSize: 12 }}>
-          {sub}
-        </span>
-        <span className="text-text-muted" style={{ fontSize: 9, marginLeft: "auto" }}>
-          ▸
-        </span>
+        {label}
       </button>
-      {open && <UnresolvedModal title={title} items={items} onClose={() => setOpen(false)} />}
-    </div>
+      {open && (
+        <UnresolvedModal title={title} sub={sub} items={items} onClose={() => setOpen(false)} />
+      )}
+    </>
   );
 }
 
-export default function UnresolvedBanner({ unresolved }: { unresolved: DbUnresolved[] }) {
+/**
+ * PageHead meta 줄에 인라인으로 얹는 칩 묶음 — 배너 행을 대체(2026-07-15).
+ * 배너가 탭 바 위에서 46px 을 상시 먹고, db-schema 신호가 crud-matrix 기반 CRUD 탭에서도
+ * 뜨던 스코프 누수를 함께 정리. meta 는 ReactNode 라 Proto.tsx(공통 금지 파일) 수정 없이 얹힌다.
+ */
+export default function UnresolvedChips({ unresolved }: { unresolved: DbUnresolved[] }) {
   const warns = unresolved.filter((u) => u.severity !== "info");
   const infos = unresolved.filter((u) => u.severity === "info");
   if (unresolved.length === 0) return null;
   return (
-    <div style={{ marginBottom: 14 }}>
+    <span className="inline-flex items-center gap-1.5" style={{ marginLeft: 2 }}>
       {warns.length > 0 && (
-        <BannerRow
+        <Chip
           tone="warn"
+          label={`⚠ 미해결 ${n(warns.length)}`}
           title={`미해결 항목 ${n(warns.length)}건`}
           sub="— 스캔 중 결정되지 않은 신호(정합 확인 필요)"
           items={warns}
         />
       )}
       {infos.length > 0 && (
-        <BannerRow
+        <Chip
           tone="info"
+          label={`참고 ${n(infos.length)}`}
           title={`참고 ${n(infos.length)}건`}
           sub="— 무해 신호(동일 정의 중복 등)"
           items={infos}
         />
       )}
-    </div>
+    </span>
   );
 }

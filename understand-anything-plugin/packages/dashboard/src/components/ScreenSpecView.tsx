@@ -1228,23 +1228,41 @@ export default function ScreenSpecView() {
                 </tr>
               </thead>
               <tbody>
-                {KIND_ORDER.flatMap((kind) => {
-                  if (kindFilter && kindGroup(kind) !== kindFilter) return [];
+                {KIND_ORDER.filter(
+                  (kind) => (!kindFilter || kindGroup(kind) === kindFilter) && visibleAnns.some((a) => a.kind === kind),
+                ).flatMap((kind, i) => {
                   const all = visibleAnns.filter((a) => a.kind === kind);
-                  if (all.length === 0) return [];
                   // 공통 네비게이션은 섹션 본문에서 빼고 아래 접이 행으로 몰아 넣는다.
                   const rows = all.filter((a) => !isCommonNav(a));
                   const commons = all.filter(isCommonNav);
+                  const tint = kindSwatch(kind);
+                  // 종류 사이 여백 — 배경을 인라인으로 고정해 tr:hover 하이라이트가 빈 줄에 뜨지 않게 한다.
+                  const spacer =
+                    i > 0
+                      ? [
+                          <tr key={`sp:${kind}`} aria-hidden="true" style={{ background: "transparent" }}>
+                            <td colSpan={7} style={{ height: 12, padding: 0, borderBottom: "none" }} />
+                          </tr>,
+                        ]
+                      : [];
+                  // 섹션 헤더 = 종류 색 띠 — 표가 길어져도 어느 종류 구역인지 눈에 걸린다.
                   const header = (
-                    <tr key={`sec:${kind}`}>
-                      <td colSpan={7} style={{ paddingTop: 12, paddingBottom: 4, borderBottom: "none" }}>
-                        <span className="inline-flex items-center gap-1.5 font-semibold text-text-secondary" style={{ fontSize: 11 }}>
-                          <span
-                            className="inline-block w-2.5 h-2.5 rounded-full"
-                            style={{ background: kindSwatch(kind) }}
-                          />
-                          {KIND_SECTION[kind] ?? kind} ({rows.length}
-                          {commons.length > 0 && <span className="text-text-muted"> + 공통 {commons.length}</span>})
+                    <tr key={`sec:${kind}`} style={{ background: "var(--color-elevated)" }}>
+                      <td
+                        colSpan={7}
+                        style={{
+                          padding: "6px 10px",
+                          borderTop: `2px solid ${tint}`,
+                          borderBottom: "1px solid var(--color-border-medium)",
+                        }}
+                      >
+                        <span className="inline-flex items-center gap-1.5 font-semibold" style={{ fontSize: 11.5, color: tint }}>
+                          <span className="inline-block w-2 h-2 rounded-full" style={{ background: tint }} />
+                          {KIND_SECTION[kind] ?? kind}
+                          <span className="text-text-muted tabular-nums">
+                            ({rows.length}
+                            {commons.length > 0 && ` + 공통 ${commons.length}`})
+                          </span>
                         </span>
                       </td>
                     </tr>
@@ -1271,7 +1289,7 @@ export default function ScreenSpecView() {
                           ...(linkFoldOpen ? commons.map(renderRow) : []),
                         ]
                       : [];
-                  return [header, ...rows.map(renderRow), ...fold];
+                  return [...spacer, header, ...rows.map(renderRow), ...fold];
                 })}
               </tbody>
             </table>

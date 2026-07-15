@@ -114,7 +114,11 @@ function sectionTitle(key: ExtSectionKey, t: ReturnType<typeof useI18n>["t"]): s
   }
 }
 
-export default function DomainMapView() {
+/**
+ * @param worksExpanded 전 카드 업무 목록 펼침 — 토글 버튼이 상단 브레드크럼 행으로
+ *   빠지면서(2026-07-15) 상태 소유도 DomainsPage 로 올라갔다. 이 뷰는 읽기만 한다.
+ */
+export default function DomainMapView({ worksExpanded = false }: { worksExpanded?: boolean } = {}) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const domainGroupsRaw = useDashboardStore((s) => s.domainGroups);
   const accessToken = useDashboardStore((s) => s.accessToken);
@@ -181,10 +185,7 @@ export default function DomainMapView() {
     return m;
   }, [domainGraph]);
 
-  // 전 노드 공통 업무 목록 펼치기/접기 — 헤더 토글(기본 접힘 = 2줄 클램프).
-  const [worksExpanded, setWorksExpanded] = useState(false);
-
-  // 헤더 통계용 업무(프로세스) 총계 — 카드 표기와 동일 소스.
+  // 업무(프로세스) 총계 — 업무/부속 카드 분리 판정에 쓴다(카드 표기와 동일 소스).
   const totalWorks = useMemo(
     () => [...processesByDomain.values()].reduce((sum, list) => sum + list.length, 0),
     [processesByDomain],
@@ -231,7 +232,7 @@ export default function DomainMapView() {
     );
   }
 
-  const { stats, cards } = data;
+  const { cards } = data;
   const detailCard = cards.find((c) => c.id === detailId) ?? null;
   const hasGroups = resolvedGroups.length > 0;
 
@@ -250,40 +251,9 @@ export default function DomainMapView() {
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
-      {/* 헤더 — pmpl-proto page-head(P6): 타이틀 + 인라인 통계 meta.
-          eyebrow(업무 지도 · 프로젝트명)는 TopBar 브레드크럼·시스템 박스 제목과
-          중복이라 제거. */}
-      <header
-        className="shrink-0 flex items-end gap-3.5 flex-wrap"
-        style={{ padding: "16px 24px 12px" }}
-      >
-        <div className="min-w-0">
-          <h1 className="font-heading text-text-primary truncate font-bold" style={{ fontSize: 20, lineHeight: 1.25, letterSpacing: "-0.3px" }}>
-            {t.domainMap.title}
-          </h1>
-        </div>
-        <div className="text-text-muted" style={{ fontSize: 13, paddingBottom: 3 }}>
-          {t.domainMap.statDomains} <b className="text-text-primary tabular-nums">{stats.domainCount}</b>
-          {" · "}
-          {t.domainMap.statWorks} <b className="text-text-primary tabular-nums">{totalWorks}</b>
-          {" · "}
-          {t.domainMap.statFlows} <b className="text-text-primary tabular-nums">{stats.flowCount}</b>
-          {stats.language && (
-            <span className="text-text-muted"> · {stats.language}{stats.framework ? ` / ${stats.framework}` : ""}</span>
-          )}
-        </div>
-        {/* 전 노드 업무 목록 펼치기/접기 — 카드별이 아닌 화면 전역 토글. */}
-        <button
-          type="button"
-          onClick={() => setWorksExpanded((v) => !v)}
-          aria-pressed={worksExpanded}
-          className="ml-auto shrink-0 rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-border-medium transition-colors cursor-pointer"
-          style={{ fontSize: 11.5, padding: "4px 10px", marginBottom: 2 }}
-        >
-          {worksExpanded ? t.domainMap.collapseAllWorks : t.domainMap.expandAllWorks}
-        </button>
-      </header>
-
+      {/* 헤더(타이틀 + 통계 meta + 펼치기 토글)는 제거됐다(2026-07-15 사용자 확정) —
+          타이틀·상향 내비는 상단 브레드크럼이, "업무 전체 펼치기"는 그 브레드크럼 행
+          우측 슬롯이 맡는다(DomainsPage). 통계는 함께 제거. */}
       {/* 구성도 본문 — 프로토 work-land 그리드: 시스템 박스(1fr) + 연동 패널(280px) */}
       <div
         className="flex-1 min-h-0 grid items-stretch"

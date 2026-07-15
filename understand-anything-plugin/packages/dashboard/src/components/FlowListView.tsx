@@ -1,13 +1,12 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { useDashboardStore } from "../store";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 import FlowSpineView from "./FlowSpineView";
 import BusinessFlowView from "./BusinessFlowView";
 import CitationChip from "./CitationChip";
 import VerdictBadge from "./VerdictBadge";
-import GroundedBar from "./GroundedBar";
 import {
   buildSequentialFallback,
   businessFlowRejectedReason,
@@ -16,13 +15,11 @@ import {
 import {
   buildDomainFlows,
   buildFlowSections,
-  domainIcon,
   filterFlows,
   findDomain,
   flowFacets,
   hasBusinessFlow,
   isFilterActive,
-  parseDomainClaims,
   resolveWorkspaceView,
   type DomainFlow,
   type FlowFilter,
@@ -30,15 +27,17 @@ import {
   type FlowMethod,
   type FlowVerdictKey,
 } from "../utils/domainData";
-import { findOwningGroup, resolveGroups } from "../utils/domainGroups";
 
 /**
  * 화면 B — 도메인 워크스페이스 (WORK_MAP §4).
  *
- * P3: 상단 워크스페이스 헤더(브레드크럼 › 도메인명 + 요약 + GroundedBar) + 탭
- * ([업무 흐름도 view=business] / [기능 N view=code]). URL이 진실 — `?view=` 미지정
+ * 뷰 = [업무 흐름도 view=business] / [기능 view=code]. URL이 진실 — `?view=` 미지정
  * 시 businessFlow 데이터가 있으면 business, 없으면 code. 기존 `?flow=` 딥링크는
- * code 탭으로 해석(하위호환 파손 0, resolveWorkspaceView).
+ * code 뷰로 해석(하위호환 파손 0, resolveWorkspaceView).
+ *
+ * 하위탭 승격(2026-07-15 사용자 확정): 워크스페이스 헤더(브레드크럼·도메인명·요약·
+ * GroundedBar)와 하위 탭바를 제거하고 뷰 전환을 상단 WorkMapTabs 로 올렸다. 이
+ * 컴포넌트는 ?view= 를 **읽기만** 한다 — 쓰기는 DomainsPage.switchView 단독.
  *
  * 기능 목록 스케일(§4-2): 검색(이름/경로/메소드 부분일치) + 필터 칩(그룹·메소드·
  * verdict, 전부 클라이언트 필터) + 그룹 접기 + 점진 windowing(IntersectionObserver
@@ -131,21 +130,10 @@ function FilterChip({
 export default function FlowListView({ processPanel }: { processPanel?: ReactNode } = {}) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const activeDomainId = useDashboardStore((s) => s.activeDomainId);
-  const domainGroupsRaw = useDashboardStore((s) => s.domainGroups);
-  const navigate = useNavigate(); // P3: 지도 복귀는 URL로
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedFlowId = useDashboardStore((s) => s.selectedFlowId);
   const setSelectedFlow = useDashboardStore((s) => s.setSelectedFlow);
   const { t } = useI18n();
-
-  // DOMAIN_HIERARCHY §7: 그룹 소속 도메인이면 브레드크럼에 그룹명을 끼우고 "업무 지도"
-  // 뒤로가기도 그룹 워크스페이스로 향한다(하위 워크스페이스 재사용 — 이 컴포넌트 자체는
-  // 그룹 인지가 없어도 되도록, 소속 그룹만 조회). groups 없는 프로젝트는 항상 null.
-  const owningGroup = useMemo(() => {
-    if (!domainGraph || !activeDomainId || domainGroupsRaw.length === 0) return null;
-    const resolved = resolveGroups(domainGraph, domainGroupsRaw, t.domainMap.unclassified);
-    return findOwningGroup(resolved, activeDomainId) ?? null;
-  }, [domainGraph, activeDomainId, domainGroupsRaw, t]);
 
   // 좌측 기능 목록 접기/펼치기 — 접으면 인라인 스파인이 폭 전체를 차지(화면3 전체화면 대체).
   // 기본 펼침: 도메인 재진입 시 FlowListView 가 remount 되며 자동으로 펼친 상태로 복귀.
@@ -189,11 +177,6 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
     () => (domainGraph && activeDomainId ? findDomain(domainGraph, activeDomainId) : undefined),
     [domainGraph, activeDomainId],
   );
-  const domainGrounding = useMemo(
-    () => (domainNode ? parseDomainClaims(domainNode) : null),
-    [domainNode],
-  );
-
   // P4/B안: 업무 흐름도 데이터 — 프로세스 목록(businessFlows[], 레거시 단수 포함)
   // 우선, 전무하면 순차 폴백. useMemo 로 참조를 고정한다(매 렌더 재생성 시
   // BusinessFlowView 의 ELK 레이아웃이 재실행됨).
@@ -230,16 +213,6 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
     searchParams.get("flow"),
     hasBusinessFlow(domainNode),
   );
-  const switchView = (next: "business" | "code") => {
-    // 탭은 워크스페이스 내부 뷰 토글 — flow 선택 동기화와 동일하게 replace(히스토리
-    // 오염 없음, 리뷰 C1). ?flow= 는 유지: business↔code 왕복 시 선택 보존(의도).
-    // 라이브 location 기준(함수형 prev 는 렌더 스냅샷 — 라이터 경합 시 스테일).
-    const p = new URLSearchParams(window.location.search);
-    p.set("view", next);
-    p.delete("token");
-    setSearchParams(p, { replace: true });
-  };
-
   // Inline-selection reset on domain switch is handled centrally in the store
   // (navigateToDomain / clearActiveDomain reset selectedFlowId) so the
   // fullscreen round-trip can preserve it — see FIX 3.
@@ -374,117 +347,11 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
-      {/* ── 워크스페이스 헤더(§4 화면 B): 브레드크럼 + 도메인명 + 요약 + GroundedBar + 탭 ── */}
-      {/* 프로토 page-head(P6): eyebrow 브레드크럼 · h1 20px · meta 요약 · 우측 근거율 gbar */}
-      <header className="shrink-0 border-b border-border-subtle bg-panel" style={{ padding: "12px 20px 0" }}>
-        <div className="flex items-end gap-3.5 flex-wrap min-w-0">
-          <div className="min-w-0">
-            <p className="text-text-muted font-bold truncate" style={{ fontSize: 11.5, letterSpacing: "0.06em", marginBottom: 3 }}>
-              <button
-                type="button"
-                onClick={() => navigate("/domains")}
-                className="text-text-muted hover:text-accent transition-colors cursor-pointer font-bold"
-                style={{ letterSpacing: "0.06em" }}
-              >
-                {t.domainMap.breadcrumbRoot}
-              </button>{" "}
-              {owningGroup && (
-                <>
-                  ›{" "}
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/domains/${owningGroup.key}`)}
-                    className="text-text-muted hover:text-accent transition-colors cursor-pointer font-bold"
-                    style={{ letterSpacing: "0.06em" }}
-                  >
-                    {owningGroup.name}
-                  </button>{" "}
-                </>
-              )}
-              › {domainNode?.name ?? ""}
-            </p>
-            <h1 className="text-text-primary font-bold whitespace-nowrap" style={{ fontSize: 20, lineHeight: 1.25 }}>
-              <span aria-hidden style={{ marginRight: 8 }}>
-                {domainNode ? domainIcon(domainNode.name, domainNode.id) : ""}
-              </span>
-              {domainNode?.name ?? ""}
-            </h1>
-          </div>
-          {domainNode?.summary && (
-            <span className="text-text-muted truncate" style={{ fontSize: 13, minWidth: 0, paddingBottom: 3, flex: 1 }}>
-              {domainNode.summary}
-            </span>
-          )}
-          {domainGrounding?.filled && domainGrounding.groundedPct !== null && (
-            <div className="shrink-0 ml-auto" style={{ width: 170, paddingBottom: 4 }}>
-              <GroundedBar
-                pct={domainGrounding.groundedPct}
-                grounded={domainGrounding.groundedCount}
-                review={domainGrounding.reviewCount}
-              />
-            </div>
-          )}
-        </div>
-        {/* 탭바 — view= 가 진실. 활성 탭 밑줄은 도메인 색. WAI-ARIA Tabs: roving
-            tabindex + 화살표 키 + tab↔tabpanel 상호 연결(리뷰 C4). */}
-        <div
-          className="flex items-center gap-1 mt-2"
-          role="tablist"
-          onKeyDown={(e) => {
-            if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-            e.preventDefault();
-            const next = view === "business" ? "code" : "business";
-            switchView(next);
-            document.getElementById(`workspace-tab-${next}`)?.focus();
-          }}
-        >
-          {(
-            [
-              { key: "business" as const, label: t.flowList.tabBusiness, count: null },
-              {
-                key: "code" as const,
-                label: t.flowList.tabCode.replace("{count}", "").trim(),
-                // 탭에는 갯수 비노출(사용자 결정) — 갯수는 목록 그룹 헤더가 담당.
-                count: null,
-              },
-            ]
-          ).map((tab) => {
-            const active = view === tab.key;
-            return (
-              <button
-                key={tab.key}
-                id={`workspace-tab-${tab.key}`}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                aria-controls={`workspace-panel-${tab.key}`}
-                tabIndex={active ? 0 : -1}
-                onClick={() => switchView(tab.key)}
-                className="cursor-pointer transition-colors border-b-2"
-                style={{
-                  fontSize: 13.5,
-                  padding: "7px 10px 9px",
-                  color: active ? "var(--color-accent)" : "var(--color-text-secondary)",
-                  borderBottomColor: active ? "var(--color-accent)" : "transparent",
-                  fontWeight: active ? 650 : 550,
-                }}
-              >
-                {tab.label}
-                {tab.count !== null && (
-                  <span
-                    className="tabular-nums"
-                    style={{ fontSize: 11, color: "var(--color-text-muted)", marginLeft: 4 }}
-                  >
-                    {tab.count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </header>
-
       {/* ── 탭 내용 ── */}
+      {/* 워크스페이스 헤더(브레드크럼·도메인명·요약·GroundedBar)와 하위 탭바는 제거됨
+          (2026-07-15 사용자 확정) — 탭은 상단 WorkMapTabs 로 승격됐고, 지도 복귀는
+          그 「시스템 구성도」 탭이 대신한다. 여기서 view 는 렌더 분기용으로만 남는다
+          (?view= 딥링크·GroupWorkspaceView 트리 강조와 같은 규칙). */}
       {view === "business" ? (
         /* P4: 순서도 — fill 채움이면 businessFlow, 미채움이면 결정론 순차 폴백(배너).
            기능 0개 도메인은 그릴 것이 없어 데이터 없음 문구로 degrade. */
@@ -505,7 +372,8 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
                   className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
                   style={{
                     width: 300,
-                    margin: "12px 0 12px 12px",
+                    // 바깥 24px = 탭 헤더·랜딩 카드와 같은 기준선(메뉴 내 격자 통일).
+                    margin: "0 0 18px 24px",
                     boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
                   }}
                 >
@@ -516,7 +384,8 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
                   className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
                   style={{
                     width: 300,
-                    margin: "12px 0 12px 12px",
+                    // 바깥 24px = 탭 헤더·랜딩 카드와 같은 기준선(메뉴 내 격자 통일).
+                    margin: "0 0 18px 24px",
                     boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
                   }}
                 >
@@ -560,7 +429,8 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
               <div
                 className="flex-1 min-w-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
                 style={{
-                  margin: 12,
+                  // 좌 14px = 랜딩 그리드 gap, 우 24px = 바깥 기준선.
+                  margin: "0 24px 18px 14px",
                   boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
                 }}
               >
@@ -645,7 +515,7 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
         className="shrink-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
         style={{
           width: 300,
-          margin: "12px 0 12px 12px",
+          margin: "0 0 18px 24px",
           boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
         }}
       >
@@ -860,7 +730,7 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
       <div
         className="flex-1 min-w-0 flex flex-col rounded-[10px] border border-border-subtle bg-panel overflow-hidden"
         style={{
-          margin: 12,
+          margin: "0 24px 18px 14px",
           boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
         }}
       >

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CIRCLED, STEP_DOC_KIND } from "./types";
-import type { Identified, RtmSession, SessionDoc } from "./types";
+import type { Identified, ImpactRun, ImpactSnapshot, RtmSession, SessionDoc } from "./types";
 import type { ModelChoice } from "../ModelSelect";
 
 /**
@@ -30,9 +30,21 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const [previewName, setPreviewName] = useState<string | null>(null);
   const [previewMd, setPreviewMd] = useState<string>("");
   const [identified, setIdentified] = useState<Identified | null>(null);
+  // W5: ① 코드영향 검증 — 포인터(세션) + 스냅샷(원장). `impactLoaded` 가 "아직 안 읽음"과 "읽었는데
+  // 없음"을 가른다 — 후자만 화면이 미실행/해당없음을 단언할 수 있다(§4.1 "없음 vs 못 봄").
+  const [impactRun, setImpactRun] = useState<ImpactRun | null>(null);
+  const [impactData, setImpactData] = useState<ImpactSnapshot | null>(null);
+  const [impactLoaded, setImpactLoaded] = useState(false);
   const [editingDoc, setEditingDoc] = useState(false);
   const [draftDoc, setDraftDoc] = useState("");
   const loadSeq = useRef(0); // 세션 조회 순번 — 늦게 온 응답이 최신 선택을 덮어쓰지 않게(W2).
+
+  /**
+   * W5: 코드영향 상태 초기화 — 세션이 바뀌는 모든 경로에서 부른다. 안 지우면 **직전 세션의 영향
+   * 분석이 새 세션의 것처럼 남는다**(다른 요청의 근거로 컨펌하는 사고). `impactLoaded=false` 로
+   * 되돌리는 게 핵심 — 화면이 "미실행"을 단언하지 않고 조회 중으로 되돌아간다.
+   */
+  const resetImpact = useCallback(() => { setImpactRun(null); setImpactData(null); setImpactLoaded(false); }, []);
 
   const startIntake = useCallback(async () => {
     const q = intakeQuery.trim();
@@ -44,10 +56,10 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
       const d = (await res.json().catch(() => null)) as { job?: { sid?: string }; session?: RtmSession; error?: string } | null;
       if (res.status === 202 && d?.session) {
         setSid(d.session.sid); setSession(d.session); setIntakeStatus("running");
-        setIntakeOpen(false); setIntakeQuery(""); setPreviewName(null); setIdentified(null);
+        setIntakeOpen(false); setIntakeQuery(""); setPreviewName(null); setIdentified(null); resetImpact();
       } else { setIntakeError(d?.error ?? `HTTP ${res.status}`); }
     } catch (e) { setIntakeError(String(e)); }
-  }, [intakeQuery, targetStep, intakeModel, accessToken]);
+  }, [intakeQuery, targetStep, intakeModel, accessToken, resetImpact]);
 
   // start..target 진행(다음 단계 / ⑤까지). 컨펌 게이트 미통과면 409 토스트.
   const advance = useCallback(async (toStep: number) => {
@@ -85,8 +97,8 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const discardSession = useCallback(async () => {
     if (!sid || !accessToken) { setSession(null); setSid(null); return; }
     try { await fetch(`/rtm-intake-discard?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid }) }); } catch { /* */ }
-    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); setIntakeStatus("idle");
-  }, [sid, accessToken]);
+    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); resetImpact(); setIntakeStatus("idle");
+  }, [sid, accessToken, resetImpact]);
 
   /**
    * W4: "닫기" — 선택 해제만. discardSession 과 달리 **서버 호출이 없다** — 세션은 원장에 그대로
@@ -94,9 +106,9 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
    * 뒤로가기 둘 다)을 감지하면 이 함수로 로컬 상태만 지운다.
    */
   const clearSession = useCallback(() => {
-    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null);
+    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); resetImpact();
     setEditingDoc(false); setViewStep(null); setIntakeStatus("idle");
-  }, []);
+  }, [resetImpact]);
 
   /**
    * 세션 1건을 서버에서 읽어 현재 세션으로 앉힌다. sid=null 이면 서버의 현재 세션(마운트 복구).
@@ -119,6 +131,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
       setSessionDocs(data.docs ?? []);
       setPreviewName(null);
       setIdentified(null);
+      resetImpact();
       setEditingDoc(false);
       const running = data.job?.status === "running" && data.job?.sid === data.session.sid;
       setIntakeStatus(running ? "running" : "idle");
@@ -126,7 +139,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     } catch {
       return false; // 복구/전환 실패 무시 — 현재 세션 유지
     }
-  }, [tokenQ]);
+  }, [tokenQ, resetImpact]);
 
   /** W2: `?sid=` 라우팅 키 → 세션 전환. URL→상태 effect(RtmView)가 호출한다. */
   const selectSession = useCallback((target: string) => { void loadSession(target, true); }, [loadSession]);
@@ -184,11 +197,37 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     } catch { /* */ }
   }, [sid, tokenQ]);
 
+  /**
+   * W5: ① 코드영향 검증 로드 — 세션 포인터(`impact-run.json`) → 원장 스냅샷 2단.
+   * 산출 본체를 세션에 두지 않는 게 §2.3 의 요점이라 인라인도 두 번 왕복한다(포인터의 jobId 로
+   * `/change` 와 **같은 스냅샷**을 읽는다 — 두 표면이 갈라질 수 없다).
+   *
+   * 404(포인터 없음)는 오류가 아니다 — 아직 안 돌렸거나 시드가 0이라 쓰이지 않은 정상 상태다.
+   * 어느 쪽인지는 `impactAbsenceOf(identified)` 가 판정한다(types.ts).
+   */
+  const loadImpactRun = useCallback(async () => {
+    if (!sid) return;
+    try {
+      const r = await fetch(`/rtm-intake-doc${tokenQ}&sid=${encodeURIComponent(sid)}&name=impact-run.json`);
+      if (!r.ok) { setImpactRun(null); setImpactData(null); setImpactLoaded(true); return; }
+      const d = (await r.json().catch(() => null)) as { content?: string } | null;
+      let run: ImpactRun | null = null;
+      try { run = d?.content ? (JSON.parse(d.content) as ImpactRun) : null; } catch { run = null; }
+      if (!run?.jobId) { setImpactRun(null); setImpactData(null); setImpactLoaded(true); return; }
+      setImpactRun(run);
+      // 스냅샷은 선택 — 없으면(원장 상한 초과로 밀렸거나 파일 유실) 포인터만 그리고 그 사실을
+      // 화면이 말한다. 여기서 조용히 빈 결과로 만들면 "영향 없음"으로 위장한다.
+      const s = await fetch(`/impact-history-item${tokenQ}&id=${encodeURIComponent(run.jobId)}&name=impact.json`);
+      setImpactData(s.ok ? ((await s.json().catch(() => null)) as ImpactSnapshot | null) : null);
+      setImpactLoaded(true);
+    } catch { setImpactLoaded(true); }
+  }, [sid, tokenQ]);
+
   // 표시 단계(viewStep 우선, 없으면 산출 최전선) 산출물 자동 미리보기.
   useEffect(() => {
     if (!session || intakeStatus === "running") return;
     const ps = viewStep ?? session.producedStep;
-    if (ps === 1) { void loadIdentified(); setPreviewName(null); }
+    if (ps === 1) { void loadIdentified(); void loadImpactRun(); setPreviewName(null); }
     else if (ps >= 2 && ps <= 4) {
       const kind = STEP_DOC_KIND[ps];
       const doc = sessionDocs.find((d) => d.kind === kind);
@@ -204,6 +243,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     intakeModel, setIntakeModel,
     intakeStatus, intakeError, setIntakeError, sid, session, sessionDocs, stepBusy, viewStep, setViewStep,
     previewName, previewMd, identified, editingDoc, setEditingDoc, draftDoc, setDraftDoc,
+    impactRun, impactData, impactLoaded,
     startIntake, advance, confirmStep, saveDoc, discardSession, clearSession, loadPreview, selectSession,
   };
 }

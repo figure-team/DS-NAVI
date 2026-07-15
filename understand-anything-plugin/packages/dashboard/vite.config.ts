@@ -1453,10 +1453,16 @@ function listRtmSessionDocs(sid: string): { name: string; kind: string }[] {
     return [];
   }
 }
-/** 세션 파일 이름 검증 — basename 만, .md 또는 identified.json. traversal 차단. */
+/**
+ * 세션 JSON 산출물 화이트리스트 — 프론트가 이름으로 조회하는 것만. 편집(POST)은 여기 없고
+ * `.md` 만 통과하므로(handleRtmDocPost) 이 목록은 **읽기 전용 노출**이다.
+ * `impact-run.json` = W5 의 ① 코드영향 인라인이 읽는 세션 포인터(RTM_INTAKE_WORKSPACE_DESIGN.md §2.3).
+ */
+const RTM_SESSION_JSON_FILES = new Set(["identified.json", "impact-run.json"]);
+/** 세션 파일 이름 검증 — basename 만, .md 또는 화이트리스트 JSON. traversal 차단. */
 function isValidSessionFileName(name: string): boolean {
   if (name.includes("/") || name.includes("\\") || name.includes("..")) return false;
-  return name.endsWith(".md") || name === "identified.json";
+  return name.endsWith(".md") || RTM_SESSION_JSON_FILES.has(name);
 }
 /** 세션 파일 절대경로(검증 통과 + 디렉터리 이탈 방지). 실패 시 null. */
 function rtmSessionFilePath(sid: string, name: string): string | null {

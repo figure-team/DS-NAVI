@@ -7,7 +7,7 @@ import { Link } from "react-router";
 import { useRtm } from "./context";
 import DiscardConfirmDialog from "./DiscardConfirmDialog";
 import { MD, confChip, useEscClose } from "./shared";
-import { AC_KIND, BAD, BORDER, CIRCLED, CONF, CONF_TITLE, FAINT, GOLD, OK, PRIORITY, STEP_DEFS, VERB, WARN, policyDocId, stripFrontmatter } from "./types";
+import { AC_KIND, BAD, BORDER, CIRCLED, CONF, CONF_TITLE, FAINT, GOLD, OK, PRIORITY, STEP_DEFS, VERB, WARN, impactAbsenceOf, policyDocId, stripFrontmatter } from "./types";
 import type { Changeset, IntakeAC, IntakePolicyRef, IntakeRequirement, IntakeScreenRef } from "./types";
 import { ModelSelect } from "../ModelSelect";
 import EvidenceLink from "../ui/EvidenceLink";
@@ -92,14 +92,19 @@ function SpecTabs() {
  *
  * 둘을 "근거 없음" 한 문구로 뭉치면 축소 모드(§10-1: "없으면 생략하되 그 사실을 명시")에서
  * **생략된 축이 '근거가 없는 축'으로 위장**한다 — 정확히 §4.1 이 경고한 오독이다.
+ *
+ * W5: `noneLabel`/`noneTitle` 은 코드영향 축(ImpactInline)이 쓴다 — 거기서 `[]` 는 "근거가 없다"가
+ * 아니라 "엔진이 계산했고 영향받는 게 0건"이다. 기본값은 근거 축(AcRow)의 종전 문구 그대로다.
  */
-function Axis({ label, state, children }: { label: string; state: "filled" | "none" | "omitted"; children?: ReactNode }) {
+function Axis({ label, state, noneLabel = "근거 없음", noneTitle = "이 축을 봤으나 근거가 없습니다 — '생략됨'(못 봄)과 다릅니다.", children }: {
+  label: string; state: "filled" | "none" | "omitted"; noneLabel?: string; noneTitle?: string; children?: ReactNode;
+}) {
   return (
     <div className="flex flex-wrap items-baseline" style={{ gap: 6, padding: "1px 0" }}>
       <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, flex: "none" }}>{label}</span>
       {state === "filled" ? children
         : state === "none"
-          ? <span title="이 축을 봤으나 근거가 없습니다 — '생략됨'(못 봄)과 다릅니다." style={{ fontSize: 10.5, color: WARN }}>근거 없음</span>
+          ? <span title={noneTitle} style={{ fontSize: 10.5, color: WARN }}>{noneLabel}</span>
           : <span title="이 축은 이 산출에 기록되지 않았습니다 — 근거가 없다는 뜻이 아닙니다(축소 모드: 있으면 포함·없으면 생략)." style={{ fontSize: 10.5, color: FAINT }}>생략됨</span>}
     </div>
   );
@@ -210,6 +215,169 @@ function ReqCard({ r }: { r: IntakeRequirement }) {
   );
 }
 
+// ── W5: ① 코드영향 검증 인라인 (RTM_INTAKE_WORKSPACE_DESIGN.md §2.3) ─────────
+/** 라우트·흐름 id → 사람이 읽는 표기("flow:ANY /x" · "route:ANY /x" → "/x"). ChangeImpactView:177 동형. */
+const shortRef = (id: string): string => id.replace(/^(?:flow|route):/, "").replace(/^ANY\s+/, "");
+/** 목록 상한 — ①은 열람이 아니라 **컨펌 직전 스캔**이라 다 쏟지 않는다. 전체는 /change 에서 본다. */
+const CAP = 8;
+/** 상한 초과분 표기 — 침묵 누락 금지(FileGroups "외 n건" 과 같은 규약). */
+function Over({ n }: { n: number }) {
+  if (n <= CAP) return null;
+  return <span title={`${n - CAP}건 더 — 전체는 '변경·영향에서 열기'로 봅니다.`} style={{ fontSize: 10, color: FAINT }}>+{n - CAP}</span>;
+}
+/** 계산된 축의 3상태 — `undefined`(구 스냅샷이 안 적음) / `[]`(0건) / `[…]`. Axis 주석과 같은 축. */
+const axisState = (xs: unknown[] | undefined): "filled" | "none" | "omitted" =>
+  xs === undefined ? "omitted" : xs.length === 0 ? "none" : "filled";
+const NONE_T = "엔진이 계산했고 영향받는 항목이 0건입니다 — '생략됨'(안 적음)과 다릅니다.";
+
+/**
+ * ①의 코드영향 검증 결과 — 설계 §2.3 "한 번 돌리고 두 곳에서 본다".
+ *
+ * 데이터가 두 조각인 게 이 컴포넌트의 형태를 정한다: **세션 포인터**(`impact-run.json` — 시드와
+ * 그 출처)와 **원장 스냅샷**(`impact-history/<jobId>/impact.json` — 상·하류). 포인터가 산출을
+ * 세션에 복사하지 않고 jobId 로 가리키므로 여기와 `/change` 가 **같은 스냅샷**을 읽는다 —
+ * 두 표면이 갈라질 수 없다. 그래서 링크가 장식이 아니라 계약이다.
+ *
+ * 부재는 세 갈래이고 절대 "없음" 한 문구로 뭉치지 않는다(§4.1 "없음 vs 못 봄" — ①은 컨펌 직전
+ * 판단 자리라 "미실행"이 "영향 없음"으로 읽히는 대가가 크다):
+ *  - **미실행** — 변경 대상이 있는데 아직 안 돌렸다.
+ *  - **해당없음** — 신규(to-be)뿐이라 시드가 없다. `code-impact` 는 이때 포인터를 아예 안 쓴다.
+ *  - **스냅샷 없음** — 돌렸다는 기록은 있는데 결과를 못 읽었다(원장 상한에 밀림 등).
+ */
+function ImpactInline() {
+  const { identified, impactRun, impactData, impactLoaded } = useRtm();
+  const up = impactData?.upstream;
+  const mappers = up?.persistence?.mappers;
+  const downFiles = impactData?.downstream?.files;
+
+  const body = !impactLoaded ? (
+    <span style={{ fontSize: 10.5, color: FAINT }}>불러오는 중…</span>
+  ) : !impactRun ? (
+    impactAbsenceOf(identified) === "notApplicable" ? (
+      <span title="changeset.modified 가 없거나 전부 신규(to-be)입니다 — 바꿀 기존 코드가 없으면 도달성을 계산할 시드가 없습니다. 신규 생성예측은 1차 범위 밖입니다." style={{ fontSize: 11, color: FAINT }}>
+        해당없음 — 기존 기능을 바꾸지 않는 요청(신규만)이라 계산할 시드가 없습니다.
+      </span>
+    ) : (
+      <span title="변경 대상 기능(changeset.modified)이 있는데 검증 산출이 없습니다 — ①의 코드영향 검증을 아직 돌리지 않았습니다. '영향 없음'이 아닙니다." style={{ fontSize: 11, color: WARN }}>
+        미실행 — 변경 대상이 있으나 아직 코드영향을 검증하지 않았습니다.
+      </span>
+    )
+  ) : !impactData ? (
+    <span title="포인터(impact-run.json)는 있으나 원장 스냅샷을 못 읽었습니다 — 원장 상한 초과로 밀렸거나 파일이 유실됐습니다." style={{ fontSize: 11, color: WARN }}>
+      스냅샷 없음 — 실행 기록은 있으나 결과를 못 읽었습니다(원장에서 밀렸을 수 있습니다).
+    </span>
+  ) : (
+    <div className="flex flex-col" style={{ gap: 1 }}>
+      {/* 시드 = "무엇을 바꾸나". 출처(fnId)를 같이 둔다 — 왜 이 파일이 시드인지 되짚을 수 있어야 한다. */}
+      <Axis label="시드" state={impactRun.bySource.length > 0 ? "filled" : "none"} noneLabel="없음" noneTitle={NONE_T}>
+        <div className="flex flex-col" style={{ gap: 2, minWidth: 0, flex: "1 1 auto" }}>
+          {impactRun.bySource.map((s) => (
+            <div key={s.fnId} className="flex flex-wrap items-baseline" style={{ gap: 5, minWidth: 0 }}>
+              <span title={`${VERB.modified.label} ${s.fnId}`} style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: VERB.modified.color }}>{VERB.modified.sym}{shortRef(s.fnId)}</span>
+              <span style={{ fontSize: 10, color: FAINT }}>→</span>
+              {/* 시드는 파일 단위다(라인이 없다) — 라인을 지어내지 않는다(AcRow 의 line=null 과 같은 규약). */}
+              {s.relPaths.map((p) => <EvidenceLink key={p} file={p} line={1} showLine={false} basename />)}
+            </div>
+          ))}
+        </div>
+      </Axis>
+
+      {/* 상류 = 이 변경이 **영향을 주는** 쪽. API 축만 진짜 file:line 근거를 갖는다. */}
+      <Axis label="상류 API" state={axisState(up?.api)} noneLabel="없음" noneTitle={NONE_T}>
+        <div className={REF_ROW} style={REF_GAP}>
+          {(up?.api ?? []).slice(0, CAP).map((a) => (
+            <span key={a.id} className="flex items-baseline" style={{ gap: 4, minWidth: 0 }} title={a.handler ? `${a.id} — ${a.handler}` : a.id}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-text-secondary)" }}>{shortRef(a.id)}</span>
+              <EvidenceLink file={a.filePath} line={a.line} basename />
+            </span>
+          ))}
+          <Over n={(up?.api ?? []).length} />
+        </div>
+      </Axis>
+      <Axis label="상류 흐름" state={axisState(up?.flows)} noneLabel="없음" noneTitle={NONE_T}>
+        <div className={REF_ROW} style={REF_GAP}>
+          {(up?.flows ?? []).slice(0, CAP).map((f) => (
+            <Link key={f.flowId} to={`/domains/${encodeURIComponent(f.domainId)}?flow=${encodeURIComponent(f.flowId)}`} title={f.flowId}
+              className="hover:underline" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)", textDecoration: "none" }}>
+              {shortRef(f.flowId)}
+            </Link>
+          ))}
+          <Over n={(up?.flows ?? []).length} />
+        </div>
+      </Axis>
+      <Axis label="상류 도메인" state={axisState(up?.domains)} noneLabel="없음" noneTitle={NONE_T}>
+        <div className={REF_ROW} style={REF_GAP}>
+          {(up?.domains ?? []).map((d) => (
+            <Link key={d.domainId} to={`/domains/${encodeURIComponent(d.domainId)}`} title={d.domainId}
+              className="hover:underline" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)", textDecoration: "none" }}>
+              {d.name || d.key}
+            </Link>
+          ))}
+        </div>
+      </Axis>
+
+      {/* 하류 = 이 변경이 **기대는** 협력자. 파일·매퍼는 라인 근거가 없어 파일만 연다. */}
+      <Axis label="하류 파일" state={axisState(downFiles)} noneLabel="없음" noneTitle={NONE_T}>
+        <div className={REF_ROW} style={REF_GAP}>
+          {(downFiles ?? []).slice(0, CAP).map((f) => (
+            <span key={f.relPath} className="flex items-baseline" style={{ gap: 3, minWidth: 0 }} title={f.relPath}>
+              <EvidenceLink file={f.relPath} line={1} showLine={false} basename />
+              {f.minDepth != null && <span title={`시드에서 ${f.minDepth}단계`} style={{ fontSize: 9, color: FAINT }}>d{f.minDepth}</span>}
+            </span>
+          ))}
+          <Over n={(downFiles ?? []).length} />
+        </div>
+      </Axis>
+      <Axis label="하류 매퍼" state={axisState(mappers)} noneLabel="없음" noneTitle={NONE_T}>
+        <div className={REF_ROW} style={REF_GAP}>
+          {(mappers ?? []).slice(0, CAP).map((m) => (
+            <span key={m.relPath} title={m.namespace}>
+              <EvidenceLink file={m.relPath} line={1} showLine={false} basename />
+            </span>
+          ))}
+          <Over n={(mappers ?? []).length} />
+        </div>
+      </Axis>
+
+      {/* 정직한 생략(§6.2) — 시드가 못 된 기능을 조용히 떨구지 않는다. 스크립트 로그와 같은 축. */}
+      {impactRun.skippedToBe.length > 0 && (
+        <Axis label="제외" state="filled">
+          <span title={impactRun.skippedToBe.join(" · ")} style={{ fontSize: 10.5, color: FAINT }}>신규(to-be) {impactRun.skippedToBe.length}건 — 파일이 아직 없어 시드가 될 수 없습니다</span>
+        </Axis>
+      )}
+      {impactRun.ungroundedFnIds.length > 0 && (
+        <Axis label="미근거" state="filled">
+          <span title={impactRun.ungroundedFnIds.join(" · ")} style={{ fontSize: 10.5, color: WARN }}>진입점 근거 0건 {impactRun.ungroundedFnIds.length}건 — 시드를 못 만들었습니다</span>
+        </Axis>
+      )}
+      {impactRun.unknownFnIds.length > 0 && (
+        <Axis label="미상" state="filled">
+          <span title={impactRun.unknownFnIds.join(" · ")} style={{ fontSize: 10.5, color: BAD }}>추적표에 없는 기능 {impactRun.unknownFnIds.length}건 — 실재 대조 확인 필요</span>
+        </Axis>
+      )}
+    </div>
+  );
+
+  return (
+    <div style={{ marginTop: 16, borderTop: BORDER, paddingTop: 12 }}>
+      <div className="flex items-baseline flex-wrap" style={{ gap: 8, marginBottom: 6 }}>
+        <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--color-text-secondary)" }}>코드영향 검증</span>
+        <span className="text-text-muted" style={{ fontSize: 10.5 }}>
+          바뀐 기능에서 무엇이 연쇄로 영향받나 — 컨펌 전 판단 근거입니다.
+        </span>
+        {/* §2.3 "한 번 돌리고 두 곳에서 본다" — 같은 jobId 스냅샷을 원장 렌즈에서 연다. */}
+        {impactRun && (
+          <Link to={`/change?run=${encodeURIComponent(impactRun.jobId)}`} title={`변경·영향 원장에서 이 분석("${impactRun.query}")을 엽니다 — 같은 산출의 전체 열람.`}
+            className="ml-auto hover:underline" style={{ fontSize: 10.5, color: "var(--color-status-info)", textDecoration: "none", flex: "none" }}>
+            변경·영향에서 열기 →
+          </Link>
+        )}
+      </div>
+      {body}
+    </div>
+  );
+}
+
 function IdentifiedView() {
   const { identified } = useRtm();
   if (!identified) return <div className="text-text-muted" style={{ fontSize: 12 }}>식별 결과를 불러오는 중…</div>;
@@ -227,6 +395,9 @@ function IdentifiedView() {
       <div className="flex flex-col gap-1.5">
         {reqs.map((r) => <ReqCard key={r.id} r={r} />)}
       </div>
+      {/* W5: 코드영향 검증(§2.3) — 요구사항 분해 **아래**에 둔다. 분해된 요구사항의
+          changeset.modified 가 이 분석의 입력이므로 읽는 순서가 곧 인과 순서다. */}
+      <ImpactInline />
       {qs.length > 0 && (
         <div style={{ marginTop: 16, borderTop: BORDER, paddingTop: 12 }}>
           <div style={{ fontSize: 11.5, color: BAD, marginBottom: 6, fontWeight: 600 }}>[확인필요] — 다음 단계 전에 검토하세요</div>

@@ -2,8 +2,9 @@ import { createContext, useContext } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
 import type {
-  CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, Identified, ReqOverride,
-  Requirement, RtmModel, RtmSession, RtmTab, SessionDoc, SessionRow, Signoff, TestRef, TestResult, TestScenario,
+  CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, Identified, ImpactRun,
+  ImpactSnapshot, ReqOverride, Requirement, RtmModel, RtmSession, RtmTab, SessionDoc, SessionRow,
+  Signoff, TestRef, TestResult, TestScenario,
 } from "./types";
 import type { ModelChoice } from "../ModelSelect";
 
@@ -125,6 +126,14 @@ export interface RtmCtx {
   previewMd: string;
   loadPreview: (name: string) => Promise<void>;
   identified: Identified | null;
+  /**
+   * W5: ①의 코드영향 검증(§2.3) — 세션 포인터 + 그 포인터가 가리키는 원장 스냅샷.
+   * `impactLoaded` 는 조회 완료 여부다: false 면 화면은 아직 "미실행"을 단언할 수 없다.
+   * `impactRun=null && impactLoaded` 일 때만 부재이고, 그 원인은 `impactAbsenceOf` 가 가른다.
+   */
+  impactRun: ImpactRun | null;
+  impactData: ImpactSnapshot | null;
+  impactLoaded: boolean;
   editingDoc: boolean;
   setEditingDoc: (v: boolean) => void;
   draftDoc: string;

@@ -366,6 +366,7 @@ export default function RtmView() {
     previewName: intake.previewName, previewMd: intake.previewMd, loadPreview: intake.loadPreview,
     identified: intake.identified, editingDoc: intake.editingDoc, setEditingDoc: intake.setEditingDoc,
     draftDoc: intake.draftDoc, setDraftDoc: intake.setDraftDoc,
+    impactRun: intake.impactRun, impactData: intake.impactData, impactLoaded: intake.impactLoaded,
     setToast,
   };
 

@@ -3,7 +3,8 @@ import { Link, useSearchParams } from "react-router";
 import { useDashboardStore } from "../store";
 import { parseBusinessFlows } from "../utils/businessFlow";
 import TrustBadge from "./TrustBadge";
-import { Badge, BtnAccent, BtnOutline, ConfBadge, type ConfKind } from "./proto/Proto";
+import { Badge, BtnAccent, BtnOutline, ConfBadge } from "./proto/Proto";
+import { confMeta } from "./confidence";
 import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
 import { Chip } from "./data-map/UnresolvedChips";
@@ -93,17 +94,6 @@ const DOMAIN_LABEL: Record<string, string> = {
   order: "주문(order)",
   common: "공통(common)",
 };
-/**
- * 신뢰도 표시 — 전부 정적 분석 자동 판정(사람 확정 아님)이라 "확정" 계열 라벨을 피한다.
- * 사람 확정은 selOv.confirmed / TrustBadge 로 시각·문구를 분리한다(데이터 맵 CrudTab 관례).
- */
-const MECH_CONF: Record<string, { kind: ConfKind; label: string; title: string }> = {
-  CONFIRMED: { kind: "fix", label: "근거확보", title: "결정적 정적 분석이 코드에서 근거(file:line)를 직접 추적함 — 규칙 기반이라 재현 가능" },
-  CONFIRMED_AI: { kind: "ai", label: "근거확보(추정)", title: "정적 분석이 잇지 못한 연결을 AI가 코드를 읽어 보완 판정한 근거 — 파일 위치는 있으나 검토 권장" },
-  INFERRED: { kind: "est", label: "추정", title: "핸들러 미검출 또는 메서드명 추론 — 기계 판정" },
-  UNVERIFIED: { kind: "chk", label: "확인 필요", title: "근거 없음 — 확인 필요" },
-};
-const mechConf = (c: string) => MECH_CONF[c] ?? MECH_CONF.INFERRED;
 const KIND_LABEL: Record<string, string> = {
   field: "입력",
   action: "이벤트",
@@ -742,7 +732,7 @@ export default function ScreenSpecView() {
         <td>
           {a.handler &&
             (() => {
-              const mc = mechConf(a.handler.confidence);
+              const mc = confMeta(a.handler.confidence);
               // 근거가 없으면 펼 것도 없다 — 배지만(등급 자체는 근거 유무로 정해지므로 사실상 하위 등급).
               if (evidence.length === 0) return <ConfBadge kind={mc.kind} label={mc.label} title={mc.title} />;
               return (
@@ -979,9 +969,9 @@ export default function ScreenSpecView() {
                 )}
                 <span style={{ marginLeft: 4 }}>
                   <ConfBadge
-                    kind={mechConf(summaryInfo.confidence).kind}
-                    label={mechConf(summaryInfo.confidence).label}
-                    title={mechConf(summaryInfo.confidence).title}
+                    kind={confMeta(summaryInfo.confidence).kind}
+                    label={confMeta(summaryInfo.confidence).label}
+                    title={confMeta(summaryInfo.confidence).title}
                   />
                 </span>
               </MetaRow>
@@ -1006,9 +996,9 @@ export default function ScreenSpecView() {
                     {!summaryInfo.evidenceParts && (
                       <span style={{ marginLeft: 6 }}>
                         <ConfBadge
-                          kind={mechConf(summaryInfo.confidence).kind}
-                          label={mechConf(summaryInfo.confidence).label}
-                          title={mechConf(summaryInfo.confidence).title}
+                          kind={confMeta(summaryInfo.confidence).kind}
+                          label={confMeta(summaryInfo.confidence).label}
+                          title={confMeta(summaryInfo.confidence).title}
                         />
                       </span>
                     )}

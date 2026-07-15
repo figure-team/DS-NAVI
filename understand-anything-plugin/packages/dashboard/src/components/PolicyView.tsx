@@ -7,7 +7,8 @@ import { dataUrl } from "../shared/api/client";
 import { Badge, ConfBadge, ProtoTabs, StatTile } from "./proto/Proto";
 import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
-import type { BadgeTone, ConfKind } from "./proto/Proto";
+import type { BadgeTone } from "./proto/Proto";
+import { confMeta } from "./confidence";
 import CitationChip from "./CitationChip";
 import SearchInput from "./ui/SearchInput";
 import EmptyCard from "./ui/EmptyCard";
@@ -89,11 +90,6 @@ function signalMatch(s: PolicySignal, q: string): boolean {
     s.detail.toLowerCase().includes(q) ||
     anchorLabel(s.anchor).toLowerCase().includes(q)
   );
-}
-
-/** 신뢰도 → ConfBadge 종류. CONFIRMED(DDL 확정)만 fix, 그 외(INFERRED 등)는 추정. */
-function confKind(confidence: string): ConfKind {
-  return confidence === "CONFIRMED" ? "fix" : "est";
 }
 
 /** 데이터 신호 kind → 한글 라벨 + 배지 톤. */
@@ -620,7 +616,7 @@ function CategoryTab({
                             <CitationChip filePath={s.anchor.file} line={s.anchor.line} />
                           </td>
                           <td>
-                            <ConfBadge kind={confKind(s.confidence)} />
+                            <ConfBadge kind={confMeta(s.confidence).kind} />
                           </td>
                         </tr>
                       );
@@ -664,7 +660,7 @@ function CategoryTab({
                 </span>
                 <div className="flex-1" />
                 <CitationChip filePath={s.anchor.file} line={s.anchor.line} />
-                <ConfBadge kind={confKind(s.confidence)} />
+                <ConfBadge kind={confMeta(s.confidence).kind} />
               </div>
             ))}
           </div>

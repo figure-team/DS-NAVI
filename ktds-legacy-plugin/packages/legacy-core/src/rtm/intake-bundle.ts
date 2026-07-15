@@ -240,6 +240,13 @@ export interface BuildIntakeInputOptions {
   request: string
   /** 번들 문자 예산(기본 `DEFAULT_BUNDLE_CHAR_CAP`). */
   charCap?: number
+  /**
+   * **현재 소스의 HEAD 커밋**(P7 완료 게이트, §10-2). 미지정(기본 `null`)이면 축끼리만 대조한다 —
+   * 그러면 **전 축이 같은 옛 커밋에 멈춰 있어도 `consistent:true`** 가 된다. 즉 "산출물이 코드보다
+   * 낡았는데 아무 장치도 알리지 않는" §9.2 의 사고를 그대로 통과시킨다. HEAD 를 주면 축 커밋을
+   * **소스 기준으로** 대조해 낡은 축을 지목한다. IO(git) 는 호출자 몫(이 모듈은 순수).
+   */
+  headCommit?: string | null
 }
 
 // ── 산출 타입 ────────────────────────────────────────────────────────────────
@@ -470,8 +477,23 @@ export interface IntakeInputBundle {
     rtm: string | null
     screens: string | null
     policy: string | null
-    /** 축 커밋이 전부 같은가. **불일치는 차단하지 않는다**(§10-2) — 사실만 싣는다. */
+    /**
+     * 현재 소스의 HEAD(P7). 호출자가 `options.headCommit` 으로 주입하지 않으면 `null` —
+     * 그러면 대조 기준이 없어 **축끼리만** 비교한다(아래 `consistent` 의 의미가 달라진다).
+     */
+    head: string | null
+    /**
+     * 정합한가. **불일치는 차단하지 않는다**(§10-2) — 사실만 싣는다.
+     * - `head !== null`: 전 축이 HEAD 와 같은가(= 산출물이 현재 소스 기준으로 최신인가).
+     * - `head === null`: 축끼리 같은가(HEAD 를 모르면 이것밖에 못 잰다).
+     */
     consistent: boolean
+    /**
+     * HEAD 와 커밋이 다른 축의 이름(정렬). **`head === null` 이면 항상 빈 배열** — 대조 기준이
+     * 없으면 어느 쪽이 낡았는지 지목할 수 없다(축끼리 다르다는 사실만 `note` 에 적는다).
+     * `reducedMode.omittedAxes` 와 같은 규약: 이 축에 의존하는 결론은 P5 가 `[추정]` 강등한다.
+     */
+    staleAxes: string[]
     /** 낡은 축 서술(강등 규칙 적용은 P5 소관 — 여기선 사실 기술만). */
     note: string | null
   }
@@ -1837,6 +1859,7 @@ export function buildIntakeInputBundle(sources: IntakeBundleSources, options: Bu
     mentionText,
   )
 
+  const head = options.headCommit ?? null
   const commits = {
     domainGraph: domain.axis.gitCommit,
     dbSchema: schema.axis.gitCommit,
@@ -1844,7 +1867,9 @@ export function buildIntakeInputBundle(sources: IntakeBundleSources, options: Bu
     rtm: rtm.axis.gitCommit,
     screens: screens.axis.gitCommit,
     policy: policy.axis.gitCommit,
+    head,
     consistent: true,
+    staleAxes: [] as string[],
     note: null as string | null,
   }
   // ★ 커밋 불일치는 **차단하지 않는다**(§10-2). 사실만 싣고 강등 규칙은 P5 소관.
@@ -1856,14 +1881,34 @@ export function buildIntakeInputBundle(sources: IntakeBundleSources, options: Bu
     ['화면', commits.screens],
     ['정책', commits.policy],
   ].filter(([, c]) => c !== null) as [string, string][]
-  const distinct = [...new Set(present.map(([, c]) => c))]
-  commits.consistent = distinct.length <= 1
-  if (!commits.consistent) {
-    const newest = distinct.slice().sort(natCmp).join(' vs ')
-    commits.note =
-      `축 커밋 ${distinct.length}종 공존(${newest}) — 차단하지 않습니다. ` +
-      `축별 커밋: ${present.map(([n, c]) => `${n}=${c.slice(0, 8)}`).join(' · ')}. ` +
-      `서로 다른 커밋의 축은 낡았을 수 있습니다(이 축에 의존하는 결론은 [추정]으로 다루십시오).`
+  const axisList = (pairs: [string, string][]): string => pairs.map(([n, c]) => `${n}=${c.slice(0, 8)}`).join(' · ')
+  if (head !== null) {
+    // ★ HEAD 대조(P7) — **축끼리만 재면 전 축이 같은 옛 커밋에 멈춰 있을 때도 "정합"이 된다**.
+    //   §9.2 가 실증한 사고(데모 산출물이 코드보다 낡았는데 아무 장치도 안 알림)가 정확히 그 경우다.
+    //   기준을 소스(HEAD)로 잡아야 어느 축이 낡았는지 **지목**할 수 있다.
+    const stale = present.filter(([, c]) => c !== head)
+    commits.staleAxes = stale.map(([n]) => n)
+    commits.consistent = stale.length === 0
+    if (stale.length > 0) {
+      // 전 축이 낡았으면 "낡은 축"과 "축별 커밋"이 같은 목록이 된다 — 두 번 적지 않는다.
+      const fresh = stale.length === present.length ? '' : `최신 축: ${axisList(present.filter(([, c]) => c === head))}. `
+      commits.note =
+        `산출물 ${stale.length}/${present.length}축이 현재 소스(HEAD=${head.slice(0, 8)})보다 뒤에 있습니다 — 차단하지 않습니다. ` +
+        `낡은 축: ${axisList(stale)}. ${fresh}` +
+        `그 사이 커밋이 이 축의 입력을 바꿨을 수 있습니다(반드시 낡았다는 뜻은 아닙니다 — 재분석 없이는 모릅니다). ` +
+        `낡은 축에 의존하는 결론은 [추정]으로 다루십시오.`
+    }
+  } else {
+    // HEAD 미주입 — 대조 기준이 없어 **축끼리만** 잰다. 어느 쪽이 낡았는지는 지목할 수 없다.
+    const distinct = [...new Set(present.map(([, c]) => c))]
+    commits.consistent = distinct.length <= 1
+    if (!commits.consistent) {
+      const newest = distinct.slice().sort(natCmp).join(' vs ')
+      commits.note =
+        `축 커밋 ${distinct.length}종 공존(${newest}) — 차단하지 않습니다. ` +
+        `축별 커밋: ${axisList(present)}. ` +
+        `서로 다른 커밋의 축은 낡았을 수 있습니다(이 축에 의존하는 결론은 [추정]으로 다루십시오).`
+    }
   }
 
   const warnings: string[] = []

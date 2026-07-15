@@ -47,6 +47,7 @@ const {
   serializeIntakeBundle,
   checkMinimalSet,
   resolveFlowSeeds,
+  gitCommitHash,
 } = engine
 
 const [, , cmd, ...rest] = process.argv
@@ -102,42 +103,85 @@ function deriveProjectRoot(identifiedPath) {
 }
 
 /**
- * rtm.json(기능 id) · db-schema.json(테이블명) 을 읽어 인벤토리를 만든다.
- * 각 축은 **있을 때만** 채운다 — 없는 축은 undefined 로 남겨 대조를 생략시킨다(P1 은 부재를
- * 차단하지 않는다. 최소집합 부재의 fail-closed 는 P7 완료 게이트 몫 — 설계서 §9).
+ * ★ P7 완료 게이트 — 최소집합(도메인·데이터·추적표)을 **fail-closed**(exit 2)로 읽는다.
+ * 설계: RTM_IMPACT_GATE_DESIGN.md §5.1 · §7 C2/C8 · §9 P7 · §10-1(사용자 결정).
+ *
+ * 이 게이트가 없으면 산출물이 없거나 손상돼도 **조용히 빈 인벤토리로 진행**한다(§5.1):
+ *  - `project`(⑤): rtm.json 손상 → 도메인 귀속이 **전부 새 `to-be:`** 로 떨어진다.
+ *  - `validate`(①후): rtm.json 부재 → 실재 대조가 **무음으로 생략**돼 게이트가 장식이 된다(C8).
+ * `understand-rtm/SKILL.md` 의 "없으면 멈춤"은 LLM 에게 주는 **자연어 지시일 뿐 코드에 없었다** —
+ * 그걸 여기서 코드로 만든다("게이트는 코드로", C8).
+ *
+ * **부재와 손상을 구분해 보고**하되 판정은 둘 다 차단이다 — 손상을 "없음"으로 뭉개면 §4.1
+ * ("없음" vs "못 봄") 오독의 재판이다. 판정 규칙 자체는 legacy-core `checkMinimalSet` 하나뿐이고
+ * 여긴 IO 경계 + 보고만 한다(순수 함수는 코어에).
+ *
+ * @returns 파싱된 3축 `{ domainGraph, dbSchema, rtm }` — 전부 non-null 보장(아니면 exit 2).
  */
-function loadIntakeInventory(projectRoot) {
-  const inv = {}
-  const sources = []
-  const missing = []
-
-  const rtmPath = join(projectRoot, '.understand-anything', 'rtm.json')
-  if (existsSync(rtmPath)) {
+function requireMinimalSet(projectRoot) {
+  const uaDir = join(projectRoot, '.understand-anything')
+  const mapDir = join(projectRoot, '.spec', 'map')
+  const sources = { domainGraph: null, dbSchema: null, rtm: null }
+  const corrupt = []
+  for (const [key, path] of [
+    ['domainGraph', join(uaDir, 'domain-graph.json')],
+    ['dbSchema', join(mapDir, 'db-schema.json')],
+    ['rtm', join(uaDir, 'rtm.json')],
+  ]) {
+    if (!existsSync(path)) continue
     try {
-      const rtm = readJson(rtmPath)
-      inv.fnIds = (rtm.functions ?? []).map((f) => f.id).filter((id) => typeof id === 'string')
-      sources.push(`rtm.json 기능 ${inv.fnIds.length}건`)
+      sources[key] = readJson(path)
     } catch (err) {
-      missing.push(`rtm.json 파싱 실패(${err.message}) — 기능 대조 생략`)
+      corrupt.push(`${path} — 파싱 실패(${err.message})`)
     }
-  } else {
-    missing.push('rtm.json 없음 — 기능 대조 생략')
   }
+  const minimal = checkMinimalSet(sources)
+  if (minimal.ok) return sources
 
-  const dbPath = join(projectRoot, '.spec', 'map', 'db-schema.json')
-  if (existsSync(dbPath)) {
+  console.error(`\n✗ 최소집합 부재 — 인테이크를 진행할 수 없습니다(${projectRoot}).`)
+  console.error('  못 쓰는 축(부재 또는 손상):')
+  for (const m of minimal.missing) console.error(`    - ${m}`)
+  if (corrupt.length > 0) {
+    console.error('  ★ 손상 — 파일은 있으나 읽을 수 없습니다("없음"과 다릅니다):')
+    for (const c of corrupt) console.error(`    - ${c}`)
+    console.error('    → 재생성하십시오. 손상을 빈 인벤토리로 넘기면 근거 없이 지어냅니다(설계서 §5.1).')
+  }
+  console.error(
+    '\n근거 없이 요구사항을 설계하면 인테이크가 지어냅니다(설계서 §1.2).\n' +
+      '  먼저 분석을 돌리십시오: /understand-map → /understand-rtm',
+  )
+  process.exit(2)
+}
+
+/**
+ * id 발급용 스캔(next-req · next-cr) — rtm.json · rtm-requirements.json 을 훑는다.
+ * **부재는 정상**(아직 인테이크된 요청이 없는 프로젝트 = 1번부터)이지만 **손상은 exit 2** 다(P7):
+ * 손상을 무시하면 이미 쓰인 번호를 못 보고 **기존과 충돌하는 REQ/CR 를 발급**한다 — 조용한
+ * 오염이라 사람이 알아챌 길이 없다(§4.1 "없음" vs "못 봄"의 id 판).
+ */
+function scanForNextId(uaDir, scan) {
+  for (const name of ['rtm.json', 'rtm-requirements.json']) {
+    const path = join(uaDir, name)
+    if (!existsSync(path)) continue
     try {
-      const db = readJson(dbPath)
-      inv.tables = (db.tables ?? []).map((t) => t.name).filter((n) => typeof n === 'string')
-      sources.push(`db-schema.json 테이블 ${inv.tables.length}건`)
+      scan(readJson(path))
     } catch (err) {
-      missing.push(`db-schema.json 파싱 실패(${err.message}) — 테이블 대조 생략`)
+      console.error(`✗ ${path} 파싱 실패(${err.message}) — 번호를 발급할 수 없습니다.`)
+      console.error('  손상된 파일을 "없음"으로 취급하면 이미 쓰인 번호와 충돌합니다. 재생성하십시오.')
+      process.exit(2)
     }
-  } else {
-    missing.push('db-schema.json 없음 — 테이블 대조 생략')
   }
+}
 
-  return { inventory: inv, sources, missing }
+/**
+ * 실재 대조 인벤토리(P1) — `requireMinimalSet` 이 이미 읽어 둔 3축에서 뽑는다(재읽기 없음).
+ * 최소집합이 통과한 뒤에만 불리므로 **축 부재로 대조가 생략되는 경로가 없다**(그게 P7 의 요점).
+ */
+function buildIntakeInventory(rtm, dbSchema) {
+  return {
+    fnIds: (rtm.functions ?? []).map((f) => f.id).filter((id) => typeof id === 'string'),
+    tables: (dbSchema.tables ?? []).map((t) => t.name).filter((n) => typeof n === 'string'),
+  }
 }
 
 // ── validate ────────────────────────────────────────────────────────────────
@@ -179,10 +223,22 @@ if (cmd === 'validate') {
   // ★ 실재 대조 게이트(P1, P1b 교정) — error 만 fail-closed(exit 2). info(신규 테이블 제안)는
   // 표면화만 하고 통과시킨다: 신규 제안 자체는 정당하고, "db-schema 를 안 봤다"는 게이트로
   // 검출할 수 없다(P3 근거 번들·P2/P5 인용 요구가 푼다). 설계: RTM_IMPACT_GATE_DESIGN.md §1.2.
-  if (projectRoot) {
-    const { inventory, sources, missing } = loadIntakeInventory(projectRoot)
-    console.log(`  실재 대조 인벤토리(${projectRoot}): ${sources.length > 0 ? sources.join(' · ') : '없음'}`)
-    for (const m of missing) console.log(`    ⚠ ${m}`)
+  // ★ P7 — projectRoot 를 모르면 대조를 **생략하지 않고 차단**한다. 무음 생략은 게이트가
+  //   조용히 무력화되는 것이고, 그게 바로 이 게이트가 막으려는 실패다(§7 C8 "게이트는 코드로").
+  if (!projectRoot) {
+    console.error('\n✗ 실재 대조를 할 수 없습니다 — projectRoot 를 못 찾았습니다.')
+    console.error(`  경로 규약(<projectRoot>/.understand-anything/rtm-intake/<sid>/identified.json)과 다릅니다: ${target}`)
+    console.error('  → `--project <projectRoot>` 로 명시하십시오. 대조 없이 통과시키지 않습니다.')
+    process.exit(2)
+  }
+  {
+    // ★ P7 — 최소집합 fail-closed. 예전엔 rtm.json 이 없거나 손상되면 "기능 대조 생략" 경고만
+    //   찍고 **exit 0 으로 통과**시켰다 — 게이트가 있는 척만 한 것이다(§5.1).
+    const min = requireMinimalSet(projectRoot)
+    const inventory = buildIntakeInventory(min.rtm, min.dbSchema)
+    console.log(
+      `  실재 대조 인벤토리(${projectRoot}): rtm.json 기능 ${inventory.fnIds.length}건 · db-schema.json 테이블 ${inventory.tables.length}건`,
+    )
     const found = checkIntakeGrounding(intake, inventory)
     const errors = found.filter((v) => v.level === 'error')
     const infos = found.filter((v) => v.level !== 'error')
@@ -211,8 +267,6 @@ if (cmd === 'validate') {
     console.log(
       `  ✓ 실재 대조 통과 — changeset 기능이 전부 실재합니다${infos.length > 0 ? ` (신규 테이블 참조 ${infos.length}건은 [추정] 제안으로 통과)` : ''}.`,
     )
-  } else {
-    console.log('  ⚠ 실재 대조 생략 — projectRoot 를 못 찾았습니다(--project <projectRoot> 로 지정).')
   }
 
   console.log('전부 [추정] 상태. 사용자가 단계 컨펌 후 다음 단계로 진행한다.')
@@ -248,15 +302,19 @@ if (cmd === 'intake-input') {
   }
   const uaDir = join(projectRoot, '.understand-anything')
   const mapDir = join(projectRoot, '.spec', 'map')
+  // ★ 최소집합(도메인·데이터·추적표)은 fail-closed — 다른 서브커맨드와 **같은 게이트**를 쓴다(P7).
+  const minimalSources = requireMinimalSet(projectRoot)
+  // 나머지 축은 축소 모드(§10-1): 없으면 생략하고 번들에 명시(exit 2 아님).
+  //  - crud-matrix: 데이터 축의 **하위 소스**라 최소집합이 아니다(checkMinimalSet 테스트 참조).
+  //  - screens: 화면 축.
   const loaded = {
-    domainGraph: load(join(uaDir, 'domain-graph.json'), 'domain-graph.json'),
-    dbSchema: load(join(mapDir, 'db-schema.json'), 'db-schema.json'),
     crudMatrix: load(join(mapDir, 'crud-matrix.json'), 'crud-matrix.json'),
-    rtm: load(join(uaDir, 'rtm.json'), 'rtm.json'),
-    // P4 화면 축 — 축소 모드(§10-1): 없으면 생략하고 번들에 명시(exit 2 아님).
     screens: load(join(uaDir, 'screens.json'), 'screens.json'),
   }
-  const sources = Object.fromEntries(Object.entries(loaded).map(([k, v]) => [k, v.value]))
+  const sources = {
+    ...minimalSources,
+    ...Object.fromEntries(Object.entries(loaded).map(([k, v]) => [k, v.value])),
+  }
   for (const { note } of Object.values(loaded)) if (note) console.error(`⚠ ${note}`)
 
   // ★ P4 정책 축 — `doc-output/policy-*.md` 전량을 **원문 그대로** 넘긴다(파싱은 legacy-core 의
@@ -279,22 +337,10 @@ if (cmd === 'intake-input') {
   }
   sources.policyDocs = policyDocs
 
-  // ★ 최소집합 fail-closed(§10-1 사용자 결정) — 도메인·데이터·추적표 중 하나라도 없으면 exit 2.
-  //   현재 인테이크는 rtm.json 이 없어도 **조용히 빈 인벤토리로 진행**한다(rtm-intake.mjs:167-180).
-  //   `understand-rtm/SKILL.md:45` 가 "없으면 멈춤"이라 규정만 하고 코드엔 없던 것을 여기서 구현한다.
-  const minimal = checkMinimalSet(sources)
-  if (!minimal.ok) {
-    console.error(`\n✗ 최소집합 부재 — 근거 번들을 만들 수 없습니다(${projectRoot}).`)
-    console.error('  없는 축:')
-    for (const m of minimal.missing) console.error(`    - ${m}`)
-    console.error(
-      '\n근거 없이 요구사항을 설계하면 인테이크가 지어냅니다(설계서 §1.2).\n' +
-        '  먼저 분석을 돌리십시오: /understand-map → /understand-rtm',
-    )
-    process.exit(2)
-  }
-
-  const bundle = buildIntakeInputBundle(sources, { request })
+  // ★ HEAD 주입(P7) — 축끼리만 대조하면 **전 축이 같은 옛 커밋에 멈춰 있어도 "정합"** 이 된다.
+  //   그게 §9.2 가 실증한 사고(데모 산출물이 코드보다 낡았는데 아무 장치도 안 알림)다.
+  //   git 이 아니면 null → 번들은 예전처럼 축끼리만 잰다(하위호환).
+  const bundle = buildIntakeInputBundle(sources, { request, headCommit: gitCommitHash(projectRoot) })
 
   // 세션 디렉터리: --session 우선, 없으면 요청 원문 해시(결정론 — 같은 요청 → 같은 sid).
   const sessionId = sid ?? `req-${createHash('sha256').update(request, 'utf8').digest('hex').slice(0, 8)}`
@@ -319,6 +365,15 @@ if (cmd === 'intake-input') {
   console.log(axisLine('추적표  ', bundle.axes.rtm))
   console.log(axisLine('화면    ', bundle.axes.screens))
   console.log(axisLine('정책    ', bundle.axes.policy))
+  // ★ 커밋 정합 실적(P7) — **차단하지 않는다**(§10-2). 무엇이 어긋났는지 이름으로 알린다.
+  console.log(
+    `  커밋 정합: HEAD=${bundle.commits.head ? bundle.commits.head.slice(0, 8) : '(git 아님 — 낡음 판정 불가)'} · ` +
+      (bundle.commits.staleAxes.length > 0
+        ? `낡은 축 ${bundle.commits.staleAxes.length}개 → ${bundle.commits.staleAxes.join(' · ')} (경고 — 이 축의 결론은 [추정])`
+        : bundle.commits.consistent
+          ? '전 축 최신'
+          : '축끼리 불일치(아래 경고 참조)'),
+  )
   if (bundle.axes.domain.items.length > 0) {
     console.log(`  선정 도메인: ${bundle.axes.domain.items.map((d) => `${d.name}(${d.id})`).join(' · ')}`)
   }
@@ -383,16 +438,7 @@ if (cmd === 'next-req') {
       }
     }
   }
-  for (const name of ['rtm.json', 'rtm-requirements.json']) {
-    const path = join(uaDir, name)
-    if (existsSync(path)) {
-      try {
-        scan(readJson(path))
-      } catch {
-        /* 손상 무시 */
-      }
-    }
-  }
+  scanForNextId(uaDir, scan)
   console.log(`REQ-${String(maxN + 1).padStart(3, '0')}`)
   process.exit(0)
 }
@@ -414,16 +460,7 @@ if (cmd === 'next-cr') {
       if (m) maxN = Math.max(maxN, parseInt(m[1], 10))
     }
   }
-  for (const name of ['rtm.json', 'rtm-requirements.json']) {
-    const path = join(uaDir, name)
-    if (existsSync(path)) {
-      try {
-        scan(readJson(path))
-      } catch {
-        /* 손상 무시 */
-      }
-    }
-  }
+  scanForNextId(uaDir, scan)
   console.log(`CR-${String(maxN + 1).padStart(3, '0')}`)
   process.exit(0)
 }
@@ -451,22 +488,18 @@ if (cmd === 'project') {
   }
 
   // 인벤토리(도메인·featureId max·기존 기능 id)는 rtm.json 에서.
-  const rtmPath = join(uaDir, 'rtm.json')
-  let domains = []
-  let existingFnIds = new Set()
+  // ★ P7 fail-closed — 예전엔 rtm.json 이 없거나 손상되면 **조용히 빈 인벤토리**로 진행했다.
+  //   그러면 `resolveDomain` 이 기존 도메인을 하나도 못 찾아 **귀속이 전부 새 `to-be:`** 로
+  //   떨어지고(§5.1), featureSeq=0 이라 **기존과 충돌하는 FN-001** 을 발급한다. 조용한 오염이라
+  //   사람이 알아챌 길이 없다 — 그래서 차단한다.
+  const { rtm } = requireMinimalSet(projectRoot)
+  const domains = Array.isArray(rtm.domains) ? rtm.domains : []
+  const existingFnIds = new Set()
   let featureSeq = 0
-  if (existsSync(rtmPath)) {
-    try {
-      const rtm = readJson(rtmPath)
-      domains = Array.isArray(rtm.domains) ? rtm.domains : []
-      for (const f of rtm.functions ?? []) {
-        if (typeof f.id === 'string') existingFnIds.add(f.id)
-        const n = parseInt(String(f.featureId ?? '').replace(/\D/g, '') || '0', 10)
-        if (n > featureSeq) featureSeq = n
-      }
-    } catch {
-      /* 손상 시 빈 인벤토리(스텁은 새 to-be 도메인으로) */
-    }
+  for (const f of rtm.functions ?? []) {
+    if (typeof f.id === 'string') existingFnIds.add(f.id)
+    const n = parseInt(String(f.featureId ?? '').replace(/\D/g, '') || '0', 10)
+    if (n > featureSeq) featureSeq = n
   }
 
   // 기존 rtm-requirements.json 보존(append 병합).
@@ -616,18 +649,9 @@ if (cmd === 'code-impact') {
     process.exit(1)
   }
 
-  const rtmPath = join(uaDir, 'rtm.json')
-  if (!existsSync(rtmPath)) {
-    console.error(`rtm.json 이 없습니다(시드 조인 불가): ${rtmPath}`)
-    process.exit(2)
-  }
-  let rtm
-  try {
-    rtm = readJson(rtmPath)
-  } catch (err) {
-    console.error(`rtm.json 파싱 실패: ${err.message}`)
-    process.exit(1)
-  }
+  // ★ P7 — 최소집합 fail-closed(다른 서브커맨드와 같은 게이트, exit 2). 예전엔 rtm.json 부재만
+  //   보고 **손상은 exit 1** 로 갈라졌다 — 게이트의 종료코드는 하나여야 SKILL 이 분기할 수 있다.
+  const { rtm } = requireMinimalSet(projectRoot)
 
   // ★ flow→시드 결정론 조인 — LLM 불필요(§6.3). 시드 범위는 entryPoint 만(impact/rtm-seeds.ts 주석).
   const modified = intake.requirements.flatMap((r) => r.changeset.modified)

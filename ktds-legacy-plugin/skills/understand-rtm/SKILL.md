@@ -125,8 +125,11 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
    - `reducedMode.active === true` 면 `reducedMode.omittedAxes` 의 축은 **못 본 것**이다. 그 축에 의존하는
      결론(예: 화면 축 생략인데 "어느 화면에 버튼을 단다")은 **`INFERRED` 로 강등**하고, 생략 사실을
      `questions[]` 에 `[확인필요]` 로 올린다.
-   - `commits.consistent === false` 면 축별 커밋이 어긋난 것이다(`commits.note` 참조). **차단하지 않되**,
+   - `commits.consistent === false` 면 커밋이 어긋난 것이다(`commits.note` 참조). **차단하지 않되**,
      낡은 축에 의존하는 결론은 **`INFERRED` 로 강등**한다.
+     낡은 축은 **`commits.staleAxes` 에 이름으로 실려 있다** — `commits.head`(현재 소스 HEAD)와
+     커밋이 다른 축들이다. `staleAxes` 가 비어 있는데 `consistent:false` 면 HEAD 를 못 잰 것이고
+     (`commits.head === null`, git 저장소가 아님) 축끼리만 어긋난 상태다 — `note` 를 읽고 판단한다.
 5. 모호점은 `questions[]` 에 `[확인필요]` 질문으로 남긴다(임의 가정 금지).
 6. 기존 요구사항과 **모순**되면 supersede 후보를 `questions` 에 적어 사람이 판단하게 한다.
 7. `identified.json` 을 세션 디렉터리에 쓴다(②③④ 필드는 비워 둔다 — default 로 통과).

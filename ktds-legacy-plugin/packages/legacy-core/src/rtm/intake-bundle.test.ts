@@ -478,6 +478,59 @@ describe('buildIntakeInputBundle — §10-2 커밋 불일치', () => {
     expect(b.commits.rtm).toBeNull()
     expect(b.commits.consistent).toBe(true)
   })
+
+  it('headCommit 미주입이면 예전대로 축끼리만 잰다 — 낡음은 지목하지 않는다(하위호환)', () => {
+    const b = buildIntakeInputBundle(sources(), { request: REQUEST })
+    expect(b.commits.head).toBeNull()
+    expect(b.commits.staleAxes).toEqual([]) // 대조 기준이 없으면 어느 쪽이 낡았는지 말할 수 없다
+  })
+})
+
+// ★ P7 — HEAD 대조. 축끼리만 재는 §10-2 게이트의 사각을 메운다.
+describe('buildIntakeInputBundle — P7 HEAD 대조(§9.2 "산출물이 코드보다 낡음")', () => {
+  it('★ 전 축이 같은 옛 커밋이면 축끼리는 정합이지만 HEAD 기준으론 전부 낡음이다', () => {
+    // 이게 §9.2 가 실증한 사고다: 데모 산출물 전량이 한 커밋에 멈춰 있었고(축끼리 정합),
+    // 코드는 그 뒤로 나아갔는데 **아무 장치도 알리지 않았다**. HEAD 를 안 보면 여기서 통과한다.
+    const axesOnly = buildIntakeInputBundle(sources(), { request: REQUEST })
+    expect(axesOnly.commits.consistent).toBe(true) // ← 낡았는데 "정합"
+
+    const b = buildIntakeInputBundle(sources(), { request: REQUEST, headCommit: 'bddc686f' })
+    expect(b.commits.head).toBe('bddc686f')
+    expect(b.commits.consistent).toBe(false)
+    expect(b.commits.staleAxes).toEqual(['도메인', '스키마', 'CRUD', '추적표'])
+  })
+
+  it('낡음은 **경고**다 — 차단하지 않고 무엇이 어긋났는지 이름으로 명시한다(§10-2)', () => {
+    const b = buildIntakeInputBundle(sources(), { request: REQUEST, headCommit: 'bddc686f' })
+    expect(b.commits.note).toContain('차단하지 않습니다')
+    expect(b.commits.note).toContain('bddc686f') // 기준(HEAD)
+    expect(b.commits.note).toContain('도메인=dfbb9822') // 어긋난 축 = 그 커밋
+    expect(b.warnings.join('\n')).toContain('[추정]') // 강등 지시가 번들에 실린다
+  })
+
+  it('전 축이 HEAD 와 같으면 정합 — note 없음, 낡은 축 없음', () => {
+    const b = buildIntakeInputBundle(sources(), { request: REQUEST, headCommit: 'dfbb9822' })
+    expect(b.commits.consistent).toBe(true)
+    expect(b.commits.staleAxes).toEqual([])
+    expect(b.commits.note).toBeNull()
+  })
+
+  it('낡은 축만 지목한다 — 최신 축은 강등 대상이 아니다', () => {
+    const s = sources()
+    s.dbSchema.gitCommit = 'bddc686f' // 스키마만 재생성된 상태
+    const b = buildIntakeInputBundle(s, { request: REQUEST, headCommit: 'bddc686f' })
+    expect(b.commits.staleAxes).toEqual(['도메인', 'CRUD', '추적표'])
+    expect(b.commits.staleAxes).not.toContain('스키마')
+  })
+
+  it('스탬프가 null 인 축은 HEAD 대조에서도 빠진다 — 없는 스탬프를 "낡음"으로 단언하지 않는다', () => {
+    const s = sources()
+    s.rtm.gitCommit = null as unknown as string
+    const b = buildIntakeInputBundle(s, { request: REQUEST, headCommit: 'dfbb9822' })
+    expect(b.commits.rtm).toBeNull()
+    expect(b.commits.staleAxes).toEqual([]) // 나머지 축은 HEAD 와 같다
+    expect(b.commits.consistent).toBe(true)
+  })
 })
 
 describe('buildIntakeInputBundle — 유계성·정직한 생략', () => {

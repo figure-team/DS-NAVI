@@ -52,6 +52,8 @@ const SPEC_FILES = [
   "impact.json",
   // impact.json 의 검증 리포트 — 없으면 demo 에서도 GROUNDED 배지가 통째로 빠진다.
   "impact-verify-report.json",
+  // impact 앵커(=census.gitCommit)의 출처 — 변경·영향의 재스캔 판정에 필요.
+  "census.json",
   "policy-signals.json",
   "policy-reconcile.json",
 ];

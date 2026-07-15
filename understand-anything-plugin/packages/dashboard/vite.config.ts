@@ -72,6 +72,9 @@ const SPEC_MAP_ENDPOINTS = new Set([
   // impact.json 의 검증 리포트 — 이게 빠져 있어 최신 슬롯 화면에서 GROUNDED 배지가
   // 통째로 누락됐다(SPA 폴백 index.html 이 200 으로 응답 → r.json() 실패 → 조용히 무시).
   "/impact-verify-report.json",
+  // impact 앵커의 출처 — engine.ts:120 이 `gitCommit: census.gitCommit` 으로 찍는다.
+  // 변경·영향 화면이 앵커와 대조해 "분석 이후 재스캔됐나"(= 낡은 입력으로 계산됐나)를 판정.
+  "/census.json",
   "/policy-signals.json",
   "/policy-reconcile.json",
 ]);

@@ -48,6 +48,7 @@ const {
   auditPolicyFillFragments,
   mergePolicyFillFragments,
   DEFAULT_MAX_FILL_ROWS,
+  gitCommitHash,
 } = engine
 
 const PLUGIN_DOC_DIR = join(here, '..', 'templates', 'doc')
@@ -197,7 +198,9 @@ if (process.argv[3] === 'domain') {
       title: doc.title,
       methodology: doc.methodology,
       status: 'DRAFT',
-      sourceCommit: null,
+      // 생성 시점 HEAD(candidates.json.gitCommit 이 아님) — 도메인 모드는 branch-scanner 로
+      // 소스를 직접 읽으므로 HEAD 가 실제 유래(RTM_IMPACT_GATE_DESIGN.md §9.1, P0b 결정).
+      sourceCommit: gitCommitHash(projectRoot) ?? null,
       evidenceRate: evidenceRate(doc),
     }
     writeFileSync(join(OUTPUT_DIR, `${doc.docId}.md`), renderMarkdown(doc, m), 'utf8')

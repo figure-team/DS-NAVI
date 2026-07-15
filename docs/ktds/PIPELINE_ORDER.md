@@ -99,4 +99,5 @@
 | rtm.json | `.understand-anything/` | `gitCommit` — **2026-07-16 복구**. 이전엔 필드는 있으나 `understand-rtm.mjs:106` 이 domain-graph 의 없는 키(`graph.gitCommit`)를 읽어 항상 `null` 이었다 |
 | rtm-requirements.json | `.understand-anything/` | (스탬프 없음 — 공백) |
 | SI/as-built 문서 | `.understand-anything/doc-output/` | `sourceCommit` — **2026-07-16 복구**(`understand-docs.mjs:259` 동일 버그) |
+| crud-matrix.json | `.spec/map/` | `gitCommit` — **2026-07-16 복구**(P0c, `export-crud-matrix.mjs:84`) 동일 버그 계보. graph 의 nodes/edges 로부터 파생되므로(먼저 확인함 — mybatisModel 은 파일을 직접 재스캔하지만 crud 행의 실체는 domain-graph.json 산출) HEAD 대신 상류 graph 의 생성 시점 커밋을 승계: `graph.ktdsMap?.generatedFromCommit \|\| graph.project?.gitCommitHash \|\| null` |
 | impact.json | `.spec/map/` | 스캔 산출 기준(별도 대조 게이트 없음). **프로젝트당 1슬롯 — 요청별 보관 불가** |

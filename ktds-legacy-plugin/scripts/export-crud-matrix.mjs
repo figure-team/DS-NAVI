@@ -76,9 +76,16 @@ if (!section) {
   console.error('crud-matrix 빌더가 표 섹션을 내지 않았습니다(그래프에 flow 없음?) — 산출 생략.')
   process.exit(2)
 }
+// domain-graph.json 은 최상위 gitCommit 을 갖지 않는다 — 스탬프는 ktdsMap.generatedFromCommit
+// (emit 이 skeleton.gitCommit 에서 투영, 없으면 빈 문자열)과 project.gitCommitHash 에 있다.
+// `||` 인 이유: emit.ts 가 `?? ''` 로 쓰므로 빈 문자열을 유효값으로 받으면 안 된다.
+// (understand-docs.mjs:262 와 동일 패턴 — crud-matrix 는 이 graph 의 nodes/edges 에서
+// 파생되므로 graph 생성 시점 커밋을 승계하는 것이 실제 유래를 반영한다.)
+const sourceCommit = graph.ktdsMap?.generatedFromCommit || graph.project?.gitCommitHash || null
+
 const out = {
   schemaVersion: 1,
-  gitCommit: graph.gitCommit ?? null,
+  gitCommit: sourceCommit,
   heading: section.heading,
   prose: section.prose ?? null,
   columns: section.table.columns,

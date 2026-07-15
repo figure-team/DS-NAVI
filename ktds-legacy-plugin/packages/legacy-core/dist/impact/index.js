@@ -14,6 +14,8 @@ export { ImpactInputMissingError, analyzeImpact, buildImpactReport, loadImpactIn
 export { PrecedentPreconditionError, classifyRole, tokenize, buildFlowSlices, rankPrecedents, findPrecedents, selectPrecedentByFlowId, loadKgSimilarity, DEFAULT_PRECEDENT_TOP_N, } from './precedents.js';
 export { CreationL1Error, buildCreationSuggestion, checkCreationL1, assertCreationL1, } from './supplement-a.js';
 export { verifyAnchorExists } from './verify.js';
+// 추적표 flow → 시드 결정론 조인(P6). RTM_IMPACT_GATE_DESIGN.md §6.3 — 시드 범위는 entryPoint 만.
+export { resolveFlowSeeds, TO_BE_FN_PREFIX } from './rtm-seeds.js';
 export { CHANGE_IMPACT_FILENAME, CHANGE_IMPACT_DOC_ID, IMPACT_READONLY_NOTE, buildChangeImpact, aggregateImpactCounts, publishChangeImpact, toProfileWChangeStory, } from './doc.js';
 export { IMPACT_OVERLAY_FILENAME, ImpactOverlaySchema, buildKgNodeIndex, buildImpactOverlay, loadKgNodeIndex, writeImpactOverlay, emitImpactOverlay, } from './overlay.js';
 //# sourceMappingURL=index.js.map

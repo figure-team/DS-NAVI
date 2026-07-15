@@ -4,11 +4,15 @@
  * 사용:
  *   node rtm-intake.mjs validate <identified.json 경로> [--project <projectRoot>]
  *   node rtm-intake.mjs intake-input <projectRoot> --request <원문> [--session <sid>]
+ *   node rtm-intake.mjs code-impact <projectRoot> --session <sid>
  *   node rtm-intake.mjs project  <projectRoot> <sid>
  *
  * - intake-input(①전 근거 번들, P3): 분석 산출물 3축(도메인·데이터·추적표)을 요청 원문으로
  *   사전 필터해 **유계 요약**을 rtm-intake/<sid>/intake-input.json 에 쓴다. ①이 이걸 읽고
  *   설계한다(현재는 rtm.json 하나만 보고 지어낸다 — 설계서 §1.1).
+ * - code-impact(①후 검증, P6): identified.json 의 `changeset.modified`(flow) → rtm.json 근거로
+ *   **결정론 조인**해 시드 파일을 뽑고 impact 엔진을 돌린다. 루트 슬롯을 안 건드리고 요청별로
+ *   보관 + impact 원장에 query=요청 원문으로 기록한다(RTM_INTAKE_WORKSPACE_DESIGN.md §2.3).
  * - validate(①후 게이트): identified.json 을 스키마로 검증 + 비치명 일관성 진단
  *   + **실재 대조 게이트(P1, fail-closed exit 2)** — changeset 기능 ⊂ rtm.json,
  *   참조 테이블 ⊂ db-schema.json. projectRoot 는 경로 규약에서 역산하거나 --project 로 준다.
@@ -19,7 +23,7 @@
  */
 import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, copyFileSync, rmSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -42,12 +46,43 @@ const {
   buildIntakeInputBundle,
   serializeIntakeBundle,
   checkMinimalSet,
+  resolveFlowSeeds,
 } = engine
 
 const [, , cmd, ...rest] = process.argv
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'))
+}
+
+/**
+ * impact 원장 append — 대시보드 `server/job-ledger.ts` 의 `appendLedgerEntry(dir, entry, MAX)` 와
+ * **동일 형식**(최신이 앞, 동일 jobId dedup, 상한 초과분 절삭). 두 패키지가 갈라져 있어
+ * (ktds-legacy-plugin ↔ understand-anything-plugin) 런타임 import 가 불가하므로 형식만 맞춘다.
+ * 상한 50 = 대시보드 `IMPACT_HISTORY_MAX`(vite.config.ts:1203) 와 동기.
+ *
+ * 절삭된 항목의 스냅샷 디렉터리도 함께 지운다(서버의 append 후처리와 동일 — 고아 디렉터리 방지).
+ */
+const IMPACT_HISTORY_MAX = 50
+function appendImpactLedger(dir, entry) {
+  const ledgerPath = join(dir, 'ledger.json')
+  let entries = []
+  try {
+    const raw = JSON.parse(readFileSync(ledgerPath, 'utf8'))
+    if (Array.isArray(raw.entries)) entries = raw.entries
+  } catch {
+    // 부재/파손 = 기록 없음(정직한 empty) — 서버 readLedger 와 동일 관용.
+  }
+  const next = [entry, ...entries.filter((e) => e.jobId !== entry.jobId)]
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(ledgerPath, JSON.stringify({ entries: next.slice(0, IMPACT_HISTORY_MAX) }, null, 2) + '\n', 'utf8')
+  for (const drop of next.slice(IMPACT_HISTORY_MAX)) {
+    try {
+      rmSync(join(dir, drop.jobId), { recursive: true, force: true })
+    } catch {
+      // 스냅샷 정리 실패는 무시(원장에서만 제거)
+    }
+  }
 }
 
 // ── 실재 대조 인벤토리 로드(P1) — IO 경계. 순수 게이트는 legacy-core 가 갖고 여기선 읽어 주입만.
@@ -542,6 +577,165 @@ if (cmd === 'withdraw') {
   process.exit(0)
 }
 
+// ── code-impact(①, 절차 A): changeset.modified → 시드 → 코드영향 분석 ──────────────
+// 설계: docs/ktds/RTM_IMPACT_GATE_DESIGN.md §6.1-5 · §6.3 · §9 P6 · RTM_INTAKE_WORKSPACE_DESIGN.md §2.3.
+//
+// ★ 아래 `impact`(절차 B) 와 **다른 것**이다 — 설계서 §6.7 의 동음이의 3종 주의:
+//   - `code-impact`(여기)  = /understand-impact 엔진. **코드 도달성**(파일·엣지 BFS).
+//   - `impact`(아래)       = computeChangeImpact. **REQ 철회의 요구사항 역추적**. 코드 분석 아님.
+//   두 서브시스템은 코드상 연결이 전혀 없다. 이름을 `impact` 로 겹치지 않게 한 이유가 이것이다.
+//
+// "한 번 돌리고 두 곳에서 본다"(워크스페이스 §2.3): 루트 슬롯을 **안 건드리고** 요청별로 보관하되,
+// impact 원장에 query=요청 원문으로 기록해 `/change` 에서도 열람되게 한다.
+if (cmd === 'code-impact') {
+  const projectRoot = rest[0]
+  const sidIdx = rest.indexOf('--session')
+  const sid = sidIdx >= 0 && rest[sidIdx + 1] ? rest[sidIdx + 1] : null
+  if (!projectRoot || !sid) {
+    console.error('사용법: node rtm-intake.mjs code-impact <projectRoot> --session <sid>')
+    process.exit(2)
+  }
+  // sid 는 파일명·디렉터리명이 된다. 대시보드 isValidSid(vite.config.ts:1363) 와 동일한 어휘 가드.
+  if (!/^[A-Za-z0-9._-]{1,64}$/.test(sid) || sid.startsWith('.')) {
+    console.error(`세션 id 가 잘못됐습니다(영숫자·._- 만, 64자 이내, . 로 시작 불가): ${sid}`)
+    process.exit(2)
+  }
+
+  const uaDir = join(projectRoot, '.understand-anything')
+  const sessionDir = join(uaDir, 'rtm-intake', sid)
+  const idPath = join(sessionDir, 'identified.json')
+  if (!existsSync(idPath)) {
+    console.error(`identified.json 이 없습니다(①식별 먼저): ${idPath}`)
+    process.exit(2)
+  }
+  let intake
+  try {
+    intake = parseIdentifiedIntake(readJson(idPath))
+  } catch (err) {
+    console.error(`identified.json 검증 실패:\n${err.message}`)
+    process.exit(1)
+  }
+
+  const rtmPath = join(uaDir, 'rtm.json')
+  if (!existsSync(rtmPath)) {
+    console.error(`rtm.json 이 없습니다(시드 조인 불가): ${rtmPath}`)
+    process.exit(2)
+  }
+  let rtm
+  try {
+    rtm = readJson(rtmPath)
+  } catch (err) {
+    console.error(`rtm.json 파싱 실패: ${err.message}`)
+    process.exit(1)
+  }
+
+  // ★ flow→시드 결정론 조인 — LLM 불필요(§6.3). 시드 범위는 entryPoint 만(impact/rtm-seeds.ts 주석).
+  const modified = intake.requirements.flatMap((r) => r.changeset.modified)
+  const res = resolveFlowSeeds(rtm.functions ?? [], modified)
+
+  console.log(`코드영향 검증(①) — ${projectRoot}`)
+  console.log(`  요청 ${intake.request.id}: "${intake.request.raw}"`)
+  console.log(`  changeset.modified ${modified.length}건 → 시드 ${res.seeds.length}개(범위: entryPoint)`)
+  for (const s of res.bySource) console.log(`    ${s.fnId}\n      → ${s.relPaths.join(' · ')}`)
+  // 정직한 생략 보고(§6.2) — 조용히 떨구지 않는다.
+  if (res.skippedToBe.length > 0) console.log(`  · 신규(to-be) ${res.skippedToBe.length}건 제외(파일 없음): ${res.skippedToBe.join(' · ')}`)
+  if (res.unknownFnIds.length > 0) console.error(`  ⚠ rtm.json 에 없는 기능 ${res.unknownFnIds.length}건(validate 실재 대조 확인 필요): ${res.unknownFnIds.join(' · ')}`)
+  if (res.ungroundedFnIds.length > 0) console.error(`  ⚠ 진입점 근거 0건이라 시드를 못 만든 기능 ${res.ungroundedFnIds.length}건: ${res.ungroundedFnIds.join(' · ')}`)
+
+  if (res.seeds.length === 0) {
+    // 전부 신규(added)면 바꿀 기존 코드가 없다 = 정당한 상태. 차단이 아니라 정직한 보고.
+    console.log('\n시드 없음 — 코드영향 분석을 생략합니다(원장 기록 없음).')
+    console.log('  modified 가 없거나 전부 to-be(신규)입니다. 신규 생성예측은 1차 범위 밖(설계서 §7 C6).')
+    process.exit(0)
+  }
+
+  // 요청별 보관 — 루트 슬롯(.spec/map/impact.json)은 **건드리지 않는다**(§6.3 C3).
+  // `.spec/map/` 은 코어 writeMapArtifact 가 강제하는 유일한 기록처라 여기 스테이징한 뒤
+  // 원장 스냅샷으로 옮기고 지운다(정규 산출물 옆에 요청별 파일이 쌓이지 않게).
+  const startedAt = new Date().toISOString()
+  const stageReport = `impact-intake-${sid}.json`
+  const stageVerify = `impact-intake-verify-${sid}.json`
+  let analyzed
+  try {
+    analyzed = engine.analyzeImpact(projectRoot, res.seeds, undefined, {
+      reportFilename: stageReport,
+      verifyFilename: stageVerify,
+    })
+  } catch (err) {
+    console.error(`\n영향도 분석 실패: ${err.message}`)
+    console.error('  먼저 /understand-map scan(+confirm) 으로 .spec/map/ 산출물을 만드세요(fail-closed).')
+    process.exit(2)
+  }
+  const { result, verify } = analyzed
+
+  // 원장 기록(§2.3) — jobId 는 세션 결정론 해시. 같은 세션 재실행은 같은 jobId 라 원장에서
+  // dedup 되고(항목이 쌓이지 않는다) 스냅샷도 제자리 갱신된다.
+  const jobId = createHash('sha256').update(`rtm-intake:${sid}`, 'utf8').digest('hex').slice(0, 16)
+  const historyDir = join(uaDir, 'impact-history')
+  const snapDir = join(historyDir, jobId)
+  mkdirSync(snapDir, { recursive: true })
+  const files = []
+  for (const [stagePath, name] of [
+    [analyzed.impactPath, 'impact.json'],
+    [analyzed.verifyPath, 'impact-verify-report.json'],
+  ]) {
+    copyFileSync(stagePath, join(snapDir, name))
+    rmSync(stagePath, { force: true }) // 스테이징 해제 — .spec/map 에 요청별 파일을 남기지 않는다
+    files.push(name)
+  }
+  // impact-overlay.json 은 스냅샷하지 않는다 — 구조 탭 오버레이는 고정 루트 슬롯이라
+  // 인테이크가 발행하면 /structure 의 현재 오버레이를 덮어쓴다(무오염 원칙).
+
+  appendImpactLedger(historyDir, {
+    jobId,
+    query: intake.request.raw, // ★ 원장 query = 요청 원문(§2.3)
+    model: null, // 결정론 조인 — LLM 미사용
+    startedAt,
+    finishedAt: new Date().toISOString(),
+    exitCode: 0,
+    status: 'done',
+    gitCommit: result.gitCommit,
+    files,
+    rootSlot: false, // ★ 루트 슬롯을 갱신하지 않은 실행 — /change 의 고아 판정에서 제외된다
+  })
+
+  // 세션 포인터 — 워크스페이스 ①이 자기 분석을 찾는 키(RTM_INTAKE_WORKSPACE_DESIGN.md §2.3 인라인).
+  writeFileSync(
+    join(sessionDir, 'impact-run.json'),
+    JSON.stringify(
+      {
+        jobId,
+        requestId: intake.request.id,
+        query: intake.request.raw,
+        gitCommit: result.gitCommit,
+        seedScope: 'entryPoint',
+        seeds: res.seeds,
+        bySource: res.bySource,
+        skippedToBe: res.skippedToBe,
+        unknownFnIds: res.unknownFnIds,
+        ungroundedFnIds: res.ungroundedFnIds,
+      },
+      null,
+      2,
+    ) + '\n',
+    'utf8',
+  )
+
+  console.log('')
+  console.log(`  상류(영향받는 호출자): 파일 ${result.upstream.files.length} · API ${result.upstream.api.length} · 흐름 ${result.upstream.flows.length} · 도메인 ${result.upstream.domains.length}`)
+  console.log(`  하류(의존 협력자): 파일 ${result.downstream.files.length} · 매퍼 ${result.upstream.persistence.mappers.length}`)
+  console.log(`  검토 필요: ${result.needsReview.length}건 · 근거율(인용 보유): ${verify.overall.groundedPct}%`)
+  console.log(`  영향 도메인: ${result.upstream.domains.map((d) => d.key).join(' · ') || '(없음)'}`)
+  console.log('')
+  console.log(`  요청별 보관: ${snapDir}/impact.json (+verify)`)
+  console.log(`  세션 포인터: ${join(sessionDir, 'impact-run.json')} (jobId ${jobId})`)
+  console.log(`  원장 기록: ${join(historyDir, 'ledger.json')} — /change 메뉴에서 "${intake.request.raw}" 로 열람`)
+  console.log('  루트 슬롯(.spec/map/impact.json)·문서 09·구조 오버레이: 무변경')
+  console.log('')
+  console.log('다음(SKILL ①): 위 영향 범위를 근거 보고에 포함하고 **멈춘다** — 사용자 컨펌이 게이트다.')
+  process.exit(0)
+}
+
 // ── impact(절차 B): 요청(REQ) 철회 영향분석(RTM 역추적) → JSON ────────────────────
 // rtm.json 모델에서 영향 기능 분류·다운스트림 의존·AC·산출물·후속조치를 결정론으로 산정해 출력한다.
 // 변경영향분석서(05) 작성의 데이터 소스. --out <path> 면 파일로도 쓴다.
@@ -583,6 +777,7 @@ console.error(
   '사용법:\n' +
     '  node rtm-intake.mjs intake-input <projectRoot> --request <원문> [--session <sid>] [--out <경로>]\n' +
     '  node rtm-intake.mjs validate <identified.json 경로> [--project <projectRoot>]\n' +
+    '  node rtm-intake.mjs code-impact <projectRoot> --session <sid>\n' +
     '  node rtm-intake.mjs next-req <projectRoot>\n' +
     '  node rtm-intake.mjs next-cr  <projectRoot>\n' +
     '  node rtm-intake.mjs project  <projectRoot> <sid>\n' +

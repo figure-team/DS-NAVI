@@ -23,6 +23,8 @@ export type { PrecedentRole, PrecedentIntent, FlowSlice, PrecedentCandidate, Pre
 export { CreationL1Error, buildCreationSuggestion, checkCreationL1, assertCreationL1, } from './supplement-a.js';
 export type { PrecedentStrength, AnchorRef, ChangeItem, CreateItem, SuggestionImpactItem, CreationSuggestion, CreationParams, } from './supplement-a.js';
 export { verifyAnchorExists } from './verify.js';
+export { resolveFlowSeeds, TO_BE_FN_PREFIX } from './rtm-seeds.js';
+export type { FlowSeedResolution } from './rtm-seeds.js';
 export { CHANGE_IMPACT_FILENAME, CHANGE_IMPACT_DOC_ID, IMPACT_READONLY_NOTE, buildChangeImpact, aggregateImpactCounts, publishChangeImpact, toProfileWChangeStory, } from './doc.js';
 export type { ImpactAggregate, ImpactAggregateRow, ImpactAggregateInputs, BuildChangeImpactOptions, } from './doc.js';
 export { IMPACT_OVERLAY_FILENAME, ImpactOverlaySchema, buildKgNodeIndex, buildImpactOverlay, loadKgNodeIndex, writeImpactOverlay, emitImpactOverlay, } from './overlay.js';

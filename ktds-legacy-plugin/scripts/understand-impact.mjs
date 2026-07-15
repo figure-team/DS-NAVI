@@ -12,6 +12,8 @@
  *               .spec/map/impact.json + impact-verify-report.json + docs/09_release/
  *               change-impact-analysis.md(read-only). 생성예측 섹션은 `--precedent <flowId>
  *               --entity <명사>` [--change <relPath:line>]... 가 있을 때 추가.
+ *               `--report-name <파일명>` [--verify-name <파일명>] 을 주면 루트 슬롯 대신
+ *               `.spec/map/<파일명>` 에 쓴다(요청별 보관 — RTM_IMPACT_GATE_DESIGN.md §6.3 C3).
  *
  * 모든 출력은 결정론·한국어. 동일 commit 재실행 시 산출물 byte-diff=0.
  */
@@ -139,9 +141,36 @@ function runAnalyze() {
     process.exit(2)
   }
   const seeds = paths.map((relPath) => ({ relPath, origin: 'path', confidence: 'CONFIRMED' }))
+
+  // ★ 산출물 리다이렉트(C3) — impact.json 은 **프로젝트당 1슬롯**이라 요청별 분석을 그대로 돌리면
+  // 직전 분석이 사라진다. 코어 `analyzeImpact` 의 artifacts 오버라이드를 노출만 한다(가드는
+  // 코어 `writeMapArtifact` 가 갖는다 — 경로 세그먼트·숨김파일 거부 → `../evil.json` 은 throw).
+  // 설계: docs/ktds/RTM_IMPACT_GATE_DESIGN.md §6.3 · §7 C3.
+  const reportName = flagValue('--report-name')
+  const verifyName = flagValue('--verify-name')
+  const redirected = reportName !== null || verifyName !== null
+
+  // 리다이렉트는 **전부 아니면 전무**다 — 한쪽만 주면 나머지는 루트 슬롯으로 간다.
+  // 실측(2026-07-16): `--report-name probe.json` 만 주면 impact.json 은 비켜 쓰지만
+  // impact-verify-report.json 은 **루트를 덮어써** 루트에 "impact=Cart · verify=Account" 라는
+  // 조용히 어긋난 짝이 남는다(둘은 같은 실행의 산출이라고 소비처가 가정한다). 부분 오염이
+  // 무오염보다 나쁘므로 fail-closed.
+  if (redirected && (reportName === null || verifyName === null)) {
+    console.error(
+      '리다이렉트는 --report-name 과 --verify-name 을 **함께** 줘야 합니다(한쪽만 주면 나머지가\n' +
+        '루트 슬롯을 덮어써 impact.json 과 impact-verify-report.json 의 짝이 어긋납니다).',
+    )
+    process.exit(2)
+  }
+
   let analyzed
   try {
-    analyzed = engine.analyzeImpact(projectRoot, seeds)
+    analyzed = engine.analyzeImpact(
+      projectRoot,
+      seeds,
+      undefined,
+      redirected ? { reportFilename: reportName, verifyFilename: verifyName } : undefined,
+    )
   } catch (err) {
     console.error(`영향도 분석 실패: ${err.message}`)
     process.exit(2)
@@ -188,15 +217,24 @@ function runAnalyze() {
     }
   }
 
-  const doc = engine.buildChangeImpact(result, verify, {
-    aggregate: { census: inputs.census.files, confirmed: inputs.confirmed, ownership: inputs.slices.ownership },
-    suggestion,
-  })
-  const mdPath = engine.publishChangeImpact(projectRoot, doc, { sourceCommit: result.gitCommit })
+  // ★ 리다이렉트 실행은 md 09·구조 오버레이를 **발행하지 않는다**. 둘 다 파일명 오버라이드가 없는
+  // 고정 루트 슬롯이라(`publishChangeImpact`→docs/09_release/, `emitImpactOverlay`→
+  // .understand-anything/impact-overlay.json) 발행하면 JSON 만 비켜 쓰고 문서·오버레이는 덮어써
+  // 리다이렉트의 목적(루트 슬롯 무오염)이 반쯤 무너진다. 곁다리 실행은 곁다리 산출만 낸다.
+  let mdPath = null
+  let overlay = null
+  let overlayPath = null
+  if (!redirected) {
+    const doc = engine.buildChangeImpact(result, verify, {
+      aggregate: { census: inputs.census.files, confirmed: inputs.confirmed, ownership: inputs.slices.ownership },
+      suggestion,
+    })
+    mdPath = engine.publishChangeImpact(projectRoot, doc, { sourceCommit: result.gitCommit })
 
-  // 대시보드 구조 탭 오버레이(impact-overlay.json) — knowledge-graph 노드 id 로 매핑.
-  // KG 부재면 changed=0 인 비활성 오버레이가 쓰여 토글이 회색(graceful).
-  const { overlay, overlayPath } = engine.emitImpactOverlay(projectRoot, result)
+    // 대시보드 구조 탭 오버레이(impact-overlay.json) — knowledge-graph 노드 id 로 매핑.
+    // KG 부재면 changed=0 인 비활성 오버레이가 쓰여 토글이 회색(graceful).
+    ;({ overlay, overlayPath } = engine.emitImpactOverlay(projectRoot, result))
+  }
 
   console.log(`영향도 분석 완료 — ${projectRoot}`)
   console.log(`  상류(영향받는 호출자): 파일 ${result.upstream.files.length} · API ${result.upstream.api.length} · 흐름 ${result.upstream.flows.length} · 도메인 ${result.upstream.domains.length}`)
@@ -206,6 +244,11 @@ function runAnalyze() {
   if (suggestion) {
     console.log(`  생성예측(${suggestion.strength}): [변경] ${suggestion.change.length} · [생성] ${suggestion.create.length} · [영향] ${suggestion.impact.length}`)
     console.log('  주의: [생성]은 net-new 라 CONFIRMED 불가(최대 [추정]) — 선례 앵커만 실존 근거.')
+  }
+  if (redirected) {
+    console.log(`  산출물(리다이렉트): ${analyzed.impactPath} · ${analyzed.verifyPath}`)
+    console.log('  루트 슬롯(.spec/map/impact.json)·문서 09·구조 오버레이는 건드리지 않았습니다.')
+    return
   }
   const overlayNote =
     overlay.changedNodeIds.length > 0

@@ -5,6 +5,7 @@ import { useDashboardStore } from "../store";
 import { Badge, BtnOutline, StatTile } from "./proto/Proto";
 import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
+import SearchInput from "./ui/SearchInput";
 
 /**
  * ktds-fork (메뉴 개편 2차 · 보고서 개선): 실적 보고서 뷰 — pmpl-proto pg-report 재현.
@@ -732,14 +733,12 @@ export default function ReportView() {
               <option key={a} value={a}>{a}</option>
             ))}
           </select>
-          <input
-            type="search"
+          <SearchInput
             value={cq}
-            onChange={(e) => setParam("q", e.target.value || null)}
+            onChange={(v) => setParam("q", v || null)}
             placeholder="메시지·sha 검색"
-            aria-label="커밋 메시지 검색"
-            className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-            style={{ padding: "6px 12px", fontSize: 12.5, flex: "1 1 200px", minWidth: 160 }}
+            ariaLabel="커밋 메시지 검색"
+            style={{ flex: "1 1 200px", minWidth: 160 }}
           />
           {(authorFilter || cq) && (
             <BtnOutline

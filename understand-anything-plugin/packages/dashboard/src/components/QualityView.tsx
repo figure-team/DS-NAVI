@@ -7,6 +7,9 @@ import { Badge, ConfBadge, Ev, ProtoTabs, StatTile } from "./proto/Proto";
 import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
 import type { BadgeTone } from "./proto/Proto";
+import SearchInput from "./ui/SearchInput";
+import EmptyCard from "./ui/EmptyCard";
+import { Tag } from "./ui/Tag";
 
 /* ────────────────────────── 데이터 타입 (실물 .spec/map/*.json) ────────────────────────── */
 
@@ -283,37 +286,6 @@ function LinkBtn({ to, children }: { to: string; children: ReactNode }) {
   );
 }
 
-function Chip({ children, title }: { children: ReactNode; title?: string }) {
-  return (
-    <span
-      title={title}
-      className="inline-flex items-center whitespace-nowrap text-text-secondary"
-      style={{
-        fontSize: 11,
-        padding: "1px 7px",
-        marginRight: 4,
-        borderRadius: 5,
-        background: "var(--color-elevated)",
-        border: "1px solid var(--color-border-subtle)",
-      }}
-    >
-      {children}
-    </span>
-  );
-}
-
-/** 정직한 부재/오류/로딩 안내 카드. */
-function EmptyCard({ children }: { children: ReactNode }) {
-  return (
-    <div
-      className="rounded-[10px] border border-border-subtle bg-panel card-shadow text-text-muted"
-      style={{ padding: "28px 26px", fontSize: 13, lineHeight: 1.7 }}
-    >
-      {children}
-    </div>
-  );
-}
-
 /* ────────────────────────── 위험 모듈 탭 ────────────────────────── */
 
 type SortKey = "score" | "grade" | "complexity" | "fanIn" | "fanOut" | "loc" | "churn";
@@ -485,13 +457,11 @@ function RiskPanel({ report }: { report: RiskReport }) {
 
       {/* 툴바 — 검색 · 등급/레이어/유형 필터 · 표시 카운트 */}
       <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 12 }}>
-        <input
-          type="search"
+        <SearchInput
           value={q}
-          onChange={(e) => setParam("q", e.target.value || null, true)}
+          onChange={(v) => setParam("q", v || null, true)}
           placeholder="파일·도메인·프로그램ID 검색"
-          className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-          style={{ padding: "6px 12px", fontSize: 12.5, width: 220 }}
+          width={220}
         />
         <select value={gradeF ?? ""} onChange={(e) => setParam("grade", e.target.value || null)} className={selectCls} style={selectStyle}>
           <option value="">등급 전체</option>
@@ -569,9 +539,9 @@ function RiskPanel({ report }: { report: RiskReport }) {
                         </span>
                       </div>
                       <div style={{ marginTop: 3 }}>
-                        <Chip title={`레이어: ${it.layer}`}>{LAYER_LABEL[it.layer] ?? it.layer}</Chip>
-                        <Chip title={`유형: ${it.type}`}>{TYPE_LABEL[it.type] ?? it.type}</Chip>
-                        {it.metrics.unreached && <Chip title="호출그래프 미도달(뷰 forward 미추적 오탐 가능)">미도달</Chip>}
+                        <Tag title={`레이어: ${it.layer}`}>{LAYER_LABEL[it.layer] ?? it.layer}</Tag>
+                        <Tag title={`유형: ${it.type}`}>{TYPE_LABEL[it.type] ?? it.type}</Tag>
+                        {it.metrics.unreached && <Tag title="호출그래프 미도달(뷰 forward 미추적 오탐 가능)">미도달</Tag>}
                       </div>
                     </td>
                     {hasScore && (
@@ -598,7 +568,7 @@ function RiskPanel({ report }: { report: RiskReport }) {
                     </td>
                     <td>
                       {it.factors.map((f) => (
-                        <Chip key={f}>{FACTOR_LABEL[f] ?? f}</Chip>
+                        <Tag key={f}>{FACTOR_LABEL[f] ?? f}</Tag>
                       ))}
                     </td>
                     <td className="num">{num(it.metrics.complexity)}</td>

@@ -6,6 +6,7 @@ import { useDashboardStore } from "../store";
 import { Badge, ConfBadge, ProtoTabs, StatTile } from "./proto/Proto";
 import TopBarSlot from "../app/shell/TopBarSlot";
 import InfoPopover from "./InfoPopover";
+import SearchInput from "./ui/SearchInput";
 
 /**
  * 프로그램 목록 뷰(pmpl-proto pg-programs) — 엔진 산출물을 전용 화면으로 승격한다.
@@ -348,31 +349,6 @@ function Legend({ children }: { children: ReactNode }) {
 /** sticky thead — 스크롤 컨테이너 내부 기준. */
 const STICKY_HEAD: CSSProperties = { position: "sticky", top: 0, background: "var(--color-panel)", zIndex: 2 };
 
-/** 검색 input(공용) — 활성 탭에 걸린 ?pq= 를 조작한다. */
-function SearchInput({
-  value,
-  onChange,
-  placeholder,
-  label,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder: string;
-  label: string;
-}) {
-  return (
-    <input
-      type="search"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      aria-label={label}
-      className="bg-elevated text-text-primary rounded-md border border-border-subtle outline-none focus:border-accent transition-colors"
-      style={{ fontSize: 13, padding: "6px 10px", minWidth: 200 }}
-    />
-  );
-}
-
 export default function ProgramsView() {
   const accessToken = useDashboardStore((s) => s.accessToken);
   const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
@@ -567,7 +543,8 @@ export default function ProgramsView() {
                     value={q}
                     onChange={(v) => setParam("pq", v || null, true)}
                     placeholder="이름·경로·ID·도메인·노트 검색"
-                    label="프로그램 검색(이름·경로·ID·도메인·노트)"
+                    ariaLabel="프로그램 검색(이름·경로·ID·도메인·노트)"
+                    style={{ minWidth: 200 }}
                   />
                   <select
                     value={typeFilter}
@@ -897,7 +874,8 @@ export default function ProgramsView() {
                     value={q}
                     onChange={(v) => setParam("pq", v || null, true)}
                     placeholder="방향·프로토콜·엔드포인트 검색"
-                    label="인터페이스 검색"
+                    ariaLabel="인터페이스 검색"
+                    style={{ minWidth: 200 }}
                   />
                   <div className="flex-1" />
                   <span className="text-text-muted tabular-nums" style={{ fontSize: 12 }}>
@@ -988,7 +966,8 @@ export default function ProgramsView() {
                     value={q}
                     onChange={(v) => setParam("pq", v || null, true)}
                     placeholder="잡·트리거·핸들러 검색"
-                    label="배치 검색"
+                    ariaLabel="배치 검색"
+                    style={{ minWidth: 200 }}
                   />
                   <div className="flex-1" />
                   <span className="text-text-muted tabular-nums" style={{ fontSize: 12 }}>

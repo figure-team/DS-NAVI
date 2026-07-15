@@ -7,6 +7,8 @@ import FlowSpineView from "./FlowSpineView";
 import BusinessFlowView from "./BusinessFlowView";
 import CitationChip from "./CitationChip";
 import VerdictBadge from "./VerdictBadge";
+import SearchInput from "./ui/SearchInput";
+import { Pill } from "./ui/Pill";
 import {
   buildSequentialFallback,
   businessFlowRejectedReason,
@@ -92,38 +94,6 @@ function MethodBadge({ method, size = "md" }: { method: FlowMethod; size?: "sm" 
     >
       {method}
     </span>
-  );
-}
-
-/** 필터 칩 — 프로토 .chip(pill): 기본 회색 배경, 활성 = 브랜드 틴트 + accent 글자. */
-function FilterChip({
-  label,
-  active,
-  onToggle,
-}: {
-  label: string;
-  active: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={active}
-      className="shrink-0 rounded-full cursor-pointer transition-colors"
-      style={{
-        fontSize: 12,
-        padding: "3px 9px",
-        lineHeight: 1.5,
-        fontWeight: active ? 600 : 400,
-        color: active ? "var(--color-accent)" : "var(--color-text-secondary)",
-        background: active
-          ? "color-mix(in srgb, var(--color-accent) 9%, transparent)"
-          : "var(--color-elevated)",
-      }}
-    >
-      {label}
-    </button>
   );
 }
 
@@ -522,29 +492,13 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
         {/* sidebar header — pmpl-proto .fl-list: 검색(.fl-search) + 필터 칩 + 접기 버튼 */}
         <div className="shrink-0" style={{ padding: "10px 10px 0" }}>
           <div className="flex items-center gap-2">
-            <div className="relative flex-1 min-w-0">
-              <svg
-                aria-hidden
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="absolute text-text-muted pointer-events-none"
-                style={{ left: 9, top: "50%", transform: "translateY(-50%)" }}
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-3.5-3.5" />
-              </svg>
-              <input
-                type="search"
+            <div className="flex-1 min-w-0">
+              <SearchInput
+                icon
+                width="full"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={setQuery}
                 placeholder={t.flowList.searchPlaceholder}
-                aria-label={t.flowList.searchPlaceholder}
-                className="w-full border border-border-medium bg-panel text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
-                style={{ fontSize: 12.5, padding: "6px 10px 6px 28px", borderRadius: 7 }}
               />
             </div>
             <button
@@ -561,37 +515,41 @@ export default function FlowListView({ processPanel }: { processPanel?: ReactNod
           {/* 필터 칩 — pmpl-proto: "전체" 칩 상시 + 이 도메인에 실존하는 값만.
               그룹(버킷 2+일 때만)·메소드(2+)·verdict(2+). */}
           <div className="flex flex-wrap items-center gap-1.5 mt-2">
-              <FilterChip
-                label={t.flowList.chipAll}
+              <Pill
                 active={!filterOn}
-                onToggle={clearFilters}
-              />
+                onClick={clearFilters}
+              >
+                {t.flowList.chipAll}
+              </Pill>
               {availableGroups.length > 1 &&
                 availableGroups.map((g) => (
-                  <FilterChip
+                  <Pill
                     key={`g:${g}`}
-                    label={groupLabel[g]}
                     active={groupSel.has(g)}
-                    onToggle={() => toggleIn(groupSel, g, setGroupSel)}
-                  />
+                    onClick={() => toggleIn(groupSel, g, setGroupSel)}
+                  >
+                    {groupLabel[g]}
+                  </Pill>
                 ))}
               {availableMethods.length > 1 &&
                 availableMethods.map((m) => (
-                  <FilterChip
+                  <Pill
                     key={`m:${m}`}
-                    label={m}
                     active={methodSel.has(m)}
-                    onToggle={() => toggleIn(methodSel, m, setMethodSel)}
-                  />
+                    onClick={() => toggleIn(methodSel, m, setMethodSel)}
+                  >
+                    {m}
+                  </Pill>
                 ))}
               {availableVerdicts.length > 1 &&
                 availableVerdicts.map((v) => (
-                  <FilterChip
+                  <Pill
                     key={`v:${v}`}
-                    label={verdictLabel[v]}
                     active={verdictSel.has(v)}
-                    onToggle={() => toggleIn(verdictSel, v, setVerdictSel)}
-                  />
+                    onClick={() => toggleIn(verdictSel, v, setVerdictSel)}
+                  >
+                    {verdictLabel[v]}
+                  </Pill>
                 ))}
           </div>
           {/* 결과 카운트 + 초기화 — 필터 활성 시에만(정직한 축소 표기). */}

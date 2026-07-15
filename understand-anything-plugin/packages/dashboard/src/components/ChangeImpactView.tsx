@@ -9,6 +9,7 @@ import InfoPopover, { type InfoRow } from "./InfoPopover";
 import { Chip, UnresolvedModal } from "./data-map/UnresolvedChips";
 import type { DbUnresolved } from "./data-map/types";
 import type { BadgeTone } from "./proto/Proto";
+import SearchInput from "./ui/SearchInput";
 
 /**
  * 변경 · 영향 분석 뷰(pmpl-proto pg-change 정합) — impact.json 을 CR 단위 화면으로 승격한다.
@@ -1031,13 +1032,11 @@ export default function ChangeImpactView() {
 
               {/* 툴바 — 파일 검색 + viaKind 필터(?q=&via=). 검색 활성 시 12행 캡 해제(전량 도달). */}
               <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 10 }}>
-                <input
-                  type="search"
+                <SearchInput
                   value={searchParams.get("q") ?? ""}
-                  onChange={(e) => setParam("q", e.target.value || null, true)}
+                  onChange={(v) => setParam("q", v || null, true)}
                   placeholder="파일 경로 검색"
-                  className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-                  style={{ padding: "6px 12px", fontSize: 12.5, width: 170 }}
+                  width={170}
                 />
                 <select
                   value={viaFilter ?? ""}

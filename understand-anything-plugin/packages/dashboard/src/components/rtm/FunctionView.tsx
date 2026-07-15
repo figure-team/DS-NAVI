@@ -7,6 +7,7 @@ import { EvidencePopover, Hl, Pill, STICKY_TH, Tile, confChip, rowKeyHandler } f
 import type { EvPopoverState } from "./shared";
 import { BORDER, CONF, CONF_TITLE, COLS, FAINT, GOLD, GOLD_DIM, NFR, OK, STATE_COLOR, STATE_LABEL, pct } from "./types";
 import type { CellKey, Confidence, FunctionRow } from "./types";
+import SearchInput from "../ui/SearchInput";
 
 const TH_STYLE: React.CSSProperties = { ...STICKY_TH, padding: "8px 12px", borderBottom: "1px solid var(--color-border-medium)", color: "var(--color-text-muted)", textAlign: "left", whiteSpace: "nowrap", fontSize: 11.5, fontWeight: 650 };
 
@@ -155,13 +156,11 @@ export default function FunctionView() {
 
       {/* gap3: 검색(?q=) · 상태·신뢰도 필터 */}
       <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 16 }}>
-        <input
-          type="search"
+        <SearchInput
           value={q}
-          onChange={(e) => setParam("q", e.target.value || null, true)}
+          onChange={(v) => setParam("q", v || null, true)}
           placeholder="기능·셀 내용 검색"
-          className="rounded-lg border border-border-medium bg-panel text-text-primary placeholder:text-text-muted"
-          style={{ padding: "6px 12px", fontSize: 12.5, width: 200 }}
+          width={200}
         />
         <select value={fstate ?? ""} onChange={(e) => setParam("fstate", e.target.value || null)} className="rounded-lg border border-border-medium bg-panel text-text-secondary" style={{ padding: "6px 10px", fontSize: 12.5 }}>
           <option value="">상태 전체</option>

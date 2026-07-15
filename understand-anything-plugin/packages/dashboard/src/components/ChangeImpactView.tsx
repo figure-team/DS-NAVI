@@ -160,6 +160,11 @@ interface HistoryEntry {
   gitCommit: string | null;
   /** 스냅샷으로 확보된 파일명 — impact.json 없으면 열람 불가(실패 job 등). */
   files: string[];
+  /**
+   * 이 실행이 루트 슬롯(.spec/map/impact.json)을 갱신했나. 부재 = true(하위호환).
+   * false = 요청별 실행(추적표 인테이크의 코드영향 검증) — 열람은 되지만 슬롯의 주인은 아니다.
+   */
+  rootSlot?: boolean;
 }
 
 type Status = "loading" | "ready" | "empty" | "error";
@@ -455,8 +460,14 @@ export default function ChangeImpactView() {
 
   // 원장 최신 done 항목(원장은 최신이 앞). 루트 슬롯은 정의상 "가장 최근 성공 job 의 산출" 이라
   // 이 한 건만 대조하면 충분하다 — 어긋나면 원장 밖 실행이 슬롯을 덮어쓴 것.
+  // ★ 단 `rootSlot === false` 인 항목(추적표 인테이크의 요청별 실행)은 **슬롯을 안 건드린다** →
+  //   대조 대상에서 뺀다. 안 빼면 그 항목이 최신 자리를 차지해 지문이 어긋나고, 멀쩡한 슬롯이
+  //   "기록 없는 분석" 으로 오판된다(설계: RTM_INTAKE_WORKSPACE_DESIGN.md §2.3).
   const newestDone = useMemo(
-    () => history.find((e) => e.status === "done" && e.files.includes("impact.json")) ?? null,
+    () =>
+      history.find(
+        (e) => e.status === "done" && e.files.includes("impact.json") && (e.rootSlot ?? true),
+      ) ?? null,
     [history],
   );
   const [newestIdent, setNewestIdent] = useState<string | null>(null);

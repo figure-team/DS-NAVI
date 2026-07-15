@@ -1197,7 +1197,10 @@ function handleImpactAnalyzePost(
 }
 
 // ── ktds(WT-E): 영향 분석 히스토리 — job 종료 시 원장 append + 산출물 스냅샷 ─────
-// 대시보드가 띄운 분석만 기록한다(CLI 직접 실행은 서버가 관찰하지 못함 — 정직한 범위).
+// 대시보드가 띄운 분석을 기록한다(임의 CLI 직접 실행은 서버가 관찰하지 못함 — 정직한 범위).
+// 예외: 인테이크의 코드영향 검증(P6)은 `rtm-intake.mjs code-impact` 가 **스스로** 같은 형식으로
+// 원장에 append 한다(rootSlot:false). 설계: RTM_INTAKE_WORKSPACE_DESIGN.md §2.3 "한 번 돌리고
+// 두 곳에서 본다" — 그 실행은 루트 슬롯을 갱신하지 않으므로 원장 항목이 rootSlot 으로 구분된다.
 // 원장: <root>/.understand-anything/impact-history/ledger.json (최신이 앞, 상한 초과분 삭제)
 // 스냅샷: <root>/.understand-anything/impact-history/<jobId>/{impact,impact-verify-report,impact-overlay}.json
 const IMPACT_HISTORY_MAX = 50;
@@ -1221,6 +1224,14 @@ interface ImpactHistoryEntry {
   gitCommit: string | null;
   /** 스냅샷으로 확보된 파일명 — 프론트가 열람 가능 여부를 판단. */
   files: string[];
+  /**
+   * 이 실행이 루트 슬롯(.spec/map/impact.json)을 갱신했나. 부재 = true(하위호환 — 원장 도입
+   * 당시엔 대시보드 실행만 있었고 전부 루트 슬롯을 썼다). 인테이크의 요청별 실행은 false.
+   * 프론트의 "기록 없는 분석" 판정이 **루트 슬롯을 쓴 최신 항목**만 대조하도록 가르는 축이다
+   * (ChangeImpactView.tsx `newestDone`) — 없으면 요청별 실행이 최신 자리를 뺏어 무오염인
+   * 슬롯을 고아로 오판한다.
+   */
+  rootSlot: boolean;
 }
 
 function impactHistoryDir(projectRoot: string): string {
@@ -1285,6 +1296,7 @@ function recordImpactHistory(projectRoot: string, job: ImpactJob): void {
       status: job.status === "done" && files.includes("impact.json") ? "done" : "failed",
       gitCommit,
       files,
+      rootSlot: true, // 서버가 띄운 /understand-impact 는 정의상 루트 슬롯을 갱신한다
     };
     for (const drop of appendLedgerEntry(dir, entry, IMPACT_HISTORY_MAX)) {
       try {

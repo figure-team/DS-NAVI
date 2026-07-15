@@ -93,6 +93,9 @@ export type {
   CreationParams,
 } from './supplement-a.js'
 export { verifyAnchorExists } from './verify.js'
+// 추적표 flow → 시드 결정론 조인(P6). RTM_IMPACT_GATE_DESIGN.md §6.3 — 시드 범위는 entryPoint 만.
+export { resolveFlowSeeds, TO_BE_FN_PREFIX } from './rtm-seeds.js'
+export type { FlowSeedResolution } from './rtm-seeds.js'
 export {
   CHANGE_IMPACT_FILENAME,
   CHANGE_IMPACT_DOC_ID,

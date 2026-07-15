@@ -3,7 +3,7 @@ docId: 02_architecture
 title: 아키텍처 설계서
 methodology: as-built
 status: DRAFT
-sourceCommit: null
+sourceCommit: dfbb9822f7c17f41a39e96704f4ea4f455580278
 evidenceRate: 0.976
 ---
 

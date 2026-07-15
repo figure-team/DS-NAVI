@@ -3,7 +3,7 @@ docId: si-위험모듈리포트
 title: SI 위험모듈리포트
 methodology: si-standard
 status: DRAFT
-sourceCommit: null
+sourceCommit: dfbb9822f7c17f41a39e96704f4ea4f455580278
 evidenceRate: 0.45714285714285713
 ---
 
@@ -63,7 +63,7 @@ risk-report.json(W4 결정론 스캔)의 지표 정의·가중치·정규화 규
 | 16 | PGM-COM-f9a3f312 | Product | 공통/기타 | account+cart+catalog+order | 0.55 | 중 | 9 | 71 | 1 | 2 | 0 |  | 팬인, 복잡도 | [확정] | `src/main/java/org/mybatis/jpetstore/domain/Product.java:1` |
 | 17 | PGM-MAP-81a3e7d5 | ItemMapper | SQL매퍼 | account+cart+catalog+order | 0.55 | 하 | [미확인] | 82 | 1 | 1 | 0 |  | 팬인, LOC | [추정] | `src/main/resources/org/mybatis/jpetstore/mapper/ItemMapper.xml:1` |
 | 18 | PGM-SVC-5f5bf3cb | AccountService | 서비스 | account | 0.54 | 하 | 5 | 75 | 1 | 2 | 1 |  | 팬인, 팬아웃 | [확정] | `src/main/java/org/mybatis/jpetstore/service/AccountService.java:1` |
-| 19 | PGM-SCR-dbbf9812 | ViewOrder | 화면 | web-inf | 0.51 | 하 | [미확인] | 173 | 1 | 0 | 0 | 미도달 | LOC, 팬아웃 | [추정] | `src/main/webapp/WEB-INF/jsp/order/ViewOrder.jsp:1` |
+| 19 | PGM-SCR-dbbf9812 | ViewOrder | 화면 | order | 0.51 | 하 | [미확인] | 173 | 1 | 0 | 0 | 미도달 | LOC, 팬아웃 | [추정] | `src/main/webapp/WEB-INF/jsp/order/ViewOrder.jsp:1` |
 | 20 | PGM-DAO-867b6414 | ItemMapper | DAO | account+cart+catalog+order | 0.48 | 하 | 4 | 38 | 1 | 5 | 1 |  | 팬인, 팬아웃 | [확정] | `src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java:1` |
 
 ## 지표 커버리지
@@ -77,6 +77,6 @@ risk-report.json(W4 결정론 스캔)의 지표 정의·가중치·정규화 규
 | 제외(테스트) | 18 | 위험 랭킹 오염 방지 — 분리 계상 | [추정] |  |
 | 등급 분포 | 상 6 · 중 10 · 하 36 | 상대 밴드(상위 10%/30%) — 절대 판정 아님 | [추정] |  |
 | 복잡도 측정 | 24/52 | 미측정(확장자별): jsp 20, xml 8 | [추정] |  |
-| 변경빈도 측정 | 52/52 | git 이력 기준(앵커 dfbb9822f7c17f41a39e96704f4ea4f455580278) | [추정] |  |
+| 변경빈도 측정 | 52/52 | git 이력 기준(앵커 d51826fcf3b5618e4a5fc6f5fa1657de3c390ad6) | [추정] |  |
 | 무분산 지표 | 변경빈도 | 전 파일 동일값 — 랭킹 변별 기여 없음(가중합 제외). 예: 단일 벤더링 커밋의 변경빈도 | [추정] |  |
 | 미도달 | 20/52 | 점수 비반영 플래그 — 뷰 forward(JSP) 미추적 한계로 오탐 가능, 데드코드 판정은 사람 확인 | [추정] |  |

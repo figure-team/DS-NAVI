@@ -3,7 +3,7 @@ docId: si-단위테스트시나리오
 title: SI 단위테스트시나리오
 methodology: si-standard
 status: DRAFT
-sourceCommit: null
+sourceCommit: dfbb9822f7c17f41a39e96704f4ea4f455580278
 evidenceRate: 0
 ---
 

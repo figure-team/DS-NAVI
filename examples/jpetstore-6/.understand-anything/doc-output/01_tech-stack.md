@@ -3,7 +3,7 @@ docId: 01_tech-stack
 title: 기술 스택
 methodology: as-built
 status: DRAFT
-sourceCommit: null
+sourceCommit: dfbb9822f7c17f41a39e96704f4ea4f455580278
 evidenceRate: 0.9230769230769231
 ---
 

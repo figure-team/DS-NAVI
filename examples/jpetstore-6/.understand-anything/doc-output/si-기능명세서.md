@@ -3,7 +3,7 @@ docId: si-기능명세서
 title: SI 기능명세서
 methodology: si-standard
 status: DRAFT
-sourceCommit: null
+sourceCommit: dfbb9822f7c17f41a39e96704f4ea4f455580278
 evidenceRate: 1
 ---
 

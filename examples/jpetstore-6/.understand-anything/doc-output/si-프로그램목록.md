@@ -3,7 +3,7 @@ docId: si-프로그램목록
 title: SI 프로그램목록
 methodology: si-standard
 status: DRAFT
-sourceCommit: null
+sourceCommit: dfbb9822f7c17f41a39e96704f4ea4f455580278
 evidenceRate: 0.9905660377358491
 ---
 
@@ -53,27 +53,27 @@ stats.excluded 에 기록됩니다(전수 오독 방지). PGM_ID 는 내용 파�
 | PGM-SCR-6c5edc23 | CartActionBean | [미확인] | cart | 화면 | api | 150 | [확정] | `src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java:1` |
 | PGM-SCR-1de6f314 | CatalogActionBean | [미확인] | catalog | 화면 | api | 219 | [확정] | `src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java:1` |
 | PGM-SCR-fc9c602d | OrderActionBean | [미확인] | order | 화면 | api | 197 | [확정] | `src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java:1` |
-| PGM-SCR-3b60f781 | EditAccountForm | [미확인] | web-inf [추정] | 화면 | unknown | 48 | [확정] | `src/main/webapp/WEB-INF/jsp/account/EditAccountForm.jsp:1` |
-| PGM-SCR-17377901 | IncludeAccountFields | [미확인] | web-inf [추정] | 화면 | unknown | 87 | [확정] | `src/main/webapp/WEB-INF/jsp/account/IncludeAccountFields.jsp:1` |
-| PGM-SCR-4e391b64 | NewAccountForm | [미확인] | web-inf [추정] | 화면 | unknown | 47 | [확정] | `src/main/webapp/WEB-INF/jsp/account/NewAccountForm.jsp:1` |
-| PGM-SCR-42f29104 | SignonForm | [미확인] | web-inf [추정] | 화면 | unknown | 34 | [확정] | `src/main/webapp/WEB-INF/jsp/account/SignonForm.jsp:1` |
-| PGM-SCR-3c93f7f6 | Cart | [미확인] | web-inf [추정] | 화면 | unknown | 105 | [확정] | `src/main/webapp/WEB-INF/jsp/cart/Cart.jsp:1` |
-| PGM-SCR-54cf59fc | Checkout | [미확인] | web-inf [추정] | 화면 | unknown | 76 | [확정] | `src/main/webapp/WEB-INF/jsp/cart/Checkout.jsp:1` |
-| PGM-SCR-f9a81dbb | IncludeMyList | [미확인] | web-inf [추정] | 화면 | unknown | 32 | [확정] | `src/main/webapp/WEB-INF/jsp/cart/IncludeMyList.jsp:1` |
-| PGM-SCR-a2276880 | Category | [미확인] | web-inf [추정] | 화면 | unknown | 50 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/Category.jsp:1` |
-| PGM-SCR-340aa6e6 | Item | [미확인] | web-inf [추정] | 화면 | unknown | 72 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/Item.jsp:1` |
-| PGM-SCR-b1ada8ee | Main | [미확인] | web-inf [추정] | 화면 | unknown | 92 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/Main.jsp:1` |
-| PGM-SCR-807f6244 | Product | [미확인] | web-inf [추정] | 화면 | unknown | 77 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/Product.jsp:1` |
-| PGM-SCR-2fc8e576 | SearchProducts | [미확인] | web-inf [추정] | 화면 | unknown | 62 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/SearchProducts.jsp:1` |
-| PGM-SCR-9d95f4c3 | Error | [미확인] | web-inf [추정] | 화면 | unknown | 22 | [확정] | `src/main/webapp/WEB-INF/jsp/common/Error.jsp:1` |
-| PGM-SCR-699ba88b | IncludeBottom | [미확인] | web-inf [추정] | 화면 | unknown | 36 | [확정] | `src/main/webapp/WEB-INF/jsp/common/IncludeBottom.jsp:1` |
-| PGM-SCR-9a011004 | IncludeTop | [미확인] | web-inf [추정] | 화면 | unknown | 131 | [확정] | `src/main/webapp/WEB-INF/jsp/common/IncludeTop.jsp:1` |
-| PGM-SCR-ed0c6c14 | ConfirmOrder | [미확인] | web-inf [추정] | 화면 | unknown | 122 | [확정] | `src/main/webapp/WEB-INF/jsp/order/ConfirmOrder.jsp:1` |
-| PGM-SCR-d0ad3de3 | ListOrders | [미확인] | web-inf [추정] | 화면 | unknown | 47 | [확정] | `src/main/webapp/WEB-INF/jsp/order/ListOrders.jsp:1` |
-| PGM-SCR-26b9e12b | NewOrderForm | [미확인] | web-inf [추정] | 화면 | unknown | 91 | [확정] | `src/main/webapp/WEB-INF/jsp/order/NewOrderForm.jsp:1` |
-| PGM-SCR-e3e1963d | ShippingForm | [미확인] | web-inf [추정] | 화면 | unknown | 68 | [확정] | `src/main/webapp/WEB-INF/jsp/order/ShippingForm.jsp:1` |
-| PGM-SCR-dbbf9812 | ViewOrder | [미확인] | web-inf [추정] | 화면 | unknown | 173 | [확정] | `src/main/webapp/WEB-INF/jsp/order/ViewOrder.jsp:1` |
-| PGM-SCR-f1c1b2e3 | web | [미확인] | web-inf | 화면 | api | 64 | [확정] | `src/main/webapp/WEB-INF/web.xml:1` |
+| PGM-SCR-3b60f781 | EditAccountForm | [미확인] | account [추정] | 화면 | unknown | 48 | [확정] | `src/main/webapp/WEB-INF/jsp/account/EditAccountForm.jsp:1` |
+| PGM-SCR-17377901 | IncludeAccountFields | [미확인] | account [추정] | 화면 | unknown | 87 | [확정] | `src/main/webapp/WEB-INF/jsp/account/IncludeAccountFields.jsp:1` |
+| PGM-SCR-4e391b64 | NewAccountForm | [미확인] | account [추정] | 화면 | unknown | 47 | [확정] | `src/main/webapp/WEB-INF/jsp/account/NewAccountForm.jsp:1` |
+| PGM-SCR-42f29104 | SignonForm | [미확인] | account [추정] | 화면 | unknown | 34 | [확정] | `src/main/webapp/WEB-INF/jsp/account/SignonForm.jsp:1` |
+| PGM-SCR-3c93f7f6 | Cart | [미확인] | cart [추정] | 화면 | unknown | 105 | [확정] | `src/main/webapp/WEB-INF/jsp/cart/Cart.jsp:1` |
+| PGM-SCR-54cf59fc | Checkout | [미확인] | cart [추정] | 화면 | unknown | 76 | [확정] | `src/main/webapp/WEB-INF/jsp/cart/Checkout.jsp:1` |
+| PGM-SCR-f9a81dbb | IncludeMyList | [미확인] | cart [추정] | 화면 | unknown | 32 | [확정] | `src/main/webapp/WEB-INF/jsp/cart/IncludeMyList.jsp:1` |
+| PGM-SCR-a2276880 | Category | [미확인] | catalog [추정] | 화면 | unknown | 50 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/Category.jsp:1` |
+| PGM-SCR-340aa6e6 | Item | [미확인] | catalog [추정] | 화면 | unknown | 72 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/Item.jsp:1` |
+| PGM-SCR-b1ada8ee | Main | [미확인] | catalog [추정] | 화면 | unknown | 92 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/Main.jsp:1` |
+| PGM-SCR-807f6244 | Product | [미확인] | catalog [추정] | 화면 | unknown | 77 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/Product.jsp:1` |
+| PGM-SCR-2fc8e576 | SearchProducts | [미확인] | catalog [추정] | 화면 | unknown | 62 | [확정] | `src/main/webapp/WEB-INF/jsp/catalog/SearchProducts.jsp:1` |
+| PGM-SCR-9d95f4c3 | Error | [미확인] | [미확인] | 화면 | unknown | 22 | [확정] | `src/main/webapp/WEB-INF/jsp/common/Error.jsp:1` |
+| PGM-SCR-699ba88b | IncludeBottom | [미확인] | [미확인] | 화면 | unknown | 36 | [확정] | `src/main/webapp/WEB-INF/jsp/common/IncludeBottom.jsp:1` |
+| PGM-SCR-9a011004 | IncludeTop | [미확인] | [미확인] | 화면 | unknown | 131 | [확정] | `src/main/webapp/WEB-INF/jsp/common/IncludeTop.jsp:1` |
+| PGM-SCR-ed0c6c14 | ConfirmOrder | [미확인] | order [추정] | 화면 | unknown | 122 | [확정] | `src/main/webapp/WEB-INF/jsp/order/ConfirmOrder.jsp:1` |
+| PGM-SCR-d0ad3de3 | ListOrders | [미확인] | order [추정] | 화면 | unknown | 47 | [확정] | `src/main/webapp/WEB-INF/jsp/order/ListOrders.jsp:1` |
+| PGM-SCR-26b9e12b | NewOrderForm | [미확인] | order [추정] | 화면 | unknown | 91 | [확정] | `src/main/webapp/WEB-INF/jsp/order/NewOrderForm.jsp:1` |
+| PGM-SCR-e3e1963d | ShippingForm | [미확인] | order [추정] | 화면 | unknown | 68 | [확정] | `src/main/webapp/WEB-INF/jsp/order/ShippingForm.jsp:1` |
+| PGM-SCR-dbbf9812 | ViewOrder | [미확인] | order [추정] | 화면 | unknown | 173 | [확정] | `src/main/webapp/WEB-INF/jsp/order/ViewOrder.jsp:1` |
+| PGM-SCR-f1c1b2e3 | web | [미확인] | web | 화면 | api | 64 | [확정] | `src/main/webapp/WEB-INF/web.xml:1` |
 | PGM-SVC-5f5bf3cb | AccountService | [미확인] | account | 서비스 | service | 75 | [확정] | `src/main/java/org/mybatis/jpetstore/service/AccountService.java:1` |
 | PGM-SVC-2d117c4e | CatalogService | [미확인] | 공용(account+cart+catalog) | 서비스 | service | 90 | [확정] | `src/main/java/org/mybatis/jpetstore/service/CatalogService.java:1` |
 | PGM-SVC-d564b236 | OrderService | [미확인] | order | 서비스 | service | 132 | [확정] | `src/main/java/org/mybatis/jpetstore/service/OrderService.java:1` |

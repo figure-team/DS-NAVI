@@ -4,17 +4,6 @@
     "files": [
       {
         "citation": {
-          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-          "line": 59
-        },
-        "minDepth": 1,
-        "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
-        "viaKinds": [
-          "field-type"
-        ]
-      },
-      {
-        "citation": {
           "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
           "line": 34
         },
@@ -51,8 +40,8 @@
       },
       {
         "citation": {
-          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-          "line": 56
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 45
         },
         "minDepth": 1,
         "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
@@ -62,8 +51,8 @@
       },
       {
         "citation": {
-          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-          "line": 42
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 37
         },
         "minDepth": 1,
         "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AbstractActionBean.java",
@@ -108,121 +97,70 @@
     "mapper-xml"
   ],
   "fanInThreshold": 24,
-  "gitCommit": "dfbb9822f7c17f41a39e96704f4ea4f455580278",
-  "needsReview": [
-    {
-      "reason": "비-Java 시드(xml) — edges가 java 기반이라 역방향 영향 빈약, host 보강 권장",
-      "ref": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml"
-    },
-    {
-      "reason": "비-Java 시드(xml) — edges가 java 기반이라 역방향 영향 빈약, host 보강 권장",
-      "ref": "src/main/webapp/WEB-INF/web.xml"
-    }
-  ],
+  "gitCommit": "50ab1fc7e7c2cbe45a19b4e0673ae36dc7114210",
+  "needsReview": [],
   "overEdges": {
     "crossCheckDiff": [],
     "hubNodes": [],
-    "importOnlyCount": 3
+    "importOnlyCount": 4
   },
   "schemaVersion": 1,
   "seeds": [
     {
       "confidence": "CONFIRMED",
       "origin": "path",
-      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java"
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java"
     },
     {
       "confidence": "CONFIRMED",
       "origin": "path",
-      "relPath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java"
-    },
-    {
-      "confidence": "CONFIRMED",
-      "origin": "path",
-      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
-    },
-    {
-      "confidence": "CONFIRMED",
-      "origin": "path",
-      "relPath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml"
-    },
-    {
-      "confidence": "CONFIRMED",
-      "origin": "path",
-      "relPath": "src/main/webapp/WEB-INF/web.xml"
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
     }
   ],
   "upstream": {
     "api": [
       {
         "confidence": "CONFIRMED_AI",
-        "filePath": "src/main/webapp/WEB-INF/web.xml",
-        "handler": "net.sourceforge.stripes.controller.DispatcherServlet",
-        "id": "route:ANY *.action",
-        "line": 60,
+        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "handler": "CartActionBean#addItemToCart",
+        "id": "route:ANY /actions/Cart.action?addItemToCart",
+        "line": 68,
         "targetKind": "route",
         "via": "both"
       },
       {
         "confidence": "CONFIRMED_AI",
-        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-        "handler": "AccountActionBean#signonForm",
-        "id": "route:ANY /actions/Account.action",
-        "line": 149,
+        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "handler": "CartActionBean#checkOut",
+        "id": "route:ANY /actions/Cart.action?checkOut",
+        "line": 141,
         "targetKind": "route",
         "via": "both"
       },
       {
         "confidence": "CONFIRMED_AI",
-        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-        "handler": "AccountActionBean#editAccount",
-        "id": "route:ANY /actions/Account.action?editAccount",
+        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "handler": "CartActionBean#removeItemFromCart",
+        "id": "route:ANY /actions/Cart.action?removeItemFromCart",
+        "line": 94,
+        "targetKind": "route",
+        "via": "both"
+      },
+      {
+        "confidence": "CONFIRMED_AI",
+        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "handler": "CartActionBean#updateCartQuantities",
+        "id": "route:ANY /actions/Cart.action?updateCartQuantities",
+        "line": 116,
+        "targetKind": "route",
+        "via": "both"
+      },
+      {
+        "confidence": "CONFIRMED_AI",
+        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "handler": "CartActionBean#viewCart",
+        "id": "route:ANY /actions/Cart.action?viewCart",
         "line": 137,
-        "targetKind": "route",
-        "via": "both"
-      },
-      {
-        "confidence": "CONFIRMED_AI",
-        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-        "handler": "AccountActionBean#editAccountForm",
-        "id": "route:ANY /actions/Account.action?editAccountForm",
-        "line": 128,
-        "targetKind": "route",
-        "via": "both"
-      },
-      {
-        "confidence": "CONFIRMED_AI",
-        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-        "handler": "AccountActionBean#newAccount",
-        "id": "route:ANY /actions/Account.action?newAccount",
-        "line": 115,
-        "targetKind": "route",
-        "via": "both"
-      },
-      {
-        "confidence": "CONFIRMED_AI",
-        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-        "handler": "AccountActionBean#newAccountForm",
-        "id": "route:ANY /actions/Account.action?newAccountForm",
-        "line": 106,
-        "targetKind": "route",
-        "via": "both"
-      },
-      {
-        "confidence": "CONFIRMED_AI",
-        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-        "handler": "AccountActionBean#signoff",
-        "id": "route:ANY /actions/Account.action?signoff",
-        "line": 184,
-        "targetKind": "route",
-        "via": "both"
-      },
-      {
-        "confidence": "CONFIRMED_AI",
-        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
-        "handler": "AccountActionBean#signon",
-        "id": "route:ANY /actions/Account.action?signon",
-        "line": 159,
         "targetKind": "route",
         "via": "both"
       }
@@ -230,42 +168,25 @@
     "domains": [
       {
         "confidence": "INFERRED",
-        "domainId": "domain:account",
-        "key": "account",
-        "name": "account"
+        "domainId": "domain:cart",
+        "key": "cart",
+        "name": "cart"
       },
       {
         "confidence": "INFERRED",
         "domainId": "domain:order",
         "key": "order",
         "name": "order"
-      },
-      {
-        "confidence": "INFERRED",
-        "domainId": "domain:web-inf",
-        "key": "web-inf",
-        "name": "web-inf"
       }
     ],
     "files": [
       {
         "citation": {
-          "filePath": "src/test/java/org/mybatis/jpetstore/mapper/AccountMapperTest.java",
-          "line": 36
+          "filePath": "src/test/java/org/mybatis/jpetstore/web/actions/CartActionBeanTest.java",
+          "line": 34
         },
         "minDepth": 1,
-        "relPath": "src/test/java/org/mybatis/jpetstore/mapper/AccountMapperTest.java",
-        "viaKinds": [
-          "injection"
-        ]
-      },
-      {
-        "citation": {
-          "filePath": "src/test/java/org/mybatis/jpetstore/service/AccountServiceTest.java",
-          "line": 37
-        },
-        "minDepth": 1,
-        "relPath": "src/test/java/org/mybatis/jpetstore/service/AccountServiceTest.java",
+        "relPath": "src/test/java/org/mybatis/jpetstore/web/actions/CartActionBeanTest.java",
         "viaKinds": [
           "field-type"
         ]
@@ -274,93 +195,63 @@
     "flows": [
       {
         "confidence": "INFERRED",
-        "domainId": "domain:web-inf",
-        "domainKey": "web-inf",
-        "domainName": "web-inf",
-        "flowId": "flow:ANY *.action",
-        "routeId": "route:ANY *.action",
+        "domainId": "domain:cart",
+        "domainKey": "cart",
+        "domainName": "cart",
+        "flowId": "flow:ANY /actions/Cart.action?addItemToCart",
+        "routeId": "route:ANY /actions/Cart.action?addItemToCart",
         "via": "step",
-        "viaStepId": "step:ANY *.action:src/main/webapp/WEB-INF/web.xml"
+        "viaStepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
       },
       {
         "confidence": "INFERRED",
-        "domainId": "domain:account",
-        "domainKey": "account",
-        "domainName": "account",
-        "flowId": "flow:ANY /actions/Account.action",
-        "routeId": "route:ANY /actions/Account.action",
+        "domainId": "domain:cart",
+        "domainKey": "cart",
+        "domainName": "cart",
+        "flowId": "flow:ANY /actions/Cart.action?checkOut",
+        "routeId": "route:ANY /actions/Cart.action?checkOut",
         "via": "step",
-        "viaStepId": "step:ANY /actions/Account.action:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+        "viaStepId": "step:ANY /actions/Cart.action?checkOut:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
       },
       {
         "confidence": "INFERRED",
-        "domainId": "domain:account",
-        "domainKey": "account",
-        "domainName": "account",
-        "flowId": "flow:ANY /actions/Account.action?editAccount",
-        "routeId": "route:ANY /actions/Account.action?editAccount",
+        "domainId": "domain:cart",
+        "domainKey": "cart",
+        "domainName": "cart",
+        "flowId": "flow:ANY /actions/Cart.action?removeItemFromCart",
+        "routeId": "route:ANY /actions/Cart.action?removeItemFromCart",
         "via": "step",
-        "viaStepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java"
+        "viaStepId": "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
       },
       {
         "confidence": "INFERRED",
-        "domainId": "domain:account",
-        "domainKey": "account",
-        "domainName": "account",
-        "flowId": "flow:ANY /actions/Account.action?editAccountForm",
-        "routeId": "route:ANY /actions/Account.action?editAccountForm",
+        "domainId": "domain:cart",
+        "domainKey": "cart",
+        "domainName": "cart",
+        "flowId": "flow:ANY /actions/Cart.action?updateCartQuantities",
+        "routeId": "route:ANY /actions/Cart.action?updateCartQuantities",
         "via": "step",
-        "viaStepId": "step:ANY /actions/Account.action?editAccountForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+        "viaStepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
       },
       {
         "confidence": "INFERRED",
-        "domainId": "domain:account",
-        "domainKey": "account",
-        "domainName": "account",
-        "flowId": "flow:ANY /actions/Account.action?newAccount",
-        "routeId": "route:ANY /actions/Account.action?newAccount",
+        "domainId": "domain:cart",
+        "domainKey": "cart",
+        "domainName": "cart",
+        "flowId": "flow:ANY /actions/Cart.action?viewCart",
+        "routeId": "route:ANY /actions/Cart.action?viewCart",
         "via": "step",
-        "viaStepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java"
-      },
-      {
-        "confidence": "INFERRED",
-        "domainId": "domain:account",
-        "domainKey": "account",
-        "domainName": "account",
-        "flowId": "flow:ANY /actions/Account.action?newAccountForm",
-        "routeId": "route:ANY /actions/Account.action?newAccountForm",
-        "via": "step",
-        "viaStepId": "step:ANY /actions/Account.action?newAccountForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
-      },
-      {
-        "confidence": "INFERRED",
-        "domainId": "domain:account",
-        "domainKey": "account",
-        "domainName": "account",
-        "flowId": "flow:ANY /actions/Account.action?signoff",
-        "routeId": "route:ANY /actions/Account.action?signoff",
-        "via": "step",
-        "viaStepId": "step:ANY /actions/Account.action?signoff:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
-      },
-      {
-        "confidence": "INFERRED",
-        "domainId": "domain:account",
-        "domainKey": "account",
-        "domainName": "account",
-        "flowId": "flow:ANY /actions/Account.action?signon",
-        "routeId": "route:ANY /actions/Account.action?signon",
-        "via": "step",
-        "viaStepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java"
+        "viaStepId": "step:ANY /actions/Cart.action?viewCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
       },
       {
         "confidence": "INFERRED",
         "domainId": "domain:order",
         "domainKey": "order",
         "domainName": "order",
-        "flowId": "flow:ANY /actions/Order.action?listOrders",
-        "routeId": "route:ANY /actions/Order.action?listOrders",
+        "flowId": "flow:ANY /actions/Order.action?newOrder",
+        "routeId": "route:ANY /actions/Order.action?newOrder",
         "via": "step",
-        "viaStepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+        "viaStepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
       },
       {
         "confidence": "INFERRED",
@@ -370,17 +261,7 @@
         "flowId": "flow:ANY /actions/Order.action?newOrderForm",
         "routeId": "route:ANY /actions/Order.action?newOrderForm",
         "via": "step",
-        "viaStepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
-      },
-      {
-        "confidence": "INFERRED",
-        "domainId": "domain:order",
-        "domainKey": "order",
-        "domainName": "order",
-        "flowId": "flow:ANY /actions/Order.action?viewOrder",
-        "routeId": "route:ANY /actions/Order.action?viewOrder",
-        "via": "step",
-        "viaStepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+        "viaStepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
       }
     ],
     "persistence": {
@@ -564,14 +445,6 @@
       "mappers": [
         {
           "citation": null,
-          "namespace": "org.mybatis.jpetstore.mapper.AccountMapper",
-          "owners": [
-            "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
-          ],
-          "relPath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml"
-        },
-        {
-          "citation": null,
           "namespace": "org.mybatis.jpetstore.mapper.CategoryMapper",
           "owners": [
             "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
@@ -605,14 +478,6 @@
       "note": "SQL 파일은 콜체인 간선에 등장하지 않아 도달성 밖입니다(census 인벤토리로만 후보화). 매퍼 XML이 건드리는 테이블/컬럼은 tableCandidateSlots의 SQL 슬라이스에서 인용 의무로 추출하세요.",
       "sqlFiles": [],
       "tableCandidateSlots": [
-        {
-          "mapperRelPath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
-          "sqlSlice": {
-            "endLine": 133,
-            "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
-            "startLine": 1
-          }
-        },
         {
           "mapperRelPath": "src/main/resources/org/mybatis/jpetstore/mapper/CategoryMapper.xml",
           "sqlSlice": {

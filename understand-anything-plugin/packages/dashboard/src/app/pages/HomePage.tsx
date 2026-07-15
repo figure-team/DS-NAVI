@@ -329,7 +329,7 @@ export default function HomePage() {
             </EntryCard>
           )}
           <EntryCard
-            to="/structure"
+            to="/domains?tab=structure"
             icon={iconStructure}
             title="코드 구조"
             description="레이어드 아키텍처 그래프. 영향도·위험 오버레이를 지원합니다."

@@ -3,7 +3,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
-import { Badge, ConfBadge, Ev, PageHead, ProtoTabs, StatTile } from "./proto/Proto";
+import { Badge, ConfBadge, Ev, ProtoTabs, StatTile } from "./proto/Proto";
+import TopBarSlot from "../app/shell/TopBarSlot";
+import InfoPopover from "./InfoPopover";
 import type { BadgeTone } from "./proto/Proto";
 
 /* ────────────────────────── 데이터 타입 (실물 .spec/map/*.json) ────────────────────────── */
@@ -625,7 +627,7 @@ function RiskPanel({ report }: { report: RiskReport }) {
         )}
 
         <div className="flex items-center flex-wrap" style={{ gap: 10, padding: "12px 4px 0", fontSize: 12.5 }}>
-          <Link to="/structure?overlay=risk" className="no-underline" style={{ color: "var(--color-status-info)" }}>
+          <Link to="/domains?tab=structure&overlay=risk" className="no-underline" style={{ color: "var(--color-status-info)" }}>
             구조 그래프에서 위험 오버레이로 보기 →
           </Link>
           {weightList && <span className="text-text-muted">· 점수 = {weightList} 가중 합산(백분위 정규화)</span>}
@@ -881,11 +883,19 @@ export default function QualityView() {
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-      <PageHead
-        title="품질 · 위험"
-        meta="risk-report · coverage · 골든셋 회귀 — PM 주간보고용 정량 지표"
-        actions={<LinkBtn to="/deliverables/si-위험모듈리포트">md 리포트</LinkBtn>}
-      />
+      {/* 메뉴 헤더 제거(2026-07-15) — 정보는 TopBar 정보 팝오버(ⓘ), md 리포트 링크는 액션 슬롯으로. */}
+      <TopBarSlot>
+        <InfoPopover
+          title="품질 정보"
+          rows={[
+            { label: "산출물", value: "risk-report · coverage" },
+            { label: "용도", value: "골든셋 회귀 · PM 주간보고 정량 지표" },
+          ]}
+        />
+      </TopBarSlot>
+      <TopBarSlot slot="actions">
+        <LinkBtn to="/deliverables/si-위험모듈리포트">md 리포트</LinkBtn>
+      </TopBarSlot>
 
       <ProtoTabs<QualTab>
         tabs={[

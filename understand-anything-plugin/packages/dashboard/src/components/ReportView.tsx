@@ -2,7 +2,9 @@ import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useDashboardStore } from "../store";
-import { Badge, BtnOutline, PageHead, StatTile } from "./proto/Proto";
+import { Badge, BtnOutline, StatTile } from "./proto/Proto";
+import TopBarSlot from "../app/shell/TopBarSlot";
+import InfoPopover from "./InfoPopover";
 
 /**
  * ktds-fork (메뉴 개편 2차 · 보고서 개선): 실적 보고서 뷰 — pmpl-proto pg-report 재현.
@@ -414,7 +416,16 @@ export default function ReportView() {
     return (
       <div className="report-print-root flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
         <style>{PRINT_CSS}</style>
-        <PageHead title="실적 보고서" meta="work-summary · git + 원장(audit) 수집 사실만 — 날조 0 원칙" />
+        <TopBarSlot>
+          <InfoPopover
+            title="보고서 정보"
+            rows={[
+              { label: "산출물", value: "work-summary" },
+              { label: "수집", value: "git + 원장(audit) 사실만" },
+              { label: "원칙", value: "날조 0" },
+            ]}
+          />
+        </TopBarSlot>
         <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 20px" }}>
           <p className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
             실적 요약 없음 — <code>/understand-report</code> 실행으로 생성하세요.
@@ -427,7 +438,16 @@ export default function ReportView() {
   if (!data) {
     return (
       <div className="report-print-root flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-        <PageHead title="실적 보고서" meta="work-summary · git + 원장(audit) 수집 사실만 — 날조 0 원칙" />
+        <TopBarSlot>
+          <InfoPopover
+            title="보고서 정보"
+            rows={[
+              { label: "산출물", value: "work-summary" },
+              { label: "수집", value: "git + 원장(audit) 사실만" },
+              { label: "원칙", value: "날조 0" },
+            ]}
+          />
+        </TopBarSlot>
         <ReportSkeleton />
       </div>
     );
@@ -454,47 +474,40 @@ export default function ReportView() {
   return (
     <div className="report-print-root flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
       <style>{PRINT_CSS}</style>
-      <PageHead
-        title="실적 보고서"
-        meta="work-summary · git + 원장(audit) 수집 사실만 — 날조 0 원칙"
-        actions={
-          <div className="flex items-center gap-2" data-report-noprint>
-            <Badge tone="mut" title={rerunHint(range)}>
-              {rangeLabel(range)}
-            </Badge>
-            <BtnOutline onClick={handleCopy} title="요약 문장을 클립보드로 복사(고정 한국어 문형)">
-              {copied ? "복사됨" : "요약 복사"}
-            </BtnOutline>
-            <BtnOutline onClick={handlePrint} title="현재 보고서를 인쇄(셸 숨김)">
-              인쇄
-            </BtnOutline>
-            <BtnOutline
-              onClick={() => navigate(`/deliverables/${encodeURIComponent("si-실적요약보고서")}`)}
-              title="산출물의 실적 요약 보고서(md · xlsx 병기)로 이동"
-            >
-              md
-            </BtnOutline>
-          </div>
-        }
-      />
-
-      {/* ── git 신뢰도 경고(불완전 수치 명시) ── */}
-      {gitWarn && (
-        <div
-          className="rounded-[10px] card-shadow"
-          style={{
-            padding: "11px 15px",
-            marginBottom: 14,
-            fontSize: 12.5,
-            lineHeight: 1.55,
-            color: "var(--color-status-warn)",
-            background: "color-mix(in srgb, var(--color-status-warn) 10%, transparent)",
-            border: "1px solid color-mix(in srgb, var(--color-status-warn) 34%, transparent)",
-          }}
-        >
-          <b>수집 신뢰도 주의</b> — {gitWarn}
+      {/* 메뉴 헤더 제거(2026-07-15) — 정보는 TopBar 정보 팝오버(ⓘ), 기간 배지+인쇄/복사/md 툴바는 액션 슬롯으로. */}
+      <TopBarSlot>
+        <InfoPopover
+          title="보고서 정보"
+          rows={[
+            { label: "산출물", value: "work-summary" },
+            { label: "수집", value: "git + 원장(audit) 사실만" },
+            { label: "원칙", value: "날조 0" },
+            // git 신뢰도 경고 → 참고 행(? 호버로 사유). 구 본문 warn 배너 대체(2026-07-15).
+            ...(gitWarn ? [{ label: "신뢰도", value: "주의", hint: gitWarn }] : []),
+          ]}
+        />
+      </TopBarSlot>
+      <TopBarSlot slot="actions">
+        <div className="flex items-center gap-2" data-report-noprint>
+          <Badge tone="mut" title={rerunHint(range)}>
+            {rangeLabel(range)}
+          </Badge>
+          <BtnOutline onClick={handleCopy} title="요약 문장을 클립보드로 복사(고정 한국어 문형)">
+            {copied ? "복사됨" : "요약 복사"}
+          </BtnOutline>
+          <BtnOutline onClick={handlePrint} title="현재 보고서를 인쇄(셸 숨김)">
+            인쇄
+          </BtnOutline>
+          <BtnOutline
+            onClick={() => navigate(`/deliverables/${encodeURIComponent("si-실적요약보고서")}`)}
+            title="산출물의 실적 요약 보고서(md · xlsx 병기)로 이동"
+          >
+            md
+          </BtnOutline>
         </div>
-      )}
+      </TopBarSlot>
+
+      {/* git 신뢰도 경고는 TopBar 정보 팝오버(ⓘ) '신뢰도' 참고 행으로 이관(2026-07-15). */}
 
       {/* ── 하이라이트 ── */}
       <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "16px 18px", marginBottom: 14 }}>

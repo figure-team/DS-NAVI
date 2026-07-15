@@ -1,10 +1,12 @@
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 import { useViewMode } from "../../hooks/useViewMode";
 import ImpactJobIndicator from "../../components/ImpactJobIndicator";
 import Omnibox from "./Omnibox";
+import { TOPBAR_SLOT_ID, TOPBAR_ACTIONS_SLOT_ID } from "./TopBarSlot";
+import { iconForMode } from "./menuIcons";
 
 interface Props {
   accessToken: string;
@@ -20,9 +22,8 @@ export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
   const mode = useViewMode();
 
   const sectionLabel =
-    // 메뉴 병합(2026-07-14): 구조(/structure)는 업무 지도 안 탭 — 섹션명도 승계.
-    mode === "structural" ? t.drawer.domain
-    : mode === "domain" ? t.drawer.domain
+    // 라우트 통일: 구조는 /domains?tab=structure 라 mode 는 "domain" 하나로 승계.
+    mode === "domain" ? t.drawer.domain
     : mode === "docs" ? "산출물"
     : mode === "rtm" ? "추적표"
     : mode === "screenspec" ? "화면설계서"
@@ -36,24 +37,25 @@ export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
 
   return (
     <header className="h-14 shrink-0 flex items-center gap-3 px-4 bg-surface border-b border-border-subtle">
-      {/* 좌측 — 시안: 홈 아이콘 + 섹션명 */}
-      <Link
-        to="/"
-        title="홈"
-        className="shrink-0 flex items-center justify-center w-7 h-7 rounded-md text-text-secondary hover:text-text-primary hover:bg-elevated transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-          <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
-        </svg>
-      </Link>
-      {mode === "domain" ? (
-        <DomainBreadcrumb />
-      ) : (
-        <span className="text-sm font-semibold text-text-primary whitespace-nowrap">
-          {sectionLabel}
+      {/* 좌측 — 현재 섹션 아이콘 + 섹션명. 구 고정 홈 아이콘을 메뉴별 아이콘으로 교체하고
+          아이콘↔이름을 한 그룹(gap-1.5)으로 묶어 간격을 좁힘(2026-07-15). */}
+      <div className="min-w-0 flex items-center gap-1.5">
+        <span className="shrink-0 w-[18px] h-[18px] flex items-center justify-center text-text-secondary">
+          {iconForMode(mode)}
         </span>
-      )}
+        {mode === "domain" ? (
+          <DomainBreadcrumb />
+        ) : (
+          <span className="text-sm font-semibold text-text-primary whitespace-nowrap">
+            {sectionLabel}
+          </span>
+        )}
+      </div>
+      {/* 페이지별 메타/액션 슬롯 — 각 메뉴가 자기 페이지 헤더 대신 여기로 텔레포트(2026-07-15). */}
+      <div id={TOPBAR_SLOT_ID} className="min-w-0 flex items-center gap-2" />
       <div className="flex-1 min-w-0" />
+      {/* 페이지별 기능 버튼 슬롯 — 옴니박스 앞(오른쪽). 구 PageHead actions 이관(2026-07-15). */}
+      <div id={TOPBAR_ACTIONS_SLOT_ID} className="shrink-0 flex items-center gap-2" />
       {/* 옴니박스 — ⌘K 전역 검색 (시안) */}
       <Omnibox accessToken={accessToken} />
       {/* 영향도 분석 진행 인디케이터 + 완료 토스트 — 전역 레이어(항상 마운트). */}

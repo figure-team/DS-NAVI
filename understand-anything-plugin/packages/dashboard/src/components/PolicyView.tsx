@@ -4,7 +4,9 @@ import { Link, useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../store";
 import { dataUrl } from "../shared/api/client";
-import { Badge, BtnAccent, ConfBadge, PageHead, ProtoTabs, StatTile } from "./proto/Proto";
+import { Badge, ConfBadge, ProtoTabs, StatTile } from "./proto/Proto";
+import TopBarSlot from "../app/shell/TopBarSlot";
+import InfoPopover from "./InfoPopover";
 import type { BadgeTone, ConfKind } from "./proto/Proto";
 import CitationChip from "./CitationChip";
 
@@ -427,7 +429,7 @@ export default function PolicyView() {
   if (signals === null) {
     return (
       <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-        <PageHead title="정책서" />
+        {/* 메뉴 헤더 제거(2026-07-15) — 신호 부재/오류 상태라 TopBar 정보 팝오버도 생략. */}
         {signalsErr ? (
           <NoticeCard title="정책 신호를 불러오지 못했습니다">
             <code>policy-signals.json</code> 응답 오류 ({signalsErr}). understand-map 스캔·dev 서버 상태를 확인하세요.
@@ -444,7 +446,7 @@ export default function PolicyView() {
   if (total === 0) {
     return (
       <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-        <PageHead title="정책서" />
+        {/* 메뉴 헤더 제거(2026-07-15) — 신호 부재/오류 상태라 TopBar 정보 팝오버도 생략. */}
         <NoticeCard title="정책 신호 없음">
           CLI에서 <code>/understand-policy</code>를 실행해 신호를 먼저 추출하세요.
         </NoticeCard>
@@ -454,23 +456,22 @@ export default function PolicyView() {
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-      <PageHead
-        title="정책서"
-        meta={
-          <>
-            policy-signals <b className="text-text-primary tabular-nums">{total}</b>건 (검증·권한{" "}
-            <b className="text-text-primary tabular-nums">{codeSignals.length}</b> · 용어{" "}
-            <b className="text-text-primary tabular-nums">{glossary.length}</b> · 데이터 무결성{" "}
-            <b className="text-text-primary tabular-nums">{dataSignals.length}</b>) · 근거 file:line · 규범 서술은
-            [추정] 마킹
-          </>
-        }
-        actions={
-          <BtnAccent disabled title="후속 예정 — 인수 시나리오는 대조 탭 참조">
-            기존 정책서 가져오기
-          </BtnAccent>
-        }
-      />
+      {/* 메뉴 헤더 제거(2026-07-15) — 신호 카운트는 TopBar 정보 팝오버(ⓘ)로 이관.
+          비활성 '기존 정책서 가져오기'(후속 예정 placeholder) 버튼은 제거. */}
+      <TopBarSlot>
+        <InfoPopover
+          title="정책 신호 정보"
+          width={250}
+          rows={[
+            { label: "산출물", value: "policy-signals" },
+            {
+              label: "신호",
+              value: `${total}건 (검증·권한 ${codeSignals.length} · 용어 ${glossary.length} · 데이터무결성 ${dataSignals.length})`,
+            },
+            { label: "근거", value: "file:line · 규범 서술 [추정] 마킹" },
+          ]}
+        />
+      </TopBarSlot>
 
       <ProtoTabs<PolicyTab>
         tabs={[

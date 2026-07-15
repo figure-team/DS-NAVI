@@ -248,7 +248,6 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
     ? cards.filter((c) => (processesByDomain.get(c.id)?.length ?? 0) === 0)
     : [];
 
-
   return (
     <div className="h-full w-full flex flex-col overflow-hidden">
       {/* 헤더(타이틀 + 통계 meta + 펼치기 토글)는 제거됐다(2026-07-15 사용자 확정) —

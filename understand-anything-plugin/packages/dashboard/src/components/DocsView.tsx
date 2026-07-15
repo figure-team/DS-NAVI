@@ -5,7 +5,9 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { useDashboardStore } from "../store";
-import { Badge, BtnAccent, BtnOutline, PageHead } from "./proto/Proto";
+import { Badge, BtnAccent, BtnOutline } from "./proto/Proto";
+import TopBarSlot from "../app/shell/TopBarSlot";
+import InfoPopover from "./InfoPopover";
 
 type MdComponents = ComponentProps<typeof ReactMarkdown>["components"];
 
@@ -432,18 +434,19 @@ export default function DocsView() {
 
   return (
     <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
-      <PageHead
-        title="산출물"
-        meta={
-          docs.length > 0 ? (
-            <>
-              산출물 <b className="text-text-primary tabular-nums">{docs.length}</b>종 · 확정{" "}
-              <b className="text-text-primary tabular-nums">{confirmedCount}</b> · 초안{" "}
-              <b className="text-text-primary tabular-nums">{docs.length - confirmedCount}</b>
-            </>
-          ) : undefined
-        }
-      />
+      {/* 메뉴 헤더 제거(2026-07-15) — 산출물 카운트는 TopBar 정보 팝오버(ⓘ)로 이관. */}
+      {docs.length > 0 && (
+        <TopBarSlot>
+          <InfoPopover
+            title="산출물 정보"
+            rows={[
+              { label: "산출물", value: `${docs.length}종` },
+              { label: "확정", value: `${confirmedCount}` },
+              { label: "초안", value: `${docs.length - confirmedCount}` },
+            ]}
+          />
+        </TopBarSlot>
+      )}
 
       {/* 프로토 .docs — 좌 270px 트리 카드 + 우 mdoc 카드 */}
       <div className="grid items-start grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)]" style={{ gap: 14 }}>

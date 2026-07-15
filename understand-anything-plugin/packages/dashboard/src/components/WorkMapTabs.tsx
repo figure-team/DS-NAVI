@@ -3,10 +3,10 @@ import { useNavigate } from "react-router";
 import { useI18n } from "../contexts/I18nContext";
 
 /**
- * 업무 지도 메뉴 상단 탭 — 메뉴 병합(2026-07-14 사용자 결정): 구조 메뉴를 업무
- * 지도 안 탭으로 흡수. 탭 = 라우트(시스템 구성도 ↔ /domains, 구조 ↔ /structure)라
- * 기존 /structure 딥링크(?overlay= 브리지·홈 카드·품질 링크)가 전부 그대로 유효하고,
- * NavRail 은 두 경로 모두에서 업무 지도를 활성으로 표시한다.
+ * 업무 지도 메뉴 상단 탭 — 메뉴 병합(2026-07-14): 구조 메뉴를 업무 지도 안 탭으로 흡수.
+ * 라우트 통일(2026-07-15): 다른 메뉴처럼 1라우트 + 쿼리 탭 — 시스템 구성도=/domains,
+ * 구조=/domains?tab=structure(구 /structure 라우트는 리다이렉트만). 같은 페이지라
+ * 탭 전환 시 언마운트가 없다. NavRail 은 /domains 항목이 자연히 활성.
  *
  * 하위탭 승격(2026-07-15 사용자 결정): 도메인 워크스페이스 안에 있던 하위 탭
  * [업무 흐름도 / 기능]을 없애고 「기능」을 이 상단 행으로 올렸다. 도메인 밖(지도
@@ -44,7 +44,12 @@ export default function WorkMapTabs({
       // 도메인 안에서의 map 탭 = 업무 흐름도(?view=business). 밖에서는 지도 랜딩.
       select: () => (onDomainView ? onDomainView("business") : navigate("/domains")),
     },
-    { key: "structure" as const, label: t.drawer.structural, select: () => navigate("/structure") },
+    {
+      key: "structure" as const,
+      label: t.drawer.structural,
+      // 라우트 통일: 구조는 같은 /domains 의 ?tab=structure 탭(별도 /structure 라우트 은퇴).
+      select: () => navigate("/domains?tab=structure"),
+    },
     // {count} 는 탭에 안 쓴다(갯수는 목록 그룹 헤더 담당) — 기존 하위탭 규약 유지.
     ...(onDomainView
       ? [

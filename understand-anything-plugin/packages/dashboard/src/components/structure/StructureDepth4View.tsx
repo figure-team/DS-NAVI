@@ -63,7 +63,7 @@ export default function StructureDepth4View({ domainId, bf }: { domainId: string
       <div className="shrink-0 flex items-center gap-2 border-b border-border-subtle bg-panel" style={{ padding: "8px 20px" }}>
         <button
           type="button"
-          onClick={() => navigate(`/structure?domain=${encodeURIComponent(domainId)}`)}
+          onClick={() => navigate(`/domains?tab=structure&domain=${encodeURIComponent(domainId)}`)}
           className="text-text-muted hover:text-accent transition-colors cursor-pointer font-semibold"
           style={{ fontSize: 12 }}
         >

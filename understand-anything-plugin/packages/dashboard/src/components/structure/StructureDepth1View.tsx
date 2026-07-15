@@ -70,7 +70,7 @@ export default function StructureDepth1View({
   );
 
   const onOpenNode = (id: string) => {
-    navigate(`/structure?group=${encodeURIComponent(id)}`);
+    navigate(`/domains?tab=structure&group=${encodeURIComponent(id)}`);
   };
   const emptyLabel = crossDomainEdges === null ? t.structure.crossDomainUnavailable : t.structure.noCrossGroupEdges;
 

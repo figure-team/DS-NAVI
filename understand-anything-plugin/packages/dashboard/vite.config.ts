@@ -69,6 +69,9 @@ const SPEC_MAP_ENDPOINTS = new Set([
   "/coverage.json",
   "/work-summary.json",
   "/impact.json",
+  // impact.json 의 검증 리포트 — 이게 빠져 있어 최신 슬롯 화면에서 GROUNDED 배지가
+  // 통째로 누락됐다(SPA 폴백 index.html 이 200 으로 응답 → r.json() 실패 → 조용히 무시).
+  "/impact-verify-report.json",
   "/policy-signals.json",
   "/policy-reconcile.json",
 ]);

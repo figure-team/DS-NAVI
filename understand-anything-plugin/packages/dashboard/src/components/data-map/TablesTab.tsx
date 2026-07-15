@@ -1,15 +1,15 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router";
 
-import { useDashboardStore } from "../../store";
 import { Badge } from "../proto/Proto";
 import { fkComponent, fkEdgePairs } from "./erd-component";
 import RowSample, { ROW_SAMPLE_MAX } from "./RowSample";
-import { baseName, isPk, len, originBadge } from "./types";
+import { isPk, len, originBadge } from "./types";
 import type { DbColumn, DbSchema, DbTable } from "./types";
 import SearchInput from "../ui/SearchInput";
 import EmptyCard from "../ui/EmptyCard";
 import { Tag } from "../ui/Tag";
+import EvidenceLink from "../ui/EvidenceLink";
 
 /**
  * 테이블 탭(개편 ②) — 검색(테이블명·comment·컬럼명·컬럼 comment) + 무의존 가상화
@@ -17,22 +17,6 @@ import { Tag } from "../ui/Tag";
  * 컬럼 표는 colgroup 고정 폭(테이블 간 셀 폭 통일), FK 배지는 참조 테이블로 이동,
  * 근거(file:line)는 클릭 시 코드 뷰어.
  */
-
-/** 클릭 가능한 근거(file:line) — 코드 뷰어 오픈. CrudTab 근거 popover 와 동일 경로. */
-function EvLink({ relPath, line }: { relPath: string; line: number }) {
-  const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
-  return (
-    <button
-      type="button"
-      onClick={() => openCodeViewerAt(relPath, line)}
-      title={`${relPath}:${line} — 코드 뷰어로 열기`}
-      className="cursor-pointer bg-transparent border-0 text-text-muted hover:text-[var(--color-status-info)] hover:underline"
-      style={{ fontFamily: "var(--font-mono)", fontSize: 11, padding: 0 }}
-    >
-      {baseName(relPath)}:{line}
-    </button>
-  );
-}
 
 interface TableMatch {
   table: DbTable;
@@ -221,7 +205,7 @@ export function TableDetail({
             </span>
           )}
           <div className="flex-1" />
-          {table.relPath && <EvLink relPath={table.relPath} line={table.line} />}
+          {table.relPath && <EvidenceLink file={table.relPath} line={table.line} basename />}
           {erdComponent && (
             <button
               type="button"
@@ -302,7 +286,7 @@ export function TableDetail({
               </span>
             )}
             <div className="flex-1" />
-            {table.relPath && <EvLink relPath={table.relPath} line={table.rows[0].line} />}
+            {table.relPath && <EvidenceLink file={table.relPath} line={table.rows[0].line} basename />}
           </div>
           <RowSample table={table} showEvidence={false} />
         </div>

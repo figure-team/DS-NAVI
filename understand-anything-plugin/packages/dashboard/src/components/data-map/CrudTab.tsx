@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
-import { useDashboardStore } from "../../store";
 import { Badge, BtnOutline } from "../proto/Proto";
 import type { BadgeTone } from "../proto/Proto";
-import type { CrudEvidence, CrudMatrix, CrudRow } from "./types";
+import { EvidencePopover } from "../rtm/shared";
+import type { EvPopoverState } from "../rtm/shared";
+import type { CrudMatrix, CrudRow } from "./types";
 import SearchInput from "../ui/SearchInput";
 
 /**
@@ -45,23 +46,15 @@ const STICKY_HEAD: React.CSSProperties = { position: "sticky", top: 0, backgroun
 const STICKY_COL: React.CSSProperties = { position: "sticky", left: 0, background: "var(--color-panel)", zIndex: 1 };
 const STICKY_CORNER: React.CSSProperties = { ...STICKY_HEAD, left: 0, zIndex: 3 };
 
-interface EvPopover {
-  key: string;
-  evidence: CrudEvidence[];
-  right: number;
-  top: number;
-}
-
 export default function CrudTab({ crud }: { crud: CrudMatrix }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
   const crudq = searchParams.get("crudq") ?? "";
   const crudTable = searchParams.get("crudTable");
   const pivot = searchParams.get("pivot") === "table";
   // 입력값은 로컬 state 가 원본 — searchParams 를 value 로 직결하면 라우터 갱신 리렌더가
   // 한글 IME 조합을 끊는다(조합 중 글자 깨짐). URL 은 필터 계산·딥링크용 사본.
   const [qInput, setQInput] = useState(crudq);
-  const [evOpen, setEvOpen] = useState<EvPopover | null>(null);
+  const [evOpen, setEvOpen] = useState<EvPopoverState | null>(null);
   const [emptyOpen, setEmptyOpen] = useState(false);
 
   const tableCols = useMemo(() => crud.columns.slice(1), [crud.columns]);
@@ -251,43 +244,8 @@ export default function CrudTab({ crud }: { crud: CrudMatrix }) {
         )}
       </div>
 
-      {/* 근거 popover — 항목 클릭 시 코드 뷰어(file:line) */}
-      {evOpen && (
-        <>
-          <button
-            type="button"
-            aria-label="근거 목록 닫기"
-            onClick={() => setEvOpen(null)}
-            style={{ position: "fixed", inset: 0, zIndex: 30, background: "transparent", border: 0, cursor: "default" }}
-          />
-          <div
-            className="rounded-lg border border-border-medium bg-panel card-shadow"
-            style={{ position: "fixed", right: evOpen.right, top: evOpen.top, zIndex: 31, padding: 6, maxWidth: 420 }}
-          >
-            {evOpen.evidence.map((e, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => {
-                  openCodeViewerAt(e.file, e.line);
-                  setEvOpen(null);
-                }}
-                className="block w-full text-left cursor-pointer bg-transparent border-0 hover:bg-elevated rounded-md"
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11.5,
-                  padding: "5px 8px",
-                  color: "var(--color-status-info)",
-                  whiteSpace: "normal",
-                  wordBreak: "break-all",
-                }}
-              >
-                {e.file}:{e.line}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+      {/* 근거 popover — 항목 클릭 시 코드 뷰어(file:line). rtm/shared 공용 컴포넌트. */}
+      {evOpen && <EvidencePopover pop={evOpen} onClose={() => setEvOpen(null)} />}
 
       {/* 빈 행 접기 — DB 접근 미검출 기능(노이즈 분리, 침묵 누락 금지) */}
       {emptyRows.length > 0 && (

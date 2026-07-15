@@ -88,22 +88,6 @@ export function rowKeyHandler(open: () => void) {
   };
 }
 
-/** 근거 file:line 링크 — 클릭 시 코드 뷰어를 그 위치로 연다(title 툴팁 대체, gap2). */
-export function EvidenceLink({ e }: { e: Evidence }) {
-  const openCodeViewerAt = useDashboardStore((s) => s.openCodeViewerAt);
-  return (
-    <button
-      type="button"
-      onClick={(ev) => { ev.stopPropagation(); openCodeViewerAt(e.file, e.line ?? 1); }}
-      title={`${e.file}${e.line !== null ? `:${e.line}` : ""} — 코드 뷰어로 열기`}
-      className="cursor-pointer bg-transparent border-0 hover:bg-elevated rounded"
-      style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--color-status-info)", padding: "1px 4px", wordBreak: "break-all", textAlign: "left" }}
-    >
-      {e.line === null ? e.file : `${e.file}:${e.line}`}
-    </button>
-  );
-}
-
 export interface EvPopoverState { key: string; evidence: Evidence[]; right: number; top: number }
 
 /** 근거 popover(고정 위치) — CrudTab 과 동일 패턴: 백드롭 클릭 닫기 + 항목 클릭 → 코드 뷰어. */

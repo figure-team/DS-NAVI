@@ -1,6 +1,7 @@
 import TrustBadge from "../TrustBadge";
+import EvidenceLink from "../ui/EvidenceLink";
 import { useRtm } from "./context";
-import { EvidenceLink, Pill, useEscClose } from "./shared";
+import { Pill, useEscClose } from "./shared";
 import { FAINT, GOLD_DIM, TS_KIND, WARN } from "./types";
 
 // ── 시나리오 드로어 — G/W/T 검토·편집·확정(기능 드로어와 동형) ──
@@ -48,7 +49,7 @@ export default function ScenarioDrawer() {
           ))}
         </tbody></table>
         {/* gap2: 근거는 평문 대신 클릭 → 코드 뷰어(file:line). */}
-        {s.evidence.length > 0 && <div className="flex flex-wrap items-center" style={{ gap: 4, marginTop: 8 }}><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT }}>근거:</span>{s.evidence.map((e, i) => <EvidenceLink key={i} e={e} />)}</div>}
+        {s.evidence.length > 0 && <div className="flex flex-wrap items-center" style={{ gap: 4, marginTop: 8 }}><span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT }}>근거:</span>{s.evidence.map((e, i) => <EvidenceLink key={i} file={e.file} line={e.line ?? 1} stopPropagation />)}</div>}
         {s.notes.length > 0 && <div style={{ marginTop: 8 }}>{s.notes.map((n, i) => <div key={i} style={{ fontSize: 11.5, color: WARN }}>⚠ {n}</div>)}</div>}
       </div>
     </div>

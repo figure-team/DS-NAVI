@@ -175,6 +175,55 @@ export interface Identified {
  */
 export const policyDocId = (doc: string): string => doc.replace(/\.md$/, "");
 
+// ── W5: ① 코드영향 검증 인라인 (RTM_INTAKE_WORKSPACE_DESIGN.md §2.3) ─────────
+/**
+ * `<session>/impact-run.json` — ①의 코드영향 검증 **포인터**(P6, rtm-intake.mjs:703-722).
+ * 산출 본체가 아니다: 결과는 `impact-history/<jobId>/impact.json` 스냅샷에 있고 원장에도
+ * `rootSlot:false` · `query=요청 원문`으로 기록된다. 루트 슬롯(`.spec/map/impact.json`)은
+ * 건드리지 않는다 — §2.3 "한 번 돌리고 두 곳에서 본다"(워크스페이스 ① 인라인 · `/change` 원장).
+ * 스키마 원본은 legacy-core(대시보드 의존 아님)라 여기서도 **필요한 필드만 재선언**한다.
+ */
+export interface ImpactRun {
+  jobId: string; requestId: string; query: string; gitCommit: string | null;
+  /** 시드 범위 — 현재는 `entryPoint` 고정(rtm-seeds.ts 주석: implementation 은 시드 폭발). */
+  seedScope: string;
+  seeds: { relPath: string; origin: string; confidence: string }[];
+  /** fnId → 그 flow 가 기여한 시드 파일. 시드의 출처(어느 기능이 끌어왔나)를 보이는 축. */
+  bySource: { fnId: string; relPaths: string[] }[];
+  /** 정직한 생략(§6.2) — 조용히 떨구지 않고 화면에도 그대로 옮긴다. */
+  skippedToBe: string[]; unknownFnIds: string[]; ungroundedFnIds: string[];
+}
+export interface ImpactCitation { filePath: string; line: number }
+/** citation=null 은 경로 병합 등으로 근거 라인을 못 짚은 정상 상태(ChangeImpactView:43). */
+export interface ImpactFileRef { relPath: string; minDepth?: number; citation?: ImpactCitation | null }
+/** GET /impact-history-item?id=&name=impact.json 중 인라인이 쓰는 필드만(`ImpactData` 사본). */
+export interface ImpactSnapshot {
+  upstream?: {
+    files?: ImpactFileRef[];
+    api?: { id: string; filePath: string; line: number; handler?: string; confidence?: string }[];
+    flows?: { flowId: string; domainId: string; confidence?: string }[];
+    domains?: { domainId: string; key: string; name: string; confidence?: string }[];
+    persistence?: { mappers?: { namespace: string; relPath: string; citation?: ImpactCitation | null }[] };
+  };
+  downstream?: { files?: ImpactFileRef[] };
+}
+
+/** 신규(TO-BE) 기능 id 접두 — 아직 파일이 없어 시드가 못 된다(legacy-core rtm-seeds.ts:47). */
+export const TO_BE_FN_PREFIX = "to-be:";
+/**
+ * 포인터 부재의 두 원인을 가른다 — `code-impact` 는 **시드가 0이면 impact-run.json 을 쓰지 않고
+ * 종료**한다(rtm-intake.mjs:645-650). 그래서 파일 부재만으로는 "아직 안 돌렸다"와 "돌릴 게 없다"가
+ * 구별되지 않는다. `changeset.modified` 로 되짚으면 갈린다(resolveFlowSeeds 와 같은 규칙:
+ * `to-be:` 는 파일이 없어 제외 — rtm-seeds.ts:85).
+ *
+ * 둘을 "영향 없음" 한 문구로 뭉치면 **미실행이 "영향 없음"으로 위장**한다 — §4.1 "없음 vs 못 봄"이
+ * 경고한 바로 그 오독이고, ①은 컨펌 직전 판단 자리라 대가가 크다.
+ */
+export const impactAbsenceOf = (identified: Identified | null): "notRun" | "notApplicable" => {
+  const modified = (identified?.requirements ?? []).flatMap((r) => r.changeset?.modified ?? []);
+  return modified.some((id) => !id.startsWith(TO_BE_FN_PREFIX)) ? "notRun" : "notApplicable";
+};
+
 /**
  * W2: GET /rtm-intake-sessions 원장 행 — server/rtm-sessions.ts 의 `RtmSessionSummary` 프론트 사본.
  * server/ 는 Node 전용(fs/path)이라 src/ 에서 import 하지 않는다 — ChangeImpactView 의 `HistoryEntry`

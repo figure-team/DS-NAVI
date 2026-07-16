@@ -6,6 +6,7 @@ import { dataUrl } from "../../shared/api/client";
 import type { CrudMatrix, DbSchema, DbTable } from "../data-map/types";
 import { useEscClose } from "./shared";
 import { BAD, BORDER, FAINT, OK, WARN } from "./types";
+import type { AfterSchema, AfterSchemaTable } from "./types";
 
 /**
  * ② 데이터 비포·에프터 모달 (2026-07-17 사용자 결정).
@@ -40,8 +41,57 @@ function OpBadges({ ops }: { ops: Set<string> }) {
   );
 }
 
-/** 테이블 카드 — ERD 노드의 축약(이름·PK·컬럼 수·FK 참조). after 에서만 도달 링·CRUD 배지. */
-function TableCard({ t, kind, ops, after }: { t: DbTable; kind: "hit" | "adj"; ops?: Set<string>; after: boolean }) {
+/** 신규 컬럼 칩 스트립 — modified 테이블의 에프터 카드 하단([추정] 어휘 = 점선 ok). */
+function DraftColsStrip({ draft }: { draft: AfterSchemaTable }) {
+  return (
+    <div className="flex flex-wrap items-baseline" style={{ gap: 3, borderTop: `1px dashed color-mix(in srgb, ${OK} 40%, transparent)`, paddingTop: 4, marginTop: 2 }}
+      title={draft.note ? `[추정] ${draft.note}` : "[추정] ②가 요구사항 근거로 제안한 컬럼 추가 — 확정 전 초안"}>
+      <span style={{ fontSize: 8.5, fontWeight: 700, color: OK, flex: "none" }}>+ 컬럼</span>
+      {draft.columns.map((c) => (
+        <span key={c.name} title={c.note ?? c.type ?? c.name} style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: OK, border: `1px dashed color-mix(in srgb, ${OK} 55%, transparent)`, borderRadius: 4, padding: "0 4px" }}>
+          {c.name}{c.type ? ` ${c.type}` : ""}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** 신규 테이블 카드 — 에프터 전용([추정] 점선). 비포엔 없다 — 그게 구조 diff 다. */
+function AddedTableCard({ draft }: { draft: AfterSchemaTable }) {
+  const shown = draft.columns.slice(0, 6);
+  const over = draft.columns.length - shown.length;
+  return (
+    <div className="rounded-lg bg-panel flex flex-col" style={{ width: 200, padding: "8px 11px", gap: 4, border: `1.5px dashed ${OK}`, boxShadow: `0 0 0 3px color-mix(in srgb, ${OK} 16%, transparent)` }}
+      title={draft.note ? `[추정] ${draft.note}` : "[추정] ②가 요구사항 근거로 제안한 신규 테이블 — 확정 전 초안"}>
+      <div className="flex items-center" style={{ gap: 6, minWidth: 0 }}>
+        <span className="truncate" style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 700, color: "var(--color-text-primary)" }}>{draft.name}</span>
+        <span className="ml-auto flex-none rounded-full font-bold" style={{ fontSize: 8.5, padding: "1px 5px", color: OK, background: `color-mix(in srgb, ${OK} 13%, transparent)`, border: `1px solid ${OK}` }}>+ 신규</span>
+      </div>
+      <div className="flex flex-col" style={{ gap: 1 }}>
+        {shown.map((c) => (
+          <span key={c.name} title={c.note ?? undefined} style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: "var(--color-text-secondary)" }}>
+            {c.name}{c.type ? <span style={{ color: FAINT }}> {c.type}</span> : null}
+            {draft.pk?.includes(c.name) && <span title="PK 제안" style={{ color: OK, marginLeft: 3, fontSize: 8.5 }}>PK</span>}
+          </span>
+        ))}
+        {over > 0 && <span style={{ fontSize: 9, color: FAINT }}>외 {over}컬럼</span>}
+      </div>
+      {(draft.fks ?? []).length > 0 && (
+        <div className="flex flex-wrap" style={{ gap: 3 }}>
+          {(draft.fks ?? []).map((fk, i) => (
+            <span key={i} title={`${fk.columns.join(",")} → ${fk.refTable}${fk.refColumns ? `(${fk.refColumns.join(",")})` : ""}`}
+              style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--color-layer-dao)", background: "color-mix(in srgb, var(--color-layer-dao) 9%, transparent)", borderRadius: 4, padding: "0 5px" }}>
+              → {fk.refTable}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** 테이블 카드 — ERD 노드의 축약(이름·PK·컬럼 수·FK 참조). after 에서만 도달 링·CRUD 배지·신규 컬럼. */
+function TableCard({ t, kind, ops, after, draft }: { t: DbTable; kind: "hit" | "adj"; ops?: Set<string>; after: boolean; draft?: AfterSchemaTable }) {
   const marked = after && kind === "hit";
   return (
     <div
@@ -76,6 +126,7 @@ function TableCard({ t, kind, ops, after }: { t: DbTable; kind: "hit" | "adj"; o
           ))}
         </div>
       )}
+      {after && draft && <DraftColsStrip draft={draft} />}
     </div>
   );
 }
@@ -99,10 +150,25 @@ function Pane({ label, tone, children, style }: { label: string; tone: string; c
  *  - `tables` — 도달 **테이블명** 직접 전달. 변경·영향 원장의 시드는 파일(relPath)이라 기능명이
  *    없어 CRUD 조인이 불가하다 — 스냅샷이 이미 계산한 테이블 카탈로그로 도달만 표식(연산 미상).
  */
-export default function DataCompareModal({ seedNames, tables, onClose }: { seedNames?: string[]; tables?: string[]; onClose: () => void }) {
+export default function DataCompareModal({ seedNames, tables, afterSchema, onClose }: {
+  seedNames?: string[];
+  tables?: string[];
+  /**
+   * ②의 에프터 스키마 초안(after-schema.json 파싱본, RTM_AFTER_FLOW_DESIGN.md §4) — 있으면
+   * 에프터 패널이 **신규 테이블·컬럼**([추정] 점선)까지 그려 구조 diff 가 된다. 없으면(구산출·
+   * 원장 렌즈) 도달 표식만 — after-flow 와 같은 폴백 규약.
+   */
+  afterSchema?: AfterSchema | null;
+  onClose: () => void;
+}) {
   useEscClose(onClose);
   const byName = seedNames !== undefined;
   const accessToken = useDashboardStore((s) => s.accessToken);
+  const addedTables = useMemo(() => afterSchema?.tables.filter((t) => t.change === "added") ?? [], [afterSchema]);
+  const modByName = useMemo(
+    () => new Map((afterSchema?.tables ?? []).filter((t) => t.change === "modified").map((t) => [t.name.toUpperCase(), t])),
+    [afterSchema],
+  );
   const [schema, setSchema] = useState<DbSchema | null>(null);
   const [crud, setCrud] = useState<CrudMatrix | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -149,10 +215,13 @@ export default function DataCompareModal({ seedNames, tables, onClose }: { seedN
     return { ops, unmatched };
   }, [byName, crud, seedNames, tables]);
 
-  // 서브셋 = 도달 테이블 + FK 1-hop 인접(맥락). 전체 스키마를 다 그리면 비교점이 묻힌다.
+  // 서브셋 = 도달 테이블 + 스키마 변경 제안 테이블 + FK 1-hop 인접(맥락).
+  // 전체 스키마를 다 그리면 비교점이 묻힌다. 컬럼 추가 제안 테이블은 도달이 아니어도
+  // 변경 범위이므로 hit 로 승격한다(비포에도 같은 카드가 서야 diff 가 공정하다).
   const subset = useMemo(() => {
     if (!schema) return [];
     const hit = new Set(join.ops.keys());
+    for (const t of schema.tables) if (modByName.has(t.name.toUpperCase())) hit.add(t.name);
     const adj = new Set<string>();
     for (const t of schema.tables) {
       for (const fk of t.foreignKeys ?? []) {
@@ -162,10 +231,11 @@ export default function DataCompareModal({ seedNames, tables, onClose }: { seedN
     }
     return schema.tables
       .filter((t) => hit.has(t.name) || adj.has(t.name))
-      .map((t) => ({ t, kind: (hit.has(t.name) ? "hit" : "adj") as "hit" | "adj" }));
-  }, [schema, join]);
+      .map((t) => ({ t, kind: (hit.has(t.name) ? "hit" : "adj") as "hit" | "adj", draft: modByName.get(t.name.toUpperCase()) }));
+  }, [schema, join, modByName]);
 
   const hitCount = subset.filter((s) => s.kind === "hit").length;
+  const modCount = subset.filter((s) => s.draft).length;
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-root/80 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -174,7 +244,9 @@ export default function DataCompareModal({ seedNames, tables, onClose }: { seedN
         <div className="shrink-0 flex items-center flex-wrap border-b border-border-subtle" style={{ gap: 10, padding: "12px 18px", rowGap: 6 }}>
           <h2 className="text-text-primary" style={{ fontSize: 15, fontWeight: 700, whiteSpace: "nowrap" }}>데이터 비포 · 에프터</h2>
           <span className="text-text-muted" style={{ fontSize: 11 }}>
-            도달 테이블 {hitCount} · {byName ? `시드 ${(seedNames ?? []).length}건 × CRUD 매트릭스 결정론 조인` : "원장 스냅샷의 테이블 카탈로그(연산 미상 — 시드가 파일 단위)"}
+            도달 테이블 {hitCount}
+            {afterSchema && <> · 신규 {addedTables.length} · 컬럼 추가 {modCount}</>}
+            {" · "}{byName ? `시드 ${(seedNames ?? []).length}건 × CRUD 매트릭스 결정론 조인` : "원장 스냅샷의 테이블 카탈로그(연산 미상 — 시드가 파일 단위)"}
           </span>
           <span className="flex items-center flex-wrap" style={{ gap: 9, marginLeft: 6, rowGap: 4 }}>
             <span className="flex items-center" style={{ gap: 4, fontSize: 10, color: "var(--color-text-secondary)" }}>
@@ -189,6 +261,11 @@ export default function DataCompareModal({ seedNames, tables, onClose }: { seedN
             <span className="flex items-center" style={{ gap: 4, fontSize: 10, color: "var(--color-text-secondary)" }}>
               <span aria-hidden style={{ width: 14, height: 9, borderRadius: 3, border: BORDER, opacity: 0.55 }} />인접(FK) — 도달 아님
             </span>
+            {afterSchema && (
+              <span className="flex items-center" style={{ gap: 4, fontSize: 10, color: "var(--color-text-secondary)" }} title="②가 요구사항 근거로 제안한 신규 테이블·컬럼 — 확정 전 초안">
+                <span aria-hidden style={{ width: 14, height: 9, borderRadius: 3, border: `1.5px dashed ${OK}` }} />신규 테이블·컬럼 [추정]
+              </span>
+            )}
           </span>
           <button onClick={onClose} aria-label="닫기" className="ml-auto text-text-muted hover:text-text-primary cursor-pointer" style={{ fontSize: 18, lineHeight: 1, background: "none", border: "none" }}>×</button>
         </div>
@@ -199,7 +276,7 @@ export default function DataCompareModal({ seedNames, tables, onClose }: { seedN
           <div className="flex-1 flex items-center justify-center text-text-muted" style={{ fontSize: 12.5, padding: 40, textAlign: "center", lineHeight: 1.7 }}>db-schema.json 을 읽지 못했습니다 — 데이터 메뉴가 뜨는 상태에서 다시 여세요.</div>
         ) : byName && !crud ? (
           <div className="flex-1 flex items-center justify-center text-text-muted" style={{ fontSize: 12.5, padding: 40, textAlign: "center", lineHeight: 1.7 }}>crud-matrix.json 을 읽지 못했습니다 — 기능→테이블 도달을 계산할 수 없습니다(스키마만으로는 비교 표식이 불가).</div>
-        ) : hitCount === 0 ? (
+        ) : hitCount === 0 && addedTables.length === 0 ? (
           <div className="flex-1 flex items-center justify-center" style={{ padding: 40 }}>
             <p className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.7, maxWidth: 520 }}>
               {byName ? (
@@ -217,16 +294,22 @@ export default function DataCompareModal({ seedNames, tables, onClose }: { seedN
             <Pane label="비포 — 현행 스키마" tone={OK}>
               {subset.map(({ t, kind }) => <TableCard key={t.name} t={t} kind={kind} after={false} />)}
             </Pane>
-            <Pane label="에프터 — 변경 도달 + CRUD 표식" tone={WARN} style={{ borderLeft: BORDER }}>
-              {subset.map(({ t, kind }) => <TableCard key={t.name} t={t} kind={kind} ops={join.ops.get(t.name)} after />)}
+            {/* 에프터 — 도달·CRUD 표식 + 스키마 초안([추정] 신규 테이블·컬럼). 신규 테이블은
+                비포에 없다 — 그 부재가 곧 구조 diff 다(after-flow 의 신규 활동과 같은 어휘). */}
+            <Pane label={afterSchema ? "에프터 — 변경 도달 + 스키마 초안 [추정]" : "에프터 — 변경 도달 + CRUD 표식"} tone={WARN} style={{ borderLeft: BORDER }}>
+              {subset.map(({ t, kind, draft }) => <TableCard key={t.name} t={t} kind={kind} ops={join.ops.get(t.name)} after draft={draft} />)}
+              {addedTables.map((d) => <AddedTableCard key={d.name} draft={d} />)}
             </Pane>
           </div>
         )}
 
         {/* 정직성 각주 — 미매칭 시드는 표시 범위 과소의 신호다(조용한 누락 금지). */}
         <div className="shrink-0 border-t border-border-subtle text-text-muted" style={{ padding: "7px 18px", fontSize: 10.5, lineHeight: 1.5 }}>
-          <b className="text-text-secondary">에프터</b>는 현행 스키마 위에 <b style={{ color: WARN }}>변경 도달</b>{byName ? "과 연산(CRUD)" : ""}을 표식한 것입니다 —
-          신규 컬럼·테이블(DAR)의 미래 스키마는 확정·구현 후 재분석이 반영합니다. 전체 ERD 는 데이터 메뉴에서 봅니다.
+          <b className="text-text-secondary">에프터</b>는 현행 스키마 위에 <b style={{ color: WARN }}>변경 도달</b>{byName ? "과 연산(CRUD)" : ""}
+          {afterSchema ? <>, 그리고 ②가 요구사항 근거로 제안한 <b style={{ color: OK }}>신규 테이블·컬럼([추정])</b></> : null}을 표식한 것입니다 —
+          {afterSchema
+            ? <> 스키마 초안은 <b className="text-text-secondary">검토·컨펌 전 확정이 아니며</b>, 이름·타입은 구현 설계에서 바뀔 수 있습니다.</>
+            : <> 신규 컬럼·테이블(DAR)의 미래 스키마는 확정·구현 후 재분석이 반영합니다.</>} 전체 ERD 는 데이터 메뉴에서 봅니다.
           {byName && loaded && crud && join.unmatched.length > 0 && (
             <span style={{ color: WARN }}> ⚠ CRUD 매트릭스와 매칭되지 않은 시드 {join.unmatched.length}건({join.unmatched.join(" · ")}) — 실제 도달 범위가 표시보다 넓을 수 있습니다.</span>
           )}

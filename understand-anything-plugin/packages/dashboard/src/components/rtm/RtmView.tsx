@@ -374,7 +374,7 @@ export default function RtmView() {
     identified: intake.identified, editingDoc: intake.editingDoc, setEditingDoc: intake.setEditingDoc,
     draftDoc: intake.draftDoc, setDraftDoc: intake.setDraftDoc,
     impactRun: intake.impactRun, impactData: intake.impactData, impactLoaded: intake.impactLoaded,
-    afterFlows: intake.afterFlows,
+    afterFlows: intake.afterFlows, afterSchema: intake.afterSchema,
     qaHistory: intake.qaHistory, answerQuestions: intake.answerQuestions, jobStep: intake.jobStep,
     setToast,
   };

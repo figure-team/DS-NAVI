@@ -71,7 +71,7 @@ export function CompareBtn({ label, onClick, disabled, title }: { label: string;
 }
 
 export default function ImpactStepView() {
-  const { identified, impactRun, impactData, impactLoaded, afterFlows, fnById } = useRtm();
+  const { identified, impactRun, impactData, impactLoaded, afterFlows, afterSchema, fnById } = useRtm();
   const [flowCompare, setFlowCompare] = useState(false);
   const [dataCompare, setDataCompare] = useState(false);
   const up = impactData?.upstream;
@@ -267,7 +267,7 @@ export default function ImpactStepView() {
       )}
       {dataCompare && impactRun && (
         // 이름 해석은 여기(RtmContext 보유자) 몫 — 모달은 컨텍스트 무관하게 재사용된다(/change).
-        <DataCompareModal seedNames={impactRun.bySource.map((s) => fnById(s.fnId)?.name ?? s.fnId)} onClose={() => setDataCompare(false)} />
+        <DataCompareModal seedNames={impactRun.bySource.map((s) => fnById(s.fnId)?.name ?? s.fnId)} afterSchema={afterSchema} onClose={() => setDataCompare(false)} />
       )}
     </div>
   );

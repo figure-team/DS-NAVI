@@ -47,7 +47,7 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
 | # | 단계 | 하는 일 | 산출 |
 |---|---|---|---|
 | ① | 식별 | 요청 → 요구사항 분해 + 6축 근거 + `validate`(실재 대조) | `identified.json` |
-| ② | 영향분석 | `code-impact` — 바뀔 기존 기능이 코드 어디를 건드리나 | `impact-run.json` · `after-flow.json`(에프터 도식 초안) |
+| ② | 영향분석 | `code-impact` — 바뀔 기존 기능이 코드 어디를 건드리나 | `impact-run.json` · `after-flow.json` · `after-schema.json`(에프터 초안) |
 | ③ | 목록표 | 템플릿 `01_*` | `요구사항목록표.md` |
 | ④ | 정의서 | 템플릿 `02_*` | `요구사항정의서.md` |
 | ⑤ | 명세서 | 템플릿 `03_*` — 요구사항 1건당 1파일 | `요구사항명세서_{ID}.md` ×N |
@@ -251,6 +251,16 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
      대시보드 조인 키),"nodes":[…],"edges":[…],"note"(선택 — 삽입 위치의 근거 한 줄)}]}`.
      모든 엣지 끝점은 실존 노드여야 한다 — 어긋나면 대시보드가 그 장을 통째로 기각하고
      표식 오버레이로 폴백한다(부분 렌더 금지 규약).
+5. **에프터 스키마 초안** — `<세션>/after-schema.json` (같은 설계 §4). 데이터 비포·에프터의
+   신규 테이블·컬럼. 전부 [추정].
+   - **근거**: `identified.json` 의 요구사항(특히 DAR·데이터 관련 AC)이 요구하는 데이터 변경만.
+     현행 스키마·명명 관례는 `.spec/map/db-schema.json` 을 따른다. **요구사항 근거 없는
+     테이블·컬럼 금지.**
+   - **형식**: `{"schemaVersion":1,"tables":[{"name","change":"added"|"modified",
+     "columns":[{"name","type","note"?}],"pk"?,"fks"?:[{"columns","refTable","refColumns"?}],
+     "note"(요구사항·AC id 근거)}]}`. **modified 는 추가 컬럼만** 적는다(기존 컬럼 나열 금지).
+   - 스키마 변경이 필요 없는 요청이면 **파일을 쓰지 않는다**(억지 제안 금지) — 그 사실을
+     보고에 한 줄 남긴다.
    **여기서 멈춘다.** ③~⑤ 문서는 이 영향 범위를 사람이 컨펌한 뒤에 쓰인다.
 
 ### --step 3 목록표

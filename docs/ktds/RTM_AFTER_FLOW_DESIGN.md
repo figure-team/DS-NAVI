@@ -48,7 +48,26 @@
 `− 삭제`=error 점선+취소선+옅게 · `~ 변경 기점`=warn — 범례 자동 병기. 각주가 "[추정] 초안 —
 연결 순서·분기는 검토 대상"을 상시 명시.
 
-## 3. 한계·경계
+## 3. 에프터 스키마 초안 (after-schema.json — 2026-07-17 2차, 사용자 지시)
+
+데이터 비포·에프터도 같은 패러다임: ②가 `<세션>/after-schema.json` 으로 **신규 테이블 /
+기존 테이블의 추가 컬럼**을 제안한다(SKILL §B --step 2 의 5번). 근거는 identified 요구사항
+(DAR·데이터 AC)뿐 — 무근거 테이블·컬럼 금지, 명명 관례는 현행 `db-schema.json`. **modified 는
+추가 컬럼만** 적는다. 스키마 변경이 불필요한 요청이면 **파일을 쓰지 않는다**(억지 제안 금지).
+
+```json
+{ "schemaVersion": 1, "tables": [
+  { "name": "NPAY_PAYMENT", "change": "added", "columns": [{"name","type","note"?}],
+    "pk"?, "fks"?: [{"columns","refTable","refColumns"?}], "note": "DAR-.. 근거" },
+  { "name": "ORDERS", "change": "modified", "columns": [/* 추가 컬럼만 */], "note": "AC-.." } ] }
+```
+
+소비: `rtm/types.ts parseAfterSchema`(방어 — 어긋난 항목만 제외, 유효 0건=null) → useIntake →
+`DataCompareModal afterSchema` prop. 에프터 패널: modified 테이블 카드에 `+ 컬럼` 점선 스트립,
+added 테이블은 **점선 신규 카드**(비포에 없음 = 구조 diff). 범례 "신규 테이블·컬럼 [추정]" +
+각주 "이름·타입은 구현 설계에서 바뀔 수 있음". 폴백·원장 제외는 after-flow 와 동일.
+
+## 4. 한계·경계
 
 - 원장 렌즈(/change)는 세션 산출이 아니라 after-flow 가 없다 — 표식 오버레이 유지(승격 금지).
 - 도식 정합의 기계 검증(rtm-intake.mjs validate 급)은 미구현 — 대시보드 방어 파싱이 1차 게이트.

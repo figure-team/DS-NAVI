@@ -52,16 +52,23 @@ interface BizNodeData {
   selected: boolean;
   /** flowRef 표시 라벨 — 연결된 기능(flow) 노드의 이름(사람 이름). 미해석 시 핸들러 꼬리 폴백. */
   flowLabel?: string;
-  /** 영향 도달 표식(RTM ② 비포·에프터, 2026-07-17) — impactIds 에 든 노드. warn 링 + '영향' 배지. */
-  impacted?: boolean;
+  /**
+   * 영향 표식(RTM ② 비포·에프터, 2026-07-17) — "seed"=변경 기점(①이 변경 대상으로 지목한
+   * 기능의 활동) / "reached"=영향 도달(연쇄). 시드와 도달을 한 라벨로 뭉치면 "영향 = 안
+   * 고쳐도 됨"으로 오독된다(사용자 실측 지적) — 기점을 따로 박는다.
+   */
+  mark?: "seed" | "reached";
   [key: string]: unknown;
 }
 
-/** '영향' 코너 배지 — impacted 노드 공통(활동·판단). 검토필요 ⚠(라벨 안)와 자리·형태로 구분. */
-function ImpactBadge() {
+/** 영향 코너 배지 — mark 노드 공통(활동·판단). 검토필요 ⚠(라벨 안)와 자리·형태로 구분. */
+function ImpactBadge({ mark }: { mark: "seed" | "reached" }) {
   return (
     <span
       className="absolute rounded-full font-bold"
+      title={mark === "seed"
+        ? "변경 기점(시드) — ①식별이 변경 대상으로 지목한 기능의 활동입니다"
+        : "영향 도달 — 변경 기점에서 연쇄로 닿는 활동입니다. 구현 시 함께 수정될 수 있으나, 수정 여부 판정은 엔진 산출이 아니라 여기서 단언하지 않습니다"}
       style={{
         top: -9,
         right: -9,
@@ -72,9 +79,10 @@ function ImpactBadge() {
         background: "color-mix(in srgb, var(--color-status-warn) 14%, var(--color-panel))",
         border: "1px solid var(--color-status-warn)",
         zIndex: 2,
+        whiteSpace: "nowrap",
       }}
     >
-      영향
+      {mark === "seed" ? "~ 변경 기점" : "영향"}
     </span>
   );
 }
@@ -89,11 +97,11 @@ function flowRefShort(flowRef: string): string {
 }
 
 function BizNode({ data }: NodeProps) {
-  const { biz, accent, selected, flowLabel, impacted } = data as BizNodeData;
+  const { biz, accent, selected, flowLabel, mark } = data as BizNodeData;
   const { w, h } = SIZE[biz.kind];
   const review = biz.verdict === "NEEDS_REVIEW";
   // 영향 링 — 노드 형태를 안 바꾸고(ELK 크기 고정) 바깥 글로우로 두른다.
-  const impactRing = impacted
+  const impactRing = mark
     ? "0 0 0 3px color-mix(in srgb, var(--color-status-warn) 26%, transparent)"
     : undefined;
 
@@ -130,7 +138,7 @@ function BizNode({ data }: NodeProps) {
         : "var(--color-status-info)";
     return (
       <div className="relative" style={{ width: w, height: h }}>
-        {impacted && <ImpactBadge />}
+        {mark && <ImpactBadge mark={mark} />}
         <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
         <div
           className="absolute inset-0"
@@ -183,14 +191,14 @@ function BizNode({ data }: NodeProps) {
         height: h,
         borderRadius: 10,
         border: `1px solid ${
-          selected ? accent : impacted ? "var(--color-status-warn)" : review ? "var(--color-status-warn)" : "var(--color-border-subtle)"
+          selected ? accent : mark ? "var(--color-status-warn)" : review ? "var(--color-status-warn)" : "var(--color-border-subtle)"
         }`,
         background: "var(--color-panel)",
         boxShadow: impactRing ?? "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
         padding: "6px 12px",
       }}
     >
-      {impacted && <ImpactBadge />}
+      {mark && <ImpactBadge mark={mark} />}
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
       <span
         className="text-center overflow-hidden"
@@ -301,7 +309,7 @@ function LegendRow({ glyph, text }: { glyph: React.ReactNode; text: string }) {
  * 글리프는 실제 노드 스타일의 축소판이라 색·형태가 본편과 자동 일치하지는
  * 않으므로, 노드 어휘를 바꿀 때 여기도 함께 갱신할 것.
  */
-function LegendPanel({ impactLegend }: { impactLegend?: string }) {
+function LegendPanel({ impactLegend, seedLegend }: { impactLegend?: string; seedLegend?: string }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   return (
@@ -400,7 +408,28 @@ function LegendPanel({ impactLegend }: { impactLegend?: string }) {
             }
             text={t.flowList.bfLegendGrounded}
           />
-          {/* 영향 표식 — RTM ② 비포·에프터 모달에서만 주입된다(impactIds 있는 렌더). */}
+          {/* 영향 표식 — RTM ②/변경·영향 비포·에프터 모달에서만 주입된다(impactIds/seedIds 렌더). */}
+          {seedLegend && (
+            <LegendRow
+              glyph={
+                <span
+                  aria-hidden
+                  className="rounded-full font-bold"
+                  style={{
+                    fontSize: 7.5,
+                    padding: "2px 4px",
+                    whiteSpace: "nowrap",
+                    color: "var(--color-status-warn)",
+                    background: "color-mix(in srgb, var(--color-status-warn) 14%, var(--color-panel))",
+                    border: "1px solid var(--color-status-warn)",
+                  }}
+                >
+                  ~ 변경 기점
+                </span>
+              }
+              text={seedLegend}
+            />
+          )}
           {impactLegend && (
             <LegendRow
               glyph={
@@ -513,6 +542,7 @@ export default function BusinessFlowView({
   title,
   domainName,
   impactIds,
+  seedIds,
   impactLegend,
   onOpenFlow,
 }: {
@@ -526,6 +556,12 @@ export default function BusinessFlowView({
   domainName?: string | null;
   /** 영향 도달 노드 id 집합(RTM ② 비포·에프터의 '에프터', 2026-07-17) — warn 링 + '영향' 배지. */
   impactIds?: Set<string>;
+  /**
+   * 변경 기점(시드) 노드 id 집합 — ①이 변경 대상으로 지목한 기능(flowRef)의 활동.
+   * impactIds 보다 우선 판정('~ 변경 기점' 배지). 도달과 한 라벨로 뭉치면 "영향 = 안 고쳐도 됨"
+   * 오독이 난다(사용자 실측 지적, 2026-07-17).
+   */
+  seedIds?: Set<string>;
   /** 범례의 '영향' 행 설명 — impactIds 렌더에서만 주입(로케일 6종 무접촉, RTM 은 한국어 고정 표면). */
   impactLegend?: string;
   /**
@@ -663,13 +699,13 @@ export default function BusinessFlowView({
         accent,
         selected: n.id === selectedId,
         flowLabel: n.flowRef ? (flowNameByRef.get(n.flowRef) ?? flowRefShort(n.flowRef)) : undefined,
-        impacted: impactIds?.has(n.id) ?? false,
+        mark: seedIds?.has(n.id) ? ("seed" as const) : impactIds?.has(n.id) ? ("reached" as const) : undefined,
       } satisfies BizNodeData,
       draggable: false,
       connectable: false,
       selectable: true,
     }));
-  }, [biz, layout, accent, selectedId, flowNameByRef, impactIds]);
+  }, [biz, layout, accent, selectedId, flowNameByRef, impactIds, seedIds]);
 
   const rfEdges = useMemo<Edge[]>(() => {
     if (!layout) return [];
@@ -762,7 +798,10 @@ export default function BusinessFlowView({
               elementsSelectable
             >
               <Background gap={24} size={1} />
-              <LegendPanel impactLegend={impactIds ? impactLegend : undefined} />
+              <LegendPanel
+                impactLegend={impactIds ? impactLegend : undefined}
+                seedLegend={seedIds && seedIds.size > 0 ? "변경 기점(시드) — ①이 변경 대상으로 지목한 기능의 활동" : undefined}
+              />
               {/* 우상단 툴바 — 미니맵 토글 + PNG 내보내기(한 슬롯, Panel 중복 방지). */}
               <Panel position="top-right" className="flex items-center" style={{ gap: 6 }}>
                 <button

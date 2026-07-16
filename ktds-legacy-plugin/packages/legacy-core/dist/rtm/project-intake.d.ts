@@ -1,5 +1,5 @@
 /**
- * project-intake — ⑤ RTM 단계: identified.json(2계층) → 현 rtm-requirements.json 스키마 투영(옵션 B).
+ * project-intake — ⑥ RTM 단계: identified.json(2계층) → 현 rtm-requirements.json 스키마 투영(옵션 B).
  *
  * 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §9(옵션 B 단계적 브릿지). 문서(②③④)는 2계층(요청 REQ →
  * 요구사항 SFR…)을 완전히 유지하되, 추적표(rtm.json)는 현 스키마를 유지하며 **요구사항(SFR…)을 1급

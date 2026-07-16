@@ -305,6 +305,48 @@ export declare const IntakeRequirementSchema: z.ZodObject<{
     }, z.core.$strip>>>;
 }, z.core.$strip>;
 export type IntakeRequirement = z.infer<typeof IntakeRequirementSchema>;
+/**
+ * 질문이 걸린 축 — 어느 근거 축의 모호함인가. 번들 6축(`intake-input`)과 같은 어휘를 쓰되
+ * `general`(축에 안 걸리는 요청 자체의 모호함, 예: "병행인가 대체인가")을 더한다.
+ * **분류는 선택**이다(`null` 허용) — 못 고르면 안 고르는 게 맞지, 억지 귀속은 오히려 오독시킨다.
+ */
+export declare const IntakeQuestionAxisSchema: z.ZodEnum<{
+    domain: "domain";
+    policy: "policy";
+    code: "code";
+    screen: "screen";
+    data: "data";
+    rtm: "rtm";
+    general: "general";
+}>;
+export type IntakeQuestionAxis = z.infer<typeof IntakeQuestionAxisSchema>;
+/**
+ * ① `[확인필요]` 질문 1건 — **답을 받을 자리가 있는** 질문(A1).
+ *
+ * 종전엔 `questions: z.array(z.string())` 이라 답변 필드도 귀속도 없었다. 가이드(①=PM/PL 인터뷰로
+ * 모호함 제거)가 규정한 ①의 본질이 여기 걸려 있었는데(설계서 §0), 화면이 표시만 하고 끝났다.
+ *
+ * `answer` 3상태가 아니라 **2상태**인 이유: 인용(`CitationField`)과 달리 여기엔 하위호환 딜레마가
+ * 없다. 구형 문자열 질문은 정규화 시 `answer: null`(미답)이 **정확한 사실**이다 — 답할 자리가
+ * 없었으니 안 답한 게 맞다. "안 물어봤다"와 "물었는데 답 안 함"을 가를 이유가 없다.
+ */
+export declare const IntakeQuestionSchema: z.ZodObject<{
+    id: z.ZodString;
+    text: z.ZodString;
+    targetReqId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    axis: z.ZodDefault<z.ZodNullable<z.ZodEnum<{
+        domain: "domain";
+        policy: "policy";
+        code: "code";
+        screen: "screen";
+        data: "data";
+        rtm: "rtm";
+        general: "general";
+    }>>>;
+    answer: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    answeredAt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+}, z.core.$strip>;
+export type IntakeQuestion = z.infer<typeof IntakeQuestionSchema>;
 /** identified.json — 한 요청의 누적 중간산출(2계층). */
 export declare const IdentifiedIntakeSchema: z.ZodObject<{
     schemaVersion: z.ZodDefault<z.ZodLiteral<1>>;
@@ -432,7 +474,22 @@ export declare const IdentifiedIntakeSchema: z.ZodObject<{
             note: z.ZodDefault<z.ZodString>;
         }, z.core.$strip>>>;
     }, z.core.$strip>>>;
-    questions: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    questions: z.ZodPipe<z.ZodTransform<unknown, unknown>, z.ZodDefault<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        text: z.ZodString;
+        targetReqId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        axis: z.ZodDefault<z.ZodNullable<z.ZodEnum<{
+            domain: "domain";
+            policy: "policy";
+            code: "code";
+            screen: "screen";
+            data: "data";
+            rtm: "rtm";
+            general: "general";
+        }>>>;
+        answer: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        answeredAt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, z.core.$strip>>>>;
 }, z.core.$strip>;
 export type IdentifiedIntake = z.infer<typeof IdentifiedIntakeSchema>;
 /**

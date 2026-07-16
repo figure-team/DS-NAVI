@@ -98,7 +98,7 @@ export function computeDiagnostics(model, droppedReqIds = []) {
             for (const id of ids) {
                 // ★ 왜 여전히 "기록만" 하고 차단하지 않는가(P1c 판단, 2026-07-16) — 승격을 검토했고 **기각**했다.
                 //
-                // 승격 이득은 "⑤에서 환각 fnId 를 실제로 막는다" 하나인데, 비용이 셋이다:
+                // 승격 이득은 "⑥에서 환각 fnId 를 실제로 막는다" 하나인데, 비용이 셋이다:
                 //  1) **계약 위반** — 이 모듈은 설계상 진단기다(머리말: "강제 대신 진단"). 호출자가 4곳
                 //     (build-rtm·apply-requirements·apply-overlay·test-scenarios)이고 그중 buildRtm 은
                 //     요구사항이 아예 없는 순수 AS-IS 경로다. 여기서 throw 하면 넷의 계약이 함께 바뀐다.
@@ -171,11 +171,11 @@ function assertsConfirmed(text, confidence) {
     return confidence === 'CONFIRMED' || text.includes(CONFIRMED_TAG);
 }
 /**
- * ★ ⑤ 재bake 표면의 실재 대조(P1c) — `rtm-requirements.json` 이 투영된 기능 셀을 db-schema 와 대조.
+ * ★ ⑥ 재bake 표면의 실재 대조(P1c) — `rtm-requirements.json` 이 투영된 기능 셀을 db-schema 와 대조.
  *
  * **왜 여기가 필요한가**: 실측 `OAUTH_ACCOUNT` 는 `identified.json` 을 거치지 않는다.
  * `project-intake.ts` 의 `intakeFnStub` 은 4축 셀을 전부 빈 값으로 만들므로, `functions[].data` 의
- * `"(제안) OAUTH_ACCOUNT(C) · …"` 는 **⑤ 이후 LLM 이 직접 쓴 것**이고 P1 게이트(`rtm-intake.mjs
+ * `"(제안) OAUTH_ACCOUNT(C) · …"` 는 **⑥ 이후 LLM 이 직접 쓴 것**이고 P1 게이트(`rtm-intake.mjs
  * validate` → `checkIntakeGrounding`)가 보는 표면 **밖**이다. 같은 규칙을 이 표면에도 세운다.
  *
  * **규칙은 P1b 확정분 재사용**(새로 만들지 않는다 — `intake-types.ts` `checkIntakeGrounding` 참조):

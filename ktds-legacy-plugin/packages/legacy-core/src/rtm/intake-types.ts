@@ -212,13 +212,102 @@ export const IntakeRequirementSchema = z.object({
 })
 export type IntakeRequirement = z.infer<typeof IntakeRequirementSchema>
 
+// ── A1 질문 스키마(RTM_INTAKE_ANSWER_DESIGN.md §3.1) ─────────────────────────
+/**
+ * 질문이 걸린 축 — 어느 근거 축의 모호함인가. 번들 6축(`intake-input`)과 같은 어휘를 쓰되
+ * `general`(축에 안 걸리는 요청 자체의 모호함, 예: "병행인가 대체인가")을 더한다.
+ * **분류는 선택**이다(`null` 허용) — 못 고르면 안 고르는 게 맞지, 억지 귀속은 오히려 오독시킨다.
+ */
+export const IntakeQuestionAxisSchema = z.enum([
+  'screen',
+  'policy',
+  'domain',
+  'data',
+  'code',
+  'rtm',
+  'general',
+])
+export type IntakeQuestionAxis = z.infer<typeof IntakeQuestionAxisSchema>
+
+/**
+ * ① `[확인필요]` 질문 1건 — **답을 받을 자리가 있는** 질문(A1).
+ *
+ * 종전엔 `questions: z.array(z.string())` 이라 답변 필드도 귀속도 없었다. 가이드(①=PM/PL 인터뷰로
+ * 모호함 제거)가 규정한 ①의 본질이 여기 걸려 있었는데(설계서 §0), 화면이 표시만 하고 끝났다.
+ *
+ * `answer` 3상태가 아니라 **2상태**인 이유: 인용(`CitationField`)과 달리 여기엔 하위호환 딜레마가
+ * 없다. 구형 문자열 질문은 정규화 시 `answer: null`(미답)이 **정확한 사실**이다 — 답할 자리가
+ * 없었으니 안 답한 게 맞다. "안 물어봤다"와 "물었는데 답 안 함"을 가를 이유가 없다.
+ */
+export const IntakeQuestionSchema = z.object({
+  /** `Q-1` — 재실행(개정)을 넘어 답을 붙잡는 **안정 키**. 개정 시 보존해야 한다(SKILL §B --revise). */
+  id: z.string().min(1),
+  text: z.string().min(1),
+  /** 이 질문이 걸린 요구사항 id. 요청 전체에 걸리는 모호함이면 null. */
+  targetReqId: z.string().nullable().default(null),
+  /** 어느 축의 모호함인가(선택 — 못 고르면 null). */
+  axis: IntakeQuestionAxisSchema.nullable().default(null),
+  /** 사용자 답변. null=미답. 미답이 컨펌을 막지는 않는다(설계 D2 — 차단 아닌 경고). */
+  answer: z.string().nullable().default(null),
+  answeredAt: z.string().nullable().default(null),
+})
+export type IntakeQuestion = z.infer<typeof IntakeQuestionSchema>
+
+/**
+ * ★ 하위호환 — **구형 문자열 배열과 신형 객체 배열을 둘 다 받는다.**
+ *
+ * 기존 산출(P5 e2e 가 만든 `questions: ["…", "…"]`)이 디스크에 실재한다. union 으로 받아 문자열을
+ * `{id, text}` 로 **정규화**하므로 소비처(UI·개정 LLM)는 항상 객체만 본다 — 스키마 시대를 소비처가
+ * 알 필요가 없다(`schemaVersion` 마이그레이션과 동형: 읽을 때 변환, 다음 write 가 신형으로 굳힌다).
+ *
+ * `id` 합성은 **인덱스 기반**(`Q-1`…)이다. 구형엔 안정 키가 없어 이것 말고 고를 게 없다.
+ * 다만 이 합성 id 로 답이 붙은 뒤엔 개정이 id 를 보존하므로(SKILL 지시), 흔들리는 건 최초 1회뿐이다.
+ * id 누락 객체(LLM 실수)도 같은 규칙으로 메운다 — 없는 키 때문에 파싱을 통째로 튕기는 것보다 낫다.
+ */
+const QuestionsField = z.preprocess((v) => {
+  if (!Array.isArray(v)) return v // 배열이 아니면 그대로 흘려 zod 가 정직하게 튕기게 둔다
+  return v.map((q, i) => {
+    const id = `Q-${i + 1}`
+    if (typeof q === 'string') return { id, text: q }
+    if (q && typeof q === 'object' && !Array.isArray(q)) {
+      const o = q as Record<string, unknown>
+      return o.id === undefined || o.id === null || o.id === '' ? { ...o, id } : o
+    }
+    return q
+  })
+}, z.array(IntakeQuestionSchema).default([]))
+
 /** identified.json — 한 요청의 누적 중간산출(2계층). */
 export const IdentifiedIntakeSchema = z.object({
   schemaVersion: z.literal(1).default(1),
   request: IntakeRequestSchema,
   requirements: z.array(IntakeRequirementSchema).default([]),
-  /** ① [확인필요] — 모호점 질문 목록(사용자가 컨펌 게이트에서 답한다). */
-  questions: z.array(z.string()).default([]),
+  /**
+   * ① `[확인필요]` — 모호점 질문. **사용자가 ① 컨펌 전에 답한다**(A1 이 그 자리를 지었다).
+   * 답변은 재실행 트리거다 — 답이 changeset·AC 를 실제로 바꾼다(설계 D1·§4.2).
+   */
+  questions: QuestionsField,
+}).superRefine((v, ctx) => {
+  // ★ 질문 id 유일성 — **코드로** 강제한다(§7 C8 "게이트는 코드로").
+  //
+  // id 는 답을 붙잡는 키다(`qa-history.json` 의 `qid`). 중복이면 화면이 원장에서 답을 끌어올 때
+  // **먼저 나온 질문이 남의 답을 주워** "답함"으로 렌더되고 입력칸이 사라진다 — 사용자가 그 질문에
+  // 영영 답할 수 없다. 조용한 실패라 validate 를 통과해버리면 아무도 모른다.
+  //
+  // SKILL 의 "안정 키 — 재발번 금지"는 **산문**이라 LLM 이 어기면 그만이다. 실제로 어길 수 있는
+  // 경로가 있다: id 누락 객체는 인덱스로 메워지므로(`QuestionsField`), 명시 id `Q-1` 과 합성 id
+  // `Q-1` 이 충돌한다. 요구사항 id 중복은 `diagnoseIntake` 가 이미 잡는다 — 그 대칭이다.
+  const seen = new Set<string>()
+  v.questions.forEach((q, i) => {
+    if (seen.has(q.id)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['questions', i, 'id'],
+        message: `중복 질문ID: ${q.id} — 답변이 엉뚱한 질문에 붙습니다(id 는 답을 붙잡는 안정 키입니다)`,
+      })
+    }
+    seen.add(q.id)
+  })
 })
 export type IdentifiedIntake = z.infer<typeof IdentifiedIntakeSchema>
 

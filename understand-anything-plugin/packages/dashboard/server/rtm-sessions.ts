@@ -30,6 +30,15 @@ export interface RtmSession {
    * 무한히 커진다. 그래서 "legacy 를 표시만 하고 둔다"는 선택지에도 이 필드는 필요하다.
    */
   schemaVersion?: number;
+  /**
+   * ① 대화의 claude 세션 UUID(A2 · RTM_INTAKE_ANSWER_DESIGN.md §3.3 · D1 하이브리드).
+   *
+   * ① 첫 spawn 이 `--session-id <uuid>` 로 이 값을 쓰고, 답변 개정은 `--resume <uuid>` 로 **그 대화를
+   * 이어** 맥락(번들을 읽은 대화)을 재주입 없이 쓴다. **optional 인 이유**: 이 필드를 모르는 구세션이
+   * 디스크에 실재한다. 없으면 개정은 fresh `-p` 로 폴백하며(§4.3), 개정 디렉티브가 자기완결형이라
+   * 결과는 같다(토큰만 더 씀) — 그래서 부재가 결함이 아니다.
+   */
+  identifyClaudeSession?: string;
   sid: string;
   request: string;
   createdAt: string;
@@ -167,6 +176,148 @@ export function writeRtmSession(base: string, s: RtmSession): void {
   if (!dir) return;
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "session.json"), JSON.stringify(s, null, 2) + "\n", "utf8");
+}
+
+// ── A2: 답변 원장 qa-history.json (RTM_INTAKE_ANSWER_DESIGN.md §3.2) ──────────
+// D1 의 "Q&A 를 우리 파일에도 기록" 이 이것 — `--resume` 대화는 `~/.claude` 에 살아 **프로젝트 밖**
+// 이라, 인테이크 산출의 "무엇을 보고/듣고 그렇게 말했나" 계보가 그쪽에만 있으면 감사가 반쪽이 된다.
+// 이 파일이 답변의 **영속 진실원본**이고, identified.json 의 questions[].answer 는 LLM 이 유지하는
+// 현재 상태다(개정이 실패해도 답은 여기 남는다).
+
+/** 답변 원장 파일명. 세션 디렉터리 직하. */
+const QA_HISTORY_FILE = "qa-history.json";
+
+/** ①식별 단계 번호 — 답변 게이트가 "① 최전선"을 재는 기준(vite.config.ts RTM_STEP_MIN 과 같은 값). */
+const RTM_STEP_IDENTIFY = 1;
+
+/**
+ * ★ 답변 게이트(D2 · RTM_INTAKE_ANSWER_DESIGN.md §5) — **판정만** 한다. HTTP 응답은 호출자 몫.
+ *
+ * legacy-core `checkMinimalSet` 과 같은 꼴이다(판정은 순수 함수, fail-closed 처리는 경계). 게이트를
+ * vite.config.ts 안 핸들러에 인라인하면 **테스트가 불가능**해지고, 그러면 "게이트는 코드로"가
+ * 산문으로 되돌아간다(RTM_IMPACT_GATE_DESIGN §7 C8 이 정확히 금지한 것).
+ *
+ * 막는 건 **"이미 지나간 단계를 뒤늦게 흔드는 것"뿐**이다. 미답변이 컨펌을 막지는 않는다(D2) —
+ * 그건 여기가 아니라 컨펌 경로의 문제고, 컨펌은 질문을 보지 않는다.
+ */
+export function checkAnswerGate(
+  session: Pick<RtmSession, "producedStep" | "confirmedStep" | "discarded">,
+): { ok: true } | { ok: false; status: number; error: string } {
+  // 폐기 세션은 ① 컨펌 루프 **밖**이다 — UI 는 이미 막지만 게이트가 스스로 알아야 한다
+  // (API 직접 호출로 도달 가능하고, 그때 원장 append + claude spawn 이 일어난다).
+  if (session.discarded) {
+    return { ok: false, status: 409, error: "폐기된 세션입니다 — 답변할 수 없습니다." };
+  }
+  if (session.producedStep !== RTM_STEP_IDENTIFY) {
+    return {
+      ok: false,
+      status: 409,
+      error:
+        session.producedStep === 0
+          ? "①이 아직 산출되지 않았습니다."
+          : `①이 최전선일 때만 답변할 수 있습니다(현재 산출 단계 ${session.producedStep}).`,
+    };
+  }
+  // 컨펌했다 = ②로 넘어갔다. 되돌리면 ②~⑥이 틀린 ① 위에 서게 되므로 잠근다(롤백은 별도 과제).
+  if (session.confirmedStep >= RTM_STEP_IDENTIFY) {
+    return {
+      ok: false,
+      status: 409,
+      error: "①을 이미 컨펌해 답변이 잠겼습니다 — 되돌리려면 세션을 새로 시작하세요.",
+    };
+  }
+  return { ok: true };
+}
+
+/** 문답 1건 — 질문 원문을 함께 싣는다(질문이 개정으로 바뀌어도 "그때 뭘 묻고 답했나"가 보존된다). */
+export interface QaEntry {
+  qid: string;
+  question: string;
+  answer: string;
+}
+/** 답변 제출 1회(여러 질문 일괄) = revision 1건. 인터뷰가 여러 턴이면 rev 가 쌓인다. */
+export interface QaRevision {
+  rev: number;
+  answeredAt: string;
+  qas: QaEntry[];
+}
+export interface QaHistory {
+  revisions: QaRevision[];
+  /**
+   * 파일이 **있는데 못 읽었다**(파싱 불가/모양 위반). `revisions: []` 만으로는 "아직 아무도 안 답함"
+   * 과 구별되지 않아 append 가 남은 이력을 조용히 파기한다 — 저장소 불변식 "없음 vs 못 봄" 그대로다.
+   */
+  corrupt?: boolean;
+}
+
+/** qa-history.json 절대경로(sid 검증·base 이탈 방지는 rtmSessionDir 이 맡는다). null=무효 sid. */
+function qaHistoryFile(base: string, sid: string): string | null {
+  const dir = rtmSessionDir(base, sid);
+  return dir ? path.join(dir, QA_HISTORY_FILE) : null;
+}
+
+/** revision 1건의 모양 검사 — 원소를 안 보면 쓰레기가 원장에 눌러앉아 조용히 오염된다. */
+function isQaRevision(v: unknown): v is QaRevision {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return false;
+  const r = v as Partial<QaRevision>;
+  return typeof r.rev === "number" && Array.isArray(r.qas);
+}
+
+/**
+ * 답변 원장 읽기. **부재와 손상을 가른다** — 부재는 `{revisions: []}`, 손상은 `corrupt: true`.
+ *
+ * 둘을 같은 빈 원장으로 뭉개면 `appendQaRevision` 이 남은 이력을 조용히 덮어쓴다(불변식 "없음 vs
+ * 못 봄"). 읽기 자체는 여전히 throw 하지 않는다 — 판단은 호출자 몫이다.
+ */
+export function readQaHistory(base: string, sid: string): QaHistory {
+  const file = qaHistoryFile(base, sid);
+  if (!file) return { revisions: [] };
+  if (!fs.existsSync(file)) return { revisions: [] }; // 부재 = 아직 아무도 안 답함(정직한 empty)
+  let raw: unknown;
+  try {
+    raw = JSON.parse(fs.readFileSync(file, "utf-8"));
+  } catch {
+    return { revisions: [], corrupt: true }; // 파일은 있는데 못 읽음
+  }
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { revisions: [], corrupt: true };
+  const revs = (raw as QaHistory).revisions;
+  if (!Array.isArray(revs)) return { revisions: [], corrupt: true };
+  const clean = revs.filter(isQaRevision);
+  // 원소 일부가 쓰레기면 그것도 손상이다 — 걸러낸 채 되쓰면 그 항목이 소리 없이 사라진다.
+  return clean.length === revs.length
+    ? { revisions: clean }
+    : { revisions: clean, corrupt: true };
+}
+
+/**
+ * 답변 revision append — 신규 파일 생성·기존 append 둘 다. 붙인 revision 을 반환.
+ *
+ * **null 을 돌려주는 두 경우**(호출자는 반드시 실패로 다뤄야 한다):
+ *  1. 무효 sid(traversal 차단)
+ *  2. **원장이 손상됨** — 덮어쓰면 rev 1~N 의 문답 계보가 경고 없이 사라진다. 답변 원장은 설계 §3.2
+ *     가 "영속 진실원본·append-only" 로 규정한 파일이라 **파기보다 거절이 맞다**. 사람이 파일을
+ *     보고 고치거나 치우게 한다(자동 rename 은 "고쳤다"는 착각을 준다).
+ *
+ * `rev` 는 **기존 최대 rev + 1**이다(길이+1 이 아니라) — 수기편집으로 배열이 짧아져도 번호가
+ * 뒤로 감기지 않는다. 번호가 겹치면 "언제 뭘 답했나"의 순서가 무너진다.
+ *
+ * 쓰기는 **tmp + rename** 으로 원자화한다 — 직접 쓰다 크래시하면 절단된 파일이 남고, 그게 바로
+ * 위 2번(손상)을 만드는 경로다.
+ */
+export function appendQaRevision(base: string, sid: string, qas: QaEntry[]): QaRevision | null {
+  const file = qaHistoryFile(base, sid);
+  const dir = rtmSessionDir(base, sid);
+  if (!file || !dir) return null;
+  const history = readQaHistory(base, sid);
+  if (history.corrupt) return null; // ★ 조용한 파기 금지 — 거절한다
+  const maxRev = history.revisions.reduce((m, r) => Math.max(m, Number(r?.rev) || 0), 0);
+  const revision: QaRevision = { rev: maxRev + 1, answeredAt: new Date().toISOString(), qas };
+  const next: QaHistory = { revisions: [...history.revisions, revision] };
+  fs.mkdirSync(dir, { recursive: true });
+  const tmp = `${file}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(next, null, 2) + "\n", "utf8");
+  fs.renameSync(tmp, file);
+  return revision;
 }
 
 /**

@@ -41,6 +41,9 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
 고객 자연어 요청(예: "네이버 로그인 추가해줘")을 **6단계 중 한 단계만** 수행하고 멈춘다. 단계 사이
 사용자 컨펌이 게이트다. `--step 1` 에만 `--request "<원문>"` 을 받고, 이후 단계는 누적 산출에서 읽는다.
 
+`--step 1 --revise` 는 **①의 재실행**이다(새 단계 아님) — 사용자가 `[확인필요]` 에 답한 뒤 그 답을
+반영해 ①을 다시 판단한다. 아래 `--step 1 --revise` 절 참조.
+
 | # | 단계 | 하는 일 | 산출 |
 |---|---|---|---|
 | ① | 식별 | 요청 → 요구사항 분해 + 6축 근거 + `validate`(실재 대조) | `identified.json` |
@@ -62,6 +65,9 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
   6축을 요청에 맞게 필터해 준다. 최소집합(도메인·데이터·추적표) 부재는 그 CLI 가 exit 2 로 차단한다.
 - 세션 디렉터리: **`.understand-anything/rtm-intake/<sid>/`** (없으면 만든다). 단계 산출물을 여기에 쌓는다.
 - 누적 중간산출: **`identified.json`** (2계층: `request` + `requirements[]` + `questions[]`). 단계마다 보강한다.
+- 답변 원장: **`qa-history.json`** — 사용자가 `[확인필요]` 에 답한 이력(append-only, 대시보드가 쓴다).
+  **답의 진실원본**이고 `identified.json` 의 `questions[].answer` 는 개정이 반영한 현재 상태다.
+  개정(`--step 1 --revise`)만 읽는다.
 - 템플릿 로드: 프로젝트 override `.understand-anything/templates/requirements/0X_*.md` → 없으면 플러그인
   동봉 `${CLAUDE_PLUGIN_ROOT}/templates/requirements/0X_*.md`. **빈 템플릿 구조만 보고 채운다(examples 미참조).**
 
@@ -86,7 +92,14 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
                      "evidence": [] },         // 이 묶음 도출의 근거(pre-cite 복사)
       "screenRefs": [], "policyRefs": [] }     // 요구사항 단위 화면·정책 귀속(AC 단위와 둘 다 가능)
   ],
-  "questions": []                               // ① [확인필요]
+  // ① [확인필요] — 사용자가 **답할 수 있는** 질문(A1). 답변은 대시보드에서 받아 개정(--revise)이 반영한다.
+  "questions": [
+    { "id": "Q-1",                              // 안정 키 — 개정 넘어 답을 붙잡는다. 절대 재발번 금지.
+      "text": "SIGNON.PASSWORD 가 NOT NULL 평문인데 소셜 사용자는 비밀번호가 없다 — 별도 컬럼인가 null 허용인가?",
+      "targetReqId": "SFR-020",                 // 걸린 요구사항(요청 전체면 null)
+      "axis": "data",                           // screen|policy|domain|data|code|rtm|general (모르면 null)
+      "answer": null, "answeredAt": null }      // 사용자 답변 — ①은 null 로 두고 개정이 채운다
+  ]
 }
 ```
 규약: priority 는 `HIGH|MEDIUM|LOW`(렌더 시 상/중/하). 신규(TO-BE)는 전부 `[추정]`(INFERRED) — `[확정]` 불가.
@@ -145,6 +158,13 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
      커밋이 다른 축들이다. `staleAxes` 가 비어 있는데 `consistent:false` 면 HEAD 를 못 잰 것이고
      (`commits.head === null`, git 저장소가 아님) 축끼리만 어긋난 상태다 — `note` 를 읽고 판단한다.
 5. 모호점은 `questions[]` 에 `[확인필요]` 질문으로 남긴다(임의 가정 금지).
+   **사용자가 답할 질문이다** — 표시용 메모가 아니라 대시보드에서 답을 받아 개정(`--revise`)이 반영한다.
+   그러니 **답할 수 있게** 쓴다: `id`(`Q-1`…)를 부여하고, 걸린 요구사항은 `targetReqId` 로, 어느 축의
+   모호함인지는 `axis` 로 귀속한다(못 고르면 null — 억지 귀속 금지). `answer`/`answeredAt` 은 null 로 둔다.
+   - **번들을 보고 물어라.** 좋은 질문은 근거에서 나온다 — "SIGNON.PASSWORD 가 NOT NULL 평문인데
+     소셜 사용자는 비밀번호가 없다, 별도 컬럼인가 null 허용인가?"처럼 **본 것을 근거로** 갈래를 제시한다.
+     번들 없이 누구나 할 수 있는 일반론("병행인가 대체인가")만 남기면 ①의 값이 없다.
+   - **한 질문에 한 갈래.** 여러 결정을 한 문장에 묶으면 답이 갈라져 반영이 안 된다.
 6. 기존 요구사항과 **모순**되면 supersede 후보를 `questions` 에 적어 사람이 판단하게 한다.
 7. `identified.json` 을 세션 디렉터리에 쓴다(④⑤ 보강 필드는 비워 둔다 — default 로 통과).
 8. **검증**: `node ${CLAUDE_PLUGIN_ROOT}/scripts/rtm-intake.mjs validate <세션>/identified.json` 실행.
@@ -158,6 +178,42 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
 9. 보고: 요청ID → 요구사항ID 매핑표 + `[확인필요]` 질문 + **근거 요약**(AC/changeset 중 근거가 붙은 비율,
    생략된 축, 커밋 불일치로 강등한 결론). **여기서 멈춘다.**
    **코드영향 범위는 ①이 말하지 않는다** — 아직 안 봤다. ②의 몫이니 넘겨짚어 쓰지 마라.
+
+### --step 1 --revise 개정 (답변 반영 → ① 재판단)
+
+사용자가 ①의 `[확인필요]` 질문에 **답한 뒤** 대시보드가 자동 실행한다. ①의 재실행이지 새 단계가
+아니다 — `producedStep` 은 1 그대로고, 사용자는 만족하면 ①을 컨펌한다(**종료는 사람**).
+
+> **왜 개정인가**: 답변은 기록이 아니라 **재실행 트리거**다. "병행이다"라는 답이 `changeset`·AC 를
+> 실제로 바꿔야 ①이 답을 반영한 것이다. 답만 받아 적고 분해가 그대로면 개정이 아니다.
+
+1. **답을 읽는다**: `<세션>/qa-history.json` 의 **최신 revision**(`revisions` 의 마지막 = `rev` 최대).
+   ```jsonc
+   { "revisions": [ { "rev": 1, "answeredAt": "…",
+       "qas": [ { "qid": "Q-1", "question": "…평문 password…", "answer": "병행 — 소셜은 password null 허용" } ] } ] }
+   ```
+   이 파일이 **답의 진실원본**이다. 대화 맥락을 이어받았더라도(`--resume`) 반드시 읽어라 —
+   맥락 없이 실행될 수도 있고(fresh 폴백), 그때도 같은 결과가 나와야 한다.
+2. **기존 산출·근거를 읽는다**: `<세션>/identified.json`(네가 쓴 것) + `<세션>/intake-input.json`(번들).
+   **번들은 재생성하지 마라** — 요청이 안 바뀌었으니 번들도 그대로다. 인용은 여전히 번들 pre-cite 를
+   verbatim 복사한다(`--step 1` 의 2번 규칙 그대로).
+   - **★ 구형 산출 주의 — `questions` 가 객체가 아니라 문자열 배열일 수 있다**(답변 필드가 없던 시절
+     산출물). 그때 `qid` 는 화면이 **배열 순서로 합성**한 것이다: 첫 문자열=`Q-1`, 둘째=`Q-2`, … 그래서
+     **`qas[].question` 텍스트로 대조해 어느 질문의 답인지 확정하라** — `qid` 숫자만 믿고 매기지 마라.
+     개정하며 객체로 올릴 때 **그 순서 그대로** `Q-1`… 를 부여해야 답이 제 질문에 붙는다.
+3. **답을 실제로 반영한다** — 답이 해소한 모호함을 `requirements`·`changeset`·`acceptanceCriteria`·
+   근거축(`evidence`/`screenRefs`/`policyRefs`)에 반영한다. 예: "병행"이면 기존 로그인 flow 를
+   `modified` 에 유지하고 대체 전제로 썼던 AC 를 고친다. 답이 요구사항을 새로 낳으면 추가하고,
+   무의미해진 요구사항은 지우지 말고 `status: "WITHDRAWN"` 으로 둔다(이력 보존).
+4. **★ 답을 지우지 마라** — `answer` 가 null 이 아닌 질문은 **`id`·`text`·`answer`·`answeredAt` 를 그대로
+   보존**한다. 답한 질문을 목록에서 빼거나 id 를 새로 매기면 **사용자의 답이 날아간다**(질문이 해소됐어도
+   답은 남는다 — 그게 결정의 근거다). 이번 revision 의 답은 해당 `qid` 의 `answer`/`answeredAt` 에 채운다.
+5. **새 모호함은 새 질문으로**: 답이 새 갈래를 낳으면 `questions[]` 에 **새 id 로 추가**한다
+   (기존 답을 덮어쓰지 말고). `--step 1` 의 5번 규칙(근거 기반·한 질문 한 갈래)을 그대로 따른다.
+6. `identified.json` 을 다시 쓰고 **`validate` 를 재실행**한다(`--step 1` 의 8번과 동일 — 실재 대조 게이트
+   포함). 개정이 스키마·실재를 깨뜨리지 않았는지 확인한다.
+7. 보고: **답이 무엇을 바꿨나**(요구사항·changeset·AC 변경점) + 남은 `[확인필요]` + 새로 생긴 질문.
+   **여기서 멈춘다.** 신규는 여전히 전부 [추정]이고 확정은 사람이 대시보드에서 한다.
 
 ### --step 2 영향분석 (코드영향 검증)
 

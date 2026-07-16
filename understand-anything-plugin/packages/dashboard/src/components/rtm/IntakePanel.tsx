@@ -416,10 +416,13 @@ export function IntakeStepContent() {
   // 단계 헤더(① 라벨 · 컨펌 상태 · 액션 줄)는 제거됐다(2026-07-16) — 단계 위치·컨펌 상태는
   // 스테퍼 칩이 이미 말하고 있었고(중복), 액션은 스테퍼 우측으로 옮겼다(IntakeStepper 주석).
   // 높이 — 드로어 시절 유산(52vh)은 큰 화면에서 카드 아래 빈 공간을 남겼다(사용자 실측,
-  // 2026-07-17). 뷰포트를 채우되(카드 위 크롬 ≈ 340px 차감) 작은 창에선 52vh 를 하한으로.
-  // 확정값이어야 하는 이유는 그대로다: 편집 textarea 가 h-full 이라 부모가 auto 면 접힌다.
+  // 2026-07-17). 뷰포트를 채우되 작은 창에선 52vh 를 하한으로. 차감 254px = 카드 위 크롬
+  // (TopBar+탭+카드헤더+스테퍼+페이지 패딩) 실측 230px + 하단 페이지 패딩 24px — 1차 340px 는
+  // 아직 ~86px 을 남겼다(사용자 재지적). 스테퍼가 2줄로 꺾이면 그만큼 살짝 스크롤이 생기는
+  // 트레이드오프는 수용(빈 공간보다 낫다). 확정값이어야 하는 이유는 그대로: 편집 textarea 가
+  // h-full 이라 부모가 auto 면 접힌다.
   return (
-    <div className="flex flex-col" style={{ height: "max(52vh, calc(100vh - 340px))" }}>
+    <div className="flex flex-col" style={{ height: "max(52vh, calc(100vh - 254px))" }}>
       <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "14px 20px" }}>
         {/* 낡음 배너 — 이 산출은 이전 단계 편집 **전** 문서를 근거로 생성됐다(조용한 불일치 금지). */}
         {stale && (

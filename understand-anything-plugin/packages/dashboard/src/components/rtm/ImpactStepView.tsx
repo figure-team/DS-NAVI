@@ -33,8 +33,9 @@ const axisState = (xs: unknown[] | undefined): "filled" | "none" | "omitted" =>
   xs === undefined ? "omitted" : xs.length === 0 ? "none" : "filled";
 const NONE_T = "엔진이 계산했고 영향받는 항목이 0건입니다 — '생략됨'(안 적음)과 다릅니다.";
 
-/** 조건 영역 카드 — 색 스트라이프 헤더(아이콘·제목·카운트) + 우측 액션 슬롯. */
-function SectionCard({ tone, icon, title, sub, count, action, children }: {
+/** 조건 영역 카드 — 색 스트라이프 헤더(아이콘·제목·카운트) + 우측 액션 슬롯.
+ *  변경·영향 메뉴(ChangeImpactView)도 이 카드로 그린다(2026-07-17 — 두 표면 디자인 정렬). */
+export function SectionCard({ tone, icon, title, sub, count, action, children }: {
   tone: string; icon: string; title: string; sub?: string; count?: number; action?: ReactNode; children: ReactNode;
 }) {
   return (
@@ -53,8 +54,8 @@ function SectionCard({ tone, icon, title, sub, count, action, children }: {
   );
 }
 
-/** 비포·에프터 모달 여는 버튼 — 두 카드 헤더 공용. */
-function CompareBtn({ label, onClick, disabled, title }: { label: string; onClick: () => void; disabled?: boolean; title: string }) {
+/** 비포·에프터 모달 여는 버튼 — 카드 헤더 공용(변경·영향 메뉴 포함). */
+export function CompareBtn({ label, onClick, disabled, title }: { label: string; onClick: () => void; disabled?: boolean; title: string }) {
   return (
     <button
       type="button"
@@ -70,7 +71,7 @@ function CompareBtn({ label, onClick, disabled, title }: { label: string; onClic
 }
 
 export default function ImpactStepView() {
-  const { identified, impactRun, impactData, impactLoaded } = useRtm();
+  const { identified, impactRun, impactData, impactLoaded, fnById } = useRtm();
   const [flowCompare, setFlowCompare] = useState(false);
   const [dataCompare, setDataCompare] = useState(false);
   const up = impactData?.upstream;
@@ -246,11 +247,24 @@ export default function ImpactStepView() {
         </div>
       ))}
 
-      {flowCompare && impactData && (
-        <FlowCompareModal flows={up?.flows ?? []} addedNames={addedNames} onClose={() => setFlowCompare(false)} />
+      {flowCompare && impactData && impactRun && (
+        <FlowCompareModal
+          flows={up?.flows ?? []}
+          addedNames={addedNames}
+          // 기능흐름도 에프터의 표식 재료 — 시드(변경 그 자체)와 도달(연쇄)을 파일 집합으로 가른다.
+          seedFiles={new Set(impactRun.bySource.flatMap((s) => s.relPaths))}
+          impactFiles={new Set([
+            ...(up?.files ?? []).map((f) => f.relPath),
+            ...(up?.api ?? []).map((a) => a.filePath),
+            ...(downFiles ?? []).map((f) => f.relPath),
+            ...(mappers ?? []).map((m) => m.relPath),
+          ])}
+          onClose={() => setFlowCompare(false)}
+        />
       )}
       {dataCompare && impactRun && (
-        <DataCompareModal seedFnIds={impactRun.bySource.map((s) => s.fnId)} onClose={() => setDataCompare(false)} />
+        // 이름 해석은 여기(RtmContext 보유자) 몫 — 모달은 컨텍스트 무관하게 재사용된다(/change).
+        <DataCompareModal seedNames={impactRun.bySource.map((s) => fnById(s.fnId)?.name ?? s.fnId)} onClose={() => setDataCompare(false)} />
       )}
     </div>
   );

@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { useDashboardStore } from "../../store";
 import { dataUrl } from "../../shared/api/client";
 import type { CrudMatrix, DbSchema, DbTable } from "../data-map/types";
-import { useRtm } from "./context";
 import { useEscClose } from "./shared";
 import { BAD, BORDER, FAINT, OK, WARN } from "./types";
 
@@ -93,9 +92,16 @@ function Pane({ label, tone, children, style }: { label: string; tone: string; c
   );
 }
 
-export default function DataCompareModal({ seedFnIds, onClose }: { seedFnIds: string[]; onClose: () => void }) {
+/**
+ * 입력 이원화(2026-07-17, /change 재사용) — RtmContext 에 묶지 않는다:
+ *  - `seedNames` — 시드 **기능명**(호출부가 fnId→이름 해석). CRUD 매트릭스 결정론 조인으로
+ *    도달 테이블 + 연산(C/R/U/D)까지 표식한다. RTM ②의 경로.
+ *  - `tables` — 도달 **테이블명** 직접 전달. 변경·영향 원장의 시드는 파일(relPath)이라 기능명이
+ *    없어 CRUD 조인이 불가하다 — 스냅샷이 이미 계산한 테이블 카탈로그로 도달만 표식(연산 미상).
+ */
+export default function DataCompareModal({ seedNames, tables, onClose }: { seedNames?: string[]; tables?: string[]; onClose: () => void }) {
   useEscClose(onClose);
-  const { fnById } = useRtm();
+  const byName = seedNames !== undefined;
   const accessToken = useDashboardStore((s) => s.accessToken);
   const [schema, setSchema] = useState<DbSchema | null>(null);
   const [crud, setCrud] = useState<CrudMatrix | null>(null);
@@ -117,27 +123,31 @@ export default function DataCompareModal({ seedFnIds, onClose }: { seedFnIds: st
     return () => { cancelled = true; };
   }, [accessToken]);
 
-  // 시드 기능 → CRUD 행(기능명 결정론 일치) → 테이블별 연산 집합. 못 찾은 시드는 정직하게
-  // 따로 센다 — 조용히 떨구면 "데이터 도달 없음"으로 위장한다(계산 제외 카드와 같은 규약).
+  // 도달 테이블 판정 — 이름 경로: 시드 기능 → CRUD 행(기능명 결정론 일치) → 테이블별 연산 집합.
+  // 못 찾은 시드는 정직하게 따로 센다 — 조용히 떨구면 "데이터 도달 없음"으로 위장한다.
+  // 테이블 경로: 호출부가 준 카탈로그 그대로(연산 미상 → 빈 집합).
   const join = useMemo(() => {
     const ops = new Map<string, Set<string>>();
     const unmatched: string[] = [];
-    if (crud) {
-      for (const fnId of seedFnIds) {
-        const name = fnById(fnId)?.name;
-        const row = name ? crud.rows.find((r) => r.cells[0] === name) : undefined;
-        if (!row) { unmatched.push(name ?? fnId); continue; }
-        row.cells.forEach((cell, i) => {
-          if (i === 0 || !cell) return;
-          const table = crud.columns[i];
-          const set = ops.get(table) ?? new Set<string>();
-          for (const ch of cell) set.add(ch);
-          ops.set(table, set);
-        });
+    if (byName) {
+      if (crud) {
+        for (const name of seedNames ?? []) {
+          const row = crud.rows.find((r) => r.cells[0] === name);
+          if (!row) { unmatched.push(name); continue; }
+          row.cells.forEach((cell, i) => {
+            if (i === 0 || !cell) return;
+            const table = crud.columns[i];
+            const set = ops.get(table) ?? new Set<string>();
+            for (const ch of cell) set.add(ch);
+            ops.set(table, set);
+          });
+        }
       }
+    } else {
+      for (const t of tables ?? []) ops.set(t, new Set());
     }
     return { ops, unmatched };
-  }, [crud, seedFnIds, fnById]);
+  }, [byName, crud, seedNames, tables]);
 
   // 서브셋 = 도달 테이블 + FK 1-hop 인접(맥락). 전체 스키마를 다 그리면 비교점이 묻힌다.
   const subset = useMemo(() => {
@@ -163,7 +173,9 @@ export default function DataCompareModal({ seedFnIds, onClose }: { seedFnIds: st
         {/* 헤더 + 범례 — 표식 어휘를 도식과 같은 줄에서 설명한다. */}
         <div className="shrink-0 flex items-center flex-wrap border-b border-border-subtle" style={{ gap: 10, padding: "12px 18px", rowGap: 6 }}>
           <h2 className="text-text-primary" style={{ fontSize: 15, fontWeight: 700, whiteSpace: "nowrap" }}>데이터 비포 · 에프터</h2>
-          <span className="text-text-muted" style={{ fontSize: 11 }}>도달 테이블 {hitCount} · 시드 {seedFnIds.length}건 × CRUD 매트릭스 결정론 조인</span>
+          <span className="text-text-muted" style={{ fontSize: 11 }}>
+            도달 테이블 {hitCount} · {byName ? `시드 ${(seedNames ?? []).length}건 × CRUD 매트릭스 결정론 조인` : "원장 스냅샷의 테이블 카탈로그(연산 미상 — 시드가 파일 단위)"}
+          </span>
           <span className="flex items-center flex-wrap" style={{ gap: 9, marginLeft: 6, rowGap: 4 }}>
             <span className="flex items-center" style={{ gap: 4, fontSize: 10, color: "var(--color-text-secondary)" }}>
               <span aria-hidden style={{ width: 14, height: 9, borderRadius: 3, border: `1.5px solid ${WARN}`, boxShadow: `0 0 0 2px color-mix(in srgb, ${WARN} 22%, transparent)` }} />변경 도달
@@ -185,14 +197,19 @@ export default function DataCompareModal({ seedFnIds, onClose }: { seedFnIds: st
           <div className="flex-1 flex items-center justify-center text-text-muted" style={{ fontSize: 13 }}>스키마·CRUD 매트릭스 불러오는 중…</div>
         ) : !schema ? (
           <div className="flex-1 flex items-center justify-center text-text-muted" style={{ fontSize: 12.5, padding: 40, textAlign: "center", lineHeight: 1.7 }}>db-schema.json 을 읽지 못했습니다 — 데이터 메뉴가 뜨는 상태에서 다시 여세요.</div>
-        ) : !crud ? (
+        ) : byName && !crud ? (
           <div className="flex-1 flex items-center justify-center text-text-muted" style={{ fontSize: 12.5, padding: 40, textAlign: "center", lineHeight: 1.7 }}>crud-matrix.json 을 읽지 못했습니다 — 기능→테이블 도달을 계산할 수 없습니다(스키마만으로는 비교 표식이 불가).</div>
         ) : hitCount === 0 ? (
           <div className="flex-1 flex items-center justify-center" style={{ padding: 40 }}>
             <p className="text-text-muted" style={{ fontSize: 12.5, lineHeight: 1.7, maxWidth: 520 }}>
-              시드 기능이 CRUD 매트릭스에서 <b className="text-text-secondary">테이블에 닿지 않습니다</b> —
-              화면·라우팅만 바꾸는 변경이거나, 시드 기능이 매트릭스 행과 매칭되지 않은 경우입니다.
-              {join.unmatched.length > 0 && <> (미매칭 시드 {join.unmatched.length}건: {join.unmatched.join(" · ")})</>}
+              {byName ? (
+                <>시드 기능이 CRUD 매트릭스에서 <b className="text-text-secondary">테이블에 닿지 않습니다</b> —
+                화면·라우팅만 바꾸는 변경이거나, 시드 기능이 매트릭스 행과 매칭되지 않은 경우입니다.
+                {join.unmatched.length > 0 && <> (미매칭 시드 {join.unmatched.length}건: {join.unmatched.join(" · ")})</>}</>
+              ) : (
+                <>이 분석 산출에 <b className="text-text-secondary">도달 테이블 기록이 없습니다</b> —
+                화면·라우팅만 건드리는 변경이거나 persistence 축이 계산되지 않은 스냅샷입니다.</>
+              )}
             </p>
           </div>
         ) : (
@@ -208,9 +225,9 @@ export default function DataCompareModal({ seedFnIds, onClose }: { seedFnIds: st
 
         {/* 정직성 각주 — 미매칭 시드는 표시 범위 과소의 신호다(조용한 누락 금지). */}
         <div className="shrink-0 border-t border-border-subtle text-text-muted" style={{ padding: "7px 18px", fontSize: 10.5, lineHeight: 1.5 }}>
-          <b className="text-text-secondary">에프터</b>는 현행 스키마 위에 <b style={{ color: WARN }}>변경 도달</b>과 연산(CRUD)을 표식한 것입니다 —
+          <b className="text-text-secondary">에프터</b>는 현행 스키마 위에 <b style={{ color: WARN }}>변경 도달</b>{byName ? "과 연산(CRUD)" : ""}을 표식한 것입니다 —
           신규 컬럼·테이블(DAR)의 미래 스키마는 확정·구현 후 재분석이 반영합니다. 전체 ERD 는 데이터 메뉴에서 봅니다.
-          {loaded && crud && join.unmatched.length > 0 && (
+          {byName && loaded && crud && join.unmatched.length > 0 && (
             <span style={{ color: WARN }}> ⚠ CRUD 매트릭스와 매칭되지 않은 시드 {join.unmatched.length}건({join.unmatched.join(" · ")}) — 실제 도달 범위가 표시보다 넓을 수 있습니다.</span>
           )}
         </div>

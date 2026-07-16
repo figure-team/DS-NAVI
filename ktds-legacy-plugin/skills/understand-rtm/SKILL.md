@@ -47,7 +47,7 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
 | # | 단계 | 하는 일 | 산출 |
 |---|---|---|---|
 | ① | 식별 | 요청 → 요구사항 분해 + 6축 근거 + `validate`(실재 대조) | `identified.json` |
-| ② | 영향분석 | `code-impact` — 바뀔 기존 기능이 코드 어디를 건드리나 | `impact-run.json` |
+| ② | 영향분석 | `code-impact` — 바뀔 기존 기능이 코드 어디를 건드리나 | `impact-run.json` · `after-flow.json`(에프터 도식 초안) |
 | ③ | 목록표 | 템플릿 `01_*` | `요구사항목록표.md` |
 | ④ | 정의서 | 템플릿 `02_*` | `요구사항정의서.md` |
 | ⑤ | 명세서 | 템플릿 `03_*` — 요구사항 1건당 1파일 | `요구사항명세서_{ID}.md` ×N |
@@ -238,6 +238,19 @@ file:line 근거와 함께 `.understand-anything/rtm.json` 으로 쓴다. 완료
    산문으로 지어내지 마라.
    - `⚠ 진입점 근거 0건` 경고가 뜨면 그 기능은 시드에서 빠진 것이다. **영향 범위가 그만큼 덜
      보인다는 사실을 보고에 명시**한다(조용히 넘어가면 §4.1 "없음 vs 못 봄" 오독의 재판이다).
+4. **에프터 업무흐름도 초안** — `<세션>/after-flow.json` (RTM_AFTER_FLOW_DESIGN.md, 2026-07-17).
+   대시보드 비포·에프터 모달의 "에프터"가 표식이 아니라 **구조 차이**(신규 삽입·삭제·변경)를
+   보여주기 위한 산출이다. 전부 [추정] — 사람이 검토 전 확정 아님.
+   - **기반**: `.understand-anything/domain-graph.json` 의 `domainMeta.businessFlows` 에서 영향
+     흐름(활동의 `flowRef`)이 등장하는 업무 프로세스를 찾아 **노드·엣지를 id 그대로 복사**한다.
+   - **바꿀 수 있는 것은 changeset 근거뿐**: `added` → 신규 활동 노드 삽입(`change:"added"`,
+     `flowRef` 는 to-be id, 잇는 엣지도 `change:"added"`) · `removed` → 해당 활동에
+     `change:"removed"` 마킹(노드 **제거 금지** — 무엇이 없어지는지 보여야 diff 다) ·
+     `modified` → `change:"modified"`. 그 밖의 구조 변경(재배치·이름 변경·무근거 분기)은 **금지**.
+   - **형식**: `{"schemaVersion":1,"flows":[{"domainId","baseTitle"(원 프로세스 제목 그대로 —
+     대시보드 조인 키),"nodes":[…],"edges":[…],"note"(선택 — 삽입 위치의 근거 한 줄)}]}`.
+     모든 엣지 끝점은 실존 노드여야 한다 — 어긋나면 대시보드가 그 장을 통째로 기각하고
+     표식 오버레이로 폴백한다(부분 렌더 금지 규약).
    **여기서 멈춘다.** ③~⑤ 문서는 이 영향 범위를 사람이 컨펌한 뒤에 쓰인다.
 
 ### --step 3 목록표

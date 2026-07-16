@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CIRCLED, STEP_DOC_KIND } from "./types";
 import type { Identified, ImpactRun, ImpactSnapshot, QaHistory, RtmSession, SessionDoc } from "./types";
+import { parseAfterFlows } from "../../utils/businessFlow";
+import type { AfterProcess } from "../../utils/businessFlow";
 import type { ModelChoice } from "../ModelSelect";
 
 /**
@@ -41,6 +43,9 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const [impactRun, setImpactRun] = useState<ImpactRun | null>(null);
   const [impactData, setImpactData] = useState<ImpactSnapshot | null>(null);
   const [impactLoaded, setImpactLoaded] = useState(false);
+  // ②의 에프터 업무흐름도 초안(after-flow.json, RTM_AFTER_FLOW_DESIGN.md) — 부재/파싱 실패 = 빈
+  // 배열(비포·에프터 모달이 표식 오버레이로 폴백한다 — 초안 없음은 결함이 아니라 구산출 정상).
+  const [afterFlows, setAfterFlows] = useState<AfterProcess[]>([]);
   // A5: ① 답변 원장 — "제출했으나 아직 개정에 반영 안 된 답"의 출처(§3.2). identified.json 만 보면
   // 개정 실패·새로고침 때 사용자가 방금 친 답이 화면에서 사라진다.
   const [qaHistory, setQaHistory] = useState<QaHistory | null>(null);
@@ -55,7 +60,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
    * 답변 원장도 같은 위험이라 함께 지운다(A5) — 그래서 이름이 impact 가 아니다.
    */
   const resetSessionArtifacts = useCallback(() => {
-    setImpactRun(null); setImpactData(null); setImpactLoaded(false); setQaHistory(null);
+    setImpactRun(null); setImpactData(null); setImpactLoaded(false); setQaHistory(null); setAfterFlows([]);
   }, []);
 
   const startIntake = useCallback(async () => {
@@ -286,6 +291,22 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     } catch { setImpactLoaded(true); }
   }, [sid, tokenQ]);
 
+  /**
+   * ②의 에프터 업무흐름도 초안 로드 — 404(구산출·미생성)는 정상(빈 초안 → 표식 폴백).
+   * 파싱은 parseAfterFlows 가 방어한다(어긋난 프로세스 장만 제외 — 부분 수용).
+   */
+  const loadAfterFlows = useCallback(async () => {
+    if (!sid) return;
+    try {
+      const r = await fetch(`/rtm-intake-doc${tokenQ}&sid=${encodeURIComponent(sid)}&name=after-flow.json`);
+      if (!r.ok) { setAfterFlows([]); return; }
+      const d = (await r.json().catch(() => null)) as { content?: string } | null;
+      let parsed: unknown = null;
+      try { parsed = d?.content ? JSON.parse(d.content) : null; } catch { parsed = null; }
+      setAfterFlows(parseAfterFlows(parsed));
+    } catch { /* 유지 — 폴백 */ }
+  }, [sid, tokenQ]);
+
   // 표시 단계(viewStep 우선, 없으면 산출 최전선) 산출물 자동 미리보기.
   useEffect(() => {
     if (!session) return;
@@ -300,7 +321,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     if (ps === 1 || ps === 2) { void loadIdentified(); setPreviewName(null); }
     // ①에서만 답변 원장을 읽는다 — 인터뷰 블록이 ①에만 있다(②부터는 답변이 잠긴다, D2·§5).
     if (ps === 1) void loadQaHistory();
-    if (ps === 2) void loadImpactRun();
+    if (ps === 2) { void loadImpactRun(); void loadAfterFlows(); }
     if (ps >= 3 && ps <= 5) {
       const kind = STEP_DOC_KIND[ps];
       const doc = sessionDocs.find((d) => d.kind === kind);
@@ -316,7 +337,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     intakeModel, setIntakeModel,
     intakeStatus, intakeError, setIntakeError, sid, session, sessionDocs, stepBusy, viewStep, setViewStep,
     previewName, previewMd, identified, editingDoc, setEditingDoc, draftDoc, setDraftDoc,
-    impactRun, impactData, impactLoaded, qaHistory, jobStep,
+    impactRun, impactData, impactLoaded, afterFlows, qaHistory, jobStep,
     startIntake, advance, confirmStep, saveDoc, discardSession, clearSession, loadPreview, selectSession,
     answerQuestions,
   };

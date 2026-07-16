@@ -6,6 +6,7 @@ import type {
   ImpactSnapshot, QaHistory, ReqOverride, Requirement, RtmModel, RtmSession, RtmTab, SessionDoc,
   SessionRow, Signoff, TestRef, TestResult, TestScenario,
 } from "./types";
+import type { AfterProcess } from "../../utils/businessFlow";
 import type { ModelChoice } from "../ModelSelect";
 
 /**
@@ -137,6 +138,8 @@ export interface RtmCtx {
   impactRun: ImpactRun | null;
   impactData: ImpactSnapshot | null;
   impactLoaded: boolean;
+  /** ②의 에프터 업무흐름도 초안(after-flow.json) — 빈 배열=미생성/구산출(표식 오버레이 폴백). */
+  afterFlows: AfterProcess[];
   /**
    * A5: ① 답변 원장(§3.2) — **제출됐지만 아직 개정에 반영 안 된 답**의 출처.
    * `identified.questions[].answer` 는 개정이 성공해야 채워지므로 둘을 겹쳐 봐야 화면이 정직하다.

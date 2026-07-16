@@ -514,6 +514,7 @@ export default function BusinessFlowView({
   domainName,
   impactIds,
   impactLegend,
+  onOpenFlow,
 }: {
   domainId: string;
   biz: BizFlow;
@@ -527,6 +528,12 @@ export default function BusinessFlowView({
   impactIds?: Set<string>;
   /** 범례의 '영향' 행 설명 — impactIds 렌더에서만 주입(로케일 6종 무접촉, RTM 은 한국어 고정 표면). */
   impactLegend?: string;
+  /**
+   * "기능 열기" 오버라이드(2026-07-17) — 기본 동작은 현재 URL 에 view=code&flow= 를 얹는
+   * 도메인 페이지 전용 내비게이션이라, 비포·에프터 모달(RTM/변경·영향 페이지) 안에서는
+   * 남의 페이지 쿼리를 오염시킨다. 모달은 이걸로 기능흐름도 비포·에프터 전환을 받는다.
+   */
+  onOpenFlow?: (flowRef: string) => void;
 }) {
   const { t } = useI18n();
   const [, setSearchParams] = useSearchParams();
@@ -690,7 +697,9 @@ export default function BusinessFlowView({
   // 업무→코드 드릴다운: 활동 노드의 기능 앵커 → code 탭 + 해당 기능 선택.
   // view+flow 를 한 번의 내비게이션으로 쓰고(라이브 location 기준 — 라이터 경합 방지),
   // store 선택은 별도 반영(URL→store 복원은 1회 게이트라 직접 세팅).
+  // onOpenFlow 가 오면 그쪽이 전부 진다 — 모달 호스트(비포·에프터)의 기능흐름도 전환.
   const openFlow = (flowRef: string) => {
+    if (onOpenFlow) { onOpenFlow(flowRef); return; }
     const p = new URLSearchParams(window.location.search);
     p.set("view", "code");
     p.set("flow", flowRef);

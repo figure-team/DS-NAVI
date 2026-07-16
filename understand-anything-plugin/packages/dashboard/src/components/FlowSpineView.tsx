@@ -116,9 +116,16 @@ interface FlowSpineViewProps {
    * header). Defaults to false (full-screen behavior).
    */
   hideBack?: boolean;
+  /**
+   * 영향 도달 파일 집합(RTM ② 기능흐름도 비포·에프터의 '에프터', 2026-07-17) — step 의
+   * filePath/stepSource.relPath 가 여기 들면 warn 링 + '영향' 배지. 비포 렌더는 미전달.
+   */
+  impactFiles?: Set<string>;
+  /** 변경 시드 파일 집합 — impactFiles 보다 우선 판정('~ 변경' 배지: 도달이 아니라 변경 그 자체). */
+  seedFiles?: Set<string>;
 }
 
-export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps = {}) {
+export default function FlowSpineView({ flowId, hideBack, impactFiles, seedFiles }: FlowSpineViewProps = {}) {
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const storeFlowId = useDashboardStore((s) => s.activeFlowId);
   const activeFlowId = flowId ?? storeFlowId;
@@ -676,6 +683,16 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
               if (!p) return null;
               const color = LAYER_COLOR[step.layer];
               const isSelected = selectedNodeId === step.id;
+              // 영향 표식(비포·에프터 '에프터' 렌더 전용) — filePath/stepSource 로 파일 매칭.
+              // 시드(변경 그 자체)가 도달(연쇄)보다 우선한다.
+              const stepPaths = [step.node.filePath, readStepSource(step.node)?.relPath].filter(
+                (v): v is string => typeof v === "string",
+              );
+              const mark = seedFiles && stepPaths.some((f) => seedFiles.has(f))
+                ? ("seed" as const)
+                : impactFiles && stepPaths.some((f) => impactFiles.has(f))
+                  ? ("reached" as const)
+                  : null;
               // 곁가지 접기: backbone steps with folded entity branches get a
               // disclosure badge ("＋N" folded / "－N" disclosed).
               const branchIds = partition.branchesByParent.get(step.id) ?? [];
@@ -695,10 +712,12 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
                     top: p.y,
                     width: NODE_W,
                     height: NODE_H,
-                    borderColor: isSelected ? color : "var(--color-border-subtle)",
+                    borderColor: isSelected ? color : mark ? "var(--color-status-warn)" : "var(--color-border-subtle)",
                     borderLeft: `3px solid ${color}`,
                     padding: "8px 12px",
                     overflow: "hidden",
+                    // 링은 overflow:hidden 에 안 잘린다(box-shadow) — BusinessFlowView 영향 링과 동일 어휘.
+                    boxShadow: mark ? "0 0 0 3px color-mix(in srgb, var(--color-status-warn) 26%, transparent)" : undefined,
                     ["--node-accent" as string]: color,
                   }}
                 >
@@ -723,6 +742,27 @@ export default function FlowSpineView({ flowId, hideBack }: FlowSpineViewProps =
                     >
                       {step.node.filePath.split("/").pop()}
                     </div>
+                  )}
+                  {/* 영향 배지 — 카드가 overflow:hidden 이라 코너 밖(-9px)이 아니라 안쪽 우하단.
+                      우상단은 곁가지 ＋N 배지 자리라 피한다. */}
+                  {mark && (
+                    <span
+                      className="absolute rounded-full font-bold"
+                      style={{
+                        bottom: 5,
+                        right: 6,
+                        fontSize: 8.5,
+                        lineHeight: 1,
+                        padding: "2px 5px",
+                        color: "var(--color-status-warn)",
+                        background: "color-mix(in srgb, var(--color-status-warn) 14%, var(--color-surface))",
+                        border: "1px solid var(--color-status-warn)",
+                        pointerEvents: "none",
+                      }}
+                      title={mark === "seed" ? "변경 시드 — 이 변경이 직접 고치는 파일의 단계" : "영향 도달 — 변경 시드에서 연쇄로 닿는 파일의 단계"}
+                    >
+                      {mark === "seed" ? "~ 변경" : "영향"}
+                    </span>
                   )}
                   {branchIds.length > 0 && (
                     <button

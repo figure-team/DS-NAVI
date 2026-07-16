@@ -20,11 +20,16 @@
     {
       "id": "domain:order",
       "name": "주문",
-      "functionCount": 4
+      "functionCount": 8
     },
     {
       "id": "domain:web-inf",
       "name": "웹 배포 설정 (web.xml)",
+      "functionCount": 1
+    },
+    {
+      "id": "to-be:screen",
+      "name": "screen",
       "functionCount": 1
     }
   ],
@@ -1524,9 +1529,13 @@
         "evidence": []
       },
       "origin": "AS_IS",
-      "state": "IMPLEMENTED",
-      "requirementHistory": [],
-      "nfrTags": [],
+      "state": "CHANGED",
+      "requirementHistory": [
+        "DAR-040"
+      ],
+      "nfrTags": [
+        "DAR-040"
+      ],
       "rules": [],
       "deliverableRefs": [],
       "custom": {}
@@ -1677,10 +1686,190 @@
         "evidence": []
       },
       "origin": "AS_IS",
-      "state": "IMPLEMENTED",
-      "requirementHistory": [],
+      "state": "CHANGED",
+      "requirementHistory": [
+        "SFR-030"
+      ],
       "nfrTags": [],
       "rules": [],
+      "deliverableRefs": [],
+      "custom": {}
+    },
+    {
+      "id": "to-be:order/authorize-refund",
+      "featureId": "FN-033",
+      "name": "authorize refund",
+      "domainId": "domain:order",
+      "domainName": "주문",
+      "entryPoint": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "SER-060"
+      ],
+      "nfrTags": [
+        "SER-060"
+      ],
+      "rules": [
+        {
+          "reqId": "SER-060",
+          "acId": "AC-6",
+          "text": "본인 주문에 대해서만 환불을 요청할 수 있다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
+      "deliverableRefs": [],
+      "custom": {}
+    },
+    {
+      "id": "to-be:order/process-refund",
+      "featureId": "FN-030",
+      "name": "process refund",
+      "domainId": "domain:order",
+      "domainName": "주문",
+      "entryPoint": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "SFR-030"
+      ],
+      "nfrTags": [],
+      "rules": [
+        {
+          "reqId": "SFR-030",
+          "acId": "AC-2",
+          "text": "환불 요청 후 자동으로 환불을 처리한다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
+      "deliverableRefs": [],
+      "custom": {}
+    },
+    {
+      "id": "to-be:order/refund-request",
+      "featureId": "FN-029",
+      "name": "refund request",
+      "domainId": "domain:order",
+      "domainName": "주문",
+      "entryPoint": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "SFR-030"
+      ],
+      "nfrTags": [],
+      "rules": [
+        {
+          "reqId": "SFR-030",
+          "acId": "AC-1",
+          "text": "생성된 주문에 대해 전체 또는 부분 환불 요청 기능을 제공한다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
+      "deliverableRefs": [],
+      "custom": {}
+    },
+    {
+      "id": "to-be:order/validate-refund-window",
+      "featureId": "FN-031",
+      "name": "validate refund window",
+      "domainId": "domain:order",
+      "domainName": "주문",
+      "entryPoint": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "SFR-030"
+      ],
+      "nfrTags": [],
+      "rules": [
+        {
+          "reqId": "SFR-030",
+          "acId": "AC-3",
+          "text": "주문 후 3일 이내에만 환불을 요청할 수 있다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
       "deliverableRefs": [],
       "custom": {}
     },
@@ -1727,9 +1916,105 @@
       "rules": [],
       "deliverableRefs": [],
       "custom": {}
+    },
+    {
+      "id": "to-be:screen/order-refund-button",
+      "featureId": "FN-032",
+      "name": "order refund button",
+      "domainId": "to-be:screen",
+      "domainName": "screen",
+      "entryPoint": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "implementation": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "data": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "test": {
+        "value": "",
+        "confidence": "UNVERIFIED",
+        "evidence": []
+      },
+      "origin": "TO_BE",
+      "state": "PLANNED",
+      "requirementHistory": [
+        "SIR-050"
+      ],
+      "nfrTags": [
+        "SIR-050"
+      ],
+      "rules": [
+        {
+          "reqId": "SIR-050",
+          "acId": "AC-5",
+          "text": "주문 조회 화면(viewOrder)에 환불 요청 버튼을 노출한다",
+          "kind": "rule",
+          "confidence": "INFERRED"
+        }
+      ],
+      "deliverableRefs": [],
+      "custom": {}
     }
   ],
   "requirements": [
+    {
+      "id": "DAR-040",
+      "text": "주문 상태 확장 (환불 상태)",
+      "type": "nonfunctional",
+      "nfrCategory": "compliance",
+      "nfrScope": [
+        "flow:ANY /actions/Order.action?newOrder"
+      ],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [
+        "SFR-030"
+      ],
+      "source": {
+        "kind": "customer",
+        "raw": "환불 추가",
+        "section": "REQ-003"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-4",
+          "text": "ORDERSTATUS 테이블에 환불 관련 상태값 3가지를 추가한다: REFUND_REQUESTED(환불 요청), REFUND_PROCESSING(처리 중), REFUNDED(완료)",
+          "kind": "rule",
+          "fnIds": [],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-7",
+          "text": "환불 요청 후 자동으로 상태가 REFUND_REQUESTED → REFUND_PROCESSING → REFUNDED 로 전이된다",
+          "kind": "rule",
+          "fnIds": [],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [],
+        "modified": [
+          "flow:ANY /actions/Order.action?newOrder"
+        ],
+        "removed": [],
+        "revived": []
+      }
+    },
     {
       "id": "REQ-001",
       "text": "카카오 OAuth 소셜 로그인 추가 — 카카오 계정으로 로그인/자동가입",
@@ -1922,6 +2207,158 @@
           "flow:ANY /actions/Account.action?signon",
           "flow:ANY /actions/Account.action?newAccount"
         ],
+        "removed": [],
+        "revived": []
+      }
+    },
+    {
+      "id": "SER-060",
+      "text": "환불 권한 제어",
+      "type": "nonfunctional",
+      "nfrCategory": "security",
+      "nfrScope": [
+        "to-be:order/authorize-refund"
+      ],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [
+        "SFR-030"
+      ],
+      "source": {
+        "kind": "customer",
+        "raw": "환불 추가",
+        "section": "REQ-003"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-6",
+          "text": "본인 주문에 대해서만 환불을 요청할 수 있다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:order/authorize-refund"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:order/authorize-refund"
+        ],
+        "modified": [],
+        "removed": [],
+        "revived": []
+      }
+    },
+    {
+      "id": "SFR-030",
+      "text": "주문 환불 기능",
+      "type": "functional",
+      "nfrCategory": null,
+      "nfrScope": [],
+      "priority": "HIGH",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [],
+      "source": {
+        "kind": "customer",
+        "raw": "환불 추가",
+        "section": "REQ-003"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "생성된 주문에 대해 전체 또는 부분 환불 요청 기능을 제공한다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:order/refund-request"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-2",
+          "text": "환불 요청 후 자동으로 환불을 처리한다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:order/process-refund"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        },
+        {
+          "id": "AC-3",
+          "text": "주문 후 3일 이내에만 환불을 요청할 수 있다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:order/validate-refund-window"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:order/refund-request",
+          "to-be:order/process-refund",
+          "to-be:order/validate-refund-window"
+        ],
+        "modified": [
+          "flow:ANY /actions/Order.action?viewOrder"
+        ],
+        "removed": [],
+        "revived": []
+      }
+    },
+    {
+      "id": "SIR-050",
+      "text": "환불 요청 화면 UI",
+      "type": "nonfunctional",
+      "nfrCategory": "usability",
+      "nfrScope": [
+        "to-be:screen/order-refund-button"
+      ],
+      "priority": "MEDIUM",
+      "lifecycle": "RECEIVED",
+      "status": "ACTIVE",
+      "supersedes": null,
+      "supersededBy": null,
+      "dependsOn": [
+        "SFR-030"
+      ],
+      "source": {
+        "kind": "customer",
+        "raw": "환불 추가",
+        "section": "REQ-003"
+      },
+      "changeReq": null,
+      "signoff": null,
+      "acceptanceCriteria": [
+        {
+          "id": "AC-5",
+          "text": "주문 조회 화면(viewOrder)에 환불 요청 버튼을 노출한다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:screen/order-refund-button"
+          ],
+          "confidence": "INFERRED",
+          "tests": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:screen/order-refund-button"
+        ],
+        "modified": [],
         "removed": [],
         "revived": []
       }
@@ -3452,6 +3889,206 @@
       "notes": []
     },
     {
+      "id": "TS-36f7fb99-N",
+      "fnId": "to-be:order/authorize-refund",
+      "reqId": null,
+      "acId": null,
+      "kind": "normal",
+      "title": "authorize refund 정상 처리",
+      "given": "유효한 입력과 선행 상태가 준비됨",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "정상 완료(오류 없음) + 응답/결과 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강"
+      ]
+    },
+    {
+      "id": "TS-36f7fb99-E",
+      "fnId": "to-be:order/authorize-refund",
+      "reqId": null,
+      "acId": null,
+      "kind": "exception",
+      "title": "authorize refund 예외 처리",
+      "given": "필수 입력 누락 또는 부적합한 입력",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "오류를 안전하게 처리(비정상 종료·데이터 오염 없음) + 명확한 오류 응답 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 예외 AC 없음 — 일반형 초안(사람 보강)"
+      ]
+    },
+    {
+      "id": "TS-36f7fb99-B",
+      "fnId": "to-be:order/authorize-refund",
+      "reqId": null,
+      "acId": null,
+      "kind": "boundary",
+      "title": "authorize refund 경계 조건",
+      "given": "경계 입력(빈 값·최대 길이·한계치)",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "경계에서도 일관 동작(오류 없이 처리 또는 명확한 거부)",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
+      ]
+    },
+    {
+      "id": "TS-3f176013-N",
+      "fnId": "to-be:order/process-refund",
+      "reqId": null,
+      "acId": null,
+      "kind": "normal",
+      "title": "process refund 정상 처리",
+      "given": "유효한 입력과 선행 상태가 준비됨",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "정상 완료(오류 없음) + 응답/결과 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강"
+      ]
+    },
+    {
+      "id": "TS-3f176013-E",
+      "fnId": "to-be:order/process-refund",
+      "reqId": null,
+      "acId": null,
+      "kind": "exception",
+      "title": "process refund 예외 처리",
+      "given": "필수 입력 누락 또는 부적합한 입력",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "오류를 안전하게 처리(비정상 종료·데이터 오염 없음) + 명확한 오류 응답 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 예외 AC 없음 — 일반형 초안(사람 보강)"
+      ]
+    },
+    {
+      "id": "TS-3f176013-B",
+      "fnId": "to-be:order/process-refund",
+      "reqId": null,
+      "acId": null,
+      "kind": "boundary",
+      "title": "process refund 경계 조건",
+      "given": "경계 입력(빈 값·최대 길이·한계치)",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "경계에서도 일관 동작(오류 없이 처리 또는 명확한 거부)",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
+      ]
+    },
+    {
+      "id": "TS-e8103bbd-N",
+      "fnId": "to-be:order/refund-request",
+      "reqId": null,
+      "acId": null,
+      "kind": "normal",
+      "title": "refund request 정상 처리",
+      "given": "유효한 입력과 선행 상태가 준비됨",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "정상 완료(오류 없음) + 응답/결과 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강"
+      ]
+    },
+    {
+      "id": "TS-e8103bbd-E",
+      "fnId": "to-be:order/refund-request",
+      "reqId": null,
+      "acId": null,
+      "kind": "exception",
+      "title": "refund request 예외 처리",
+      "given": "필수 입력 누락 또는 부적합한 입력",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "오류를 안전하게 처리(비정상 종료·데이터 오염 없음) + 명확한 오류 응답 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 예외 AC 없음 — 일반형 초안(사람 보강)"
+      ]
+    },
+    {
+      "id": "TS-e8103bbd-B",
+      "fnId": "to-be:order/refund-request",
+      "reqId": null,
+      "acId": null,
+      "kind": "boundary",
+      "title": "refund request 경계 조건",
+      "given": "경계 입력(빈 값·최대 길이·한계치)",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "경계에서도 일관 동작(오류 없이 처리 또는 명확한 거부)",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
+      ]
+    },
+    {
+      "id": "TS-a089f515-N",
+      "fnId": "to-be:order/validate-refund-window",
+      "reqId": null,
+      "acId": null,
+      "kind": "normal",
+      "title": "validate refund window 정상 처리",
+      "given": "유효한 입력과 선행 상태가 준비됨",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "정상 완료(오류 없음) + 응답/결과 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강"
+      ]
+    },
+    {
+      "id": "TS-a089f515-E",
+      "fnId": "to-be:order/validate-refund-window",
+      "reqId": null,
+      "acId": null,
+      "kind": "exception",
+      "title": "validate refund window 예외 처리",
+      "given": "필수 입력 누락 또는 부적합한 입력",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "오류를 안전하게 처리(비정상 종료·데이터 오염 없음) + 명확한 오류 응답 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 예외 AC 없음 — 일반형 초안(사람 보강)"
+      ]
+    },
+    {
+      "id": "TS-a089f515-B",
+      "fnId": "to-be:order/validate-refund-window",
+      "reqId": null,
+      "acId": null,
+      "kind": "boundary",
+      "title": "validate refund window 경계 조건",
+      "given": "경계 입력(빈 값·최대 길이·한계치)",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "경계에서도 일관 동작(오류 없이 처리 또는 명확한 거부)",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
+      ]
+    },
+    {
       "id": "TS-ef87ef36-N",
       "fnId": "flow:ANY *.action",
       "reqId": null,
@@ -3511,23 +4148,73 @@
       "notes": [
         "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
       ]
+    },
+    {
+      "id": "TS-38ff5545-N",
+      "fnId": "to-be:screen/order-refund-button",
+      "reqId": null,
+      "acId": null,
+      "kind": "normal",
+      "title": "order refund button 정상 처리",
+      "given": "유효한 입력과 선행 상태가 준비됨",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "정상 완료(오류 없음) + 응답/결과 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강"
+      ]
+    },
+    {
+      "id": "TS-38ff5545-E",
+      "fnId": "to-be:screen/order-refund-button",
+      "reqId": null,
+      "acId": null,
+      "kind": "exception",
+      "title": "order refund button 예외 처리",
+      "given": "필수 입력 누락 또는 부적합한 입력",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "오류를 안전하게 처리(비정상 종료·데이터 오염 없음) + 명확한 오류 응답 확인",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 예외 AC 없음 — 일반형 초안(사람 보강)"
+      ]
+    },
+    {
+      "id": "TS-38ff5545-B",
+      "fnId": "to-be:screen/order-refund-button",
+      "reqId": null,
+      "acId": null,
+      "kind": "boundary",
+      "title": "order refund button 경계 조건",
+      "given": "경계 입력(빈 값·최대 길이·한계치)",
+      "when": "기능 실행(진입 경로 미상)",
+      "then": "경계에서도 일관 동작(오류 없이 처리 또는 명확한 거부)",
+      "confidence": "INFERRED",
+      "evidence": [],
+      "notes": [
+        "[미확인] 진입점 없음 — 호출 절차는 사람 보강",
+        "[미확인] 데이터 근거 없음 — 경계값은 사람 특정"
+      ]
     }
   ],
   "customFields": [],
   "coverage": {
     "requirements": {
-      "total": 2,
-      "implemented": 0,
+      "total": 6,
+      "implemented": 1,
       "verified": 0,
       "signedOff": 0,
       "byLifecycle": {
-        "RECEIVED": 2
+        "RECEIVED": 6
       }
     },
     "functions": {
-      "total": 28,
-      "implemented": 19,
-      "planned": 6,
+      "total": 33,
+      "implemented": 17,
+      "planned": 11,
       "orphaned": 0,
       "confirmed": 0
     },
@@ -3538,18 +4225,21 @@
       "untested": 0
     },
     "scenarios": {
-      "total": 84,
+      "total": 99,
       "confirmed": 0,
       "byKind": {
-        "normal": 28,
-        "exception": 28,
-        "boundary": 28
+        "normal": 33,
+        "exception": 33,
+        "boundary": 33
       }
     },
     "gaps": {
       "unimplemented": [
         "REQ-001",
-        "REQ-002"
+        "REQ-002",
+        "SER-060",
+        "SFR-030",
+        "SIR-050"
       ],
       "orphanCode": [],
       "unverified": [
@@ -3578,6 +4268,12 @@
       ]
     },
     "byRequirement": {
+      "DAR-040": {
+        "targetsTotal": 1,
+        "targetsBuilt": 1,
+        "acsTotal": 2,
+        "acsPassed": 0
+      },
       "REQ-001": {
         "targetsTotal": 6,
         "targetsBuilt": 3,
@@ -3589,8 +4285,39 @@
         "targetsBuilt": 3,
         "acsTotal": 6,
         "acsPassed": 0
+      },
+      "SER-060": {
+        "targetsTotal": 1,
+        "targetsBuilt": 0,
+        "acsTotal": 1,
+        "acsPassed": 0
+      },
+      "SFR-030": {
+        "targetsTotal": 4,
+        "targetsBuilt": 1,
+        "acsTotal": 3,
+        "acsPassed": 0
+      },
+      "SIR-050": {
+        "targetsTotal": 1,
+        "targetsBuilt": 0,
+        "acsTotal": 1,
+        "acsPassed": 0
       }
     }
   },
-  "diagnostics": []
+  "diagnostics": [
+    {
+      "level": "warn",
+      "code": "unknown-table",
+      "message": "기능 to-be:account/네이버-계정연동-자동가입 data 의 테이블이 db-schema.json 에 없음(신규 제안 — 정당할 수 있음, db-schema 를 보고 제안했는지 검토): OAUTH_ACCOUNT",
+      "ref": "to-be:account/네이버-계정연동-자동가입/data"
+    },
+    {
+      "level": "warn",
+      "code": "unknown-table",
+      "message": "기능 to-be:account/카카오-계정연동-자동가입 data 의 테이블이 db-schema.json 에 없음(신규 제안 — 정당할 수 있음, db-schema 를 보고 제안했는지 검토): OAUTH_ACCOUNT",
+      "ref": "to-be:account/카카오-계정연동-자동가입/data"
+    }
+  ]
 }

@@ -1,0 +1,31 @@
+{
+  "jobId": "1efc46db06501569",
+  "requestId": "REQ-003",
+  "query": "환불 추가",
+  "gitCommit": "50ab1fc7e7c2cbe45a19b4e0673ae36dc7114210",
+  "seedScope": "entryPoint",
+  "seeds": [
+    {
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "origin": "route",
+      "confidence": "CONFIRMED"
+    }
+  ],
+  "bySource": [
+    {
+      "fnId": "flow:ANY /actions/Order.action?newOrder",
+      "relPaths": [
+        "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java"
+      ]
+    },
+    {
+      "fnId": "flow:ANY /actions/Order.action?viewOrder",
+      "relPaths": [
+        "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java"
+      ]
+    }
+  ],
+  "skippedToBe": [],
+  "unknownFnIds": [],
+  "ungroundedFnIds": []
+}

@@ -1457,7 +1457,7 @@ function rtmSessionDir(sid: string): string | null {
   if (!base || !isValidSid(sid)) return null;
   return path.join(base, sid);
 }
-function newRtmSession(sid: string, request: string, targetStep: number): RtmSession {
+function newRtmSession(sid: string, request: string, targetStep: number, model: string | null): RtmSession {
   const steps: Record<string, { status: RtmStepStatus }> = {};
   for (let k = RTM_STEP_MIN; k <= RTM_STEP_MAX; k++) steps[String(k)] = { status: "pending" };
   return {
@@ -1473,6 +1473,8 @@ function newRtmSession(sid: string, request: string, targetStep: number): RtmSes
     targetStep,
     discarded: false,
     steps,
+    // 첫 실행 모델을 세션에 박는다 — 이후 진행·개정이 전부 이 값을 이어받는다(RtmSession.model 주석).
+    model,
   };
 }
 function readRtmSession(sid: string): RtmSession | null {
@@ -1643,7 +1645,7 @@ function handleRtmIntakePost(
   }
   collectRequestBody(req, MAX_IMPACT_QUERY_BYTES)
     .then((body) => {
-      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown; model?: unknown } = {};
+      let parsed: { request?: unknown; sid?: unknown; targetStep?: unknown; model?: unknown; rerunFrom?: unknown } = {};
       try {
         parsed = JSON.parse(body);
       } catch {
@@ -1652,36 +1654,58 @@ function handleRtmIntakePost(
       }
       const wantTarget =
         typeof parsed.targetStep === "number" ? Math.floor(parsed.targetStep) : RTM_STEP_MAX;
-      const model = pickModel(parsed.model);
 
       let session: RtmSession;
       let startStep: number;
       let request: string;
+      let model: string | null;
       if (typeof parsed.sid === "string" && parsed.sid) {
         const existing = readRtmSession(parsed.sid);
         if (!existing) {
           sendJson(res, 404, { error: "Unknown session" });
           return;
         }
-        // 컨펌 게이트 — 미컨펌 산출이 있으면 더 진행 불가(같은 호출 자동진행은 예외, 여기선 새 호출).
-        if (existing.producedStep > existing.confirmedStep) {
-          sendJson(res, 409, {
-            error: `단계 ${existing.producedStep} 을(를) 먼저 컨펌하세요.`,
-            session: existing,
-          });
-          return;
+        const rerunFrom = typeof parsed.rerunFrom === "number" ? Math.floor(parsed.rerunFrom) : null;
+        if (rerunFrom !== null) {
+          // 낡은 단계 재생성(2026-07-17) — 중간 단계 편집 후 뒤 단계를 다시 만든다. 산출 최전선을
+          // rerunFrom-1 로 되감고 그 뒤를 pending 으로 리셋한 뒤 통상 실행기로 태운다.
+          // 컨펌 게이트는 여기 안 건다: 게이트의 목적은 "검토 안 된 얕은 산출 위에 깊은 작업 금지"인데,
+          // 재생성의 근거 문서는 사용자가 방금 손으로 편집한 것이라 검토가 정의상 끝나 있다.
+          if (!(rerunFrom > RTM_STEP_MIN && rerunFrom <= existing.producedStep)) {
+            sendJson(res, 400, { error: "rerunFrom 은 산출된 단계(② 이후) 범위여야 합니다.", session: existing });
+            return;
+          }
+          existing.producedStep = rerunFrom - 1;
+          existing.confirmedStep = Math.min(existing.confirmedStep, rerunFrom - 1);
+          for (let j = rerunFrom; j <= RTM_STEP_MAX; j++) {
+            if (existing.steps[String(j)]) existing.steps[String(j)] = { status: "pending" };
+          }
+          startStep = rerunFrom;
+        } else {
+          // 컨펌 게이트 — 미컨펌 산출이 있으면 더 진행 불가(같은 호출 자동진행은 예외, 여기선 새 호출).
+          if (existing.producedStep > existing.confirmedStep) {
+            sendJson(res, 409, {
+              error: `단계 ${existing.producedStep} 을(를) 먼저 컨펌하세요.`,
+              session: existing,
+            });
+            return;
+          }
+          startStep = existing.producedStep + 1;
         }
         session = existing;
-        startStep = existing.producedStep + 1;
         request = existing.request;
+        // 진행은 **첫 실행 모델을 이어받는다**(2026-07-16) — body 의 model 은 무시한다. 안 그러면
+        // 새로고침·세션 전환으로 브라우저 상태가 리셋된 뒤 "다음 단계"가 다른 모델로 튄다.
+        model = existing.model ?? null;
       } else {
         request = typeof parsed.request === "string" ? parsed.request.trim() : "";
         if (!request) {
           sendJson(res, 400, { error: "Missing 'request'" });
           return;
         }
+        model = pickModel(parsed.model);
         const sid = crypto.randomBytes(8).toString("hex");
-        session = newRtmSession(sid, request, wantTarget);
+        session = newRtmSession(sid, request, wantTarget, model);
         startStep = RTM_STEP_MIN;
         // 세션이 늘어나는 유일한 지점 — 여기서 상한 정리(impact 가 원장 append 시 자르는 것과 동형).
         const base = rtmIntakeBaseDir();
@@ -1828,7 +1852,8 @@ function handleRtmAnswerPost(
         });
         return;
       }
-      const model = pickModel(parsed.model);
+      // 개정도 첫 실행 모델을 이어받는다(진행과 같은 규약, 2026-07-16) — body 의 model 은 무시.
+      const model = session.model ?? null;
       const jobId = rtmTracker.begin({
         sid: session.sid,
         step: RTM_STEP_MIN,
@@ -1872,7 +1897,8 @@ function handleRtmConfirmPost(
       }
       session.confirmedStep = Math.min(Math.max(session.confirmedStep, step), session.producedStep);
       for (let j = RTM_STEP_MIN; j <= session.confirmedStep; j++) {
-        session.steps[String(j)] = { status: "confirmed" };
+        // spread — stale 표시를 컨펌이 지우면 안 된다(편집으로 낡은 산출을 컨펌해도 낡음은 사실).
+        session.steps[String(j)] = { ...session.steps[String(j)], status: "confirmed" };
       }
       writeRtmSession(session);
       sendJson(res, 200, { session });
@@ -1949,7 +1975,20 @@ function handleRtmDocPost(
         sendJson(res, 500, { error: "Failed to write document" });
         return;
       }
-      sendJson(res, 200, { sid, name, saved: true });
+      // 중간 단계 편집 → 이후 산출 단계에 낡음 표시(2026-07-17, RtmSession.steps.stale 주석).
+      // 뒤 단계는 편집 **전** 문서를 근거로 생성됐다 — 표시 없이 두면 조용한 불일치가 된다.
+      // 재생성 강제는 아니다: "낡은 단계 다시 생성"(rerunFrom)은 사용자가 스테퍼에서 고른다.
+      const docStep = name.startsWith("요구사항목록표") ? 3 : name.startsWith("요구사항정의서") ? 4 : name.startsWith("요구사항명세서") ? 5 : null;
+      let session = readRtmSession(sid);
+      if (session && docStep !== null && docStep < session.producedStep) {
+        for (let j = docStep + 1; j <= session.producedStep; j++) {
+          const cur = session.steps[String(j)];
+          if (cur) session.steps[String(j)] = { ...cur, stale: true };
+        }
+        writeRtmSession(session);
+        session = readRtmSession(sid); // 기록 후 재독 — 응답은 디스크의 진실을 준다.
+      }
+      sendJson(res, 200, { sid, name, saved: true, session });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }

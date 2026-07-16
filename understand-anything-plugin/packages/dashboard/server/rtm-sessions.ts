@@ -46,7 +46,20 @@ export interface RtmSession {
   confirmedStep: number; // 사용자가 컨펌한 최고 단계
   targetStep: number;
   discarded: boolean;
-  steps: Record<string, { status: RtmStepStatus }>;
+  /**
+   * `stale` — **이전 단계가 편집된 뒤 재생성되지 않은 산출**(2026-07-17). ③④⑤ 문서 저장 시
+   * 그보다 뒤의 산출 단계에 찍히고(handleRtmDocPost), 그 단계가 다시 실행되는 순간 걷힌다
+   * (setRtmStepStatus 가 엔트리를 통째로 교체). 강제 재생성이 아니라 표시인 이유: 오타 수정
+   * 같은 경미한 편집에 LLM 재실행을 강제하지 않는다 — 재생성 여부는 사용자가 판단한다.
+   */
+  steps: Record<string, { status: RtmStepStatus; stale?: boolean }>;
+  /**
+   * 첫 실행에서 고른 모델(null=세션 기본) — **이후 모든 단계 진행·①개정이 이 값을 이어받는다**
+   * (2026-07-16 사용자 결정). 세션에 박지 않으면 브라우저 상태에 의존해 새로고침·세션 전환 뒤
+   * "다음 단계"가 다른 모델로 튄다. optional 인 이유: 이 필드를 모르는 구세션이 디스크에 실재한다
+   * (없으면 세션 기본 모델 — identifyClaudeSession 부재 폴백과 같은 관례).
+   */
+  model?: string | null;
 }
 
 /** 원장 행 — 세션 1건의 요약 + 이 서버가 실제로 돌리고 있는지(running). */

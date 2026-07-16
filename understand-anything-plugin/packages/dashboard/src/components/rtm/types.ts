@@ -132,7 +132,11 @@ export interface RtmSession {
    *  (server/rtm-sessions.ts `migrateRtmSession`). 프론트에 도달하는 세션은 항상 마이그레이션 후다. */
   schemaVersion?: number;
   sid: string; request: string; producedStep: number; confirmedStep: number;
-  targetStep: number; discarded: boolean; steps: Record<string, { status: string }>;
+  targetStep: number; discarded: boolean;
+  /** stale = 이전 단계 편집 뒤 재생성 안 된 산출(2026-07-17) — 서버 RtmSession.steps 주석 참조. */
+  steps: Record<string, { status: string; stale?: boolean }>;
+  /** 첫 실행 모델(null/부재=세션 기본) — 진행·개정은 서버가 이 값으로 이어간다(2026-07-16). */
+  model?: string | null;
 }
 export interface SessionDoc { name: string; kind: string }
 

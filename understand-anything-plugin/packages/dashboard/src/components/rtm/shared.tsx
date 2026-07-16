@@ -1,9 +1,40 @@
 import { useEffect } from "react";
-import type { ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef, CSSProperties, ReactNode } from "react";
 
 import { useDashboardStore } from "../../store";
-import { BORDER, WARN } from "./types";
+import { BORDER, FAINT, WARN } from "./types";
 import type { Evidence } from "./types";
+
+// ── P9: 근거 축 공통부 — IntakePanel 에서 이동(2026-07-17, ② ImpactStepView 와 공유) ──
+export const REF_ROW = "flex flex-wrap items-baseline";
+export const REF_GAP: CSSProperties = { gap: 6, minWidth: 0 };
+
+/**
+ * 축 한 줄. `state` 가 세 갈래인 것이 이 컴포넌트의 존재 이유다(설계 §4.1 "없음 vs 못 봄"):
+ *  - `filled`  — 근거를 그린다.
+ *  - `none`    — **찾았는데 없다**. `evidence: []`(명시적 빈 배열)만 이 상태가 될 수 있다.
+ *  - `omitted` — **못 봤다**. 축이 통째로 비었거나(화면·정책 축은 생산자 default 가 `[]` 라
+ *                부재와 구별할 수 없다) 인용을 기록하지 않던 시대의 산출(`evidence: undefined`).
+ *
+ * 둘을 "근거 없음" 한 문구로 뭉치면 축소 모드(§10-1: "없으면 생략하되 그 사실을 명시")에서
+ * **생략된 축이 '근거가 없는 축'으로 위장**한다 — 정확히 §4.1 이 경고한 오독이다.
+ *
+ * W5: `noneLabel`/`noneTitle` 은 코드영향 축(ImpactStepView)이 쓴다 — 거기서 `[]` 는 "근거가 없다"
+ * 가 아니라 "엔진이 계산했고 영향받는 게 0건"이다. 기본값은 근거 축(AcRow)의 종전 문구 그대로다.
+ */
+export function Axis({ label, state, noneLabel = "근거 없음", noneTitle = "이 축을 봤으나 근거가 없습니다 — '생략됨'(못 봄)과 다릅니다.", children }: {
+  label: string; state: "filled" | "none" | "omitted"; noneLabel?: string; noneTitle?: string; children?: ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-baseline" style={{ gap: 6, padding: "1px 0" }}>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, flex: "none" }}>{label}</span>
+      {state === "filled" ? children
+        : state === "none"
+          ? <span title={noneTitle} style={{ fontSize: 10.5, color: WARN }}>{noneLabel}</span>
+          : <span title="이 축은 이 산출에 기록되지 않았습니다 — 근거가 없다는 뜻이 아닙니다(축소 모드: 있으면 포함·없으면 생략)." style={{ fontSize: 10.5, color: FAINT }}>생략됨</span>}
+    </div>
+  );
+}
 
 /** 다크 테마 마크다운 컴포넌트(GFM 표 포함) — DocsView 와 동일 패턴(태그별 타이핑). */
 export const MD = {
@@ -22,6 +53,16 @@ export const MD = {
   blockquote: (p: ComponentPropsWithoutRef<"blockquote">) => <blockquote style={{ borderLeft: `2px solid ${WARN}`, margin: "8px 0", padding: "2px 0 2px 11px", color: "var(--color-text-muted)", fontSize: 12 }} {...p} />,
   a: (p: ComponentPropsWithoutRef<"a">) => <a style={{ color: "var(--color-accent)" }} {...p} />,
 };
+
+/** 실행 중 스피너 — 종전 RTM 헤더의 인테이크 진행 표시(2026-07-16 헤더 제거로 세션 원장 행·세션 카드로 이사). */
+export function Spinner({ size = 12 }: { size?: number }) {
+  return (
+    <svg className="animate-spin" style={{ width: size, height: size, flex: "none" }} fill="none" viewBox="0 0 24 24" aria-label="진행 중">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+  );
+}
 
 export function Pill({ label, color, bg }: { label: string; color: string; bg?: string }) {
   return <span style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, display: "inline-flex", width: "max-content", color, background: bg ?? "color-mix(in srgb,currentColor 10%,transparent)", boxShadow: `inset 0 0 0 1px color-mix(in srgb,${color} 22%,transparent)` }}>{label}</span>;

@@ -95,6 +95,8 @@ export interface RtmCtx {
   // 인테이크(P4)
   intakeOpen: boolean;
   setIntakeOpen: (v: boolean) => void;
+  /** 새 요청 모달 열기(에러 리셋 + 목표 ⑥) — 버튼은 요청 세션 탭 좌측 원장 위에 산다(2026-07-16). */
+  openIntake: () => void;
   intakeQuery: string;
   setIntakeQuery: (v: string) => void;
   targetStep: number;
@@ -118,7 +120,8 @@ export interface RtmCtx {
   stepBusy: boolean;
   viewStep: number | null;
   setViewStep: (v: number | null) => void;
-  advance: (toStep: number) => Promise<void>;
+  /** 단계 진행. rerunFrom 지정 시 그 단계부터 되감아 재생성(낡은 단계 재생성, 2026-07-17). */
+  advance: (toStep: number, rerunFrom?: number) => Promise<void>;
   confirmStep: (step: number) => Promise<void>;
   saveDoc: () => Promise<void>;
   discardSession: () => Promise<void>;

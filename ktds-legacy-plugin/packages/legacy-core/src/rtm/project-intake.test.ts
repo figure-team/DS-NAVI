@@ -1,5 +1,5 @@
 /**
- * project-intake 단위테스트 — ⑤ 투영(identified.json → 현 rtm 스키마, 옵션 B).
+ * project-intake 단위테스트 — ⑥ 투영(identified.json → 현 rtm 스키마, 옵션 B).
  */
 import { describe, it, expect } from 'vitest'
 import { parseIdentifiedIntake } from './intake-types.js'

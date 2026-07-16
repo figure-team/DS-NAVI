@@ -65,10 +65,10 @@ describe('computeDiagnostics (C1/C2/M4/M5)', () => {
 })
 
 /**
- * P1c — ⑤ 재bake 표면(rtm-requirements.json 이 투영된 기능 셀)의 근거 게이트.
+ * P1c — ⑥ 재bake 표면(rtm-requirements.json 이 투영된 기능 셀)의 근거 게이트.
  * 규칙은 P1b(`intake-types.ts` `checkIntakeGrounding`) 재사용: 신규 제안=warn, 확정 단언=error.
  */
-describe('checkCellGrounding (P1c) — ⑤ 표면 실재 대조', () => {
+describe('checkCellGrounding (P1c) — ⑥ 표면 실재 대조', () => {
   const JPETSTORE_TABLES = ['ACCOUNT', 'SIGNON', 'PROFILE']
   /** data 셀만 바꾼 기능 행 — 나머지 축은 테이블 표기가 없는 값으로 둔다. */
   function dataFn(id: string, value: string, confidence: Confidence): RtmFunctionRow {

@@ -215,10 +215,10 @@ function ReqCard({ r }: { r: IntakeRequirement }) {
   );
 }
 
-// ── W5: ① 코드영향 검증 인라인 (RTM_INTAKE_WORKSPACE_DESIGN.md §2.3) ─────────
+// ── ② 영향분석 — 코드영향 검증 (RTM_INTAKE_WORKSPACE_DESIGN.md §2.3) ─────────
 /** 라우트·흐름 id → 사람이 읽는 표기("flow:ANY /x" · "route:ANY /x" → "/x"). ChangeImpactView:177 동형. */
 const shortRef = (id: string): string => id.replace(/^(?:flow|route):/, "").replace(/^ANY\s+/, "");
-/** 목록 상한 — ①은 열람이 아니라 **컨펌 직전 스캔**이라 다 쏟지 않는다. 전체는 /change 에서 본다. */
+/** 목록 상한 — ②는 열람이 아니라 **컨펌 직전 스캔**이라 다 쏟지 않는다. 전체는 /change 에서 본다. */
 const CAP = 8;
 /** 상한 초과분 표기 — 침묵 누락 금지(FileGroups "외 n건" 과 같은 규약). */
 function Over({ n }: { n: number }) {
@@ -231,14 +231,14 @@ const axisState = (xs: unknown[] | undefined): "filled" | "none" | "omitted" =>
 const NONE_T = "엔진이 계산했고 영향받는 항목이 0건입니다 — '생략됨'(안 적음)과 다릅니다.";
 
 /**
- * ①의 코드영향 검증 결과 — 설계 §2.3 "한 번 돌리고 두 곳에서 본다".
+ * ②영향분석의 산출 — 설계 §2.3 "한 번 돌리고 두 곳에서 본다".
  *
  * 데이터가 두 조각인 게 이 컴포넌트의 형태를 정한다: **세션 포인터**(`impact-run.json` — 시드와
  * 그 출처)와 **원장 스냅샷**(`impact-history/<jobId>/impact.json` — 상·하류). 포인터가 산출을
  * 세션에 복사하지 않고 jobId 로 가리키므로 여기와 `/change` 가 **같은 스냅샷**을 읽는다 —
  * 두 표면이 갈라질 수 없다. 그래서 링크가 장식이 아니라 계약이다.
  *
- * 부재는 세 갈래이고 절대 "없음" 한 문구로 뭉치지 않는다(§4.1 "없음 vs 못 봄" — ①은 컨펌 직전
+ * 부재는 세 갈래이고 절대 "없음" 한 문구로 뭉치지 않는다(§4.1 "없음 vs 못 봄" — ②는 컨펌 직전
  * 판단 자리라 "미실행"이 "영향 없음"으로 읽히는 대가가 크다):
  *  - **미실행** — 변경 대상이 있는데 아직 안 돌렸다.
  *  - **해당없음** — 신규(to-be)뿐이라 시드가 없다. `code-impact` 는 이때 포인터를 아예 안 쓴다.
@@ -358,13 +358,21 @@ function ImpactInline() {
     </div>
   );
 
+  const modified = (identified?.requirements ?? []).flatMap((r) => r.changeset?.modified ?? []);
   return (
-    <div style={{ marginTop: 16, borderTop: BORDER, paddingTop: 12 }}>
-      <div className="flex items-baseline flex-wrap" style={{ gap: 8, marginBottom: 6 }}>
+    <div>
+      <div style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginBottom: 4 }}>
+        ①이 분해한 <b style={{ color: "var(--color-text-primary)" }}>변경 대상 {modified.length}</b>건에서
+        무엇이 연쇄로 영향받는지 — <b style={{ color: "var(--color-text-primary)" }}>영향도 엔진</b>이 계산한 결과입니다.
+      </div>
+      {/* ② 가 무엇을 근거로 말하는지 못 박는다 — 여기 숫자는 산문이 아니라 엔진 출력이다. */}
+      <div className="text-text-muted" style={{ fontSize: 10.5, lineHeight: 1.5, marginBottom: 12 }}>
+        시드는 <b className="text-text-secondary">결정론 조인</b>으로 뽑습니다(changeset.modified → 추적표 진입점 근거).
+        <b style={{ color: FAINT }}> 생략됨</b> = 이 산출에 그 축이 기록되지 않음,
+        <b style={{ color: WARN }}> 없음</b> = 엔진이 계산했고 영향받는 항목이 0건.
+      </div>
+      <div className="flex items-baseline flex-wrap" style={{ gap: 8, marginBottom: 6, borderTop: BORDER, paddingTop: 12 }}>
         <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--color-text-secondary)" }}>코드영향 검증</span>
-        <span className="text-text-muted" style={{ fontSize: 10.5 }}>
-          바뀐 기능에서 무엇이 연쇄로 영향받나 — 컨펌 전 판단 근거입니다.
-        </span>
         {/* §2.3 "한 번 돌리고 두 곳에서 본다" — 같은 jobId 스냅샷을 원장 렌즈에서 연다. */}
         {impactRun && (
           <Link to={`/change?run=${encodeURIComponent(impactRun.jobId)}`} title={`변경·영향 원장에서 이 분석("${impactRun.query}")을 엽니다 — 같은 산출의 전체 열람.`}
@@ -395,9 +403,6 @@ function IdentifiedView() {
       <div className="flex flex-col gap-1.5">
         {reqs.map((r) => <ReqCard key={r.id} r={r} />)}
       </div>
-      {/* W5: 코드영향 검증(§2.3) — 요구사항 분해 **아래**에 둔다. 분해된 요구사항의
-          changeset.modified 가 이 분석의 입력이므로 읽는 순서가 곧 인과 순서다. */}
-      <ImpactInline />
       {qs.length > 0 && (
         <div style={{ marginTop: 16, borderTop: BORDER, paddingTop: 12 }}>
           <div style={{ fontSize: 11.5, color: BAD, marginBottom: 6, fontWeight: 600 }}>[확인필요] — 다음 단계 전에 검토하세요</div>
@@ -430,8 +435,8 @@ export function IntakeStepContent() {
   const ps = viewStep ?? frontier; // 표시 단계(스테퍼에서 고른 단계)
   const isFrontier = ps === frontier;
   const confirmed = session.confirmedStep >= ps;
-  const canAdvance = isFrontier && session.confirmedStep >= frontier && frontier < 5;
-  const isDoc = ps >= 2 && ps <= 4;
+  const canAdvance = isFrontier && session.confirmedStep >= frontier && frontier < 6;
+  const isDoc = ps >= 3 && ps <= 5; // ③목록표 ④정의서 ⑤명세서 — .md 편집 대상
   return (
     <div className="flex flex-col" style={{ height: "52vh" }}>
       <div className="flex items-center gap-3 shrink-0 border-b border-border-subtle" style={{ padding: "10px 20px" }}>
@@ -446,14 +451,15 @@ export function IntakeStepContent() {
           </>}
           {isFrontier && !confirmed && !editingDoc && <button type="button" onClick={() => void confirmStep(frontier)} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12, fontWeight: 600 }}>✓ 컨펌</button>}
           {canAdvance && <button type="button" onClick={() => void advance(frontier + 1)} disabled={stepBusy} className="rounded-md bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>다음 단계 ▸</button>}
-          {canAdvance && frontier < 4 && <button type="button" onClick={() => void advance(5)} disabled={stepBusy} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent disabled:opacity-50" style={{ padding: "5px 11px", fontSize: 12 }}>⑤까지 ▸</button>}
+          {canAdvance && frontier < 5 && <button type="button" onClick={() => void advance(6)} disabled={stepBusy} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent disabled:opacity-50" style={{ padding: "5px 11px", fontSize: 12 }}>⑥까지 ▸</button>}
         </span>
       </div>
       <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "14px 20px" }}>
         {ps === 1 ? <IdentifiedView />
-          : ps === 5 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑤ RTM 반영 완료 — <b style={{ color: "var(--color-text-primary)" }}>요청 기준</b> 탭에서 분해된 요청·요구사항과 추적 결과를 확인하세요. <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
+          : ps === 2 ? <ImpactInline />
+          : ps === 6 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑥ RTM 반영 완료 — <b style={{ color: "var(--color-text-primary)" }}>요청 기준</b> 탭에서 분해된 요청·요구사항과 추적 결과를 확인하세요. <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
           : editingDoc ? <textarea value={draftDoc} onChange={(e) => setDraftDoc(e.target.value)} spellCheck={false} className="w-full h-full resize-none rounded-lg bg-elevated border border-border-medium text-text-primary focus:outline-none focus:border-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.55, padding: "10px 12px" }} />
-          : ps === 4 ? <SpecTabs />
+          : ps === 5 ? <SpecTabs />
           : <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD}>{stripFrontmatter(previewMd)}</ReactMarkdown>}
       </div>
     </div>
@@ -472,12 +478,12 @@ export function IntakeModal() {
           <button onClick={() => setIntakeOpen(false)} aria-label="닫기" className="text-text-muted hover:text-text-primary" style={{ fontSize: 18, lineHeight: 1 }}>×</button>
         </div>
         <div style={{ padding: "16px 20px" }}>
-          <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 10 }}>고객 요청을 자연어로 입력하세요. 요청(REQ)을 요구사항(SFR/SIR/DAR/SER…)으로 분해해 가이드 5단계로 문서화합니다.<span className="text-text-muted"> 결과는 전부 <code style={{ fontFamily: "var(--font-mono)" }}>[추정]</code> — 단계마다 검토·컨펌하세요.</span></p>
-          {/* 범위 경계(P9 갱신) — 종전 문구는 "코드 영향 범위는 여기서 분석하지 않습니다" 였으나
-              P5 로 ①식별이 분석 산출물 6축을 근거로 읽게 되면서 절반이 낡았다. 그렇다고 impact
-              엔진을 부르는 건 아니다(P6 진행 중) — 자연어 입구가 둘인 이상(여기 · 변경·영향의
-              "자연어 영향 분석") 무엇을 주고 무엇을 안 주는지 여기서 정확히 갈라야 한다. */}
-          <p className="text-text-muted" style={{ fontSize: 11.5, lineHeight: 1.6, marginBottom: 10 }}>이미 분석된 산출물(화면·정책·도메인·데이터·추적표)을 근거로 분해합니다. 다만 <b className="text-text-secondary">코드 도달성 분석</b>(바뀐 파일에서 무엇이 연쇄로 영향받는지)은 아직 별도입니다 — <b className="text-text-secondary">변경·영향</b> 메뉴에서 실행하세요.</p>
+          <p className="text-text-secondary" style={{ fontSize: 12.5, lineHeight: 1.6, marginBottom: 10 }}>고객 요청을 자연어로 입력하세요. 요청(REQ)을 요구사항(SFR/SIR/DAR/SER…)으로 분해해 6단계로 문서화합니다.<span className="text-text-muted"> 결과는 전부 <code style={{ fontFamily: "var(--font-mono)" }}>[추정]</code> — 단계마다 검토·컨펌하세요.</span></p>
+          {/* 범위 경계 — 자연어 입구가 둘이므로(여기 · 변경·영향의 "자연어 영향 분석") 무엇을 주고
+              무엇을 안 주는지 정확히 갈라야 한다. 종전 문구는 "코드 도달성은 변경·영향에서"였으나
+              ②영향분석이 독립 단계가 되며 낡았다 — 이제 여기서도 돌린다. 남은 차이는 **시드 도출**:
+              여기는 ①의 changeset 에서 결정론 조인, 변경·영향은 임의 파일집합. */}
+          <p className="text-text-muted" style={{ fontSize: 11.5, lineHeight: 1.6, marginBottom: 10 }}>이미 분석된 산출물(화면·정책·도메인·데이터·추적표)을 근거로 분해하고, <b className="text-text-secondary">②영향분석</b>에서 코드 도달성(바뀐 기능에서 무엇이 연쇄로 영향받는지)까지 확인합니다. 임의 파일집합으로 영향만 보려면 <b className="text-text-secondary">변경·영향</b> 메뉴를 쓰세요.</p>
           <textarea value={intakeQuery} onChange={(e) => setIntakeQuery(e.target.value)} onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") void startIntake(); }} placeholder="예) 네이버 로그인 추가해주세요." rows={3} autoFocus className="w-full resize-y rounded-lg bg-elevated border border-border-medium text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent" style={{ fontSize: 13, padding: "8px 11px" }} />
           <div style={{ marginTop: 14 }}>
             <div className="text-text-muted" style={{ fontSize: 11, marginBottom: 7 }}>어디까지 진행할까요? <span style={{ color: "var(--color-text-secondary)" }}>(선택 단계까지 한 번에 생성 후 멈춤)</span></div>
@@ -490,7 +496,7 @@ export function IntakeModal() {
                 </button>
               ))}
             </div>
-            <div className="text-text-muted" style={{ fontSize: 10.5, marginTop: 6 }}>{targetStep === 5 ? "⑤ RTM까지 — 추적표에 바로 반영(한 방에 완료)." : `${CIRCLED[targetStep - 1]} ${STEP_DEFS[targetStep - 1].label}까지 생성 후 검토 대기.`}</div>
+            <div className="text-text-muted" style={{ fontSize: 10.5, marginTop: 6 }}>{targetStep === 6 ? "⑥ RTM까지 — 추적표에 바로 반영(한 방에 완료)." : `${CIRCLED[targetStep - 1]} ${STEP_DEFS[targetStep - 1].label}까지 생성 후 검토 대기.`}</div>
           </div>
           {intakeError && <p style={{ fontSize: 11.5, marginTop: 8, color: BAD }}>{intakeError}</p>}
         </div>

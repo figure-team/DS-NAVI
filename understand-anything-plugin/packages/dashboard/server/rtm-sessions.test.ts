@@ -11,6 +11,7 @@ import {
   readAllRtmSessions,
   readRtmSession,
   reconcileRtmSessions,
+  RTM_SESSION_SCHEMA_VERSION,
   rtmSessionDir,
   writeRtmSession,
   type RtmSession,
@@ -28,21 +29,54 @@ afterEach(() => {
 const sid = (n: number): string => n.toString(16).padStart(16, "0");
 const never = (): boolean => false;
 
-/** 세션 1건 생성 — steps 는 전부 pending, createdAt 은 인자로 고정(정렬 검증용). */
+/**
+ * 세션 1건 생성 — steps 는 전부 pending, createdAt 은 인자로 고정(정렬 검증용).
+ * **현행 스키마(v2 = 6단계)로 쓴다** — 구 5단계 세션의 마이그레이션은 아래 전용 describe 가 다룬다.
+ */
 function seed(n: number, createdAt: string, over: Partial<RtmSession> = {}): RtmSession {
   const s: RtmSession = {
+    schemaVersion: RTM_SESSION_SCHEMA_VERSION,
     sid: sid(n),
     request: `요청 ${n}`,
     createdAt,
     producedStep: 0,
     confirmedStep: 0,
-    targetStep: 5,
+    targetStep: 6,
     discarded: false,
     steps: { "1": { status: "pending" }, "2": { status: "pending" } },
     ...over,
   };
   writeRtmSession(base, s);
   return s;
+}
+
+/** 구 5단계 세션(schemaVersion 없음)을 **날것으로** 디스크에 쓴다 — 마이그레이션 입력. */
+function seedLegacy(n: number, over: Record<string, unknown> = {}): void {
+  const dir = path.join(base, sid(n));
+  fs.mkdirSync(dir, { recursive: true });
+  const s = {
+    sid: sid(n),
+    request: `구 요청 ${n}`,
+    createdAt: "2026-07-16T00:00:00.000Z",
+    producedStep: 1,
+    confirmedStep: 0,
+    targetStep: 1,
+    discarded: false,
+    steps: {
+      "1": { status: "produced" },
+      "2": { status: "pending" },
+      "3": { status: "pending" },
+      "4": { status: "pending" },
+      "5": { status: "pending" },
+    },
+    ...over,
+  };
+  fs.writeFileSync(path.join(dir, "session.json"), JSON.stringify(s, null, 2) + "\n", "utf8");
+}
+
+/** 구 ①이 코드영향까지 돌린 흔적 — 마이그레이션이 ② 승격 근거로 삼는 관측 사실. */
+function seedImpactRun(n: number): void {
+  fs.writeFileSync(path.join(base, sid(n), "impact-run.json"), JSON.stringify({ jobId: "j1" }), "utf8");
 }
 
 /** session.json 의 mtime 을 과거로 밀어 "마지막 전이 이후 경과"를 흉내낸다. */
@@ -210,5 +244,83 @@ describe("pruneRtmSessions", () => {
     pruneRtmSessions(base, never, 1);
     expect(fs.existsSync(bystander)).toBe(true);
     expect(readAllRtmSessions(base).map((s) => s.sid)).toEqual([sid(3)]);
+  });
+});
+
+// ── 구 5단계 → 6단계 마이그레이션(2026-07-16) ────────────────────────────────
+describe("migrateRtmSession — 구 5단계 세션", () => {
+  it("schemaVersion 부재 = 구 세션 → v2 로 재사상", () => {
+    seedLegacy(1);
+    const s = readRtmSession(base, sid(1))!;
+    expect(s.schemaVersion).toBe(RTM_SESSION_SCHEMA_VERSION);
+  });
+
+  it("★ producedStep 1 + impact-run.json → ②까지 산출됨(구 ①이 code-impact 를 돌렸다)", () => {
+    seedLegacy(1);
+    seedImpactRun(1);
+    const s = readRtmSession(base, sid(1))!;
+    expect(s.producedStep).toBe(2);
+    expect(s.steps["1"].status).toBe("produced");
+    expect(s.steps["2"].status).toBe("produced");
+  });
+
+  it("★ impact-run.json 이 없으면 ①에 그대로 — 거짓 완료를 만들지 않는다", () => {
+    seedLegacy(1);
+    const s = readRtmSession(base, sid(1))!;
+    expect(s.producedStep).toBe(1);
+    expect(s.steps["2"].status).toBe("pending");
+  });
+
+  it("★ 구 ②③④⑤ → 신 ③④⑤⑥ (k+1) — 라벨이 따라간다", () => {
+    // 구 producedStep 5 = 구 ⑤RTM 까지 = 신 ⑥RTM. 신 ⑤(명세서)로 오독하면 안 된다.
+    seedLegacy(1, {
+      producedStep: 5,
+      confirmedStep: 4,
+      targetStep: 5,
+      steps: {
+        "1": { status: "confirmed" }, "2": { status: "confirmed" }, "3": { status: "confirmed" },
+        "4": { status: "confirmed" }, "5": { status: "produced" },
+      },
+    });
+    const s = readRtmSession(base, sid(1))!;
+    expect(s.producedStep).toBe(6);
+    expect(s.confirmedStep).toBe(5);
+    expect(s.steps["6"].status).toBe("produced"); // 구 ⑤RTM 이 신 ⑥RTM 자리로
+  });
+
+  it("★ confirmedStep 은 승격하지 않는다 — 안 누른 컨펌을 만들지 않는다", () => {
+    // 구 ① 컨펌 + impact-run 존재 → produced 2 지만 confirmed 는 1 에 머문다.
+    // 결과 confirmed(1) < produced(2) 라 서버 게이트가 ②를 컨펌하라고 정직하게 막는다.
+    seedLegacy(1, { confirmedStep: 1, steps: { "1": { status: "confirmed" } } });
+    seedImpactRun(1);
+    const s = readRtmSession(base, sid(1))!;
+    expect(s.producedStep).toBe(2);
+    expect(s.confirmedStep).toBe(1);
+    expect(s.steps["2"].status).toBe("produced");
+  });
+
+  it("★ 멱등 — 두 번 읽어도 단계가 또 밀리지 않는다(schemaVersion 이 막는다)", () => {
+    seedLegacy(1, { producedStep: 3, targetStep: 5 });
+    const once = readRtmSession(base, sid(1))!;
+    writeRtmSession(base, once); // 정상 쓰기 경로가 v2 로 굳힌다
+    const twice = readRtmSession(base, sid(1))!;
+    expect(twice.producedStep).toBe(once.producedStep);
+    expect(twice.producedStep).toBe(4);
+    expect(twice.targetStep).toBe(once.targetStep);
+  });
+
+  it("★ 읽기는 디스크를 건드리지 않는다 — mtime 이 밀리면 reconcile 이 무력화된다", () => {
+    seedLegacy(1);
+    const file = path.join(base, sid(1), "session.json");
+    const before = fs.statSync(file).mtimeMs;
+    readRtmSession(base, sid(1));
+    expect(fs.statSync(file).mtimeMs).toBe(before);
+  });
+
+  it("구 세션의 고착 running 도 reconcile 이 복원한다(마이그레이션과 공존)", () => {
+    seedLegacy(1, { steps: { "1": { status: "running" } } });
+    backdate(1, RECONCILE_GRACE_MS + 1000);
+    expect(reconcileRtmSessions(base, never)).toBe(1);
+    expect(stepStatus(1, "1")).toBe("failed");
   });
 });

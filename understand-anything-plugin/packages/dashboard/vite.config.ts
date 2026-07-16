@@ -26,6 +26,7 @@ import {
   pruneRtmSessions,
   readRtmSession as readRtmSessionIn,
   reconcileRtmSessions,
+  RTM_SESSION_SCHEMA_VERSION,
   writeRtmSession as writeRtmSessionIn,
   type RtmSession,
   type RtmStepStatus,
@@ -1336,12 +1337,16 @@ function reconcileImpactHistory(projectRoot: string): void {
   });
 }
 
-// ── P3: RTM 단계 인테이크 — 가이드 5단계를 단계당 claude -p 1회로 ─────
+// ── P3: RTM 단계 인테이크 — 6단계를 단계당 claude -p 1회로 ─────
 // 한 POST 가 start..target 단계를 순차 spawn(중간 컨펌 없이 자동진행), target 에서 멈춤. 단계마다
 // claude -p "/understand-rtm --intake --session <sid> --step <k>". 세션 상태는 디스크(session.json)에
 // 영속, 인메모리 rtmTracker 는 실행 추적(409 차단). 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §5.
+// 6단계(2026-07-16): ①식별 ②영향분석 ③목록표 ④정의서 ⑤명세서 ⑥RTM — 종전 ① 안에 있던 코드영향
+// 검증이 독립 단계 ②가 됐다(RTM_IMPACT_GATE_DESIGN.md §6.5 개정).
 const RTM_STEP_MIN = 1;
-const RTM_STEP_MAX = 5;
+const RTM_STEP_MAX = 6;
+/** ②영향분석 — `rtm-intake.mjs code-impact` 를 돌리는 단계. 디렉티브 분기의 앵커. */
+const RTM_STEP_IMPACT = 2;
 /**
  * ①식별 전용 근거 계약 — 여기 주입 컨텍스트가 **0바이트**여서 인테이크가 근거 없이 설계를 지어내고
  * 있었다(RTM_IMPACT_GATE_DESIGN.md §1.1 "주입 컨텍스트 0바이트"). 번들 **경로와 계약**만 싣는다:
@@ -1362,12 +1367,34 @@ function rtmIdentifyGroundingDirective(sid: string): string {
     `커밋이 어긋나면(\`commits.consistent:false\`) 그 축에 의존하는 결론은 [추정]으로 강등하라.`
   );
 }
+/**
+ * ②영향분석 전용 계약 — ①의 짝이다. **각 단계가 자기 계약만 받는다**: ①은 근거 번들(무엇을 바꾸나),
+ * ②는 코드영향(그게 무엇을 건드리나). 종전엔 이 둘이 ① 하나에 얹혀 있었고 디렉티브도 ①에만 붙어
+ * 코드영향 계약은 SKILL 본문에만 있었다.
+ *
+ * 여기서 시드 도출을 못 박는 이유는 ①의 번들 강제와 같다 — LLM 이 `code-impact` 를 **건너뛰고**
+ * 산문으로 "이 요청은 X·Y·Z 를 건드립니다"를 지어내는 이탈을 막는다. 그게 정확히
+ * RTM_CHANGE_MENU_BOUNDARY 가 드리프트 결함으로 지목한 것이다.
+ */
+function rtmImpactDirective(sid: string): string {
+  return (
+    ` ②영향분석은 **엔진 실행 결과만** 보고한다: \`rtm-intake.mjs code-impact <projectRoot> --session ${sid}\` 를 ` +
+    `SKILL.md §B --step 2 지침대로 실행하고, 그 출력(영향 도메인·흐름·API·매퍼)을 보고에 실어라. ` +
+    `**시드를 네가 고르지 마라** — \`identified.json\` 의 \`changeset.modified\` → rtm.json 진입점 근거로 ` +
+    `조인하는 건 코드가 한다. **영향 범위를 산문으로 지어내지 마라** — 엔진이 출력한 것만이 근거다. ` +
+    `\`⚠ 진입점 근거 0건\` 경고가 뜨면 그 기능은 시드에서 빠진 것이니 **영향 범위가 그만큼 덜 보인다는 사실을 ` +
+    `보고에 명시**하라(조용히 넘어가면 "없음"과 "못 봄"을 뭉개는 것이다). ` +
+    `modified 가 없거나 전부 \`to-be:\`(신규)면 **시드 없음으로 정상 종료**다 — 바꿀 기존 코드가 없다는 뜻이니 ` +
+    `실패가 아니다. 그 사실을 그대로 보고하라.`
+  );
+}
 function rtmStepDirective(step: number, sid: string): string {
   return headlessDirective(
     `위 작업은 대시보드 추적표에서 자동 실행된 헤드리스 단계 ${step} 이다.`,
     ` SKILL.md §B 의 --step ${step} 지침만 끝까지 수행한 뒤 보고하고 멈춰라. 다음 단계는 사용자 컨펌 후 별도로 ` +
       `진행된다. 신규는 전부 [추정]이며 확정은 사람이 대시보드에서 한다.` +
-      (step === RTM_STEP_MIN ? rtmIdentifyGroundingDirective(sid) : ""),
+      (step === RTM_STEP_MIN ? rtmIdentifyGroundingDirective(sid) : "") +
+      (step === RTM_STEP_IMPACT ? rtmImpactDirective(sid) : ""),
   );
 }
 
@@ -1407,6 +1434,8 @@ function newRtmSession(sid: string, request: string, targetStep: number): RtmSes
   const steps: Record<string, { status: RtmStepStatus }> = {};
   for (let k = RTM_STEP_MIN; k <= RTM_STEP_MAX; k++) steps[String(k)] = { status: "pending" };
   return {
+    // 새 세션은 6단계 체계로 태어난다 — 스탬프가 없으면 마이그레이터가 구 5단계로 오인한다.
+    schemaVersion: RTM_SESSION_SCHEMA_VERSION,
     sid,
     request,
     createdAt: new Date().toISOString(),
@@ -1456,7 +1485,7 @@ function listRtmSessionDocs(sid: string): { name: string; kind: string }[] {
 /**
  * 세션 JSON 산출물 화이트리스트 — 프론트가 이름으로 조회하는 것만. 편집(POST)은 여기 없고
  * `.md` 만 통과하므로(handleRtmDocPost) 이 목록은 **읽기 전용 노출**이다.
- * `impact-run.json` = W5 의 ① 코드영향 인라인이 읽는 세션 포인터(RTM_INTAKE_WORKSPACE_DESIGN.md §2.3).
+ * `impact-run.json` = ②영향분석의 산출 포인터(RTM_INTAKE_WORKSPACE_DESIGN.md §2.3).
  */
 const RTM_SESSION_JSON_FILES = new Set(["identified.json", "impact-run.json"]);
 /** 세션 파일 이름 검증 — basename 만, .md 또는 화이트리스트 JSON. traversal 차단. */
@@ -1594,7 +1623,7 @@ function handleRtmIntakePost(
       }
 
       if (startStep > RTM_STEP_MAX) {
-        sendJson(res, 400, { error: "이미 모든 단계(⑤)가 산출되었습니다.", session });
+        sendJson(res, 400, { error: "이미 모든 단계(⑥)가 산출되었습니다.", session });
         return;
       }
       const target = Math.min(Math.max(wantTarget, startStep), RTM_STEP_MAX);

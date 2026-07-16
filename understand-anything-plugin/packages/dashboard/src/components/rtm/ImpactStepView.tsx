@@ -251,7 +251,9 @@ export default function ImpactStepView() {
         <FlowCompareModal
           flows={up?.flows ?? []}
           addedNames={addedNames}
-          // 기능흐름도 에프터의 표식 재료 — 시드(변경 그 자체)와 도달(연쇄)을 파일 집합으로 가른다.
+          // 표식 재료 — 시드(변경 기점)와 도달(연쇄)을 가른다. 파일 집합=기능흐름도, flow id
+          // 집합=업무흐름도(bySource 의 fnId 가 곧 flow id — 활동 flowRef 와 결정론 일치).
+          seedFlowIds={new Set(impactRun.bySource.map((s) => s.fnId))}
           seedFiles={new Set(impactRun.bySource.flatMap((s) => s.relPaths))}
           impactFiles={new Set([
             ...(up?.files ?? []).map((f) => f.relPath),

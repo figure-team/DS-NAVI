@@ -32,7 +32,10 @@ interface Candidate {
   domainName: string;
   title: string;
   flow: BizFlow;
+  /** 도달 활동(시드 제외) — '영향' 배지. */
   impactIds: Set<string>;
+  /** 변경 기점 활동(flowRef ∈ 시드 기능) — '~ 변경 기점' 배지. 도달과 라벨을 가른다(오독 방지). */
+  seedIds: Set<string>;
   rejected: string | null;
 }
 
@@ -82,14 +85,20 @@ function MarkGlyph({ label }: { label: string }) {
   );
 }
 
-export default function FlowCompareModal({ flows, addedNames, impactFiles, seedFiles, onClose }: {
+export default function FlowCompareModal({ flows, addedNames, impactFiles, seedFiles, seedFlowIds, onClose }: {
   flows: { flowId: string; domainId: string }[];
   /** ①의 changeset.added — 위치 미정 신규 후보(도식 창작 금지 → 칩 표기). 없으면 빈 배열. */
   addedNames: string[];
   /** 영향 도달 파일 집합(상류 API·파일 + 하류 파일·매퍼) — 기능흐름도 에프터의 표식 재료. */
   impactFiles: Set<string>;
-  /** 변경 시드 파일 집합 — 기능흐름도 에프터에서 '~ 변경'으로 도달과 구분. */
+  /** 변경 시드 파일 집합 — 기능흐름도 에프터에서 '~ 변경 기점'으로 도달과 구분. */
   seedFiles: Set<string>;
+  /**
+   * 변경 기점 기능(flow) id 집합 — 업무흐름도 에프터에서 시드 기능의 활동을 '~ 변경 기점'으로
+   * 가른다(RTM ②: impactRun.bySource 의 fnId 가 곧 flow id). 원장(/change)엔 이 정보가 없어
+   * 생략 가능 — 그땐 전부 '영향'으로만 표식한다(근거 없는 승격 금지).
+   */
+  seedFlowIds?: Set<string>;
   onClose: () => void;
 }) {
   useEscClose(onClose);
@@ -106,23 +115,29 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
       if (!node) continue;
       const rejected = businessFlowRejectedReason(node);
       for (const proc of parseBusinessFlows(node)) {
-        const ids = new Set(
-          proc.flow.nodes.filter((n) => n.flowRef && affected.has(n.flowRef)).map((n) => n.id),
+        const seedIds = new Set(
+          proc.flow.nodes.filter((n) => n.flowRef && seedFlowIds?.has(n.flowRef)).map((n) => n.id),
         );
-        if (ids.size > 0) {
+        const ids = new Set(
+          proc.flow.nodes
+            .filter((n) => n.flowRef && affected.has(n.flowRef) && !seedIds.has(n.id))
+            .map((n) => n.id),
+        );
+        if (ids.size > 0 || seedIds.size > 0) {
           out.push({
             domainId,
             domainName: node.name ?? domainId.replace(/^domain:/, ""),
             title: proc.title ?? `프로세스 ${proc.index + 1}`,
             flow: proc.flow,
             impactIds: ids,
+            seedIds,
             rejected,
           });
         }
       }
     }
     return out;
-  }, [domainGraph, flows, affected]);
+  }, [domainGraph, flows, affected, seedFlowIds]);
 
   const [sel, setSel] = useState(0);
   const cur = candidates[Math.min(sel, Math.max(candidates.length - 1, 0))] ?? null;
@@ -165,7 +180,7 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
                 <button key={`${c.domainId}:${c.title}:${i}`} type="button" onClick={() => setSel(i)}
                   className="rounded-md transition-colors cursor-pointer whitespace-nowrap" style={chipStyle(i === sel)}>
                   {c.domainName} — {c.title}
-                  <span className="tabular-nums" style={{ marginLeft: 5, fontSize: 9.5, color: WARN }}>영향 {c.impactIds.size}</span>
+                  <span className="tabular-nums" style={{ marginLeft: 5, fontSize: 9.5, color: WARN }}>표식 {c.seedIds.size + c.impactIds.size}</span>
                 </button>
               ))}
             </span>
@@ -184,10 +199,10 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
           {/* 기능흐름도 표식 범례 — FlowSpineView 엔 범례 패널이 없어 헤더가 진다. */}
           {view === "code" && (
             <span className="flex items-center" style={{ gap: 9, marginLeft: 6 }}>
-              <span className="flex items-center" style={{ gap: 4, fontSize: 10, color: "var(--color-text-secondary)" }}>
-                <MarkGlyph label="~ 변경" />시드 파일의 단계
+              <span className="flex items-center" style={{ gap: 4, fontSize: 10, color: "var(--color-text-secondary)" }} title="①식별이 변경 대상으로 지목한 기능의 진입점 파일">
+                <MarkGlyph label="~ 변경 기점" />시드 파일의 단계
               </span>
-              <span className="flex items-center" style={{ gap: 4, fontSize: 10, color: "var(--color-text-secondary)" }}>
+              <span className="flex items-center" style={{ gap: 4, fontSize: 10, color: "var(--color-text-secondary)" }} title="변경 기점에서 연쇄로 닿는 파일 — 구현 시 함께 수정될 수 있으나 그 판정은 여기서 하지 않는다">
                 <MarkGlyph label="영향" />도달 파일의 단계
               </span>
             </span>
@@ -214,7 +229,8 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
               </Pane>
               <Pane label="에프터 — 변경 반영 시 (영향 도달 표식)" tone={WARN} style={{ borderLeft: BORDER }} foot={<AddedFoot addedNames={addedNames} />}>
                 <BusinessFlowView key={`after-${sel}`} domainId={cur.domainId} biz={cur.flow} rejectedReason={cur.rejected} title={`에프터 — ${cur.title}`} domainName={cur.domainName}
-                  impactIds={cur.impactIds} impactLegend="영향 도달 — 이 변경이 연쇄로 건드리는 활동" onOpenFlow={openCode} />
+                  impactIds={cur.impactIds} seedIds={cur.seedIds}
+                  impactLegend="영향 도달 — 변경 기점에서 연쇄로 닿는 활동(구현 시 함께 수정될 수 있음)" onOpenFlow={openCode} />
               </Pane>
             </div>
           )
@@ -233,8 +249,9 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
 
         {/* 정직성 각주 — 에프터는 미래 도식의 창작이 아니라 영향 도달의 투영이다. */}
         <div className="shrink-0 border-t border-border-subtle text-text-muted" style={{ padding: "7px 18px", fontSize: 10.5, lineHeight: 1.5 }}>
-          <b className="text-text-secondary">에프터</b>는 현행 도식 위에 <b style={{ color: WARN }}>영향 도달</b>(변경 시드에서 연쇄로 닿는 {view === "biz" ? "활동" : "단계"})을 표식한 것입니다 —
-          확정 전 요청의 미래 토폴로지({view === "biz" ? "활동" : "단계"} 추가·삭제)는 엔진 산출이 아니라 그리지 않습니다.
+          <b className="text-text-secondary">에프터</b>는 현행 도식 위에 <b style={{ color: WARN }}>~ 변경 기점</b>(①이 지목한 변경 기능)과 <b style={{ color: WARN }}>영향</b>(기점에서 연쇄로 닿는 {view === "biz" ? "활동" : "단계"})을 표식한 것입니다.
+          <b className="text-text-secondary"> 영향 {view === "biz" ? "활동" : "단계"}도 구현 시 함께 수정될 수 있습니다</b> — 무엇을 고칠지의 판정은 엔진 산출이 아니라 여기서 단언하지 않으며,
+          미래 토폴로지({view === "biz" ? "활동" : "단계"} 추가·삭제)도 그리지 않습니다.
           {view === "biz" && <> 활동을 누른 뒤 <b className="text-text-secondary">기능 열기</b>를 누르면 그 기능의 <b className="text-text-secondary">기능흐름도 비포·에프터</b>로 들어갑니다.</>}
         </div>
       </div>

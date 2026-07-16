@@ -759,9 +759,11 @@ export default function FlowSpineView({ flowId, hideBack, impactFiles, seedFiles
                         border: "1px solid var(--color-status-warn)",
                         pointerEvents: "none",
                       }}
-                      title={mark === "seed" ? "변경 시드 — 이 변경이 직접 고치는 파일의 단계" : "영향 도달 — 변경 시드에서 연쇄로 닿는 파일의 단계"}
+                      title={mark === "seed"
+                        ? "변경 기점(시드) — ①식별이 변경 대상으로 지목한 기능의 진입점 파일입니다"
+                        : "영향 도달 — 변경 기점에서 연쇄로 닿는 파일의 단계입니다. 구현 시 함께 수정될 수 있으나, 수정 여부 판정은 엔진 산출이 아니라 여기서 단언하지 않습니다"}
                     >
-                      {mark === "seed" ? "~ 변경" : "영향"}
+                      {mark === "seed" ? "~ 변경 기점" : "영향"}
                     </span>
                   )}
                   {branchIds.length > 0 && (

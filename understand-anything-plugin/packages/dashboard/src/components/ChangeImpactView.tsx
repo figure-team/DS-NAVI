@@ -10,6 +10,11 @@ import { Chip, UnresolvedModal } from "./data-map/UnresolvedChips";
 import type { DbUnresolved } from "./data-map/types";
 import type { BadgeTone } from "./proto/Proto";
 import SearchInput from "./ui/SearchInput";
+// RTM ② 영향분석과 표면 정렬(2026-07-17) — 같은 조건 카드·같은 비포·에프터 모달을 쓴다.
+// 두 화면이 같은 스냅샷을 읽으므로(§2.3 "한 번 돌리고 두 곳에서 본다") 표현도 갈라지지 않는다.
+import DataCompareModal from "./rtm/DataCompareModal";
+import FlowCompareModal from "./rtm/FlowCompareModal";
+import { CompareBtn, SectionCard } from "./rtm/ImpactStepView";
 
 /**
  * 변경 · 영향 분석 뷰(pmpl-proto pg-change 정합) — impact.json 을 CR 단위 화면으로 승격한다.
@@ -559,6 +564,9 @@ export default function ChangeImpactView() {
   const warnReview = needsReview.filter((r) => r.severity !== "info");
   const infoReview = needsReview.filter((r) => r.severity === "info");
   const [reviewInfoOpen, setReviewInfoOpen] = useState(false);
+  // 비포·에프터 모달(RTM ②와 공유) — 업무/기능흐름도 · 데이터.
+  const [flowCompare, setFlowCompare] = useState(false);
+  const [dataCompare, setDataCompare] = useState(false);
 
   const infoRows: InfoRow[] = [
     { label: "산출물", value: "impact.json" },
@@ -909,79 +917,97 @@ export default function ChangeImpactView() {
             </div>
           )}
 
-          {/* 영향받는 진입점(라우트) — upstream.api */}
-          {api.length > 0 && (
-            <div className={CARD} style={{ padding: "16px 18px", marginBottom: 14 }}>
-              <h3 style={PANEL_H3}>
-                영향받는 진입점 <span className="text-text-muted" style={{ fontWeight: 500 }}>({api.length})</span>
-              </h3>
-              {api.map((r) => {
-                const verdict = verdictOf.get(r.id);
-                const vb = verdict ? VERDICT[verdict] : undefined;
-                return (
-                  <div key={r.id} className="flex items-center gap-2" style={ROW}>
-                    <span
-                      className="truncate"
-                      title={r.id}
-                      style={{ fontFamily: "var(--font-mono)", fontSize: 12, minWidth: 0, flex: "1 1 auto", color: "var(--color-text-primary)" }}
-                    >
-                      {r.handler}
-                    </span>
-                    {vb && (
-                      <Badge tone={vb.tone} style={{ flex: "none" }}>
-                        {vb.label}
-                      </Badge>
-                    )}
-                    <CiteBtn filePath={r.filePath} line={r.line} onOpen={openCodeViewerAt} />
-                  </div>
-                );
-              })}
+          {/* 상류 영향 — 진입점(API)·도메인·플로우 한 카드(2026-07-17, RTM ② 조건 카드와 동형).
+              종전 "영향받는 진입점"/"영향 도메인·플로우" 두 카드의 통합. */}
+          {(api.length > 0 || domains.length > 0 || flows.length > 0) && (
+            <div style={{ marginBottom: 14 }}>
+              <SectionCard
+                tone="var(--color-status-info)" icon="↑" title="상류 영향" sub="이 변경이 흔드는 것 — 진입점 기반 추정(기계 판정)"
+                action={
+                  <CompareBtn
+                    label="업무흐름도 비포·에프터"
+                    onClick={() => setFlowCompare(true)}
+                    disabled={flows.length === 0}
+                    title={flows.length === 0 ? "영향받는 업무 흐름이 없어 비교할 도식이 없습니다" : "현행 업무흐름도(비포)와 영향 도달 표식(에프터)을 나란히 봅니다 — 기능흐름도 전환 포함"}
+                  />
+                }
+              >
+                {api.length > 0 && (
+                  <>
+                    <div style={GRP_LABEL}>진입점 ({api.length})</div>
+                    {api.map((r) => {
+                      const verdict = verdictOf.get(r.id);
+                      const vb = verdict ? VERDICT[verdict] : undefined;
+                      return (
+                        <div key={r.id} className="flex items-center gap-2" style={ROW}>
+                          <span
+                            className="truncate"
+                            title={r.id}
+                            style={{ fontFamily: "var(--font-mono)", fontSize: 12, minWidth: 0, flex: "1 1 auto", color: "var(--color-text-primary)" }}
+                          >
+                            {r.handler}
+                          </span>
+                          {vb && (
+                            <Badge tone={vb.tone} style={{ flex: "none" }}>
+                              {vb.label}
+                            </Badge>
+                          )}
+                          <CiteBtn filePath={r.filePath} line={r.line} onOpen={openCodeViewerAt} />
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+                {domains.length > 0 && (
+                  <>
+                    <div style={GRP_LABEL}>도메인 ({domains.length})</div>
+                    <div className="flex flex-wrap" style={{ gap: 6 }}>
+                      {domains.map((d) => (
+                        <Link key={d.domainId} to={`/domains/${encodeURIComponent(d.domainId)}`} title={d.domainId} style={CHIP}>
+                          {d.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {flows.length > 0 && (
+                  <>
+                    <div style={GRP_LABEL}>플로우 ({flows.length})</div>
+                    <div className="flex flex-wrap" style={{ gap: 6 }}>
+                      {flows.map((f) => (
+                        <Link
+                          key={f.flowId}
+                          to={`/domains/${encodeURIComponent(f.domainId)}?flow=${encodeURIComponent(f.flowId)}`}
+                          title={`${f.flowId} · ${f.domainName}`}
+                          style={CHIP}
+                        >
+                          {shortFlow(f.flowId)}
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
+                <div className="text-text-muted" style={{ fontSize: 11.5, marginTop: 5 }}>
+                  칩 클릭 시 도메인 · 순서도로 이동 — 비포·에프터는 우상단 버튼
+                </div>
+              </SectionCard>
             </div>
           )}
 
-          {/* 영향 도메인 · 플로우 — upstream.domains / upstream.flows (진입점 기반 추정) */}
-          {(domains.length > 0 || flows.length > 0) && (
-            <div className={CARD} style={{ padding: "16px 18px", marginBottom: 14 }}>
-              <h3 style={PANEL_H3}>영향 도메인 · 플로우</h3>
-              {domains.length > 0 && (
-                <>
-                  <div style={GRP_LABEL}>도메인 ({domains.length})</div>
-                  <div className="flex flex-wrap" style={{ gap: 6 }}>
-                    {domains.map((d) => (
-                      <Link key={d.domainId} to={`/domains/${encodeURIComponent(d.domainId)}`} title={d.domainId} style={CHIP}>
-                        {d.name}
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              )}
-              {flows.length > 0 && (
-                <>
-                  <div style={GRP_LABEL}>플로우 ({flows.length})</div>
-                  <div className="flex flex-wrap" style={{ gap: 6 }}>
-                    {flows.map((f) => (
-                      <Link
-                        key={f.flowId}
-                        to={`/domains/${encodeURIComponent(f.domainId)}?flow=${encodeURIComponent(f.flowId)}`}
-                        title={`${f.flowId} · ${f.domainName}`}
-                        style={CHIP}
-                      >
-                        {shortFlow(f.flowId)}
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              )}
-              <div className="text-text-muted" style={{ fontSize: 11.5, marginTop: 8 }}>
-                도메인·플로우는 진입점 기반 추정(기계 판정) — 칩 클릭 시 도메인 · 순서도로 이동
-              </div>
-            </div>
-          )}
-
-          {/* 건드리는 DB — 매퍼 + 테이블 카탈로그 (persistence) */}
+          {/* 하류 의존(데이터) — 매퍼 + 테이블 카탈로그 (persistence). RTM ② 하류 카드와 동형. */}
           {(mappers.length > 0 || tables.length > 0) && (
-            <div className={CARD} style={{ padding: "16px 18px", marginBottom: 14 }}>
-              <h3 style={PANEL_H3}>건드리는 DB</h3>
+            <div style={{ marginBottom: 14 }}>
+              <SectionCard
+                tone="var(--color-layer-dao)" icon="↓" title="하류 의존 — 건드리는 DB" sub="이 변경이 기대는 데이터"
+                action={
+                  <CompareBtn
+                    label="데이터 비포·에프터"
+                    onClick={() => setDataCompare(true)}
+                    disabled={tables.length === 0}
+                    title={tables.length === 0 ? "도달 테이블 기록이 없어 비교할 대상이 없습니다" : "현행 스키마(비포)와 변경 도달 테이블 표식(에프터)을 나란히 봅니다"}
+                  />
+                }
+              >
               {mappers.length > 0 && (
                 <>
                   <div style={GRP_LABEL}>매퍼 ({mappers.length})</div>
@@ -1038,14 +1064,14 @@ export default function ChangeImpactView() {
                   </div>
                 </>
               )}
+              </SectionCard>
             </div>
           )}
 
           {/* 2컬럼 패널 */}
           <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: 14 }}>
-            {/* 좌 — 영향 분해 (하류 + 상류, viaKinds 그룹) */}
-            <div className={CARD} style={{ padding: "16px 18px" }}>
-              <h3 style={PANEL_H3}>영향 분해</h3>
+            {/* 좌 — 영향 분해 (하류 + 상류 파일 전량, viaKinds 그룹) — RTM ② 조건 카드와 동형. */}
+            <SectionCard tone="var(--color-layer-dao)" icon="⇉" title="영향 분해 — 도달 파일" sub="시드에서 연쇄로 닿는 파일 전량" count={upFiles.length + downFiles.length}>
 
               {/* 툴바 — 파일 검색 + viaKind 필터(?q=&via=). 검색 활성 시 12행 캡 해제(전량 도달). */}
               <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 10 }}>
@@ -1095,7 +1121,7 @@ export default function ChangeImpactView() {
                 d = 시드로부터 도달 깊이 · 근거(file:line) 클릭 시 코드 열람
                 {importOnly > 0 && ` · import 전용 간선 ${importOnly}건은 도달성에서 제외됨`}
               </div>
-            </div>
+            </SectionCard>
 
             {/* 우 — 확인 필요 · 후속 조치 */}
             <div className={CARD} style={{ padding: "16px 18px" }}>
@@ -1133,6 +1159,27 @@ export default function ChangeImpactView() {
           </div>
         </div>
       </div>
+
+      {/* 비포·에프터 모달 — RTM ② 와 같은 컴포넌트·같은 스냅샷(표면이 갈라질 수 없다). */}
+      {flowCompare && (
+        <FlowCompareModal
+          flows={flows.map((f) => ({ flowId: f.flowId, domainId: f.domainId }))}
+          // 원장 분석은 요청(①) 없이 도는 임의 질의 — changeset.added 개념이 없다.
+          addedNames={[]}
+          seedFiles={new Set(data.seeds.map((s) => s.relPath))}
+          impactFiles={new Set([
+            ...upFiles.map((f) => f.relPath),
+            ...downFiles.map((f) => f.relPath),
+            ...api.map((r) => r.filePath),
+            ...mappers.map((m) => m.relPath),
+          ])}
+          onClose={() => setFlowCompare(false)}
+        />
+      )}
+      {dataCompare && (
+        // 원장 시드는 파일(relPath)이라 기능명이 없다 — CRUD 조인 대신 스냅샷의 테이블 카탈로그로 도달만 표식.
+        <DataCompareModal tables={tables.map((t) => t.name)} onClose={() => setDataCompare(false)} />
+      )}
     </div>
   );
 }

@@ -14,6 +14,13 @@ import { parseCitations, type DomainClaimCitation, type DomainFlow } from "./dom
 export type BizNodeKind = "start" | "end" | "activity" | "decision";
 const BIZ_KINDS: ReadonlySet<string> = new Set(["start", "end", "activity", "decision"]);
 
+/**
+ * 에프터 도식(after-flow.json)의 변경 표기 — RTM ② 가 제안한 미래 업무흐름도 초안 전용
+ * (RTM_AFTER_FLOW_DESIGN.md, 2026-07-17). 현행 도식(domainMeta.businessFlows)에는 없다.
+ */
+export type BizChange = "added" | "modified" | "removed";
+const BIZ_CHANGES: ReadonlySet<string> = new Set(["added", "modified", "removed"]);
+
 export interface BizFlowNode {
   id: string;
   kind: BizNodeKind;
@@ -22,6 +29,8 @@ export interface BizFlowNode {
   flowRef?: string;
   /** emit 기계검증 결과(activity/decision 만) — 없으면 검증 항목 없음(start/end). */
   verdict?: "GROUNDED" | "NEEDS_REVIEW";
+  /** 에프터 초안의 변경 표기 — added=신규 삽입 · modified=변경 기점 · removed=삭제 예정(잔존 렌더). */
+  change?: BizChange;
   citations: DomainClaimCitation[];
 }
 
@@ -29,6 +38,8 @@ export interface BizFlowEdge {
   from: string;
   to: string;
   label?: string;
+  /** 에프터 초안 전용 — 신규 활동을 잇는 제안 연결([추정], 점선 렌더). */
+  change?: "added";
 }
 
 export interface BizFlow {
@@ -106,6 +117,7 @@ function parseBizGraph(rawInput: unknown): BizFlow | null {
       flowRef: typeof o.flowRef === "string" ? o.flowRef : undefined,
       verdict:
         o.verdict === "GROUNDED" || o.verdict === "NEEDS_REVIEW" ? o.verdict : undefined,
+      change: typeof o.change === "string" && BIZ_CHANGES.has(o.change) ? (o.change as BizChange) : undefined,
       citations: parseCitations(o.citations),
     });
   }
@@ -119,9 +131,52 @@ function parseBizGraph(rawInput: unknown): BizFlow | null {
     // emit 이 정합 검증을 통과시킨 산출물만 병합하지만, 손편집/구버전 방어로
     // 끝점 미실존 엣지는 조용히 버리지 않고 전체를 폴백으로 보낸다(부분 렌더 금지).
     if (!ids.has(o.from) || !ids.has(o.to)) return null;
-    edges.push({ from: o.from, to: o.to, label: typeof o.label === "string" ? o.label : undefined });
+    edges.push({
+      from: o.from,
+      to: o.to,
+      label: typeof o.label === "string" ? o.label : undefined,
+      change: o.change === "added" ? "added" : undefined,
+    });
   }
   return { nodes, edges, fallback: false };
+}
+
+// ── RTM ② 에프터 도식 초안(after-flow.json) — RTM_AFTER_FLOW_DESIGN.md ────────
+/**
+ * 에프터 프로세스 1건 — `domainId`+`baseTitle` 이 비포(현행 businessFlows 의 프로세스)와
+ * 짝짓는 키다. 짝이 없으면 대시보드는 초안을 버리고 표식 오버레이로 폴백한다(부분 수용).
+ */
+export interface AfterProcess {
+  domainId: string;
+  /** 기반이 된 현행 프로세스 제목 — 비포 패널과의 조인 키. */
+  baseTitle: string;
+  flow: BizFlow;
+  /** 초안 한 줄 근거(선택) — 엔진이 제안 이유를 남긴 경우. */
+  note?: string;
+}
+
+/**
+ * after-flow.json 파싱 — ②(LLM)가 쓴 산출물이라 **전부 방어적**이다: 형태가 어긋난
+ * 프로세스는 그 장만 조용히 제외(parseBusinessFlows 와 같은 부분 수용). 도식 자체는
+ * parseBizGraph 를 그대로 태워 현행 도식과 동일 정합 기준(끝점 실존 등)을 적용한다.
+ */
+export function parseAfterFlows(rawInput: unknown): AfterProcess[] {
+  const raw = rawInput as { flows?: unknown } | undefined | null;
+  if (!raw || !Array.isArray(raw.flows)) return [];
+  const out: AfterProcess[] = [];
+  for (const item of raw.flows as unknown[]) {
+    const o = item as Record<string, unknown>;
+    if (typeof o.domainId !== "string" || typeof o.baseTitle !== "string") continue;
+    const flow = parseBizGraph(o);
+    if (!flow) continue;
+    out.push({
+      domainId: o.domainId,
+      baseTitle: o.baseTitle,
+      flow,
+      note: typeof o.note === "string" ? o.note : undefined,
+    });
+  }
+  return out;
 }
 
 /** 폴백 순차 나열의 activity 상한 — 초과분은 "…외 N건" 집계 노드로 접는다(리뷰 C3). */

@@ -71,7 +71,7 @@ export function CompareBtn({ label, onClick, disabled, title }: { label: string;
 }
 
 export default function ImpactStepView() {
-  const { identified, impactRun, impactData, impactLoaded, fnById } = useRtm();
+  const { identified, impactRun, impactData, impactLoaded, afterFlows, fnById } = useRtm();
   const [flowCompare, setFlowCompare] = useState(false);
   const [dataCompare, setDataCompare] = useState(false);
   const up = impactData?.upstream;
@@ -251,6 +251,7 @@ export default function ImpactStepView() {
         <FlowCompareModal
           flows={up?.flows ?? []}
           addedNames={addedNames}
+          afterFlows={afterFlows}
           // 표식 재료 — 시드(변경 기점)와 도달(연쇄)을 가른다. 파일 집합=기능흐름도, flow id
           // 집합=업무흐름도(bySource 의 fnId 가 곧 flow id — 활동 flowRef 와 결정론 일치).
           seedFlowIds={new Set(impactRun.bySource.map((s) => s.fnId))}

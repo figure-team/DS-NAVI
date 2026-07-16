@@ -1388,7 +1388,16 @@ function rtmImpactDirective(sid: string): string {
     `\`⚠ 진입점 근거 0건\` 경고가 뜨면 그 기능은 시드에서 빠진 것이니 **영향 범위가 그만큼 덜 보인다는 사실을 ` +
     `보고에 명시**하라(조용히 넘어가면 "없음"과 "못 봄"을 뭉개는 것이다). ` +
     `modified 가 없거나 전부 \`to-be:\`(신규)면 **시드 없음으로 정상 종료**다 — 바꿀 기존 코드가 없다는 뜻이니 ` +
-    `실패가 아니다. 그 사실을 그대로 보고하라.`
+    `실패가 아니다. 그 사실을 그대로 보고하라.` +
+    // 에프터 업무흐름도 초안(RTM_AFTER_FLOW_DESIGN.md, 2026-07-17) — 비포·에프터 모달의 에프터가
+    // 구조 차이를 실제로 보여주기 위한 산출. SKILL §B --step 2 의 4번 지침과 같은 계약이다.
+    ` 엔진 보고 후 **에프터 업무흐름도 초안**을 \`<세션>/after-flow.json\` 으로 써라(SKILL §B --step 2 의 4번): ` +
+    `\`.understand-anything/domain-graph.json\` 에서 영향 흐름(flowRef)이 등장하는 업무 프로세스(domainMeta.businessFlows)를 찾아, ` +
+    `그 노드·엣지를 **id 그대로 복사**한 뒤 changeset 근거로만 바꾼다 — added 기능은 신규 활동 노드 삽입` +
+    `(change:"added", flowRef 는 to-be id, 잇는 엣지도 change:"added"), removed 기능의 활동은 change:"removed" 로 남기고(제거 금지 — diff 가 보여야 한다), ` +
+    `modified 기능의 활동은 change:"modified". **changeset 에 없는 구조 변경(재배치·이름 변경·무근거 분기)은 금지**다. ` +
+    `형식: {"schemaVersion":1,"flows":[{"domainId","baseTitle"(원 프로세스 제목 그대로 — 대시보드 조인 키),"nodes":[...],"edges":[...],"note"(선택, 제안 근거 한 줄)}]}. ` +
+    `모든 엣지 끝점은 실존 노드여야 한다(어긋나면 대시보드가 그 장을 통째로 기각한다). 삽입 위치·순서는 네 판단([추정])이되 note 에 근거를 남겨라.`
   );
 }
 function rtmStepDirective(step: number, sid: string): string {
@@ -1523,6 +1532,8 @@ function listRtmSessionDocs(sid: string): { name: string; kind: string }[] {
 const RTM_SESSION_JSON_FILES = new Set([
   "identified.json",
   "impact-run.json",
+  // ②의 에프터 업무흐름도 초안(RTM_AFTER_FLOW_DESIGN.md) — 비포·에프터 모달이 읽는다.
+  "after-flow.json",
   "qa-history.json",
 ]);
 /** 세션 파일 이름 검증 — basename 만, .md 또는 화이트리스트 JSON. traversal 차단. */

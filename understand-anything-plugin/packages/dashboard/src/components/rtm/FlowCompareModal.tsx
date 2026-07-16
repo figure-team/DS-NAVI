@@ -5,7 +5,7 @@ import { useDashboardStore } from "../../store";
 import BusinessFlowView from "../BusinessFlowView";
 import FlowSpineView from "../FlowSpineView";
 import { businessFlowRejectedReason, parseBusinessFlows } from "../../utils/businessFlow";
-import type { BizFlow } from "../../utils/businessFlow";
+import type { AfterProcess, BizFlow } from "../../utils/businessFlow";
 import { findDomain } from "../../utils/domainData";
 import { useEscClose } from "./shared";
 import { BORDER, FAINT, OK, WARN } from "./types";
@@ -31,6 +31,8 @@ interface Candidate {
   domainId: string;
   domainName: string;
   title: string;
+  /** 원 제목(무제목이면 null) — 에프터 초안(baseTitle)과의 조인 키(표시 폴백 제목과 분리). */
+  rawTitle: string | null;
   flow: BizFlow;
   /** 도달 활동(시드 제외) — '영향' 배지. */
   impactIds: Set<string>;
@@ -85,7 +87,7 @@ function MarkGlyph({ label }: { label: string }) {
   );
 }
 
-export default function FlowCompareModal({ flows, addedNames, impactFiles, seedFiles, seedFlowIds, onClose }: {
+export default function FlowCompareModal({ flows, addedNames, impactFiles, seedFiles, seedFlowIds, afterFlows, onClose }: {
   flows: { flowId: string; domainId: string }[];
   /** ①의 changeset.added — 위치 미정 신규 후보(도식 창작 금지 → 칩 표기). 없으면 빈 배열. */
   addedNames: string[];
@@ -99,6 +101,13 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
    * 생략 가능 — 그땐 전부 '영향'으로만 표식한다(근거 없는 승격 금지).
    */
   seedFlowIds?: Set<string>;
+  /**
+   * ②의 에프터 업무흐름도 초안(after-flow.json 파싱본) — 있으면 에프터 패널이 **실제 미래
+   * 도식**(신규 삽입·삭제 잔존·변경 기점, 전부 [추정])을 그린다. 없거나(구산출·원장 렌즈)
+   * 현 프로세스와 짝이 안 맞으면 표식 오버레이로 폴백한다 — 그래야 비포·에프터가 구조
+   * 차이를 보여준다는 존재 이유가 선다(2026-07-17 사용자 결정).
+   */
+  afterFlows?: AfterProcess[];
   onClose: () => void;
 }) {
   useEscClose(onClose);
@@ -128,6 +137,7 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
             domainId,
             domainName: node.name ?? domainId.replace(/^domain:/, ""),
             title: proc.title ?? `프로세스 ${proc.index + 1}`,
+            rawTitle: proc.title,
             flow: proc.flow,
             impactIds: ids,
             seedIds,
@@ -141,6 +151,10 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
 
   const [sel, setSel] = useState(0);
   const cur = candidates[Math.min(sel, Math.max(candidates.length - 1, 0))] ?? null;
+  // 에프터 초안 짝짓기 — domainId + baseTitle(원 제목). 무제목 프로세스는 조인 불가 → 폴백.
+  const draft = cur && cur.rawTitle
+    ? afterFlows?.find((a) => a.domainId === cur.domainId && a.baseTitle === cur.rawTitle) ?? null
+    : null;
 
   // 기능흐름도 모드 — 업무흐름도의 "기능 열기" 드릴다운이 여기로 전환한다. 업무 프로세스
   // 도식이 없어도(후보 0) 영향 흐름만 있으면 기능흐름도 비교는 가능하므로 초기 모드를 가른다.
@@ -227,11 +241,31 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
               <Pane label="비포 — 현행" tone={OK}>
                 <BusinessFlowView key={`before-${sel}`} domainId={cur.domainId} biz={cur.flow} rejectedReason={cur.rejected} title={`비포 — ${cur.title}`} domainName={cur.domainName} onOpenFlow={openCode} />
               </Pane>
-              <Pane label="에프터 — 변경 반영 시 (영향 도달 표식)" tone={WARN} style={{ borderLeft: BORDER }} foot={<AddedFoot addedNames={addedNames} />}>
-                <BusinessFlowView key={`after-${sel}`} domainId={cur.domainId} biz={cur.flow} rejectedReason={cur.rejected} title={`에프터 — ${cur.title}`} domainName={cur.domainName}
-                  impactIds={cur.impactIds} seedIds={cur.seedIds}
-                  impactLegend="영향 도달 — 변경 기점에서 연쇄로 닿는 활동(구현 시 함께 수정될 수 있음)" onOpenFlow={openCode} />
-              </Pane>
+              {draft ? (
+                <Pane
+                  label="에프터 — 미래 도식 초안 [추정]"
+                  tone={WARN}
+                  style={{ borderLeft: BORDER }}
+                  foot={
+                    <div className="shrink-0 border-t border-border-subtle text-text-muted" style={{ padding: "7px 14px", fontSize: 10.5, lineHeight: 1.5 }}>
+                      <b style={{ color: WARN }}>[추정]</b> ②가 changeset 근거로 제안한 초안입니다 — 신규·삭제·변경 기점은 근거가 있고,
+                      <b className="text-text-secondary"> 연결 순서·분기는 검토 대상</b>입니다.{draft.note && <> — {draft.note}</>}
+                    </div>
+                  }
+                >
+                  {/* 초안은 change 를 노드에 내장한다 — 표식 집합(seedIds 등)은 초안이 안 찍은
+                      노드의 보강 오버레이로만 동작(데이터 내장이 우선). */}
+                  <BusinessFlowView key={`after-draft-${sel}`} domainId={cur.domainId} biz={draft.flow} title={`에프터 — ${cur.title}`} domainName={cur.domainName}
+                    impactIds={cur.impactIds} seedIds={cur.seedIds}
+                    impactLegend="영향 도달 — 변경 기점에서 연쇄로 닿는 활동(구현 시 함께 수정될 수 있음)" onOpenFlow={openCode} />
+                </Pane>
+              ) : (
+                <Pane label="에프터 — 변경 반영 시 (영향 도달 표식)" tone={WARN} style={{ borderLeft: BORDER }} foot={<AddedFoot addedNames={addedNames} />}>
+                  <BusinessFlowView key={`after-${sel}`} domainId={cur.domainId} biz={cur.flow} rejectedReason={cur.rejected} title={`에프터 — ${cur.title}`} domainName={cur.domainName}
+                    impactIds={cur.impactIds} seedIds={cur.seedIds}
+                    impactLegend="영향 도달 — 변경 기점에서 연쇄로 닿는 활동(구현 시 함께 수정될 수 있음)" onOpenFlow={openCode} />
+                </Pane>
+              )}
             </div>
           )
         ) : !codeFlowId ? (
@@ -247,11 +281,21 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
           </div>
         )}
 
-        {/* 정직성 각주 — 에프터는 미래 도식의 창작이 아니라 영향 도달의 투영이다. */}
+        {/* 정직성 각주 — 초안이 있으면 "제안된 미래 도식([추정])", 없으면 "영향 도달의 투영". */}
         <div className="shrink-0 border-t border-border-subtle text-text-muted" style={{ padding: "7px 18px", fontSize: 10.5, lineHeight: 1.5 }}>
-          <b className="text-text-secondary">에프터</b>는 현행 도식 위에 <b style={{ color: WARN }}>~ 변경 기점</b>(①이 지목한 변경 기능)과 <b style={{ color: WARN }}>영향</b>(기점에서 연쇄로 닿는 {view === "biz" ? "활동" : "단계"})을 표식한 것입니다.
-          <b className="text-text-secondary"> 영향 {view === "biz" ? "활동" : "단계"}도 구현 시 함께 수정될 수 있습니다</b> — 무엇을 고칠지의 판정은 엔진 산출이 아니라 여기서 단언하지 않으며,
-          미래 토폴로지({view === "biz" ? "활동" : "단계"} 추가·삭제)도 그리지 않습니다.
+          {view === "biz" && draft ? (
+            <>
+              <b className="text-text-secondary">에프터</b>는 ②가 제안한 <b style={{ color: WARN }}>미래 도식 초안([추정])</b>입니다 —
+              <b style={{ color: OK }}> + 신규</b>·<b style={{ color: "var(--color-status-error)" }}>− 삭제</b>·<b style={{ color: WARN }}>~ 변경 기점</b>은 ①의 changeset 근거이고,
+              <b className="text-text-secondary"> 연결 순서·분기는 검토·컨펌 전 확정이 아닙니다.</b>
+            </>
+          ) : (
+            <>
+              <b className="text-text-secondary">에프터</b>는 현행 도식 위에 <b style={{ color: WARN }}>~ 변경 기점</b>(①이 지목한 변경 기능)과 <b style={{ color: WARN }}>영향</b>(기점에서 연쇄로 닿는 {view === "biz" ? "활동" : "단계"})을 표식한 것입니다.
+              <b className="text-text-secondary"> 영향 {view === "biz" ? "활동" : "단계"}도 구현 시 함께 수정될 수 있습니다</b> — 무엇을 고칠지의 판정은 엔진 산출이 아니라 여기서 단언하지 않습니다.
+              {view === "biz" && <> 미래 도식 초안은 ② 산출(after-flow.json)이 있을 때 그려집니다 — 이 산출엔 아직 없습니다.</>}
+            </>
+          )}
           {view === "biz" && <> 활동을 누른 뒤 <b className="text-text-secondary">기능 열기</b>를 누르면 그 기능의 <b className="text-text-secondary">기능흐름도 비포·에프터</b>로 들어갑니다.</>}
         </div>
       </div>

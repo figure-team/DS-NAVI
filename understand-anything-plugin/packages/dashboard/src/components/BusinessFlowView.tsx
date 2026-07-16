@@ -53,36 +53,45 @@ interface BizNodeData {
   /** flowRef 표시 라벨 — 연결된 기능(flow) 노드의 이름(사람 이름). 미해석 시 핸들러 꼬리 폴백. */
   flowLabel?: string;
   /**
-   * 영향 표식(RTM ② 비포·에프터, 2026-07-17) — "seed"=변경 기점(①이 변경 대상으로 지목한
-   * 기능의 활동) / "reached"=영향 도달(연쇄). 시드와 도달을 한 라벨로 뭉치면 "영향 = 안
-   * 고쳐도 됨"으로 오독된다(사용자 실측 지적) — 기점을 따로 박는다.
+   * 영향·변경 표식(RTM ② 비포·에프터, 2026-07-17) — "seed"=변경 기점(①이 변경 대상으로
+   * 지목한 기능의 활동) / "reached"=영향 도달(연쇄) / "added"·"removed"=에프터 초안
+   * (after-flow.json)의 신규·삭제. 시드와 도달을 한 라벨로 뭉치면 "영향 = 안 고쳐도 됨"으로
+   * 오독된다(사용자 실측 지적) — 넷을 전부 가른다.
    */
-  mark?: "seed" | "reached";
+  mark?: BizMark;
   [key: string]: unknown;
 }
 
-/** 영향 코너 배지 — mark 노드 공통(활동·판단). 검토필요 ⚠(라벨 안)와 자리·형태로 구분. */
-function ImpactBadge({ mark }: { mark: "seed" | "reached" }) {
+type BizMark = "seed" | "reached" | "added" | "removed";
+/** 표식 어휘 — 색·라벨·계약 설명 단일소스(배지·범례가 같이 쓴다). */
+const MARK_META: Record<BizMark, { label: string; color: string; title: string }> = {
+  seed: { label: "~ 변경 기점", color: "var(--color-status-warn)", title: "변경 기점(시드) — ①식별이 변경 대상으로 지목한 기능의 활동입니다" },
+  reached: { label: "영향", color: "var(--color-status-warn)", title: "영향 도달 — 변경 기점에서 연쇄로 닿는 활동입니다. 구현 시 함께 수정될 수 있으나, 수정 여부 판정은 엔진 산출이 아니라 여기서 단언하지 않습니다" },
+  added: { label: "+ 신규", color: "var(--color-status-ok)", title: "신규 활동([추정]) — ②가 changeset.added 근거로 제안한 삽입입니다. 연결 위치·순서는 확정 전 초안입니다" },
+  removed: { label: "− 삭제", color: "var(--color-status-error)", title: "삭제 예정([추정]) — changeset.removed 의 기능 활동입니다. 무엇이 없어지는지 보이도록 도식에 남겨 그립니다" },
+};
+
+/** 표식 코너 배지 — mark 노드 공통(활동·판단). 검토필요 ⚠(라벨 안)와 자리·형태로 구분. */
+function ImpactBadge({ mark }: { mark: BizMark }) {
+  const m = MARK_META[mark];
   return (
     <span
       className="absolute rounded-full font-bold"
-      title={mark === "seed"
-        ? "변경 기점(시드) — ①식별이 변경 대상으로 지목한 기능의 활동입니다"
-        : "영향 도달 — 변경 기점에서 연쇄로 닿는 활동입니다. 구현 시 함께 수정될 수 있으나, 수정 여부 판정은 엔진 산출이 아니라 여기서 단언하지 않습니다"}
+      title={m.title}
       style={{
         top: -9,
         right: -9,
         fontSize: 9,
         lineHeight: 1,
         padding: "3px 6px",
-        color: "var(--color-status-warn)",
-        background: "color-mix(in srgb, var(--color-status-warn) 14%, var(--color-panel))",
-        border: "1px solid var(--color-status-warn)",
+        color: m.color,
+        background: `color-mix(in srgb, ${m.color} 14%, var(--color-panel))`,
+        border: `1px solid ${m.color}`,
         zIndex: 2,
         whiteSpace: "nowrap",
       }}
     >
-      {mark === "seed" ? "~ 변경 기점" : "영향"}
+      {m.label}
     </span>
   );
 }
@@ -100,10 +109,13 @@ function BizNode({ data }: NodeProps) {
   const { biz, accent, selected, flowLabel, mark } = data as BizNodeData;
   const { w, h } = SIZE[biz.kind];
   const review = biz.verdict === "NEEDS_REVIEW";
-  // 영향 링 — 노드 형태를 안 바꾸고(ELK 크기 고정) 바깥 글로우로 두른다.
-  const impactRing = mark
-    ? "0 0 0 3px color-mix(in srgb, var(--color-status-warn) 26%, transparent)"
+  const markMeta = mark ? MARK_META[mark] : undefined;
+  // 영향 링 — 노드 형태를 안 바꾸고(ELK 크기 고정) 바깥 글로우로 두른다. 색은 표식 어휘를 따른다.
+  const impactRing = markMeta
+    ? `0 0 0 3px color-mix(in srgb, ${markMeta.color} 26%, transparent)`
     : undefined;
+  // 에프터 초안 어휘 — 신규·삭제는 점선(확정 전 [추정]), 삭제는 라벨 취소선 + 옅게.
+  const dashed = mark === "added" || mark === "removed";
 
   // 프로토(P6) 노드 어휘 — pill: border-medium/bg-surface, activity: 카드+그림자,
   // decision: status-warn 윤곽. 선택 = accent, 검토필요 = warn 강조(정직성 유지).
@@ -190,19 +202,20 @@ function BizNode({ data }: NodeProps) {
         width: w,
         height: h,
         borderRadius: 10,
-        border: `1px solid ${
-          selected ? accent : mark ? "var(--color-status-warn)" : review ? "var(--color-status-warn)" : "var(--color-border-subtle)"
+        border: `1px ${dashed ? "dashed" : "solid"} ${
+          selected ? accent : markMeta ? markMeta.color : review ? "var(--color-status-warn)" : "var(--color-border-subtle)"
         }`,
         background: "var(--color-panel)",
         boxShadow: impactRing ?? "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
         padding: "6px 12px",
+        opacity: mark === "removed" ? 0.72 : 1,
       }}
     >
       {mark && <ImpactBadge mark={mark} />}
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
       <span
         className="text-center overflow-hidden"
-        style={{ fontSize: 13, fontWeight: 550, lineHeight: 1.35, maxHeight: 36, wordBreak: "keep-all" }}
+        style={{ fontSize: 13, fontWeight: 550, lineHeight: 1.35, maxHeight: 36, wordBreak: "keep-all", textDecoration: mark === "removed" ? "line-through" : undefined }}
         title={biz.label}
       >
         {review && <span className="mr-1" title="[확인 필요]">⚠</span>}
@@ -309,7 +322,28 @@ function LegendRow({ glyph, text }: { glyph: React.ReactNode; text: string }) {
  * 글리프는 실제 노드 스타일의 축소판이라 색·형태가 본편과 자동 일치하지는
  * 않으므로, 노드 어휘를 바꿀 때 여기도 함께 갱신할 것.
  */
-function LegendPanel({ impactLegend, seedLegend }: { impactLegend?: string; seedLegend?: string }) {
+/** 표식 범례 글리프 — MARK_META 축소판(배지와 색·라벨 자동 일치). */
+function MarkGlyph({ mark }: { mark: BizMark }) {
+  const m = MARK_META[mark];
+  return (
+    <span
+      aria-hidden
+      className="rounded-full font-bold"
+      style={{
+        fontSize: 7.5,
+        padding: "2px 4px",
+        whiteSpace: "nowrap",
+        color: m.color,
+        background: `color-mix(in srgb, ${m.color} 14%, var(--color-panel))`,
+        border: `1px solid ${m.color}`,
+      }}
+    >
+      {m.label}
+    </span>
+  );
+}
+
+function LegendPanel({ impactLegend, seedLegend, changeLegend }: { impactLegend?: string; seedLegend?: string; changeLegend?: boolean }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   return (
@@ -408,47 +442,14 @@ function LegendPanel({ impactLegend, seedLegend }: { impactLegend?: string; seed
             }
             text={t.flowList.bfLegendGrounded}
           />
-          {/* 영향 표식 — RTM ②/변경·영향 비포·에프터 모달에서만 주입된다(impactIds/seedIds 렌더). */}
-          {seedLegend && (
-            <LegendRow
-              glyph={
-                <span
-                  aria-hidden
-                  className="rounded-full font-bold"
-                  style={{
-                    fontSize: 7.5,
-                    padding: "2px 4px",
-                    whiteSpace: "nowrap",
-                    color: "var(--color-status-warn)",
-                    background: "color-mix(in srgb, var(--color-status-warn) 14%, var(--color-panel))",
-                    border: "1px solid var(--color-status-warn)",
-                  }}
-                >
-                  ~ 변경 기점
-                </span>
-              }
-              text={seedLegend}
-            />
-          )}
-          {impactLegend && (
-            <LegendRow
-              glyph={
-                <span
-                  aria-hidden
-                  className="rounded-full font-bold"
-                  style={{
-                    fontSize: 8.5,
-                    padding: "2px 5px",
-                    color: "var(--color-status-warn)",
-                    background: "color-mix(in srgb, var(--color-status-warn) 14%, var(--color-panel))",
-                    border: "1px solid var(--color-status-warn)",
-                  }}
-                >
-                  영향
-                </span>
-              }
-              text={impactLegend}
-            />
+          {/* 영향·변경 표식 — RTM ②/변경·영향 비포·에프터 모달에서만 주입된다. */}
+          {seedLegend && <LegendRow glyph={<MarkGlyph mark="seed" />} text={seedLegend} />}
+          {impactLegend && <LegendRow glyph={<MarkGlyph mark="reached" />} text={impactLegend} />}
+          {changeLegend && (
+            <>
+              <LegendRow glyph={<MarkGlyph mark="added" />} text="신규 활동([추정]) — ②가 changeset 근거로 제안한 삽입, 점선" />
+              <LegendRow glyph={<MarkGlyph mark="removed" />} text="삭제 예정([추정]) — 무엇이 없어지는지 보이도록 남겨 그림" />
+            </>
           )}
           {/* 근거 확인 안내 — 캔버스 상시 문구에서 이동(사용자 결정, 소음 제거). */}
           <p
@@ -699,7 +700,13 @@ export default function BusinessFlowView({
         accent,
         selected: n.id === selectedId,
         flowLabel: n.flowRef ? (flowNameByRef.get(n.flowRef) ?? flowRefShort(n.flowRef)) : undefined,
-        mark: seedIds?.has(n.id) ? ("seed" as const) : impactIds?.has(n.id) ? ("reached" as const) : undefined,
+        // 데이터 내장 change(에프터 초안)가 우선 — 주입 집합(seedIds/impactIds)은 표식 오버레이용.
+        mark: n.change === "added" ? ("added" as const)
+          : n.change === "removed" ? ("removed" as const)
+          : n.change === "modified" ? ("seed" as const)
+          : seedIds?.has(n.id) ? ("seed" as const)
+          : impactIds?.has(n.id) ? ("reached" as const)
+          : undefined,
       } satisfies BizNodeData,
       draggable: false,
       connectable: false,
@@ -715,9 +722,12 @@ export default function BusinessFlowView({
       target: e.to,
       type: "elk",
       label: e.label,
-      // 방향 화살표 — 순서도 판독성(흐름 방향)의 기본기.
-      markerEnd: { type: MarkerType.ArrowClosed, width: 15, height: 15, color: "var(--color-border-medium)" },
-      style: { stroke: "var(--color-border-medium)", strokeWidth: 1.5 },
+      // 방향 화살표 — 순서도 판독성(흐름 방향)의 기본기. 에프터 초안의 신규 연결은
+      // 점선 + ok 색([추정] 어휘 — 노드의 + 신규와 같은 축).
+      markerEnd: { type: MarkerType.ArrowClosed, width: 15, height: 15, color: e.change === "added" ? "var(--color-status-ok)" : "var(--color-border-medium)" },
+      style: e.change === "added"
+        ? { stroke: "var(--color-status-ok)", strokeWidth: 1.5, strokeDasharray: "6 4" }
+        : { stroke: "var(--color-border-medium)", strokeWidth: 1.5 },
       // labelChip: 분기 라벨을 노드 위 레이어의 칩으로(경로 중간점 SVG 텍스트는
       // 노드에 가려짐), 앵커는 계층 사이 수평 런(ElkEdge.chipAnchor).
       // snapHandles:false — 렌더 크기 == ELK 크기라 스냅 불필요, 루프백 왜곡 방지.
@@ -800,7 +810,9 @@ export default function BusinessFlowView({
               <Background gap={24} size={1} />
               <LegendPanel
                 impactLegend={impactIds ? impactLegend : undefined}
-                seedLegend={seedIds && seedIds.size > 0 ? "변경 기점(시드) — ①이 변경 대상으로 지목한 기능의 활동" : undefined}
+                seedLegend={(seedIds && seedIds.size > 0) || biz.nodes.some((n) => n.change === "modified")
+                  ? "변경 기점(시드) — ①이 변경 대상으로 지목한 기능의 활동" : undefined}
+                changeLegend={biz.nodes.some((n) => n.change === "added" || n.change === "removed")}
               />
               {/* 우상단 툴바 — 미니맵 토글 + PNG 내보내기(한 슬롯, Panel 중복 방지). */}
               <Panel position="top-right" className="flex items-center" style={{ gap: 6 }}>

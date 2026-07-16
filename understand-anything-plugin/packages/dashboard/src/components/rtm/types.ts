@@ -353,3 +353,61 @@ export const stripFrontmatter = (md: string) => md.replace(/^\uFEFF?---\r?\n[\s\
 export const STEP_DOC_KIND: Record<number, string> = { 3: "list", 4: "definition", 5: "spec" };
 
 export function pct(n: number, d: number): number { return d > 0 ? Math.round((n / d) * 100) : 0; }
+
+// ── ② 에프터 스키마 초안(after-schema.json) — RTM_AFTER_FLOW_DESIGN.md §4 ────
+/** 제안 컬럼 — added 테이블은 전체 컬럼, modified 테이블은 **추가 컬럼만**. */
+export interface AfterSchemaColumn { name: string; type?: string; note?: string }
+export interface AfterSchemaTable {
+  name: string;
+  /** added=신규 테이블 · modified=기존 테이블에 컬럼 추가. 삭제 제안은 1차 범위 밖. */
+  change: "added" | "modified";
+  columns: AfterSchemaColumn[];
+  pk?: string[];
+  fks?: { columns: string[]; refTable: string; refColumns?: string[] }[];
+  /** 제안 근거 한 줄(요구사항·AC id) — 전부 [추정]. */
+  note?: string;
+}
+export interface AfterSchema { tables: AfterSchemaTable[] }
+
+/**
+ * after-schema.json 방어 파싱 — ②(LLM) 산출이라 어긋난 테이블 항목만 조용히 제외(부분 수용,
+ * parseAfterFlows 와 같은 규약). 유효 항목이 0이면 null(에프터는 도달 표식만 — 폴백).
+ */
+export function parseAfterSchema(rawInput: unknown): AfterSchema | null {
+  const raw = rawInput as { tables?: unknown } | null | undefined;
+  if (!raw || !Array.isArray(raw.tables)) return null;
+  const tables: AfterSchemaTable[] = [];
+  for (const item of raw.tables as unknown[]) {
+    const o = item as Record<string, unknown>;
+    if (typeof o.name !== "string" || (o.change !== "added" && o.change !== "modified")) continue;
+    if (!Array.isArray(o.columns)) continue;
+    const columns: AfterSchemaColumn[] = [];
+    for (const c of o.columns as unknown[]) {
+      const co = c as Record<string, unknown>;
+      if (typeof co.name !== "string") continue;
+      columns.push({ name: co.name, type: typeof co.type === "string" ? co.type : undefined, note: typeof co.note === "string" ? co.note : undefined });
+    }
+    if (columns.length === 0) continue;
+    const fks: AfterSchemaTable["fks"] = [];
+    if (Array.isArray(o.fks)) {
+      for (const f of o.fks as unknown[]) {
+        const fo = f as Record<string, unknown>;
+        if (typeof fo.refTable !== "string" || !Array.isArray(fo.columns)) continue;
+        fks.push({
+          columns: (fo.columns as unknown[]).filter((v): v is string => typeof v === "string"),
+          refTable: fo.refTable,
+          refColumns: Array.isArray(fo.refColumns) ? (fo.refColumns as unknown[]).filter((v): v is string => typeof v === "string") : undefined,
+        });
+      }
+    }
+    tables.push({
+      name: o.name,
+      change: o.change,
+      columns,
+      pk: Array.isArray(o.pk) ? (o.pk as unknown[]).filter((v): v is string => typeof v === "string") : undefined,
+      fks: fks.length > 0 ? fks : undefined,
+      note: typeof o.note === "string" ? o.note : undefined,
+    });
+  }
+  return tables.length > 0 ? { tables } : null;
+}

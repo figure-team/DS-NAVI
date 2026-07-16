@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
 import type {
-  CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, Identified, ImpactRun,
+  AfterSchema, CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, Identified, ImpactRun,
   ImpactSnapshot, QaHistory, ReqOverride, Requirement, RtmModel, RtmSession, RtmTab, SessionDoc,
   SessionRow, Signoff, TestRef, TestResult, TestScenario,
 } from "./types";
@@ -140,6 +140,8 @@ export interface RtmCtx {
   impactLoaded: boolean;
   /** ②의 에프터 업무흐름도 초안(after-flow.json) — 빈 배열=미생성/구산출(표식 오버레이 폴백). */
   afterFlows: AfterProcess[];
+  /** ②의 에프터 스키마 초안(after-schema.json) — null=미생성/구산출(데이터 모달 도달 표식만). */
+  afterSchema: AfterSchema | null;
   /**
    * A5: ① 답변 원장(§3.2) — **제출됐지만 아직 개정에 반영 안 된 답**의 출처.
    * `identified.questions[].answer` 는 개정이 성공해야 채워지므로 둘을 겹쳐 봐야 화면이 정직하다.

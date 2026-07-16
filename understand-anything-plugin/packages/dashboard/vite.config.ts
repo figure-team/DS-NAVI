@@ -1397,7 +1397,14 @@ function rtmImpactDirective(sid: string): string {
     `(change:"added", flowRef 는 to-be id, 잇는 엣지도 change:"added"), removed 기능의 활동은 change:"removed" 로 남기고(제거 금지 — diff 가 보여야 한다), ` +
     `modified 기능의 활동은 change:"modified". **changeset 에 없는 구조 변경(재배치·이름 변경·무근거 분기)은 금지**다. ` +
     `형식: {"schemaVersion":1,"flows":[{"domainId","baseTitle"(원 프로세스 제목 그대로 — 대시보드 조인 키),"nodes":[...],"edges":[...],"note"(선택, 제안 근거 한 줄)}]}. ` +
-    `모든 엣지 끝점은 실존 노드여야 한다(어긋나면 대시보드가 그 장을 통째로 기각한다). 삽입 위치·순서는 네 판단([추정])이되 note 에 근거를 남겨라.`
+    `모든 엣지 끝점은 실존 노드여야 한다(어긋나면 대시보드가 그 장을 통째로 기각한다). 삽입 위치·순서는 네 판단([추정])이되 note 에 근거를 남겨라.` +
+    // 에프터 스키마 초안(같은 설계 §4) — 데이터 비포·에프터의 신규 테이블·컬럼.
+    ` 이어서 **에프터 스키마 초안**을 \`<세션>/after-schema.json\` 으로 써라(SKILL §B --step 2 의 5번): ` +
+    `\`identified.json\` 의 요구사항(특히 DAR·데이터 관련 AC)이 요구하는 **신규 테이블/기존 테이블의 추가 컬럼**을 ` +
+    `\`.spec/map/db-schema.json\` 의 현행 스키마·명명 관례에 맞춰 제안한다. ` +
+    `형식: {"schemaVersion":1,"tables":[{"name","change":"added"|"modified","columns":[{"name","type","note"?}],"pk"?,"fks"?:[{"columns","refTable","refColumns"?}],"note"(요구사항·AC id 근거)}]}. ` +
+    `**modified 는 추가 컬럼만** 적는다(기존 컬럼 나열 금지). 요구사항 근거 없는 테이블·컬럼은 만들지 마라. ` +
+    `스키마 변경이 필요 없는 요청이면 파일을 쓰지 않는다(억지 제안 금지) — 그 사실을 보고에 한 줄 남겨라.`
   );
 }
 function rtmStepDirective(step: number, sid: string): string {
@@ -1532,8 +1539,9 @@ function listRtmSessionDocs(sid: string): { name: string; kind: string }[] {
 const RTM_SESSION_JSON_FILES = new Set([
   "identified.json",
   "impact-run.json",
-  // ②의 에프터 업무흐름도 초안(RTM_AFTER_FLOW_DESIGN.md) — 비포·에프터 모달이 읽는다.
+  // ②의 에프터 초안 2종(RTM_AFTER_FLOW_DESIGN.md) — 비포·에프터 모달이 읽는다.
   "after-flow.json",
+  "after-schema.json",
   "qa-history.json",
 ]);
 /** 세션 파일 이름 검증 — basename 만, .md 또는 화이트리스트 JSON. traversal 차단. */

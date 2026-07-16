@@ -1,0 +1,20 @@
+{
+  "revisions": [
+    {
+      "rev": 1,
+      "answeredAt": "2026-07-16T18:35:00.000Z",
+      "qas": [
+        {
+          "qid": "Q-2",
+          "question": "SIGNON.PASSWORD NOT NULL 평문 — 소셜 사용자 처리?",
+          "answer": "(c) 소셜 계정은 SIGNON 행을 만들지 않는다. 소셜 로그인은 SIGNON을 아예 거치지 않고 ACCOUNT만 생성한다. 더미 비밀번호도 넣지 않는다."
+        },
+        {
+          "qid": "Q-3",
+          "question": "구글 전용 구현인가, 3사 공통 OAuth 추상화인가?",
+          "answer": "3사 공통 OAuth 추상화로 묶는다. 구글 전용 구현을 새로 만들지 말고 카카오·네이버와 공유하는 소셜 로그인 추상화를 세운다."
+        }
+      ]
+    }
+  ]
+}

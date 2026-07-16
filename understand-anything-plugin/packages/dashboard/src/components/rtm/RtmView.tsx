@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
 import { useDashboardStore } from "../../store";
 import ApproverDialog from "./ApproverDialog";
@@ -7,7 +7,7 @@ import { RtmContext } from "./context";
 import type { RtmCtx } from "./context";
 import FunctionDrawer from "./FunctionDrawer";
 import FunctionView from "./FunctionView";
-import { IntakeModal, IntakeStepper } from "./IntakePanel";
+import { IntakeModal } from "./IntakePanel";
 import RequirementDrawer from "./RequirementDrawer";
 import RequirementView from "./RequirementView";
 import ScenarioDrawer from "./ScenarioDrawer";
@@ -18,7 +18,7 @@ import TopBarSlot from "../../app/shell/TopBarSlot";
 import { useChange } from "./useChange";
 import { useIntake } from "./useIntake";
 import {
-  APPROVER_LS_KEY, BAD, CIRCLED, OK, WARN,
+  APPROVER_LS_KEY, BAD, OK, WARN,
 } from "./types";
 import type {
   CellKey, CustomField, FnOverride, FunctionRow, ReqOverride, Requirement, RtmModel, RtmTab,
@@ -279,6 +279,13 @@ export default function RtmView() {
 
   const openFunction = useCallback((id: string) => { setView("function"); setSelReq(null); setSelFn(id); setEditing(false); setSaveError(null); }, []);
 
+  // 새 요청 모달 열기 — 버튼이 요청 세션 탭(SessionView 좌측 원장 위)으로 이동(2026-07-16, 종전 헤더
+  // 우상단). 세션이 쌓이는 자리와 세션을 만드는 액션을 한 곳에 둔다.
+  const { setIntakeOpen, setIntakeError, setTargetStep } = intake;
+  const openIntake = useCallback(() => {
+    setIntakeOpen(true); setIntakeError(null); setTargetStep(6);
+  }, [setIntakeOpen, setIntakeError, setTargetStep]);
+
   // W2/N2: 원장에서 세션 열기 — 미러 effect 는 replace 라 히스토리가 안 쌓인다. 세션 전환은
   // 사용자의 이동이므로 여기서 직접 push 하고(변경·영향 setParam("run", …) 과 동형), 실제 전환은
   // URL→상태 effect 가 selectSession 으로 처리한다 — URL 이 단일 진실이 되도록 한 방향으로만 흐른다.
@@ -353,7 +360,7 @@ export default function RtmView() {
     effCell, isEdited, isConfirmed, effLifecycle, effSignoff, effTest, fnById, reqById,
     scenarios, effTs, tsConfirmed, tsConfirmedCount, effFields, effCustom,
     changeReqId, changeRunning, startChange, changeModel, setChangeModel,
-    intakeOpen: intake.intakeOpen, setIntakeOpen: intake.setIntakeOpen,
+    intakeOpen: intake.intakeOpen, setIntakeOpen: intake.setIntakeOpen, openIntake,
     intakeQuery: intake.intakeQuery, setIntakeQuery: intake.setIntakeQuery,
     targetStep: intake.targetStep, setTargetStep: intake.setTargetStep,
     intakeModel: intake.intakeModel, setIntakeModel: intake.setIntakeModel,
@@ -384,48 +391,9 @@ export default function RtmView() {
   return (
     <RtmContext.Provider value={ctx}>
       <div className="flex-1 min-h-0 flex flex-col bg-root overflow-hidden relative">
-        {/* 헤더 — pmpl-proto page-head: h1 + RTM 배지 + 우측 액션(xlsx · 새 요청) */}
-        <div className="flex items-end gap-3.5 shrink-0 flex-wrap" style={{ padding: "20px 24px 0" }}>
-          <h1 className="font-heading text-text-primary font-bold" style={{ fontSize: 22, lineHeight: 1.25, letterSpacing: "-0.3px" }}>요구사항 추적표</h1>
-          <span className="self-center inline-flex items-center whitespace-nowrap font-bold" style={{ fontSize: 11, padding: "2px 7px", borderRadius: 5, color: "var(--color-status-info)", background: "color-mix(in srgb, var(--color-status-info) 12%, transparent)" }}>RTM</span>
-          <span className="ml-auto flex items-center gap-2">
-            {intake.intakeStatus === "running" && (
-              <span className="flex items-center gap-1.5" style={{ fontSize: 11, color: WARN }} title="요구사항 단계 생성 진행 중">
-                <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                {CIRCLED[Math.min(intake.session?.producedStep ?? 0, CIRCLED.length - 1)]} 단계 생성 중…
-              </span>
-            )}
-            {/* 인테이크도 ②영향분석에서 impact 를 부른다(6단계, 2026-07-16) — 다만 시드가 ①의
-                changeset 에서 결정론 조인된다. 임의 파일집합 질의는 이 메뉴 몫이라 길만 열어 둔다.
-                버튼 3개는 과하므로 조용한 텍스트 링크. */}
-            <Link
-              to="/change"
-              className="text-text-muted hover:text-text-secondary transition-colors font-semibold whitespace-nowrap"
-              style={{ fontSize: 12.5, textDecoration: "none" }}
-              title="코드 영향 범위(파일·API·DB) 원장 — 임의 파일집합에 대한 자연어 영향 분석은 여기서 실행한다"
-            >
-              변경·영향 →
-            </Link>
-            {canWrite && (
-              <a
-                href={`/doc-xlsx?token=${encodeURIComponent(accessToken ?? "")}&docId=rtm`}
-                download="rtm.xlsx"
-                className="rounded-lg border border-border-medium bg-panel text-text-secondary hover:bg-elevated transition-colors font-semibold"
-                style={{ padding: "7px 14px", fontSize: 13, textDecoration: "none" }}
-                title="RTM xlsx(문서정보·요구/기능 원장·커버리지 현황) — understand-docs 실행 시점 스냅샷. 행단위 확정 오버레이는 미반영(md/탭이 진실)."
-              >
-                xlsx 다운로드
-              </a>
-            )}
-            <button type="button" onClick={() => { intake.setIntakeOpen(true); intake.setIntakeError(null); intake.setTargetStep(6); }} disabled={intake.intakeStatus === "running"}
-              className="rounded-lg border border-accent bg-panel text-accent hover:bg-accent/10 transition-colors disabled:opacity-40 font-semibold cursor-pointer" style={{ padding: "7px 14px", fontSize: 13 }}
-              title="자연어로 새 요구사항을 요청 → 6단계(식별·영향분석·목록표·정의서·명세서·RTM)로 분해·문서화(전부 [추정])">＋ 새 요청</button>
-          </span>
-        </div>
-
-        {/* P4: 단계 진행 스테퍼 — 요청 세션 탭에선 우측 콘텐츠 카드 안에 들어간다(설계 §2.2 목업).
-            같은 컴포넌트를 두 번 렌더하면 스테퍼가 둘이 되므로 여기선 건다. */}
-        {view !== "session" && <IntakeStepper />}
+        {/* 메뉴 헤더 제거(2026-07-16) — 탭 행이 첫 요소. 종전 헤더 액션은 새 요청=요청 세션 탭
+            (SessionView), 변경·영향·xlsx=탭 행 우측으로 이동. 상단 스테퍼 스트립도 걷었다 —
+            요청 세션 탭 카드 안의 스테퍼와 중복이고, 단계 클릭이 어차피 그 탭으로 데려갔다. */}
 
         {/* 진단 배너 → TopBar warn 칩으로 이관(2026-07-15). 클릭 동작(커버리지 현황 탭 이동)은
             그대로 유지 — 상세는 현황 탭 무결성 진단 목록에서 본다(모달 중복 없음). */}
@@ -443,12 +411,14 @@ export default function RtmView() {
           </TopBarSlot>
         )}
 
-        {/* pmpl-proto .tabs — 기준(기능/요청)·시험 시나리오·커버리지 현황 (count 병기) */}
-        <div className="shrink-0 flex border-b border-border-subtle" style={{ margin: "10px 24px 0", gap: 2 }}>
+        {/* pmpl-proto .tabs — 기준(기능/요청)·시험 시나리오·커버리지 현황 (count 병기).
+            우측 액션(변경·영향 링크 · xlsx)은 삭제됐다(2026-07-16 사용자 결정) — 변경·영향은
+            좌측 내비 메뉴가 이미 있고, xlsx 는 산출물 메뉴 몫이다. */}
+        <div className="shrink-0 flex border-b border-border-subtle" style={{ margin: "14px 24px 0", gap: 2 }}>
           {tabBtn("function", "기능 기준", model?.functions.length)}
           {tabBtn("requirement", "요청 기준", model?.requirements.length)}
           {/* W2: 라벨은 작업("새 요청")이 아니라 대상 명사 — 탭=렌즈 관례(RTM_TAB_DESIGN.md:108)를
-              지키기 위한 것으로, 액션 어포던스는 헤더의 ＋ 새 요청 버튼이 진다(설계 §2.1). */}
+              지키기 위한 것으로, 액션 어포던스는 요청 세션 탭의 ＋ 새 요청 버튼이 진다. */}
           {tabBtn("session", "요청 세션", sessions.length)}
           {tabBtn("scenario", "시험 시나리오", model?.testScenarios?.length)}
           {tabBtn("status", "커버리지 현황")}

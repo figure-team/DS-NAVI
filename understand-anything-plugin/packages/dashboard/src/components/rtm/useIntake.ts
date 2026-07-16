@@ -74,16 +74,19 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   }, [intakeQuery, targetStep, intakeModel, accessToken, resetSessionArtifacts]);
 
   // start..target 진행(다음 단계 / ⑤까지). 컨펌 게이트 미통과면 409 토스트.
-  const advance = useCallback(async (toStep: number) => {
+  // 모델은 보내지 않는다 — 서버가 세션에 박힌 첫 실행 모델을 이어받는다(session.model, 2026-07-16).
+  // 종전엔 브라우저 상태(intakeModel)를 재전송해 새로고침·세션 전환 뒤 다른 모델로 튀었다.
+  // rerunFrom: 낡은 단계 재생성(2026-07-17) — 중간 단계 편집 뒤 그 다음 단계부터 되감아 다시 생성.
+  const advance = useCallback(async (toStep: number, rerunFrom?: number) => {
     if (!sid || !accessToken) return;
     setStepBusy(true);
     try {
-      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(intakeModel ? { sid, targetStep: toStep, model: intakeModel } : { sid, targetStep: toStep }) });
+      const res = await fetch(`/rtm-intake?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rerunFrom ? { sid, targetStep: toStep, rerunFrom } : { sid, targetStep: toStep }) });
       const d = (await res.json().catch(() => null)) as { session?: RtmSession; error?: string } | null;
       if (res.status === 202 && d?.session) { setSession(d.session); setIntakeStatus("running"); setPreviewName(null); }
       else setToast({ kind: "failed", msg: d?.error ?? `진행 실패: HTTP ${res.status}` });
     } catch (e) { setToast({ kind: "failed", msg: String(e) }); } finally { setStepBusy(false); }
-  }, [sid, accessToken, intakeModel, setToast]);
+  }, [sid, accessToken, setToast]);
 
   const confirmStep = useCallback(async (step: number) => {
     if (!sid || !accessToken) return;
@@ -101,8 +104,12 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     setStepBusy(true);
     try {
       const res = await fetch(`/rtm-intake-doc?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid, name: previewName, content: draftDoc }) });
-      if (res.ok) { setPreviewMd(draftDoc); setEditingDoc(false); }
-      else { const d = (await res.json().catch(() => null)) as { error?: string } | null; setToast({ kind: "failed", msg: d?.error ?? `저장 실패: HTTP ${res.status}` }); }
+      const d = (await res.json().catch(() => null)) as { session?: RtmSession; error?: string } | null;
+      if (res.ok) {
+        setPreviewMd(draftDoc); setEditingDoc(false);
+        // 중간 단계 편집이면 서버가 뒤 단계에 stale 을 찍어 돌려준다 — 바로 앉혀야 스테퍼 ⚠가 뜬다.
+        if (d?.session) setSession(d.session);
+      } else setToast({ kind: "failed", msg: d?.error ?? `저장 실패: HTTP ${res.status}` });
     } catch (e) { setToast({ kind: "failed", msg: String(e) }); } finally { setStepBusy(false); }
   }, [sid, previewName, draftDoc, accessToken, setToast]);
 
@@ -234,9 +241,10 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     if (!sid || !accessToken || answers.length === 0) return;
     setStepBusy(true);
     try {
+      // 모델은 보내지 않는다 — 개정도 세션의 첫 실행 모델을 이어받는다(advance 와 같은 규약).
       const res = await fetch(`/rtm-intake-answer?token=${encodeURIComponent(accessToken)}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(intakeModel ? { sid, answers, model: intakeModel } : { sid, answers }),
+        body: JSON.stringify({ sid, answers }),
       });
       const d = (await res.json().catch(() => null)) as { session?: RtmSession; error?: string } | null;
       if (res.status === 202 && d?.session) {
@@ -250,7 +258,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
         setToast({ kind: "failed", msg: d?.error ?? `답변 제출 실패: HTTP ${res.status}` });
       }
     } catch (e) { setToast({ kind: "failed", msg: String(e) }); } finally { setStepBusy(false); }
-  }, [sid, accessToken, intakeModel, loadQaHistory, setToast]);
+  }, [sid, accessToken, loadQaHistory, setToast]);
 
   /**
    * W5: ① 코드영향 검증 로드 — 세션 포인터(`impact-run.json`) → 원장 스냅샷 2단.
@@ -280,8 +288,13 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
 
   // 표시 단계(viewStep 우선, 없으면 산출 최전선) 산출물 자동 미리보기.
   useEffect(() => {
-    if (!session || intakeStatus === "running") return;
+    if (!session) return;
     const ps = viewStep ?? session.producedStep;
+    // 실행 중에도 **안정된 단계는 읽는다**(2026-07-16: 진행 중 이전 단계 read-only 열람) — 안정
+    // = 지금 도는 단계(jobStep)보다 앞. 다음 단계 생성 중엔 산출된 전 단계가 전부 앞이고, ①개정
+    // 중엔 ① 산출물이 다시 쓰이는 중이라 여기 걸려 건너뛴다(기존에 읽어둔 identified 가 남는다 —
+    // 반쯤 쓰인 JSON 을 읽어 인터뷰가 깜빡이는 걸 막는 게이트). jobStep=null(모름)이면 전부 보류.
+    if (intakeStatus === "running" && !(jobStep !== null && ps < jobStep)) return;
     // ②도 identified 가 필요하다 — `impactAbsenceOf` 가 changeset.modified 로 "미실행"과 "해당없음"을
     // 가르므로(types.ts), 이게 없으면 화면이 둘을 구별하지 못한다.
     if (ps === 1 || ps === 2) { void loadIdentified(); setPreviewName(null); }
@@ -294,7 +307,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
       if (doc && doc.name !== previewName) void loadPreview(doc.name);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.producedStep, viewStep, intakeStatus, sessionDocs]);
+  }, [session?.producedStep, viewStep, intakeStatus, jobStep, sessionDocs]);
   // 새 단계가 산출되면 표시를 최전선으로 되돌린다.
   useEffect(() => { setViewStep(null); }, [session?.producedStep]);
 

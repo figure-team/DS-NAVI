@@ -90,7 +90,7 @@ export default function FunctionView() {
   const { model, cov, canWrite, effFields, effCell, effCustom, fnOv, isConfirmed, openFunction, postField, selFn } = useRtm();
   const [searchParams, setSearchParams] = useSearchParams();
   const [evOpen, setEvOpen] = useState<EvPopoverState | null>(null);
-  // 도메인 아코디언 — null=기본값(소규모 전부 펼침 / 대규모 첫 도메인만). 접힘 셋으로 관리.
+  // 도메인 아코디언 — null=기본값(전부 접힘, 2026-07-16). 접힘 셋으로 관리.
   const [closedOverride, setClosedOverride] = useState<Set<string> | null>(null);
   const q = searchParams.get("q") ?? "";
   const fstate = searchParams.get("fstate");
@@ -128,10 +128,10 @@ export default function FunctionView() {
   const byDomain = new Map<string, FunctionRow[]>();
   for (const f of visible) { const arr = byDomain.get(f.domainId); if (arr) arr.push(f); else byDomain.set(f.domainId, [f]); }
 
-  // 스케일 대비 도메인 접기 — 소규모는 전부 펼침이 기본, 대규모는 첫 도메인만.
+  // 도메인 접기 — 기본 전부 접힘(2026-07-16, 종전 스케일 분기 폐기): 표는 도메인 헤더의 요약
+  // (기능 수·확정)만 먼저 보이고, 펼쳐야 행이 나온다.
   // 텍스트 검색 중에만 매칭 도메인을 강제 펼침(카드·드롭다운 필터는 접기 유지 — 필터 중에도 도메인 훑기 가능).
-  const bigModel = model.functions.length > 60 || model.domains.length > 8;
-  const defaultClosed = () => new Set(bigModel ? model.domains.slice(1).map((d) => d.id) : []);
+  const defaultClosed = () => new Set(model.domains.map((d) => d.id));
   const closed = closedOverride ?? defaultClosed();
   const searching = ql.length > 0;
   const isDomainOpen = (id: string) => searching || !closed.has(id);

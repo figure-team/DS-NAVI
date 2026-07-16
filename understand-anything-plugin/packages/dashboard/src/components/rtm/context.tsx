@@ -3,8 +3,8 @@ import type { Dispatch, SetStateAction } from "react";
 
 import type {
   CellKey, Coverage, CustomField, Diagnostic, FnOverride, FunctionRow, Identified, ImpactRun,
-  ImpactSnapshot, ReqOverride, Requirement, RtmModel, RtmSession, RtmTab, SessionDoc, SessionRow,
-  Signoff, TestRef, TestResult, TestScenario,
+  ImpactSnapshot, QaHistory, ReqOverride, Requirement, RtmModel, RtmSession, RtmTab, SessionDoc,
+  SessionRow, Signoff, TestRef, TestResult, TestScenario,
 } from "./types";
 import type { ModelChoice } from "../ModelSelect";
 
@@ -134,6 +134,19 @@ export interface RtmCtx {
   impactRun: ImpactRun | null;
   impactData: ImpactSnapshot | null;
   impactLoaded: boolean;
+  /**
+   * A5: ① 답변 원장(§3.2) — **제출됐지만 아직 개정에 반영 안 된 답**의 출처.
+   * `identified.questions[].answer` 는 개정이 성공해야 채워지므로 둘을 겹쳐 봐야 화면이 정직하다.
+   */
+  qaHistory: QaHistory | null;
+  /**
+   * 지금 도는 job 의 단계(서버 `rtmTracker.job.step`). null=실행 중 아님/모름.
+   * `jobStep <= producedStep` = **최전선 재실행**(①개정) · `> producedStep` = 다음 단계 생성.
+   * 이 구별이 없으면 개정 중에 "② 다음 단계 생성 중"이라 말해 단계 경계를 거짓으로 알린다.
+   */
+  jobStep: number | null;
+  /** A5: ① `[확인필요]` 답변 일괄 제출 → 개정 재실행(§4.2). 성공 시 running 으로 전환된다. */
+  answerQuestions: (answers: { qid: string; question: string; answer: string }[]) => Promise<void>;
   editingDoc: boolean;
   setEditingDoc: (v: boolean) => void;
   draftDoc: string;

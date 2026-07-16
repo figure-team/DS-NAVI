@@ -52,7 +52,31 @@ interface BizNodeData {
   selected: boolean;
   /** flowRef 표시 라벨 — 연결된 기능(flow) 노드의 이름(사람 이름). 미해석 시 핸들러 꼬리 폴백. */
   flowLabel?: string;
+  /** 영향 도달 표식(RTM ② 비포·에프터, 2026-07-17) — impactIds 에 든 노드. warn 링 + '영향' 배지. */
+  impacted?: boolean;
   [key: string]: unknown;
+}
+
+/** '영향' 코너 배지 — impacted 노드 공통(활동·판단). 검토필요 ⚠(라벨 안)와 자리·형태로 구분. */
+function ImpactBadge() {
+  return (
+    <span
+      className="absolute rounded-full font-bold"
+      style={{
+        top: -9,
+        right: -9,
+        fontSize: 9,
+        lineHeight: 1,
+        padding: "3px 6px",
+        color: "var(--color-status-warn)",
+        background: "color-mix(in srgb, var(--color-status-warn) 14%, var(--color-panel))",
+        border: "1px solid var(--color-status-warn)",
+        zIndex: 2,
+      }}
+    >
+      영향
+    </span>
+  );
 }
 
 /** flowRef → 짧은 핸들러 표기(프로토 .fref "flow: viewCart") — ?쿼리 우선, 없으면 경로 꼬리. */
@@ -65,9 +89,13 @@ function flowRefShort(flowRef: string): string {
 }
 
 function BizNode({ data }: NodeProps) {
-  const { biz, accent, selected, flowLabel } = data as BizNodeData;
+  const { biz, accent, selected, flowLabel, impacted } = data as BizNodeData;
   const { w, h } = SIZE[biz.kind];
   const review = biz.verdict === "NEEDS_REVIEW";
+  // 영향 링 — 노드 형태를 안 바꾸고(ELK 크기 고정) 바깥 글로우로 두른다.
+  const impactRing = impacted
+    ? "0 0 0 3px color-mix(in srgb, var(--color-status-warn) 26%, transparent)"
+    : undefined;
 
   // 프로토(P6) 노드 어휘 — pill: border-medium/bg-surface, activity: 카드+그림자,
   // decision: status-warn 윤곽. 선택 = accent, 검토필요 = warn 강조(정직성 유지).
@@ -102,6 +130,7 @@ function BizNode({ data }: NodeProps) {
         : "var(--color-status-info)";
     return (
       <div className="relative" style={{ width: w, height: h }}>
+        {impacted && <ImpactBadge />}
         <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
         <div
           className="absolute inset-0"
@@ -148,19 +177,20 @@ function BizNode({ data }: NodeProps) {
   // activity — 프로토 .fc-act: 카드 배경 + 그림자 + hover accent, fref 파란 칩.
   return (
     <div
-      className="flex flex-col items-center justify-center gap-1 text-text-primary"
+      className="relative flex flex-col items-center justify-center gap-1 text-text-primary"
       style={{
         width: w,
         height: h,
         borderRadius: 10,
         border: `1px solid ${
-          selected ? accent : review ? "var(--color-status-warn)" : "var(--color-border-subtle)"
+          selected ? accent : impacted ? "var(--color-status-warn)" : review ? "var(--color-status-warn)" : "var(--color-border-subtle)"
         }`,
         background: "var(--color-panel)",
-        boxShadow: "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
+        boxShadow: impactRing ?? "0 1px 2px rgba(26,27,31,.04), 0 1px 3px rgba(26,27,31,.06)",
         padding: "6px 12px",
       }}
     >
+      {impacted && <ImpactBadge />}
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
       <span
         className="text-center overflow-hidden"
@@ -271,7 +301,7 @@ function LegendRow({ glyph, text }: { glyph: React.ReactNode; text: string }) {
  * 글리프는 실제 노드 스타일의 축소판이라 색·형태가 본편과 자동 일치하지는
  * 않으므로, 노드 어휘를 바꿀 때 여기도 함께 갱신할 것.
  */
-function LegendPanel() {
+function LegendPanel({ impactLegend }: { impactLegend?: string }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   return (
@@ -370,6 +400,27 @@ function LegendPanel() {
             }
             text={t.flowList.bfLegendGrounded}
           />
+          {/* 영향 표식 — RTM ② 비포·에프터 모달에서만 주입된다(impactIds 있는 렌더). */}
+          {impactLegend && (
+            <LegendRow
+              glyph={
+                <span
+                  aria-hidden
+                  className="rounded-full font-bold"
+                  style={{
+                    fontSize: 8.5,
+                    padding: "2px 5px",
+                    color: "var(--color-status-warn)",
+                    background: "color-mix(in srgb, var(--color-status-warn) 14%, var(--color-panel))",
+                    border: "1px solid var(--color-status-warn)",
+                  }}
+                >
+                  영향
+                </span>
+              }
+              text={impactLegend}
+            />
+          )}
           {/* 근거 확인 안내 — 캔버스 상시 문구에서 이동(사용자 결정, 소음 제거). */}
           <p
             className="text-text-muted border-t border-border-subtle"
@@ -461,6 +512,8 @@ export default function BusinessFlowView({
   rejectedReason,
   title,
   domainName,
+  impactIds,
+  impactLegend,
 }: {
   domainId: string;
   biz: BizFlow;
@@ -470,6 +523,10 @@ export default function BusinessFlowView({
   title?: string | null;
   /** 도메인 표시명 — PNG 제목 스탬프용(없으면 도메인 키 폴백). */
   domainName?: string | null;
+  /** 영향 도달 노드 id 집합(RTM ② 비포·에프터의 '에프터', 2026-07-17) — warn 링 + '영향' 배지. */
+  impactIds?: Set<string>;
+  /** 범례의 '영향' 행 설명 — impactIds 렌더에서만 주입(로케일 6종 무접촉, RTM 은 한국어 고정 표면). */
+  impactLegend?: string;
 }) {
   const { t } = useI18n();
   const [, setSearchParams] = useSearchParams();
@@ -599,12 +656,13 @@ export default function BusinessFlowView({
         accent,
         selected: n.id === selectedId,
         flowLabel: n.flowRef ? (flowNameByRef.get(n.flowRef) ?? flowRefShort(n.flowRef)) : undefined,
+        impacted: impactIds?.has(n.id) ?? false,
       } satisfies BizNodeData,
       draggable: false,
       connectable: false,
       selectable: true,
     }));
-  }, [biz, layout, accent, selectedId, flowNameByRef]);
+  }, [biz, layout, accent, selectedId, flowNameByRef, impactIds]);
 
   const rfEdges = useMemo<Edge[]>(() => {
     if (!layout) return [];
@@ -695,7 +753,7 @@ export default function BusinessFlowView({
               elementsSelectable
             >
               <Background gap={24} size={1} />
-              <LegendPanel />
+              <LegendPanel impactLegend={impactIds ? impactLegend : undefined} />
               {/* 우상단 툴바 — 미니맵 토글 + PNG 내보내기(한 슬롯, Panel 중복 방지). */}
               <Panel position="top-right" className="flex items-center" style={{ gap: 6 }}>
                 <button

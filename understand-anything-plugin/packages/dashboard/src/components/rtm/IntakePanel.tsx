@@ -1,64 +1,100 @@
 import { useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Link } from "react-router";
 
 import { useRtm } from "./context";
-import DiscardConfirmDialog from "./DiscardConfirmDialog";
-import { MD, confChip, useEscClose } from "./shared";
-import { AC_KIND, BAD, BORDER, CIRCLED, CONF, CONF_TITLE, FAINT, GOLD, OK, PRIORITY, QUESTION_AXIS, STEP_DEFS, VERB, WARN, impactAbsenceOf, latestAnswers, normalizeQuestions, policyDocId, stripFrontmatter } from "./types";
+import ImpactStepView from "./ImpactStepView";
+import { Axis, MD, REF_GAP, REF_ROW, confChip, useEscClose } from "./shared";
+import { AC_KIND, BAD, BORDER, CIRCLED, CONF, CONF_TITLE, FAINT, GOLD, OK, PRIORITY, QUESTION_AXIS, STEP_DEFS, VERB, WARN, latestAnswers, normalizeQuestions, policyDocId, stripFrontmatter } from "./types";
 import type { Changeset, IntakeAC, IntakePolicyRef, IntakeQuestion, IntakeRequirement, IntakeScreenRef } from "./types";
 import { ModelSelect } from "../ModelSelect";
 import EvidenceLink from "../ui/EvidenceLink";
 
 // ── P4: 단계 진행 스테퍼 ──
+/**
+ * 우측 액션(편집/컨펌/다음 단계)은 종전 IntakeStepContent 단계 헤더의 것이다 — 그 헤더가 단계
+ * 위치·컨펌 상태를 스테퍼와 중복 표기해 제거되면서(2026-07-16) 액션만 여기로 왔다. 폐기/닫기는
+ * 세션 카드 헤더(SessionView) 최우측으로 — 세션 수명 조작은 세션 제목 줄의 몫이다.
+ */
 export function IntakeStepper() {
-  const { session, intakeStatus, viewStep, setViewStep, discardSession, closeSession, setView } = useRtm();
-  // W4: 폐기 확인 다이얼로그 pending 상태 — 이 컴포넌트는 모듈 레벨(gap4/8 무관, 부모 리렌더에도
-  // 타입이 안 바뀜)이라 로컬 useState 로 충분하다.
-  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const {
+    session, intakeStatus, viewStep, setViewStep, setView,
+    previewName, previewMd, editingDoc, setEditingDoc, setDraftDoc, stepBusy, confirmStep, advance, saveDoc,
+  } = useRtm();
   if (!session || session.discarded) return null;
   const running = intakeStatus === "running";
+  const frontier = session.producedStep;
+  const ps = viewStep ?? frontier;
+  const isDoc = ps >= 3 && ps <= 5; // ③목록표 ④정의서 ⑤명세서 — .md 편집 대상
+  // 컨펌·진행은 **세션의 최전선**에 대한 액션이라 보고 있는 단계와 무관하다(2026-07-17 결함 수정:
+  // 종전엔 isFrontier 게이트라 이전 단계 칩을 누를 때마다 버튼이 사라졌다 붙었다 해 깜빡임으로
+  // 보였다). 라벨에 대상 단계(✓ ② 컨펌)를 박아 무엇을 컨펌하는지 못 박는다.
+  const needConfirm = session.confirmedStep < frontier;
+  const canAdvance = session.confirmedStep >= frontier && frontier < 6;
+  // 낡은 단계(이전 단계 편집 뒤 미재생성) — 가장 앞의 것부터 되감아 다시 만든다.
+  const firstStale = STEP_DEFS.map((s) => s.n).find((n) => session.steps[String(n)]?.stale) ?? null;
   return (
-    <div className="flex items-center gap-1 shrink-0 bg-panel/60 border-b border-border-subtle" style={{ padding: "8px 24px" }}>
-      <span style={{ fontSize: 11, color: "var(--color-text-muted)", marginRight: 6 }}>요청 분해</span>
+    // flex-wrap — 우측 액션이 늘어(컨펌·다음·목표·재생성) 좁은 폭에선 칩 라벨이 세로로 꺾였다.
+    // 칩·버튼은 전부 nowrap 으로 형태를 지키고, 넘치면 액션 묶음이 통째로 다음 줄로 내려간다.
+    <div className="flex items-center gap-1 shrink-0 bg-panel/60 border-b border-border-subtle flex-wrap" style={{ padding: "8px 24px", rowGap: 6 }}>
+      <span style={{ fontSize: 11, color: "var(--color-text-muted)", marginRight: 6, whiteSpace: "nowrap" }}>요청 분해</span>
       {STEP_DEFS.map((s, i) => {
         const st = session.steps[String(s.n)]?.status ?? "pending";
         const isRunningStep = running && s.n === session.producedStep + 1;
         const color = st === "confirmed" ? GOLD : st === "produced" ? OK : st === "failed" ? BAD : isRunningStep ? WARN : FAINT;
-        const clickable = st !== "pending";
+        // 진행 중 이전 단계는 read-only 로 열람 가능(2026-07-16) — 단 **지금 생성 중인 미산출
+        // 단계**(st=running 이고 아직 산출 전)는 보여줄 완성물이 없어 클릭을 막는다. ①개정 중의
+        // ①은 산출된 적이 있으므로(producedStep>=1) 열람이 되고, 인터뷰의 "재검토 중"이 그 자리다.
+        const clickable = st !== "pending" && !(st === "running" && s.n > session.producedStep);
         const active = (viewStep ?? session.producedStep) === s.n;
         return (
           <span key={s.n} className="flex items-center">
             {i > 0 && <span style={{ width: 14, height: 1, background: "var(--color-border-subtle)", margin: "0 2px" }} />}
-            {/* W3: 산출물이 요청 세션 탭 본문으로 옮겨왔으므로 단계 선택은 그 탭으로 데려간다 —
-                안 그러면 다른 탭의 상단 스트립에서 단계를 눌러도 보여줄 자리가 없어 죽은 클릭이 된다. */}
+            {/* W3: 산출물이 요청 세션 탭 본문으로 옮겨왔으므로 단계 선택은 그 탭으로 데려간다. */}
             <button type="button" disabled={!clickable} onClick={() => { setViewStep(s.n); setView("session"); }} className="flex items-center gap-1.5 rounded-md transition-colors" title={clickable ? `${s.label} 보기` : undefined}
-              style={{ padding: "3px 8px", border: `1px solid ${active ? color : `${color}40`}`, background: active ? `${color}26` : `${color}14`, opacity: clickable || isRunningStep ? 1 : 0.5, cursor: clickable ? "pointer" : "default" }}>
+              style={{ padding: "3px 8px", border: `1px solid ${active ? color : `${color}40`}`, background: active ? `${color}26` : `${color}14`, opacity: clickable || isRunningStep ? 1 : 0.5, cursor: clickable ? "pointer" : "default", whiteSpace: "nowrap" }}>
               <span style={{ color, fontSize: 12 }}>{CIRCLED[i]}</span>
               <span style={{ fontSize: 11, color: st === "pending" ? FAINT : "var(--color-text-secondary)" }}>{s.label}</span>
               {st === "confirmed" && <span style={{ color: GOLD, fontSize: 10 }}>✓</span>}
+              {session.steps[String(s.n)]?.stale && <span title="낡음 — 이전 단계가 편집된 뒤 재생성되지 않은 산출입니다. '낡은 단계 다시 생성'으로 갱신하세요." style={{ color: WARN, fontSize: 10 }}>⚠</span>}
               {isRunningStep && <span className="animate-pulse" style={{ color: WARN, fontSize: 11 }}>…</span>}
             </button>
           </span>
         );
       })}
-      {/* W4(C2): 닫기(선택 해제만)와 폐기(영구 tombstone)를 분리한다 — 종전엔 "닫기 ×" 라벨로
-          discardSession 을 호출해 문구·동작이 어긋났다(RTM_INTAKE_WORKSPACE_DESIGN.md §4 C2).
-          자리 배치: 습관적으로 클릭하는 우측 끝은 안전한 "닫기"가 갖고, 되돌릴 수 없는 "폐기"는
-          구분선을 두어 왼쪽으로 떨어뜨린 뒤 확인 다이얼로그로 한 번 더 막는다. */}
-      <span className="ml-auto flex items-center gap-1.5">
-        <button type="button" onClick={() => setConfirmDiscard(true)} disabled={running} className="text-text-muted hover:text-status-error disabled:opacity-40" style={{ fontSize: 10.5 }} title="세션 폐기 — 되돌릴 수 없습니다(닫기와 다름)">폐기</button>
-        <span style={{ width: 1, height: 11, background: "var(--color-border-subtle)" }} />
-        <button type="button" onClick={closeSession} disabled={running} className="text-text-muted hover:text-text-primary disabled:opacity-40" style={{ fontSize: 11 }} title="닫기 — 세션 원장 목록으로 돌아갑니다(세션은 유지됩니다)">닫기 ×</button>
-      </span>
-      {confirmDiscard && (
-        <DiscardConfirmDialog
-          request={session.request}
-          onCancel={() => setConfirmDiscard(false)}
-          onConfirm={() => { setConfirmDiscard(false); void discardSession(); }}
-        />
+      {/* 실행 중엔 액션 전체를 숨긴다 — 진행 중 열람은 read-only 다(편집·컨펌·진행 불가). */}
+      {!running && frontier >= 1 && (
+        <span className="ml-auto flex items-center gap-2 whitespace-nowrap">
+          {isDoc && previewName && !editingDoc && <button type="button" onClick={() => { setDraftDoc(previewMd); setEditingDoc(true); }} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent" style={{ padding: "4px 11px", fontSize: 11.5 }}>편집</button>}
+          {isDoc && editingDoc && <>
+            <button type="button" onClick={() => setEditingDoc(false)} className="rounded-md border border-border-subtle text-text-secondary" style={{ padding: "4px 11px", fontSize: 11.5 }}>취소</button>
+            <button type="button" onClick={() => void saveDoc()} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "4px 11px", fontSize: 11.5 }}>{stepBusy ? "저장 중…" : "저장"}</button>
+          </>}
+          {/* 낡은 단계 재생성 — 첫 낡은 단계부터 종전 최전선까지 되감아 다시 만든다(편집 정책:
+              낡음 표시 + 선택 재생성, 2026-07-17 사용자 결정). */}
+          {firstStale !== null && !editingDoc && (
+            <button type="button" onClick={() => void advance(frontier, firstStale)} disabled={stepBusy}
+              title={`${CIRCLED[firstStale - 1]}~${CIRCLED[frontier - 1]} 을(를) 편집된 문서 기준으로 다시 생성합니다`}
+              className="rounded-md disabled:opacity-50" style={{ padding: "4px 12px", fontSize: 11.5, fontWeight: 600, border: `1px solid ${WARN}`, background: `${WARN}1A`, color: WARN, cursor: "pointer" }}>
+              ⚠ 낡은 단계 다시 생성 ▸
+            </button>
+          )}
+          {needConfirm && !editingDoc && <button type="button" onClick={() => void confirmStep(frontier)} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "4px 12px", fontSize: 11.5, fontWeight: 600 }} title={`${CIRCLED[frontier - 1]} ${STEP_DEFS[frontier - 1].label} 산출을 컨펌합니다 — 다음 단계 게이트가 열립니다`}>✓ {CIRCLED[frontier - 1]} 컨펌</button>}
+          {canAdvance && <button type="button" onClick={() => void advance(frontier + 1)} disabled={stepBusy} className="rounded-md bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50" style={{ padding: "4px 12px", fontSize: 11.5 }}>다음 단계 ▸</button>}
+          {/* 목표 단계 드롭다운(2026-07-17) — 시작 모달의 목표 선택과 대칭. 다음 단계(frontier+1)는
+              왼쪽 버튼 몫이라 그 뒤(frontier+2~⑥)만 나열한다. */}
+          {canAdvance && frontier + 2 <= 6 && (
+            <select value="" onChange={(e) => { const n = Number(e.target.value); if (n) void advance(n); }} disabled={stepBusy}
+              className="rounded-md border border-border-subtle bg-panel text-text-secondary disabled:opacity-50" style={{ padding: "4px 6px", fontSize: 11.5, cursor: "pointer" }}
+              title="선택한 단계까지 한 번에 생성 후 멈춤(중간 컨펌 없이 자동 진행)">
+              <option value="" disabled>…까지 ▸</option>
+              {STEP_DEFS.filter((s) => s.n >= frontier + 2).map((s) => (
+                <option key={s.n} value={s.n}>{CIRCLED[s.n - 1]} {s.label}까지</option>
+              ))}
+            </select>
+          )}
+        </span>
       )}
     </div>
   );
@@ -83,32 +119,7 @@ function SpecTabs() {
 }
 
 // ── P9: ① 식별의 근거 6축 표시 (RTM_IMPACT_GATE_DESIGN.md §9 P9) ─────────────
-/**
- * 축 한 줄. `state` 가 세 갈래인 것이 이 컴포넌트의 존재 이유다(설계 §4.1 "없음 vs 못 봄"):
- *  - `filled`  — 근거를 그린다.
- *  - `none`    — **찾았는데 없다**. `evidence: []`(명시적 빈 배열)만 이 상태가 될 수 있다.
- *  - `omitted` — **못 봤다**. 축이 통째로 비었거나(화면·정책 축은 생산자 default 가 `[]` 라
- *                부재와 구별할 수 없다) 인용을 기록하지 않던 시대의 산출(`evidence: undefined`).
- *
- * 둘을 "근거 없음" 한 문구로 뭉치면 축소 모드(§10-1: "없으면 생략하되 그 사실을 명시")에서
- * **생략된 축이 '근거가 없는 축'으로 위장**한다 — 정확히 §4.1 이 경고한 오독이다.
- *
- * W5: `noneLabel`/`noneTitle` 은 코드영향 축(ImpactInline)이 쓴다 — 거기서 `[]` 는 "근거가 없다"가
- * 아니라 "엔진이 계산했고 영향받는 게 0건"이다. 기본값은 근거 축(AcRow)의 종전 문구 그대로다.
- */
-function Axis({ label, state, noneLabel = "근거 없음", noneTitle = "이 축을 봤으나 근거가 없습니다 — '생략됨'(못 봄)과 다릅니다.", children }: {
-  label: string; state: "filled" | "none" | "omitted"; noneLabel?: string; noneTitle?: string; children?: ReactNode;
-}) {
-  return (
-    <div className="flex flex-wrap items-baseline" style={{ gap: 6, padding: "1px 0" }}>
-      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, flex: "none" }}>{label}</span>
-      {state === "filled" ? children
-        : state === "none"
-          ? <span title={noneTitle} style={{ fontSize: 10.5, color: WARN }}>{noneLabel}</span>
-          : <span title="이 축은 이 산출에 기록되지 않았습니다 — 근거가 없다는 뜻이 아닙니다(축소 모드: 있으면 포함·없으면 생략)." style={{ fontSize: 10.5, color: FAINT }}>생략됨</span>}
-    </div>
-  );
-}
+// Axis·REF_ROW·REF_GAP 은 shared.tsx 로 이동(2026-07-17) — ② ImpactStepView 와 공유.
 
 /** 화면 축 → 화면설계서 딥링크(`/screens?screen=`, ScreenSpecView.tsx:304 의 URL 계약). */
 function ScreenRef({ r }: { r: IntakeScreenRef }) {
@@ -133,9 +144,6 @@ function PolicyRef({ r }: { r: IntakePolicyRef }) {
     </Link>
   );
 }
-
-const REF_ROW = "flex flex-wrap items-baseline";
-const REF_GAP: CSSProperties = { gap: 6, minWidth: 0 };
 
 /** 인수 기준 1건 — 신뢰도 배지 + 근거·화면·정책 3축. */
 function AcRow({ ac }: { ac: IntakeAC }) {
@@ -215,176 +223,6 @@ function ReqCard({ r }: { r: IntakeRequirement }) {
   );
 }
 
-// ── ② 영향분석 — 코드영향 검증 (RTM_INTAKE_WORKSPACE_DESIGN.md §2.3) ─────────
-/** 라우트·흐름 id → 사람이 읽는 표기("flow:ANY /x" · "route:ANY /x" → "/x"). ChangeImpactView:177 동형. */
-const shortRef = (id: string): string => id.replace(/^(?:flow|route):/, "").replace(/^ANY\s+/, "");
-/** 목록 상한 — ②는 열람이 아니라 **컨펌 직전 스캔**이라 다 쏟지 않는다. 전체는 /change 에서 본다. */
-const CAP = 8;
-/** 상한 초과분 표기 — 침묵 누락 금지(FileGroups "외 n건" 과 같은 규약). */
-function Over({ n }: { n: number }) {
-  if (n <= CAP) return null;
-  return <span title={`${n - CAP}건 더 — 전체는 '변경·영향에서 열기'로 봅니다.`} style={{ fontSize: 10, color: FAINT }}>+{n - CAP}</span>;
-}
-/** 계산된 축의 3상태 — `undefined`(구 스냅샷이 안 적음) / `[]`(0건) / `[…]`. Axis 주석과 같은 축. */
-const axisState = (xs: unknown[] | undefined): "filled" | "none" | "omitted" =>
-  xs === undefined ? "omitted" : xs.length === 0 ? "none" : "filled";
-const NONE_T = "엔진이 계산했고 영향받는 항목이 0건입니다 — '생략됨'(안 적음)과 다릅니다.";
-
-/**
- * ②영향분석의 산출 — 설계 §2.3 "한 번 돌리고 두 곳에서 본다".
- *
- * 데이터가 두 조각인 게 이 컴포넌트의 형태를 정한다: **세션 포인터**(`impact-run.json` — 시드와
- * 그 출처)와 **원장 스냅샷**(`impact-history/<jobId>/impact.json` — 상·하류). 포인터가 산출을
- * 세션에 복사하지 않고 jobId 로 가리키므로 여기와 `/change` 가 **같은 스냅샷**을 읽는다 —
- * 두 표면이 갈라질 수 없다. 그래서 링크가 장식이 아니라 계약이다.
- *
- * 부재는 세 갈래이고 절대 "없음" 한 문구로 뭉치지 않는다(§4.1 "없음 vs 못 봄" — ②는 컨펌 직전
- * 판단 자리라 "미실행"이 "영향 없음"으로 읽히는 대가가 크다):
- *  - **미실행** — 변경 대상이 있는데 아직 안 돌렸다.
- *  - **해당없음** — 신규(to-be)뿐이라 시드가 없다. `code-impact` 는 이때 포인터를 아예 안 쓴다.
- *  - **스냅샷 없음** — 돌렸다는 기록은 있는데 결과를 못 읽었다(원장 상한에 밀림 등).
- */
-function ImpactInline() {
-  const { identified, impactRun, impactData, impactLoaded } = useRtm();
-  const up = impactData?.upstream;
-  const mappers = up?.persistence?.mappers;
-  const downFiles = impactData?.downstream?.files;
-
-  const body = !impactLoaded ? (
-    <span style={{ fontSize: 10.5, color: FAINT }}>불러오는 중…</span>
-  ) : !impactRun ? (
-    impactAbsenceOf(identified) === "notApplicable" ? (
-      <span title="changeset.modified 가 없거나 전부 신규(to-be)입니다 — 바꿀 기존 코드가 없으면 도달성을 계산할 시드가 없습니다. 신규 생성예측은 1차 범위 밖입니다." style={{ fontSize: 11, color: FAINT }}>
-        해당없음 — 기존 기능을 바꾸지 않는 요청(신규만)이라 계산할 시드가 없습니다.
-      </span>
-    ) : (
-      <span title="변경 대상 기능(changeset.modified)이 있는데 검증 산출이 없습니다 — ①의 코드영향 검증을 아직 돌리지 않았습니다. '영향 없음'이 아닙니다." style={{ fontSize: 11, color: WARN }}>
-        미실행 — 변경 대상이 있으나 아직 코드영향을 검증하지 않았습니다.
-      </span>
-    )
-  ) : !impactData ? (
-    <span title="포인터(impact-run.json)는 있으나 원장 스냅샷을 못 읽었습니다 — 원장 상한 초과로 밀렸거나 파일이 유실됐습니다." style={{ fontSize: 11, color: WARN }}>
-      스냅샷 없음 — 실행 기록은 있으나 결과를 못 읽었습니다(원장에서 밀렸을 수 있습니다).
-    </span>
-  ) : (
-    <div className="flex flex-col" style={{ gap: 1 }}>
-      {/* 시드 = "무엇을 바꾸나". 출처(fnId)를 같이 둔다 — 왜 이 파일이 시드인지 되짚을 수 있어야 한다. */}
-      <Axis label="시드" state={impactRun.bySource.length > 0 ? "filled" : "none"} noneLabel="없음" noneTitle={NONE_T}>
-        <div className="flex flex-col" style={{ gap: 2, minWidth: 0, flex: "1 1 auto" }}>
-          {impactRun.bySource.map((s) => (
-            <div key={s.fnId} className="flex flex-wrap items-baseline" style={{ gap: 5, minWidth: 0 }}>
-              <span title={`${VERB.modified.label} ${s.fnId}`} style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: VERB.modified.color }}>{VERB.modified.sym}{shortRef(s.fnId)}</span>
-              <span style={{ fontSize: 10, color: FAINT }}>→</span>
-              {/* 시드는 파일 단위다(라인이 없다) — 라인을 지어내지 않는다(AcRow 의 line=null 과 같은 규약). */}
-              {s.relPaths.map((p) => <EvidenceLink key={p} file={p} line={1} showLine={false} basename />)}
-            </div>
-          ))}
-        </div>
-      </Axis>
-
-      {/* 상류 = 이 변경이 **영향을 주는** 쪽. API 축만 진짜 file:line 근거를 갖는다. */}
-      <Axis label="상류 API" state={axisState(up?.api)} noneLabel="없음" noneTitle={NONE_T}>
-        <div className={REF_ROW} style={REF_GAP}>
-          {(up?.api ?? []).slice(0, CAP).map((a) => (
-            <span key={a.id} className="flex items-baseline" style={{ gap: 4, minWidth: 0 }} title={a.handler ? `${a.id} — ${a.handler}` : a.id}>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-text-secondary)" }}>{shortRef(a.id)}</span>
-              <EvidenceLink file={a.filePath} line={a.line} basename />
-            </span>
-          ))}
-          <Over n={(up?.api ?? []).length} />
-        </div>
-      </Axis>
-      <Axis label="상류 흐름" state={axisState(up?.flows)} noneLabel="없음" noneTitle={NONE_T}>
-        <div className={REF_ROW} style={REF_GAP}>
-          {(up?.flows ?? []).slice(0, CAP).map((f) => (
-            <Link key={f.flowId} to={`/domains/${encodeURIComponent(f.domainId)}?flow=${encodeURIComponent(f.flowId)}`} title={f.flowId}
-              className="hover:underline" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)", textDecoration: "none" }}>
-              {shortRef(f.flowId)}
-            </Link>
-          ))}
-          <Over n={(up?.flows ?? []).length} />
-        </div>
-      </Axis>
-      <Axis label="상류 도메인" state={axisState(up?.domains)} noneLabel="없음" noneTitle={NONE_T}>
-        <div className={REF_ROW} style={REF_GAP}>
-          {(up?.domains ?? []).map((d) => (
-            <Link key={d.domainId} to={`/domains/${encodeURIComponent(d.domainId)}`} title={d.domainId}
-              className="hover:underline" style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: "var(--color-status-info)", textDecoration: "none" }}>
-              {d.name || d.key}
-            </Link>
-          ))}
-        </div>
-      </Axis>
-
-      {/* 하류 = 이 변경이 **기대는** 협력자. 파일·매퍼는 라인 근거가 없어 파일만 연다. */}
-      <Axis label="하류 파일" state={axisState(downFiles)} noneLabel="없음" noneTitle={NONE_T}>
-        <div className={REF_ROW} style={REF_GAP}>
-          {(downFiles ?? []).slice(0, CAP).map((f) => (
-            <span key={f.relPath} className="flex items-baseline" style={{ gap: 3, minWidth: 0 }} title={f.relPath}>
-              <EvidenceLink file={f.relPath} line={1} showLine={false} basename />
-              {f.minDepth != null && <span title={`시드에서 ${f.minDepth}단계`} style={{ fontSize: 9, color: FAINT }}>d{f.minDepth}</span>}
-            </span>
-          ))}
-          <Over n={(downFiles ?? []).length} />
-        </div>
-      </Axis>
-      <Axis label="하류 매퍼" state={axisState(mappers)} noneLabel="없음" noneTitle={NONE_T}>
-        <div className={REF_ROW} style={REF_GAP}>
-          {(mappers ?? []).slice(0, CAP).map((m) => (
-            <span key={m.relPath} title={m.namespace}>
-              <EvidenceLink file={m.relPath} line={1} showLine={false} basename />
-            </span>
-          ))}
-          <Over n={(mappers ?? []).length} />
-        </div>
-      </Axis>
-
-      {/* 정직한 생략(§6.2) — 시드가 못 된 기능을 조용히 떨구지 않는다. 스크립트 로그와 같은 축. */}
-      {impactRun.skippedToBe.length > 0 && (
-        <Axis label="제외" state="filled">
-          <span title={impactRun.skippedToBe.join(" · ")} style={{ fontSize: 10.5, color: FAINT }}>신규(to-be) {impactRun.skippedToBe.length}건 — 파일이 아직 없어 시드가 될 수 없습니다</span>
-        </Axis>
-      )}
-      {impactRun.ungroundedFnIds.length > 0 && (
-        <Axis label="미근거" state="filled">
-          <span title={impactRun.ungroundedFnIds.join(" · ")} style={{ fontSize: 10.5, color: WARN }}>진입점 근거 0건 {impactRun.ungroundedFnIds.length}건 — 시드를 못 만들었습니다</span>
-        </Axis>
-      )}
-      {impactRun.unknownFnIds.length > 0 && (
-        <Axis label="미상" state="filled">
-          <span title={impactRun.unknownFnIds.join(" · ")} style={{ fontSize: 10.5, color: BAD }}>추적표에 없는 기능 {impactRun.unknownFnIds.length}건 — 실재 대조 확인 필요</span>
-        </Axis>
-      )}
-    </div>
-  );
-
-  const modified = (identified?.requirements ?? []).flatMap((r) => r.changeset?.modified ?? []);
-  return (
-    <div>
-      <div style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginBottom: 4 }}>
-        ①이 분해한 <b style={{ color: "var(--color-text-primary)" }}>변경 대상 {modified.length}</b>건에서
-        무엇이 연쇄로 영향받는지 — <b style={{ color: "var(--color-text-primary)" }}>영향도 엔진</b>이 계산한 결과입니다.
-      </div>
-      {/* ② 가 무엇을 근거로 말하는지 못 박는다 — 여기 숫자는 산문이 아니라 엔진 출력이다. */}
-      <div className="text-text-muted" style={{ fontSize: 10.5, lineHeight: 1.5, marginBottom: 12 }}>
-        시드는 <b className="text-text-secondary">결정론 조인</b>으로 뽑습니다(changeset.modified → 추적표 진입점 근거).
-        <b style={{ color: FAINT }}> 생략됨</b> = 이 산출에 그 축이 기록되지 않음,
-        <b style={{ color: WARN }}> 없음</b> = 엔진이 계산했고 영향받는 항목이 0건.
-      </div>
-      <div className="flex items-baseline flex-wrap" style={{ gap: 8, marginBottom: 6, borderTop: BORDER, paddingTop: 12 }}>
-        <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--color-text-secondary)" }}>코드영향 검증</span>
-        {/* §2.3 "한 번 돌리고 두 곳에서 본다" — 같은 jobId 스냅샷을 원장 렌즈에서 연다. */}
-        {impactRun && (
-          <Link to={`/change?run=${encodeURIComponent(impactRun.jobId)}`} title={`변경·영향 원장에서 이 분석("${impactRun.query}")을 엽니다 — 같은 산출의 전체 열람.`}
-            className="ml-auto hover:underline" style={{ fontSize: 10.5, color: "var(--color-status-info)", textDecoration: "none", flex: "none" }}>
-            변경·영향에서 열기 →
-          </Link>
-        )}
-      </div>
-      {body}
-    </div>
-  );
-}
 
 /**
  * A5/D3: ① `[확인필요]` 인터뷰 블록 — **분해보다 위**에 온다.
@@ -569,35 +407,29 @@ function IdentifiedView() {
  * 확정이어야 한다(auto 면 기본 2행으로 접힌다). 드로어 시절의 내부 비율을 그대로 보존한다.
  */
 export function IntakeStepContent() {
-  const { session, viewStep, previewName, previewMd, editingDoc, setEditingDoc, draftDoc, setDraftDoc, stepBusy, confirmStep, advance, saveDoc } = useRtm();
+  const { session, viewStep, previewMd, editingDoc, draftDoc, setDraftDoc } = useRtm();
   if (!session) return null;
   const frontier = session.producedStep;
   if (frontier < 1) return null;
   const ps = viewStep ?? frontier; // 표시 단계(스테퍼에서 고른 단계)
-  const isFrontier = ps === frontier;
-  const confirmed = session.confirmedStep >= ps;
-  const canAdvance = isFrontier && session.confirmedStep >= frontier && frontier < 6;
-  const isDoc = ps >= 3 && ps <= 5; // ③목록표 ④정의서 ⑤명세서 — .md 편집 대상
+  const stale = Boolean(session.steps[String(ps)]?.stale);
+  // 단계 헤더(① 라벨 · 컨펌 상태 · 액션 줄)는 제거됐다(2026-07-16) — 단계 위치·컨펌 상태는
+  // 스테퍼 칩이 이미 말하고 있었고(중복), 액션은 스테퍼 우측으로 옮겼다(IntakeStepper 주석).
+  // 높이 — 드로어 시절 유산(52vh)은 큰 화면에서 카드 아래 빈 공간을 남겼다(사용자 실측,
+  // 2026-07-17). 뷰포트를 채우되(카드 위 크롬 ≈ 340px 차감) 작은 창에선 52vh 를 하한으로.
+  // 확정값이어야 하는 이유는 그대로다: 편집 textarea 가 h-full 이라 부모가 auto 면 접힌다.
   return (
-    <div className="flex flex-col" style={{ height: "52vh" }}>
-      <div className="flex items-center gap-3 shrink-0 border-b border-border-subtle" style={{ padding: "10px 20px" }}>
-        <span style={{ fontFamily: "var(--font-heading)", fontSize: 14, color: "var(--color-text-primary)" }}>{CIRCLED[ps - 1]} {STEP_DEFS[ps - 1].label}</span>
-        {confirmed ? <span style={{ fontSize: 11, color: GOLD }}>✓ 컨펌됨</span> : <span style={{ fontSize: 11, color: WARN }}>검토 필요</span>}
-        {!isFrontier && <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>· 이전 단계 보기</span>}
-        <span className="ml-auto flex items-center gap-2">
-          {isDoc && previewName && !editingDoc && <button type="button" onClick={() => { setDraftDoc(previewMd); setEditingDoc(true); }} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent" style={{ padding: "5px 12px", fontSize: 12 }}>편집</button>}
-          {isDoc && editingDoc && <>
-            <button type="button" onClick={() => setEditingDoc(false)} className="rounded-md border border-border-subtle text-text-secondary" style={{ padding: "5px 12px", fontSize: 12 }}>취소</button>
-            <button type="button" onClick={() => void saveDoc()} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 12px", fontSize: 12 }}>{stepBusy ? "저장 중…" : "저장"}</button>
-          </>}
-          {isFrontier && !confirmed && !editingDoc && <button type="button" onClick={() => void confirmStep(frontier)} disabled={stepBusy} className="rounded-md border border-accent text-accent hover:bg-accent/10 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12, fontWeight: 600 }}>✓ 컨펌</button>}
-          {canAdvance && <button type="button" onClick={() => void advance(frontier + 1)} disabled={stepBusy} className="rounded-md bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50" style={{ padding: "5px 13px", fontSize: 12 }}>다음 단계 ▸</button>}
-          {canAdvance && frontier < 5 && <button type="button" onClick={() => void advance(6)} disabled={stepBusy} className="rounded-md border border-border-subtle text-text-secondary hover:text-accent hover:border-accent disabled:opacity-50" style={{ padding: "5px 11px", fontSize: 12 }}>⑥까지 ▸</button>}
-        </span>
-      </div>
+    <div className="flex flex-col" style={{ height: "max(52vh, calc(100vh - 340px))" }}>
       <div className="flex-1 min-h-0 overflow-auto" style={{ padding: "14px 20px" }}>
+        {/* 낡음 배너 — 이 산출은 이전 단계 편집 **전** 문서를 근거로 생성됐다(조용한 불일치 금지). */}
+        {stale && (
+          <div style={{ border: `1px solid ${WARN}55`, background: `${WARN}0F`, borderRadius: 8, padding: "8px 12px", marginBottom: 12, fontSize: 11.5, color: WARN, lineHeight: 1.5 }}>
+            ⚠ 이 산출물은 이전 단계가 편집되기 <b>전에</b> 생성되었습니다 — 편집 내용이 반영되어 있지 않습니다.
+            상단 <b>낡은 단계 다시 생성</b>으로 갱신하세요.
+          </div>
+        )}
         {ps === 1 ? <IdentifiedView />
-          : ps === 2 ? <ImpactInline />
+          : ps === 2 ? <ImpactStepView />
           : ps === 6 ? <div className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.7 }}>⑥ RTM 반영 완료 — <b style={{ color: "var(--color-text-primary)" }}>요청 기준</b> 탭에서 분해된 요청·요구사항과 추적 결과를 확인하세요. <span className="text-text-muted">생성된 문서는 세션 폴더(rtm-intake)에 보존됩니다.</span></div>
           : editingDoc ? <textarea value={draftDoc} onChange={(e) => setDraftDoc(e.target.value)} spellCheck={false} className="w-full h-full resize-none rounded-lg bg-elevated border border-border-medium text-text-primary focus:outline-none focus:border-accent" style={{ fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.55, padding: "10px 12px" }} />
           : ps === 5 ? <SpecTabs />

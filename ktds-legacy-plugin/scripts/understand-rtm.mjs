@@ -151,7 +151,7 @@ if (existsSync(overlayPath)) {
   }
 }
 
-// ★ P1c 근거 게이트 — ⑤ 재bake 표면(rtm-requirements.json 이 투영된 기능 셀)을 db-schema 와 대조한다.
+// ★ P1c 근거 게이트 — ⑥ 재bake 표면(rtm-requirements.json 이 투영된 기능 셀)을 db-schema 와 대조한다.
 //
 // 실측 `OAUTH_ACCOUNT` 는 identified.json 을 거치지 않아(intakeFnStub 이 4축 셀을 빈 값으로 만든다)
 // P1 게이트(rtm-intake.mjs validate)가 보는 표면 밖이다 — 여기가 그 구멍을 막는 자리다.

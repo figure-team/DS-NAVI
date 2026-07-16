@@ -5,9 +5,9 @@ import type { Identified, ImpactRun, ImpactSnapshot, RtmSession, SessionDoc } fr
 import type { ModelChoice } from "../ModelSelect";
 
 /**
- * P4 단계 인테이크(가이드 5단계) 상태·진행 — RtmView 본문에서 기계적 이동.
+ * P4 단계 인테이크(6단계) 상태·진행 — RtmView 본문에서 기계적 이동.
  * 계약(불가침): startIntake/advance/confirmStep/saveDoc/discardSession, 3초 폴링,
- * 마운트 복구(?sid= 딥링크 우선), producedStep>=5 면 추적표 재로드(loadModel).
+ * 마운트 복구(?sid= 딥링크 우선), producedStep>=6(⑥ RTM 반영) 이면 추적표 재로드(loadModel).
  */
 export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   accessToken: string | null;
@@ -17,7 +17,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
 }) {
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [intakeQuery, setIntakeQuery] = useState("");
-  const [targetStep, setTargetStep] = useState(5);
+  const [targetStep, setTargetStep] = useState(6);
   const [intakeModel, setIntakeModel] = useState<ModelChoice>(""); // "" = 세션 모델(기본)
   const [intakeStatus, setIntakeStatus] = useState<"idle" | "running" | "done" | "failed">("idle");
   const [intakeError, setIntakeError] = useState<string | null>(null);
@@ -152,7 +152,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     void loadSession(null, false);
   }, [loadSession]);
 
-  // 폴링 — 실행 중이면 세션·문서 갱신. done 이면 멈추고, ⑤ 산출이면 추적표 재로드.
+  // 폴링 — 실행 중이면 세션·문서 갱신. done 이면 멈추고, ⑥ 산출이면 추적표 재로드.
   useEffect(() => {
     if (intakeStatus !== "running" || !sid) return;
     const poll = async () => {
@@ -165,7 +165,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
         if (st === "done") {
           setIntakeStatus("done");
           const ps = data.session?.producedStep ?? 0;
-          if (ps >= 5) { setToast({ kind: "done", msg: "⑤ RTM 반영 완료 — 추적표를 갱신했습니다." }); loadModel(); }
+          if (ps >= 6) { setToast({ kind: "done", msg: "⑥ RTM 반영 완료 — 추적표를 갱신했습니다." }); loadModel(); }
           else setToast({ kind: "done", msg: `${CIRCLED[ps - 1] ?? ""} 단계 산출 완료 — 검토 후 컨펌하세요.` });
         } else if (st === "failed") {
           setIntakeStatus("failed"); setToast({ kind: "failed", msg: "단계 실행 실패 — 서버 로그를 확인하세요." });
@@ -227,8 +227,11 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   useEffect(() => {
     if (!session || intakeStatus === "running") return;
     const ps = viewStep ?? session.producedStep;
-    if (ps === 1) { void loadIdentified(); void loadImpactRun(); setPreviewName(null); }
-    else if (ps >= 2 && ps <= 4) {
+    // ②도 identified 가 필요하다 — `impactAbsenceOf` 가 changeset.modified 로 "미실행"과 "해당없음"을
+    // 가르므로(types.ts), 이게 없으면 화면이 둘을 구별하지 못한다.
+    if (ps === 1 || ps === 2) { void loadIdentified(); setPreviewName(null); }
+    if (ps === 2) void loadImpactRun();
+    if (ps >= 3 && ps <= 5) {
       const kind = STEP_DOC_KIND[ps];
       const doc = sessionDocs.find((d) => d.kind === kind);
       if (doc && doc.name !== previewName) void loadPreview(doc.name);

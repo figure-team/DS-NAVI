@@ -23,8 +23,9 @@ const CARD = "rounded-[10px] border border-border-subtle bg-panel card-shadow";
 
 /** 최고 단계 배지 — producedStep(산출물이 존재하는 최고 단계, 0=없음). */
 function StepBadge({ n }: { n: number }) {
-  const label = n >= 1 && n <= 5 ? CIRCLED[n - 1] : "–";
-  const title = n >= 1 && n <= 5 ? `${CIRCLED[n - 1]} ${STEP_DEFS[n - 1].label}까지 산출됨` : "아직 산출물 없음";
+  const ok = n >= 1 && n <= STEP_DEFS.length;
+  const label = ok ? CIRCLED[n - 1] : "–";
+  const title = ok ? `${CIRCLED[n - 1]} ${STEP_DEFS[n - 1].label}까지 산출됨` : "아직 산출물 없음";
   return (
     <span
       title={title}
@@ -147,6 +148,7 @@ function StepArea() {
   if (session.discarded) return msg("폐기된 세션입니다 — 진행할 수 없습니다. 산출물은 세션 폴더(rtm-intake)에 남아 있습니다.");
   if (frontier < 1) return msg(intakeStatus === "running" ? "① 식별 진행 중…" : "아직 산출된 단계가 없습니다.");
   // 실행 중엔 산출물을 걸지 않는다 — 폴링이 producedStep 을 올리는 순간 최전선으로 바뀐다.
-  if (intakeStatus === "running") return msg(`${CIRCLED[Math.min(frontier, 4)]} 다음 단계 생성 중… — 완료되면 산출물이 여기 표시됩니다.`);
+  // 인덱스는 "다음 단계"(frontier+1 의 0-based = frontier)이고 마지막 단계에서 넘치지 않게 자른다.
+  if (intakeStatus === "running") return msg(`${CIRCLED[Math.min(frontier, STEP_DEFS.length - 1)]} 다음 단계 생성 중… — 완료되면 산출물이 여기 표시됩니다.`);
   return <IntakeStepContent />;
 }

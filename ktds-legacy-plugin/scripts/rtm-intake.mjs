@@ -10,13 +10,13 @@
  * - intake-input(①전 근거 번들, P3): 분석 산출물 3축(도메인·데이터·추적표)을 요청 원문으로
  *   사전 필터해 **유계 요약**을 rtm-intake/<sid>/intake-input.json 에 쓴다. ①이 이걸 읽고
  *   설계한다(현재는 rtm.json 하나만 보고 지어낸다 — 설계서 §1.1).
- * - code-impact(①후 검증, P6): identified.json 의 `changeset.modified`(flow) → rtm.json 근거로
+ * - code-impact(②영향분석, P6): identified.json 의 `changeset.modified`(flow) → rtm.json 근거로
  *   **결정론 조인**해 시드 파일을 뽑고 impact 엔진을 돌린다. 루트 슬롯을 안 건드리고 요청별로
  *   보관 + impact 원장에 query=요청 원문으로 기록한다(RTM_INTAKE_WORKSPACE_DESIGN.md §2.3).
  * - validate(①후 게이트): identified.json 을 스키마로 검증 + 비치명 일관성 진단
  *   + **실재 대조 게이트(P1, fail-closed exit 2)** — changeset 기능 ⊂ rtm.json,
  *   참조 테이블 ⊂ db-schema.json. projectRoot 는 경로 규약에서 역산하거나 --project 로 준다.
- * - project(⑤): identified.json(2계층) → 현 rtm-requirements.json 스키마로 **투영·병합**(옵션 B).
+ * - project(⑥): identified.json(2계층) → 현 rtm-requirements.json 스키마로 **투영·병합**(옵션 B).
  *   요구사항(SFR…)을 1급 requirement 로, changeset.added 를 TO-BE 기능 스텁으로. 기존 보존(id 병합).
  *   투영 후 SKILL 이 understand-rtm.mjs 를 돌려 rtm.json 을 재생성한다.
  * 설계: docs/ktds/RTM_STEP_FLOW_DESIGN.md §9(옵션 B).
@@ -107,7 +107,7 @@ function deriveProjectRoot(identifiedPath) {
  * 설계: RTM_IMPACT_GATE_DESIGN.md §5.1 · §7 C2/C8 · §9 P7 · §10-1(사용자 결정).
  *
  * 이 게이트가 없으면 산출물이 없거나 손상돼도 **조용히 빈 인벤토리로 진행**한다(§5.1):
- *  - `project`(⑤): rtm.json 손상 → 도메인 귀속이 **전부 새 `to-be:`** 로 떨어진다.
+ *  - `project`(⑥): rtm.json 손상 → 도메인 귀속이 **전부 새 `to-be:`** 로 떨어진다.
  *  - `validate`(①후): rtm.json 부재 → 실재 대조가 **무음으로 생략**돼 게이트가 장식이 된다(C8).
  * `understand-rtm/SKILL.md` 의 "없으면 멈춤"은 LLM 에게 주는 **자연어 지시일 뿐 코드에 없었다** —
  * 그걸 여기서 코드로 만든다("게이트는 코드로", C8).
@@ -465,7 +465,7 @@ if (cmd === 'next-cr') {
   process.exit(0)
 }
 
-// ── project(⑤) ───────────────────────────────────────────────────────────────
+// ── project(⑥ RTM 반영) ──────────────────────────────────────────────────────
 if (cmd === 'project') {
   const projectRoot = rest[0]
   const sid = rest[1]
@@ -561,7 +561,7 @@ if (cmd === 'project') {
   mkdirSync(uaDir, { recursive: true })
   writeFileSync(reqPath, JSON.stringify(merged, null, 2) + '\n', 'utf8')
 
-  console.log(`투영 완료(⑤) — ${reqPath}`)
+  console.log(`투영 완료(⑥) — ${reqPath}`)
   console.log(`  요청 ${intake.request.id} → 요구사항 ${projectedReqs.length}건 투영 · 신규 TO-BE 기능 ${newFunctions.length}개`)
   for (const r of projectedReqs) console.log(`    + ${r.id} ${r.text}`)
   for (const f of newFunctions) console.log(`    ~ ${f.featureId} ${f.name} (${f.domainName})`)

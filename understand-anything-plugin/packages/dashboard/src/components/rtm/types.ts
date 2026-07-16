@@ -126,8 +126,11 @@ export const requestIdOf = (r: Requirement): string => {
 };
 export const UNGROUPED = "(미분류)";
 
-// ── P4: 단계 인테이크(가이드 5단계) ───────────────────────────────────────────
+// ── P4: 단계 인테이크(6단계 — 가이드 5단계 + ②영향분석) ───────────────────────
 export interface RtmSession {
+  /** 단계 체계 버전. 없음(undefined) = 구 5단계 세션 — 서버가 읽을 때 6단계로 마이그레이션한다
+   *  (server/rtm-sessions.ts `migrateRtmSession`). 프론트에 도달하는 세션은 항상 마이그레이션 후다. */
+  schemaVersion?: number;
   sid: string; request: string; producedStep: number; confirmedStep: number;
   targetStep: number; discarded: boolean; steps: Record<string, { status: string }>;
 }
@@ -217,7 +220,7 @@ export const TO_BE_FN_PREFIX = "to-be:";
  * `to-be:` 는 파일이 없어 제외 — rtm-seeds.ts:85).
  *
  * 둘을 "영향 없음" 한 문구로 뭉치면 **미실행이 "영향 없음"으로 위장**한다 — §4.1 "없음 vs 못 봄"이
- * 경고한 바로 그 오독이고, ①은 컨펌 직전 판단 자리라 대가가 크다.
+ * 경고한 바로 그 오독이고, ②는 컨펌 직전 판단 자리라 대가가 크다.
  */
 export const impactAbsenceOf = (identified: Identified | null): "notRun" | "notApplicable" => {
   const modified = (identified?.requirements ?? []).flatMap((r) => r.changeset?.modified ?? []);
@@ -237,25 +240,37 @@ export interface SessionRow {
 }
 /**
  * 원장 행의 상태 — C1 을 오해시키지 않는 것이 이 함수의 존재 이유다. 동시 실행이 전역 1개이므로
- * 미완 세션은 **대기가 아니라 중단됨**이고(큐가 없다), 완료는 ⑤ RTM 반영뿐이다(IntakePanel ps===5).
+ * 미완 세션은 **대기가 아니라 중단됨**이고(큐가 없다), 완료는 ⑥ RTM 반영뿐이다(IntakePanel ps===6).
  */
 export const sessionStateOf = (s: SessionRow): "discarded" | "running" | "done" | "stopped" =>
-  s.discarded ? "discarded" : s.running ? "running" : s.producedStep >= 5 ? "done" : "stopped";
+  s.discarded ? "discarded" : s.running ? "running" : s.producedStep >= 6 ? "done" : "stopped";
 export const SESSION_STATE: Record<ReturnType<typeof sessionStateOf>, { label: string; tone: "ok" | "warn" | "mut"; title: string }> = {
   running: { label: "진행 중", tone: "warn", title: "지금 실행 중 — 동시 실행은 전역 1건뿐입니다." },
-  done: { label: "완료", tone: "ok", title: "⑤ RTM 반영까지 완료 — 요청 기준 탭에서 결과를 봅니다." },
+  done: { label: "완료", tone: "ok", title: "⑥ RTM 반영까지 완료 — 요청 기준 탭에서 결과를 봅니다." },
   stopped: { label: "중단됨", tone: "mut", title: "실행 중이 아닙니다 — 대기열이 아니라 멈춘 상태입니다(동시 실행 1건). 선택해 이어서 진행하세요." },
   discarded: { label: "폐기", tone: "mut", title: "폐기된 세션 — 산출물은 디스크에 남아 있으나 진행할 수 없습니다." },
 };
 /** ISO → "MM-DD HH:mm"(로컬) — 원장 목록용 축약(ChangeImpactView fmtTime 과 동형). */
 export const fmtSessionTime = (iso: string): string =>
   iso ? new Date(iso).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }) : "";
+/**
+ * 6단계(2026-07-16 사용자 결정) — ②영향분석이 ① 안에서 나와 독립 단계가 됐다.
+ *
+ * 왜 6번째가 아니라 ②인가: 단계 게이트의 존재 이유는 "깊은 작업 전에 얕은 범위를 사용자가 먼저
+ * 확정"(RTM_STEP_FLOW_DESIGN.md §2)인데 종전 ①이 가장 깊은 작업(impact 엔진 BFS)을 품고 있었다.
+ * 영향분석은 ①의 changeset.modified 를 입력으로 쓰고 ③④⑤ 문서가 그 위에 쓰이므로 자리는 ①과 ③
+ * 사이다. RTM_IMPACT_GATE_DESIGN.md §6.5 가 "외부 가이드 5단계에 앵커돼 있다"는 이유로 6단계화를
+ * 반려했으나, 그 가이드를 실제로 읽어 보니 ①은 **고객 인터뷰로 모호함 제거**(담당 "PM·PL")이고
+ * 가이드 전체에 "영향"·"impact" 언급이 **0건**이었다 — 반려 근거가 사실과 반대였다(§6.5 개정 참조).
+ */
 export const STEP_DEFS: { n: number; label: string }[] = [
-  { n: 1, label: "식별" }, { n: 2, label: "목록표" }, { n: 3, label: "정의서" }, { n: 4, label: "명세서" }, { n: 5, label: "RTM" },
+  { n: 1, label: "식별" }, { n: 2, label: "영향분석" }, { n: 3, label: "목록표" },
+  { n: 4, label: "정의서" }, { n: 5, label: "명세서" }, { n: 6, label: "RTM" },
 ];
-export const CIRCLED = ["①", "②", "③", "④", "⑤"];
+export const CIRCLED = ["①", "②", "③", "④", "⑤", "⑥"];
 /** 표시용 frontmatter 제거(메타는 배지로, 본문엔 불필요). */
 export const stripFrontmatter = (md: string) => md.replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
-export const STEP_DOC_KIND: Record<number, string> = { 2: "list", 3: "definition", 4: "spec" };
+/** 문서(.md) 산출 단계 → 종류. ①은 identified.json · ②는 impact-run.json · ⑥은 rtm.json 이라 없다. */
+export const STEP_DOC_KIND: Record<number, string> = { 3: "list", 4: "definition", 5: "spec" };
 
 export function pct(n: number, d: number): number { return d > 0 ? Math.round((n / d) * 100) : 0; }

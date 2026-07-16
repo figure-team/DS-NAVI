@@ -391,16 +391,17 @@ export default function RtmView() {
             {intake.intakeStatus === "running" && (
               <span className="flex items-center gap-1.5" style={{ fontSize: 11, color: WARN }} title="요구사항 단계 생성 진행 중">
                 <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                {CIRCLED[Math.min(intake.session?.producedStep ?? 0, 4)]} 단계 생성 중…
+                {CIRCLED[Math.min(intake.session?.producedStep ?? 0, CIRCLED.length - 1)]} 단계 생성 중…
               </span>
             )}
-            {/* 코드 영향 분석은 이 탭이 하지 않는다(인테이크 5단계는 impact 미호출) — 짝이 되는
-                메뉴로 나가는 길만 열어 둔다. 버튼 3개는 과하므로 조용한 텍스트 링크. */}
+            {/* 인테이크도 ②영향분석에서 impact 를 부른다(6단계, 2026-07-16) — 다만 시드가 ①의
+                changeset 에서 결정론 조인된다. 임의 파일집합 질의는 이 메뉴 몫이라 길만 열어 둔다.
+                버튼 3개는 과하므로 조용한 텍스트 링크. */}
             <Link
               to="/change"
               className="text-text-muted hover:text-text-secondary transition-colors font-semibold whitespace-nowrap"
               style={{ fontSize: 12.5, textDecoration: "none" }}
-              title="코드 영향 범위(파일·API·DB) 분석 — 자연어 영향 분석은 변경·영향 메뉴에서 실행한다"
+              title="코드 영향 범위(파일·API·DB) 원장 — 임의 파일집합에 대한 자연어 영향 분석은 여기서 실행한다"
             >
               변경·영향 →
             </Link>
@@ -415,9 +416,9 @@ export default function RtmView() {
                 xlsx 다운로드
               </a>
             )}
-            <button type="button" onClick={() => { intake.setIntakeOpen(true); intake.setIntakeError(null); intake.setTargetStep(5); }} disabled={intake.intakeStatus === "running"}
+            <button type="button" onClick={() => { intake.setIntakeOpen(true); intake.setIntakeError(null); intake.setTargetStep(6); }} disabled={intake.intakeStatus === "running"}
               className="rounded-lg border border-accent bg-panel text-accent hover:bg-accent/10 transition-colors disabled:opacity-40 font-semibold cursor-pointer" style={{ padding: "7px 14px", fontSize: 13 }}
-              title="자연어로 새 요구사항을 요청 → 가이드 5단계로 분해·문서화(전부 [추정])">＋ 새 요청</button>
+              title="자연어로 새 요구사항을 요청 → 6단계(식별·영향분석·목록표·정의서·명세서·RTM)로 분해·문서화(전부 [추정])">＋ 새 요청</button>
           </span>
         </div>
 

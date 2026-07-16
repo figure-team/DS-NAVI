@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CIRCLED, STEP_DOC_KIND } from "./types";
-import type { Identified, ImpactRun, ImpactSnapshot, RtmSession, SessionDoc } from "./types";
+import type { Identified, ImpactRun, ImpactSnapshot, QaHistory, RtmSession, SessionDoc } from "./types";
 import type { ModelChoice } from "../ModelSelect";
 
 /**
@@ -21,6 +21,12 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const [intakeModel, setIntakeModel] = useState<ModelChoice>(""); // "" = 세션 모델(기본)
   const [intakeStatus, setIntakeStatus] = useState<"idle" | "running" | "done" | "failed">("idle");
   const [intakeError, setIntakeError] = useState<string | null>(null);
+  /**
+   * 지금 도는 job 이 **몇 번 단계**인가(서버 `rtmTracker.job.step`). null=모름.
+   * 이게 있어야 "최전선 재실행(①개정)"과 "다음 단계 생성"을 화면이 가른다 — 없으면 개정 중에도
+   * "② 다음 단계 생성 중"이라 말해 **컨펌하지 않은 단계로 넘어간 것처럼 거짓말**한다.
+   */
+  const [jobStep, setJobStep] = useState<number | null>(null);
   const [sid, setSid] = useState<string | null>(null);
   const [session, setSession] = useState<RtmSession | null>(null);
   const [sessionDocs, setSessionDocs] = useState<SessionDoc[]>([]);
@@ -35,16 +41,22 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const [impactRun, setImpactRun] = useState<ImpactRun | null>(null);
   const [impactData, setImpactData] = useState<ImpactSnapshot | null>(null);
   const [impactLoaded, setImpactLoaded] = useState(false);
+  // A5: ① 답변 원장 — "제출했으나 아직 개정에 반영 안 된 답"의 출처(§3.2). identified.json 만 보면
+  // 개정 실패·새로고침 때 사용자가 방금 친 답이 화면에서 사라진다.
+  const [qaHistory, setQaHistory] = useState<QaHistory | null>(null);
   const [editingDoc, setEditingDoc] = useState(false);
   const [draftDoc, setDraftDoc] = useState("");
   const loadSeq = useRef(0); // 세션 조회 순번 — 늦게 온 응답이 최신 선택을 덮어쓰지 않게(W2).
 
   /**
-   * W5: 코드영향 상태 초기화 — 세션이 바뀌는 모든 경로에서 부른다. 안 지우면 **직전 세션의 영향
-   * 분석이 새 세션의 것처럼 남는다**(다른 요청의 근거로 컨펌하는 사고). `impactLoaded=false` 로
-   * 되돌리는 게 핵심 — 화면이 "미실행"을 단언하지 않고 조회 중으로 되돌아간다.
+   * W5/A5: 세션 종속 산출물 초기화 — 세션이 바뀌는 모든 경로에서 부른다. 안 지우면 **직전 세션의
+   * 영향분석·답변이 새 세션의 것처럼 남는다**(다른 요청의 근거로 컨펌하는 사고). `impactLoaded=false`
+   * 로 되돌리는 게 핵심 — 화면이 "미실행"을 단언하지 않고 조회 중으로 되돌아간다.
+   * 답변 원장도 같은 위험이라 함께 지운다(A5) — 그래서 이름이 impact 가 아니다.
    */
-  const resetImpact = useCallback(() => { setImpactRun(null); setImpactData(null); setImpactLoaded(false); }, []);
+  const resetSessionArtifacts = useCallback(() => {
+    setImpactRun(null); setImpactData(null); setImpactLoaded(false); setQaHistory(null);
+  }, []);
 
   const startIntake = useCallback(async () => {
     const q = intakeQuery.trim();
@@ -56,10 +68,10 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
       const d = (await res.json().catch(() => null)) as { job?: { sid?: string }; session?: RtmSession; error?: string } | null;
       if (res.status === 202 && d?.session) {
         setSid(d.session.sid); setSession(d.session); setIntakeStatus("running");
-        setIntakeOpen(false); setIntakeQuery(""); setPreviewName(null); setIdentified(null); resetImpact();
+        setIntakeOpen(false); setIntakeQuery(""); setPreviewName(null); setIdentified(null); resetSessionArtifacts();
       } else { setIntakeError(d?.error ?? `HTTP ${res.status}`); }
     } catch (e) { setIntakeError(String(e)); }
-  }, [intakeQuery, targetStep, intakeModel, accessToken, resetImpact]);
+  }, [intakeQuery, targetStep, intakeModel, accessToken, resetSessionArtifacts]);
 
   // start..target 진행(다음 단계 / ⑤까지). 컨펌 게이트 미통과면 409 토스트.
   const advance = useCallback(async (toStep: number) => {
@@ -97,8 +109,8 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   const discardSession = useCallback(async () => {
     if (!sid || !accessToken) { setSession(null); setSid(null); return; }
     try { await fetch(`/rtm-intake-discard?token=${encodeURIComponent(accessToken)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sid }) }); } catch { /* */ }
-    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); resetImpact(); setIntakeStatus("idle");
-  }, [sid, accessToken, resetImpact]);
+    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); resetSessionArtifacts(); setIntakeStatus("idle");
+  }, [sid, accessToken, resetSessionArtifacts]);
 
   /**
    * W4: "닫기" — 선택 해제만. discardSession 과 달리 **서버 호출이 없다** — 세션은 원장에 그대로
@@ -106,9 +118,9 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
    * 뒤로가기 둘 다)을 감지하면 이 함수로 로컬 상태만 지운다.
    */
   const clearSession = useCallback(() => {
-    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); resetImpact();
+    setSession(null); setSid(null); setSessionDocs([]); setPreviewName(null); setIdentified(null); resetSessionArtifacts();
     setEditingDoc(false); setViewStep(null); setIntakeStatus("idle");
-  }, [resetImpact]);
+  }, [resetSessionArtifacts]);
 
   /**
    * 세션 1건을 서버에서 읽어 현재 세션으로 앉힌다. sid=null 이면 서버의 현재 세션(마운트 복구).
@@ -120,7 +132,7 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     const seq = ++loadSeq.current;
     try {
       const r = await fetch(`/rtm-intake-status${tokenQ}${target ? `&sid=${encodeURIComponent(target)}` : ""}`);
-      const data = (await r.json()) as { job?: { status?: string; sid?: string | null }; session?: RtmSession | null; docs?: SessionDoc[] };
+      const data = (await r.json()) as { job?: { status?: string; sid?: string | null; step?: number | null }; session?: RtmSession | null; docs?: SessionDoc[] };
       // 원장에서 빠르게 두 세션을 연달아 고르면 먼저 띄운 요청이 나중에 도착할 수 있다 — 늦게 온
       // 응답이 최신 선택을 덮어쓰지 않도록 순번으로 폐기한다.
       if (seq !== loadSeq.current) return false;
@@ -131,15 +143,16 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
       setSessionDocs(data.docs ?? []);
       setPreviewName(null);
       setIdentified(null);
-      resetImpact();
+      resetSessionArtifacts();
       setEditingDoc(false);
       const running = data.job?.status === "running" && data.job?.sid === data.session.sid;
+      setJobStep(running ? data.job?.step ?? null : null);
       setIntakeStatus(running ? "running" : "idle");
       return true;
     } catch {
       return false; // 복구/전환 실패 무시 — 현재 세션 유지
     }
-  }, [tokenQ, resetImpact]);
+  }, [tokenQ, resetSessionArtifacts]);
 
   /** W2: `?sid=` 라우팅 키 → 세션 전환. URL→상태 effect(RtmView)가 호출한다. */
   const selectSession = useCallback((target: string) => { void loadSession(target, true); }, [loadSession]);
@@ -158,10 +171,11 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     const poll = async () => {
       try {
         const r = await fetch(`/rtm-intake-status${tokenQ}&sid=${encodeURIComponent(sid)}`);
-        const data = (await r.json()) as { job?: { status?: string }; session?: RtmSession | null; docs?: SessionDoc[] };
+        const data = (await r.json()) as { job?: { status?: string; step?: number | null }; session?: RtmSession | null; docs?: SessionDoc[] };
         if (data.session) setSession(data.session);
         if (data.docs) setSessionDocs(data.docs);
         const st = data.job?.status;
+        setJobStep(st === "running" ? data.job?.step ?? null : null);
         if (st === "done") {
           setIntakeStatus("done");
           const ps = data.session?.producedStep ?? 0;
@@ -198,6 +212,47 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
   }, [sid, tokenQ]);
 
   /**
+   * A5: 답변 원장 로드. 404(아직 아무도 안 답함)는 오류가 아니라 **정상**이다 — 빈 원장으로 둔다.
+   * identified.json 과 나란히 읽어 화면이 "반영된 답"(questions[].answer)과 "제출됐지만 아직 반영
+   * 안 된 답"(원장에만 있음)을 **둘 다** 안다.
+   */
+  const loadQaHistory = useCallback(async () => {
+    if (!sid) return;
+    try {
+      const r = await fetch(`/rtm-intake-doc${tokenQ}&sid=${encodeURIComponent(sid)}&name=qa-history.json`);
+      if (!r.ok) { setQaHistory(null); return; }
+      const d = (await r.json().catch(() => null)) as { content?: string } | null;
+      try { setQaHistory(d?.content ? (JSON.parse(d.content) as QaHistory) : null); } catch { setQaHistory(null); }
+    } catch { /* */ }
+  }, [sid, tokenQ]);
+
+  /**
+   * A5: ① `[확인필요]` 답변 제출 → ① 개정 재실행(§4). 서버가 원장에 append 하고 개정을 spawn 한다.
+   * 성공하면 running 으로 전환돼 기존 폴링이 개정본을 집어온다 — 별도 대기 로직이 필요 없다.
+   */
+  const answerQuestions = useCallback(async (answers: { qid: string; question: string; answer: string }[]) => {
+    if (!sid || !accessToken || answers.length === 0) return;
+    setStepBusy(true);
+    try {
+      const res = await fetch(`/rtm-intake-answer?token=${encodeURIComponent(accessToken)}`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(intakeModel ? { sid, answers, model: intakeModel } : { sid, answers }),
+      });
+      const d = (await res.json().catch(() => null)) as { session?: RtmSession; error?: string } | null;
+      if (res.status === 202 && d?.session) {
+        setSession(d.session);
+        // 개정은 ①의 재실행이다 — 폴링(3초)이 오기 전에도 화면이 "다음 단계 생성 중"으로 튀지 않게
+        // 즉시 못박는다. 안 하면 첫 3초 동안 ②로 넘어간 것처럼 보인다.
+        setJobStep(1);
+        setIntakeStatus("running");
+        void loadQaHistory(); // 제출 즉시 원장 반영 — 개정이 끝나기 전에도 답이 화면에 남는다.
+      } else {
+        setToast({ kind: "failed", msg: d?.error ?? `답변 제출 실패: HTTP ${res.status}` });
+      }
+    } catch (e) { setToast({ kind: "failed", msg: String(e) }); } finally { setStepBusy(false); }
+  }, [sid, accessToken, intakeModel, loadQaHistory, setToast]);
+
+  /**
    * W5: ① 코드영향 검증 로드 — 세션 포인터(`impact-run.json`) → 원장 스냅샷 2단.
    * 산출 본체를 세션에 두지 않는 게 §2.3 의 요점이라 인라인도 두 번 왕복한다(포인터의 jobId 로
    * `/change` 와 **같은 스냅샷**을 읽는다 — 두 표면이 갈라질 수 없다).
@@ -230,6 +285,8 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     // ②도 identified 가 필요하다 — `impactAbsenceOf` 가 changeset.modified 로 "미실행"과 "해당없음"을
     // 가르므로(types.ts), 이게 없으면 화면이 둘을 구별하지 못한다.
     if (ps === 1 || ps === 2) { void loadIdentified(); setPreviewName(null); }
+    // ①에서만 답변 원장을 읽는다 — 인터뷰 블록이 ①에만 있다(②부터는 답변이 잠긴다, D2·§5).
+    if (ps === 1) void loadQaHistory();
     if (ps === 2) void loadImpactRun();
     if (ps >= 3 && ps <= 5) {
       const kind = STEP_DOC_KIND[ps];
@@ -246,7 +303,8 @@ export function useIntake({ accessToken, tokenQ, loadModel, setToast }: {
     intakeModel, setIntakeModel,
     intakeStatus, intakeError, setIntakeError, sid, session, sessionDocs, stepBusy, viewStep, setViewStep,
     previewName, previewMd, identified, editingDoc, setEditingDoc, draftDoc, setDraftDoc,
-    impactRun, impactData, impactLoaded,
+    impactRun, impactData, impactLoaded, qaHistory, jobStep,
     startIntake, advance, confirmStep, saveDoc, discardSession, clearSession, loadPreview, selectSession,
+    answerQuestions,
   };
 }

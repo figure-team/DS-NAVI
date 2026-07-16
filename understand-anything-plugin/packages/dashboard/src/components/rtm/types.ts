@@ -165,11 +165,86 @@ export interface IntakeRequirement {
   acceptanceCriteria?: IntakeAC[]; changeset?: IntakeChangeset;
   screenRefs?: IntakeScreenRef[]; policyRefs?: IntakePolicyRef[];
 }
+// ── A1 질문(RTM_INTAKE_ANSWER_DESIGN.md §3.1) ────────────────────────────────
+export type IntakeQuestionAxis =
+  | "screen" | "policy" | "domain" | "data" | "code" | "rtm" | "general";
+/**
+ * ① `[확인필요]` 질문 1건. legacy-core `intake-types.ts` `IntakeQuestionSchema` 의 화면쪽 짝이다.
+ * **타입을 복제하는 이유**: 대시보드는 legacy-core 를 import 하지 않는다(별 패키지 · 브라우저 번들).
+ * 계약이 갈리지 않게 필드는 저쪽 스키마를 단일 원본으로 보고 따라간다.
+ */
+export interface IntakeQuestion {
+  id: string;
+  text: string;
+  targetReqId?: string | null;
+  axis?: IntakeQuestionAxis | null;
+  /** null/부재 = 미답. 미답이 컨펌을 막지는 않는다(설계 D2). */
+  answer?: string | null;
+  answeredAt?: string | null;
+}
+
 /** GET /rtm-intake-doc?name=identified.json 응답 본문. */
 export interface Identified {
   request?: { id: string; name: string };
   requirements?: IntakeRequirement[];
-  questions?: string[];
+  /**
+   * 구형(문자열)·신형(객체) **혼재**이고 객체도 **필드가 빠져 있을 수 있다**(`Partial`) — 프론트는
+   * identified.json 을 **날것으로** 읽으므로(useIntake `loadIdentified` 가 JSON.parse) legacy-core 의
+   * 정규화·검증을 못 거친다. 여기를 `IntakeQuestion[]` 로 적으면 **타입이 거짓말**을 한다(디스크엔
+   * id 없는 객체가 실재하고, 그래서 정규화기가 id 를 합성한다). 화면은 `normalizeQuestions` 를 거친다.
+   */
+  questions?: Array<string | Partial<IntakeQuestion>>;
+}
+
+/** 질문 축 라벨 — 화면 배지. 근거 번들 6축 어휘 + general(축에 안 걸리는 요청 자체의 모호함). */
+export const QUESTION_AXIS: Record<IntakeQuestionAxis, string> = {
+  screen: "화면",
+  policy: "정책",
+  domain: "도메인",
+  data: "데이터",
+  code: "코드영향",
+  rtm: "추적표",
+  general: "요청",
+};
+
+// ── A2: 답변 원장(GET /rtm-intake-doc?name=qa-history.json · 설계 §3.2) ───────
+/** 문답 1건 — 질문 원문을 함께 실어 "그때 뭘 묻고 답했나"가 개정에 흔들리지 않는다. */
+export interface QaEntry { qid: string; question: string; answer: string }
+/** 답변 제출 1회(여러 질문 일괄) = revision 1건. */
+export interface QaRevision { rev: number; answeredAt: string; qas: QaEntry[] }
+/**
+ * 답변의 **영속 진실원본**. identified.json 의 `questions[].answer` 는 개정이 성공해야 채워지므로,
+ * 화면은 이 원장으로 "제출했으나 아직 반영 안 된 답"을 안다(개정 실패·새로고침에도 안 사라진다).
+ */
+export interface QaHistory { revisions?: QaRevision[] }
+
+/** 원장에서 qid → 최신 답변을 뽑는다(같은 질문에 여러 번 답했으면 마지막이 이긴다). */
+export function latestAnswers(h: QaHistory | null): Map<string, QaEntry> {
+  const out = new Map<string, QaEntry>();
+  for (const rev of h?.revisions ?? []) {
+    for (const qa of rev?.qas ?? []) if (qa?.qid) out.set(qa.qid, qa);
+  }
+  return out;
+}
+
+/**
+ * 구형 문자열 질문 → 객체 정규화. legacy-core `QuestionsField` preprocess 와 **같은 규칙**
+ * (인덱스 기반 `Q-N` 합성, 이미 있는 id 는 보존)이라 서버가 굳힌 id 와 화면이 보는 id 가 일치한다.
+ * 둘이 갈리면 답변 POST 의 `qid` 가 엉뚱한 질문에 붙는다 — 그래서 규칙을 베낀다(§3.1 주석 참조).
+ *
+ * **`null` 을 돌려주는 경우 = 질문을 못 읽음**(`questions` 가 배열이 아님 — 손상). `[]` 와 갈라야
+ * 한다: `[]` 에는 "모호함 없음 → 인터뷰 블록 숨기고 통과"라는 **의미가 있어서**(§6), 손상을 `[]` 로
+ * 뭉개면 **"질문 없음"으로 위장**한다(불변식 "없음 vs 못 봄"). 프론트는 identified.json 을 날것으로
+ * 읽어 legacy-core 검증을 못 거치므로 방어선이 여기뿐이다.
+ */
+export function normalizeQuestions(qs: Identified["questions"]): IntakeQuestion[] | null {
+  if (qs === undefined || qs === null) return []; // 부재 = 질문 없음(정직한 empty)
+  if (!Array.isArray(qs)) return null; // 있는데 모양이 틀림 = 못 읽음
+  return qs.map((q, i) => {
+    const id = `Q-${i + 1}`;
+    if (typeof q === "string") return { id, text: q, answer: null, answeredAt: null };
+    return { ...q, id: q?.id ? q.id : id, text: q?.text ?? "" };
+  });
 }
 /**
  * 정책 축 → 문서 뷰어 링크. `/policy` 에는 문서 단위 딥링크 파라미터가 없고(탭 `?tab=cat|dom|rec`

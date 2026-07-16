@@ -7,8 +7,8 @@ import { Link } from "react-router";
 import { useRtm } from "./context";
 import DiscardConfirmDialog from "./DiscardConfirmDialog";
 import { MD, confChip, useEscClose } from "./shared";
-import { AC_KIND, BAD, BORDER, CIRCLED, CONF, CONF_TITLE, FAINT, GOLD, OK, PRIORITY, STEP_DEFS, VERB, WARN, impactAbsenceOf, policyDocId, stripFrontmatter } from "./types";
-import type { Changeset, IntakeAC, IntakePolicyRef, IntakeRequirement, IntakeScreenRef } from "./types";
+import { AC_KIND, BAD, BORDER, CIRCLED, CONF, CONF_TITLE, FAINT, GOLD, OK, PRIORITY, QUESTION_AXIS, STEP_DEFS, VERB, WARN, impactAbsenceOf, latestAnswers, normalizeQuestions, policyDocId, stripFrontmatter } from "./types";
+import type { Changeset, IntakeAC, IntakePolicyRef, IntakeQuestion, IntakeRequirement, IntakeScreenRef } from "./types";
 import { ModelSelect } from "../ModelSelect";
 import EvidenceLink from "../ui/EvidenceLink";
 
@@ -386,14 +386,161 @@ function ImpactInline() {
   );
 }
 
+/**
+ * A5/D3: ① `[확인필요]` 인터뷰 블록 — **분해보다 위**에 온다.
+ *
+ * 순서가 설계다(RTM_INTAKE_ANSWER_DESIGN.md §2.2·§6). 가이드의 ①은 "모호함을 먼저 제거"인데,
+ * 분해를 위에 두면 **이미 다 정해진 것처럼 보인다**(사용자 실측 지적). 엔진은 한 패스로 분해+질문을
+ * 내지만(날카로운 질문은 코드를 봐야 나오므로), 화면이 순서를 바로잡아 논리적 순서를 지킨다:
+ * 분해는 답 전까지 `[추정]` 초안이고, 답하면 굳는다.
+ */
+function QuestionInterview({ questions, locked }: { questions: IntakeQuestion[]; locked: boolean }) {
+  const { qaHistory, answerQuestions, stepBusy, intakeStatus } = useRtm();
+  // 입력 중인 답(qid → 텍스트). 제출 전까지 로컬 — 제출하면 서버 원장이 진실원본이 된다.
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const running = intakeStatus === "running";
+  // 원장에 있으나 identified 에 아직 안 실린 답 = **제출됐지만 개정이 반영 전**. 이 겹침을 봐야
+  // 개정 실패·새로고침에도 사용자가 친 답이 사라지지 않는다(§3.2).
+  const submitted = latestAnswers(qaHistory);
+  // `||` 인 이유: 개정이 `answer: ""` 를 쓸 수 있는데(빈 답), `??` 면 `""` 에서 멈춰 **원장에 답이
+  // 있는데도** 미답으로 그린다. 빈 문자열은 답이 아니다 — 서버도 같은 판정으로 빈 답을 버린다.
+  const answerOf = (q: IntakeQuestion): string | null =>
+    q.answer?.trim() || submitted.get(q.id)?.answer || null;
+  const open = questions.filter((q) => !answerOf(q));
+  const answered = questions.filter((q) => answerOf(q));
+  /** 제출됐지만 개정이 아직 안 실은 답 — 원장에는 있고 산출에는 없다. */
+  const isPending = (q: IntakeQuestion): boolean => !q.answer?.trim() && submitted.has(q.id);
+  /**
+   * ★ 개정이 **답한 질문을 지워버린 경우**(SKILL 의 "answer≠null 은 지우지 마라" 위반)를 잡는다.
+   *
+   * 산문 지시는 지켜지지 않을 수 있고, 그때 사용자의 답은 원장에만 남아 **화면에서 조용히 사라진다** —
+   * 이 저장소가 금지하는 바로 그 손실이다(§C8 "게이트는 코드로"의 짝: 못 지킬 약속은 코드로 잡는다).
+   * `qid` 대조 + **답 텍스트 대조**를 함께 쓴다 — 구형 문자열 질문은 id 가 순서로 합성된 값이라
+   * 개정이 번호를 다시 매기면 qid 만으로는 오탐한다(그때도 답 자체는 산출에 실려 있으면 정상).
+   */
+  const answerTexts = new Set(questions.map((q) => q.answer?.trim()).filter(Boolean));
+  const orphaned = [...submitted.values()].filter(
+    (qa) => !questions.some((q) => q.id === qa.qid) && !answerTexts.has(qa.answer),
+  );
+
+  const submit = () => {
+    const payload = questions
+      .map((q) => ({ qid: q.id, question: q.text, answer: (drafts[q.id] ?? "").trim() }))
+      .filter((a) => a.answer.length > 0);
+    if (payload.length === 0) return;
+    void answerQuestions(payload);
+    setDrafts({});
+  };
+  const filled = Object.values(drafts).some((v) => v.trim().length > 0);
+
+  return (
+    <div style={{ border: `1px solid ${BAD}55`, background: `${BAD}0A`, borderRadius: 8, padding: 12, marginBottom: 14 }}>
+      <div className="flex items-baseline" style={{ gap: 8, marginBottom: 8 }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: BAD }}>먼저 정해 주세요</span>
+        <span className="text-text-muted" style={{ fontSize: 10.5 }}>
+          [확인필요] {open.length}건{answered.length > 0 && ` · 답함 ${answered.length}건`}
+        </span>
+        {locked && <span style={{ marginLeft: "auto", fontSize: 10.5, color: GOLD }}>① 컨펌됨 — 답변 잠금</span>}
+      </div>
+      {/* 미답변이 컨펌을 막지 않는다(D2) — 그 사실을 화면이 먼저 말해야 사용자가 갇히지 않는다. */}
+      {!locked && (
+        <div className="text-text-muted" style={{ fontSize: 10.5, lineHeight: 1.5, marginBottom: 10 }}>
+          답하면 그 답을 반영해 <b className="text-text-secondary">①을 다시 분해</b>합니다(답변은 기록이 아니라 재검토입니다).
+          <b> 답하지 않아도 컨펌할 수 있습니다</b> — 남은 질문과 그에 의존하는 결론은 <b style={{ color: WARN }}>[추정]</b>으로 남습니다.
+        </div>
+      )}
+      <div className="flex flex-col" style={{ gap: 10 }}>
+        {questions.map((q) => {
+          const ans = answerOf(q);
+          const pending = isPending(q);
+          return (
+            <div key={q.id} style={{ borderTop: q === questions[0] ? "none" : BORDER, paddingTop: q === questions[0] ? 0 : 8 }}>
+              <div className="flex items-baseline" style={{ gap: 6 }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: FAINT, flex: "none" }}>{q.id}</span>
+                <span style={{ fontSize: 12, color: "var(--color-text-primary)", lineHeight: 1.5 }}>{q.text}</span>
+              </div>
+              <div className="flex items-center" style={{ gap: 5, marginTop: 3, marginLeft: 26 }}>
+                {q.targetReqId && <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: GOLD, border: `1px solid ${GOLD}40`, borderRadius: 3, padding: "0 4px" }}>{q.targetReqId}</span>}
+                {q.axis && <span style={{ fontSize: 9.5, color: FAINT, border: BORDER, borderRadius: 3, padding: "0 4px" }}>{QUESTION_AXIS[q.axis] ?? q.axis}</span>}
+              </div>
+              {ans ? (
+                <div style={{ marginLeft: 26, marginTop: 5 }}>
+                  <div style={{ fontSize: 11.5, color: "var(--color-text-secondary)", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+                    <b style={{ color: OK }}>답</b> {ans}
+                  </div>
+                  <div className="text-text-muted" style={{ fontSize: 9.5, marginTop: 2 }}>
+                    {pending ? <span style={{ color: WARN }}>제출됨 — 재검토 대기(아직 분해에 반영 전)</span> : q.answeredAt ?? ""}
+                  </div>
+                </div>
+              ) : locked ? null : (
+                <textarea
+                  value={drafts[q.id] ?? ""}
+                  onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
+                  disabled={running || stepBusy}
+                  rows={2}
+                  placeholder="답을 적으면 이 답을 반영해 ①을 다시 분해합니다"
+                  className="w-full rounded-md bg-panel border border-border-subtle focus:outline-none focus:border-status-info"
+                  style={{ marginLeft: 26, width: "calc(100% - 26px)", marginTop: 5, padding: "5px 7px", fontSize: 11.5, color: "var(--color-text-primary)", resize: "vertical", fontFamily: "inherit" }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {/* 개정이 답한 질문을 지웠다 — 답은 원장에 남아 있으니 화면이 그 사실을 말한다(조용한 손실 금지). */}
+      {orphaned.length > 0 && (
+        <div style={{ marginTop: 10, borderTop: BORDER, paddingTop: 8 }}>
+          <div style={{ fontSize: 10.5, color: WARN, fontWeight: 600, marginBottom: 4 }}>
+            ⚠ 개정이 이 답을 산출에서 빠뜨렸습니다 — 답변 원장에는 남아 있습니다
+          </div>
+          {orphaned.map((qa) => (
+            <div key={qa.qid} style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: 3 }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: FAINT }}>{qa.qid}</span>{" "}
+              {qa.question && <span className="text-text-muted">{qa.question} → </span>}
+              <b>{qa.answer}</b>
+            </div>
+          ))}
+        </div>
+      )}
+      {!locked && (
+        <div className="flex items-center" style={{ gap: 8, marginTop: 10 }}>
+          <button type="button" onClick={submit} disabled={!filled || running || stepBusy}
+            className="rounded-md transition-colors"
+            title={filled ? "답변을 반영해 ①을 다시 분해합니다" : "답을 하나 이상 입력하세요"}
+            style={{ padding: "5px 11px", fontSize: 11.5, fontWeight: 600, border: `1px solid ${filled && !running ? BAD : "var(--color-border-subtle)"}`, background: filled && !running ? `${BAD}1F` : "transparent", color: filled && !running ? BAD : FAINT, cursor: filled && !running ? "pointer" : "default" }}>
+            {running ? "재검토 중…" : "답변 반영해 ① 재검토"}
+          </button>
+          <span className="text-text-muted" style={{ fontSize: 10 }}>여러 질문에 답한 뒤 한 번에 반영됩니다.</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function IdentifiedView() {
-  const { identified } = useRtm();
+  const { identified, session } = useRtm();
   if (!identified) return <div className="text-text-muted" style={{ fontSize: 12 }}>식별 결과를 불러오는 중…</div>;
   const reqs = identified.requirements ?? [];
-  const qs = identified.questions ?? [];
+  const qs = normalizeQuestions(identified.questions);
+  // 답변은 ① 컨펌 루프 안에서만(D2 · §5) — 서버 게이트와 **같은 판정**이라야 화면이 거짓말을 안 한다.
+  const locked = (session?.confirmedStep ?? 0) >= 1;
   return (
     <div>
-      <div style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginBottom: 4 }}>요청 <b style={{ color: GOLD, fontFamily: "var(--font-mono)" }}>{identified.request?.id}</b> {identified.request?.name} → 요구사항 <b style={{ color: "var(--color-text-primary)" }}>{reqs.length}</b>건으로 분해</div>
+      <div style={{ fontSize: 12.5, color: "var(--color-text-secondary)", marginBottom: 10 }}>요청 <b style={{ color: GOLD, fontFamily: "var(--font-mono)" }}>{identified.request?.id}</b> {identified.request?.name} → 요구사항 <b style={{ color: "var(--color-text-primary)" }}>{reqs.length}</b>건으로 분해</div>
+      {/* 질문을 **못 읽었다** — "질문 없음"으로 위장하지 않는다(§6 · "없음 vs 못 봄"). */}
+      {qs === null && (
+        <div style={{ border: `1px solid ${BAD}55`, background: `${BAD}0A`, borderRadius: 8, padding: 10, marginBottom: 14, fontSize: 11.5, color: BAD }}>
+          ⚠ `questions` 가 배열이 아닙니다 — 질문을 읽지 못했습니다(<b>모호함이 없다는 뜻이 아닙니다</b>). identified.json 을 확인하세요.
+        </div>
+      )}
+      {/* D3: 질문이 먼저. 0건이면 물을 게 없으니 숨기고 분해를 바로 보여준다(명확한 요청은 루프 없이 통과). */}
+      {qs !== null && qs.length > 0 && <QuestionInterview questions={qs} locked={locked} />}
+      {/* 분해는 "초안"이다 — 질문이 남아 있는 동안 확정처럼 읽히지 않게 여기서 못박는다(§2.2). */}
+      {qs !== null && qs.length > 0 && (
+        <div style={{ fontSize: 11.5, color: "var(--color-text-secondary)", marginBottom: 4 }}>
+          <b>근거로 본 초안</b> — 위 질문에 답하면 확정됩니다
+        </div>
+      )}
       {/* 축소 모드(§10-1)를 화면에서 읽는 법 — "생략됨"이 "없음"으로 오독되지 않게 미리 못박는다. */}
       <div className="text-text-muted" style={{ fontSize: 10.5, lineHeight: 1.5, marginBottom: 12 }}>
         각 인수 기준의 <b className="text-text-secondary">근거·화면·정책</b> 축은 분석 산출물에서 가져온 것입니다.
@@ -403,12 +550,6 @@ function IdentifiedView() {
       <div className="flex flex-col gap-1.5">
         {reqs.map((r) => <ReqCard key={r.id} r={r} />)}
       </div>
-      {qs.length > 0 && (
-        <div style={{ marginTop: 16, borderTop: BORDER, paddingTop: 12 }}>
-          <div style={{ fontSize: 11.5, color: BAD, marginBottom: 6, fontWeight: 600 }}>[확인필요] — 다음 단계 전에 검토하세요</div>
-          {qs.map((q, i) => <div key={i} style={{ fontSize: 12, color: "var(--color-text-secondary)", padding: "2px 0", lineHeight: 1.5 }}>· {q}</div>)}
-        </div>
-      )}
     </div>
   );
 }

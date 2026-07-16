@@ -137,7 +137,7 @@ export default function SessionView() {
  * 게이트는 종전 RtmView 의 `intakePanelOpen`(세션 있음 · 미폐기 · 미실행 · producedStep>=1)과 동일.
  */
 function StepArea() {
-  const { session, intakeStatus } = useRtm();
+  const { session, intakeStatus, jobStep } = useRtm();
   if (!session) return null;
   const frontier = session.producedStep;
   const msg = (text: string) => (
@@ -147,8 +147,18 @@ function StepArea() {
   );
   if (session.discarded) return msg("폐기된 세션입니다 — 진행할 수 없습니다. 산출물은 세션 폴더(rtm-intake)에 남아 있습니다.");
   if (frontier < 1) return msg(intakeStatus === "running" ? "① 식별 진행 중…" : "아직 산출된 단계가 없습니다.");
-  // 실행 중엔 산출물을 걸지 않는다 — 폴링이 producedStep 을 올리는 순간 최전선으로 바뀐다.
-  // 인덱스는 "다음 단계"(frontier+1 의 0-based = frontier)이고 마지막 단계에서 넘치지 않게 자른다.
-  if (intakeStatus === "running") return msg(`${CIRCLED[Math.min(frontier, STEP_DEFS.length - 1)]} 다음 단계 생성 중… — 완료되면 산출물이 여기 표시됩니다.`);
+  if (intakeStatus === "running") {
+    // ★ **최전선 재실행(①개정)은 산출물을 걷지 않는다**(A5 · RTM_INTAKE_ANSWER_DESIGN.md §6).
+    //
+    // 두 가지가 걸려 있다. ① 패널을 걷으면 인터뷰가 사라져 설계가 명시한 optimistic "재검토 중"
+    // (버튼 문구·textarea disable)이 **도달 불가능한 죽은 코드**가 된다. ② 더 나쁜 건 문구다 —
+    // `CIRCLED[frontier]` 는 "다음 단계"를 가리키므로 ① 개정 중에 **"② 다음 단계 생성 중"** 이라
+    // 말한다. ②는 ① 컨펌 후에만 열리는데(§5 게이트) 컨펌한 적이 없다 — 화면이 단계 경계를
+    // 거짓으로 알리는 것이다.
+    if (jobStep !== null && jobStep <= frontier) return <IntakeStepContent />;
+    // 다음 단계 생성 중 — 폴링이 producedStep 을 올리는 순간 최전선으로 바뀐다.
+    // 인덱스는 "다음 단계"(frontier+1 의 0-based = frontier)이고 마지막 단계에서 넘치지 않게 자른다.
+    return msg(`${CIRCLED[Math.min(frontier, STEP_DEFS.length - 1)]} 다음 단계 생성 중… — 완료되면 산출물이 여기 표시됩니다.`);
+  }
   return <IntakeStepContent />;
 }

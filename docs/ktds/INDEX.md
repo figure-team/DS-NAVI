@@ -14,7 +14,7 @@
 | `UNDERSTAND_LITE_DESIGN.md` | /understand lite 기본값 | 기각 대안 기록 포함 |
 | `UNDERSTAND_SCALE_WORKFLOW_DESIGN.md` | 대규모 Phase2 Workflow 팬아웃 | v2.1 |
 | `RTM_INTAKE_ANSWER_DESIGN.md` | ①식별 [확인필요] 답변 경로 (A1~A7) | 구현 완료(ktds.21), §9.1 시각QA 미실측 |
-| `RTM_INTAKE_WORKSPACE_DESIGN.md` | 새 요청 = 추적표 "요청 세션" 탭 워크스페이스 | 사용자 확정, W1~W5 구현 대기 |
+| `RTM_INTAKE_WORKSPACE_DESIGN.md` | 새 요청 = 추적표 "요청 세션" 탭 워크스페이스 | W1~W5 구현 완료 + 07-17 개편으로 일부 낡음(아래 드리프트 참조) |
 | `RTM_IMPACT_GATE_DESIGN.md` | 인테이크↔impact 근거 게이트 (2차 개정판) | **제안 상태 — 사용자 승인 전** |
 | `FEATURE_VERIFICATION_GUIDE.md` | 전 기능 점검 절차 | ⚠️ emit을 fill 없이 돌리면 그래프 클로버 주의 포함 |
 | `VERSION_TRACKING.md` | 버전 체계 | Scheme A(5파일)+Scheme B(2파일) |
@@ -35,3 +35,9 @@
 - `RTM_STEP_FLOW_DESIGN.md:143` — 세션을 `rtm-intake/session.json` 단일 파일로 그리나 구현은 `rtm-intake/<sid>/session.json`(복수). "단일 세션" 근거로 오용 금지.
 - `RTM_TAB_DESIGN.md:145/148-149/264` — 인테이크가 impact 엔진으로 [확정] 근거 산출한다고 규정했으나 미구현(이 드리프트가 `RTM_IMPACT_GATE_DESIGN.md`의 주제).
 - `STRUCTURE_FROM_MAP_DESIGN.md` 이전의 구조 탭 서술 전반(구 `/structure` 라우트, KG 뷰) — 라우팅 통일로 `/domains?tab=structure`가 현행.
+- `RTM_INTAKE_WORKSPACE_DESIGN.md` §2 목업의 UI 배치 일부 — 2026-07-16~17 사용자 지시 개편으로 낡음:
+  추적표 메뉴 헤더·상단 스테퍼 스트립 폐지, ＋새 요청=세션 탭 좌측 원장 위, 폐기/닫기=세션 카드 헤더
+  최우측, 컨펌/편집/진행=스테퍼 우측(단계 헤더 영역 삭제), 본문 52vh→뷰포트 채움. 추가된 계약(문서
+  미반영): `session.model` 모델 이어가기 · `steps[k].stale`+`rerunFrom` 낡음 재생성 · ②영향분석
+  조건별 템플릿(`ImpactStepView`)+업무흐름도/데이터 비포·에프터 모달. 레이아웃 원칙(좌 원장 270px·
+  탭=렌즈·닫기≠폐기)은 여전히 유효 — 코드가 진실.

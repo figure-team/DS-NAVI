@@ -4,11 +4,14 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { RECONCILE_GRACE_MS } from "./job-ledger";
 import {
+  appendQaRevision,
+  checkAnswerGate,
   isValidSid,
   latestRtmSession,
   listRtmSessions,
   pruneRtmSessions,
   readAllRtmSessions,
+  readQaHistory,
   readRtmSession,
   reconcileRtmSessions,
   RTM_SESSION_SCHEMA_VERSION,
@@ -322,5 +325,152 @@ describe("migrateRtmSession — 구 5단계 세션", () => {
     backdate(1, RECONCILE_GRACE_MS + 1000);
     expect(reconcileRtmSessions(base, never)).toBe(1);
     expect(stepStatus(1, "1")).toBe("failed");
+  });
+});
+
+// ── A2: 답변 원장 qa-history.json (RTM_INTAKE_ANSWER_DESIGN.md §3.2) ──────────
+describe("qa-history — readQaHistory / appendQaRevision", () => {
+  const qa = (qid: string, answer: string) => ({ qid, question: `${qid} 질문?`, answer });
+
+  it("부재하면 빈 원장이다(정직한 empty)", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    expect(readQaHistory(base, sid(1))).toEqual({ revisions: [] });
+  });
+
+  it("★ 신규 파일 생성 — 첫 append 가 rev 1 로 시작한다", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    const rev = appendQaRevision(base, sid(1), [qa("Q-1", "병행 로그인")]);
+    expect(rev).toMatchObject({ rev: 1, qas: [{ qid: "Q-1", answer: "병행 로그인" }] });
+    expect(rev?.answeredAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(fs.existsSync(path.join(base, sid(1), "qa-history.json"))).toBe(true);
+    expect(readQaHistory(base, sid(1)).revisions).toHaveLength(1);
+  });
+
+  it("★ append 는 누적한다 — 인터뷰 여러 턴이 rev 로 쌓인다", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    appendQaRevision(base, sid(1), [qa("Q-1", "a1")]);
+    appendQaRevision(base, sid(1), [qa("Q-2", "a2"), qa("Q-3", "a3")]);
+    const h = readQaHistory(base, sid(1));
+    expect(h.revisions.map((r) => r.rev)).toEqual([1, 2]);
+    expect(h.revisions[0].qas).toHaveLength(1);
+    expect(h.revisions[1].qas).toHaveLength(2);
+    // 이전 revision 은 불변 — 답변 원장은 append-only 다(개정이 답을 날려도 여기 남는다).
+    expect(h.revisions[0].qas[0].answer).toBe("a1");
+  });
+
+  it("★ rev 는 최대값+1 이다 — 배열이 짧아져도 번호가 뒤로 감기지 않는다", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    // 수기편집/손상으로 rev 1·2 가 지워지고 3 만 남은 상태를 흉내낸다.
+    fs.writeFileSync(
+      path.join(base, sid(1), "qa-history.json"),
+      JSON.stringify({ revisions: [{ rev: 3, answeredAt: "x", qas: [] }] }),
+    );
+    expect(appendQaRevision(base, sid(1), [qa("Q-1", "a")])?.rev).toBe(4); // 2 가 아니다
+  });
+
+  it("★ 부재와 손상을 가른다 — 둘 다 빈 배열이면 append 가 이력을 조용히 파기한다", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    expect(readQaHistory(base, sid(1))).toEqual({ revisions: [] }); // 부재: corrupt 없음
+    fs.writeFileSync(path.join(base, sid(1), "qa-history.json"), "{ 깨진 json");
+    expect(readQaHistory(base, sid(1))).toEqual({ revisions: [], corrupt: true }); // 손상: 표식
+  });
+
+  it("★ 손상 원장에는 append 를 거절한다(null) — 덮어쓰면 rev 1~N 문답 계보가 사라진다", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    appendQaRevision(base, sid(1), [qa("Q-1", "옛 답")]);
+    const before = fs.readFileSync(path.join(base, sid(1), "qa-history.json"), "utf-8");
+    // 절단(비원자적 쓰기 중 크래시)을 흉내낸다.
+    fs.writeFileSync(path.join(base, sid(1), "qa-history.json"), before.slice(0, 30));
+    const after = fs.readFileSync(path.join(base, sid(1), "qa-history.json"), "utf-8");
+    expect(appendQaRevision(base, sid(1), [qa("Q-2", "새 답")])).toBeNull(); // 거절
+    // 손상 파일을 건드리지 않는다 — 사람이 보고 고칠 수 있게 그대로 둔다.
+    expect(fs.readFileSync(path.join(base, sid(1), "qa-history.json"), "utf-8")).toBe(after);
+  });
+
+  it("revisions 가 배열이 아니면 손상으로 읽고 append 를 거절한다", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    fs.writeFileSync(path.join(base, sid(1), "qa-history.json"), JSON.stringify({ revisions: 7 }));
+    expect(readQaHistory(base, sid(1))).toEqual({ revisions: [], corrupt: true });
+    expect(appendQaRevision(base, sid(1), [qa("Q-1", "a")])).toBeNull();
+  });
+
+  it("★ revision 원소가 쓰레기면 손상이다 — 걸러 되쓰면 그 항목이 소리 없이 사라진다", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    fs.writeFileSync(
+      path.join(base, sid(1), "qa-history.json"),
+      JSON.stringify({ revisions: [1, 2, { rev: 3, answeredAt: "t", qas: [] }] }),
+    );
+    const h = readQaHistory(base, sid(1));
+    expect(h.corrupt).toBe(true);
+    expect(h.revisions).toHaveLength(1); // 성한 것만 읽되
+    expect(appendQaRevision(base, sid(1), [qa("Q-1", "a")])).toBeNull(); // 되쓰진 않는다
+  });
+
+  it("★ 무효 sid 는 append 를 거부한다(traversal 차단 — rtmSessionDir 경유)", () => {
+    expect(appendQaRevision(base, "../escape", [qa("Q-1", "a")])).toBeNull();
+    expect(appendQaRevision(base, "nope!", [qa("Q-1", "a")])).toBeNull();
+    expect(readQaHistory(base, "../escape")).toEqual({ revisions: [] });
+  });
+});
+
+// ── A3: 답변 게이트(D2 · RTM_INTAKE_ANSWER_DESIGN.md §5) ─────────────────────
+describe("checkAnswerGate", () => {
+  it("★ ①이 최전선이고 미컨펌이면 통과한다(정상 인터뷰 루프)", () => {
+    expect(checkAnswerGate({ producedStep: 1, confirmedStep: 0, discarded: false })).toEqual({ ok: true });
+  });
+
+  it("①이 아직 안 나왔으면 거절한다", () => {
+    const g = checkAnswerGate({ producedStep: 0, confirmedStep: 0, discarded: false });
+    expect(g).toMatchObject({ ok: false, status: 409 });
+    expect(g.ok === false && g.error).toContain("아직 산출되지 않았습니다");
+  });
+
+  it("★ ① 컨펌 후엔 잠근다 — ②~⑥이 틀린 ① 위에 서면 안 된다", () => {
+    const g = checkAnswerGate({ producedStep: 1, confirmedStep: 1, discarded: false });
+    expect(g).toMatchObject({ ok: false, status: 409 });
+    expect(g.ok === false && g.error).toContain("컨펌해 답변이 잠겼습니다");
+  });
+
+  it("② 이후 단계가 산출됐으면 거절하고 현재 단계를 말한다", () => {
+    const g = checkAnswerGate({ producedStep: 4, confirmedStep: 3, discarded: false });
+    expect(g).toMatchObject({ ok: false, status: 409 });
+    expect(g.ok === false && g.error).toContain("현재 산출 단계 4");
+  });
+
+  it("★ 폐기 세션은 거절한다 — ① 컨펌 루프 밖이다(API 직접 호출 방어)", () => {
+    const g = checkAnswerGate({ producedStep: 1, confirmedStep: 0, discarded: true });
+    expect(g).toMatchObject({ ok: false, status: 409 });
+    expect(g.ok === false && g.error).toContain("폐기된 세션");
+  });
+
+  it("★ 미답변은 게이트의 관심사가 아니다 — 질문을 보지 않는다(D2: 차단 아닌 경고)", () => {
+    // 질문이 몇 건이든·답이 있든 없든 판정이 같다. 미답변 차단은 **여기서 하지 않는 것**이 설계다.
+    expect(checkAnswerGate({ producedStep: 1, confirmedStep: 0, discarded: false })).toEqual({ ok: true });
+  });
+});
+
+// ── A2: identifyClaudeSession (D1 하이브리드 · §3.3) ──────────────────────────
+describe("identifyClaudeSession", () => {
+  it("★ 구세션(필드 부재)이 그대로 파싱된다 — 부재는 결함이 아니라 fresh 폴백 신호다", () => {
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z"));
+    const s = readRtmSession(base, sid(1));
+    expect(s).not.toBeNull();
+    expect(s?.identifyClaudeSession).toBeUndefined();
+  });
+
+  it("값이 있으면 왕복에서 보존된다(--resume 대상)", () => {
+    const uuid = "3f2504e0-4f89-11d3-9a0c-0305e82c3301";
+    writeRtmSession(base, seed(1, "2026-07-16T00:00:00.000Z", { identifyClaudeSession: uuid }));
+    expect(readRtmSession(base, sid(1))?.identifyClaudeSession).toBe(uuid);
+  });
+
+  it("구 5단계 세션 마이그레이션이 필드를 잃지 않는다", () => {
+    const uuid = "3f2504e0-4f89-11d3-9a0c-0305e82c3301";
+    const legacy = { ...seed(1, "2026-07-16T00:00:00.000Z", { identifyClaudeSession: uuid }) };
+    delete (legacy as Partial<RtmSession>).schemaVersion; // 구 5단계 표식
+    writeRtmSession(base, legacy);
+    const s = readRtmSession(base, sid(1));
+    expect(s?.schemaVersion).toBe(RTM_SESSION_SCHEMA_VERSION); // 재사상됨
+    expect(s?.identifyClaudeSession).toBe(uuid); // 그래도 보존
   });
 });

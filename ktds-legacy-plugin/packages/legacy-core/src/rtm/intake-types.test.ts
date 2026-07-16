@@ -112,6 +112,139 @@ describe('IdentifiedIntakeSchema', () => {
   })
 })
 
+// ── A1 질문 스키마 — 문자열 → 객체 정규화(하위호환) ────────────────────────────
+// 설계: docs/ktds/RTM_INTAKE_ANSWER_DESIGN.md §3.1. 디스크에 구형 산출(P5 e2e 가 만든
+// `questions: ["…"]`)이 실재하므로 union+정규화가 아니면 기존 세션이 통째로 안 열린다.
+describe('A1 questions — 구형 문자열 정규화', () => {
+  const Q1_FULL = {
+    id: 'Q-1',
+    text: '기존 회원 계정 연동 정책은?',
+    targetReqId: null,
+    axis: null,
+    answer: null,
+    answeredAt: null,
+  }
+
+  it('★ 구형 문자열 배열을 객체로 정규화한다 — 소비처는 스키마 시대를 몰라도 된다', () => {
+    const out = parseIdentifiedIntake(STEP1_ONLY)
+    expect(out.questions).toEqual([Q1_FULL])
+  })
+
+  it('★ 정규화된 미답 질문의 answer 는 null 이다("답할 자리가 없었으니 안 답한 게 사실")', () => {
+    const out = parseIdentifiedIntake(STEP1_ONLY)
+    expect(out.questions[0].answer).toBeNull()
+    expect(out.questions[0].answeredAt).toBeNull()
+  })
+
+  it('신형 객체는 그대로 파싱되고 왕복이 고정점이다', () => {
+    const src = {
+      request: { id: 'REQ-1', name: 'x', raw: 'y' },
+      questions: [
+        {
+          id: 'Q-1',
+          text: 'SIGNON.PASSWORD 가 평문인데 소셜 사용자는 어떻게 하나?',
+          targetReqId: 'SFR-020',
+          axis: 'data',
+          answer: '병행 로그인 — 소셜 사용자는 password null 허용',
+          answeredAt: '2026-07-16T10:00:00.000Z',
+        },
+      ],
+    }
+    const once = parseIdentifiedIntake(src)
+    const twice = parseIdentifiedIntake(JSON.parse(JSON.stringify(once)))
+    expect(twice).toEqual(once) // 왕복 고정점
+    expect(twice.questions[0].axis).toBe('data')
+    expect(twice.questions[0].answer).toBe('병행 로그인 — 소셜 사용자는 password null 허용')
+  })
+
+  it('문자열/객체 혼합 배열도 받는다(개정이 새 질문만 객체로 추가한 중간 상태)', () => {
+    const out = parseIdentifiedIntake({
+      request: { id: 'REQ-1', name: 'x', raw: 'y' },
+      questions: ['구형 질문', { id: 'Q-9', text: '신형 질문', answer: '답' }],
+    })
+    expect(out.questions).toHaveLength(2)
+    expect(out.questions[0]).toMatchObject({ id: 'Q-1', text: '구형 질문', answer: null })
+    // 이미 id 가 있으면 인덱스로 덮지 않는다 — 답을 붙잡는 안정 키라서.
+    expect(out.questions[1]).toMatchObject({ id: 'Q-9', text: '신형 질문', answer: '답' })
+  })
+
+  it('id 없는/빈 객체는 인덱스로 합성한다(파싱을 통째로 튕기지 않는다)', () => {
+    const out = parseIdentifiedIntake({
+      request: { id: 'REQ-1', name: 'x', raw: 'y' },
+      questions: [{ text: 'id 없음' }, { id: '', text: 'id 빈문자' }],
+    })
+    expect(out.questions.map((q) => q.id)).toEqual(['Q-1', 'Q-2'])
+  })
+
+  it('axis 는 선택이다 — 못 고르면 null(억지 귀속 금지)', () => {
+    const out = parseIdentifiedIntake({
+      request: { id: 'REQ-1', name: 'x', raw: 'y' },
+      questions: [{ id: 'Q-1', text: 't' }],
+    })
+    expect(out.questions[0].axis).toBeNull()
+    expect(out.questions[0].targetReqId).toBeNull()
+  })
+
+  it('잘못된 axis 는 거부한다', () => {
+    expect(() =>
+      parseIdentifiedIntake({
+        request: { id: 'REQ-1', name: 'x', raw: 'y' },
+        questions: [{ id: 'Q-1', text: 't', axis: 'nonsense' }],
+      }),
+    ).toThrow(/identified\.json 검증 실패/)
+  })
+
+  it('빈 text 는 거부한다(질문 없는 질문은 물음이 아니다)', () => {
+    expect(() =>
+      parseIdentifiedIntake({
+        request: { id: 'REQ-1', name: 'x', raw: 'y' },
+        questions: [{ id: 'Q-1', text: '' }],
+      }),
+    ).toThrow(/identified\.json 검증 실패/)
+    expect(() =>
+      parseIdentifiedIntake({ request: { id: 'REQ-1', name: 'x', raw: 'y' }, questions: [''] }),
+    ).toThrow(/identified\.json 검증 실패/)
+  })
+
+  it('배열이 아니면 정직하게 튕긴다(조용한 [] 드롭 금지)', () => {
+    expect(() =>
+      parseIdentifiedIntake({ request: { id: 'REQ-1', name: 'x', raw: 'y' }, questions: 'nope' }),
+    ).toThrow(/identified\.json 검증 실패/)
+  })
+
+  // ── 질문 id 유일성(게이트는 코드로) ──
+  it('★ 중복 질문ID 를 차단한다 — 답이 엉뚱한 질문에 붙는 조용한 사고', () => {
+    expect(() =>
+      parseIdentifiedIntake({
+        request: { id: 'REQ-1', name: 'x', raw: 'y' },
+        questions: [
+          { id: 'Q-1', text: '첫째' },
+          { id: 'Q-1', text: '둘째', answer: '답' },
+        ],
+      }),
+    ).toThrow(/중복 질문ID: Q-1/)
+  })
+
+  it('★ 합성 id 와 명시 id 의 충돌도 잡는다(id 누락 객체 + Q-1 명시)', () => {
+    // 첫 원소는 id 가 없어 `Q-1` 로 합성 → 둘째의 명시 `Q-1` 과 충돌.
+    // 이걸 통과시키면 화면이 원장의 Q-1 답을 첫 질문에 얹어 "답함"으로 그리고 입력칸을 없앤다.
+    expect(() =>
+      parseIdentifiedIntake({
+        request: { id: 'REQ-1', name: 'x', raw: 'y' },
+        questions: [{ text: 'id 누락' }, { id: 'Q-1', text: '명시', answer: '병행' }],
+      }),
+    ).toThrow(/중복 질문ID: Q-1/)
+  })
+
+  it('유일하면 통과한다(정상 경로 무회귀)', () => {
+    const out = parseIdentifiedIntake({
+      request: { id: 'REQ-1', name: 'x', raw: 'y' },
+      questions: [{ id: 'Q-1', text: '첫째' }, { id: 'Q-2', text: '둘째' }],
+    })
+    expect(out.questions.map((q) => q.id)).toEqual(['Q-1', 'Q-2'])
+  })
+})
+
 // ── 실재 대조 게이트(P1) ────────────────────────────────────────────────────────
 // 설계: docs/ktds/RTM_IMPACT_GATE_DESIGN.md §6.1-4. 기준선은 examples/jpetstore-6 실측:
 //   db-schema.json tables[].name = 13개(OAUTH_ACCOUNT 없음)

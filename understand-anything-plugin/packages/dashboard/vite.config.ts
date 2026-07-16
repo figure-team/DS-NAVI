@@ -20,6 +20,8 @@ import {
   writePendingMarker,
 } from "./server/job-ledger";
 import {
+  appendQaRevision as appendQaRevisionIn,
+  checkAnswerGate,
   isValidSid,
   latestRtmSession as latestRtmSessionIn,
   listRtmSessions as listRtmSessionsIn,
@@ -28,6 +30,7 @@ import {
   reconcileRtmSessions,
   RTM_SESSION_SCHEMA_VERSION,
   writeRtmSession as writeRtmSessionIn,
+  type QaEntry,
   type RtmSession,
   type RtmStepStatus,
 } from "./server/rtm-sessions";
@@ -1397,6 +1400,30 @@ function rtmStepDirective(step: number, sid: string): string {
       (step === RTM_STEP_IMPACT ? rtmImpactDirective(sid) : ""),
   );
 }
+/**
+ * ①개정 전용 계약(A4 · RTM_INTAKE_ANSWER_DESIGN.md §4.2) — 사용자가 `[확인필요]` 에 답한 뒤
+ * ①을 **다시 판단**하게 한다. 답변은 기록이 아니라 **재실행 트리거**다(D1 파생): "병행이다"라는
+ * 답이 changeset·AC 를 실제로 바꿔야 ①의 산출이 답을 반영한 것이 된다.
+ *
+ * ★ **자기완결형이다**(§4.3) — 답·기존 산출·번들을 전부 **디스크에서 읽으라**고 지시한다. 그래서
+ * `--resume`(대화 맥락 있음)이든 fresh `-p`(맥락 없음)든 **같은 디렉티브로 같은 결과**가 나온다.
+ * 이게 하이브리드의 폴백을 공짜로 만든다 — `~/.claude` 세션이 사라져도 기능이 성립한다.
+ */
+function rtmReviseDirective(sid: string): string {
+  return headlessDirective(
+    `위 작업은 대시보드 추적표에서 자동 실행된 **①식별 개정**이다 — 사용자가 [확인필요] 질문에 답했다.`,
+    ` SKILL.md §B 의 --step 1 --revise 지침만 끝까지 수행한 뒤 보고하고 멈춰라. ` +
+      `**답은 \`.understand-anything/rtm-intake/${sid}/qa-history.json\` 의 최신 revision 에 있다** — ` +
+      `이 대화를 이어받았더라도(맥락이 있더라도) **그 파일을 반드시 읽어라**(그게 답의 진실원본이다). ` +
+      `기존 산출 \`${sid}/identified.json\` 과 근거 번들 \`${sid}/intake-input.json\` 도 디스크에 있다 — ` +
+      `번들은 **재생성하지 말고** 있으면 그대로 근거로 써라(요청이 안 바뀌었으므로 번들도 그대로다). ` +
+      `답이 해소한 모호함을 requirements·changeset·AC·근거축에 **실제로 반영**하라 — 답을 받아 적기만 하고 ` +
+      `분해가 그대로면 개정이 아니다. ` +
+      `**답이 채워진 질문(\`answer\` 가 null 이 아닌 것)은 절대 지우지 마라** — 답과 \`id\` 를 보존하고, ` +
+      `답이 새 모호함을 낳으면 **새 질문을 추가**하라(기존 답을 덮어쓰지 말고). ` +
+      `개정 후 \`validate\` 를 다시 돌려라. 신규는 여전히 전부 [추정]이며 확정은 사람이 대시보드에서 한다.`,
+  );
+}
 
 interface RtmStepExtra extends Record<string, unknown> {
   sid: string | null;
@@ -1436,6 +1463,8 @@ function newRtmSession(sid: string, request: string, targetStep: number): RtmSes
   return {
     // 새 세션은 6단계 체계로 태어난다 — 스탬프가 없으면 마이그레이터가 구 5단계로 오인한다.
     schemaVersion: RTM_SESSION_SCHEMA_VERSION,
+    // identifyClaudeSession 은 여기서 발급하지 않는다 — ① spawn 때마다 **새로** 발급한다
+    // (`issueIdentifyClaudeSession`). 이유는 그쪽 주석 참조(uuid 재사용 = claude 가 거절).
     sid,
     request,
     createdAt: new Date().toISOString(),
@@ -1486,8 +1515,14 @@ function listRtmSessionDocs(sid: string): { name: string; kind: string }[] {
  * 세션 JSON 산출물 화이트리스트 — 프론트가 이름으로 조회하는 것만. 편집(POST)은 여기 없고
  * `.md` 만 통과하므로(handleRtmDocPost) 이 목록은 **읽기 전용 노출**이다.
  * `impact-run.json` = ②영향분석의 산출 포인터(RTM_INTAKE_WORKSPACE_DESIGN.md §2.3).
+ * `qa-history.json` = ① 답변 원장(A2) — 개정이 실패하거나 새로고침해도 **제출한 답이 화면에서
+ * 사라지지 않게** 노출한다(identified.json 은 개정이 성공해야 답을 품는다).
  */
-const RTM_SESSION_JSON_FILES = new Set(["identified.json", "impact-run.json"]);
+const RTM_SESSION_JSON_FILES = new Set([
+  "identified.json",
+  "impact-run.json",
+  "qa-history.json",
+]);
 /** 세션 파일 이름 검증 — basename 만, .md 또는 화이트리스트 JSON. traversal 차단. */
 function isValidSessionFileName(name: string): boolean {
   if (name.includes("/") || name.includes("\\") || name.includes("..")) return false;
@@ -1500,6 +1535,39 @@ function rtmSessionFilePath(sid: string, name: string): string | null {
   const full = path.join(dir, name);
   if (!full.startsWith(dir + path.sep)) return null;
   return full;
+}
+
+/**
+ * 단계 상태 전이 1건 — 세션을 다시 읽어 쓴다(mtime 갱신이 곧 "마지막 전이 시각" → reconcile 재료).
+ * 단계 실행기와 개정 실행기가 **같은 전이 규약**을 쓰도록 모듈 스코프로 뽑았다.
+ */
+function setRtmStepStatus(sid: string, k: number, status: RtmStepStatus): void {
+  const s = readRtmSession(sid);
+  if (!s) return;
+  s.steps[String(k)] = { status };
+  if (status === "produced") s.producedStep = Math.max(s.producedStep, k);
+  writeRtmSession(s);
+}
+
+/**
+ * ① 대화 UUID 발급 — **① spawn 마다 새로** 만들어 세션에 굳히고 그 값을 돌려준다(D1).
+ *
+ * ★ **재사용하면 claude 가 거절한다**(실측 2026-07-16): 같은 `--session-id` 로 두 번 spawn 하면
+ * `Error: Session ID <uuid> is already in use.` 다. 세션 생성 시 1회만 발급하면, ① spawn 이 실패해
+ * `producedStep` 이 0 으로 남았을 때 재시도가 **같은 uuid 로** 돌아가 영구히 실패한다 —
+ * 그 세션은 ①을 영영 못 넘기고 사용자는 새 세션을 파야 한다. (`runRtmSteps` 의 `--session-id` 에는
+ * `runRtmRevise` 같은 fresh 폴백이 없다.)
+ *
+ * 매 ① spawn 마다 새로 발급하는 게 **의미상으로도 맞다**: ①을 다시 돌리면 이전 대화는 낡은 것이고,
+ * 개정(`--resume`)이 이어야 할 맥락은 **가장 최근 ①** 이다. spawn 전에 써야 개정이 그 값을 본다.
+ */
+function issueIdentifyClaudeSession(sid: string): string | undefined {
+  const s = readRtmSession(sid);
+  if (!s) return undefined;
+  const uuid = crypto.randomUUID();
+  s.identifyClaudeSession = uuid;
+  writeRtmSession(s);
+  return uuid;
 }
 
 /**
@@ -1516,13 +1584,7 @@ function runRtmSteps(
   model: string | null,
 ): void {
   const reqArg = request.replace(/[\r\n]+/g, " ").replace(/"/g, "'").trim();
-  const setStepStatus = (k: number, status: RtmStepStatus): void => {
-    const s = readRtmSession(sid);
-    if (!s) return;
-    s.steps[String(k)] = { status };
-    if (status === "produced") s.producedStep = Math.max(s.producedStep, k);
-    writeRtmSession(s);
-  };
+  const setStepStatus = (k: number, status: RtmStepStatus): void => setRtmStepStatus(sid, k, status);
   const runOne = (k: number): void => {
     if (!rtmTracker.isCurrent(jobId)) return; // 후속 job 으로 교체됨
     rtmTracker.job.step = k;
@@ -1534,6 +1596,10 @@ function runRtmSteps(
       jobId,
       tracker: rtmTracker,
       model: model ?? undefined,
+      // ①만 대화 UUID 로 연다(D1) — 답변 개정이 `--resume` 으로 **이 대화**(번들을 읽은 맥락)를
+      // 이어받는다. ②~⑥은 디스크 산출물만 읽는 독립 단계라 대화를 이을 이유가 없다.
+      // 매번 **새 uuid** 다 — 재사용은 claude 가 거절한다(issueIdentifyClaudeSession 주석 참조).
+      sessionId: k === RTM_STEP_MIN ? issueIdentifyClaudeSession(sid) : undefined,
       onSpawnError: () => setStepStatus(k, "failed"),
       onClose: (code) => {
         if (code !== 0) {
@@ -1639,6 +1705,139 @@ function handleRtmIntakePost(
       });
       runRtmSteps(jobId, session.sid, projectRoot, request, startStep, target, model);
       sendJson(res, 202, { job: rtmTracker.snapshot(), session });
+    })
+    .catch(() => sendJson(res, 413, { error: "Request body too large" }));
+}
+
+/**
+ * ①개정 실행기(A3 · §4.2) — 답변을 반영해 ①을 다시 돌린다. 단일 spawn 이라 체인이 없다.
+ *
+ * `resume` 이 있으면 ① 대화를 이어받고, 없으면(구세션·유실) fresh `-p` 로 돈다 — 디렉티브가
+ * 자기완결형이라 **결과가 같다**(§4.3, 토큰만 더 씀). 그래서 폴백에 분기 로직이 없다.
+ */
+function runRtmRevise(
+  jobId: string,
+  sid: string,
+  projectRoot: string,
+  model: string | null,
+  resume: string | null,
+): void {
+  if (!rtmTracker.isCurrent(jobId)) return; // 후속 job 으로 교체됨 — runRtmSteps.runOne 과 같은 규약
+  rtmTracker.job.step = RTM_STEP_MIN;
+  setRtmStepStatus(sid, RTM_STEP_MIN, "running");
+  runClaudeSkill({
+    prompt: `/understand-rtm --intake --session ${sid} --step ${RTM_STEP_MIN} --revise${rtmReviseDirective(sid)}`,
+    cwd: projectRoot,
+    jobId,
+    tracker: rtmTracker,
+    model: model ?? undefined,
+    resume: resume ?? undefined,
+    // ★ 상태 전이는 **현재 job 일 때만**. 안 그러면 뒤늦게 죽은 job 이 정상 진행 중인 job 의 단계를
+    // failed 로 덮어쓴다(형제 runRtmSteps 는 tracker.fail/finish 가 jobId 를 가드하고 runOne 이
+    // isCurrent 로 시작한다 — 여기만 빠져 규약이 갈렸었다).
+    onSpawnError: () => {
+      if (rtmTracker.isCurrent(jobId)) setRtmStepStatus(sid, RTM_STEP_MIN, "failed");
+    },
+    onClose: (code) => {
+      if (!rtmTracker.isCurrent(jobId)) return;
+      if (code !== 0) {
+        rtmTracker.finish(jobId, code);
+        setRtmStepStatus(sid, RTM_STEP_MIN, "failed");
+        return;
+      }
+      setRtmStepStatus(sid, RTM_STEP_MIN, "produced");
+      rtmTracker.finish(jobId, 0);
+    },
+  });
+}
+
+/**
+ * POST /rtm-intake-answer — { sid, answers: [{qid, question, answer}] } ① `[확인필요]` 답변 제출(A3).
+ *
+ * 서버는 **기록하고 spawn 할 뿐 의미를 반영하지 않는다**(§4.1): 자유텍스트 답을 changeset·AC 에
+ * 넣는 건 애초에 결정론이 아니라 판단이고, 대시보드는 legacy-core 스키마를 import 하지 않는다.
+ * → 답의 **불변 원본**은 qa-history.json(코드가 보장), **의미 개정**은 ① 재실행(LLM)이 맡는다.
+ * 개정이 실패해도 답은 원장에 남는다 — 그래서 append 가 spawn 보다 먼저다.
+ */
+function handleRtmAnswerPost(
+  req: import("http").IncomingMessage,
+  res: import("http").ServerResponse,
+): void {
+  if (rtmTracker.running) {
+    sendJson(res, 409, { error: "실행 중에는 답변할 수 없습니다.", job: rtmTracker.snapshot() });
+    return;
+  }
+  const projectRoot = impactProjectRoot();
+  if (!projectRoot) {
+    sendJson(res, 404, { error: "No project found. Run /understand first." });
+    return;
+  }
+  const base = rtmIntakeBaseDir();
+  if (!base) {
+    sendJson(res, 404, { error: "No RTM found. Run /understand-rtm first." });
+    return;
+  }
+  collectRequestBody(req, MAX_DOC_BODY_BYTES)
+    .then((body) => {
+      let parsed: { sid?: unknown; answers?: unknown; model?: unknown };
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        sendJson(res, 400, { error: "Invalid JSON body" });
+        return;
+      }
+      const sid = typeof parsed.sid === "string" ? parsed.sid : "";
+      const session = sid ? readRtmSession(sid) : null;
+      if (!session) {
+        sendJson(res, 404, { error: "Unknown session" });
+        return;
+      }
+      // ── 게이트(D2 · §5) — 판정은 코어 `checkAnswerGate` 하나만 쓴다(테스트 가능한 순수 함수).
+      const gate = checkAnswerGate(session);
+      if (!gate.ok) {
+        sendJson(res, gate.status, { error: gate.error, session });
+        return;
+      }
+      // ── 답변 정규화 — 빈 답은 "안 한 것"이라 버린다(미답을 답으로 굳히지 않는다) ──
+      const raw = Array.isArray(parsed.answers) ? parsed.answers : [];
+      const answers: QaEntry[] = [];
+      for (const a of raw) {
+        if (!a || typeof a !== "object" || Array.isArray(a)) continue;
+        const o = a as Record<string, unknown>;
+        const qid = typeof o.qid === "string" ? o.qid.trim() : "";
+        const answer = typeof o.answer === "string" ? o.answer.trim() : "";
+        if (!qid || !answer) continue;
+        answers.push({
+          qid,
+          question: typeof o.question === "string" ? o.question : "",
+          answer,
+        });
+      }
+      if (answers.length === 0) {
+        sendJson(res, 400, { error: "답변이 비어 있습니다." });
+        return;
+      }
+      // ★ 기록이 spawn 보다 먼저다 — 개정이 실패해도 답은 남아야 한다(원장이 진실원본).
+      // 손상 원장이면 append 가 null 로 거절한다(덮어쓰면 기존 문답 계보가 사라지므로) — 그때는
+      // 개정을 돌리지 않는다. 답을 못 남긴 채 개정만 도는 건 계보 없는 산출을 만드는 것이다.
+      const revision = appendQaRevisionIn(base, sid, answers);
+      if (!revision) {
+        sendJson(res, 500, {
+          error:
+            "답변 원장(qa-history.json)이 손상돼 기록할 수 없습니다 — 덮어쓰면 기존 문답 이력이 사라지므로 중단했습니다. 파일을 확인하세요.",
+        });
+        return;
+      }
+      const model = pickModel(parsed.model);
+      const jobId = rtmTracker.begin({
+        sid: session.sid,
+        step: RTM_STEP_MIN,
+        targetStep: RTM_STEP_MIN,
+        request: session.request,
+        model,
+      });
+      runRtmRevise(jobId, sid, projectRoot, model, session.identifyClaudeSession ?? null);
+      sendJson(res, 202, { job: rtmTracker.snapshot(), session, revision });
     })
     .catch(() => sendJson(res, 413, { error: "Request body too large" }));
 }
@@ -2102,6 +2301,7 @@ export default defineConfig({
             pathname === "/rtm-intake-status" ||
             pathname === "/rtm-intake-sessions" ||
             pathname === "/rtm-intake-confirm" ||
+            pathname === "/rtm-intake-answer" ||
             pathname === "/rtm-intake-discard" ||
             pathname === "/rtm-intake-doc" ||
             pathname === "/rtm-change" ||
@@ -2352,6 +2552,11 @@ export default defineConfig({
           if (pathname === "/rtm-intake-confirm") {
             if (req.method === "POST") handleRtmConfirmPost(req, res);
             else sendJson(res, 405, { error: "Use POST to confirm a step" });
+            return;
+          }
+          if (pathname === "/rtm-intake-answer") {
+            if (req.method === "POST") handleRtmAnswerPost(req, res);
+            else sendJson(res, 405, { error: "Use POST to answer intake questions" });
             return;
           }
           if (pathname === "/rtm-intake-discard") {

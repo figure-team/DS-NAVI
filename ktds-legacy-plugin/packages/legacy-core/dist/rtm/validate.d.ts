@@ -11,7 +11,7 @@ export declare function natCmp(a: string, b: string): number;
  */
 export declare function computeDiagnostics(model: RtmModel, droppedReqIds?: string[]): RtmDiagnostic[];
 /**
- * ⑤ 표면의 인벤토리 — **분석 산출물에서 읽은 "실재하는 것"의 목록**.
+ * ⑥ 표면의 인벤토리 — **분석 산출물에서 읽은 "실재하는 것"의 목록**.
  *
  * `intake-types.ts` 의 `IntakeInventory` 와 같은 관례다: 이 파일은 순수 함수라 디스크를 읽지 않고,
  * 호출자(IO 경계 = `scripts/understand-rtm.mjs`)가 db-schema.json 에서 읽어 **주입**한다.
@@ -22,11 +22,11 @@ export interface RtmCellInventory {
     tables?: string[];
 }
 /**
- * ★ ⑤ 재bake 표면의 실재 대조(P1c) — `rtm-requirements.json` 이 투영된 기능 셀을 db-schema 와 대조.
+ * ★ ⑥ 재bake 표면의 실재 대조(P1c) — `rtm-requirements.json` 이 투영된 기능 셀을 db-schema 와 대조.
  *
  * **왜 여기가 필요한가**: 실측 `OAUTH_ACCOUNT` 는 `identified.json` 을 거치지 않는다.
  * `project-intake.ts` 의 `intakeFnStub` 은 4축 셀을 전부 빈 값으로 만들므로, `functions[].data` 의
- * `"(제안) OAUTH_ACCOUNT(C) · …"` 는 **⑤ 이후 LLM 이 직접 쓴 것**이고 P1 게이트(`rtm-intake.mjs
+ * `"(제안) OAUTH_ACCOUNT(C) · …"` 는 **⑥ 이후 LLM 이 직접 쓴 것**이고 P1 게이트(`rtm-intake.mjs
  * validate` → `checkIntakeGrounding`)가 보는 표면 **밖**이다. 같은 규칙을 이 표면에도 세운다.
  *
  * **규칙은 P1b 확정분 재사용**(새로 만들지 않는다 — `intake-types.ts` `checkIntakeGrounding` 참조):

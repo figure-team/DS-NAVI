@@ -165,6 +165,47 @@ describe("runClaudeSkill", () => {
     expect(t.job.tail).not.toContain("--model");
   });
 
+  // ── A3: 대화 연속성 args(D1 하이브리드 · RTM_INTAKE_ANSWER_DESIGN.md §4.2·§4.3) ──
+  const UUID = "3f2504e0-4f89-11d3-9a0c-0305e82c3301";
+
+  it("sessionId 지정 시 --session-id 를 덧붙인다(① 첫 spawn — 나중에 resume 하려면 id 를 미리 정해야)", async () => {
+    const t = new ClaudeJobTracker<Record<string, never>>({});
+    const jobId = t.begin({});
+    runClaudeSkill({ prompt: "P", cwd: process.cwd(), jobId, tracker: t, command: "echo", sessionId: UUID });
+    await until(() => t.job.status !== "running");
+    expect(t.job.tail).toContain(`--session-id ${UUID}`);
+    expect(t.job.tail).not.toContain("--resume");
+  });
+
+  it("resume 지정 시 --resume 을 덧붙인다(답변 개정 — 대화창 없이 이어간다)", async () => {
+    const t = new ClaudeJobTracker<Record<string, never>>({});
+    const jobId = t.begin({});
+    runClaudeSkill({ prompt: "P", cwd: process.cwd(), jobId, tracker: t, command: "echo", resume: UUID });
+    await until(() => t.job.status !== "running");
+    expect(t.job.tail).toContain(`--resume ${UUID}`);
+    expect(t.job.tail).not.toContain("--session-id");
+  });
+
+  it("★ 둘 다 오면 resume 이 이긴다 — 새 대화를 열면 이어가려던 맥락이 조용히 사라진다", async () => {
+    const t = new ClaudeJobTracker<Record<string, never>>({});
+    const jobId = t.begin({});
+    runClaudeSkill({
+      prompt: "P", cwd: process.cwd(), jobId, tracker: t, command: "echo",
+      sessionId: "11111111-1111-1111-1111-111111111111", resume: UUID,
+    });
+    await until(() => t.job.status !== "running");
+    expect(t.job.tail).toContain(`--resume ${UUID}`);
+    expect(t.job.tail).not.toContain("--session-id");
+  });
+
+  it("★ 둘 다 미지정(기본) 이면 args 가 기존과 바이트 동일하다(additive 보장)", async () => {
+    const t = new ClaudeJobTracker<Record<string, never>>({});
+    const jobId = t.begin({});
+    runClaudeSkill({ prompt: "P", cwd: process.cwd(), jobId, tracker: t, command: "echo" });
+    await until(() => t.job.status !== "running");
+    expect(t.job.tail.trim()).toBe("-p P --permission-mode bypassPermissions");
+  });
+
   it("비 0 exit → failed", async () => {
     const t = new ClaudeJobTracker<Record<string, never>>({});
     const jobId = t.begin({});

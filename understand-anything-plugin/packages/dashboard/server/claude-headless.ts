@@ -123,6 +123,18 @@ export interface RunClaudeSkillOptions<Extra extends Record<string, unknown>> {
    * `--model <model>` 을 덧붙이고, 없으면(기본) 플래그를 생략해 세션 모델을 그대로 쓴다.
    */
   model?: string;
+  /**
+   * 새 claude 대화를 **이 UUID 로 연다**(`--session-id`). 나중에 `resume` 으로 그 대화를 이어가려면
+   * 우리가 id 를 미리 정해야 한다 — 헤드리스 spawn 은 자기가 만든 session id 를 돌려주지 않는다.
+   * `resume` 과 배타(둘 다 오면 resume 이 이긴다 — 이어가기가 새로 열기보다 구체적인 의도다).
+   * A2/A3 · RTM_INTAKE_ANSWER_DESIGN.md §3.3·§4.2(D1 하이브리드).
+   */
+  sessionId?: string;
+  /**
+   * 기존 claude 대화를 **이어간다**(`--resume <uuid>`). 이전 턴의 맥락(예: ①이 근거 번들을 읽은
+   * 대화)을 재주입 없이 그대로 쓴다. 대화창을 띄우지 않는다 — 여전히 `-p` 헤드리스 1회 spawn 이다.
+   */
+  resume?: string;
   /** spawn 동기 실패로 failed 처리된 직후(현재 job 일 때만) 추가 후처리 — 예: 500 응답. */
   onSpawnError?: () => void;
   /** child 'error' 이벤트로 failed 처리된 직후 추가 후처리 — 예: 이력 기록. */
@@ -147,6 +159,11 @@ export function runClaudeSkill<Extra extends Record<string, unknown>>(
   const args = ["-p", prompt, "--permission-mode", "bypassPermissions"];
   // 모델 미전달(기본) 이면 플래그 없이 세션 모델을 쓴다 — 프로젝트 공통 규약.
   if (opts.model) args.push("--model", opts.model);
+  // 대화 연속성(D1) — 둘 다 미전달(기본)이면 플래그가 붙지 않아 **기존 호출의 args 가 바이트 동일**하다.
+  // resume 이 sessionId 를 이긴다: "이 대화를 이어라"가 "이 id 로 새로 열어라"보다 구체적인 의도고,
+  // 둘 다 넘기는 건 호출자 실수인데 그때 새 대화를 열면 이어가려던 맥락이 조용히 사라진다.
+  if (opts.resume) args.push("--resume", opts.resume);
+  else if (opts.sessionId) args.push("--session-id", opts.sessionId);
   try {
     child = spawn(opts.command ?? "claude", args, { cwd, env: process.env });
   } catch (err) {

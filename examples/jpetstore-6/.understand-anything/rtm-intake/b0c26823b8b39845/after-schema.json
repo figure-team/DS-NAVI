@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "tables": [
+    {
+      "name": "ORDERS",
+      "change": "modified",
+      "columns": [
+        {
+          "name": "paymethod",
+          "type": "varchar(20)",
+          "note": "[추정] 결제수단 구분 코드(예: CARD/NAVERPAY) — DAR-010 AC-1. 기존 cardtype(카드 브랜드)과 구분되는 상위 결제수단 축. 기존 주문 호환 위해 기본값 CARD 상정"
+        },
+        {
+          "name": "naverpaytxid",
+          "type": "varchar(80)",
+          "note": "[추정] 네이버페이 거래ID — DAR-010 AC-1. 네이버페이 결제 건에만 존재하므로 nullable. 길이는 ORDERS 문자열 관례(varchar(80)) 준용"
+        },
+        {
+          "name": "paystatus",
+          "type": "varchar(20)",
+          "note": "[추정] 결제상태(예: REQUESTED/APPROVED/FAILED/CANCELED) — DAR-010 AC-1, 승인 시점 갱신은 AC-2. 코드성 짧은 값 관례(varchar(20)) 준용"
+        }
+      ],
+      "note": "[추정] DAR-010(결제수단/네이버페이 거래정보 데이터 저장) AC-1·AC-2 근거 — 신규 테이블 요구 없음(AC 가 ORDERS 컬럼 추가로 명시). 명명은 현행 ORDERS 소문자·무밑줄 관례(orderid·totalprice·cardtype) 준용. 컬럼 확정 전 스키마 상세 검토 필요([확인필요] Q3 미해결)"
+    }
+  ]
+}

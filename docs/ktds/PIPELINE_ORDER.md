@@ -100,7 +100,7 @@
 | system-map.json | `.understand-anything/` | `generatedFromCommit` |
 | screens.json | `.understand-anything/` | `gitCommit`, `mechanicalHash` |
 | policy-*.md(카테고리) | `.understand-anything/doc-output/` | `sourceCommit`(메타 — `signals.gitCommit`), 앵커 file:line |
-| policy-domain-*.md | `.understand-anything/doc-output/` | `sourceCommit` — **2026-07-16 배선**(P0b, `understand-policy.mjs:200`). `gitCommitHash(projectRoot)` = 생성 시점 HEAD(도메인 모드는 `branch-scanner` 로 소스를 직접 읽으므로 HEAD 가 실제 유래) |
+| policy-domain-*.md | `.understand-anything/doc-output/` | `sourceCommit` — **2026-07-16 코드만 배선**(P0b, `understand-policy.mjs:203`). `gitCommitHash(projectRoot)` = 생성 시점 HEAD(도메인 모드는 `branch-scanner` 로 소스를 직접 읽으므로 HEAD 가 실제 유래). **⚠ 데모 데이터는 아직 `null`** — 위 rtm.json/SI문서 행의 "복구"와 달리 **데이터 미반영**이다. 1단계 재생성이 `<!-- policy-fill -->` 이 아니라 **앵커 표 본문에 직접 구워진** LLM 보강(커밋 `7345d330`)을 초기화해 `policy-domain-account.md` 의 "SIGNON.PASSWORD varchar(25) 평문" 미결이 소실되기 때문. 반영하려면 `fill-prep --mode domain` → 팬아웃 → `fill-merge` 전체 필요(별건 결함, 티켓 없음) |
 | rtm.json | `.understand-anything/` | `gitCommit` — **2026-07-16 복구**. 이전엔 필드는 있으나 `understand-rtm.mjs:106` 이 domain-graph 의 없는 키(`graph.gitCommit`)를 읽어 항상 `null` 이었다 |
 | rtm-requirements.json | `.understand-anything/` | (스탬프 없음 — 공백) |
 | SI/as-built 문서 | `.understand-anything/doc-output/` | `sourceCommit` — **2026-07-16 복구**(`understand-docs.mjs:259` 동일 버그) |

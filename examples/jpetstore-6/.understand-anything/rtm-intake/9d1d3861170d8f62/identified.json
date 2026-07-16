@@ -1,0 +1,549 @@
+{
+  "request": {
+    "id": "REQ-003",
+    "name": "구글 로그인 추가",
+    "raw": "구글 로그인 추가",
+    "source": "고객 요청",
+    "requestedAt": null
+  },
+  "requirements": [
+    {
+      "id": "SFR-010",
+      "category": "SFR",
+      "name": "구글 소셜 로그인",
+      "type": "functional",
+      "nfrCategory": null,
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": null,
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "[추정] 로그인 폼 화면에 '구글로 로그인' 버튼/링크를 노출한다.",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action",
+            "to-be:account/구글-로그인-진입"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 149,
+              "snippet": "@DefaultHandler"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 49,
+              "snippet": "private static final String SIGNON = \"/WEB-INF/jsp/account/SignonForm.jsp\";"
+            }
+          ],
+          "screenRefs": [
+            {
+              "screenId": "screen:actions/Account.action__signonForm",
+              "annotationNo": 2,
+              "note": "[추정] 기존 아이디/비밀번호 Login 버튼과 같은 폼 영역에 구글 버튼을 추가한다. 화면 축이 HEAD보다 낡아 배치는 추정."
+            }
+          ],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "[추정] '구글로 로그인' 클릭 시 state 파라미터를 발급해 구글 인가(authorize) 엔드포인트로 리다이렉트한다.",
+          "kind": "postcondition",
+          "fnIds": [
+            "to-be:account/구글-로그인-진입"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 175,
+              "snippet": "return new RedirectResolution(CatalogActionBean.class);"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-3",
+          "text": "[추정] 구글 콜백에서 인가코드를 액세스 토큰으로 교환하고 구글 사용자 정보를 조회한다.",
+          "kind": "postcondition",
+          "fnIds": [
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-4",
+          "text": "[추정] 구글 로그인 성공 시 기존 signon 세션 확립 관례를 그대로 따른다 — password를 null로 비우고, 즐겨찾기 카테고리 상품을 MyList로 로딩하고, authenticated 플래그를 켜고 accountBean을 세션에 저장한 뒤 카탈로그로 리다이렉트한다.",
+          "kind": "postcondition",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon",
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 169,
+              "snippet": "account.setPassword(null);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 170,
+              "snippet": "myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 171,
+              "snippet": "authenticated = true;"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 174,
+              "snippet": "s.setAttribute(\"accountBean\", this);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 175,
+              "snippet": "return new RedirectResolution(CatalogActionBean.class);"
+            }
+          ],
+          "screenRefs": [
+            {
+              "screenId": "screen:actions/Account.action__signonForm",
+              "annotationNo": 2,
+              "note": "[추정] 기존 Login submit 핸들러(AccountActionBean#signon)의 성공 경로를 재사용한다."
+            }
+          ],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-5",
+          "text": "[추정] 구글 로그인 실패 시 기존 자격증명 실패 관례를 따라 메시지를 세팅하고 상태를 clear한 뒤 로그인 폼으로 되돌린다.",
+          "kind": "exception",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon",
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 163,
+              "snippet": "if (account == null)"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 164,
+              "snippet": "Invalid username or password"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 165,
+              "snippet": "setMessage(value);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 166,
+              "snippet": "clear();"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": [
+            {
+              "doc": "policy-domain-account.md",
+              "section": "4",
+              "ruleId": "PL-001",
+              "note": "[추정] 자격증명 불일치 로그인 차단 규칙과 동일한 처리 경로를 따른다. 정책 축이 HEAD보다 낡아 추정."
+            }
+          ]
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/구글-로그인-진입",
+          "to-be:account/구글-콜백-처리"
+        ],
+        "modified": [
+          "flow:ANY /actions/Account.action",
+          "flow:ANY /actions/Account.action?signon"
+        ],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 43,
+            "snippet": "public class AccountActionBean extends AbstractActionBean"
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 159,
+            "snippet": "public Resolution signon() {"
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 161,
+            "snippet": "account = accountService.getAccount(getUsername(), getPassword());"
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 149,
+            "snippet": "@DefaultHandler"
+          }
+        ]
+      },
+      "screenRefs": [
+        {
+          "screenId": "screen:actions/Account.action__signonForm",
+          "annotationNo": 2,
+          "note": "[추정] 로그인 화면이 이 요구사항의 유일한 진입 화면이다."
+        }
+      ],
+      "policyRefs": []
+    },
+    {
+      "id": "SIR-010",
+      "category": "SIR",
+      "name": "구글 OAuth2 인가·토큰·사용자정보 API 연계",
+      "type": "functional",
+      "nfrCategory": null,
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-010",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "[추정] 구글 토큰 엔드포인트에 인가코드·client_id·client_secret·redirect_uri를 전송해 액세스 토큰을 교환한다.",
+          "kind": "postcondition",
+          "fnIds": [
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "[추정] 액세스 토큰으로 구글 userinfo를 조회해 계정 식별자(sub)와 email·이름을 획득한다.",
+          "kind": "postcondition",
+          "fnIds": [
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-3",
+          "text": "[추정] 구글 API 호출이 실패하거나 타임아웃되면 로그인을 거부하고 사용자에게 오류를 알린다(무한 대기 금지).",
+          "kind": "exception",
+          "fnIds": [
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/구글-콜백-처리"
+        ],
+        "modified": [],
+        "removed": [],
+        "revived": [],
+        "evidence": []
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    },
+    {
+      "id": "DAR-010",
+      "category": "DAR",
+      "name": "구글 계정 연동 및 자동가입 데이터 처리",
+      "type": "functional",
+      "nfrCategory": null,
+      "priority": "MEDIUM",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-010",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "[추정] 구글 식별자에 연동된 계정이 이미 있으면 해당 계정을 조회해 세션 로그인시킨다. 기존 로그인 처리는 ACCOUNT·SIGNON을 조회(R)해 자격증명을 검증한다.",
+          "kind": "branch",
+          "fnIds": [
+            "to-be:account/구글-계정연동-자동가입",
+            "flow:ANY /actions/Account.action?signon"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+              "line": 26
+            },
+            {
+              "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+              "line": 52
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "[추정] 연동된 계정이 없으면 구글 프로필로 신규 계정을 자동 생성한 뒤 로그인시킨다. 신규 계정 생성은 기존 insertAccount 트랜잭션 관례(account·profile·signon 동시 기록)를 따른다.",
+          "kind": "branch",
+          "fnIds": [
+            "to-be:account/구글-계정연동-자동가입",
+            "flow:ANY /actions/Account.action?newAccount"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-3",
+          "text": "[추정] 자동가입 계정도 기존 계정과 동일하게 즐겨찾기 카테고리(favouriteCategoryId) 기반 MyList 로딩이 동작해야 한다.",
+          "kind": "rule",
+          "fnIds": [
+            "flow:ANY /actions/Account.action?signon",
+            "to-be:account/구글-계정연동-자동가입"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 27,
+              "snippet": "public class Account implements Serializable"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 170,
+              "snippet": "myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+              "line": 59,
+              "snippet": "public List<Product> getProductListByCategory(String categoryId)"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/구글-계정연동-자동가입"
+        ],
+        "modified": [
+          "flow:ANY /actions/Account.action?signon",
+          "flow:ANY /actions/Account.action?newAccount"
+        ],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 26
+          },
+          {
+            "file": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml",
+            "line": 52
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+            "line": 25
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+            "line": 30
+          }
+        ]
+      },
+      "screenRefs": [],
+      "policyRefs": [
+        {
+          "doc": "policy-domain-account.md",
+          "section": "8",
+          "ruleId": null,
+          "note": "[추정] 미결 1번(SIGNON.PASSWORD 평문 varchar(25))이 소셜 로그인 자동가입 시 비밀번호 없는 계정 저장과 충돌한다 — questions 참조."
+        }
+      ]
+    },
+    {
+      "id": "SER-010",
+      "category": "SER",
+      "name": "구글 로그인 보안 통제(state 검증·시크릿 보관·자격증명 미노출)",
+      "type": "nonfunctional",
+      "nfrCategory": "security",
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-010",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "[추정] 인가요청 시 발급한 state를 콜백에서 검증하고, 불일치하면 로그인을 거부한다(CSRF 방어).",
+          "kind": "exception",
+          "fnIds": [
+            "to-be:account/구글-로그인-진입",
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-2",
+          "text": "[추정] client_secret 등 구글 자격정보를 소스에 하드코딩하지 않고 외부 설정으로 분리한다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-3",
+          "text": "[추정] 구글 로그인 성공 후 세션 빈에 비밀번호를 남기지 않는다 — 기존 signon이 password를 null로 비우는 관례를 그대로 지킨다.",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:account/구글-콜백-처리"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 169,
+              "snippet": "account.setPassword(null);"
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 82,
+              "snippet": "return account.getPassword();"
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": [
+            {
+              "doc": "policy-domain-account.md",
+              "section": "8",
+              "ruleId": null,
+              "note": "[추정] 미결 1번(비밀번호 해시/솔트 미적용, 평문 비교)과 직결된다."
+            }
+          ]
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:account/구글-로그인-진입",
+          "to-be:account/구글-콜백-처리"
+        ],
+        "modified": [],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 163
+          }
+        ]
+      },
+      "screenRefs": [],
+      "policyRefs": [
+        {
+          "doc": "policy-domain-account.md",
+          "section": "4",
+          "ruleId": "PL-001",
+          "note": "[추정] 기존 로그인 차단 정책과 동일 지점에서 소셜 로그인 실패를 처리해야 한다."
+        }
+      ]
+    }
+  ],
+  "questions": [
+    "[확인필요] 구글 계정 식별자(sub)를 저장할 자리가 현재 스키마에 없다 — 선정된 테이블은 ACCOUNT(PK userid)와 SIGNON(PK username, password varchar(25) NOT NULL)뿐이다. 신규 컬럼(예: ACCOUNT.google_sub) 대 신규 연동 테이블(예: SOCIAL_ACCOUNT) 중 무엇으로 갈지 사람이 결정해야 한다. 없는 테이블을 지어내지 않기 위해 changeset에는 넣지 않았다.",
+    "[확인필요] SIGNON.PASSWORD는 NOT NULL varchar(25) 평문 컬럼인데 구글 로그인 사용자는 비밀번호가 없다. 자동가입 시 (a) 더미/랜덤 값 저장, (b) 컬럼 nullable 변경, (c) 소셜 계정은 SIGNON 행 미생성 중 무엇을 택할지 결정 필요. policy-domain-account §8 미결 1번(해시/솔트 미적용)과 같은 뿌리다.",
+    "[확인필요] 기존 REQ-001(카카오)·REQ-002(네이버)가 같은 구조의 TO-BE 기능을 이미 계획 중이다(to-be:account/카카오-로그인-진입·네이버-로그인-진입 등). 구글을 전용 구현으로 추가할지, 3사 공통 OAuth 추상화(예: SocialOAuthService)로 묶어 REQ-001·002를 함께 재설계할지 사람이 판단해야 한다. supersede가 아니라 병렬 추가로 가정했다.",
+    "[확인필요] 구글 클라이언트 등록 정보(client_id·client_secret)와 개발/운영 리다이렉트 URI가 미정이다. 콜백 경로를 기존 Stripes 관례에 맞춰 /actions/Account.action?googleCallback 형태로 가정했으나 확정 필요.",
+    "[확인필요] 근거 번들의 6개 축(도메인·스키마·CRUD·추적표·화면·정책)이 모두 현재 소스 HEAD(c0d1383c)보다 뒤에 있다. 그 사이 커밋이 이 축들의 입력을 바꿨을 수 있어(반드시 낡았다는 뜻은 아님) 화면 배치·정책 규칙·기존 기능 목록에 의존하는 결론은 전부 [추정]으로 강등했다. 확정 전 재분석 권장.",
+    "[확인필요] policy-authz.md·policy-validation.md는 데이터 행 0건이다. 이는 '권한/검증 통제가 없다'는 뜻이 아니라 스캐너가 못 본 것이다. 따라서 구글 로그인에 적용될 기존 권한·입력검증 정책을 이 인테이크에서는 확인하지 못했다 — 사람이 별도 확인해야 한다."
+  ]
+}

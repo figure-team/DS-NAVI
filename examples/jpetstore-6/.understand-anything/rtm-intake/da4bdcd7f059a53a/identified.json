@@ -1,0 +1,359 @@
+{
+  "request": {
+    "id": "REQ-003",
+    "name": "환불 추가",
+    "raw": "환불 추가",
+    "source": "고객 요청",
+    "requestedAt": null
+  },
+  "requirements": [
+    {
+      "id": "SFR-030",
+      "category": "SFR",
+      "name": "주문 환불 기능",
+      "type": "functional",
+      "nfrCategory": null,
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": null,
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-1",
+          "text": "생성된 주문에 대해 전체 또는 부분 환불 요청 기능을 제공한다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:order/refund-request"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": null
+            },
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": null
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": [
+            {
+              "doc": "policy-domain-order.md",
+              "section": "8",
+              "ruleId": null,
+              "note": "미결 사항 — 주문 취소/환불 처리 로직·정책이 코드 내에서 발견되지 않음"
+            }
+          ]
+        },
+        {
+          "id": "AC-2",
+          "text": "환불 요청 후 자동으로 환불을 처리한다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:order/process-refund"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        },
+        {
+          "id": "AC-3",
+          "text": "주문 후 3일 이내에만 환불을 요청할 수 있다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:order/validate-refund-window"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:order/refund-request",
+          "to-be:order/process-refund",
+          "to-be:order/validate-refund-window"
+        ],
+        "modified": [
+          "flow:ANY /actions/Order.action?viewOrder"
+        ],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": null
+          },
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": null
+          }
+        ]
+      },
+      "screenRefs": [],
+      "policyRefs": [
+        {
+          "doc": "policy-domain-order.md",
+          "section": "8",
+          "ruleId": null,
+          "note": "미결 사항 — 환불 처리 로직·정책 부재"
+        }
+      ]
+    },
+    {
+      "id": "DAR-040",
+      "category": "DAR",
+      "name": "주문 상태 확장 (환불 상태)",
+      "type": "nonfunctional",
+      "nfrCategory": "compliance",
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-030",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-4",
+          "text": "ORDERSTATUS 테이블에 환불 관련 상태값 3가지를 추가한다: REFUND_REQUESTED(환불 요청), REFUND_PROCESSING(처리 중), REFUNDED(완료)",
+          "kind": "rule",
+          "fnIds": [],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": [
+            {
+              "doc": "policy-domain-order.md",
+              "section": "3",
+              "ruleId": null,
+              "note": "상태값 코드 그룹/enum 미정의"
+            }
+          ]
+        },
+        {
+          "id": "AC-7",
+          "text": "환불 요청 후 자동으로 상태가 REFUND_REQUESTED → REFUND_PROCESSING → REFUNDED 로 전이된다",
+          "kind": "rule",
+          "fnIds": [],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [],
+        "modified": [
+          "flow:ANY /actions/Order.action?newOrder"
+        ],
+        "removed": [],
+        "revived": [],
+        "evidence": []
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    },
+    {
+      "id": "SIR-050",
+      "category": "SIR",
+      "name": "환불 요청 화면 UI",
+      "type": "nonfunctional",
+      "nfrCategory": "usability",
+      "priority": "MEDIUM",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-030",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-5",
+          "text": "주문 조회 화면(viewOrder)에 환불 요청 버튼을 노출한다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:screen/order-refund-button"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [],
+          "screenRefs": [],
+          "policyRefs": []
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:screen/order-refund-button"
+        ],
+        "modified": [],
+        "removed": [],
+        "revived": [],
+        "evidence": []
+      },
+      "screenRefs": [],
+      "policyRefs": []
+    },
+    {
+      "id": "SER-060",
+      "category": "SER",
+      "name": "환불 권한 제어",
+      "type": "nonfunctional",
+      "nfrCategory": "security",
+      "priority": "HIGH",
+      "status": "ACTIVE",
+      "derivedFrom": "SFR-030",
+      "definition": "",
+      "scope": "",
+      "origin": "",
+      "spec": {
+        "details": [],
+        "inputs": "",
+        "outputs": "",
+        "flow": "",
+        "preceding": [],
+        "exceptions": [],
+        "acceptance": [],
+        "verify": ""
+      },
+      "acceptanceCriteria": [
+        {
+          "id": "AC-6",
+          "text": "본인 주문에 대해서만 환불을 요청할 수 있다",
+          "kind": "rule",
+          "fnIds": [
+            "to-be:order/authorize-refund"
+          ],
+          "confidence": "INFERRED",
+          "tests": [],
+          "evidence": [
+            {
+              "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 178
+            }
+          ],
+          "screenRefs": [],
+          "policyRefs": [
+            {
+              "doc": "policy-domain-order.md",
+              "section": "4",
+              "ruleId": "PL-007",
+              "note": "본인 주문 조회 제한 — 기존 정책을 환불에도 적용"
+            }
+          ]
+        }
+      ],
+      "changeset": {
+        "added": [
+          "to-be:order/authorize-refund"
+        ],
+        "modified": [],
+        "removed": [],
+        "revived": [],
+        "evidence": [
+          {
+            "file": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 178
+          }
+        ]
+      },
+      "screenRefs": [],
+      "policyRefs": [
+        {
+          "doc": "policy-domain-order.md",
+          "section": "4",
+          "ruleId": "PL-007",
+          "note": "본인 주문 조회 제한 정책"
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q-1",
+      "text": "환불 범위 — 전체 주문 환불만 지원하는가, 아니면 라인아이템 단위 부분 환불도 지원하는가?",
+      "targetReqId": "SFR-030",
+      "axis": "domain",
+      "answer": "부분 환불 지원",
+      "answeredAt": "2026-07-16T11:19:13.444Z"
+    },
+    {
+      "id": "Q-2",
+      "text": "환불 상태값 — 정책 문서에 '상태값 코드 그룹/enum 미정의'라고 명시되어 있다. 환불 요청, 승인, 완료 등 어떤 상태값을 추가할 것인가?",
+      "targetReqId": "DAR-040",
+      "axis": "data",
+      "answer": "알아서 해줘",
+      "answeredAt": "2026-07-16T11:19:13.444Z"
+    },
+    {
+      "id": "Q-3",
+      "text": "환불 화면 — 기존 주문 조회 화면(viewOrder)에 환불 버튼을 추가하는가, 별도의 환불 관리 화면을 만드는가?",
+      "targetReqId": "SIR-050",
+      "axis": "screen",
+      "answer": "버튼 추가",
+      "answeredAt": "2026-07-16T11:19:13.444Z"
+    },
+    {
+      "id": "Q-4",
+      "text": "환불 승인 프로세스 — 자동 승인인가, 아니면 관리자가 수동으로 승인하는가?",
+      "targetReqId": "SFR-030",
+      "axis": "domain",
+      "answer": "자동",
+      "answeredAt": "2026-07-16T11:19:13.444Z"
+    },
+    {
+      "id": "Q-5",
+      "text": "환불 시간 제한 — 주문 후 일정 기간(예: 30일) 이내에만 환불을 요청할 수 있도록 제한할 것인가?",
+      "targetReqId": "SFR-030",
+      "axis": "domain",
+      "answer": "3일 이내",
+      "answeredAt": "2026-07-16T11:19:13.444Z"
+    },
+    {
+      "id": "Q-6",
+      "text": "환불 상태값 상세 정의 — Q-2의 \"알아서 해줘\"를 반영하여, 개발팀이 설계할 환불 상태값이 구체적으로 어떤 흐름을 따를 것인가? (예: REFUND_REQUESTED → REFUND_PROCESSING → REFUNDED vs 즉시 REFUNDED)",
+      "targetReqId": "DAR-040",
+      "axis": "data",
+      "answer": "전자",
+      "answeredAt": "2026-07-16T11:22:05.499Z"
+    }
+  ]
+}

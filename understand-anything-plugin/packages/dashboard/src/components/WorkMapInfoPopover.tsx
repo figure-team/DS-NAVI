@@ -53,7 +53,7 @@ export default function WorkMapInfoPopover() {
     groupCards.length > 0
       ? [
           { label: "상위도메인", value: `${groupCards.length}개` },
-          { label: "하위도메인", value: `${groupCards.reduce((s, g) => s + g.subDomainCount, 0)}개` },
+          { label: "하위 도메인", value: `${groupCards.reduce((s, g) => s + g.subDomainCount, 0)}개` },
           { label: "업무", value: `${totalWorks}개` },
           { label: "기능", value: `${data.stats.flowCount}개` },
         ]
@@ -65,7 +65,7 @@ export default function WorkMapInfoPopover() {
 
   return (
     <TopBarSlot>
-      <InfoPopover title="업무 지도 정보" rows={rows} />
+      <InfoPopover title="도메인 정보" rows={rows} />
     </TopBarSlot>
   );
 }

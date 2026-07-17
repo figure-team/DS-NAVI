@@ -435,7 +435,13 @@ export default function RtmView() {
           {view === "session" ? (
             <SessionView />
           ) : error ? (
-            <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>요구사항 추적표를 불러오지 못했습니다 ({error}).<br /><code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>understand-rtm</code> 을 먼저 실행하세요.</div>
+            <div className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6, maxWidth: 520 }}>
+              {error === "HTTP 404" ? (
+                <>요구사항 추적표가 없습니다.<br />CLI에서 <code style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>/understand-rtm</code>을 실행해 추적표를 먼저 생성하세요.</>
+              ) : (
+                <>요구사항 추적표를 불러오지 못했습니다 ({error}). dev 서버 상태를 확인하세요.</>
+              )}
+            </div>
           ) : !model ? (
             <div className="text-text-muted" style={{ fontSize: 13 }}>불러오는 중…</div>
           ) : view === "function" ? (

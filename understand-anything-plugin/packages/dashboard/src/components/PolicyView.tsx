@@ -377,9 +377,11 @@ export default function PolicyView() {
     return (
       <div className="flex-1 min-h-0 overflow-auto bg-root" style={{ padding: "24px 28px 48px" }}>
         {/* 메뉴 헤더 제거(2026-07-15) — 신호 부재/오류 상태라 TopBar 정보 팝오버도 생략. */}
-        {signalsErr ? (
+        {/* 404 = 파일 부재 = /understand-policy 미실행(이 파일은 map 스캔이 아니라
+            policy 스킬 산출물) — 미실행 안내로 합류. 그 외 오류만 서버 문제로 표기. */}
+        {signalsErr && signalsErr !== "HTTP 404" ? (
           <EmptyCard title="정책 신호를 불러오지 못했습니다">
-            <code>policy-signals.json</code> 응답 오류 ({signalsErr}). understand-map 스캔·dev 서버 상태를 확인하세요.
+            <code>policy-signals.json</code> 응답 오류 ({signalsErr}). dev 서버 상태를 확인하세요.
           </EmptyCard>
         ) : (
           <EmptyCard title="정책 신호 없음">
@@ -1148,7 +1150,7 @@ function ReconcileTab({
           대조 데이터 없음
         </p>
         <p className="text-text-secondary" style={{ fontSize: 13, lineHeight: 1.65 }}>
-          {entriesErr ? (
+          {entriesErr && entriesErr !== "HTTP 404" ? (
             <>
               <code>policy-reconcile.json</code> 응답 오류 ({entriesErr}).
             </>

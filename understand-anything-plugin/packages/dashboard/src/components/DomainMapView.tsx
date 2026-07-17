@@ -315,6 +315,7 @@ export default function DomainMapView({ worksExpanded = false }: { worksExpanded
                           style={{ fontSize: 11.5, fontWeight: 500 }}
                         >
                           {t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} ·{" "}
+                          {t.domainMap.workCount.replace("{count}", String(g.workCount))} ·{" "}
                           {t.domainMap.flowCount.replace("{count}", String(g.flowCount))}
                         </span>
                       </div>

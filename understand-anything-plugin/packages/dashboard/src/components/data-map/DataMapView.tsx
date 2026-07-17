@@ -97,8 +97,8 @@ export default function DataMapView() {
         <EmptyCard>
           <b className="text-text-primary">db-schema.json 없음</b>
           <br />
-          데이터 맵은 정적 분석 산출물 <code>db-schema.json</code> 에 의존합니다. understand-map 스캔을 먼저 실행하면
-          테이블·컬럼·PK/FK·코드성 행 데이터가 생성됩니다.
+          데이터 맵은 정적 분석 산출물 <code>db-schema.json</code> 에 의존합니다. CLI에서{" "}
+          <code>/understand-map scan</code>을 실행해 테이블·컬럼·PK/FK·코드성 행 데이터를 먼저 생성하세요.
           <br />
           <span style={{ fontSize: 12 }}>({schemaErr})</span>
         </EmptyCard>
@@ -133,7 +133,7 @@ export default function DataMapView() {
               <EmptyCard>
                 <b className="text-text-primary">crud-matrix.json 없음</b>
                 <br />
-                기능 흐름 × 테이블 CRUD 매트릭스는 understand-map 스캔에서 생성됩니다.
+                CLI에서 <code>/understand-map scan</code>을 실행해 기능 흐름 × 테이블 CRUD 매트릭스를 먼저 생성하세요.
                 {crudErr && (
                   <>
                     <br />

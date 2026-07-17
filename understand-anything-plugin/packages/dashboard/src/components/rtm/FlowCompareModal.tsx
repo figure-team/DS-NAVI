@@ -225,7 +225,7 @@ export default function FlowCompareModal({ flows, addedNames, impactFiles, seedF
         </div>
 
         {!domainGraph ? (
-          <div className="flex-1 flex items-center justify-center text-text-muted" style={{ fontSize: 13 }}>업무지도 그래프를 아직 불러오지 못했습니다 — 잠시 후 다시 여세요.</div>
+          <div className="flex-1 flex items-center justify-center text-text-muted" style={{ fontSize: 13 }}>도메인 그래프를 아직 불러오지 못했습니다 — 잠시 후 다시 여세요.</div>
         ) : view === "biz" ? (
           !cur ? (
             <div className="flex-1 flex items-center justify-center" style={{ padding: 40 }}>

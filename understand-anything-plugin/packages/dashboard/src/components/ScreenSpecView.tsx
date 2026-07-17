@@ -524,7 +524,7 @@ export default function ScreenSpecView() {
     if (domainId && domainGraph.nodes.some((n) => n.id === domainId)) {
       return {
         to: `/domains/${domainId}`,
-        label: "업무 지도 →",
+        label: "도메인 →",
         title: "흐름 매칭 실패 — 도메인 워크스페이스로 이동",
       };
     }
@@ -624,7 +624,13 @@ export default function ScreenSpecView() {
   if (error) {
     return (
       <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
-        화면설계서 데이터를 불러올 수 없습니다: {error} — 먼저 /understand-screens 를 실행하세요.
+        {error === "HTTP 404" ? (
+          <>
+            화면설계서 데이터가 없습니다. CLI에서 <code>/understand-screens</code>를 실행해 화면 캡처·설계서를 먼저 생성하세요.
+          </>
+        ) : (
+          <>화면설계서 데이터를 불러오지 못했습니다 ({error}). dev 서버 상태를 확인하세요.</>
+        )}
       </div>
     );
   }

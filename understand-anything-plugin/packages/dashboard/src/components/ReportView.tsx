@@ -429,9 +429,11 @@ export default function ReportView() {
         </TopBarSlot>
         <div className="rounded-[10px] border border-border-subtle bg-panel card-shadow" style={{ padding: "18px 20px" }}>
           <p className="text-text-muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
-            실적 요약 없음 — <code>/understand-report</code> 실행으로 생성하세요.
+            실적 요약이 없습니다. CLI에서 <code>/understand-report</code>를 실행해 실적 요약을 먼저 생성하세요.
           </p>
-          <p className="text-text-muted" style={{ fontSize: 11.5, marginTop: 8 }}>({error})</p>
+          {error !== "HTTP 404" && (
+            <p className="text-text-muted" style={{ fontSize: 11.5, marginTop: 8 }}>({error})</p>
+          )}
         </div>
       </div>
     );

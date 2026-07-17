@@ -309,7 +309,7 @@ export default function HomePage() {
               to="/domains"
               icon={iconDomain}
               title={t.drawer.domain}
-              description={`시스템 구성도에서 도메인 ${stats.domains}개·기능 ${stats.flows}개와 타 시스템 연동을 한눈에 봅니다.`}
+              description={`구성 탭에서 도메인 ${stats.domains}개·기능 ${stats.flows}개와 타 시스템 연동을 한눈에 봅니다.`}
             >
               <div className="flex flex-wrap gap-1.5">
                 {domainChips.slice(0, 5).map((d) => (

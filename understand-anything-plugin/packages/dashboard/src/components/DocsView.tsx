@@ -492,7 +492,7 @@ export default function DocsView() {
             ) : docs.length === 0 ? (
               <p className="text-text-muted" style={{ fontSize: 12, lineHeight: 1.5, padding: "4px 6px" }}>
                 생성된 문서가 없습니다.<br />
-                <code>understand-docs</code> 를 먼저 실행하세요.
+                CLI에서 <code>/understand-docs</code>를 실행해 산출물 문서를 먼저 생성하세요.
               </p>
             ) : filtered.length === 0 ? (
               <p className="text-text-muted" style={{ fontSize: 12, padding: "10px 8px" }}>검색 결과 없음</p>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useDashboardStore } from "../../store";
 import { useI18n } from "../../contexts/I18nContext";
 import { buildDomainCards } from "../../utils/domainData";
+import { parseBusinessFlows } from "../../utils/businessFlow";
 import { buildGroupCards, type ResolvedGroup } from "../../utils/domainGroups";
 import {
   aggregateGroupEdges,
@@ -35,7 +36,11 @@ export default function StructureDepth1View({
   const groupCards = useMemo(() => {
     if (!domainGraph) return [];
     const { cards } = buildDomainCards(domainGraph);
-    const workCountByDomain = new Map<string, number>(); // 뎁스1은 업무 지도 위계와 무관 — 0으로 두고 flowCount만 표기.
+    // 업무(프로세스) 수 — 랜딩(DomainMapView) 그룹 카드와 동일 소스(businessFlows[]).
+    const workCountByDomain = new Map<string, number>();
+    for (const n of domainGraph.nodes) {
+      if (n.type === "domain") workCountByDomain.set(n.id, parseBusinessFlows(n).length);
+    }
     return buildGroupCards(groups, cards, workCountByDomain);
   }, [groups, domainGraph]);
 
@@ -57,7 +62,7 @@ export default function StructureDepth1View({
           id: g.key,
           name: g.name,
           icon: g.icon,
-          summary: `${t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} · ${t.domainMap.flowCount.replace("{count}", String(g.flowCount))}`,
+          summary: `${t.domainMap.subDomainCount.replace("{count}", String(g.subDomainCount))} · ${t.domainMap.workCount.replace("{count}", String(g.workCount))} · ${t.domainMap.flowCount.replace("{count}", String(g.flowCount))}`,
           chips: g.allMemberChips.map((c) => c.name),
           chipsLabel: t.structure.chipSubDomains,
           footer: g.filled && g.groundedPct !== null ? `${t.grounding.rate} ${g.groundedPct}%` : "",

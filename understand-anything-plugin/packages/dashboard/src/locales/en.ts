@@ -89,15 +89,15 @@ export const en = {
     tools: "Tools",
     path: "Path",
     help: "Help",
-    structural: "Structural",
-    domain: "Work Map",
+    structural: "Graph",
+    domain: "Domains",
   },
   domainView: {
     backToDomains: "Back to domains",
   },
   domainMap: {
     eyebrow: "Legacy acquisition analysis",
-    title: "System Map",
+    title: "Composition",
     subtitle:
       "Start here when you inherit a codebase. Pick a domain to trace its core features across every layer boundary on one screen.",
     statDomains: "Domains",
@@ -111,8 +111,8 @@ export const en = {
     collapseAllWorks: "Collapse all processes",
     nodeCount: "{count} nodes",
     empty: "No domain graph available. Run /understand-domain to generate one.",
-    breadcrumbRoot: "Work Map",
-    breadcrumbLabel: "Work map breadcrumb",
+    breadcrumbRoot: "Domains",
+    breadcrumbLabel: "Composition breadcrumb",
     viewFeatures: "View features",
     detail: "Details",
     systemSuffix: "System",
@@ -205,9 +205,9 @@ export const en = {
     noFlows: "No business flows",
   },
   structure: {
-    menuTitle: "STRUCTURE",
-    root: "Structure",
-    breadcrumbLabel: "Structure breadcrumb",
+    menuTitle: "GRAPH",
+    root: "Graph",
+    breadcrumbLabel: "Graph breadcrumb",
     crossDomainUnavailable: "Dependency data unavailable — re-run /understand-map scan",
     noCrossGroupEdges: "No cross-domain dependencies",
     evidenceTitle: "Dependency evidence",
@@ -294,7 +294,7 @@ export const en = {
   impactAnalyze: {
     title: "Change Impact Analysis",
     description:
-      "Describe the change you intend to make in natural language. When the analysis finishes, changed/affected nodes are highlighted on the structure graph.",
+      "Describe the change you intend to make in natural language. When the analysis finishes, changed/affected nodes are highlighted on the Graph tab.",
     placeholder: "e.g. I want to add Kakao social login",
     run: "Run analysis",
     submitting: "Starting…",
@@ -306,7 +306,7 @@ export const en = {
     errGeneric: "Failed to start analysis.",
     modelDefault: "Session model (default)",
     modelAria: "Select analysis model",
-    toastDone: "Impact analysis complete — results highlighted on the structure graph.",
+    toastDone: "Impact analysis complete — results highlighted on the Graph tab.",
     toastFailed: "Impact analysis failed. Check the console/logs.",
   },
   layer: {
@@ -437,27 +437,27 @@ export const en = {
     steps: [
       {
         title: "Welcome to DS-NAVI",
-        body: "A legacy-system takeover analysis dashboard. The home page summarizes the project; each card leads to a journey — domains, structure, the requirements matrix, or deliverables.",
+        body: "A legacy-system takeover analysis dashboard. The home page summarizes the project; each card leads to a journey — domains, the requirements matrix, or deliverables.",
         hint: "Five steps cover the core screens",
       },
       {
         title: "Left navigation — every screen is a URL",
-        body: "Move between Domains (business map), Structure (code graph), RTM (requirements), and Deliverables (SI documents). Every screen and selection lives in the address bar, so copying the URL shares the exact view.",
+        body: "Move between Domains (composition & graph), RTM (requirements), and Deliverables (SI documents). Every screen and selection lives in the address bar, so copying the URL shares the exact view.",
         hint: "Refresh, back/forward, and link sharing all just work",
       },
       {
         title: "The domain journey — map to flows",
-        body: "Pick a business domain on the map to see its feature flows; pick a flow to open the API→Service→DAO→DB cross-layer spine. Grounding bars and citation chips tie every statement back to code.",
+        body: "Pick a business domain on the Composition tab to see its feature flows; pick a flow to open the API→Service→DAO→DB cross-layer spine. Grounding bars and citation chips tie every statement back to code.",
         hint: "Click a citation chip to open the source right there",
       },
       {
-        title: "Structure graph — a map of the code",
+        title: "Graph tab — a map of the code",
         body: "Switch between file/class detail to explore the layered architecture. Clicking a node opens details on the right and adds ?node= to the URL so you can share that exact node. Impact analysis and diff overlays live here too.",
         hint: "Describe a change in plain language to highlight affected nodes",
       },
       {
         title: "And a bit more",
-        body: "The structure toolbar has Filter, Export, and Path finding; the top bar has theme switching and help. Press Shift + ? for the full keyboard shortcut list.",
+        body: "The Graph tab toolbar has Filter, Export, and Path finding; the top bar has theme switching and help. Press Shift + ? for the full keyboard shortcut list.",
         hint: "No need to memorize — open them when you need them",
       },
     ],

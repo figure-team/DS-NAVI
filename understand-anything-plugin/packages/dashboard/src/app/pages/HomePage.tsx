@@ -37,6 +37,13 @@ interface WorkSummaryLite {
   files: number;
 }
 
+/** 데이터 카드 — db-schema.json 요약. */
+interface DataLite {
+  tables: number;
+  columns: number;
+  codeTables: number;
+}
+
 /** 위험 모듈 카드 — risk-report.json 요약. */
 interface RiskLite {
   high: number;
@@ -54,7 +61,7 @@ interface FeedItem {
 
 /**
  * 홈 (FRONT_REDESIGN §5.1) — P0 승인 시안(mockup-shell-home.html)과 1:1 정합.
- * 헤더(제목+분석 메타+내보내기), 스탯 타일 5, 여정 카드 3(아이콘·레이어 카운트·상태 요약),
+ * 헤더(제목+분석 메타+내보내기), 스탯 타일 5, 여정 카드 3(도메인·데이터·추적표 — 아이콘·요약 칩),
  * 하단 산출물+최근 활동. 시안의 "재분석 실행" 버튼은 대시보드에서 실행 수단이 없어 제외.
  */
 export default function HomePage() {
@@ -70,6 +77,7 @@ export default function HomePage() {
   const [programTotal, setProgramTotal] = useState<number | null>(null);
   const [work, setWork] = useState<WorkSummaryLite | null>(null);
   const [risk, setRisk] = useState<RiskLite | null>(null);
+  const [dataStats, setDataStats] = useState<DataLite | null>(null);
 
   // 홈 전용 요약 데이터 — 없으면(404) 해당 카드/타일만 숨긴다.
   useEffect(() => {
@@ -103,6 +111,20 @@ export default function HomePage() {
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data && Array.isArray(data.docs)) setDocs(data.docs as DocEntry[]);
+      })
+      .catch(() => {});
+    // 데이터 카드 요약 — db-schema.json 의 테이블·컬럼·코드성 테이블 수.
+    fetch(dataUrl("db-schema.json", accessToken))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && Array.isArray(data.tables)) {
+          const tables = data.tables as { columns?: unknown[]; isCodeTable?: boolean }[];
+          setDataStats({
+            tables: tables.length,
+            columns: tables.reduce((sum, tb) => sum + (Array.isArray(tb.columns) ? tb.columns.length : 0), 0),
+            codeTables: tables.filter((tb) => tb.isCodeTable).length,
+          });
+        }
       })
       .catch(() => {});
     // 신설 메뉴 요약(메뉴 개편 2차) — 프로그램 타일 + 이번 주 실적·위험 모듈 카드.
@@ -162,18 +184,6 @@ export default function HomePage() {
         : [],
     [domainGraph],
   );
-
-  // 구조 카드 푸터 — 시안: 레이어별 파일 수 상위 4개.
-  const layerCounts = useMemo(() => {
-    if (!graph) return [];
-    return graph.layers
-      .map((l) => ({
-        name: l.name.replace(/\s*레이어\s*/g, " ").replace(/\(.*?\)/g, "").trim() || l.name,
-        count: l.nodeIds.length,
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 4);
-  }, [graph]);
 
   // 산출물 진행 카드 집계 — doc-list 실데이터(확정/초안/xlsx 보유 종수).
   const docCounts = useMemo(() => {
@@ -329,18 +339,26 @@ export default function HomePage() {
             </EntryCard>
           )}
           <EntryCard
-            to="/domains?tab=structure"
-            icon={iconStructure}
-            title="코드 구조"
-            description="레이어드 아키텍처 그래프. 영향도·위험 오버레이를 지원합니다."
+            to="/data"
+            icon={iconData}
+            title="데이터"
+            description="DB 스키마·ERD·CRUD 매트릭스로 테이블 구조와 기능별 데이터 접근을 봅니다."
           >
-            <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[12.5px] text-text-muted">
-              {layerCounts.map((l) => (
-                <span key={l.name} className="whitespace-nowrap">
-                  {l.name} <b className="text-text-primary font-semibold">{l.count}</b>
+            {dataStats && (
+              <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[12.5px] text-text-muted">
+                <span className="whitespace-nowrap">
+                  테이블 <b className="text-text-primary font-semibold">{dataStats.tables}</b>
                 </span>
-              ))}
-            </div>
+                <span className="whitespace-nowrap">
+                  컬럼 <b className="text-text-primary font-semibold">{dataStats.columns}</b>
+                </span>
+                {dataStats.codeTables > 0 && (
+                  <span className="whitespace-nowrap">
+                    코드성 <b className="text-text-primary font-semibold">{dataStats.codeTables}</b>
+                  </span>
+                )}
+              </div>
+            )}
           </EntryCard>
           {rtm && (
             <EntryCard
@@ -575,12 +593,10 @@ const iconDomain = (
     <path d="M9 9.5 11 14M15 9.5 13 14" />
   </svg>
 );
-const iconStructure = (
+const iconData = (
   <svg {...svgProps}>
-    <rect x="3" y="3" width="7" height="7" rx="1.5" />
-    <rect x="14" y="3" width="7" height="7" rx="1.5" />
-    <rect x="8.5" y="14" width="7" height="7" rx="1.5" />
-    <path d="M6.5 10v2.5h5.5M17.5 10v2.5h-5.5" />
+    <ellipse cx="12" cy="5.5" rx="8" ry="2.8" />
+    <path d="M4 5.5v13c0 1.5 3.6 2.8 8 2.8s8-1.3 8-2.8v-13M4 12c0 1.5 3.6 2.8 8 2.8s8-1.3 8-2.8" />
   </svg>
 );
 const iconRtm = (

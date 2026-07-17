@@ -77,9 +77,11 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/understand-screens.mjs <projectRoot> status  
 
 1. `fill-prep` — screens.json 을 화면 N개 자립 청크로 분해한다(도메인 우선 그룹핑,
    화면 단위로만 자름 — 주석은 화면에서 분리하지 않는다). 각 청크에 **핸들러 사전**
-   (routes/method-calls 결정론 조인의 pre-cite: file:line + verbatim 스니펫)과 컨트롤러/
-   서비스 소스 슬라이스를 동봉한다. 산출: `.spec/map/screens-fill-prep/<chunkId>.json` +
-   `index.json`(청크 id 목록 `chunks[].chunkId`).
+   (routes/method-calls 결정론 조인의 pre-cite: file:line + verbatim 스니펫), **뷰 상수
+   사전**(`viewConstants[]` — 앵커 파일+상속 부모 전 범위에서 `.jsp` 리터럴 선언을 스캔,
+   상수명→원문→repo 실경로 해결까지 동봉 — 슬라이스 창 밖 상단 상수로 jspFile 이 비는
+   갭 방지), 컨트롤러/서비스 소스 슬라이스를 동봉한다. 산출:
+   `.spec/map/screens-fill-prep/<chunkId>.json` + `index.json`(청크 id 목록 `chunks[].chunkId`).
 2. **모델 질문**(아래 공통 문안) 후 Workflow 도구로 `scripts/screens-fill-fanout.workflow.js`
    실행 — 인자 `{ projectRoot, cliScript: understand-screens.mjs 절대경로, chunkIds, model, effort:"low" }`.
    청크당 fill-writer 에이전트가 `screens-fill-frag/<chunkId>.json` 을 쓴다(멱등 skip 가드:

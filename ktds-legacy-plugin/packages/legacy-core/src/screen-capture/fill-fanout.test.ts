@@ -443,6 +443,54 @@ describe('screen fill-fanout', () => {
     expect(result.missingScreens).toEqual(['screen:bar/b'])
   })
 
+  it('prep: 뷰 상수 사전 — 슬라이스 창 밖 상단 상수도 전 파일 스캔으로 동봉·실경로 해결', async () => {
+    // 상수 정의(3행)와 핸들러(100+행)를 창 밖으로 벌린다 — jpetstore OrderActionBean 갭 재현.
+    const filler = Array.from({ length: 100 }, (_, i) => `  private void filler${i}() { /* pad */ }`).join('\n')
+    const SRC_BAR = `package shop.web;\npublic class BarActionBean extends BaseBean {\n  private static final String LIST = "/WEB-INF/jsp/bar/list.jsp";\n${filler}\n  public Resolution view() {\n    return new ForwardResolution(LIST);\n  }\n}\n`
+    // 공용 상수는 부모에 — 상속 홉 스캔(AbstractActionBean.ERROR 전형) 검증.
+    const SRC_BASE = `package shop.web;\npublic abstract class BaseBean {\n  protected static final String ERROR = "/WEB-INF/jsp/common/Error.jsp";\n}\n`
+    await mkdir(join(root, 'src/main/java/shop/web'), { recursive: true })
+    await writeFile(join(root, 'src/main/java/shop/web/BarActionBean.java'), SRC_BAR, 'utf8')
+    await writeFile(join(root, 'src/main/java/shop/web/BaseBean.java'), SRC_BASE, 'utf8')
+    // 실경로 해석 폴백 대상(KG 부재 → 웹앱 문서루트 실존 확인).
+    await mkdir(join(root, 'src/main/webapp/WEB-INF/jsp/bar'), { recursive: true })
+    await mkdir(join(root, 'src/main/webapp/WEB-INF/jsp/common'), { recursive: true })
+    await writeFile(join(root, 'src/main/webapp/WEB-INF/jsp/bar/list.jsp'), '<html/>', 'utf8')
+    await writeFile(join(root, 'src/main/webapp/WEB-INF/jsp/common/Error.jsp'), '<html/>', 'utf8')
+
+    const srcLines = SRC_BAR.split('\n')
+    const viewLine = srcLines.findIndex((l) => l.includes('public Resolution view()')) + 1
+    const handler = {
+      target: 'BarActionBean#view',
+      chain: [],
+      evidence: [{ file: 'src/main/java/shop/web/BarActionBean.java', line: viewLine }],
+      confidence: 'CONFIRMED' as const,
+    }
+    await seedScreens(root, [screen('screen:bar/list', 'bar', [ann({ no: 1, kind: 'action', handler })])])
+    await prepScreenFill(root)
+
+    const chunk = ScreenFillChunkSchema.parse(
+      JSON.parse(await readFile(join(root, '.spec/map/screens-fill-prep/scr-000.json'), 'utf8')),
+    )
+    // 테스트 의도 고정: 상수 라인(3)은 번들 슬라이스 창 밖이어야 한다(창 안이면 갭 재현 실패).
+    const bundle = chunk.files.find((f) => f.relPath.endsWith('BarActionBean.java'))
+    expect(bundle?.slice).toBeTruthy()
+    expect(bundle!.slice!.startLine).toBeGreaterThan(3)
+    // 사전은 창과 무관하게 상수를 잡고, 이름·원문·실경로·verbatim 스니펫을 동봉한다.
+    const vc = chunk.viewConstants.find((v) => v.name === 'LIST')
+    expect(vc).toBeDefined()
+    expect(vc!.relPath).toBe('src/main/java/shop/web/BarActionBean.java')
+    expect(vc!.line).toBe(3)
+    expect(vc!.value).toBe('/WEB-INF/jsp/bar/list.jsp')
+    expect(vc!.resolvedPath).toBe('src/main/webapp/WEB-INF/jsp/bar/list.jsp')
+    expect(vc!.snippet).toBe(srcLines[2].trim())
+    // 상속 부모(BaseBean)의 공용 상수도 홉 스캔으로 동봉된다.
+    const err = chunk.viewConstants.find((v) => v.name === 'ERROR')
+    expect(err).toBeDefined()
+    expect(err!.relPath).toBe('src/main/java/shop/web/BaseBean.java')
+    expect(err!.resolvedPath).toBe('src/main/webapp/WEB-INF/jsp/common/Error.jsp')
+  })
+
   it('결정론: prep 두 번 실행 시 청크 바이트 동일', async () => {
     await seedSources(root)
     await seedMethodCalls(root)

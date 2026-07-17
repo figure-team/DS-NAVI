@@ -76,6 +76,14 @@ export declare const ScreenFillChunkSchema: z.ZodObject<{
         }, z.core.$strip>>;
     }, z.core.$strip>>;
     sliceOmitted: z.ZodArray<z.ZodString>;
+    viewConstants: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        relPath: z.ZodString;
+        line: z.ZodNumber;
+        name: z.ZodNullable<z.ZodString>;
+        value: z.ZodString;
+        resolvedPath: z.ZodNullable<z.ZodString>;
+        snippet: z.ZodString;
+    }, z.core.$strip>>>;
 }, z.core.$strip>;
 export type ScreenFillChunk = z.infer<typeof ScreenFillChunkSchema>;
 export declare const ScreenFillChunkIndexSchema: z.ZodObject<{

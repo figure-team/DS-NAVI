@@ -38,6 +38,8 @@ export {
 export type { DocTemplate, DocTemplateSection } from './doc-template.js'
 export { DOC_SET, buildDocSet } from './doc-set.js'
 export type { DocSetEntry } from './doc-set.js'
+export { exportCrudMatrix, CRUD_MATRIX_FILENAME } from './crud-export.js'
+export type { CrudExportResult, CrudMatrixExport } from './crud-export.js'
 export {
   renderMarkdown,
   renderSkeleton,

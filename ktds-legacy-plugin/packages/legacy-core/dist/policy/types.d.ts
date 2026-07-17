@@ -16,10 +16,10 @@ export declare const POLICY_RECONCILE_FILENAME = "policy-reconcile.json";
 /** 정책 카테고리(사용자 정의 9종). PoC: glossary/data/validation/authz. */
 export declare const PolicyCategorySchema: z.ZodEnum<{
     status: "status";
+    validation: "validation";
     glossary: "glossary";
     authz: "authz";
     account: "account";
-    validation: "validation";
     billing: "billing";
     data: "data";
     integration: "integration";
@@ -30,10 +30,10 @@ export type PolicyCategory = z.infer<typeof PolicyCategorySchema>;
 export declare const PolicySignalSchema: z.ZodObject<{
     category: z.ZodEnum<{
         status: "status";
+        validation: "validation";
         glossary: "glossary";
         authz: "authz";
         account: "account";
-        validation: "validation";
         billing: "billing";
         data: "data";
         integration: "integration";
@@ -62,10 +62,10 @@ export declare const PolicySignalSetSchema: z.ZodObject<{
     signals: z.ZodArray<z.ZodObject<{
         category: z.ZodEnum<{
             status: "status";
+            validation: "validation";
             glossary: "glossary";
             authz: "authz";
             account: "account";
-            validation: "validation";
             billing: "billing";
             data: "data";
             integration: "integration";
@@ -111,10 +111,10 @@ export type PolicyStatus = z.infer<typeof PolicyStatusSchema>;
 export declare const PolicyItemSchema: z.ZodObject<{
     category: z.ZodEnum<{
         status: "status";
+        validation: "validation";
         glossary: "glossary";
         authz: "authz";
         account: "account";
-        validation: "validation";
         billing: "billing";
         data: "data";
         integration: "integration";
@@ -129,10 +129,10 @@ export type PolicyItem = z.infer<typeof PolicyItemSchema>;
 export declare const ReconcileEntrySchema: z.ZodObject<{
     category: z.ZodEnum<{
         status: "status";
+        validation: "validation";
         glossary: "glossary";
         authz: "authz";
         account: "account";
-        validation: "validation";
         billing: "billing";
         data: "data";
         integration: "integration";
@@ -162,10 +162,10 @@ export declare const ReconcileResultSchema: z.ZodObject<{
     entries: z.ZodArray<z.ZodObject<{
         category: z.ZodEnum<{
             status: "status";
+            validation: "validation";
             glossary: "glossary";
             authz: "authz";
             account: "account";
-            validation: "validation";
             billing: "billing";
             data: "data";
             integration: "integration";

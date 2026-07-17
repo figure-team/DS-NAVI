@@ -224,6 +224,7 @@ export async function buildSkeleton(projectRoot, input, options = {}) {
                     source: `domain:${d.key}`,
                     target: flow.flowId,
                     type: 'contains_flow',
+                    direction: 'forward',
                     weight: 1,
                 });
                 stepFiles.forEach((file, i) => {
@@ -251,6 +252,7 @@ export async function buildSkeleton(projectRoot, input, options = {}) {
                         source: flow.flowId,
                         target: stepId,
                         type: 'flow_step',
+                        direction: 'forward',
                         weight: round4((i + 1) / stepFiles.length),
                     });
                 });
@@ -271,6 +273,7 @@ export async function buildSkeleton(projectRoot, input, options = {}) {
                             source: `step:${flowKey}:${fileA}`,
                             target: `step:${flowKey}:${fileB}`,
                             type: 'calls',
+                            direction: 'forward',
                             weight: 1,
                             ...(methods && methods.length > 0
                                 ? { description: methods.join(' → ') }

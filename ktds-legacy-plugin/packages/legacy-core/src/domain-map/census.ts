@@ -29,22 +29,45 @@ export const SOURCE_LANG_BY_EXT: Record<string, string> = {
   py: 'python',
 }
 
-/** walk 폴백에서 건너뛸 디렉터리. */
+/** walk 폴백에서 건너뛸 디렉터리(정확 일치). */
 const WALK_SKIP_DIRS = new Set([
   'node_modules',
   '.git',
   'dist',
-  '.spec',
-  '.understand-anything',
   // 빌드 툴링(소스 아님) — Maven wrapper(.mvn/MavenWrapperDownloader.java 의 main()이
   // 가짜 배치 진입점/도메인으로 잡히는 것 방지), Maven/Gradle 산출물.
   '.mvn',
   'target',
 ])
 
+/**
+ * 도구 자체 산출물 디렉터리의 베이스명 — 이름 그대로도, **변형(백업/사본)도** 건너뛴다.
+ *
+ * census 는 `git ls-files --cached --others --exclude-standard` 로 열거하므로 추적도
+ * 무시도 되지 않은 파일이 전부 소스로 들어온다. `mv .spec .spec.bak-$(date +%s)` 같은
+ * 흔한 재실행 전 백업이 정확일치 필터를 그대로 통과해 다음 스캔을 오염시켰다
+ * (jpetstore 실측: census 298개 중 150개가 백업 산출물, 유일한 증상은 plan 표의 유령 도메인).
+ */
+const WALK_SKIP_DIR_BASES = ['.spec', '.understand-anything']
+
+/** 산출물 변형 접미사 구분자 — `.spec.bak-1784231904`, `.spec-old`, `.spec_2`, `.spec copy`. */
+const SKIP_BASE_SUFFIX_SEP = /^[.\-_ ]/
+
+/**
+ * 경로 세그먼트가 skip 대상이면 true. 베이스명은 정확일치 또는 구분자로 시작하는
+ * 접미사가 붙은 변형까지 포함한다(`.specs`·`.specification` 같은 남의 디렉터리는 제외).
+ */
+export function isSkippedSegment(seg: string): boolean {
+  if (WALK_SKIP_DIRS.has(seg)) return true
+  return WALK_SKIP_DIR_BASES.some(
+    (base) =>
+      seg === base || (seg.startsWith(base) && SKIP_BASE_SUFFIX_SEP.test(seg.slice(base.length))),
+  )
+}
+
 /** relPath 의 경로 세그먼트 중 하나라도 skip 디렉터리면 true(인구조사 제외). */
 function isInSkippedDir(relPath: string): boolean {
-  return relPath.split('/').some((seg) => WALK_SKIP_DIRS.has(seg))
+  return relPath.split('/').some(isSkippedSegment)
 }
 
 /** 경로 구분자를 forward slash 로 정규화. */
@@ -95,7 +118,7 @@ function walkFiles(projectRoot: string): string[] {
     for (const entry of entries) {
       const full = join(dir, entry.name)
       if (entry.isDirectory()) {
-        if (WALK_SKIP_DIRS.has(entry.name)) continue
+        if (isSkippedSegment(entry.name)) continue
         stack.push(full)
       } else if (entry.isFile()) {
         out.push(toPosix(relative(projectRoot, full)))

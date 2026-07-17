@@ -11,6 +11,7 @@ import { buildCandidates } from './classify.js'
 import { buildAutoPlan } from './confirm.js'
 import { buildSkeleton } from './skeleton.js'
 import { emitDomainGraph, embedVerification } from './emit.js'
+import { validateGraph } from '@understand-anything/core/schema'
 import { loadProjectGraph } from '../orchestrator/index.js'
 import type { SkeletonReport, UaGraphNode } from './types.js'
 import type { VerifyReport } from './verify.js'
@@ -70,6 +71,19 @@ describe('emit — structural domain-graph.json (pre-LLM-fill)', () => {
     expect(Array.isArray(parsed.edges)).toBe(true)
     expect(parsed.nodes.length).toBe(skeleton.nodes.length)
     expect(parsed.edges.length).toBe(skeleton.edges.length)
+  })
+
+  it('UA core 자동 보정을 한 건도 유발하지 않는다(정식 어휘 — 대시보드 배너 소음 0)', async () => {
+    // 엣지에 direction 을 안 쓰던 시절엔 UA 검증기가 엣지마다 'forward' 를 채워 넣고
+    // auto-corrected 이슈를 1건씩 쌓았다(egov 실측 11776건 = 엣지 수). 배너는 그걸
+    // "LLM generation errors" 로 안내해 사람을 엉뚱한 곳으로 보냈다.
+    const skeleton = await shopMiniSkeleton()
+    emitDomainGraph(root, skeleton)
+    const raw = await readFile(join(root, '.understand-anything', 'domain-graph.json'), 'utf8')
+    const result = validateGraph(JSON.parse(raw))
+
+    expect(result.success).toBe(true)
+    expect(result.issues.filter((i) => i.level === 'auto-corrected')).toEqual([])
   })
 
   it('groups 옵션은 ktdsMap.groups 로 투영되고, 없으면 필드가 생략된다(DOMAIN_HIERARCHY)', async () => {

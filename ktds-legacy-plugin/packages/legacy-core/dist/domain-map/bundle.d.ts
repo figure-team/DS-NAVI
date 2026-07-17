@@ -132,5 +132,6 @@ export declare function sliceFile(projectRoot: string, relPath: string, anchorLi
 export declare function buildBundles(projectRoot: string, skeleton: SkeletonReport, options?: BuildBundlesOptions): Promise<{
     bundles: DomainBundle[];
     paths: string[];
+    stale: string[];
 }>;
 //# sourceMappingURL=bundle.d.ts.map

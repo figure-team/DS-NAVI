@@ -9,10 +9,15 @@
  *
  * file/config/schema/document 노드만 만들고(클래스·함수·의존 엣지는 없음 — 구조 뷰가
  * KG 렌더를 은퇴했으므로 불필요), table 노드는 DDL 파일에서 defines_schema 엣지 하나로
- * 잇는다. complexity="low" 는 상수다: UA core 의 COMPLEXITY_ALIASES 가 sanitizeGraph→
- * autoFixGraph 단계에서 "low"→"simple" 로 치환하므로(understand-anything-plugin/
- * packages/core/src/schema.ts) validateGraph 를 그대로 통과한다 — 이 파일에 새 상수를
- * 들이는 게 아니라 이미 있는 별칭 경로에 올라타는 것.
+ * 잇는다. complexity="simple" 은 상수다 — UA GraphNodeSchema 의 **정식 값**
+ * (simple|moderate|complex, understand-anything-plugin/packages/core/src/schema.ts).
+ *
+ * 과거엔 "low" 를 써서 COMPLEXITY_ALIASES 의 "low"→"simple" 별칭 경로에 올라탔다.
+ * validateGraph 는 통과했지만 별칭 치환마다 auto-corrected 이슈가 1건씩 쌓여
+ * 대시보드 배너가 노드 수만큼(egov 실측 11658건) 경고를 띄웠다 — 게다가 배너 문구는
+ * 그걸 "LLM generation errors" 로 안내해 사람을 엉뚱한 곳으로 보냈다. 별칭 경유는
+ * 정상 경로가 아니라 소음의 출처였으므로 정식 값을 직접 쓴다(치환 결과가 동일해
+ * 다운스트림 데이터는 불변).
  */
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
@@ -44,8 +49,8 @@ export interface MinimalKgNode {
   lineRange?: [number, number]
   summary: string
   tags: string[]
-  /** 상수 — 헤더 주석의 COMPLEXITY_ALIASES 경유 설명 참조. */
-  complexity: 'low'
+  /** 상수 — UA 정식 값(별칭 아님). 헤더 주석 참조. */
+  complexity: 'simple'
 }
 
 /** 최소 KG 의 엣지 종류 — schema 파일 → table 하나뿐(defines_schema, UA EdgeTypeSchema 값). */
@@ -185,7 +190,7 @@ function fileNodeFor(f: CensusReport['files'][number]): MinimalKgNode {
     filePath: f.relPath,
     summary: `${f.relPath} — ${f.lang} 파일`,
     tags: tagsForPath(f.relPath),
-    complexity: 'low',
+    complexity: 'simple',
   }
 }
 
@@ -208,7 +213,7 @@ function tableNodeFor(t: DbTable): MinimalKgNode {
     lineRange: tableLineRange(t),
     summary: `${t.relPath} — 테이블 ${t.name}`,
     tags: [],
-    complexity: 'low',
+    complexity: 'simple',
   }
 }
 

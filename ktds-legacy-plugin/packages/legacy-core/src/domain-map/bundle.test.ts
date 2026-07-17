@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { mkdtemp, rm, mkdir, writeFile, readFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { buildCensus } from './census.js'
@@ -95,6 +96,28 @@ describe('bundle — 도메인 LLM 입력 묶음', () => {
     expect(onDisk.key).toBe('order')
     // 슬라이스가 실제 인용 가능 텍스트(비즈니스 규칙 주석)를 담는다.
     expect(svc.slice!.text).toContain('주문은 회원만 생성할 수 있다')
+  })
+
+  it('확정 플랜에서 사라진 key 의 유령 번들을 지우고 보고한다(split/merge/exclude 재확정)', async () => {
+    const skeleton = await shopSkeleton(root)
+    await buildBundles(root, skeleton)
+    // 이전 확정의 잔재 — 이 key 는 현 skeleton 에 없다.
+    await writeFile(join(bundleDir(root), 'ghost.json'), '{"key":"ghost"}', 'utf8')
+
+    const { bundles, stale } = await buildBundles(root, skeleton)
+
+    expect(stale).toEqual(['ghost.json'])
+    expect(existsSync(join(bundleDir(root), 'ghost.json'))).toBe(false)
+    // 살아있는 번들은 건드리지 않는다.
+    expect(existsSync(join(bundleDir(root), 'order.json'))).toBe(true)
+    expect(bundles.some((b) => b.key === 'order')).toBe(true)
+  })
+
+  it('유령이 없으면 아무것도 지우지 않는다', async () => {
+    const skeleton = await shopSkeleton(root)
+    await buildBundles(root, skeleton)
+    const { stale } = await buildBundles(root, skeleton)
+    expect(stale).toEqual([])
   })
 
   it('P4: 모든 번들에 계층별 nodeDetailTemplate(v2) 동봉 + 각 계층 role 섹션', async () => {

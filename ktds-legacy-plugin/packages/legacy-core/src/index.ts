@@ -259,6 +259,8 @@ export {
   DocTemplateSectionSchema,
   DOC_SET,
   buildDocSet,
+  exportCrudMatrix,
+  CRUD_MATRIX_FILENAME,
   MethodologySchema,
   DocStatusSchema,
   EvidenceSchema,

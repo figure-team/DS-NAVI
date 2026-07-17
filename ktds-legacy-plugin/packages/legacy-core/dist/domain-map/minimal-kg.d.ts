@@ -12,8 +12,8 @@ export interface MinimalKgNode {
     lineRange?: [number, number];
     summary: string;
     tags: string[];
-    /** 상수 — 헤더 주석의 COMPLEXITY_ALIASES 경유 설명 참조. */
-    complexity: 'low';
+    /** 상수 — UA 정식 값(별칭 아님). 헤더 주석 참조. */
+    complexity: 'simple';
 }
 /** 최소 KG 의 엣지 종류 — schema 파일 → table 하나뿐(defines_schema, UA EdgeTypeSchema 값). */
 export interface MinimalKgEdge {

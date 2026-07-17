@@ -16,6 +16,7 @@
 //     model?: string,        // fill-writer model: 'inherit' (session, default —
 //                            // 공통 규약) | 'sonnet' (egov-proven) | 'haiku' | any model id
 //     effort?: string,       // fill-writer reasoning effort (default 'low')
+//     headerEffort?: string, // effort for header chunks only (default 'medium' — see below)
 //     language?: string }    // output language for names/summaries (default '한국어')
 
 
@@ -31,7 +32,15 @@ export const meta = {
 
 // Tolerate hosts that deliver args as a JSON-encoded string instead of an object.
 const A = typeof args === 'string' ? JSON.parse(args) : args
-const { projectRoot, cliScript, chunkIds, model = 'inherit', effort = 'low', language = '한국어' } = A ?? {}
+const {
+  projectRoot,
+  cliScript,
+  chunkIds,
+  model = 'inherit',
+  effort = 'low',
+  headerEffort = 'medium',
+  language = '한국어',
+} = A ?? {}
 if (!projectRoot || !cliScript || !Array.isArray(chunkIds) || chunkIds.length === 0) {
   throw new Error('args must provide { projectRoot, cliScript, chunkIds: [least one chunk id] }')
 }
@@ -41,6 +50,16 @@ if (!projectRoot || !cliScript || !Array.isArray(chunkIds) || chunkIds.length ==
 // slices, not open-ended analysis (egov: sonnet+low → 100% grounded).
 const modelOpts = model === 'inherit' ? {} : { model }
 const effortOpts = effort === 'inherit' ? {} : { effort }
+
+// Header chunks (chunkId `<key>-000`, isHeaderChunk === gi === 0 in prepFillChunks) do
+// strictly more work than the rest: on top of their own 20 flows they survey the domain's
+// FULL header.flowIndex roster and write the domain summary/entities/rules plus up to 20
+// business-process flowcharts. egov 실측: at a flat effort=low a 484-flow domain came back
+// with ONE 8-node chart — the roster was in the payload, unread. Effort is per-chunk so the
+// bump costs only 1 agent per domain, not per chunk.
+const isHeaderChunkId = (id) => /-000$/.test(id)
+const headerEffortOpts = headerEffort === 'inherit' ? {} : { effort: headerEffort }
+const chunkOpts = (id) => (isHeaderChunkId(id) ? headerEffortOpts : effortOpts)
 
 const ACK = {
   type: 'object',
@@ -87,7 +106,9 @@ ${retryReason ? `\nThis is a RE-DISPATCH. Previous attempt was incomplete: ${ret
    - steps[]: EXACTLY one entry per chunk.steps[] id — { "stepId", "name", "summary": { "text", "citations": [...] } }. If the step has a "layer" and chunk.nodeDetailTemplate.byLayer[<layer>] lists sections, ALSO add "detail": { "<sectionId>": { "text", "citations": [...] } } for each section, following that section's promptHint, grounded in the step file's slice.
    - CITATIONS (the load-bearing rule): copy the chunk's preCite objects VERBATIM — byte-for-byte, do not rephrase, re-indent, translate, or shorten the snippet. You may ADD citations only by copying an EXACT line from a chunk.files[].slice.text with its real 1-based line number (slice.startLine + line offset within the slice). NEVER invent or alter file paths, line numbers, or snippets — a machine verifier compares every snippet against the real file and demotes mismatches.
    - Rule H (header): "header" MUST be null unless chunk.isHeaderChunk is true. If true, header = { "name" (domain display name, business language — the ONLY citation-exempt field), "summary": Claim, "entities": Claim[], "businessRules": Claim[], "crossDomainInteractions": Claim[], "businessFlows": [...] (optional) }. Every Claim = { "text", "citations": [≥1] } grounded per the citation rule.
-   - businessFlows (header chunk, optional — quality over quantity): 1..N per-business-process flowcharts { "title" (~20 chars, citation-exempt), "nodes": [...], "edges": [...] }. Node = { "id", "kind": "start"|"end"|"activity"|"decision", "label" (≤30 chars business language), "flowRef"? , "citations"? }. activity/decision REQUIRE citations; each chart needs ≥1 start and ≥1 end; decision nodes need ≥2 outgoing edges, ALL labeled (e.g. "YES"/"NO"/"재고 있음") — only create a decision when the slice/rules actually evidence a branch. flowRef may ONLY be an id from chunk.header.flowIndex. If the domain has one obvious process, write one chart; if evidence is weak, OMIT businessFlows entirely rather than forcing it.
+   - businessFlows (header chunk): per-business-process flowcharts { "title" (~20 chars, citation-exempt), "nodes": [...], "edges": [...] }. Node = { "id", "kind": "start"|"end"|"activity"|"decision", "label" (≤30 chars business language), "flowRef"? , "citations"? }. activity/decision REQUIRE citations; each chart needs ≥1 start and ≥1 end; decision nodes need ≥2 outgoing edges, ALL labeled (e.g. "YES"/"NO"/"재고 있음") — only create a decision when the slice/rules actually evidence a branch. flowRef may ONLY be an id from chunk.header.flowIndex.
+   - HOW MANY CHARTS — coverage, not effort budget: chunk.header.flowIndex is the domain's COMPLETE flow roster (EVERY flow in the domain, not just this chunk's flows[]), and each entry carries its own preCite you may copy verbatim. SURVEY IT FIRST, then group its entries into distinct business processes — entries sharing a controller or URL prefix are normally one process (.../nts/insert|update|delete|selectList → one chart "공지사항 관리"). Write ONE chart PER process you find, up to 20. Scale to what the roster shows: a 400-flow domain has many processes, and returning a single chart for it is a COVERAGE FAILURE, not brevity. Never let chart count be decided by how much work it is.
+   - Do NOT pad, either: a domain whose roster genuinely shows one process gets exactly one chart, and any process you cannot ground in a real citation is omitted rather than invented. Coverage means every process the roster evidences, never a process it does not.
    - If a flow/step has preCite: null and you cannot find a citable line in the provided slices, still write the entry citing the nearest meaningful slice line — the verifier will judge it. Do not drop the entry (coverage is audited).
 
 4. SELF-VERIFY: re-run the exact command from step 1. If chunk ${id} is still in "incomplete", fix your fragment ONCE according to the printed reason and re-verify.
@@ -100,9 +121,13 @@ It prints a single JSON line: { "complete": [...], "incomplete": [{ "chunkId", "
 Return { incomplete } via structured output, copied verbatim from the command output. Do NOT attempt to fix, rewrite, or delete anything yourself.`
 
 phase('Fill')
-log(`Fanning out ${chunkIds.length} fill chunks (model=${model}, effort=${effort}, disk-guarded skip)`)
+const headerCount = chunkIds.filter(isHeaderChunkId).length
+log(
+  `Fanning out ${chunkIds.length} fill chunks (model=${model}, effort=${effort}, ` +
+    `${headerCount} header chunks at effort=${headerEffort}, disk-guarded skip)`,
+)
 const acks = await pipeline(chunkIds, id =>
-  agent(fillPrompt(id), { label: `fill:${id}`, phase: 'Fill', schema: ACK, ...modelOpts, ...effortOpts }))
+  agent(fillPrompt(id), { label: `fill:${id}`, phase: 'Fill', schema: ACK, ...modelOpts, ...chunkOpts(id) }))
 
 phase('Audit')
 // Bounded re-dispatch: initial run + at most 2 re-injections, then whatever is
@@ -116,7 +141,7 @@ for (let round = 0; round < 3; round++) {
   if (round === 2) { failed = pending; break }
   log(`Audit round ${round + 1}: ${pending.length} incomplete — re-dispatching`)
   await parallel(pending.map(p => () =>
-    agent(fillPrompt(p.chunkId, p.reason), { label: `retry:${p.chunkId}`, phase: 'Audit', schema: ACK, ...modelOpts, ...effortOpts })))
+    agent(fillPrompt(p.chunkId, p.reason), { label: `retry:${p.chunkId}`, phase: 'Audit', schema: ACK, ...modelOpts, ...chunkOpts(p.chunkId) })))
 }
 
 const okAcks = acks.filter(Boolean)

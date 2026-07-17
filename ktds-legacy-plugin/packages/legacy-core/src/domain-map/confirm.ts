@@ -14,7 +14,7 @@ import type {
   DomainConfidence,
   PlanOp,
 } from './types.js'
-import { GROUP_KEY_PREFIX, PlanOpsSchema } from './types.js'
+import { GROUP_KEY_PREFIX, PlanOpsSchema, SPLIT_KEY_SEPARATOR } from './types.js'
 
 function cmp(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
@@ -181,6 +181,114 @@ export function moveRoot(plan: ConfirmedPlan, root: string, toKey: string): Conf
   })
 }
 
+/**
+ * 계층 세그먼트 — 업무 분기가 아니라 기술 계층을 뜻하는 디렉터리 이름.
+ * split 은 이 토큰으로 도메인을 가르지 않는다(`cop.bbs.web` 같은 계층 도메인은 무의미).
+ * 이 토큰을 만난 루트는 하위 도메인이 아니라 부모 직속으로 남는다.
+ */
+const LAYER_SEGMENTS = new Set([
+  'annotation',
+  'aop',
+  'config',
+  'context',
+  'exception',
+  'filter',
+  'impl',
+  'interceptor',
+  'resolver',
+  'service',
+  'taglibs',
+  'util',
+  'validation',
+  'web',
+])
+
+/** 공통 디렉터리 prefix 길이 — 루트들이 처음으로 갈라지는 세그먼트 위치. */
+function commonPrefixLength(dirs: string[][]): number {
+  if (dirs.length === 0) return 0
+  let i = 0
+  for (;;) {
+    const seg = dirs[0][i]
+    if (seg === undefined || !dirs.every((d) => d[i] === seg)) return i
+    i++
+  }
+}
+
+/**
+ * 분할 — 도메인을 공통 prefix 아래 **첫 분기 디렉터리 토큰**으로 한 단계 쪼갠다
+ * (`uss` → `uss.ion`/`uss.olh`/…). 자동 분류기는 네임스페이스 아래 첫 토큰 하나만
+ * 도메인으로 잡으므로(classify.ts 과반 하강), 디렉터리가 3단 이상인 코드에서는
+ * 도메인 하나가 수백 흐름을 삼킨다. 그 경우 사람이 이 연산으로 경계를 내린다.
+ *
+ * **반복 적용이 설계다** — 한 번에 한 단계만 내려간다. `split uss` 뒤 여전히 큰
+ * `uss.ion` 은 `split uss.ion` 으로 또 내린다. 깊이를 전역 인자로 받지 않는 이유는
+ * 적정 깊이가 도메인마다 다르기 때문이다(egov 실측: uss 는 3단, sec 는 2단이 적정).
+ *
+ * 불변: key 는 skeleton ID 의 닻이라 부모 key 는 재사용하지 않고 새 key 를 만든다
+ * (`부모.토큰`). 자식은 부모 key 를 aliasKeys 로 물려받지 **않는다** — 물려받으면
+ * skeleton 의 alias→key 사상이 여러 자식으로 갈라져 비결정적이 된다(skeleton.ts).
+ * 그 대가로 후보 key 로 배정되던 파일들이 자식의 fileCount 에서 빠지지만, fileCount
+ * 는 도달성(sole)+루트로 다시 세어지므로 오히려 후보 뭉치보다 정확하다.
+ */
+export function splitDomain(plan: ConfirmedPlan, key: string): ConfirmedPlan {
+  const target = plan.domains.find((d) => d.key === key)
+  if (!target) throw new Error(`unknown domain key: "${key}"`)
+
+  const prefixLen = commonPrefixLength(target.roots.map((r) => r.split('/').slice(0, -1)))
+  const byToken = new Map<string, string[]>()
+  const parentRoots: string[] = []
+  for (const root of target.roots) {
+    const token = root.split('/').slice(0, -1)[prefixLen]
+    // 토큰 없음(파일이 prefix 직속) 또는 계층 토큰 → 하위 도메인이 아니라 부모 직속.
+    if (token === undefined || LAYER_SEGMENTS.has(token)) {
+      parentRoots.push(root)
+      continue
+    }
+    const bucket = byToken.get(token)
+    if (bucket) bucket.push(root)
+    else byToken.set(token, [root])
+  }
+
+  if (byToken.size < 2) {
+    const why =
+      byToken.size === 0
+        ? '루트 아래 업무 하위 디렉터리가 없습니다(전부 계층 디렉터리 또는 prefix 직속)'
+        : `하위 디렉터리가 "${[...byToken.keys()][0]}" 하나뿐이라 쪼개도 같은 덩어리입니다`
+    throw new Error(`domain "${key}" 는 분할할 수 없습니다 — ${why}`)
+  }
+
+  const childKeys = [...byToken.keys()].map((t) => `${key}${SPLIT_KEY_SEPARATOR}${t}`)
+  for (const ck of childKeys) {
+    if (plan.domains.some((d) => d.key === ck)) throw new Error(`domain key already exists: "${ck}"`)
+  }
+
+  const children: ConfirmedDomain[] = [...byToken.entries()].map(([token, roots]) => {
+    const childKey = `${key}${SPLIT_KEY_SEPARATOR}${token}`
+    return { key: childKey, name: childKey, roots: sortUnique(roots), aliasKeys: [] }
+  })
+  // 부모는 직속 루트가 남을 때만 생존한다(빈 도메인은 skeleton 에서 무의미 — moveRoot 와 같은 규약).
+  const parentSurvives = parentRoots.length > 0
+  const parent: ConfirmedDomain[] = parentSurvives
+    ? [{ ...target, roots: sortUnique(parentRoots) }]
+    : []
+
+  // 그룹 정합: 부모가 속한 상단도메인은 자식들이 그대로 승계한다(비파괴 오버레이 유지).
+  const successors = sortUnique([...(parentSurvives ? [key] : []), ...childKeys])
+  const groups = plan.groups?.map((g) =>
+    g.memberKeys.includes(key)
+      ? { ...g, memberKeys: sortUnique([...g.memberKeys.filter((k) => k !== key), ...successors]) }
+      : g,
+  )
+
+  return pruneGroups({
+    ...plan,
+    domains: [...plan.domains.filter((d) => d.key !== key), ...parent, ...children].sort((a, b) =>
+      cmp(a.key, b.key),
+    ),
+    ...(groups ? { groups: sortGroups(groups) } : {}),
+  })
+}
+
 /** 제외 — 도메인을 빼고 key 를 excludedKeys 에 기록(정렬, 감사 추적). */
 export function excludeDomain(plan: ConfirmedPlan, key: string): ConfirmedPlan {
   if (!plan.domains.some((d) => d.key === key)) {
@@ -203,7 +311,7 @@ export function parsePlanOps(raw: unknown): PlanOp[] {
     throw new Error(
       `ops 형식 오류(${issue.path.join('.')}): ${issue.message} — ` +
         `허용: {op:"merge",from,into} | {op:"move",root,to} | {op:"exclude",key} | {op:"rename",key,name} | ` +
-        `{op:"group",key,name,members[]} | {op:"ungroup",key}`,
+        `{op:"group",key,name,members[]} | {op:"ungroup",key} | {op:"split",key}`,
     )
   }
   return parsed.data
@@ -236,6 +344,9 @@ export function applyOps(plan: ConfirmedPlan, ops: PlanOp[]): ConfirmedPlan {
           break
         case 'ungroup':
           next = ungroupDomains(next, op.key)
+          break
+        case 'split':
+          next = splitDomain(next, op.key)
           break
       }
     } catch (err) {

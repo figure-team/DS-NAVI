@@ -46,6 +46,12 @@ export const DEFAULT_CHUNK_SCREENS = 6;
 const PRECITE_SCAN_LINES = 40;
 /** pre-cite 스니펫 길이 상한(정규화 substring 일치라 잘라도 안전). */
 const PRECITE_SNIPPET_MAX = 200;
+/** 뷰 경로 리터럴 패턴 — 따옴표 문자열이 .jsp/.jspx 로 끝나는 선언(대소문자 무시). */
+const VIEW_LITERAL_RE = /"([^"\n]*\.jspx?)"/i;
+/** 청크당 뷰 상수 사전 상한(과다 팽창 방지 — 전형적 ActionBean 은 파일당 수 건). */
+const VIEW_CONSTANT_CAP = 60;
+/** 표준 웹앱 문서루트 후보 — 컨테이너 경로("/WEB-INF/…")의 repo 상대 해석에 사용. */
+const WEBAPP_ROOTS = ['src/main/webapp', 'WebContent', 'web', 'webapp'];
 /** 핸들러 사전 체인 후보 BFS 깊이(ActionBean → Service → Mapper). */
 const CHAIN_DEPTH = 2;
 /** 핸들러 1건당 체인 후보 상한(과다 팽창 방지). */
@@ -100,6 +106,26 @@ const HandlerDictEntrySchema = z.object({
         preCite: CitationSchema.nullable(),
     })),
 });
+/**
+ * 뷰 상수 사전 항목 — 앵커 파일 **전 범위**에서 결정론 추출한 뷰 경로 리터럴.
+ * 소스 슬라이스는 핸들러 앵커 주변 창이라 파일 상단의 뷰 상수 정의를 우연히만
+ * 담는다(jpetstore: Cart 는 창 안이라 jspFile 매핑 성공·Order 는 창 밖이라 미채움).
+ * 사전은 창과 무관하게 전 파일을 스캔하고 상수→repo 실경로 해결까지 동봉해
+ * 에이전트가 `ForwardResolution(상수)` 를 근거와 함께 jspFile 로 풀 수 있게 한다.
+ */
+const ViewConstantSchema = z.object({
+    /** 리터럴이 선언된 파일(repo 상대) — 인용(file:line) 대상. */
+    relPath: z.string(),
+    line: z.number().int().positive(),
+    /** `String NAME = "..."` 선언의 NAME(인라인 리터럴 등 파싱 불가 시 null). */
+    name: z.string().nullable(),
+    /** 리터럴 원문(컨테이너 경로, 예 "/WEB-INF/jsp/order/NewOrderForm.jsp"). */
+    value: z.string(),
+    /** repo 상대 실경로(KG 유일 대조 또는 웹앱 문서루트 실존 확인 통과). 미해결 null. */
+    resolvedPath: z.string().nullable(),
+    /** 선언 라인 verbatim(검증 통과 보장 인용용). */
+    snippet: z.string(),
+});
 /** 팬아웃 에이전트 1명이 읽는 자립 청크 — screens.json 의 부분집합 + pre-cite. */
 export const ScreenFillChunkSchema = z.object({
     schemaVersion: z.literal(1),
@@ -113,6 +139,8 @@ export const ScreenFillChunkSchema = z.object({
     files: z.array(BundleFileSchema),
     /** 청크 charCap 으로 슬라이스가 생략된 파일(조용한 누락 금지). */
     sliceOmitted: z.array(z.string()),
+    /** 앵커 파일들의 뷰 경로 리터럴 사전 — jspFile 채움의 결정론 근거(구판 청크 호환 default). */
+    viewConstants: z.array(ViewConstantSchema).default([]),
 });
 const ChunkIndexEntrySchema = z.object({
     chunkId: z.string(),
@@ -201,13 +229,8 @@ export async function readScreenFillChunkIndex(projectRoot) {
 // ──────────────────────────────────────────────────────────────────────────
 // pre-cite 추출(domain-map fill-fanout 과 동일 규칙, 헬퍼 재사용)
 // ──────────────────────────────────────────────────────────────────────────
-/**
- * 실파일에서 검증 통과가 보장된 인용 1건을 결정론으로 추출한다.
- * 후보 순서: 앵커 라인 → 아래로 PRECITE_SCAN_LINES → 위로 PRECITE_SCAN_LINES.
- * verify.ts 와 동일 규칙(normalizeCitationText/isTrivialSnippet)을 공유하고,
- * CitationSchema 의 snippet min 8 도 함께 보장한다. 실패는 null(정직 보고).
- */
-async function extractPreCite(projectRoot, relPath, anchorLine, cache) {
+/** relPath 의 라인 배열을 캐시 경유로 읽는다(읽기 실패는 null 캐시 — 정직 보고). */
+async function loadLinesCached(projectRoot, relPath, cache) {
     let lines = cache.get(relPath);
     if (lines === undefined) {
         try {
@@ -218,6 +241,116 @@ async function extractPreCite(projectRoot, relPath, anchorLine, cache) {
         }
         cache.set(relPath, lines);
     }
+    return lines;
+}
+/** KG 노드에서 JSP 목록을 읽는다(KG 부재/파손 시 null — 호출측이 fs 폴백). */
+function readGraphJsps(projectRoot) {
+    const kgPath = join(projectRoot, '.understand-anything', 'knowledge-graph.json');
+    if (!existsSync(kgPath))
+        return null;
+    try {
+        const kg = JSON.parse(readFileSync(kgPath, 'utf8'));
+        return listJspFilesFromGraph(kg.nodes ?? []);
+    }
+    catch {
+        return null;
+    }
+}
+/**
+ * 뷰 리터럴(컨테이너 경로)을 repo 상대 실경로로 해석한다.
+ * 1) KG JSP 목록과 suffix 대조(유일 일치만 — 동명 다수는 단정 금지),
+ * 2) 웹앱 문서루트 후보 + 경로의 실존 확인. 실패는 null(합성 금지).
+ */
+function resolveViewPath(projectRoot, value, graphJsps) {
+    const clean = value.replace(/^\/+/, '');
+    if (graphJsps) {
+        const matches = graphJsps.filter((p) => p === clean || p.endsWith(`/${clean}`));
+        if (matches.length === 1)
+            return matches[0];
+    }
+    for (const rootDir of WEBAPP_ROOTS) {
+        const candidate = `${rootDir}/${clean}`;
+        if (existsSync(join(projectRoot, candidate)))
+            return candidate;
+    }
+    return null;
+}
+/** 상속 부모 추적 홉 상한 — AbstractActionBean 류 공용 상수(예: ERROR)까지 커버. */
+const SUPERCLASS_HOPS = 3;
+/**
+ * 앵커 파일 목록을 상속 부모(같은 디렉터리의 `extends X` → X.java)로 확장한다.
+ * 공용 뷰 상수(jpetstore: AbstractActionBean.ERROR)가 부모에 선언되는 전형을
+ * 결정론으로 커버한다 — 패키지 밖/소스 밖 부모는 침묵 생략(합성 금지).
+ */
+async function expandWithSuperclasses(projectRoot, relPaths, cache) {
+    const visited = new Set(relPaths);
+    let frontier = [...relPaths];
+    for (let hop = 0; hop < SUPERCLASS_HOPS && frontier.length > 0; hop++) {
+        const next = [];
+        for (const relPath of frontier) {
+            const lines = await loadLinesCached(projectRoot, relPath, cache);
+            if (!lines)
+                continue;
+            for (const line of lines) {
+                const m = /\bclass\s+[A-Za-z_$][\w$]*\s+extends\s+([A-Za-z_$][\w$]*)/.exec(line);
+                if (!m)
+                    continue;
+                const dir = relPath.includes('/') ? relPath.slice(0, relPath.lastIndexOf('/')) : '';
+                const superPath = dir ? `${dir}/${m[1]}.java` : `${m[1]}.java`;
+                if (!visited.has(superPath) && existsSync(join(projectRoot, superPath))) {
+                    visited.add(superPath);
+                    next.push(superPath);
+                }
+            }
+        }
+        frontier = next;
+    }
+    return [...visited];
+}
+/**
+ * 앵커 파일들(+상속 부모)을 **전 범위** 스캔해 뷰 상수 사전을 만든다(파일 정렬·라인 순
+ * 결정론). 슬라이스 창(extractPreCite ±PRECITE_SCAN_LINES·번들 슬라이스)은 앵커 주변만
+ * 담아 파일 상단의 뷰 상수 정의를 놓친다 — 사전은 창과 독립이라 이 갭을 결정론으로
+ * 막는다. 스니펫은 실파일 라인 verbatim(min 8)이라 인용 검증을 통과한다. 상한 초과분은
+ * 잘라낸다(전형 규모에선 도달하지 않음 — 도달 시에도 스키마상 개수로 드러난다).
+ */
+async function scanViewConstants(projectRoot, relPaths, cache, graphJsps) {
+    const out = [];
+    const scanPaths = await expandWithSuperclasses(projectRoot, relPaths, cache);
+    for (const relPath of scanPaths.sort(cmp)) {
+        const lines = await loadLinesCached(projectRoot, relPath, cache);
+        if (!lines)
+            continue;
+        for (let i = 0; i < lines.length && out.length < VIEW_CONSTANT_CAP; i++) {
+            const m = VIEW_LITERAL_RE.exec(lines[i]);
+            if (!m)
+                continue;
+            const snippet = lines[i].trim().slice(0, PRECITE_SNIPPET_MAX);
+            if (snippet.length < 8)
+                continue;
+            const nameMatch = /String\s+([A-Za-z_$][\w$]*)\s*=/.exec(lines[i]);
+            out.push({
+                relPath,
+                line: i + 1,
+                name: nameMatch ? nameMatch[1] : null,
+                value: m[1],
+                resolvedPath: resolveViewPath(projectRoot, m[1], graphJsps),
+                snippet,
+            });
+        }
+        if (out.length >= VIEW_CONSTANT_CAP)
+            break;
+    }
+    return out;
+}
+/**
+ * 실파일에서 검증 통과가 보장된 인용 1건을 결정론으로 추출한다.
+ * 후보 순서: 앵커 라인 → 아래로 PRECITE_SCAN_LINES → 위로 PRECITE_SCAN_LINES.
+ * verify.ts 와 동일 규칙(normalizeCitationText/isTrivialSnippet)을 공유하고,
+ * CitationSchema 의 snippet min 8 도 함께 보장한다. 실패는 null(정직 보고).
+ */
+async function extractPreCite(projectRoot, relPath, anchorLine, cache) {
+    const lines = await loadLinesCached(projectRoot, relPath, cache);
     if (!lines)
         return null;
     const anchor = Math.min(Math.max(1, anchorLine), lines.length);
@@ -355,6 +488,8 @@ export async function prepScreenFill(projectRoot, options = {}) {
         }
     }
     const fileCache = new Map();
+    // 뷰 상수 실경로 해석용 KG JSP 목록(1회 로드, KG 부재 시 null → fs 폴백).
+    const graphJsps = readGraphJsps(projectRoot);
     const entries = [];
     const paths = [];
     let totalScreens = 0;
@@ -423,6 +558,8 @@ export async function prepScreenFill(projectRoot, options = {}) {
                 used += slice.text.length;
             files.push({ relPath, className: null, line: anchorLine, slice, kgHint: null });
         }
+        // 뷰 상수 사전 — 슬라이스 창 밖의 상수 정의까지 전 파일 스캔(jspFile 채움 근거).
+        const viewConstants = await scanViewConstants(projectRoot, relPaths, fileCache, graphJsps);
         const chunk = {
             schemaVersion: 1,
             gitCommit: file.gitCommit,
@@ -432,6 +569,7 @@ export async function prepScreenFill(projectRoot, options = {}) {
             handlerDict: dict,
             files,
             sliceOmitted,
+            viewConstants,
         };
         const filePath = chunkPath(projectRoot, chunkId);
         await writeFile(filePath, stableJson(ScreenFillChunkSchema.parse(chunk)), 'utf8');
@@ -544,16 +682,8 @@ export async function auditScreenFillFragments(projectRoot, only) {
 }
 /** KG 가 있으면 unmatchedJsps 를 재계산한다(understand-screens.mjs recomputeUnmatched 동형). */
 function recomputeUnmatched(projectRoot, screens, fragments) {
-    const kgPath = join(projectRoot, '.understand-anything', 'knowledge-graph.json');
-    if (!existsSync(kgPath))
-        return null;
-    try {
-        const kg = JSON.parse(readFileSync(kgPath, 'utf8'));
-        return reconcileJsps(listJspFilesFromGraph(kg.nodes ?? []), screens, fragments);
-    }
-    catch {
-        return null;
-    }
+    const jsps = readGraphJsps(projectRoot);
+    return jsps ? reconcileJsps(jsps, screens, fragments) : null;
 }
 /**
  * 조각이 가져온 handler.evidence 진위를 실파일과 대조한다(map fill verify 와 동형).

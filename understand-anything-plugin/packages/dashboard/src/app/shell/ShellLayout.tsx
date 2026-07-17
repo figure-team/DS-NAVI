@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from "react";
+import { useEffect, useRef, useState, useCallback, lazy, Suspense } from "react";
 import { Outlet } from "react-router";
 import { useDashboardStore } from "../../store";
 import NavRail from "./NavRail";
@@ -7,16 +7,11 @@ import MobileTabBar from "./MobileTabBar";
 import WarningBanner from "../../components/WarningBanner";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useViewMode } from "../../hooks/useViewMode";
-import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
-import type { KeyboardShortcut } from "../../hooks/useKeyboardShortcuts";
-import { useI18n } from "../../contexts/I18nContext";
 import type { ShellContext } from "../Root";
 
 const CodeViewer = lazy(() => import("../../components/CodeViewer"));
 const ImpactAnalysisModal = lazy(() => import("../../components/ImpactAnalysisModal"));
-const KeyboardShortcutsHelp = lazy(
-  () => import("../../components/KeyboardShortcutsHelp"),
-);
+const HelpModal = lazy(() => import("../../components/HelpModal"));
 const OnboardingOverlay = lazy(() => import("../../components/OnboardingOverlay"));
 
 const ONBOARDING_DISMISSED_KEY = "ua-onboarding-dismissed-v1";
@@ -31,8 +26,9 @@ function shouldShowOnboarding(): boolean {
 
 /**
  * 셸 골격 (FRONT_REDESIGN §4, P2) — NavRail + TopBar + Outlet에 더해
- * 전역 레이어(코드뷰어, 단축키+도움말, 온보딩, 경로찾기/영향도 모달, 검증 배너)를
- * 1회 마운트한다. 모바일은 NavRail 대신 하단 섹션 탭바(MobileTabBar) — 반응형 통합.
+ * 전역 레이어(코드뷰어, 도움말, 온보딩, 영향도 모달, 검증 배너)를 1회 마운트한다.
+ * 모바일은 NavRail 대신 하단 섹션 탭바(MobileTabBar) — 반응형 통합.
+ * 단축키는 은퇴(2026-07-18) — Escape 의 다단계 뒤로가기만 표준 UX 관례로 남겼다.
  */
 export default function ShellLayout(ctx: ShellContext) {
   const { accessToken, loadError, graphIssues } = ctx;
@@ -44,11 +40,10 @@ export default function ShellLayout(ctx: ShellContext) {
   const resetTransientOnSectionChange = useDashboardStore(
     (s) => s.resetTransientOnSectionChange,
   );
-  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding);
   const isMobile = useIsMobile();
   const mode = useViewMode();
-  const { t } = useI18n();
 
   // 브라우저 탭 타이틀 — 프로젝트가 로드되면 "프로젝트명 · DS-NAVI".
   const projectName = useDashboardStore((s) => s.graph?.project.name);
@@ -81,87 +76,34 @@ export default function ShellLayout(ctx: ShellContext) {
     }
   }, [mode, resetTransientOnSectionChange]);
 
-  // Define keyboard shortcuts (구 LegacyDashboard에서 셸로 승격 — 전역 1회 등록)
-  const shortcuts = useMemo<KeyboardShortcut[]>(
-    () => [
-      // Help
-      {
-        key: "?",
-        shiftKey: true,
-        description: t.keyboardShortcuts.showHelp,
-        action: () => setShowKeyboardHelp((prev) => !prev),
-        category: "General",
-      },
-      // Navigation
-      {
-        key: "Escape",
-        description: t.keyboardShortcuts.escapeDesc,
-        action: () => {
-          // Read from store at invocation time to avoid stale closures
-          const state = useDashboardStore.getState();
-          if (state.codeViewerExpanded) {
-            state.collapseCodeViewer();
-          } else if (state.codeViewerOpen) {
-            state.closeCodeViewer();
-          } else if (state.selectedNodeId) {
-            state.selectNode(null);
-          } else if (state.activeFlowId) {
-            // ktds-fork: 선택 없는 흐름 스파인에서 Escape → 흐름 목록(도메인)으로 복귀
-            state.clearActiveFlow();
-          } else {
-            setShowKeyboardHelp(false);
-          }
-        },
-        category: "Navigation",
-      },
-      {
-        key: "/",
-        description: t.keyboardShortcuts.focusSearch,
-        action: () => {
-          const searchInput = document.querySelector<HTMLInputElement>(
-            '[data-testid="search-input"]'
-          );
-          searchInput?.focus();
-        },
-        category: "Navigation",
-      },
-      // View toggles
-      {
-        key: "d",
-        description: t.keyboardShortcuts.toggleDiff,
-        action: () => {
-          useDashboardStore.getState().toggleOverlay("diff");
-        },
-        category: "View",
-      },
-      {
-        key: "i",
-        description: t.keyboardShortcuts.toggleImpact,
-        action: () => {
-          useDashboardStore.getState().toggleOverlay("impact");
-        },
-        category: "View",
-      },
-      {
-        key: "r",
-        description: "위험 오버레이 토글",
-        action: () => {
-          useDashboardStore.getState().toggleOverlay("risk");
-        },
-        category: "View",
-      },
-    ],
-    [t]
-  );
-
-  // Register keyboard shortcuts
-  useKeyboardShortcuts(shortcuts);
+  // Escape 다단계 뒤로가기 — 코드뷰어 접기/닫기 → 노드 선택 해제 → 흐름 목록 복귀
+  // → 도움말 닫기. 스토어는 발화 시점에 읽는다(스테일 클로저 방지).
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      const state = useDashboardStore.getState();
+      if (state.codeViewerExpanded) {
+        state.collapseCodeViewer();
+      } else if (state.codeViewerOpen) {
+        state.closeCodeViewer();
+      } else if (state.selectedNodeId) {
+        state.selectNode(null);
+      } else if (state.activeFlowId) {
+        // ktds-fork: 선택 없는 흐름 스파인에서 Escape → 흐름 목록(도메인)으로 복귀
+        state.clearActiveFlow();
+      } else {
+        setShowHelp(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div className="h-screen w-screen flex bg-root text-text-primary noise-overlay">
-      {!isMobile && <NavRail onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />}
+      {!isMobile && <NavRail />}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        <TopBar accessToken={accessToken} onShowKeyboardHelp={() => setShowKeyboardHelp(true)} />
+        <TopBar accessToken={accessToken} onShowHelp={() => setShowHelp(true)} />
 
         {/* Validation warning banner */}
         {allIssues.length > 0 && !loadError && <WarningBanner issues={allIssues} />}
@@ -211,13 +153,10 @@ export default function ShellLayout(ctx: ShellContext) {
         </div>
       )}
 
-      {/* Keyboard shortcuts help modal */}
-      {showKeyboardHelp && (
+      {/* 도움말 모달 — 내용은 다음 작업에서 메뉴별 사용법으로 채운다. */}
+      {showHelp && (
         <Suspense fallback={null}>
-          <KeyboardShortcutsHelp
-            shortcuts={shortcuts}
-            onClose={() => setShowKeyboardHelp(false)}
-          />
+          <HelpModal onClose={() => setShowHelp(false)} />
         </Suspense>
       )}
 

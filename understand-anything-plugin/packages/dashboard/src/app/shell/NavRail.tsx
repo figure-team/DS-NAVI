@@ -15,7 +15,6 @@ import {
   iconReport,
   iconPolicy,
   iconDocs,
-  iconKbd,
 } from "./menuIcons";
 
 interface NavItem {
@@ -26,16 +25,12 @@ interface NavItem {
   group?: string;
 }
 
-interface Props {
-  onShowKeyboardHelp: () => void;
-}
-
 /**
  * 좌측 NavRail (FRONT_REDESIGN §4, 시안 mockup-shell-home 정합).
  * 활성 항목 = 중립 배경(bg-elevated) + 본문색 텍스트 + 액센트 아이콘·좌측 바(시안 규칙 —
- * 액센트 틴트 배경이 아님). 하단 유틸(테마·단축키)은 시안대로 레일 하단에.
+ * 액센트 틴트 배경이 아님). 하단 유틸(테마)은 시안대로 레일 하단에.
  */
-export default function NavRail({ onShowKeyboardHelp }: Props) {
+export default function NavRail() {
   const graph = useDashboardStore((s) => s.graph);
   const domainGraph = useDashboardStore((s) => s.domainGraph);
   const { t } = useI18n();
@@ -101,19 +96,11 @@ export default function NavRail({ onShowKeyboardHelp }: Props) {
         );
       })}
       <div className="flex-1" />
-      {/* 하단 유틸 — 시안: border-t 위에 테마·단축키 도움말. */}
+      {/* 하단 유틸 — 시안: border-t 위에 테마. (단축키 도움말은 은퇴 — 도움말은 TopBar 소유) */}
       <div className="border-t border-border-subtle pt-2 mt-2 flex flex-col gap-0.5">
         <div className="px-1.5">
           <ThemePicker />
         </div>
-        <button
-          type="button"
-          onClick={onShowKeyboardHelp}
-          className="flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[13px] text-text-muted hover:text-text-primary hover:bg-elevated transition-colors"
-        >
-          <span className="w-[16px] h-[16px] shrink-0">{iconKbd}</span>
-          단축키 도움말
-        </button>
       </div>
     </nav>
   );

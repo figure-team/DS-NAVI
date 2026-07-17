@@ -1,8 +1,10 @@
 import { useI18n } from "../contexts/I18nContext";
+import { useViewMode } from "../hooks/useViewMode";
 
 /**
  * 도움말 모달 — TopBar 물음표 버튼 전용(단축키 은퇴 후 용도 전환, 2026-07-18).
- * 내용 = CLI 명령 실행 순서(요약 리스트) + 명령별 설명·반영 메뉴.
+ * 내용은 현재 메뉴별로 다르다(사용자 확정): 홈(useViewMode null)에서만 CLI 실행 순서
+ * +명령별 설명, 나머지 메뉴는 사용법 안내가 채워질 때까지 플레이스홀더.
  * 순서·의존의 단일 참조는 docs/ktds/PIPELINE_ORDER.md — 파이프라인이 바뀌면 함께 갱신.
  */
 
@@ -71,6 +73,7 @@ const STEPS: { cmd: string; label: string; desc: string; menus: string }[] = [
 
 export default function HelpModal({ onClose }: { onClose: () => void }) {
   const { t } = useI18n();
+  const isHome = useViewMode() === null;
 
   return (
     <div
@@ -84,7 +87,9 @@ export default function HelpModal({ onClose }: { onClose: () => void }) {
         <div className="sticky top-0 glass-heavy border-b border-border-subtle px-6 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-heading text-text-primary">{t.drawer.help}</h2>
-            <p className="text-xs text-text-muted mt-1">CLI 명령 실행 순서와 각 명령이 채우는 메뉴</p>
+            {isHome && (
+              <p className="text-xs text-text-muted mt-1">CLI 명령 실행 순서와 각 명령이 채우는 메뉴</p>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -96,6 +101,12 @@ export default function HelpModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
+        {!isHome ? (
+          // 메뉴별 사용법은 아직 미작성 — 채워질 때까지 플레이스홀더(홈만 1차 완성).
+          <div className="p-6">
+            <p className="text-sm text-text-muted">이 메뉴의 사용법 안내가 준비 중입니다.</p>
+          </div>
+        ) : (
         <div className="p-6 space-y-6">
           {/* ① 실행 순서 요약 */}
           <section>
@@ -137,6 +148,7 @@ export default function HelpModal({ onClose }: { onClose: () => void }) {
             </div>
           </section>
         </div>
+        )}
       </div>
     </div>
   );

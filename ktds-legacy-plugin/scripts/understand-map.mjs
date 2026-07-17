@@ -65,6 +65,10 @@ function hasFlag(name) {
   return flags.includes(name)
 }
 
+/** fill 팬아웃 규모 게이트 — 이 값을 넘으면 인라인 대신 팬아웃 경로를 권장한다. */
+const FANOUT_GATE_DOMAINS = 8
+const FANOUT_GATE_FLOWS = 60
+
 const engine = await import(distEntry)
 
 switch (sub) {
@@ -532,10 +536,6 @@ function runTemplates() {
   console.log('')
   console.log('계층 템플릿을 프로젝트별로 바꾸려면 위 override 경로에 <계층>.md 를 두세요(편집 즉시 반영).')
 }
-
-/** fill 팬아웃 규모 게이트 — 이 값을 넘으면 인라인 대신 팬아웃 경로를 권장한다. */
-const FANOUT_GATE_DOMAINS = 8
-const FANOUT_GATE_FLOWS = 60
 
 async function runBundle() {
   const { buildBundles } = engine

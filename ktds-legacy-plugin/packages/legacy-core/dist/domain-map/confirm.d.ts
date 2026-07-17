@@ -27,6 +27,23 @@ export declare function mergeDomains(plan: ConfirmedPlan, fromKey: string, intoK
  * 마지막 루트가 빠진 도메인은 사라진다(빈 도메인은 skeleton 에서 무의미).
  */
 export declare function moveRoot(plan: ConfirmedPlan, root: string, toKey: string): ConfirmedPlan;
+/**
+ * 분할 — 도메인을 공통 prefix 아래 **첫 분기 디렉터리 토큰**으로 한 단계 쪼갠다
+ * (`uss` → `uss.ion`/`uss.olh`/…). 자동 분류기는 네임스페이스 아래 첫 토큰 하나만
+ * 도메인으로 잡으므로(classify.ts 과반 하강), 디렉터리가 3단 이상인 코드에서는
+ * 도메인 하나가 수백 흐름을 삼킨다. 그 경우 사람이 이 연산으로 경계를 내린다.
+ *
+ * **반복 적용이 설계다** — 한 번에 한 단계만 내려간다. `split uss` 뒤 여전히 큰
+ * `uss.ion` 은 `split uss.ion` 으로 또 내린다. 깊이를 전역 인자로 받지 않는 이유는
+ * 적정 깊이가 도메인마다 다르기 때문이다(egov 실측: uss 는 3단, sec 는 2단이 적정).
+ *
+ * 불변: key 는 skeleton ID 의 닻이라 부모 key 는 재사용하지 않고 새 key 를 만든다
+ * (`부모.토큰`). 자식은 부모 key 를 aliasKeys 로 물려받지 **않는다** — 물려받으면
+ * skeleton 의 alias→key 사상이 여러 자식으로 갈라져 비결정적이 된다(skeleton.ts).
+ * 그 대가로 후보 key 로 배정되던 파일들이 자식의 fileCount 에서 빠지지만, fileCount
+ * 는 도달성(sole)+루트로 다시 세어지므로 오히려 후보 뭉치보다 정확하다.
+ */
+export declare function splitDomain(plan: ConfirmedPlan, key: string): ConfirmedPlan;
 /** 제외 — 도메인을 빼고 key 를 excludedKeys 에 기록(정렬, 감사 추적). */
 export declare function excludeDomain(plan: ConfirmedPlan, key: string): ConfirmedPlan;
 /**

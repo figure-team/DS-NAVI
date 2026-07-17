@@ -263,7 +263,8 @@ async function runPlan() {
   reportClassifySignals(candidates)
   console.log('확정하려면: confirm --auto-approve --by <담당자>')
   console.log('경계를 고쳐 확정하려면: confirm --auto-approve --by <담당자> --ops <ops.json>')
-  console.log('  (ops: [{"op":"merge","from":…,"into":…} | {"op":"move","root":…,"to":…} | {"op":"exclude","key":…} | {"op":"rename","key":…,"name":…} | {"op":"group","key":"g:…","name":…,"members":[…]} | {"op":"ungroup","key":"g:…"}])')
+  console.log('  (ops: [{"op":"merge","from":…,"into":…} | {"op":"move","root":…,"to":…} | {"op":"exclude","key":…} | {"op":"rename","key":…,"name":…} | {"op":"group","key":"g:…","name":…,"members":[…]} | {"op":"ungroup","key":"g:…"} | {"op":"split","key":…}])')
+  console.log('  (split: 도메인을 하위 디렉터리 토큰으로 한 단계 쪼갠다 — uss → uss.ion/uss.olh/… 반복 적용 가능)')
   console.log('상단도메인 계층(LLM 그룹 분류)을 만들려면: group-input → SKILL group-classify 절차 참조')
 }
 
@@ -541,8 +542,13 @@ async function runBundle() {
   const { buildBundles } = engine
   const skeleton = readSkeletonOrExit()
   const nodeDetailTemplate = loadNodeDetailTemplate()
-  const { bundles, paths } = await buildBundles(projectRoot, skeleton, { nodeDetailTemplate })
+  const { bundles, paths, stale } = await buildBundles(projectRoot, skeleton, { nodeDetailTemplate })
   console.log(`도메인 번들 조립 완료 — ${projectRoot}`)
+  if (stale.length > 0) {
+    // 확정 플랜에서 사라진 key(split/merge/exclude 재확정)의 번들 — 남겨두면 fill-prep 이
+    // 유령 도메인으로 청크를 만든다. 지운 사실은 조용히 넘기지 않고 보고한다.
+    console.log(`  🧹 유령 번들 ${stale.length}개 삭제(확정 플랜에 없는 key): ${stale.join(', ')}`)
+  }
   console.log(`  도메인 ${bundles.length}개 번들(.spec/map/bundle/):`)
   for (const b of bundles) {
     const omitted = b.sliceOmitted.length > 0 ? ` (슬라이스 생략 ${b.sliceOmitted.length}개)` : ''
@@ -663,10 +669,25 @@ async function runEmit() {
   if (result.staleSkeleton) {
     console.log('  ⚠️ skeleton 이 옛 commit 산물입니다 — 라인 이동으로 정당한 인용이 강등될 수 있습니다(재scan 권장).')
   }
+  // CRUD 매트릭스 — 방금 쓴 domain-graph.json 에서 파생(대시보드 "데이터" 화면 입력).
+  // emit 이 그래프의 소유자라 여기서 함께 갱신해야 둘이 어긋나지 않는다.
+  const { exportCrudMatrix } = engine
+  let crud = null
+  try {
+    crud = exportCrudMatrix(projectRoot)
+  } catch (err) {
+    console.log(`  ⚠️ crud-matrix.json 산출 실패: ${err.message} (도메인 그래프는 정상 기록됨)`)
+  }
+
   console.log('')
   console.log('산출물:')
   console.log(`  ${result.domainGraphPath}  (U-A 호환 도메인 그래프)`)
   console.log(`  ${result.verifyReportPath}  (인용 검증 리포트)`)
+  if (crud) {
+    console.log(`  ${crud.outPath}  (CRUD 매트릭스 — 열 ${crud.columns} · 행 ${crud.rows})`)
+  } else {
+    console.log('  ⚠️ crud-matrix.json 미산출 — 표 섹션 없음(그래프에 flow 부재?). 데이터 화면이 빕니다.')
+  }
   console.log('동일 입력 재실행 시 byte-diff=0(NEEDS_REVIEW 항목은 [확인 필요] 마커로 보존).')
 }
 

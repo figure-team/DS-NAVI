@@ -329,8 +329,16 @@ describe('minimal KG — 계약 스모크(실제 소비 함수 호출)', () => {
     expect(result.success).toBe(true)
     expect(result.fatal).toBeUndefined()
     expect((result.data?.nodes.length ?? 0) >= 1).toBe(true)
-    // complexity:"low" 는 UA core COMPLEXITY_ALIASES 로 "simple" 치환(auto-corrected, 비치명적).
     expect(result.data?.nodes.every((n) => n.complexity === 'simple')).toBe(true)
+  })
+
+  it('UA core 자동 보정을 한 건도 유발하지 않는다(정식 어휘 — 대시보드 배너 소음 0)', () => {
+    // 과거엔 complexity:"low" 를 써서 COMPLEXITY_ALIASES 별칭 경로로 통과했다. 값은
+    // "simple" 로 치환돼 결과가 같았지만 노드마다 auto-corrected 이슈가 1건씩 쌓여
+    // 대시보드가 노드 수만큼 경고를 띄웠다(egov 11658건). 위 테스트는 치환 **결과**만
+    // 보므로 이 회귀를 못 잡는다 — 보정이 일어났는지 자체를 단언한다.
+    const result = validateGraph(buildMinimalKg(baseInputs()))
+    expect(result.issues.filter((i) => i.level === 'auto-corrected')).toEqual([])
   })
 
   it('orchestrator loadProjectGraph 가 하드 throw 없이 병합 그래프를 반환', async () => {

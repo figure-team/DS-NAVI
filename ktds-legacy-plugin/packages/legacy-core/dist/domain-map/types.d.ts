@@ -420,6 +420,9 @@ export declare const PlanOpSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
 }, z.core.$strip>, z.ZodObject<{
     op: z.ZodLiteral<"ungroup">;
     key: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    op: z.ZodLiteral<"split">;
+    key: z.ZodString;
 }, z.core.$strip>], "op">;
 export type PlanOp = z.infer<typeof PlanOpSchema>;
 export declare const PlanOpsSchema: z.ZodArray<z.ZodDiscriminatedUnion<[z.ZodObject<{
@@ -445,9 +448,14 @@ export declare const PlanOpsSchema: z.ZodArray<z.ZodDiscriminatedUnion<[z.ZodObj
 }, z.core.$strip>, z.ZodObject<{
     op: z.ZodLiteral<"ungroup">;
     key: z.ZodString;
+}, z.core.$strip>, z.ZodObject<{
+    op: z.ZodLiteral<"split">;
+    key: z.ZodString;
 }, z.core.$strip>], "op">>;
 /** 그룹 키 접두 — 도메인 key/aliasKeys 공간과 충돌을 원천 차단하는 네임스페이스. */
 export declare const GROUP_KEY_PREFIX = "g:";
+/** split 로 생긴 하위 도메인 key 의 계층 구분자(`uss` → `uss.ion`). 반복 split 시 중첩된다. */
+export declare const SPLIT_KEY_SEPARATOR = ".";
 /**
  * 상단도메인(그룹) — 서브도메인 위의 비파괴 표시/내비 계층(DOMAIN_HIERARCHY).
  * 분류의 진실(파일 귀속·도메인 key)은 불변이고, 그룹은 plan 레벨 오버레이다.
@@ -541,7 +549,20 @@ export declare const UaGraphEdgeTypeSchema: z.ZodEnum<{
     calls: "calls";
 }>;
 export type UaGraphEdgeType = z.infer<typeof UaGraphEdgeTypeSchema>;
-/** U-A domain-graph 호환 엣지. weight 는 flow_step 의 단조 진행도(마지막≈1). */
+/**
+ * U-A domain-graph 호환 엣지. weight 는 flow_step 의 단조 진행도(마지막≈1).
+ *
+ * `direction` 은 항상 'forward' — 세 엣지 종류(contains_flow/flow_step/calls)가 전부
+ * 단방향 포함·진행 관계라 backward/bidirectional 이 성립하지 않는다. UA EdgeSchema 는
+ * direction 을 필수로 요구하는데(core/src/schema.ts), 예전엔 이 필드를 아예 안 써서
+ * 검증기가 엣지마다 'forward' 를 채워 넣고 auto-corrected 이슈를 1건씩 쌓았다
+ * (egov 실측 11776건). 값이 자명하므로 생성 시점에 명시한다.
+ *
+ * `.default()` 인 이유(필수 아님): 이 스키마는 **읽기 경로**이기도 하다 — 이미 디스크에
+ * 있는 skeleton.json 은 direction 없이 기록됐고, 필수로 만들면 기존 산출물이 전부 파싱
+ * 실패한다(재-scan 강요). 기본값으로 두면 낡은 파일도 그대로 읽히면서 'forward' 가
+ * 채워지고, 새로 쓰는 산출물은 필드를 명시적으로 갖는다.
+ */
 export declare const UaGraphEdgeSchema: z.ZodObject<{
     source: z.ZodString;
     target: z.ZodString;
@@ -550,6 +571,7 @@ export declare const UaGraphEdgeSchema: z.ZodObject<{
         flow_step: "flow_step";
         calls: "calls";
     }>;
+    direction: z.ZodDefault<z.ZodLiteral<"forward">>;
     weight: z.ZodOptional<z.ZodNumber>;
     description: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
@@ -605,6 +627,7 @@ export declare const SkeletonReportSchema: z.ZodObject<{
             flow_step: "flow_step";
             calls: "calls";
         }>;
+        direction: z.ZodDefault<z.ZodLiteral<"forward">>;
         weight: z.ZodOptional<z.ZodNumber>;
         description: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>;

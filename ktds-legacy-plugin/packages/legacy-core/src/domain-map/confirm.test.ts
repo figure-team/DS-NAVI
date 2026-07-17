@@ -10,6 +10,7 @@ import {
   excludeDomain,
   groupDomains,
   ungroupDomains,
+  splitDomain,
   detectPlanDrift,
   planTable,
   parsePlanOps,
@@ -305,5 +306,93 @@ describe('confirm — group/ungroup (DOMAIN_HIERARCHY)', () => {
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }
+  })
+})
+
+/** egov 실측 형태의 3단 도메인 — uss/{ion,olh}/…/web/*Controller.java + 직속 루트. */
+function deepPlan(): ConfirmedPlan {
+  return {
+    schemaVersion: 1,
+    gitCommit: 'abc123',
+    decidedBy: 'tester',
+    domains: [
+      {
+        key: 'uss',
+        name: '사용자지원',
+        roots: [
+          'src/egovframework/com/uss/ion/nts/web/NoticeController.java',
+          'src/egovframework/com/uss/ion/wik/web/WikiController.java',
+          'src/egovframework/com/uss/olh/faq/web/FaqController.java',
+        ],
+        aliasKeys: [],
+      },
+    ],
+    excludedKeys: [],
+  }
+}
+
+describe('confirm — splitDomain (자동 분류기가 굵게 잡은 경계 내리기)', () => {
+  it('공통 prefix 아래 첫 분기 토큰으로 한 단계만 쪼갠다', () => {
+    const next = splitDomain(deepPlan(), 'uss')
+    expect(next.domains.map((d) => d.key)).toEqual(['uss.ion', 'uss.olh'])
+    // 한 단계만 — ion 은 nts/wik 로 더 갈라지지 않고 통째로 남는다.
+    expect(next.domains.find((d) => d.key === 'uss.ion')?.roots).toEqual([
+      'src/egovframework/com/uss/ion/nts/web/NoticeController.java',
+      'src/egovframework/com/uss/ion/wik/web/WikiController.java',
+    ])
+  })
+
+  it('반복 적용으로 다음 단계를 내린다(깊이는 도메인마다 사람이 고른다)', () => {
+    const next = splitDomain(splitDomain(deepPlan(), 'uss'), 'uss.ion')
+    expect(next.domains.map((d) => d.key)).toEqual(['uss.ion.nts', 'uss.ion.wik', 'uss.olh'])
+  })
+
+  it('자식은 부모 key 를 alias 로 물려받지 않는다(skeleton alias 사상 모호성 차단)', () => {
+    const next = splitDomain(deepPlan(), 'uss')
+    expect(next.domains.every((d) => d.aliasKeys.length === 0)).toBe(true)
+  })
+
+  it('계층 디렉터리는 도메인이 되지 않고 부모 직속으로 남는다', () => {
+    const plan = deepPlan()
+    plan.domains[0].roots = [...plan.domains[0].roots, 'src/egovframework/com/uss/web/IndexController.java']
+    const next = splitDomain(plan, 'uss')
+    expect(next.domains.map((d) => d.key)).toEqual(['uss', 'uss.ion', 'uss.olh'])
+    // 부모는 직속 루트만 남기고 생존 — web/ 이 uss.web 이 되지 않는다.
+    expect(next.domains.find((d) => d.key === 'uss')?.roots).toEqual([
+      'src/egovframework/com/uss/web/IndexController.java',
+    ])
+  })
+
+  it('쪼갤 분기가 없으면 조용히 통과하지 않고 이유를 던진다', () => {
+    const plan = deepPlan()
+    plan.domains[0].roots = ['src/egovframework/com/cmm/web/A.java', 'src/egovframework/com/cmm/web/B.java']
+    expect(() => splitDomain(plan, 'uss')).toThrow(/분할할 수 없습니다/)
+  })
+
+  it('갈라지지 않는 통과 세그먼트는 건너뛴다(egov ssi/syi 형태 — 자식 1개짜리 층 방지)', () => {
+    const plan = deepPlan()
+    plan.domains[0].roots = [
+      'src/egovframework/com/ssi/syi/iis/web/A.java',
+      'src/egovframework/com/ssi/syi/ims/web/B.java',
+    ]
+    // 공통 prefix 가 syi 까지 내려가므로 ssi.syi 라는 무의미한 1자식 층이 생기지 않고
+    // 바로 분기 지점(iis/ims)에서 갈린다 — split 을 두 번 부를 필요가 없다.
+    expect(splitDomain(plan, 'uss').domains.map((d) => d.key)).toEqual(['uss.iis', 'uss.ims'])
+  })
+
+  it('없는 key 는 오류', () => {
+    expect(() => splitDomain(deepPlan(), 'nope')).toThrow(/unknown domain key/)
+  })
+
+  it('부모가 속한 상단도메인은 자식들이 승계한다', () => {
+    const plan = groupDomains(deepPlan(), 'g:biz', '업무', ['uss'])
+    const next = splitDomain(plan, 'uss')
+    expect(next.groups).toEqual([{ key: 'g:biz', name: '업무', memberKeys: ['uss.ion', 'uss.olh'] }])
+  })
+
+  it('applyOps 로 ops 파일에서 재생된다(결정론 닻)', () => {
+    const ops = parsePlanOps([{ op: 'split', key: 'uss' }, { op: 'rename', key: 'uss.ion', name: '통합게시' }])
+    const next = applyOps(deepPlan(), ops)
+    expect(next.domains.find((d) => d.key === 'uss.ion')?.name).toBe('통합게시')
   })
 })

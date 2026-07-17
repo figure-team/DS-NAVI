@@ -9,6 +9,7 @@ export { MethodologySchema, DocStatusSchema, EvidenceSchema, ClaimSchema, TableR
 export { claim, claimUnits, confidenceTag, evidenceRate, inferredRatio } from './claims.js';
 export { parseDocTemplate, applyDocTemplate, DocTemplateSchema, DocTemplateSectionSchema, } from './doc-template.js';
 export { DOC_SET, buildDocSet } from './doc-set.js';
+export { exportCrudMatrix, CRUD_MATRIX_FILENAME } from './crud-export.js';
 export { renderMarkdown, renderSkeleton, CLAIMS_FENCE_OPEN, CLAIMS_FENCE_CLOSE, EMPTY_SECTION, } from './render.js';
 export { buildTechStack, buildArchitecture, buildFeatureSpec, buildApiSpec, buildDbSpec, buildProgramList, buildCrudMatrix, buildBatchList, buildImpactAnalysis, detectCycles, sortNodes, sortEdges, nodesOfType, nodesWithTag, edgesOfType, nodeEvidence, nodeClaim, inferred, unverified, displayName, summarySuffix, } from './builders/index.js';
 export { asBuiltMethodology, siStandardMethodology, getMethodology, listMethodologies, DEFAULT_METHODOLOGY, } from './methodology/index.js';

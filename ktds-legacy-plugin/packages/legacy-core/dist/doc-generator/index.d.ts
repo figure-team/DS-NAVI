@@ -13,6 +13,8 @@ export { parseDocTemplate, applyDocTemplate, DocTemplateSchema, DocTemplateSecti
 export type { DocTemplate, DocTemplateSection } from './doc-template.js';
 export { DOC_SET, buildDocSet } from './doc-set.js';
 export type { DocSetEntry } from './doc-set.js';
+export { exportCrudMatrix, CRUD_MATRIX_FILENAME } from './crud-export.js';
+export type { CrudExportResult, CrudMatrixExport } from './crud-export.js';
 export { renderMarkdown, renderSkeleton, CLAIMS_FENCE_OPEN, CLAIMS_FENCE_CLOSE, EMPTY_SECTION, } from './render.js';
 export { buildTechStack, buildArchitecture, buildFeatureSpec, buildApiSpec, buildDbSpec, buildProgramList, buildCrudMatrix, buildBatchList, buildImpactAnalysis, detectCycles, sortNodes, sortEdges, nodesOfType, nodesWithTag, edgesOfType, nodeEvidence, nodeClaim, inferred, unverified, displayName, summarySuffix, } from './builders/index.js';
 export type { DocInput } from './builders/index.js';

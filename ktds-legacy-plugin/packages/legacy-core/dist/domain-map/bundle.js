@@ -11,7 +11,7 @@
  * (조용한 누락 금지 — LLM 은 생략 파일에 인용 없는 주장을 만들 수 없고, S9 검증기가
  * 어차피 환각을 걸러낸다).
  */
-import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { readFile, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { z } from 'zod';
 import { specMapDir, stableJson } from './persist.js';
@@ -230,6 +230,30 @@ export async function buildBundles(projectRoot, skeleton, options = {}) {
         bundles.push(bundle);
         paths.push(filePath);
     }
-    return { bundles, paths };
+    const stale = await pruneStaleBundles(dir, bundles);
+    return { bundles, paths, stale };
+}
+/**
+ * 유령 번들 청소 — 확정 플랜에서 사라진 key 의 번들 파일을 지운다.
+ *
+ * bundle 은 도메인당 파일 1개를 쓰지만, key 를 없애는 연산(split/merge/exclude)으로
+ * 재확정하면 옛 key 의 파일이 디스크에 남는다. fill-prep 은 이 디렉터리를 통째로 읽으므로
+ * 유령이 그대로 청크가 되어 팬아웃 비용을 부풀리고 emit 에 없는 도메인을 만든다
+ * (egov 실측: split 재확정 후 136 도메인인데 fill-prep 이 145 도메인·2392 흐름을 봤다 —
+ * 유령 9개가 1183 흐름을 얹었다). 삭제 목록은 호출자가 사용자에게 보고한다(조용한 삭제 금지).
+ */
+async function pruneStaleBundles(dir, bundles) {
+    const live = new Set(bundles.map((b) => `${safeKeyFilename(b.key)}.json`));
+    let entries;
+    try {
+        entries = await readdir(dir);
+    }
+    catch {
+        return [];
+    }
+    const stale = entries.filter((f) => f.endsWith('.json') && !live.has(f)).sort(cmp);
+    for (const f of stale)
+        await rm(join(dir, f), { force: true });
+    return stale;
 }
 //# sourceMappingURL=bundle.js.map

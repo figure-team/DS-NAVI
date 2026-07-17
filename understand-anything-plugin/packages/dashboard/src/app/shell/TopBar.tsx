@@ -7,14 +7,14 @@ import { iconForMode } from "./menuIcons";
 
 interface Props {
   accessToken: string;
-  onShowKeyboardHelp: () => void;
+  onShowHelp: () => void;
 }
 
 /**
  * 상단 TopBar (FRONT_REDESIGN §4, 시안 mockup-shell-home 정합) —
  * 좌측 홈 아이콘 + 섹션 브레드크럼, 우측 옴니박스(⌘K) + 전역 액션.
  */
-export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
+export default function TopBar({ accessToken, onShowHelp }: Props) {
   const { t } = useI18n();
   const mode = useViewMode();
 
@@ -56,9 +56,9 @@ export default function TopBar({ accessToken, onShowKeyboardHelp }: Props) {
       {/* 영향도 분석 진행 인디케이터 + 완료 토스트 — 전역 레이어(항상 마운트). */}
       <ImpactJobIndicator />
       <button
-        onClick={onShowKeyboardHelp}
+        onClick={onShowHelp}
         className="text-text-muted hover:text-accent transition-colors"
-        title={t.keyboardShortcuts.showHelp}
+        title={t.drawer.help}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

@@ -80,13 +80,6 @@ export const iconPolicy = (
     <path d="M9.5 9.5h5M9.5 13h3.5" />
   </svg>
 );
-export const iconKbd = (
-  <svg {...svgProps}>
-    <rect x="3" y="6" width="18" height="12" rx="2" />
-    <path d="M7 10h.01M11 10h.01M15 10h.01M8 14h8" />
-  </svg>
-);
-
 /**
  * 현재 섹션(useViewMode 값)에 맞는 아이콘 — TopBar 좌측 섹션 아이콘용.
  * 구조 탭(structural)은 업무 지도 소속이라 도메인 아이콘을 승계. 미매핑/홈은 iconHome.

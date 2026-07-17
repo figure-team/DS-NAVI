@@ -1,0 +1,442 @@
+{
+  "domainId": "domain:order",
+  "files": [
+    {
+      "className": "Account",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/domain/Account.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "slice": {
+        "endLine": 96,
+        "startLine": 17,
+        "text": "\nimport java.io.Serializable;\n\nimport net.sourceforge.stripes.validation.Validate;\n\n/**\n * The Class Account.\n *\n * @author Eduardo Macarron\n */\npublic class Account implements Serializable {\n\n  private static final long serialVersionUID = 8751282105532159742L;\n\n  private String username;\n  private String password;\n  private String email;\n  private String firstName;\n  private String lastName;\n  private String status;\n  private String address1;\n  private String address2;\n  private String city;\n  private String state;\n  private String zip;\n  private String country;\n  private String phone;\n  private String favouriteCategoryId;\n  private String languagePreference;\n  private boolean listOption;\n  private boolean bannerOption;\n  private String bannerName;\n\n  public String getUsername() {\n    return username;\n  }\n\n  public void setUsername(String username) {\n    this.username = username;\n  }\n\n  public String getPassword() {\n    return password;\n  }\n\n  public void setPassword(String password) {\n    this.password = password;\n  }\n\n  public String getEmail() {\n    return email;\n  }\n\n  public void setEmail(String email) {\n    this.email = email;\n  }\n\n  public String getFirstName() {\n    return firstName;\n  }\n\n  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })\n  public void setFirstName(String firstName) {\n    this.firstName = firstName;\n  }\n\n  public String getLastName() {\n    return lastName;\n  }\n\n  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })\n  public void setLastName(String lastName) {\n    this.lastName = lastName;\n  }\n\n  public String getStatus() {\n    return status;\n  }\n\n  public void setStatus(String status) {",
+        "truncated": true
+      }
+    },
+    {
+      "className": "Cart",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/domain/Cart.java — java 파일",
+        "tags": []
+      },
+      "line": 32,
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "slice": {
+        "endLine": 101,
+        "startLine": 22,
+        "text": "import java.util.HashMap;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.Map;\n\n/**\n * The Class Cart.\n *\n * @author Eduardo Macarron\n */\npublic class Cart implements Serializable {\n\n  private static final long serialVersionUID = 8329559983943337176L;\n\n  private final Map<String, CartItem> itemMap = Collections.synchronizedMap(new HashMap<>());\n  private final List<CartItem> itemList = new ArrayList<>();\n\n  public Iterator<CartItem> getCartItems() {\n    return itemList.iterator();\n  }\n\n  public List<CartItem> getCartItemList() {\n    return itemList;\n  }\n\n  public int getNumberOfItems() {\n    return itemList.size();\n  }\n\n  public Iterator<CartItem> getAllCartItems() {\n    return itemList.iterator();\n  }\n\n  public boolean containsItemId(String itemId) {\n    return itemMap.containsKey(itemId);\n  }\n\n  /**\n   * Adds the item.\n   *\n   * @param item\n   *          the item\n   * @param isInStock\n   *          the is in stock\n   */\n  public void addItem(Item item, boolean isInStock) {\n    CartItem cartItem = itemMap.get(item.getItemId());\n    if (cartItem == null) {\n      cartItem = new CartItem();\n      cartItem.setItem(item);\n      cartItem.setQuantity(0);\n      cartItem.setInStock(isInStock);\n      itemMap.put(item.getItemId(), cartItem);\n      itemList.add(cartItem);\n    }\n    cartItem.incrementQuantity();\n  }\n\n  /**\n   * Removes the item by id.\n   *\n   * @param itemId\n   *          the item id\n   *\n   * @return the item\n   */\n  public Item removeItemById(String itemId) {\n    CartItem cartItem = itemMap.remove(itemId);\n    if (cartItem == null) {\n      return null;\n    } else {\n      itemList.remove(cartItem);\n      return cartItem.getItem();\n    }\n  }\n\n  /**\n   * Increment quantity by item id.\n   *\n   * @param itemId",
+        "truncated": true
+      }
+    },
+    {
+      "className": "Order",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/domain/Order.java — java 파일",
+        "tags": []
+      },
+      "line": 30,
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+      "slice": {
+        "endLine": 99,
+        "startLine": 20,
+        "text": "import java.util.ArrayList;\nimport java.util.Date;\nimport java.util.Iterator;\nimport java.util.List;\n\n/**\n * The Class Order.\n *\n * @author Eduardo Macarron\n */\npublic class Order implements Serializable {\n\n  private static final long serialVersionUID = 6321792448424424931L;\n\n  private int orderId;\n  private String username;\n  private Date orderDate;\n  private String shipAddress1;\n  private String shipAddress2;\n  private String shipCity;\n  private String shipState;\n  private String shipZip;\n  private String shipCountry;\n  private String billAddress1;\n  private String billAddress2;\n  private String billCity;\n  private String billState;\n  private String billZip;\n  private String billCountry;\n  private String courier;\n  private BigDecimal totalPrice;\n  private String billToFirstName;\n  private String billToLastName;\n  private String shipToFirstName;\n  private String shipToLastName;\n  private String creditCard;\n  private String expiryDate;\n  private String cardType;\n  private String locale;\n  private String status;\n  private List<LineItem> lineItems = new ArrayList<>();\n\n  public int getOrderId() {\n    return orderId;\n  }\n\n  public void setOrderId(int orderId) {\n    this.orderId = orderId;\n  }\n\n  public String getUsername() {\n    return username;\n  }\n\n  public void setUsername(String username) {\n    this.username = username;\n  }\n\n  public Date getOrderDate() {\n    return orderDate;\n  }\n\n  public void setOrderDate(Date orderDate) {\n    this.orderDate = orderDate;\n  }\n\n  public String getShipAddress1() {\n    return shipAddress1;\n  }\n\n  public void setShipAddress1(String shipAddress1) {\n    this.shipAddress1 = shipAddress1;\n  }\n\n  public String getShipAddress2() {\n    return shipAddress2;\n  }\n\n  public void setShipAddress2(String shipAddress2) {\n    this.shipAddress2 = shipAddress2;",
+        "truncated": true
+      }
+    },
+    {
+      "className": "ItemMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "slice": {
+        "endLine": 39,
+        "startLine": 18,
+        "text": "import java.util.List;\nimport java.util.Map;\n\nimport org.mybatis.jpetstore.domain.Item;\n\n/**\n * The Interface ItemMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface ItemMapper {\n\n  void updateInventoryQuantity(Map<String, Object> param);\n\n  int getInventoryQuantity(String itemId);\n\n  List<Item> getItemListByProduct(String productId);\n\n  Item getItem(String itemId);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "LineItemMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+      "slice": {
+        "endLine": 34,
+        "startLine": 17,
+        "text": "\nimport java.util.List;\n\nimport org.mybatis.jpetstore.domain.LineItem;\n\n/**\n * The Interface LineItemMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface LineItemMapper {\n\n  List<LineItem> getLineItemsByOrderId(int orderId);\n\n  void insertLineItem(LineItem lineItem);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "OrderMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+      "slice": {
+        "endLine": 38,
+        "startLine": 17,
+        "text": "\nimport java.util.List;\n\nimport org.mybatis.jpetstore.domain.Order;\n\n/**\n * The Interface OrderMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface OrderMapper {\n\n  List<Order> getOrdersByUsername(String username);\n\n  Order getOrder(int orderId);\n\n  void insertOrder(Order order);\n\n  void insertOrderStatus(Order order);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "SequenceMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+      "slice": {
+        "endLine": 31,
+        "startLine": 15,
+        "text": " */\npackage org.mybatis.jpetstore.mapper;\n\nimport org.mybatis.jpetstore.domain.Sequence;\n\n/**\n * The Interface SequenceMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface SequenceMapper {\n\n  Sequence getSequence(Sequence sequence);\n\n  void updateSequence(Sequence sequence);\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "OrderService",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/service/OrderService.java — java 파일",
+        "tags": []
+      },
+      "line": 37,
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "slice": {
+        "endLine": 106,
+        "startLine": 27,
+        "text": "import org.mybatis.jpetstore.mapper.OrderMapper;\nimport org.mybatis.jpetstore.mapper.SequenceMapper;\nimport org.springframework.stereotype.Service;\nimport org.springframework.transaction.annotation.Transactional;\n\n/**\n * The Class OrderService.\n *\n * @author Eduardo Macarron\n */\n@Service\npublic class OrderService {\n\n  private final ItemMapper itemMapper;\n  private final OrderMapper orderMapper;\n  private final SequenceMapper sequenceMapper;\n  private final LineItemMapper lineItemMapper;\n\n  public OrderService(ItemMapper itemMapper, OrderMapper orderMapper, SequenceMapper sequenceMapper,\n      LineItemMapper lineItemMapper) {\n    this.itemMapper = itemMapper;\n    this.orderMapper = orderMapper;\n    this.sequenceMapper = sequenceMapper;\n    this.lineItemMapper = lineItemMapper;\n  }\n\n  /**\n   * Insert order.\n   *\n   * @param order\n   *          the order\n   */\n  @Transactional\n  public void insertOrder(Order order) {\n    order.setOrderId(getNextId(\"ordernum\"));\n    order.getLineItems().forEach(lineItem -> {\n      String itemId = lineItem.getItemId();\n      Integer increment = lineItem.getQuantity();\n      Map<String, Object> param = new HashMap<>(2);\n      param.put(\"itemId\", itemId);\n      param.put(\"increment\", increment);\n      itemMapper.updateInventoryQuantity(param);\n    });\n\n    orderMapper.insertOrder(order);\n    orderMapper.insertOrderStatus(order);\n    order.getLineItems().forEach(lineItem -> {\n      lineItem.setOrderId(order.getOrderId());\n      lineItemMapper.insertLineItem(lineItem);\n    });\n  }\n\n  /**\n   * Gets the order.\n   *\n   * @param orderId\n   *          the order id\n   *\n   * @return the order\n   */\n  @Transactional\n  public Order getOrder(int orderId) {\n    Order order = orderMapper.getOrder(orderId);\n    order.setLineItems(lineItemMapper.getLineItemsByOrderId(orderId));\n\n    order.getLineItems().forEach(lineItem -> {\n      Item item = itemMapper.getItem(lineItem.getItemId());\n      item.setQuantity(itemMapper.getInventoryQuantity(lineItem.getItemId()));\n      lineItem.setItem(item);\n    });\n\n    return order;\n  }\n\n  /**\n   * Gets the orders by username.\n   *\n   * @param username\n   *          the username\n   *",
+        "truncated": true
+      }
+    },
+    {
+      "className": "AccountActionBean",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java — java 파일",
+        "tags": []
+      },
+      "line": 42,
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "slice": {
+        "endLine": 111,
+        "startLine": 32,
+        "text": "import org.mybatis.jpetstore.domain.Account;\nimport org.mybatis.jpetstore.domain.Product;\nimport org.mybatis.jpetstore.service.AccountService;\nimport org.mybatis.jpetstore.service.CatalogService;\n\n/**\n * The Class AccountActionBean.\n *\n * @author Eduardo Macarron\n */\n@SessionScope\npublic class AccountActionBean extends AbstractActionBean {\n\n  private static final long serialVersionUID = 5499663666155758178L;\n\n  private static final String NEW_ACCOUNT = \"/WEB-INF/jsp/account/NewAccountForm.jsp\";\n  private static final String EDIT_ACCOUNT = \"/WEB-INF/jsp/account/EditAccountForm.jsp\";\n  private static final String SIGNON = \"/WEB-INF/jsp/account/SignonForm.jsp\";\n\n  private static final List<String> LANGUAGE_LIST;\n  private static final List<String> CATEGORY_LIST;\n\n  @SpringBean\n  private transient AccountService accountService;\n  @SpringBean\n  private transient CatalogService catalogService;\n\n  private Account account = new Account();\n  private List<Product> myList;\n  private boolean authenticated;\n\n  static {\n    LANGUAGE_LIST = Collections.unmodifiableList(Arrays.asList(\"english\", \"japanese\"));\n    CATEGORY_LIST = Collections.unmodifiableList(Arrays.asList(\"FISH\", \"DOGS\", \"REPTILES\", \"CATS\", \"BIRDS\"));\n  }\n\n  public Account getAccount() {\n    return this.account;\n  }\n\n  public String getUsername() {\n    return account.getUsername();\n  }\n\n  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })\n  public void setUsername(String username) {\n    account.setUsername(username);\n  }\n\n  public String getPassword() {\n    return account.getPassword();\n  }\n\n  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })\n  public void setPassword(String password) {\n    account.setPassword(password);\n  }\n\n  public List<Product> getMyList() {\n    return myList;\n  }\n\n  public void setMyList(List<Product> myList) {\n    this.myList = myList;\n  }\n\n  public List<String> getLanguages() {\n    return LANGUAGE_LIST;\n  }\n\n  public List<String> getCategories() {\n    return CATEGORY_LIST;\n  }\n\n  public Resolution newAccountForm() {\n    return new ForwardResolution(NEW_ACCOUNT);\n  }\n\n  /**\n   * New account.",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CartActionBean",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java — java 파일",
+        "tags": []
+      },
+      "line": 37,
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "slice": {
+        "endLine": 106,
+        "startLine": 27,
+        "text": "import org.mybatis.jpetstore.domain.Cart;\nimport org.mybatis.jpetstore.domain.CartItem;\nimport org.mybatis.jpetstore.domain.Item;\nimport org.mybatis.jpetstore.service.CatalogService;\n\n/**\n * The Class CartActionBean.\n *\n * @author Eduardo Macarron\n */\n@SessionScope\npublic class CartActionBean extends AbstractActionBean {\n\n  private static final long serialVersionUID = -4038684592582714235L;\n\n  private static final String VIEW_CART = \"/WEB-INF/jsp/cart/Cart.jsp\";\n  private static final String CHECK_OUT = \"/WEB-INF/jsp/cart/Checkout.jsp\";\n\n  @SpringBean\n  private transient CatalogService catalogService;\n\n  private Cart cart = new Cart();\n  private String workingItemId;\n\n  public Cart getCart() {\n    return cart;\n  }\n\n  public void setCart(Cart cart) {\n    this.cart = cart;\n  }\n\n  public void setWorkingItemId(String workingItemId) {\n    this.workingItemId = workingItemId;\n  }\n\n  /**\n   * Adds the item to cart.\n   *\n   * @return the resolution\n   */\n  public Resolution addItemToCart() {\n\n    if (workingItemId == null || workingItemId.trim().isEmpty()) {\n      setMessage(\"Invalid item ID: cannot add item to cart.\");\n      return new ForwardResolution(ERROR);\n    }\n\n    if (cart.containsItemId(workingItemId)) {\n      cart.incrementQuantityByItemId(workingItemId);\n    } else {\n      // isInStock is a \"real-time\" property that must be updated\n      // every time an item is added to the cart, even if other\n      // item details are cached.\n      boolean isInStock = catalogService.isItemInStock(workingItemId);\n      Item item = catalogService.getItem(workingItemId);\n      cart.addItem(item, isInStock);\n    }\n\n    return new ForwardResolution(VIEW_CART);\n  }\n\n  /**\n   * Removes the item from cart.\n   *\n   * @return the resolution\n   */\n  public Resolution removeItemFromCart() {\n\n    if (workingItemId == null || workingItemId.trim().isEmpty()) {\n      setMessage(\"Invalid item ID: cannot remove item from cart.\");\n      return new ForwardResolution(ERROR);\n    }\n\n    Item item = cart.removeItemById(workingItemId);\n\n    if (item == null) {\n      setMessage(\"Attempted to remove null CartItem from Cart.\");\n      return new ForwardResolution(ERROR);\n    } else {",
+        "truncated": true
+      }
+    },
+    {
+      "className": "OrderActionBean",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java — java 파일",
+        "tags": []
+      },
+      "line": 107,
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "slice": {
+        "endLine": 176,
+        "startLine": 97,
+        "text": "\n  public List<Order> getOrderList() {\n    return orderList;\n  }\n\n  /**\n   * List orders.\n   *\n   * @return the resolution\n   */\n  public Resolution listOrders() {\n    HttpSession session = context.getRequest().getSession();\n    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");\n    orderList = orderService.getOrdersByUsername(accountBean.getAccount().getUsername());\n    return new ForwardResolution(LIST_ORDERS);\n  }\n\n  /**\n   * New order form.\n   *\n   * @return the resolution\n   */\n  public Resolution newOrderForm() {\n    HttpSession session = context.getRequest().getSession();\n    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");\n    CartActionBean cartBean = (CartActionBean) session.getAttribute(\"/actions/Cart.action\");\n\n    clear();\n    if (accountBean == null || !accountBean.isAuthenticated()) {\n      setMessage(\"You must sign on before attempting to check out.  Please sign on and try checking out again.\");\n      return new ForwardResolution(AccountActionBean.class);\n    } else if (cartBean != null) {\n      order.initOrder(accountBean.getAccount(), cartBean.getCart());\n      return new ForwardResolution(NEW_ORDER);\n    } else {\n      setMessage(\"An order could not be created because a cart could not be found.\");\n      return new ForwardResolution(ERROR);\n    }\n  }\n\n  /**\n   * New order.\n   *\n   * @return the resolution\n   */\n  public Resolution newOrder() {\n    HttpSession session = context.getRequest().getSession();\n\n    if (shippingAddressRequired) {\n      shippingAddressRequired = false;\n      return new ForwardResolution(SHIPPING);\n    } else if (!isConfirmed()) {\n      return new ForwardResolution(CONFIRM_ORDER);\n    } else if (getOrder() != null) {\n\n      orderService.insertOrder(order);\n\n      CartActionBean cartBean = (CartActionBean) session.getAttribute(\"/actions/Cart.action\");\n      cartBean.clear();\n\n      setMessage(\"Thank you, your order has been submitted.\");\n\n      return new ForwardResolution(VIEW_ORDER);\n    } else {\n      setMessage(\"An error occurred processing your order (order was null).\");\n      return new ForwardResolution(ERROR);\n    }\n  }\n\n  /**\n   * View order.\n   *\n   * @return the resolution\n   */\n  public Resolution viewOrder() {\n    HttpSession session = context.getRequest().getSession();\n\n    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"accountBean\");\n\n    order = orderService.getOrder(order.getOrderId());",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "OrderActionBean#listOrders",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "flowId": "flow:ANY /actions/Order.action?listOrders",
+      "line": 107,
+      "stepIds": [
+        "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+        "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+        "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+        "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+        "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java"
+      ]
+    },
+    {
+      "entryPoint": "OrderActionBean#newOrder",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "flowId": "flow:ANY /actions/Order.action?newOrder",
+      "line": 142,
+      "stepIds": [
+        "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+        "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+        "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/domain/Order.java",
+        "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+        "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+        "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+        "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java"
+      ]
+    },
+    {
+      "entryPoint": "OrderActionBean#newOrderForm",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "flowId": "flow:ANY /actions/Order.action?newOrderForm",
+      "line": 119,
+      "stepIds": [
+        "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+        "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+        "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Order.java",
+        "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+        "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
+      ]
+    },
+    {
+      "entryPoint": "OrderActionBean#viewOrder",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "flowId": "flow:ANY /actions/Order.action?viewOrder",
+      "line": 171,
+      "stepIds": [
+        "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+        "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+        "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/domain/Order.java",
+        "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+        "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+        "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+        "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+        "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "order",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/domain/Account.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/service/OrderService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/domain/Order.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/service/OrderService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Account.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Order.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/domain/Account.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/domain/Order.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/service/OrderService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java"
+    }
+  ]
+}

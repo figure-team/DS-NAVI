@@ -1,0 +1,924 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:cart",
+  "name": "장바구니",
+  "summary": {
+    "text": "고객이 고른 상품 항목을 세션 단위 장바구니에 담고, 조회·수량 변경·제거를 거쳐 주문 시작(체크아웃) 화면으로 넘기는 업무 영역이다. 장바구니는 세션 범위 객체로 보관되며, 담기·제거·수량변경·조회·체크아웃 다섯 개의 요청 처리로 구성된다.",
+    "citations": [
+      { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 37, "snippet": "@SessionScope" },
+      { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 48, "snippet": "  private Cart cart = new Cart();" },
+      { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 68, "snippet": "  public Resolution addItemToCart() {" }
+    ]
+  },
+  "entities": [
+    {
+      "text": "장바구니(Cart)는 항목 식별자별 조회를 위한 맵과 표시 순서를 유지하는 목록 두 가지로 담긴 항목을 이중 보관하며, 직렬화 가능한 세션 보관 객체다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 32, "snippet": "public class Cart implements Serializable {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 36, "snippet": "  private final Map<String, CartItem> itemMap = Collections.synchronizedMap(new HashMap<>());" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 37, "snippet": "  private final List<CartItem> itemList = new ArrayList<>();" }
+      ]
+    },
+    {
+      "text": "장바구니 항목(CartItem)은 대상 상품 항목, 수량, 재고 보유 여부, 합계 금액 네 가지 속성을 가진다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 31, "snippet": "  private Item item;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 32, "snippet": "  private int quantity;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 33, "snippet": "  private boolean inStock;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 34, "snippet": "  private BigDecimal total;" }
+      ]
+    },
+    {
+      "text": "상품 항목(Item)은 항목 식별자와 판매가를 보유하며, 장바구니 금액 계산의 단가 원천이 된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 30, "snippet": "  private String itemId;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 32, "snippet": "  private BigDecimal listPrice;" }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "장바구니에 이미 있는 항목을 다시 담으면 새 항목을 만들지 않고 기존 항목의 수량만 1 증가시킨다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 75, "snippet": "    if (cart.containsItemId(workingItemId)) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 76, "snippet": "      cart.incrementQuantityByItemId(workingItemId);" }
+      ]
+    },
+    {
+      "text": "재고 보유 여부는 캐시하지 않고 항목을 새로 담는 시점에 카탈로그에서 실시간으로 조회해 항목에 기록한다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 81, "snippet": "      boolean isInStock = catalogService.isItemInStock(workingItemId);" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 73, "snippet": "      cartItem.setInStock(isInStock);" }
+      ]
+    },
+    {
+      "text": "재고 보유 여부는 해당 항목의 재고 수량이 0보다 클 때 참으로 판정한다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 88, "snippet": "    return itemMapper.getInventoryQuantity(itemId) > 0;" }
+      ]
+    },
+    {
+      "text": "항목 식별자가 비어 있으면 담기·제거 요청을 처리하지 않고 안내 메시지와 함께 오류 화면으로 보낸다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 70, "snippet": "    if (workingItemId == null || workingItemId.trim().isEmpty()) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 71, "snippet": "      setMessage(\"Invalid item ID: cannot add item to cart.\");" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 97, "snippet": "      setMessage(\"Invalid item ID: cannot remove item from cart.\");" }
+      ]
+    },
+    {
+      "text": "장바구니에 없는 항목의 제거를 시도하면 오류 화면으로 보낸다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 103, "snippet": "    if (item == null) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 104, "snippet": "      setMessage(\"Attempted to remove null CartItem from Cart.\");" }
+      ]
+    },
+    {
+      "text": "수량 일괄 변경 시 입력 수량이 1 미만이면 해당 항목을 장바구니에서 제거한다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 126, "snippet": "        if (quantity < 1) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 127, "snippet": "          cartItems.remove();" }
+      ]
+    },
+    {
+      "text": "수량 입력이 숫자가 아니면 해당 항목의 수량 변경을 의도적으로 무시하고 다음 항목으로 넘어간다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 129, "snippet": "      } catch (NumberFormatException e) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 130, "snippet": "        // ignore invalid numeric input on purpose" }
+      ]
+    },
+    {
+      "text": "항목 합계 금액은 판매가에 수량을 곱해 산출하며, 상품 정보나 판매가가 없으면 합계를 비운다. 수량 설정·증가·상품 지정 시마다 자동 재계산된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 72, "snippet": "    total = Optional.ofNullable(item).map(Item::getListPrice).map(v -> v.multiply(new BigDecimal(quantity)))" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 73, "snippet": "        .orElse(null);" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 63, "snippet": "    calculateTotal();" }
+      ]
+    },
+    {
+      "text": "장바구니 소계는 담긴 모든 항목의 판매가×수량을 합산해 산출한다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 119, "snippet": "  public BigDecimal getSubTotal() {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 121, "snippet": "        .map(cartItem -> cartItem.getItem().getListPrice().multiply(new BigDecimal(cartItem.getQuantity())))" }
+      ]
+    },
+    {
+      "text": "새로 담는 항목은 수량 0으로 만든 뒤 증가시키므로 최초 담기 수량은 1이 된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 72, "snippet": "      cartItem.setQuantity(0);" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 77, "snippet": "    cartItem.incrementQuantity();" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 67, "snippet": "    quantity++;" }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "text": "장바구니 담기는 카탈로그 서비스에 재고 보유 여부와 상품 항목 정보를 요청해 항목을 구성한다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 46, "snippet": "  private transient CatalogService catalogService;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 82, "snippet": "      Item item = catalogService.getItem(workingItemId);" }
+      ]
+    },
+    {
+      "text": "카탈로그 서비스는 상품 항목 매퍼를 통해 재고 수량과 항목 정보를 데이터베이스에서 읽어 온다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 38, "snippet": "  private final ItemMapper itemMapper;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 84, "snippet": "    return itemMapper.getItem(itemId);" }
+      ]
+    },
+    {
+      "text": "체크아웃 요청은 장바구니 내용을 주문 진행 화면으로 넘겨 주문 업무로 이어진다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 43, "snippet": "  private static final String CHECK_OUT = \"/WEB-INF/jsp/cart/Checkout.jsp\";" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 142, "snippet": "    return new ForwardResolution(CHECK_OUT);" }
+      ]
+    },
+    {
+      "text": "장바구니 비우기 기능이 제공되어 주문 완료 등 외부 시점에 장바구니를 새로 만들고 작업 항목 식별자를 초기화할 수 있다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 145, "snippet": "  public void clear() {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 146, "snippet": "    cart = new Cart();" }
+      ]
+    }
+  ],
+  "businessFlows": [
+    {
+      "title": "장바구니 담기",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "담기 요청" },
+        {
+          "id": "v",
+          "kind": "decision",
+          "label": "항목 식별자 유효?",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 70, "snippet": "    if (workingItemId == null || workingItemId.trim().isEmpty()) {" }
+          ]
+        },
+        {
+          "id": "err",
+          "kind": "activity",
+          "label": "오류 안내 표시",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 71, "snippet": "      setMessage(\"Invalid item ID: cannot add item to cart.\");" }
+          ]
+        },
+        {
+          "id": "d",
+          "kind": "decision",
+          "label": "이미 담긴 항목?",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 75, "snippet": "    if (cart.containsItemId(workingItemId)) {" }
+          ]
+        },
+        {
+          "id": "inc",
+          "kind": "activity",
+          "label": "기존 항목 수량 1 증가",
+          "flowRef": "flow:ANY /actions/Cart.action?addItemToCart",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 76, "snippet": "      cart.incrementQuantityByItemId(workingItemId);" }
+          ]
+        },
+        {
+          "id": "stk",
+          "kind": "activity",
+          "label": "실시간 재고 보유 확인",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 81, "snippet": "      boolean isInStock = catalogService.isItemInStock(workingItemId);" }
+          ]
+        },
+        {
+          "id": "get",
+          "kind": "activity",
+          "label": "상품 항목 정보 조회",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 82, "snippet": "      Item item = catalogService.getItem(workingItemId);" }
+          ]
+        },
+        {
+          "id": "add",
+          "kind": "activity",
+          "label": "새 항목 수량 1로 추가",
+          "flowRef": "flow:ANY /actions/Cart.action?addItemToCart",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 83, "snippet": "      cart.addItem(item, isInStock);" }
+          ]
+        },
+        {
+          "id": "view",
+          "kind": "activity",
+          "label": "장바구니 화면으로 이동",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 86, "snippet": "    return new ForwardResolution(VIEW_CART);" }
+          ]
+        },
+        { "id": "e", "kind": "end", "label": "완료" }
+      ],
+      "edges": [
+        { "from": "s", "to": "v" },
+        { "from": "v", "to": "err", "label": "NO" },
+        { "from": "v", "to": "d", "label": "YES" },
+        { "from": "err", "to": "e" },
+        { "from": "d", "to": "inc", "label": "YES" },
+        { "from": "d", "to": "stk", "label": "NO" },
+        { "from": "stk", "to": "get" },
+        { "from": "get", "to": "add" },
+        { "from": "inc", "to": "view" },
+        { "from": "add", "to": "view" },
+        { "from": "view", "to": "e" }
+      ]
+    },
+    {
+      "title": "장바구니 조회",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "조회 요청" },
+        {
+          "id": "a",
+          "kind": "activity",
+          "label": "세션 장바구니 확보",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 48, "snippet": "  private Cart cart = new Cart();" }
+          ]
+        },
+        {
+          "id": "b",
+          "kind": "activity",
+          "label": "장바구니 화면 표시",
+          "flowRef": "flow:ANY /actions/Cart.action?viewCart",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 138, "snippet": "    return new ForwardResolution(VIEW_CART);" }
+          ]
+        },
+        { "id": "e", "kind": "end", "label": "완료" }
+      ],
+      "edges": [
+        { "from": "s", "to": "a" },
+        { "from": "a", "to": "b" },
+        { "from": "b", "to": "e" }
+      ]
+    },
+    {
+      "title": "수량 일괄 변경",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "수량 변경 요청" },
+        {
+          "id": "it",
+          "kind": "activity",
+          "label": "담긴 항목 순회",
+          "flowRef": "flow:ANY /actions/Cart.action?updateCartQuantities",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 119, "snippet": "    Iterator<CartItem> cartItems = getCart().getAllCartItems();" }
+          ]
+        },
+        {
+          "id": "p",
+          "kind": "decision",
+          "label": "입력 수량이 숫자?",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 129, "snippet": "      } catch (NumberFormatException e) {" }
+          ]
+        },
+        {
+          "id": "skip",
+          "kind": "activity",
+          "label": "해당 항목 변경 무시",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 130, "snippet": "        // ignore invalid numeric input on purpose" }
+          ]
+        },
+        {
+          "id": "set",
+          "kind": "activity",
+          "label": "항목 수량 반영",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 125, "snippet": "        getCart().setQuantityByItemId(itemId, quantity);" }
+          ]
+        },
+        {
+          "id": "d",
+          "kind": "decision",
+          "label": "수량 1 미만?",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 126, "snippet": "        if (quantity < 1) {" }
+          ]
+        },
+        {
+          "id": "rm",
+          "kind": "activity",
+          "label": "항목 장바구니에서 제외",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 127, "snippet": "          cartItems.remove();" }
+          ]
+        },
+        {
+          "id": "view",
+          "kind": "activity",
+          "label": "장바구니 화면으로 이동",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 134, "snippet": "    return new ForwardResolution(VIEW_CART);" }
+          ]
+        },
+        { "id": "e", "kind": "end", "label": "완료" }
+      ],
+      "edges": [
+        { "from": "s", "to": "it" },
+        { "from": "it", "to": "p" },
+        { "from": "p", "to": "skip", "label": "NO" },
+        { "from": "p", "to": "set", "label": "YES" },
+        { "from": "set", "to": "d" },
+        { "from": "d", "to": "rm", "label": "YES" },
+        { "from": "d", "to": "view", "label": "NO" },
+        { "from": "rm", "to": "view" },
+        { "from": "skip", "to": "view" },
+        { "from": "view", "to": "e" }
+      ]
+    },
+    {
+      "title": "상품 제거",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "제거 요청" },
+        {
+          "id": "v",
+          "kind": "decision",
+          "label": "항목 식별자 유효?",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 96, "snippet": "    if (workingItemId == null || workingItemId.trim().isEmpty()) {" }
+          ]
+        },
+        {
+          "id": "err1",
+          "kind": "activity",
+          "label": "오류 안내 표시",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 97, "snippet": "      setMessage(\"Invalid item ID: cannot remove item from cart.\");" }
+          ]
+        },
+        {
+          "id": "rm",
+          "kind": "activity",
+          "label": "장바구니에서 항목 제거",
+          "flowRef": "flow:ANY /actions/Cart.action?removeItemFromCart",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 101, "snippet": "    Item item = cart.removeItemById(workingItemId);" }
+          ]
+        },
+        {
+          "id": "d",
+          "kind": "decision",
+          "label": "제거 대상 존재?",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 103, "snippet": "    if (item == null) {" }
+          ]
+        },
+        {
+          "id": "err2",
+          "kind": "activity",
+          "label": "없는 항목 오류 안내",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 104, "snippet": "      setMessage(\"Attempted to remove null CartItem from Cart.\");" }
+          ]
+        },
+        {
+          "id": "view",
+          "kind": "activity",
+          "label": "장바구니 화면으로 이동",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 107, "snippet": "      return new ForwardResolution(VIEW_CART);" }
+          ]
+        },
+        { "id": "e", "kind": "end", "label": "완료" }
+      ],
+      "edges": [
+        { "from": "s", "to": "v" },
+        { "from": "v", "to": "err1", "label": "NO" },
+        { "from": "v", "to": "rm", "label": "YES" },
+        { "from": "rm", "to": "d" },
+        { "from": "d", "to": "err2", "label": "NO" },
+        { "from": "d", "to": "view", "label": "YES" },
+        { "from": "err1", "to": "e" },
+        { "from": "err2", "to": "e" },
+        { "from": "view", "to": "e" }
+      ]
+    },
+    {
+      "title": "주문 시작(체크아웃)",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "체크아웃 요청" },
+        {
+          "id": "a",
+          "kind": "activity",
+          "label": "세션 장바구니 내용 인계",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 51, "snippet": "  public Cart getCart() {" }
+          ]
+        },
+        {
+          "id": "b",
+          "kind": "activity",
+          "label": "주문 진행 화면 표시",
+          "flowRef": "flow:ANY /actions/Cart.action?checkOut",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 142, "snippet": "    return new ForwardResolution(CHECK_OUT);" }
+          ]
+        },
+        { "id": "e", "kind": "end", "label": "주문 업무로 인계" }
+      ],
+      "edges": [
+        { "from": "s", "to": "a" },
+        { "from": "a", "to": "b" },
+        { "from": "b", "to": "e" }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /actions/Cart.action?addItemToCart",
+      "name": "장바구니 담기",
+      "summary": {
+        "text": "요청받은 항목 식별자를 검증한 뒤, 이미 담긴 항목이면 수량을 1 증가시키고 새 항목이면 실시간 재고 보유 여부와 항목 정보를 조회해 장바구니에 추가한 다음 장바구니 화면으로 보낸다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 68, "snippet": "  public Resolution addItemToCart() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 75, "snippet": "    if (cart.containsItemId(workingItemId)) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 83, "snippet": "      cart.addItem(item, isInStock);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Cart.action?checkOut",
+      "name": "주문 시작(체크아웃)",
+      "summary": {
+        "text": "장바구니 내용을 확정해 주문 진행 화면으로 전달한다. 별도 검증이나 저장 없이 화면 전환만 수행한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 141, "snippet": "  public ForwardResolution checkOut() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 142, "snippet": "    return new ForwardResolution(CHECK_OUT);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Cart.action?removeItemFromCart",
+      "name": "장바구니 항목 제거",
+      "summary": {
+        "text": "항목 식별자를 검증한 뒤 장바구니에서 해당 항목을 제거하고, 제거 대상이 없으면 오류 화면으로, 성공하면 장바구니 화면으로 보낸다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 94, "snippet": "  public Resolution removeItemFromCart() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 101, "snippet": "    Item item = cart.removeItemById(workingItemId);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 103, "snippet": "    if (item == null) {" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Cart.action?updateCartQuantities",
+      "name": "장바구니 수량 일괄 변경",
+      "summary": {
+        "text": "장바구니에 담긴 항목을 순회하며 항목 식별자와 같은 이름의 요청 파라미터에서 수량을 읽어 반영하고, 1 미만이면 항목을 제거한다. 숫자가 아닌 입력은 무시한 뒤 장바구니 화면으로 보낸다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 116, "snippet": "  public Resolution updateCartQuantities() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 124, "snippet": "        int quantity = Integer.parseInt(request.getParameter(itemId));" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 126, "snippet": "        if (quantity < 1) {" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Cart.action?viewCart",
+      "name": "장바구니 조회",
+      "summary": {
+        "text": "세션에 보관된 장바구니 내용을 장바구니 화면으로 그대로 전달한다. 별도 로직 없이 화면 전환만 수행한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 137, "snippet": "  public ForwardResolution viewCart() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 138, "snippet": "    return new ForwardResolution(VIEW_CART);" }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "name": "담기 요청 처리",
+      "summary": {
+        "text": "담기 요청의 진입점으로, 항목 식별자를 검증하고 이미 담긴 항목과 신규 항목을 갈라 장바구니에 반영한 뒤 장바구니 화면으로 보낸다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 68, "snippet": "  public Resolution addItemToCart() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 86, "snippet": "    return new ForwardResolution(VIEW_CART);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "세션 범위로 보관되는 장바구니 액션 빈이 담기 요청을 받아, 재고·상품 조회는 카탈로그 서비스에 위임하고 항목 적재는 장바구니 객체에 위임한 뒤 장바구니 화면으로 포워딩한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 37, "snippet": "@SessionScope" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 46, "snippet": "  private transient CatalogService catalogService;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 83, "snippet": "      cart.addItem(item, isInStock);" }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터로 담을 항목 식별자를 바인딩 받으며, 값이 없거나 공백뿐이면 안내 메시지를 설정하고 오류 화면으로 포워딩한다. 별도의 인증·권한 검사는 이 처리에 없다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 59, "snippet": "  public void setWorkingItemId(String workingItemId) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 70, "snippet": "    if (workingItemId == null || workingItemId.trim().isEmpty()) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 72, "snippet": "      return new ForwardResolution(ERROR);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "name": "카탈로그 조회 서비스",
+      "summary": {
+        "text": "담기 시점에 필요한 재고 보유 여부와 상품 항목 정보를 매퍼를 통해 조회해 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 87, "snippet": "  public boolean isItemInStock(String itemId) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 83, "snippet": "  public Item getItem(String itemId)" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "스프링 서비스 빈으로서 카탈로그 조회를 담당하며, 장바구니 담기 흐름에서는 항목 정보와 재고 판정을 상품 항목 매퍼에 위임해 반환한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 34, "snippet": "@Service" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 38, "snippet": "  private final ItemMapper itemMapper;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 84, "snippet": "    return itemMapper.getItem(itemId);" }
+          ]
+        },
+        "businessLogic": {
+          "text": "재고 보유 판정 규칙을 보유한다. 항목의 재고 수량을 조회해 0보다 크면 보유로 판정한다. 별도의 트랜잭션 선언은 없다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 88, "snippet": "    return itemMapper.getInventoryQuantity(itemId) > 0;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "name": "상품 항목 매퍼",
+      "summary": {
+        "text": "상품 항목과 재고 수량을 데이터베이스에서 읽어 오는 마이바티스 매퍼 인터페이스다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java", "line": 28, "snippet": "public interface ItemMapper {" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "장바구니 담기 흐름에서 항목 단건 조회와 재고 수량 조회 두 가지 읽기 작업을 담당한다. 재고 수량 갱신 기능도 함께 정의되어 있으나 담기 흐름에서는 쓰이지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java", "line": 32, "snippet": "  int getInventoryQuantity(String itemId);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java", "line": 36, "snippet": "  Item getItem(String itemId);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java", "line": 30, "snippet": "  void updateInventoryQuantity(Map<String, Object> param);" }
+          ]
+        },
+        "persistence": {
+          "text": "항목 식별자를 받아 재고 수량을 정수로, 상품 항목을 도메인 객체로 매핑해 반환한다. 상품 단위 항목 목록 조회도 제공한다. 실제 SQL 은 매퍼 XML 에 외부화되어 있다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java", "line": 21, "snippet": "import org.mybatis.jpetstore.domain.Item;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java", "line": 34, "snippet": "  List<Item> getItemListByProduct(String productId);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java", "line": 36, "snippet": "  Item getItem(String itemId);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "name": "장바구니 항목 적재",
+      "summary": {
+        "text": "새 항목이면 수량 0으로 만들어 맵과 목록에 등록한 뒤 수량을 1 증가시키고, 이미 있는 항목이면 수량만 증가시킨다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 67, "snippet": "  public void addItem(Item item, boolean isInStock) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 104, "snippet": "  public void incrementQuantityByItemId(String itemId) {" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "담긴 항목들을 보관하는 세션 단위 집합 객체로서, 담기 흐름에서 항목 보유 여부 확인과 신규 항목 등록·수량 증가를 담당한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 55, "snippet": "  public boolean containsItemId(String itemId) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 68, "snippet": "    CartItem cartItem = itemMap.get(item.getItemId());" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 75, "snippet": "      itemList.add(cartItem);" }
+          ]
+        },
+        "dataShape": {
+          "text": "항목 식별자를 키로 하는 동기화 맵과 표시 순서를 유지하는 목록을 함께 보유한다. 두 자료구조는 같은 항목 집합을 가리켜야 하므로 등록·제거 시 항상 쌍으로 갱신된다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 36, "snippet": "  private final Map<String, CartItem> itemMap = Collections.synchronizedMap(new HashMap<>());" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 37, "snippet": "  private final List<CartItem> itemList = new ArrayList<>();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 74, "snippet": "      itemMap.put(item.getItemId(), cartItem);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+      "name": "장바구니 항목 생성",
+      "summary": {
+        "text": "담기 시 상품·수량·재고 보유 여부가 설정되며, 설정될 때마다 합계 금액이 재계산된다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 52, "snippet": "  public void setItem(Item item) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 66, "snippet": "  public void incrementQuantity() {" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "장바구니에 담긴 한 줄을 표현하는 데이터 객체로, 담기 흐름에서 상품 항목과 재고 보유 여부를 받아 수량을 누적하는 대상이 된다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 27, "snippet": "public class CartItem implements Serializable {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 40, "snippet": "  public void setInStock(boolean inStock) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 67, "snippet": "    quantity++;" }
+          ]
+        },
+        "dataShape": {
+          "text": "상품 항목·수량·재고 보유 여부·합계 금액을 가지며, 합계는 항상 판매가×수량으로 유지되고 상품이나 판매가가 없으면 비워진다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 31, "snippet": "  private Item item;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 34, "snippet": "  private BigDecimal total;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 72, "snippet": "    total = Optional.ofNullable(item).map(Item::getListPrice).map(v -> v.multiply(new BigDecimal(quantity)))" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/Item.java",
+      "name": "상품 항목 정보",
+      "summary": {
+        "text": "카탈로그에서 조회한 상품 항목으로, 항목 식별자와 판매가를 장바구니 항목에 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 44, "snippet": "  public String getItemId() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 76, "snippet": "  public BigDecimal getListPrice() {" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "담기 흐름에서 장바구니 맵의 키가 되는 항목 식별자와 합계 계산 단가인 판매가를 공급하는 데이터 객체다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 26, "snippet": "public class Item implements Serializable {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 30, "snippet": "  private String itemId;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 32, "snippet": "  private BigDecimal listPrice;" }
+          ]
+        },
+        "dataShape": {
+          "text": "항목 식별자·상품 식별자·판매가·원가·공급사·상태·부가속성 다섯 개와 소속 상품, 재고 수량을 보유한다. 항목 식별자는 설정 시 앞뒤 공백이 제거되어 저장된다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 31, "snippet": "  private String productId;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 41, "snippet": "  private Product product;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 49, "snippet": "    this.itemId = itemId.trim();" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?checkOut:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "name": "체크아웃 요청 처리",
+      "summary": {
+        "text": "장바구니 내용을 그대로 주문 진행 화면으로 포워딩한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 141, "snippet": "  public ForwardResolution checkOut() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 142, "snippet": "    return new ForwardResolution(CHECK_OUT);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "세션에 보관된 장바구니를 주문 진행 화면에 넘기는 전환 지점이다. 별도 서비스 위임이나 저장 없이 화면 경로만 결정한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 43, "snippet": "  private static final String CHECK_OUT = \"/WEB-INF/jsp/cart/Checkout.jsp\";" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 142, "snippet": "    return new ForwardResolution(CHECK_OUT);" }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터를 받지 않으며 검증이나 인증·권한 검사도 수행하지 않는다. 세션 범위 액션 빈에 이미 보관된 장바구니를 사용한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 37, "snippet": "@SessionScope" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 141, "snippet": "  public ForwardResolution checkOut() {" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "name": "제거 요청 처리",
+      "summary": {
+        "text": "항목 식별자를 검증하고 장바구니에서 항목을 제거한 뒤, 대상이 없으면 오류 화면, 성공하면 장바구니 화면으로 포워딩한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 94, "snippet": "  public Resolution removeItemFromCart() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 101, "snippet": "    Item item = cart.removeItemById(workingItemId);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "제거 요청을 받아 항목 제거를 장바구니 객체에 위임하고, 제거 결과에 따라 오류 화면과 장바구니 화면 중 하나로 포워딩한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 101, "snippet": "    Item item = cart.removeItemById(workingItemId);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 105, "snippet": "      return new ForwardResolution(ERROR);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 107, "snippet": "      return new ForwardResolution(VIEW_CART);" }
+          ]
+        },
+        "request": {
+          "text": "제거할 항목 식별자를 요청 파라미터로 바인딩 받으며, 값이 없거나 공백뿐이면 안내 메시지를 설정하고 오류 화면으로 보낸다. 인증·권한 검사는 없다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 59, "snippet": "  public void setWorkingItemId(String workingItemId) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 96, "snippet": "    if (workingItemId == null || workingItemId.trim().isEmpty()) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 97, "snippet": "      setMessage(\"Invalid item ID: cannot remove item from cart.\");" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "name": "장바구니 항목 제거",
+      "summary": {
+        "text": "항목 식별자로 맵에서 항목을 꺼내고, 없으면 비어 있음을 반환하고 있으면 목록에서도 제거한 뒤 해당 상품 항목을 반환한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 88, "snippet": "  public Item removeItemById(String itemId) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 93, "snippet": "      itemList.remove(cartItem);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "제거 흐름에서 실제 항목 삭제를 수행하는 집합 객체다. 맵에서 제거한 결과가 없으면 상위에 없음을 알리고, 있으면 목록에서도 제거해 두 자료구조의 정합을 유지한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 89, "snippet": "    CartItem cartItem = itemMap.remove(itemId);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 91, "snippet": "      return null;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 94, "snippet": "      return cartItem.getItem();" }
+          ]
+        },
+        "dataShape": {
+          "text": "제거는 맵과 목록 양쪽에서 이뤄져야 하며, 이 불변식이 깨지면 담긴 항목 수와 표시 내용이 어긋난다. 항목 수는 목록 크기로 산출된다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 89, "snippet": "    CartItem cartItem = itemMap.remove(itemId);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 93, "snippet": "      itemList.remove(cartItem);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 48, "snippet": "    return itemList.size();" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+      "name": "제거 대상 항목",
+      "summary": {
+        "text": "제거 시 보관하던 상품 항목을 반환해 상위에서 제거 성공 여부를 판정하게 한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 48, "snippet": "  public Item getItem() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 94, "snippet": "      return cartItem.getItem();" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "제거 흐름에서 삭제 대상이 되는 데이터 객체로, 자신이 보관하던 상품 항목을 넘겨 제거 결과 판정의 근거를 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 27, "snippet": "public class CartItem implements Serializable {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 49, "snippet": "    return item;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 103, "snippet": "    if (item == null) {" }
+          ]
+        },
+        "dataShape": {
+          "text": "상품 항목·수량·재고 보유 여부·합계 금액을 보유하며, 제거되면 이 항목이 통째로 장바구니 집합에서 빠진다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 31, "snippet": "  private Item item;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 32, "snippet": "  private int quantity;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 33, "snippet": "  private boolean inStock;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "name": "수량 변경 요청 처리",
+      "summary": {
+        "text": "담긴 항목을 순회하며 항목 식별자와 같은 이름의 요청 파라미터에서 수량을 읽어 반영하고, 1 미만이면 항목을 제거한 뒤 장바구니 화면으로 포워딩한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 116, "snippet": "  public Resolution updateCartQuantities() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 125, "snippet": "        getCart().setQuantityByItemId(itemId, quantity);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수량 일괄 변경 요청의 진입점으로, 서블릿 요청에서 항목별 수량을 직접 읽어 장바구니 객체에 반영하고 1 미만 항목을 제거한 뒤 장바구니 화면으로 포워딩한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 117, "snippet": "    HttpServletRequest request = context.getRequest();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 127, "snippet": "          cartItems.remove();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 134, "snippet": "    return new ForwardResolution(VIEW_CART);" }
+          ]
+        },
+        "request": {
+          "text": "수량은 각 항목의 식별자를 이름으로 하는 요청 파라미터에서 읽는다. 숫자 변환에 실패하면 예외를 잡아 해당 항목을 건너뛰며, 인증·권한 검사는 없다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 122, "snippet": "      String itemId = cartItem.getItem().getItemId();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 124, "snippet": "        int quantity = Integer.parseInt(request.getParameter(itemId));" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 129, "snippet": "      } catch (NumberFormatException e) {" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "name": "수량 반영 대상 장바구니",
+      "summary": {
+        "text": "담긴 항목 순회용 반복자를 제공하고, 항목 식별자로 찾은 항목의 수량을 설정한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 51, "snippet": "  public Iterator<CartItem> getAllCartItems() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 109, "snippet": "  public void setQuantityByItemId(String itemId, int quantity) {" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수량 변경 흐름에서 항목 목록의 반복자를 넘겨 순회와 제거를 가능하게 하고, 식별자로 항목을 찾아 수량을 설정하는 역할을 한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 52, "snippet": "    return itemList.iterator();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 110, "snippet": "    CartItem cartItem = itemMap.get(itemId);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 111, "snippet": "    cartItem.setQuantity(quantity);" }
+          ]
+        },
+        "dataShape": {
+          "text": "반복자는 목록에서 얻으므로 반복자 제거는 목록에서만 항목을 지운다. 반면 수량 조회·설정은 맵을 사용하므로, 목록과 맵이 같은 항목 집합을 가리켜야 한다는 불변식이 이 경로에서 특히 중요하다. 소계는 목록을 기준으로 합산된다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 37, "snippet": "  private final List<CartItem> itemList = new ArrayList<>();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 110, "snippet": "    CartItem cartItem = itemMap.get(itemId);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java", "line": 120, "snippet": "    return itemList.stream()" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+      "name": "수량 변경 대상 항목",
+      "summary": {
+        "text": "수량이 설정되면 합계 금액을 즉시 재계산한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 61, "snippet": "  public void setQuantity(int quantity) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 63, "snippet": "    calculateTotal();" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수량 변경 흐름에서 새 수량을 받아 보관하고 합계 금액을 다시 계산하는 데이터 객체다. 순회 시 자신이 가진 상품 항목의 식별자를 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 62, "snippet": "    this.quantity = quantity;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 71, "snippet": "  private void calculateTotal() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 122, "snippet": "      String itemId = cartItem.getItem().getItemId();" }
+          ]
+        },
+        "dataShape": {
+          "text": "수량과 합계 금액을 함께 보유하며, 합계는 항상 판매가×수량과 일치하도록 수량 설정 시점마다 재계산된다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 32, "snippet": "  private int quantity;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 34, "snippet": "  private BigDecimal total;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java", "line": 72, "snippet": "    total = Optional.ofNullable(item).map(Item::getListPrice).map(v -> v.multiply(new BigDecimal(quantity)))" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/Item.java",
+      "name": "수량 변경 기준 상품 항목",
+      "summary": {
+        "text": "항목 식별자를 제공해 요청 파라미터 이름 매칭의 기준이 되고, 판매가로 합계 재계산의 단가를 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 44, "snippet": "  public String getItemId() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 77, "snippet": "    return listPrice;" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "수량 변경 흐름에서 각 장바구니 줄이 어떤 요청 파라미터에 대응하는지 결정하는 식별자와, 합계 재계산의 단가인 판매가를 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 45, "snippet": "    return itemId;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 76, "snippet": "  public BigDecimal getListPrice() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 124, "snippet": "        int quantity = Integer.parseInt(request.getParameter(itemId));" }
+          ]
+        },
+        "dataShape": {
+          "text": "항목 식별자와 판매가를 포함한 상품 항목 속성을 보유하며, 식별자는 설정 시 앞뒤 공백이 제거되어 파라미터 이름 매칭이 공백에 흔들리지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 30, "snippet": "  private String itemId;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 32, "snippet": "  private BigDecimal listPrice;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Item.java", "line": 49, "snippet": "    this.itemId = itemId.trim();" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Cart.action?viewCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "name": "조회 요청 처리",
+      "summary": {
+        "text": "세션에 보관된 장바구니를 장바구니 화면으로 포워딩한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 137, "snippet": "  public ForwardResolution viewCart() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 138, "snippet": "    return new ForwardResolution(VIEW_CART);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "조회 요청을 받아 세션 범위 액션 빈이 이미 보유한 장바구니를 그대로 장바구니 화면에 넘긴다. 서비스 위임이나 조회 로직은 없다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 42, "snippet": "  private static final String VIEW_CART = \"/WEB-INF/jsp/cart/Cart.jsp\";" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 51, "snippet": "  public Cart getCart() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 138, "snippet": "    return new ForwardResolution(VIEW_CART);" }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터를 받지 않고 검증이나 인증·권한 검사도 수행하지 않는다. 표시할 장바구니는 세션 범위 액션 빈의 필드에서 가져온다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 37, "snippet": "@SessionScope" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 48, "snippet": "  private Cart cart = new Cart();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java", "line": 137, "snippet": "  public ForwardResolution viewCart() {" }
+          ]
+        }
+      }
+    }
+  ]
+}

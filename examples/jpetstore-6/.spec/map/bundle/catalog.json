@@ -1,0 +1,310 @@
+{
+  "domainId": "domain:catalog",
+  "files": [
+    {
+      "className": "Item",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/domain/Item.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+      "slice": {
+        "endLine": 95,
+        "startLine": 16,
+        "text": "package org.mybatis.jpetstore.domain;\n\nimport java.io.Serializable;\nimport java.math.BigDecimal;\n\n/**\n * The Class Item.\n *\n * @author Eduardo Macarron\n */\npublic class Item implements Serializable {\n\n  private static final long serialVersionUID = -2159121673445254631L;\n\n  private String itemId;\n  private String productId;\n  private BigDecimal listPrice;\n  private BigDecimal unitCost;\n  private int supplierId;\n  private String status;\n  private String attribute1;\n  private String attribute2;\n  private String attribute3;\n  private String attribute4;\n  private String attribute5;\n  private Product product;\n  private int quantity;\n\n  public String getItemId() {\n    return itemId;\n  }\n\n  public void setItemId(String itemId) {\n    this.itemId = itemId.trim();\n  }\n\n  public int getQuantity() {\n    return quantity;\n  }\n\n  public void setQuantity(int quantity) {\n    this.quantity = quantity;\n  }\n\n  public Product getProduct() {\n    return product;\n  }\n\n  public void setProduct(Product product) {\n    this.product = product;\n  }\n\n  public int getSupplierId() {\n    return supplierId;\n  }\n\n  public void setSupplierId(int supplierId) {\n    this.supplierId = supplierId;\n  }\n\n  public BigDecimal getListPrice() {\n    return listPrice;\n  }\n\n  public void setListPrice(BigDecimal listPrice) {\n    this.listPrice = listPrice;\n  }\n\n  public BigDecimal getUnitCost() {\n    return unitCost;\n  }\n\n  public void setUnitCost(BigDecimal unitCost) {\n    this.unitCost = unitCost;\n  }\n\n  public String getStatus() {\n    return status;\n  }\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CategoryMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java",
+      "slice": {
+        "endLine": 34,
+        "startLine": 17,
+        "text": "\nimport java.util.List;\n\nimport org.mybatis.jpetstore.domain.Category;\n\n/**\n * The Interface CategoryMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface CategoryMapper {\n\n  List<Category> getCategoryList();\n\n  Category getCategory(String categoryId);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "ItemMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "slice": {
+        "endLine": 39,
+        "startLine": 18,
+        "text": "import java.util.List;\nimport java.util.Map;\n\nimport org.mybatis.jpetstore.domain.Item;\n\n/**\n * The Interface ItemMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface ItemMapper {\n\n  void updateInventoryQuantity(Map<String, Object> param);\n\n  int getInventoryQuantity(String itemId);\n\n  List<Item> getItemListByProduct(String productId);\n\n  Item getItem(String itemId);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "ProductMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "slice": {
+        "endLine": 36,
+        "startLine": 17,
+        "text": "\nimport java.util.List;\n\nimport org.mybatis.jpetstore.domain.Product;\n\n/**\n * The Interface ProductMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface ProductMapper {\n\n  List<Product> getProductListByCategory(String categoryId);\n\n  Product getProduct(String productId);\n\n  List<Product> searchProductList(String keywords);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CatalogService",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java — java 파일",
+        "tags": []
+      },
+      "line": 34,
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 24,
+        "text": "import org.mybatis.jpetstore.mapper.CategoryMapper;\nimport org.mybatis.jpetstore.mapper.ItemMapper;\nimport org.mybatis.jpetstore.mapper.ProductMapper;\nimport org.springframework.stereotype.Service;\n\n/**\n * The Class CatalogService.\n *\n * @author Eduardo Macarron\n */\n@Service\npublic class CatalogService {\n\n  private final CategoryMapper categoryMapper;\n  private final ItemMapper itemMapper;\n  private final ProductMapper productMapper;\n\n  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper, ProductMapper productMapper) {\n    this.categoryMapper = categoryMapper;\n    this.itemMapper = itemMapper;\n    this.productMapper = productMapper;\n  }\n\n  public List<Category> getCategoryList() {\n    return categoryMapper.getCategoryList();\n  }\n\n  public Category getCategory(String categoryId) {\n    return categoryMapper.getCategory(categoryId);\n  }\n\n  public Product getProduct(String productId) {\n    return productMapper.getProduct(productId);\n  }\n\n  public List<Product> getProductListByCategory(String categoryId) {\n    return productMapper.getProductListByCategory(categoryId);\n  }\n\n  /**\n   * Search product list.\n   *\n   * @param keywords\n   *          the keywords\n   *\n   * @return the list\n   */\n  public List<Product> searchProductList(String keywords) {\n    List<Product> products = new ArrayList<>();\n    for (String keyword : keywords.split(\"\\\\s+\")) {\n      products.addAll(productMapper.searchProductList(\"%\" + keyword.toLowerCase() + \"%\"));\n    }\n    return products;\n  }\n\n  public List<Item> getItemListByProduct(String productId) {\n    return itemMapper.getItemListByProduct(productId);\n  }\n\n  public Item getItem(String itemId) {\n    return itemMapper.getItem(itemId);\n  }\n\n  public boolean isItemInStock(String itemId) {\n    return itemMapper.getInventoryQuantity(itemId) > 0;\n  }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CatalogActionBean",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java — java 파일",
+        "tags": []
+      },
+      "line": 143,
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "slice": {
+        "endLine": 212,
+        "startLine": 133,
+        "text": "  }\n\n  public List<Item> getItemList() {\n    return itemList;\n  }\n\n  public void setItemList(List<Item> itemList) {\n    this.itemList = itemList;\n  }\n\n  @DefaultHandler\n  public ForwardResolution viewMain() {\n    return new ForwardResolution(MAIN);\n  }\n\n  /**\n   * View category.\n   *\n   * @return the forward resolution\n   */\n  public ForwardResolution viewCategory() {\n    if (categoryId != null) {\n      productList = catalogService.getProductListByCategory(categoryId);\n      category = catalogService.getCategory(categoryId);\n    }\n    return new ForwardResolution(VIEW_CATEGORY);\n  }\n\n  /**\n   * View product.\n   *\n   * @return the forward resolution\n   */\n  public ForwardResolution viewProduct() {\n    if (productId != null) {\n      itemList = catalogService.getItemListByProduct(productId);\n      product = catalogService.getProduct(productId);\n    }\n    return new ForwardResolution(VIEW_PRODUCT);\n  }\n\n  /**\n   * View item.\n   *\n   * @return the forward resolution\n   */\n  public ForwardResolution viewItem() {\n    item = catalogService.getItem(itemId);\n    product = item.getProduct();\n    return new ForwardResolution(VIEW_ITEM);\n  }\n\n  /**\n   * Search products.\n   *\n   * @return the forward resolution\n   */\n  public ForwardResolution searchProducts() {\n    if (keyword == null || keyword.length() < 1) {\n      setMessage(\"Please enter a keyword to search for, then press the search button.\");\n      return new ForwardResolution(ERROR);\n    } else {\n      productList = catalogService.searchProductList(keyword.toLowerCase());\n      return new ForwardResolution(SEARCH_PRODUCTS);\n    }\n  }\n\n  /**\n   * Clear.\n   */\n  public void clear() {\n    keyword = null;\n\n    categoryId = null;\n    category = null;\n    categoryList = null;\n\n    productId = null;\n    product = null;\n    productList = null;",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "CatalogActionBean#viewMain",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "flowId": "flow:ANY /actions/Catalog.action",
+      "line": 143,
+      "stepIds": [
+        "step:ANY /actions/Catalog.action:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java"
+      ]
+    },
+    {
+      "entryPoint": "CatalogActionBean#searchProducts",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "flowId": "flow:ANY /actions/Catalog.action?searchProducts",
+      "line": 190,
+      "stepIds": [
+        "step:ANY /actions/Catalog.action?searchProducts:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+        "step:ANY /actions/Catalog.action?searchProducts:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+        "step:ANY /actions/Catalog.action?searchProducts:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+      ]
+    },
+    {
+      "entryPoint": "CatalogActionBean#viewCategory",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "flowId": "flow:ANY /actions/Catalog.action?viewCategory",
+      "line": 153,
+      "stepIds": [
+        "step:ANY /actions/Catalog.action?viewCategory:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+        "step:ANY /actions/Catalog.action?viewCategory:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+        "step:ANY /actions/Catalog.action?viewCategory:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+        "step:ANY /actions/Catalog.action?viewCategory:src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java"
+      ]
+    },
+    {
+      "entryPoint": "CatalogActionBean#viewItem",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "flowId": "flow:ANY /actions/Catalog.action?viewItem",
+      "line": 179,
+      "stepIds": [
+        "step:ANY /actions/Catalog.action?viewItem:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+        "step:ANY /actions/Catalog.action?viewItem:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+        "step:ANY /actions/Catalog.action?viewItem:src/main/java/org/mybatis/jpetstore/domain/Item.java",
+        "step:ANY /actions/Catalog.action?viewItem:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+      ]
+    },
+    {
+      "entryPoint": "CatalogActionBean#viewProduct",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "flowId": "flow:ANY /actions/Catalog.action?viewProduct",
+      "line": 166,
+      "stepIds": [
+        "step:ANY /actions/Catalog.action?viewProduct:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+        "step:ANY /actions/Catalog.action?viewProduct:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+        "step:ANY /actions/Catalog.action?viewProduct:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+        "step:ANY /actions/Catalog.action?viewProduct:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "catalog",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "stepId": "step:ANY /actions/Catalog.action:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "stepId": "step:ANY /actions/Catalog.action?searchProducts:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "stepId": "step:ANY /actions/Catalog.action?searchProducts:src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "stepId": "step:ANY /actions/Catalog.action?searchProducts:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewCategory:src/main/java/org/mybatis/jpetstore/mapper/CategoryMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewCategory:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewCategory:src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewCategory:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewItem:src/main/java/org/mybatis/jpetstore/domain/Item.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewItem:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewItem:src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewItem:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewProduct:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewProduct:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewProduct:src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "stepId": "step:ANY /actions/Catalog.action?viewProduct:src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java"
+    }
+  ]
+}

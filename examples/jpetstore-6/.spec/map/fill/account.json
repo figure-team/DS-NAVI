@@ -1,0 +1,1236 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:account",
+  "name": "계정",
+  "summary": {
+    "text": "계정 도메인은 애완동물 쇼핑몰 이용자의 로그인·로그아웃·회원가입·계정 정보 수정을 담당한다. 단일 화면 진입점인 Account.action 이 세션 범위로 동작하며, 계정 조회·등록·수정 업무는 계정 서비스가 조율하고 실제 저장은 ACCOUNT·PROFILE·SIGNON 세 테이블에 나뉘어 이루어진다. 로그인과 회원가입, 계정 수정이 끝나면 이용자가 선호 분류로 지정한 상품 목록을 함께 조회해 개인화 목록으로 보관한다.",
+    "citations": [
+      { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 43, "snippet": "public class AccountActionBean extends AbstractActionBean {" },
+      { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 55, "snippet": "    accountMapper.insertAccount(account);" },
+      { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 56, "snippet": "    accountMapper.insertProfile(account);" },
+      { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 57, "snippet": "    accountMapper.insertSignon(account);" },
+      { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 118, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+    ]
+  },
+  "entities": [
+    {
+      "text": "계정(Account)은 이용자 한 명을 표현하는 핵심 자료로, 아이디·비밀번호·이메일·이름·상태·주소·도시·주·우편번호·국가·전화번호를 담는다. 세션에 실려 다니도록 직렬화 가능한 형태로 정의되어 있다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 27, "snippet": "public class Account implements Serializable {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 31, "snippet": "  private String username;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 33, "snippet": "  private String email;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 37, "snippet": "  private String address1;" }
+      ]
+    },
+    {
+      "text": "계정에는 개인화 설정 항목이 함께 들어 있다. 선호 분류·언어 설정·내 목록 노출 여부·배너 노출 여부·배너 이름이 그것이며, 이 값들은 프로필 성격의 정보로 취급된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 44, "snippet": "  private String favouriteCategoryId;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 45, "snippet": "  private String languagePreference;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 46, "snippet": "  private boolean listOption;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 47, "snippet": "  private boolean bannerOption;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 48, "snippet": "  private String bannerName;" }
+      ]
+    },
+    {
+      "text": "하나의 계정 자료는 저장 시점에 세 테이블로 갈라진다. 기본 인적사항은 ACCOUNT, 개인화 설정은 PROFILE, 로그인 비밀번호는 SIGNON 에 각각 보관된다.",
+      "citations": [
+        { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 96, "snippet": "    INSERT INTO ACCOUNT" },
+        { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 118, "snippet": "    INSERT INTO PROFILE (LANGPREF, FAVCATEGORY, MYLISTOPT, BANNEROPT, USERID)" },
+        { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 128, "snippet": "    INSERT INTO SIGNON (PASSWORD,USERNAME)" }
+      ]
+    },
+    {
+      "text": "계정 조회 결과에는 배너 정보가 붙는다. 계정의 선호 분류를 배너 자료(BANNERDATA)의 분류와 맞물려 조회하므로, 이용자의 선호 분류에 대응하는 배너 이름이 함께 실려 나온다.",
+      "citations": [
+        { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 44, "snippet": "          BANNERDATA.BANNERNAME" },
+        { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 49, "snippet": "      AND PROFILE.FAVCATEGORY = BANNERDATA.FAVCATEGORY" }
+      ]
+    },
+    {
+      "text": "이용자가 고를 수 있는 언어는 영어와 일본어 두 가지, 선호 분류는 물고기·개·파충류·고양이·새 다섯 가지로 화면 진입점에 고정 목록으로 정의되어 있다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 64, "snippet": "    LANGUAGE_LIST = Collections.unmodifiableList(Arrays.asList(\"english\", \"japanese\"));" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 65, "snippet": "    CATEGORY_LIST = Collections.unmodifiableList(Arrays.asList(\"FISH\", \"DOGS\", \"REPTILES\", \"CATS\", \"BIRDS\"));" }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "로그인·회원가입·계정 수정에서 아이디와 비밀번호는 반드시 입력해야 한다. 세 업무 모두에 대해 필수 입력 검증이 걸려 있다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 76, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 77, "snippet": "  public void setUsername(String username) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 85, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 86, "snippet": "  public void setPassword(String password) {" }
+      ]
+    },
+    {
+      "text": "회원가입과 계정 수정에서는 이름과 성이 필수 입력이다. 로그인에는 이 제약이 걸리지 않는다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 78, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 79, "snippet": "  public void setFirstName(String firstName) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 87, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 88, "snippet": "  public void setLastName(String lastName) {" }
+      ]
+    },
+    {
+      "text": "로그인은 아이디와 비밀번호가 함께 일치하는 계정이 조회될 때만 성공한다. 조회 결과가 없으면 아이디 또는 비밀번호가 잘못되었다는 안내를 남기고 입력값을 비운 뒤 로그인 화면으로 되돌린다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 161, "snippet": "    account = accountService.getAccount(getUsername(), getPassword());" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 163, "snippet": "    if (account == null) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 164, "snippet": "      String value = \"Invalid username or password.  Signon failed.\";" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 167, "snippet": "      return new ForwardResolution(SIGNON);" }
+      ]
+    },
+    {
+      "text": "로그인이 성공하면 세션에 보관하기 전에 비밀번호를 지운다. 인증 상태를 참으로 세우고 계정 정보를 세션에 등록한다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 169, "snippet": "      account.setPassword(null);" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 171, "snippet": "      authenticated = true;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 174, "snippet": "      s.setAttribute(\"accountBean\", this);" }
+      ]
+    },
+    {
+      "text": "인증 상태로 인정받으려면 인증 표시가 서 있고 계정 정보가 있으며 아이디도 채워져 있어야 한다. 세 조건을 모두 만족해야 로그인한 이용자로 취급된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 196, "snippet": "    return authenticated && account != null && account.getUsername() != null;" }
+      ]
+    },
+    {
+      "text": "계정 수정 시 비밀번호는 입력값이 있고 길이가 0보다 클 때만 변경한다. 비워 두면 기존 비밀번호가 유지되고, 인적사항과 개인화 설정만 갱신된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 71, "snippet": "    Optional.ofNullable(account.getPassword()).filter(password -> password.length() > 0)" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 72, "snippet": "        .ifPresent(password -> accountMapper.updateSignon(account));" }
+      ]
+    },
+    {
+      "text": "회원가입과 계정 수정은 각각 하나의 트랜잭션으로 묶인다. 계정·프로필·로그인 정보 저장이 모두 성공하거나 모두 취소된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 53, "snippet": "  @Transactional" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 54, "snippet": "  public void insertAccount(Account account) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 66, "snippet": "  @Transactional" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 67, "snippet": "  public void updateAccount(Account account) {" }
+      ]
+    },
+    {
+      "text": "회원가입이 끝나면 별도 로그인 절차 없이 곧바로 인증된 상태가 된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 116, "snippet": "    accountService.insertAccount(account);" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 119, "snippet": "    authenticated = true;" }
+      ]
+    },
+    {
+      "text": "회원가입·계정 수정 직후에는 방금 저장한 값을 그대로 쓰지 않고 아이디로 계정을 다시 조회해 세션 정보를 새로 채운다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 117, "snippet": "    account = accountService.getAccount(account.getUsername());" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 139, "snippet": "    account = accountService.getAccount(account.getUsername());" }
+      ]
+    },
+    {
+      "text": "로그아웃은 세션 자체를 무효화하고 계정·개인화 목록·인증 표시를 초기 상태로 되돌린다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 185, "snippet": "    context.getRequest().getSession().invalidate();" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 203, "snippet": "    account = new Account();" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 204, "snippet": "    myList = null;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 205, "snippet": "    authenticated = false;" }
+      ]
+    },
+    {
+      "text": "계정 화면에 아무 업무도 지정하지 않고 들어오면 기본으로 로그인 화면이 표시된다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 149, "snippet": "  @DefaultHandler" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 150, "snippet": "  public Resolution signonForm() {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 151, "snippet": "    return new ForwardResolution(SIGNON);" }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "text": "계정 도메인은 상품 카탈로그 도메인의 분류별 상품 조회를 불러 쓴다. 로그인·회원가입·계정 수정이 끝날 때마다 이용자의 선호 분류에 해당하는 상품 목록을 받아 개인화 목록으로 보관한다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 170, "snippet": "      myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 59, "snippet": "  public List<Product> getProductListByCategory(String categoryId) {" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 60, "snippet": "    return productMapper.getProductListByCategory(categoryId);" }
+      ]
+    },
+    {
+      "text": "로그인·로그아웃·회원가입·계정 수정 네 업무는 모두 끝난 뒤 카탈로그 화면으로 이용자를 넘긴다. 계정 업무의 종착지는 상품 카탈로그다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 120, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 141, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 175, "snippet": "      return new RedirectResolution(CatalogActionBean.class);" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 187, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+      ]
+    },
+    {
+      "text": "계정 화면은 계정 서비스와 카탈로그 서비스 두 가지를 주입받아 함께 사용한다. 계정 업무 자체는 계정 서비스가, 개인화 상품 목록은 카탈로그 서비스가 맡는다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 55, "snippet": "  private transient AccountService accountService;" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 57, "snippet": "  private transient CatalogService catalogService;" }
+      ]
+    },
+    {
+      "text": "계정 정보는 세션에 accountBean 이름으로 등록되어 다른 화면에서도 로그인한 이용자 정보를 참조할 수 있다.",
+      "citations": [
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 172, "snippet": "      HttpSession s = context.getRequest().getSession();" },
+        { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 174, "snippet": "      s.setAttribute(\"accountBean\", this);" }
+      ]
+    }
+  ],
+  "businessFlows": [
+    {
+      "title": "로그인",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "로그인 시작" },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "로그인 화면 표시",
+          "flowRef": "flow:ANY /actions/Account.action",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 151, "snippet": "    return new ForwardResolution(SIGNON);" }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "아이디·비밀번호 입력",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 76, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "계정 조회",
+          "flowRef": "flow:ANY /actions/Account.action?signon",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 161, "snippet": "    account = accountService.getAccount(getUsername(), getPassword());" }
+          ]
+        },
+        {
+          "id": "d1",
+          "kind": "decision",
+          "label": "일치 계정 있는가",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 163, "snippet": "    if (account == null) {" }
+          ]
+        },
+        {
+          "id": "a4",
+          "kind": "activity",
+          "label": "실패 안내 후 입력값 초기화",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 164, "snippet": "      String value = \"Invalid username or password.  Signon failed.\";" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 166, "snippet": "      clear();" }
+          ]
+        },
+        {
+          "id": "a5",
+          "kind": "activity",
+          "label": "비밀번호 제거",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 169, "snippet": "      account.setPassword(null);" }
+          ]
+        },
+        {
+          "id": "a6",
+          "kind": "activity",
+          "label": "선호 분류 상품 목록 조회",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 170, "snippet": "      myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+          ]
+        },
+        {
+          "id": "a7",
+          "kind": "activity",
+          "label": "세션에 계정 등록",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 171, "snippet": "      authenticated = true;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 174, "snippet": "      s.setAttribute(\"accountBean\", this);" }
+          ]
+        },
+        {
+          "id": "a8",
+          "kind": "activity",
+          "label": "카탈로그 화면으로 이동",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 175, "snippet": "      return new RedirectResolution(CatalogActionBean.class);" }
+          ]
+        },
+        { "id": "e1", "kind": "end", "label": "로그인 실패" },
+        { "id": "e2", "kind": "end", "label": "로그인 완료" }
+      ],
+      "edges": [
+        { "from": "s", "to": "a1" },
+        { "from": "a1", "to": "a2" },
+        { "from": "a2", "to": "a3" },
+        { "from": "a3", "to": "d1" },
+        { "from": "d1", "to": "a4", "label": "NO" },
+        { "from": "d1", "to": "a5", "label": "YES" },
+        { "from": "a4", "to": "e1" },
+        { "from": "a5", "to": "a6" },
+        { "from": "a6", "to": "a7" },
+        { "from": "a7", "to": "a8" },
+        { "from": "a8", "to": "e2" }
+      ]
+    },
+    {
+      "title": "회원가입",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "회원가입 시작" },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "가입 입력 화면 표시",
+          "flowRef": "flow:ANY /actions/Account.action?newAccountForm",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 107, "snippet": "    return new ForwardResolution(NEW_ACCOUNT);" }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "필수 항목 입력 검증",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 78, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 76, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "인적사항 저장",
+          "flowRef": "flow:ANY /actions/Account.action?newAccount",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 55, "snippet": "    accountMapper.insertAccount(account);" }
+          ]
+        },
+        {
+          "id": "a4",
+          "kind": "activity",
+          "label": "개인화 설정 저장",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 56, "snippet": "    accountMapper.insertProfile(account);" }
+          ]
+        },
+        {
+          "id": "a5",
+          "kind": "activity",
+          "label": "로그인 정보 저장",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 57, "snippet": "    accountMapper.insertSignon(account);" }
+          ]
+        },
+        {
+          "id": "a6",
+          "kind": "activity",
+          "label": "가입 계정 재조회",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 117, "snippet": "    account = accountService.getAccount(account.getUsername());" }
+          ]
+        },
+        {
+          "id": "a7",
+          "kind": "activity",
+          "label": "선호 분류 상품 목록 조회",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 118, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+          ]
+        },
+        {
+          "id": "a8",
+          "kind": "activity",
+          "label": "인증 상태로 전환",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 119, "snippet": "    authenticated = true;" }
+          ]
+        },
+        {
+          "id": "a9",
+          "kind": "activity",
+          "label": "카탈로그 화면으로 이동",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 120, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+          ]
+        },
+        { "id": "e1", "kind": "end", "label": "가입 완료" }
+      ],
+      "edges": [
+        { "from": "s", "to": "a1" },
+        { "from": "a1", "to": "a2" },
+        { "from": "a2", "to": "a3" },
+        { "from": "a3", "to": "a4" },
+        { "from": "a4", "to": "a5" },
+        { "from": "a5", "to": "a6" },
+        { "from": "a6", "to": "a7" },
+        { "from": "a7", "to": "a8" },
+        { "from": "a8", "to": "a9" },
+        { "from": "a9", "to": "e1" }
+      ]
+    },
+    {
+      "title": "계정 정보 수정",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "계정 수정 시작" },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "수정 입력 화면 표시",
+          "flowRef": "flow:ANY /actions/Account.action?editAccountForm",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 129, "snippet": "    return new ForwardResolution(EDIT_ACCOUNT);" }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "인적사항 갱신",
+          "flowRef": "flow:ANY /actions/Account.action?editAccount",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 68, "snippet": "    accountMapper.updateAccount(account);" }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "개인화 설정 갱신",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 69, "snippet": "    accountMapper.updateProfile(account);" }
+          ]
+        },
+        {
+          "id": "d1",
+          "kind": "decision",
+          "label": "새 비밀번호 입력됐나",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 71, "snippet": "    Optional.ofNullable(account.getPassword()).filter(password -> password.length() > 0)" }
+          ]
+        },
+        {
+          "id": "a4",
+          "kind": "activity",
+          "label": "비밀번호 변경",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 72, "snippet": "        .ifPresent(password -> accountMapper.updateSignon(account));" }
+          ]
+        },
+        {
+          "id": "a5",
+          "kind": "activity",
+          "label": "수정 계정 재조회",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 139, "snippet": "    account = accountService.getAccount(account.getUsername());" }
+          ]
+        },
+        {
+          "id": "a6",
+          "kind": "activity",
+          "label": "선호 분류 상품 목록 갱신",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 140, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+          ]
+        },
+        {
+          "id": "a7",
+          "kind": "activity",
+          "label": "카탈로그 화면으로 이동",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 141, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+          ]
+        },
+        { "id": "e1", "kind": "end", "label": "수정 완료" }
+      ],
+      "edges": [
+        { "from": "s", "to": "a1" },
+        { "from": "a1", "to": "a2" },
+        { "from": "a2", "to": "a3" },
+        { "from": "a3", "to": "d1" },
+        { "from": "d1", "to": "a4", "label": "YES" },
+        { "from": "d1", "to": "a5", "label": "NO" },
+        { "from": "a4", "to": "a5" },
+        { "from": "a5", "to": "a6" },
+        { "from": "a6", "to": "a7" },
+        { "from": "a7", "to": "e1" }
+      ]
+    },
+    {
+      "title": "로그아웃",
+      "nodes": [
+        { "id": "s", "kind": "start", "label": "로그아웃 시작" },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "세션 무효화",
+          "flowRef": "flow:ANY /actions/Account.action?signoff",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 185, "snippet": "    context.getRequest().getSession().invalidate();" }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "계정·목록·인증 초기화",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 203, "snippet": "    account = new Account();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 205, "snippet": "    authenticated = false;" }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "카탈로그 화면으로 이동",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 187, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+          ]
+        },
+        { "id": "e1", "kind": "end", "label": "로그아웃 완료" }
+      ],
+      "edges": [
+        { "from": "s", "to": "a1" },
+        { "from": "a1", "to": "a2" },
+        { "from": "a2", "to": "a3" },
+        { "from": "a3", "to": "e1" }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /actions/Account.action",
+      "name": "로그인 화면 표시(기본)",
+      "summary": {
+        "text": "계정 화면에 업무 지정 없이 들어왔을 때 실행되는 기본 처리다. 별도 조회 없이 로그인 입력 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 149, "snippet": "  @DefaultHandler" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 151, "snippet": "    return new ForwardResolution(SIGNON);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Account.action?editAccount",
+      "name": "계정 정보 수정",
+      "summary": {
+        "text": "수정 화면에서 입력한 값으로 계정 인적사항과 개인화 설정을 갱신하고, 비밀번호가 입력된 경우에만 비밀번호도 바꾼다. 이후 계정을 다시 조회해 세션 정보를 새로 채우고 선호 분류 상품 목록을 갱신한 뒤 카탈로그 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 138, "snippet": "    accountService.updateAccount(account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 139, "snippet": "    account = accountService.getAccount(account.getUsername());" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 140, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 71, "snippet": "    Optional.ofNullable(account.getPassword()).filter(password -> password.length() > 0)" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Account.action?editAccountForm",
+      "name": "계정 수정 화면 표시",
+      "summary": {
+        "text": "계정 수정 입력 화면을 띄운다. 조회나 저장 없이 화면 전환만 수행한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 128, "snippet": "  public Resolution editAccountForm() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 129, "snippet": "    return new ForwardResolution(EDIT_ACCOUNT);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Account.action?newAccount",
+      "name": "회원가입",
+      "summary": {
+        "text": "입력받은 정보로 신규 계정을 등록한다. 등록 후 아이디로 계정을 다시 조회하고 선호 분류 상품 목록을 채운 뒤 인증 상태로 전환해 카탈로그 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 116, "snippet": "    accountService.insertAccount(account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 117, "snippet": "    account = accountService.getAccount(account.getUsername());" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 119, "snippet": "    authenticated = true;" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 120, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Account.action?newAccountForm",
+      "name": "회원가입 화면 표시",
+      "summary": {
+        "text": "신규 계정 입력 화면을 띄운다. 조회나 저장 없이 화면 전환만 수행한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 106, "snippet": "  public Resolution newAccountForm() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 107, "snippet": "    return new ForwardResolution(NEW_ACCOUNT);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Account.action?signoff",
+      "name": "로그아웃",
+      "summary": {
+        "text": "세션을 무효화하고 계정·개인화 목록·인증 표시를 초기 상태로 되돌린 뒤 카탈로그 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 185, "snippet": "    context.getRequest().getSession().invalidate();" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 186, "snippet": "    clear();" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 187, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Account.action?signon",
+      "name": "로그인",
+      "summary": {
+        "text": "아이디와 비밀번호로 계정을 조회해 인증한다. 일치 계정이 없으면 실패 안내와 함께 로그인 화면으로 되돌리고, 있으면 비밀번호를 지운 뒤 선호 분류 상품 목록을 채우고 세션에 계정을 등록해 카탈로그 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 161, "snippet": "    account = accountService.getAccount(getUsername(), getPassword());" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 163, "snippet": "    if (account == null) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 169, "snippet": "      account.setPassword(null);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 174, "snippet": "      s.setAttribute(\"accountBean\", this);" }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /actions/Account.action:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "계정 화면 기본 진입",
+      "summary": {
+        "text": "업무 지정 없이 계정 화면에 들어왔을 때의 기본 처리로, 로그인 입력 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 149, "snippet": "  @DefaultHandler" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 151, "snippet": "    return new ForwardResolution(SIGNON);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 화면의 기본 진입 지점이다. 업무를 지정하지 않고 들어온 요청을 받아 로그인 입력 화면으로 넘기는 역할만 맡으며, 서비스 계층으로 위임하지 않는다. 세션 범위로 동작하는 화면 진입점 안에 놓여 있다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 42, "snippet": "@SessionScope" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 149, "snippet": "  @DefaultHandler" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 151, "snippet": "    return new ForwardResolution(SIGNON);" }
+          ]
+        },
+        "request": {
+          "text": "받는 요청 파라미터가 없고 검증이나 인증 확인도 하지 않는다. 화면 전환 결과만 돌려주며, 목적지는 로그인 입력 화면으로 고정되어 있다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 150, "snippet": "  public Resolution signonForm() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 49, "snippet": "  private static final String SIGNON = \"/WEB-INF/jsp/account/SignonForm.jsp\";" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "name": "계정 자료(수정)",
+      "summary": {
+        "text": "수정 화면에서 입력한 값을 담아 서비스와 매퍼로 전달되는 계정 자료다. 이름과 성은 수정 업무에서 필수 입력으로 검증된다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 27, "snippet": "public class Account implements Serializable {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 78, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 수정 흐름에서 입력값을 실어 나르는 자료 구조다. 화면 진입점이 보유한 계정 필드에 입력이 채워진 뒤 그대로 서비스로 넘어가 갱신 대상이 된다. 세션에 담기므로 직렬화 가능한 형태로 정의되어 있다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 27, "snippet": "public class Account implements Serializable {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 59, "snippet": "  private Account account = new Account();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 138, "snippet": "    accountService.updateAccount(account);" }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·비밀번호·이메일·이름·성·상태·주소·도시·주·우편번호·국가·전화번호와 선호 분류·언어 설정·목록 노출·배너 노출·배너 이름을 갖는다. 수정 업무에서는 이름과 성이 비어 있으면 안 되는 제약이 걸린다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 34, "snippet": "  private String firstName;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 44, "snippet": "  private String favouriteCategoryId;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 78, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 88, "snippet": "  public void setLastName(String lastName) {" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+      "name": "계정 매퍼(수정)",
+      "summary": {
+        "text": "계정 수정 흐름에서 인적사항·개인화 설정·비밀번호 갱신 세 가지 영속 작업을 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 37, "snippet": "  void updateAccount(Account account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 39, "snippet": "  void updateProfile(Account account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 41, "snippet": "  void updateSignon(Account account);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 수정 흐름의 영속 담당이다. 계정 인적사항 갱신·개인화 설정 갱신·비밀번호 갱신, 그리고 수정 직후 재조회를 위한 아이디 기준 계정 조회를 맡는다. 인터페이스로만 선언되고 실제 질의는 매핑 정의에 있다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 25, "snippet": "public interface AccountMapper {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 27, "snippet": "  Account getAccountByUsername(String username);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 37, "snippet": "  void updateAccount(Account account);" }
+          ]
+        },
+        "persistence": {
+          "text": "인적사항 갱신은 ACCOUNT 테이블을 아이디 기준으로 갱신하고, 개인화 설정 갱신은 PROFILE 테이블의 언어 설정·선호 분류·목록 노출·배너 노출을 갱신한다. 비밀번호 갱신은 SIGNON 테이블의 비밀번호를 아이디 기준으로 바꾼다. 재조회는 ACCOUNT·PROFILE·SIGNON·BANNERDATA 네 테이블을 결합해 계정 정보를 읽는다.",
+          "citations": [
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 80, "snippet": "    UPDATE ACCOUNT SET" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 106, "snippet": "    UPDATE PROFILE SET" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 123, "snippet": "    UPDATE SIGNON SET PASSWORD = #{password}" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 45, "snippet": "    FROM ACCOUNT, PROFILE, SIGNON, BANNERDATA" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "name": "상품 매퍼(수정 후 목록)",
+      "summary": {
+        "text": "계정 수정 후 이용자의 선호 분류에 해당하는 상품 목록을 조회한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 29, "snippet": "  List<Product> getProductListByCategory(String categoryId);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 수정 흐름의 마지막 단계에서 개인화 목록을 채우기 위한 조회를 담당한다. 계정 자체를 다루지 않고 상품 분류 기준 목록 조회만 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 27, "snippet": "public interface ProductMapper {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 29, "snippet": "  List<Product> getProductListByCategory(String categoryId);" }
+          ]
+        },
+        "persistence": {
+          "text": "PRODUCT 테이블에서 분류가 일치하는 행을 읽어 상품 번호·이름·설명·분류를 상품 자료로 매핑한다.",
+          "citations": [
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 36, "snippet": "  <select id=\"getProductListByCategory\" resultType=\"Product\">" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 42, "snippet": "    FROM PRODUCT" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 43, "snippet": "    WHERE CATEGORY = #{value}" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "name": "계정 서비스(수정)",
+      "summary": {
+        "text": "계정 수정 업무를 하나의 트랜잭션으로 조율한다. 인적사항과 개인화 설정을 갱신하고, 비밀번호는 입력됐을 때만 바꾼다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 66, "snippet": "  @Transactional" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 68, "snippet": "    accountMapper.updateAccount(account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 72, "snippet": "        .ifPresent(password -> accountMapper.updateSignon(account));" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 수정 흐름의 업무 조율자다. 화면 진입점에서 받은 계정 자료로 인적사항·개인화 설정·비밀번호 갱신을 순서대로 지시하고, 수정 직후 재조회 요청도 처리한다. 계정 매퍼 하나만 의존한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 31, "snippet": "public class AccountService {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 33, "snippet": "  private final AccountMapper accountMapper;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 39, "snippet": "  public Account getAccount(String username) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 67, "snippet": "  public void updateAccount(Account account) {" }
+          ]
+        },
+        "businessLogic": {
+          "text": "핵심 규칙은 비밀번호 조건부 갱신이다. 인적사항과 개인화 설정은 무조건 갱신하되, 비밀번호는 값이 있고 길이가 0보다 클 때만 갱신한다. 세 갱신은 하나의 트랜잭션 경계 안에서 실행되어 함께 반영되거나 함께 취소된다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 66, "snippet": "  @Transactional" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 68, "snippet": "    accountMapper.updateAccount(account);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 69, "snippet": "    accountMapper.updateProfile(account);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 71, "snippet": "    Optional.ofNullable(account.getPassword()).filter(password -> password.length() > 0)" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "name": "카탈로그 서비스(수정 후 목록)",
+      "summary": {
+        "text": "계정 수정 후 선호 분류 상품 목록을 조회해 돌려준다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 59, "snippet": "  public List<Product> getProductListByCategory(String categoryId) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 60, "snippet": "    return productMapper.getProductListByCategory(categoryId);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 도메인 바깥의 협력 서비스다. 계정 수정 흐름의 마지막에서 이용자의 선호 분류를 받아 그 분류의 상품 목록을 돌려주는 역할만 맡는다. 계정 정보에는 관여하지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 35, "snippet": "public class CatalogService {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 59, "snippet": "  public List<Product> getProductListByCategory(String categoryId) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 140, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+          ]
+        },
+        "businessLogic": {
+          "text": "분류 조회에는 별도 가공이나 규칙이 없다. 받은 분류 값을 상품 매퍼로 그대로 넘겨 조회 결과를 반환한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 60, "snippet": "    return productMapper.getProductListByCategory(categoryId);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "계정 수정 요청 처리",
+      "summary": {
+        "text": "계정 수정 요청을 받아 서비스에 갱신을 지시하고, 갱신된 계정을 재조회한 뒤 선호 분류 상품 목록을 채워 카탈로그 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 137, "snippet": "  public Resolution editAccount() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 138, "snippet": "    accountService.updateAccount(account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 141, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 수정 흐름의 입구다. 화면에서 채워진 계정 자료를 받아 계정 서비스에 갱신을 위임하고, 그 결과를 다시 조회해 세션 계정 정보를 새로 채운다. 이어서 카탈로그 서비스로 개인화 목록을 채운 뒤 카탈로그 화면으로 넘긴다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 138, "snippet": "    accountService.updateAccount(account);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 139, "snippet": "    account = accountService.getAccount(account.getUsername());" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 140, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 141, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 화면 진입점의 계정 필드로 바인딩된다. 아이디와 비밀번호는 수정 업무에서 필수 입력으로 검증되고, 이름과 성도 계정 자료 쪽에서 필수로 검증된다. 이 처리 자체에는 별도 권한 확인 코드가 없다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 76, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 85, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 78, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 137, "snippet": "  public Resolution editAccount() {" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?editAccountForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "계정 수정 화면 표시",
+      "summary": {
+        "text": "계정 수정 입력 화면으로 넘긴다. 조회나 저장은 하지 않는다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 128, "snippet": "  public Resolution editAccountForm() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 129, "snippet": "    return new ForwardResolution(EDIT_ACCOUNT);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 수정 화면을 띄우는 역할만 맡는다. 서비스로 위임하지 않고 화면 전환 결과만 돌려준다. 화면에 표시할 계정 값은 세션 범위 진입점이 이미 보유한 계정 자료에서 나온다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 42, "snippet": "@SessionScope" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 68, "snippet": "  public Account getAccount() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 129, "snippet": "    return new ForwardResolution(EDIT_ACCOUNT);" }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터를 받지 않으며 검증이나 인증 확인도 하지 않는다. 목적지는 계정 수정 화면으로 고정되어 있다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 128, "snippet": "  public Resolution editAccountForm() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 48, "snippet": "  private static final String EDIT_ACCOUNT = \"/WEB-INF/jsp/account/EditAccountForm.jsp\";" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "name": "계정 자료(가입)",
+      "summary": {
+        "text": "회원가입 화면에서 입력한 값을 담아 신규 등록 대상이 되는 계정 자료다. 이름과 성은 가입 업무에서 필수 입력으로 검증된다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 27, "snippet": "public class Account implements Serializable {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 87, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "회원가입 흐름에서 입력값을 실어 나르는 자료 구조다. 화면 진입점의 계정 필드에 입력이 채워진 뒤 그대로 서비스로 넘어가 등록 대상이 되며, 등록 후에는 재조회 결과로 다시 채워진다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 27, "snippet": "public class Account implements Serializable {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 116, "snippet": "    accountService.insertAccount(account);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 117, "snippet": "    account = accountService.getAccount(account.getUsername());" }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·비밀번호·이메일·이름·성·상태와 주소 관련 항목, 그리고 선호 분류·언어 설정·목록 노출·배너 노출을 갖는다. 가입 업무에서는 이름과 성이 비어 있으면 안 되고, 목록 노출과 배너 노출은 참·거짓 값으로 다룬다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 32, "snippet": "  private String password;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 46, "snippet": "  private boolean listOption;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 47, "snippet": "  private boolean bannerOption;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 87, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+      "name": "계정 매퍼(가입)",
+      "summary": {
+        "text": "회원가입 흐름에서 계정 인적사항·개인화 설정·로그인 정보 등록 세 가지 영속 작업을 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 31, "snippet": "  void insertAccount(Account account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 33, "snippet": "  void insertProfile(Account account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 35, "snippet": "  void insertSignon(Account account);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "회원가입 흐름의 영속 담당이다. 하나의 계정 자료를 인적사항·개인화 설정·로그인 정보 세 갈래로 나눠 등록하고, 가입 직후 재조회를 위한 아이디 기준 조회도 맡는다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 25, "snippet": "public interface AccountMapper {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 27, "snippet": "  Account getAccountByUsername(String username);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 31, "snippet": "  void insertAccount(Account account);" }
+          ]
+        },
+        "persistence": {
+          "text": "인적사항은 ACCOUNT 테이블에 이메일·이름·성·상태·주소·도시·주·우편번호·국가·전화번호·아이디로 등록한다. 개인화 설정은 PROFILE 테이블에 언어 설정·선호 분류·목록 노출·배너 노출·아이디로 등록하며, 목록·배너 노출은 참일 때 1, 거짓일 때 0으로 변환해 저장한다. 로그인 정보는 SIGNON 테이블에 비밀번호와 아이디로 등록한다.",
+          "citations": [
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 96, "snippet": "    INSERT INTO ACCOUNT" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 97, "snippet": "      (EMAIL, FIRSTNAME, LASTNAME, STATUS, ADDR1, ADDR2, CITY, STATE, ZIP, COUNTRY, PHONE, USERID)" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 115, "snippet": "    <bind name=\"listOptionValue\" value=\"_parameter.isListOption() ? 1 : 0\" />" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 118, "snippet": "    INSERT INTO PROFILE (LANGPREF, FAVCATEGORY, MYLISTOPT, BANNEROPT, USERID)" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 128, "snippet": "    INSERT INTO SIGNON (PASSWORD,USERNAME)" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "name": "상품 매퍼(가입 후 목록)",
+      "summary": {
+        "text": "회원가입 후 신규 이용자의 선호 분류에 해당하는 상품 목록을 조회한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 29, "snippet": "  List<Product> getProductListByCategory(String categoryId);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "회원가입 흐름의 마지막에서 개인화 목록을 채우기 위한 조회를 담당한다. 계정 자료를 다루지 않고 분류 기준 상품 목록 조회만 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 27, "snippet": "public interface ProductMapper {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 29, "snippet": "  List<Product> getProductListByCategory(String categoryId);" }
+          ]
+        },
+        "persistence": {
+          "text": "PRODUCT 테이블에서 분류가 일치하는 행을 조회해 상품 번호·이름·설명·분류를 상품 자료로 매핑한다.",
+          "citations": [
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 36, "snippet": "  <select id=\"getProductListByCategory\" resultType=\"Product\">" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 42, "snippet": "    FROM PRODUCT" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 43, "snippet": "    WHERE CATEGORY = #{value}" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "name": "계정 서비스(가입)",
+      "summary": {
+        "text": "회원가입 업무를 하나의 트랜잭션으로 조율한다. 인적사항·개인화 설정·로그인 정보를 차례로 등록한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 53, "snippet": "  @Transactional" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 54, "snippet": "  public void insertAccount(Account account) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 55, "snippet": "    accountMapper.insertAccount(account);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "회원가입 흐름의 업무 조율자다. 화면 진입점에서 받은 계정 자료 하나로 인적사항·개인화 설정·로그인 정보 등록을 순서대로 지시하고, 가입 직후 아이디 기준 재조회도 처리한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 31, "snippet": "public class AccountService {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 54, "snippet": "  public void insertAccount(Account account) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 39, "snippet": "  public Account getAccount(String username) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 40, "snippet": "    return accountMapper.getAccountByUsername(username);" }
+          ]
+        },
+        "businessLogic": {
+          "text": "등록 순서는 인적사항, 개인화 설정, 로그인 정보 순으로 고정되어 있고 조건 분기가 없다. 세 등록은 하나의 트랜잭션 경계 안에서 실행되어 모두 반영되거나 모두 취소된다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 53, "snippet": "  @Transactional" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 55, "snippet": "    accountMapper.insertAccount(account);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 56, "snippet": "    accountMapper.insertProfile(account);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 57, "snippet": "    accountMapper.insertSignon(account);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "name": "카탈로그 서비스(가입 후 목록)",
+      "summary": {
+        "text": "회원가입 후 신규 이용자의 선호 분류 상품 목록을 조회해 돌려준다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 59, "snippet": "  public List<Product> getProductListByCategory(String categoryId) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 118, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 도메인 바깥의 협력 서비스다. 회원가입 흐름의 마지막에서 신규 이용자의 선호 분류를 받아 그 분류의 상품 목록을 돌려주며, 계정 정보에는 관여하지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 35, "snippet": "public class CatalogService {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 39, "snippet": "  private final ProductMapper productMapper;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 118, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+          ]
+        },
+        "businessLogic": {
+          "text": "분류 조회에는 가공이나 규칙이 없다. 받은 분류 값을 상품 매퍼로 그대로 위임한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 60, "snippet": "    return productMapper.getProductListByCategory(categoryId);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "회원가입 요청 처리",
+      "summary": {
+        "text": "회원가입 요청을 받아 계정을 등록하고, 등록된 계정을 재조회해 선호 분류 상품 목록을 채운 뒤 인증 상태로 전환해 카탈로그 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 115, "snippet": "  public Resolution newAccount() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 116, "snippet": "    accountService.insertAccount(account);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 119, "snippet": "    authenticated = true;" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "회원가입 흐름의 입구다. 화면에서 채워진 계정 자료를 계정 서비스에 넘겨 등록하고, 등록 결과를 아이디로 다시 조회해 세션 계정 정보를 채운다. 이어서 카탈로그 서비스로 개인화 목록을 채우고 인증 상태를 세운 뒤 카탈로그 화면으로 넘긴다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 116, "snippet": "    accountService.insertAccount(account);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 117, "snippet": "    account = accountService.getAccount(account.getUsername());" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 118, "snippet": "    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 120, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터는 화면 진입점의 계정 필드로 바인딩되며, 아이디와 비밀번호는 가입 업무에서 필수 입력으로 검증된다. 이름과 성도 계정 자료 쪽에서 필수로 검증된다. 별도 인증 확인은 없고, 등록이 끝나면 스스로 인증 상태를 세운다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 76, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 86, "snippet": "  public void setPassword(String password) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 78, "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 119, "snippet": "    authenticated = true;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?newAccountForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "회원가입 화면 표시",
+      "summary": {
+        "text": "신규 계정 입력 화면으로 넘긴다. 조회나 저장은 하지 않는다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 106, "snippet": "  public Resolution newAccountForm() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 107, "snippet": "    return new ForwardResolution(NEW_ACCOUNT);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "회원가입 입력 화면을 띄우는 역할만 맡는다. 서비스로 위임하지 않고 화면 전환 결과만 돌려준다. 화면에 표시할 언어·선호 분류 선택지는 진입점이 보유한 고정 목록에서 나온다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 107, "snippet": "    return new ForwardResolution(NEW_ACCOUNT);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 98, "snippet": "  public List<String> getLanguages() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 102, "snippet": "  public List<String> getCategories() {" }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터를 받지 않고 검증이나 인증 확인도 하지 않는다. 목적지는 신규 계정 입력 화면으로 고정되어 있다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 106, "snippet": "  public Resolution newAccountForm() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 47, "snippet": "  private static final String NEW_ACCOUNT = \"/WEB-INF/jsp/account/NewAccountForm.jsp\";" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?signoff:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "로그아웃 요청 처리",
+      "summary": {
+        "text": "세션을 무효화하고 보유 중이던 계정·개인화 목록·인증 표시를 초기화한 뒤 카탈로그 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 184, "snippet": "  public Resolution signoff() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 185, "snippet": "    context.getRequest().getSession().invalidate();" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 186, "snippet": "    clear();" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그아웃 흐름의 입구이자 전부다. 서비스나 저장소로 위임하지 않고 세션 무효화와 보유 상태 초기화만 수행한 뒤 카탈로그 화면으로 넘긴다. 초기화는 계정을 새 자료로 바꾸고 개인화 목록을 비우며 인증 표시를 내리는 것을 뜻한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 185, "snippet": "    context.getRequest().getSession().invalidate();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 203, "snippet": "    account = new Account();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 204, "snippet": "    myList = null;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 187, "snippet": "    return new RedirectResolution(CatalogActionBean.class);" }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터를 받지 않고 입력 검증도 없다. 로그인 상태인지 확인하는 절차 없이 곧바로 세션을 무효화한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 184, "snippet": "  public Resolution signoff() {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 185, "snippet": "    context.getRequest().getSession().invalidate();" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "name": "계정 자료(로그인)",
+      "summary": {
+        "text": "로그인 조회 결과를 담는 계정 자료다. 세션에 보관하기 전에 비밀번호는 지워진다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 27, "snippet": "public class Account implements Serializable {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 169, "snippet": "      account.setPassword(null);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인 흐름에서 두 가지 역할을 한다. 먼저 입력한 아이디와 비밀번호를 담아 조회 조건을 제공하고, 조회가 성공하면 그 결과를 담아 세션에 보관되는 이용자 정보가 된다. 세션에 실리므로 직렬화 가능한 형태로 정의되어 있다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 27, "snippet": "public class Account implements Serializable {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 73, "snippet": "    return account.getUsername();" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 161, "snippet": "    account = accountService.getAccount(getUsername(), getPassword());" }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디와 비밀번호가 인증에 쓰이고, 선호 분류는 로그인 성공 후 개인화 목록 조회의 기준이 된다. 세션에 보관될 때 비밀번호 항목은 비워지고, 인증된 것으로 인정받으려면 아이디가 채워져 있어야 한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 31, "snippet": "  private String username;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 32, "snippet": "  private String password;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java", "line": 44, "snippet": "  private String favouriteCategoryId;" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 196, "snippet": "    return authenticated && account != null && account.getUsername() != null;" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+      "name": "계정 매퍼(로그인)",
+      "summary": {
+        "text": "로그인 흐름에서 아이디와 비밀번호가 함께 일치하는 계정을 조회한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 29, "snippet": "  Account getAccountByUsernameAndPassword(String username, String password);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인 흐름의 영속 담당이다. 아이디와 비밀번호 두 조건으로 계정을 조회하는 단 하나의 읽기 작업만 맡으며, 쓰기 작업은 관여하지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 25, "snippet": "public interface AccountMapper {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java", "line": 29, "snippet": "  Account getAccountByUsernameAndPassword(String username, String password);" }
+          ]
+        },
+        "persistence": {
+          "text": "ACCOUNT·PROFILE·SIGNON·BANNERDATA 네 테이블을 결합해 조회하며, 계정 아이디가 첫 번째 인자와 같고 로그인 비밀번호가 두 번째 인자와 같은 행을 찾는다. 결과에는 이메일·이름·주소 등 인적사항과 언어 설정·선호 분류·목록 노출·배너 노출, 그리고 선호 분류에 대응하는 배너 이름이 함께 실린다. 조회 결과는 캐시 대상이다.",
+          "citations": [
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 52, "snippet": "  <select id=\"getAccountByUsernameAndPassword\" resultType=\"Account\">" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 71, "snippet": "    FROM ACCOUNT, PROFILE, SIGNON, BANNERDATA" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 72, "snippet": "    WHERE ACCOUNT.USERID = #{param1}" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 73, "snippet": "      AND SIGNON.PASSWORD = #{param2}" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 24, "snippet": "  <cache />" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "name": "상품 매퍼(로그인 후 목록)",
+      "summary": {
+        "text": "로그인 후 이용자의 선호 분류에 해당하는 상품 목록을 조회한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 29, "snippet": "  List<Product> getProductListByCategory(String categoryId);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인 흐름의 마지막에서 개인화 목록을 채우기 위한 조회를 담당한다. 인증 자체에는 관여하지 않고 분류 기준 상품 목록 조회만 제공한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 27, "snippet": "public interface ProductMapper {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java", "line": 29, "snippet": "  List<Product> getProductListByCategory(String categoryId);" }
+          ]
+        },
+        "persistence": {
+          "text": "PRODUCT 테이블에서 분류가 일치하는 행을 조회해 상품 번호·이름·설명·분류를 상품 자료로 매핑한다. 조회 결과는 캐시 대상이다.",
+          "citations": [
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 36, "snippet": "  <select id=\"getProductListByCategory\" resultType=\"Product\">" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 43, "snippet": "    WHERE CATEGORY = #{value}" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/ProductMapper.xml", "line": 24, "snippet": "  <cache />" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "name": "계정 서비스(로그인)",
+      "summary": {
+        "text": "아이디와 비밀번호로 계정을 조회해 인증 판정의 근거를 제공한다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 43, "snippet": "  public Account getAccount(String username, String password) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 44, "snippet": "    return accountMapper.getAccountByUsernameAndPassword(username, password);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인 흐름의 업무 조율자다. 아이디와 비밀번호를 받아 계정 매퍼로 조회를 위임하고 그 결과를 그대로 돌려준다. 조회 결과가 있는지 없는지에 대한 판정은 화면 진입점이 맡는다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 31, "snippet": "public class AccountService {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 43, "snippet": "  public Account getAccount(String username, String password) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 163, "snippet": "    if (account == null) {" }
+          ]
+        },
+        "businessLogic": {
+          "text": "이 조회에는 비즈니스 규칙이나 트랜잭션 경계가 없다. 받은 아이디와 비밀번호를 가공 없이 매퍼로 넘기며, 비밀번호 대조는 조회 조건으로 처리된다. 쓰기 작업에만 트랜잭션이 걸려 있고 이 조회에는 걸려 있지 않다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 44, "snippet": "    return accountMapper.getAccountByUsernameAndPassword(username, password);" },
+            { "filePath": "src/main/resources/org/mybatis/jpetstore/mapper/AccountMapper.xml", "line": 73, "snippet": "      AND SIGNON.PASSWORD = #{param2}" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java", "line": 53, "snippet": "  @Transactional" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "name": "카탈로그 서비스(로그인 후 목록)",
+      "summary": {
+        "text": "로그인 성공 후 이용자의 선호 분류 상품 목록을 조회해 돌려준다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 59, "snippet": "  public List<Product> getProductListByCategory(String categoryId) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 170, "snippet": "      myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "계정 도메인 바깥의 협력 서비스다. 로그인이 성공한 경우에만 호출되어 이용자의 선호 분류에 해당하는 상품 목록을 돌려준다. 인증 판정에는 관여하지 않는다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 35, "snippet": "public class CatalogService {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 59, "snippet": "  public List<Product> getProductListByCategory(String categoryId) {" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 170, "snippet": "      myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" }
+          ]
+        },
+        "businessLogic": {
+          "text": "분류 조회에는 가공이나 규칙이 없고 트랜잭션 경계도 없다. 받은 분류 값을 상품 매퍼로 그대로 위임한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java", "line": 60, "snippet": "    return productMapper.getProductListByCategory(categoryId);" }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "로그인 요청 처리",
+      "summary": {
+        "text": "아이디와 비밀번호로 계정을 조회해 인증을 판정한다. 실패하면 안내와 함께 로그인 화면으로 되돌리고, 성공하면 비밀번호를 지운 뒤 개인화 목록을 채우고 세션에 계정을 등록해 카탈로그 화면으로 넘긴다.",
+        "citations": [
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 159, "snippet": "  public Resolution signon() {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 163, "snippet": "    if (account == null) {" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 169, "snippet": "      account.setPassword(null);" },
+          { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 175, "snippet": "      return new RedirectResolution(CatalogActionBean.class);" }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "로그인 흐름의 입구이자 인증 판정 지점이다. 입력받은 아이디와 비밀번호로 계정 서비스에 조회를 위임하고, 결과 유무로 성공·실패를 가른다. 성공 시에는 카탈로그 서비스로 개인화 목록을 채우고 세션에 자신을 등록한 뒤 카탈로그 화면으로 넘기며, 실패 시에는 안내 문구를 남기고 로그인 화면으로 되돌린다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 161, "snippet": "    account = accountService.getAccount(getUsername(), getPassword());" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 165, "snippet": "      setMessage(value);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 167, "snippet": "      return new ForwardResolution(SIGNON);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 170, "snippet": "      myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 174, "snippet": "      s.setAttribute(\"accountBean\", this);" }
+          ]
+        },
+        "request": {
+          "text": "아이디와 비밀번호를 요청 파라미터로 받으며 둘 다 로그인 업무에서 필수 입력으로 검증된다. 입력값은 진입점이 보유한 계정 자료에 바인딩된 뒤 조회 조건으로 쓰인다. 인증은 이 처리에서 직접 판정하며, 성공 시 인증 표시를 세우고 세션에 계정을 등록한다.",
+          "citations": [
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 76, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 78, "snippet": "    account.setUsername(username);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 85, "snippet": "  @Validate(required = true, on = { \"signon\", \"newAccount\", \"editAccount\" })" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 87, "snippet": "    account.setPassword(password);" },
+            { "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java", "line": 171, "snippet": "      authenticated = true;" }
+          ]
+        }
+      }
+    }
+  ]
+}

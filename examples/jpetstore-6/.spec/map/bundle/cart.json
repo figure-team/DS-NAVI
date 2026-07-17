@@ -1,0 +1,304 @@
+{
+  "domainId": "domain:cart",
+  "files": [
+    {
+      "className": "Cart",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/domain/Cart.java — java 파일",
+        "tags": []
+      },
+      "line": 32,
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "slice": {
+        "endLine": 101,
+        "startLine": 22,
+        "text": "import java.util.HashMap;\nimport java.util.Iterator;\nimport java.util.List;\nimport java.util.Map;\n\n/**\n * The Class Cart.\n *\n * @author Eduardo Macarron\n */\npublic class Cart implements Serializable {\n\n  private static final long serialVersionUID = 8329559983943337176L;\n\n  private final Map<String, CartItem> itemMap = Collections.synchronizedMap(new HashMap<>());\n  private final List<CartItem> itemList = new ArrayList<>();\n\n  public Iterator<CartItem> getCartItems() {\n    return itemList.iterator();\n  }\n\n  public List<CartItem> getCartItemList() {\n    return itemList;\n  }\n\n  public int getNumberOfItems() {\n    return itemList.size();\n  }\n\n  public Iterator<CartItem> getAllCartItems() {\n    return itemList.iterator();\n  }\n\n  public boolean containsItemId(String itemId) {\n    return itemMap.containsKey(itemId);\n  }\n\n  /**\n   * Adds the item.\n   *\n   * @param item\n   *          the item\n   * @param isInStock\n   *          the is in stock\n   */\n  public void addItem(Item item, boolean isInStock) {\n    CartItem cartItem = itemMap.get(item.getItemId());\n    if (cartItem == null) {\n      cartItem = new CartItem();\n      cartItem.setItem(item);\n      cartItem.setQuantity(0);\n      cartItem.setInStock(isInStock);\n      itemMap.put(item.getItemId(), cartItem);\n      itemList.add(cartItem);\n    }\n    cartItem.incrementQuantity();\n  }\n\n  /**\n   * Removes the item by id.\n   *\n   * @param itemId\n   *          the item id\n   *\n   * @return the item\n   */\n  public Item removeItemById(String itemId) {\n    CartItem cartItem = itemMap.remove(itemId);\n    if (cartItem == null) {\n      return null;\n    } else {\n      itemList.remove(cartItem);\n      return cartItem.getItem();\n    }\n  }\n\n  /**\n   * Increment quantity by item id.\n   *\n   * @param itemId",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CartItem",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+      "slice": {
+        "endLine": 77,
+        "startLine": 17,
+        "text": "\nimport java.io.Serializable;\nimport java.math.BigDecimal;\nimport java.util.Optional;\n\n/**\n * The Class CartItem.\n *\n * @author Eduardo Macarron\n */\npublic class CartItem implements Serializable {\n\n  private static final long serialVersionUID = 6620528781626504362L;\n\n  private Item item;\n  private int quantity;\n  private boolean inStock;\n  private BigDecimal total;\n\n  public boolean isInStock() {\n    return inStock;\n  }\n\n  public void setInStock(boolean inStock) {\n    this.inStock = inStock;\n  }\n\n  public BigDecimal getTotal() {\n    return total;\n  }\n\n  public Item getItem() {\n    return item;\n  }\n\n  public void setItem(Item item) {\n    this.item = item;\n    calculateTotal();\n  }\n\n  public int getQuantity() {\n    return quantity;\n  }\n\n  public void setQuantity(int quantity) {\n    this.quantity = quantity;\n    calculateTotal();\n  }\n\n  public void incrementQuantity() {\n    quantity++;\n    calculateTotal();\n  }\n\n  private void calculateTotal() {\n    total = Optional.ofNullable(item).map(Item::getListPrice).map(v -> v.multiply(new BigDecimal(quantity)))\n        .orElse(null);\n  }\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "Item",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/domain/Item.java — java 파일",
+        "tags": []
+      },
+      "line": 26,
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+      "slice": {
+        "endLine": 95,
+        "startLine": 16,
+        "text": "package org.mybatis.jpetstore.domain;\n\nimport java.io.Serializable;\nimport java.math.BigDecimal;\n\n/**\n * The Class Item.\n *\n * @author Eduardo Macarron\n */\npublic class Item implements Serializable {\n\n  private static final long serialVersionUID = -2159121673445254631L;\n\n  private String itemId;\n  private String productId;\n  private BigDecimal listPrice;\n  private BigDecimal unitCost;\n  private int supplierId;\n  private String status;\n  private String attribute1;\n  private String attribute2;\n  private String attribute3;\n  private String attribute4;\n  private String attribute5;\n  private Product product;\n  private int quantity;\n\n  public String getItemId() {\n    return itemId;\n  }\n\n  public void setItemId(String itemId) {\n    this.itemId = itemId.trim();\n  }\n\n  public int getQuantity() {\n    return quantity;\n  }\n\n  public void setQuantity(int quantity) {\n    this.quantity = quantity;\n  }\n\n  public Product getProduct() {\n    return product;\n  }\n\n  public void setProduct(Product product) {\n    this.product = product;\n  }\n\n  public int getSupplierId() {\n    return supplierId;\n  }\n\n  public void setSupplierId(int supplierId) {\n    this.supplierId = supplierId;\n  }\n\n  public BigDecimal getListPrice() {\n    return listPrice;\n  }\n\n  public void setListPrice(BigDecimal listPrice) {\n    this.listPrice = listPrice;\n  }\n\n  public BigDecimal getUnitCost() {\n    return unitCost;\n  }\n\n  public void setUnitCost(BigDecimal unitCost) {\n    this.unitCost = unitCost;\n  }\n\n  public String getStatus() {\n    return status;\n  }\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "ItemMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 28,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "slice": {
+        "endLine": 39,
+        "startLine": 18,
+        "text": "import java.util.List;\nimport java.util.Map;\n\nimport org.mybatis.jpetstore.domain.Item;\n\n/**\n * The Interface ItemMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface ItemMapper {\n\n  void updateInventoryQuantity(Map<String, Object> param);\n\n  int getInventoryQuantity(String itemId);\n\n  List<Item> getItemListByProduct(String productId);\n\n  Item getItem(String itemId);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CatalogService",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java — java 파일",
+        "tags": []
+      },
+      "line": 34,
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 24,
+        "text": "import org.mybatis.jpetstore.mapper.CategoryMapper;\nimport org.mybatis.jpetstore.mapper.ItemMapper;\nimport org.mybatis.jpetstore.mapper.ProductMapper;\nimport org.springframework.stereotype.Service;\n\n/**\n * The Class CatalogService.\n *\n * @author Eduardo Macarron\n */\n@Service\npublic class CatalogService {\n\n  private final CategoryMapper categoryMapper;\n  private final ItemMapper itemMapper;\n  private final ProductMapper productMapper;\n\n  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper, ProductMapper productMapper) {\n    this.categoryMapper = categoryMapper;\n    this.itemMapper = itemMapper;\n    this.productMapper = productMapper;\n  }\n\n  public List<Category> getCategoryList() {\n    return categoryMapper.getCategoryList();\n  }\n\n  public Category getCategory(String categoryId) {\n    return categoryMapper.getCategory(categoryId);\n  }\n\n  public Product getProduct(String productId) {\n    return productMapper.getProduct(productId);\n  }\n\n  public List<Product> getProductListByCategory(String categoryId) {\n    return productMapper.getProductListByCategory(categoryId);\n  }\n\n  /**\n   * Search product list.\n   *\n   * @param keywords\n   *          the keywords\n   *\n   * @return the list\n   */\n  public List<Product> searchProductList(String keywords) {\n    List<Product> products = new ArrayList<>();\n    for (String keyword : keywords.split(\"\\\\s+\")) {\n      products.addAll(productMapper.searchProductList(\"%\" + keyword.toLowerCase() + \"%\"));\n    }\n    return products;\n  }\n\n  public List<Item> getItemListByProduct(String productId) {\n    return itemMapper.getItemListByProduct(productId);\n  }\n\n  public Item getItem(String itemId) {\n    return itemMapper.getItem(itemId);\n  }\n\n  public boolean isItemInStock(String itemId) {\n    return itemMapper.getInventoryQuantity(itemId) > 0;\n  }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CartActionBean",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java — java 파일",
+        "tags": []
+      },
+      "line": 68,
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "slice": {
+        "endLine": 137,
+        "startLine": 58,
+        "text": "\n  public void setWorkingItemId(String workingItemId) {\n    this.workingItemId = workingItemId;\n  }\n\n  /**\n   * Adds the item to cart.\n   *\n   * @return the resolution\n   */\n  public Resolution addItemToCart() {\n\n    if (workingItemId == null || workingItemId.trim().isEmpty()) {\n      setMessage(\"Invalid item ID: cannot add item to cart.\");\n      return new ForwardResolution(ERROR);\n    }\n\n    if (cart.containsItemId(workingItemId)) {\n      cart.incrementQuantityByItemId(workingItemId);\n    } else {\n      // isInStock is a \"real-time\" property that must be updated\n      // every time an item is added to the cart, even if other\n      // item details are cached.\n      boolean isInStock = catalogService.isItemInStock(workingItemId);\n      Item item = catalogService.getItem(workingItemId);\n      cart.addItem(item, isInStock);\n    }\n\n    return new ForwardResolution(VIEW_CART);\n  }\n\n  /**\n   * Removes the item from cart.\n   *\n   * @return the resolution\n   */\n  public Resolution removeItemFromCart() {\n\n    if (workingItemId == null || workingItemId.trim().isEmpty()) {\n      setMessage(\"Invalid item ID: cannot remove item from cart.\");\n      return new ForwardResolution(ERROR);\n    }\n\n    Item item = cart.removeItemById(workingItemId);\n\n    if (item == null) {\n      setMessage(\"Attempted to remove null CartItem from Cart.\");\n      return new ForwardResolution(ERROR);\n    } else {\n      return new ForwardResolution(VIEW_CART);\n    }\n  }\n\n  /**\n   * Update cart quantities.\n   *\n   * @return the resolution\n   */\n  public Resolution updateCartQuantities() {\n    HttpServletRequest request = context.getRequest();\n\n    Iterator<CartItem> cartItems = getCart().getAllCartItems();\n    while (cartItems.hasNext()) {\n      CartItem cartItem = cartItems.next();\n      String itemId = cartItem.getItem().getItemId();\n      try {\n        int quantity = Integer.parseInt(request.getParameter(itemId));\n        getCart().setQuantityByItemId(itemId, quantity);\n        if (quantity < 1) {\n          cartItems.remove();\n        }\n      } catch (NumberFormatException e) {\n        // ignore invalid numeric input on purpose\n      }\n    }\n\n    return new ForwardResolution(VIEW_CART);\n  }\n\n  public ForwardResolution viewCart() {",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "CartActionBean#addItemToCart",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "flowId": "flow:ANY /actions/Cart.action?addItemToCart",
+      "line": 68,
+      "stepIds": [
+        "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+        "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+        "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+        "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+        "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/Item.java"
+      ]
+    },
+    {
+      "entryPoint": "CartActionBean#checkOut",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "flowId": "flow:ANY /actions/Cart.action?checkOut",
+      "line": 141,
+      "stepIds": [
+        "step:ANY /actions/Cart.action?checkOut:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+      ]
+    },
+    {
+      "entryPoint": "CartActionBean#removeItemFromCart",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "flowId": "flow:ANY /actions/Cart.action?removeItemFromCart",
+      "line": 94,
+      "stepIds": [
+        "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+        "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/domain/CartItem.java"
+      ]
+    },
+    {
+      "entryPoint": "CartActionBean#updateCartQuantities",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "flowId": "flow:ANY /actions/Cart.action?updateCartQuantities",
+      "line": 116,
+      "stepIds": [
+        "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+        "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+        "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+        "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/Item.java"
+      ]
+    },
+    {
+      "entryPoint": "CartActionBean#viewCart",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "flowId": "flow:ANY /actions/Cart.action?viewCart",
+      "line": 137,
+      "stepIds": [
+        "step:ANY /actions/Cart.action?viewCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "cart",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/CartItem.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/domain/Item.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "stepId": "step:ANY /actions/Cart.action?addItemToCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "stepId": "step:ANY /actions/Cart.action?checkOut:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "stepId": "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+      "stepId": "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/domain/CartItem.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "stepId": "step:ANY /actions/Cart.action?removeItemFromCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "stepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/Cart.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/CartItem.java",
+      "stepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/CartItem.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Item.java",
+      "stepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/domain/Item.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "stepId": "step:ANY /actions/Cart.action?updateCartQuantities:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "stepId": "step:ANY /actions/Cart.action?viewCart:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java"
+    }
+  ]
+}

@@ -1,0 +1,364 @@
+{
+  "domainId": "domain:account",
+  "files": [
+    {
+      "className": "Account",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/domain/Account.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "slice": {
+        "endLine": 96,
+        "startLine": 17,
+        "text": "\nimport java.io.Serializable;\n\nimport net.sourceforge.stripes.validation.Validate;\n\n/**\n * The Class Account.\n *\n * @author Eduardo Macarron\n */\npublic class Account implements Serializable {\n\n  private static final long serialVersionUID = 8751282105532159742L;\n\n  private String username;\n  private String password;\n  private String email;\n  private String firstName;\n  private String lastName;\n  private String status;\n  private String address1;\n  private String address2;\n  private String city;\n  private String state;\n  private String zip;\n  private String country;\n  private String phone;\n  private String favouriteCategoryId;\n  private String languagePreference;\n  private boolean listOption;\n  private boolean bannerOption;\n  private String bannerName;\n\n  public String getUsername() {\n    return username;\n  }\n\n  public void setUsername(String username) {\n    this.username = username;\n  }\n\n  public String getPassword() {\n    return password;\n  }\n\n  public void setPassword(String password) {\n    this.password = password;\n  }\n\n  public String getEmail() {\n    return email;\n  }\n\n  public void setEmail(String email) {\n    this.email = email;\n  }\n\n  public String getFirstName() {\n    return firstName;\n  }\n\n  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })\n  public void setFirstName(String firstName) {\n    this.firstName = firstName;\n  }\n\n  public String getLastName() {\n    return lastName;\n  }\n\n  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })\n  public void setLastName(String lastName) {\n    this.lastName = lastName;\n  }\n\n  public String getStatus() {\n    return status;\n  }\n\n  public void setStatus(String status) {",
+        "truncated": true
+      }
+    },
+    {
+      "className": "AccountMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 25,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+      "slice": {
+        "endLine": 44,
+        "startLine": 15,
+        "text": " */\npackage org.mybatis.jpetstore.mapper;\n\nimport org.mybatis.jpetstore.domain.Account;\n\n/**\n * The Interface AccountMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface AccountMapper {\n\n  Account getAccountByUsername(String username);\n\n  Account getAccountByUsernameAndPassword(String username, String password);\n\n  void insertAccount(Account account);\n\n  void insertProfile(Account account);\n\n  void insertSignon(Account account);\n\n  void updateAccount(Account account);\n\n  void updateProfile(Account account);\n\n  void updateSignon(Account account);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "ProductMapper",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java — java 파일",
+        "tags": []
+      },
+      "line": 27,
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "slice": {
+        "endLine": 36,
+        "startLine": 17,
+        "text": "\nimport java.util.List;\n\nimport org.mybatis.jpetstore.domain.Product;\n\n/**\n * The Interface ProductMapper.\n *\n * @author Eduardo Macarron\n */\npublic interface ProductMapper {\n\n  List<Product> getProductListByCategory(String categoryId);\n\n  Product getProduct(String productId);\n\n  List<Product> searchProductList(String keywords);\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "AccountService",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/service/AccountService.java — java 파일",
+        "tags": []
+      },
+      "line": 30,
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "slice": {
+        "endLine": 76,
+        "startLine": 20,
+        "text": "import org.mybatis.jpetstore.domain.Account;\nimport org.mybatis.jpetstore.mapper.AccountMapper;\nimport org.springframework.stereotype.Service;\nimport org.springframework.transaction.annotation.Transactional;\n\n/**\n * The Class AccountService.\n *\n * @author Eduardo Macarron\n */\n@Service\npublic class AccountService {\n\n  private final AccountMapper accountMapper;\n\n  public AccountService(AccountMapper accountMapper) {\n    this.accountMapper = accountMapper;\n  }\n\n  public Account getAccount(String username) {\n    return accountMapper.getAccountByUsername(username);\n  }\n\n  public Account getAccount(String username, String password) {\n    return accountMapper.getAccountByUsernameAndPassword(username, password);\n  }\n\n  /**\n   * Insert account.\n   *\n   * @param account\n   *          the account\n   */\n  @Transactional\n  public void insertAccount(Account account) {\n    accountMapper.insertAccount(account);\n    accountMapper.insertProfile(account);\n    accountMapper.insertSignon(account);\n  }\n\n  /**\n   * Update account.\n   *\n   * @param account\n   *          the account\n   */\n  @Transactional\n  public void updateAccount(Account account) {\n    accountMapper.updateAccount(account);\n    accountMapper.updateProfile(account);\n\n    Optional.ofNullable(account.getPassword()).filter(password -> password.length() > 0)\n        .ifPresent(password -> accountMapper.updateSignon(account));\n  }\n\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "CatalogService",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java — java 파일",
+        "tags": []
+      },
+      "line": 34,
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "slice": {
+        "endLine": 91,
+        "startLine": 24,
+        "text": "import org.mybatis.jpetstore.mapper.CategoryMapper;\nimport org.mybatis.jpetstore.mapper.ItemMapper;\nimport org.mybatis.jpetstore.mapper.ProductMapper;\nimport org.springframework.stereotype.Service;\n\n/**\n * The Class CatalogService.\n *\n * @author Eduardo Macarron\n */\n@Service\npublic class CatalogService {\n\n  private final CategoryMapper categoryMapper;\n  private final ItemMapper itemMapper;\n  private final ProductMapper productMapper;\n\n  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper, ProductMapper productMapper) {\n    this.categoryMapper = categoryMapper;\n    this.itemMapper = itemMapper;\n    this.productMapper = productMapper;\n  }\n\n  public List<Category> getCategoryList() {\n    return categoryMapper.getCategoryList();\n  }\n\n  public Category getCategory(String categoryId) {\n    return categoryMapper.getCategory(categoryId);\n  }\n\n  public Product getProduct(String productId) {\n    return productMapper.getProduct(productId);\n  }\n\n  public List<Product> getProductListByCategory(String categoryId) {\n    return productMapper.getProductListByCategory(categoryId);\n  }\n\n  /**\n   * Search product list.\n   *\n   * @param keywords\n   *          the keywords\n   *\n   * @return the list\n   */\n  public List<Product> searchProductList(String keywords) {\n    List<Product> products = new ArrayList<>();\n    for (String keyword : keywords.split(\"\\\\s+\")) {\n      products.addAll(productMapper.searchProductList(\"%\" + keyword.toLowerCase() + \"%\"));\n    }\n    return products;\n  }\n\n  public List<Item> getItemListByProduct(String productId) {\n    return itemMapper.getItemListByProduct(productId);\n  }\n\n  public Item getItem(String itemId) {\n    return itemMapper.getItem(itemId);\n  }\n\n  public boolean isItemInStock(String itemId) {\n    return itemMapper.getInventoryQuantity(itemId) > 0;\n  }\n}\n",
+        "truncated": true
+      }
+    },
+    {
+      "className": "AccountActionBean",
+      "kgHint": {
+        "summary": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java — java 파일",
+        "tags": []
+      },
+      "line": 149,
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "slice": {
+        "endLine": 209,
+        "startLine": 139,
+        "text": "    account = accountService.getAccount(account.getUsername());\n    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());\n    return new RedirectResolution(CatalogActionBean.class);\n  }\n\n  /**\n   * Signon form.\n   *\n   * @return the resolution\n   */\n  @DefaultHandler\n  public Resolution signonForm() {\n    return new ForwardResolution(SIGNON);\n  }\n\n  /**\n   * Signon.\n   *\n   * @return the resolution\n   */\n  public Resolution signon() {\n\n    account = accountService.getAccount(getUsername(), getPassword());\n\n    if (account == null) {\n      String value = \"Invalid username or password.  Signon failed.\";\n      setMessage(value);\n      clear();\n      return new ForwardResolution(SIGNON);\n    } else {\n      account.setPassword(null);\n      myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());\n      authenticated = true;\n      HttpSession s = context.getRequest().getSession();\n      // this bean is already registered as /actions/Account.action\n      s.setAttribute(\"accountBean\", this);\n      return new RedirectResolution(CatalogActionBean.class);\n    }\n  }\n\n  /**\n   * Signoff.\n   *\n   * @return the resolution\n   */\n  public Resolution signoff() {\n    context.getRequest().getSession().invalidate();\n    clear();\n    return new RedirectResolution(CatalogActionBean.class);\n  }\n\n  /**\n   * Checks if is authenticated.\n   *\n   * @return true, if is authenticated\n   */\n  public boolean isAuthenticated() {\n    return authenticated && account != null && account.getUsername() != null;\n  }\n\n  /**\n   * Clear.\n   */\n  public void clear() {\n    account = new Account();\n    myList = null;\n    authenticated = false;\n  }\n\n}\n",
+        "truncated": true
+      }
+    }
+  ],
+  "flows": [
+    {
+      "entryPoint": "AccountActionBean#signonForm",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "flowId": "flow:ANY /actions/Account.action",
+      "line": 149,
+      "stepIds": [
+        "step:ANY /actions/Account.action:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    },
+    {
+      "entryPoint": "AccountActionBean#editAccount",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "flowId": "flow:ANY /actions/Account.action?editAccount",
+      "line": 137,
+      "stepIds": [
+        "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+        "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+        "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+        "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+        "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+        "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+      ]
+    },
+    {
+      "entryPoint": "AccountActionBean#editAccountForm",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "flowId": "flow:ANY /actions/Account.action?editAccountForm",
+      "line": 128,
+      "stepIds": [
+        "step:ANY /actions/Account.action?editAccountForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    },
+    {
+      "entryPoint": "AccountActionBean#newAccount",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "flowId": "flow:ANY /actions/Account.action?newAccount",
+      "line": 115,
+      "stepIds": [
+        "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+        "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+        "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+        "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+        "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+        "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+      ]
+    },
+    {
+      "entryPoint": "AccountActionBean#newAccountForm",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "flowId": "flow:ANY /actions/Account.action?newAccountForm",
+      "line": 106,
+      "stepIds": [
+        "step:ANY /actions/Account.action?newAccountForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    },
+    {
+      "entryPoint": "AccountActionBean#signoff",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "flowId": "flow:ANY /actions/Account.action?signoff",
+      "line": 184,
+      "stepIds": [
+        "step:ANY /actions/Account.action?signoff:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+      ]
+    },
+    {
+      "entryPoint": "AccountActionBean#signon",
+      "entryType": "http",
+      "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "flowId": "flow:ANY /actions/Account.action?signon",
+      "line": 159,
+      "stepIds": [
+        "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+        "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+        "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+        "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+        "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+        "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+      ]
+    }
+  ],
+  "gitCommit": "a73a85b4dc02c36b56a65d9a79f6cd45b350a700",
+  "key": "account",
+  "name": "",
+  "nodeDetailTemplate": {
+    "byLayer": {
+      "api": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 엔드포인트/컨트롤러가 맡는 역할을 한 문단으로 — 무엇을 받아 어디로 위임하는지."
+        },
+        {
+          "id": "request",
+          "label": "요청 처리",
+          "promptHint": "받는 요청 파라미터·검증·인증/권한 처리. 핸들러 메서드 시그니처와 검증 코드에서 인용."
+        }
+      ],
+      "dao": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 DAO/매퍼가 맡는 역할을 한 문단으로 — 어떤 영속 작업을 담당하는지."
+        },
+        {
+          "id": "persistence",
+          "label": "영속 처리",
+          "promptHint": "실행하는 쿼리/SQL·대상 테이블·결과 매핑. 매퍼 메서드/XML/@Query 에서 인용."
+        }
+      ],
+      "db": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 데이터 노드가 흐름에서 맡는 역할을 한 문단으로 — 어떤 데이터를 보관/표현하는지."
+        },
+        {
+          "id": "schema",
+          "label": "스키마",
+          "promptHint": "테이블/엔티티의 주요 컬럼·키·제약·관계. 스키마 정의/@Entity/DDL 에서 인용."
+        }
+      ],
+      "service": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 흐름에서 이 서비스가 맡는 역할을 한 문단으로 — 어떤 비즈니스 작업을 조율하는지."
+        },
+        {
+          "id": "businessLogic",
+          "label": "비즈니스 로직",
+          "promptHint": "핵심 비즈니스 규칙·계산·트랜잭션 경계. 규칙이 구현된 메서드 본문에서 인용."
+        }
+      ],
+      "unknown": [
+        {
+          "id": "role",
+          "label": "역할",
+          "promptHint": "이 노드가 흐름에서 맡는 역할을 한 문단으로 — 데이터 구조 또는 협력 객체로서."
+        },
+        {
+          "id": "dataShape",
+          "label": "데이터 구조",
+          "promptHint": "주요 필드/구조와 지켜야 할 불변식. 클래스 필드 선언/검증 로직에서 인용."
+        }
+      ]
+    },
+    "version": 2
+  },
+  "schemaVersion": 1,
+  "sliceOmitted": [],
+  "steps": [
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Account.action:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/domain/Account.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/service/AccountService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Account.action?editAccount:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Account.action?editAccountForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/domain/Account.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/service/AccountService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Account.action?newAccount:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Account.action?newAccountForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Account.action?signoff:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    },
+    {
+      "layer": "unknown",
+      "relPath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/domain/Account.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java",
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/mapper/AccountMapper.java"
+    },
+    {
+      "layer": "dao",
+      "relPath": "src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java",
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/mapper/ProductMapper.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/service/AccountService.java"
+    },
+    {
+      "layer": "service",
+      "relPath": "src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/service/CatalogService.java"
+    },
+    {
+      "layer": "api",
+      "relPath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "stepId": "step:ANY /actions/Account.action?signon:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java"
+    }
+  ]
+}

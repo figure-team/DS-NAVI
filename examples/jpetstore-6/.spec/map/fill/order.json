@@ -1,0 +1,2709 @@
+{
+  "schemaVersion": 1,
+  "domainId": "domain:order",
+  "name": "주문",
+  "summary": {
+    "text": "주문 도메인은 장바구니에 담긴 상품을 주문서로 전환하고, 배송지·결제 정보를 확인받아 주문을 확정하며, 확정된 주문의 이력과 상세를 조회하는 업무를 담당한다. 주문 확정 시 재고 차감·주문 저장·주문 상태 기록·품목 저장을 하나의 트랜잭션으로 처리한다.",
+    "citations": [
+      {
+        "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+        "line": 60,
+        "snippet": "  public void insertOrder(Order order) {"
+      },
+      {
+        "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+        "line": 59,
+        "snippet": "  @Transactional"
+      },
+      {
+        "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+        "line": 129,
+        "snippet": "      order.initOrder(accountBean.getAccount(), cartBean.getCart());"
+      }
+    ]
+  },
+  "entities": [
+    {
+      "text": "주문(Order)은 주문번호·주문자·주문일시·배송지 정보·청구지 정보·배송사·총액·신용카드 정보·상태를 보유하며, 여러 개의 주문품목(LineItem)을 목록으로 가진다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+          "line": 34,
+          "snippet": "  private int orderId;"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+          "line": 50,
+          "snippet": "  private BigDecimal totalPrice;"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+          "line": 60,
+          "snippet": "  private List<LineItem> lineItems = new ArrayList<>();"
+        }
+      ]
+    },
+    {
+      "text": "계정(Account)은 주문자 식별과 배송지·청구지 기본값의 공급원으로, 아이디·이름·성·주소·도시·주(state)·우편번호·국가를 보유한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+          "line": 31,
+          "snippet": "  private String username;"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+          "line": 37,
+          "snippet": "  private String address1;"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+          "line": 293,
+          "snippet": "    shipAddress1 = account.getAddress1();"
+        }
+      ]
+    },
+    {
+      "text": "장바구니(Cart)는 주문 전 담긴 상품 목록을 보관하며 주문서 작성 시 주문품목과 주문 총액의 원천이 된다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+          "line": 37,
+          "snippet": "  private final List<CartItem> itemList = new ArrayList<>();"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+          "line": 119,
+          "snippet": "  public BigDecimal getSubTotal() {"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+          "line": 309,
+          "snippet": "    totalPrice = cart.getSubTotal();"
+        }
+      ]
+    },
+    {
+      "text": "채번(Sequence)은 주문번호를 발번하는 데 쓰이며, 주문 저장 직전 'ordernum' 이름으로 다음 번호를 조회하고 증가시킨다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 61,
+          "snippet": "    order.setOrderId(getNextId(\"ordernum\"));"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 122,
+          "snippet": "    Sequence sequence = sequenceMapper.getSequence(new Sequence(name, -1));"
+        }
+      ]
+    }
+  ],
+  "businessRules": [
+    {
+      "text": "주문서 작성은 로그인한 사용자만 가능하다. 미인증 상태이면 안내 문구와 함께 로그인 화면으로 되돌린다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 125,
+          "snippet": "    if (accountBean == null || !accountBean.isAuthenticated()) {"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 126,
+          "snippet": "      setMessage(\"You must sign on before attempting to check out.  Please sign on and try checking out again.\");"
+        }
+      ]
+    },
+    {
+      "text": "장바구니가 없으면 주문을 생성할 수 없으며 오류 화면으로 보낸다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 128,
+          "snippet": "    } else if (cartBean != null) {"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 132,
+          "snippet": "      setMessage(\"An order could not be created because a cart could not be found.\");"
+        }
+      ]
+    },
+    {
+      "text": "배송지 별도 입력이 요청된 경우 배송지 입력 화면을 먼저 거치며, 이때 배송지 요청 표시는 해제된다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 145,
+          "snippet": "    if (shippingAddressRequired) {"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 146,
+          "snippet": "      shippingAddressRequired = false;"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 147,
+          "snippet": "      return new ForwardResolution(SHIPPING);"
+        }
+      ]
+    },
+    {
+      "text": "확인 절차를 거치지 않은 주문은 저장되지 않고 주문 확인 화면으로 보내진다. 즉 주문 확정 전 사용자 확인이 필수다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 148,
+          "snippet": "    } else if (!isConfirmed()) {"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 149,
+          "snippet": "      return new ForwardResolution(CONFIRM_ORDER);"
+        }
+      ]
+    },
+    {
+      "text": "주문 확정이 완료되면 장바구니를 비우고 접수 완료 안내를 표시한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 155,
+          "snippet": "      cartBean.clear();"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 157,
+          "snippet": "      setMessage(\"Thank you, your order has been submitted.\");"
+        }
+      ]
+    },
+    {
+      "text": "주문 상세는 본인 주문만 조회할 수 있다. 로그인 계정의 아이디와 주문의 주문자 아이디가 다르면 주문을 비우고 오류 화면으로 보낸다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 178,
+          "snippet": "    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 182,
+          "snippet": "      setMessage(\"You may only view your own orders.\");"
+        }
+      ]
+    },
+    {
+      "text": "주문 확정은 재고 차감·주문 저장·주문 상태 저장·주문품목 저장을 하나의 트랜잭션으로 묶어 처리한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 59,
+          "snippet": "  @Transactional"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 68,
+          "snippet": "      itemMapper.updateInventoryQuantity(param);"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 71,
+          "snippet": "    orderMapper.insertOrder(order);"
+        }
+      ]
+    },
+    {
+      "text": "주문번호 채번 시 채번 정보가 조회되지 않으면 예외를 발생시켜 주문 처리를 중단한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 123,
+          "snippet": "    if (sequence == null) {"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 124,
+          "snippet": "      throw new RuntimeException("
+        }
+      ]
+    },
+    {
+      "text": "주문서 초기값은 계정 정보에서 배송지와 청구지를 동일하게 채우고, 총액은 장바구니 소계로 설정하며, 주문 상태는 'P'로 시작한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+          "line": 291,
+          "snippet": "    shipToFirstName = account.getFirstName();"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+          "line": 300,
+          "snippet": "    billToFirstName = account.getFirstName();"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+          "line": 316,
+          "snippet": "    status = \"P\";"
+        }
+      ]
+    },
+    {
+      "text": "취급 가능한 신용카드 종류는 Visa, MasterCard, American Express 세 가지로 고정되어 있다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 59,
+          "snippet": "    CARD_TYPE_LIST = Collections.unmodifiableList(Arrays.asList(\"Visa\", \"MasterCard\", \"American Express\"));"
+        }
+      ]
+    }
+  ],
+  "crossDomainInteractions": [
+    {
+      "text": "주문 도메인은 세션에 등록된 계정 화면 객체에서 로그인 여부와 주문자 정보를 얻는다. 인증 판정은 계정 도메인이 보유한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 121,
+          "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+          "line": 196,
+          "snippet": "    return authenticated && account != null && account.getUsername() != null;"
+        }
+      ]
+    },
+    {
+      "text": "주문서 작성은 세션의 장바구니 화면 객체에서 장바구니를 받아 주문품목과 총액을 구성하고, 주문 확정 후에는 장바구니를 비우도록 요청한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 122,
+          "snippet": "    CartActionBean cartBean = (CartActionBean) session.getAttribute(\"/actions/Cart.action\");"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 155,
+          "snippet": "      cartBean.clear();"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+          "line": 146,
+          "snippet": "    cart = new Cart();"
+        }
+      ]
+    },
+    {
+      "text": "주문 확정과 주문 상세 조회는 상품 도메인의 재고 정보를 사용한다. 확정 시 재고를 차감하고, 상세 조회 시 각 품목의 현재 재고 수량을 채운다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 68,
+          "snippet": "      itemMapper.updateInventoryQuantity(param);"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+          "line": 94,
+          "snippet": "      item.setQuantity(itemMapper.getInventoryQuantity(lineItem.getItemId()));"
+        }
+      ]
+    },
+    {
+      "text": "주문 상세 조회는 세션 속성 'accountBean' 으로 등록된 계정 객체를 참조하며, 이 속성은 로그인 시점에 계정 도메인이 등록한다.",
+      "citations": [
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+          "line": 174,
+          "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"accountBean\");"
+        },
+        {
+          "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+          "line": 174,
+          "snippet": "      s.setAttribute(\"accountBean\", this);"
+        }
+      ]
+    }
+  ],
+  "businessFlows": [
+    {
+      "title": "주문서 작성",
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "주문서 작성 요청"
+        },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "이전 주문 입력 내용 초기화",
+          "flowRef": "flow:ANY /actions/Order.action?newOrderForm",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 124,
+              "snippet": "    clear();"
+            }
+          ]
+        },
+        {
+          "id": "d1",
+          "kind": "decision",
+          "label": "로그인 상태인가",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 125,
+              "snippet": "    if (accountBean == null || !accountBean.isAuthenticated()) {"
+            }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "로그인 안내 후 로그인 화면 이동",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 126,
+              "snippet": "      setMessage(\"You must sign on before attempting to check out.  Please sign on and try checking out again.\");"
+            }
+          ]
+        },
+        {
+          "id": "d2",
+          "kind": "decision",
+          "label": "장바구니가 있는가",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 128,
+              "snippet": "    } else if (cartBean != null) {"
+            }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "계정·장바구니로 주문서 초기화",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 129,
+              "snippet": "      order.initOrder(accountBean.getAccount(), cartBean.getCart());"
+            }
+          ]
+        },
+        {
+          "id": "a4",
+          "kind": "activity",
+          "label": "배송지·청구지 기본값 채움",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 293,
+              "snippet": "    shipAddress1 = account.getAddress1();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 302,
+              "snippet": "    billAddress1 = account.getAddress1();"
+            }
+          ]
+        },
+        {
+          "id": "a5",
+          "kind": "activity",
+          "label": "장바구니 소계로 총액 설정",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 309,
+              "snippet": "    totalPrice = cart.getSubTotal();"
+            }
+          ]
+        },
+        {
+          "id": "a6",
+          "kind": "activity",
+          "label": "장바구니 상품을 주문품목으로 등록",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 321,
+              "snippet": "      addLineItem(cartItem);"
+            }
+          ]
+        },
+        {
+          "id": "a7",
+          "kind": "activity",
+          "label": "주문 입력 화면 표시",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 130,
+              "snippet": "      return new ForwardResolution(NEW_ORDER);"
+            }
+          ]
+        },
+        {
+          "id": "a8",
+          "kind": "activity",
+          "label": "장바구니 없음 오류 안내",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 132,
+              "snippet": "      setMessage(\"An order could not be created because a cart could not be found.\");"
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "주문서 준비 완료"
+        },
+        {
+          "id": "e2",
+          "kind": "end",
+          "label": "작성 중단"
+        }
+      ],
+      "edges": [
+        {
+          "from": "s1",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "to": "a2",
+          "label": "NO"
+        },
+        {
+          "from": "d1",
+          "to": "d2",
+          "label": "YES"
+        },
+        {
+          "from": "a2",
+          "to": "e2"
+        },
+        {
+          "from": "d2",
+          "to": "a3",
+          "label": "YES"
+        },
+        {
+          "from": "d2",
+          "to": "a8",
+          "label": "NO"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "a5"
+        },
+        {
+          "from": "a5",
+          "to": "a6"
+        },
+        {
+          "from": "a6",
+          "to": "a7"
+        },
+        {
+          "from": "a7",
+          "to": "e1"
+        },
+        {
+          "from": "a8",
+          "to": "e2"
+        }
+      ]
+    },
+    {
+      "title": "주문 확정",
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "주문 확정 요청"
+        },
+        {
+          "id": "d1",
+          "kind": "decision",
+          "label": "배송지 별도 입력 필요",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 145,
+              "snippet": "    if (shippingAddressRequired) {"
+            }
+          ]
+        },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "배송지 입력 화면 표시",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 147,
+              "snippet": "      return new ForwardResolution(SHIPPING);"
+            }
+          ]
+        },
+        {
+          "id": "d2",
+          "kind": "decision",
+          "label": "사용자 확인을 마쳤는가",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 148,
+              "snippet": "    } else if (!isConfirmed()) {"
+            }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "주문 확인 화면 표시",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 149,
+              "snippet": "      return new ForwardResolution(CONFIRM_ORDER);"
+            }
+          ]
+        },
+        {
+          "id": "d3",
+          "kind": "decision",
+          "label": "주문 정보가 있는가",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 150,
+              "snippet": "    } else if (getOrder() != null) {"
+            }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "주문번호 채번",
+          "flowRef": "flow:ANY /actions/Order.action?newOrder",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 61,
+              "snippet": "    order.setOrderId(getNextId(\"ordernum\"));"
+            }
+          ]
+        },
+        {
+          "id": "a4",
+          "kind": "activity",
+          "label": "품목별 재고 차감",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 68,
+              "snippet": "      itemMapper.updateInventoryQuantity(param);"
+            }
+          ]
+        },
+        {
+          "id": "a5",
+          "kind": "activity",
+          "label": "주문 저장",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 71,
+              "snippet": "    orderMapper.insertOrder(order);"
+            }
+          ]
+        },
+        {
+          "id": "a6",
+          "kind": "activity",
+          "label": "주문 상태 기록",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 72,
+              "snippet": "    orderMapper.insertOrderStatus(order);"
+            }
+          ]
+        },
+        {
+          "id": "a7",
+          "kind": "activity",
+          "label": "주문품목 저장",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 75,
+              "snippet": "      lineItemMapper.insertLineItem(lineItem);"
+            }
+          ]
+        },
+        {
+          "id": "a8",
+          "kind": "activity",
+          "label": "장바구니 비움",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 155,
+              "snippet": "      cartBean.clear();"
+            }
+          ]
+        },
+        {
+          "id": "a9",
+          "kind": "activity",
+          "label": "접수 완료 안내 후 주문 표시",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 157,
+              "snippet": "      setMessage(\"Thank you, your order has been submitted.\");"
+            }
+          ]
+        },
+        {
+          "id": "a10",
+          "kind": "activity",
+          "label": "주문 없음 오류 안내",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 161,
+              "snippet": "      setMessage(\"An error occurred processing your order (order was null).\");"
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "주문 접수 완료"
+        },
+        {
+          "id": "e2",
+          "kind": "end",
+          "label": "추가 입력 대기"
+        },
+        {
+          "id": "e3",
+          "kind": "end",
+          "label": "확정 실패"
+        }
+      ],
+      "edges": [
+        {
+          "from": "s1",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "to": "a1",
+          "label": "YES"
+        },
+        {
+          "from": "d1",
+          "to": "d2",
+          "label": "NO"
+        },
+        {
+          "from": "a1",
+          "to": "e2"
+        },
+        {
+          "from": "d2",
+          "to": "a2",
+          "label": "NO"
+        },
+        {
+          "from": "d2",
+          "to": "d3",
+          "label": "YES"
+        },
+        {
+          "from": "a2",
+          "to": "e2"
+        },
+        {
+          "from": "d3",
+          "to": "a3",
+          "label": "YES"
+        },
+        {
+          "from": "d3",
+          "to": "a10",
+          "label": "NO"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "a5"
+        },
+        {
+          "from": "a5",
+          "to": "a6"
+        },
+        {
+          "from": "a6",
+          "to": "a7"
+        },
+        {
+          "from": "a7",
+          "to": "a8"
+        },
+        {
+          "from": "a8",
+          "to": "a9"
+        },
+        {
+          "from": "a9",
+          "to": "e1"
+        },
+        {
+          "from": "a10",
+          "to": "e3"
+        }
+      ]
+    },
+    {
+      "title": "주문번호 채번",
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "채번 요청"
+        },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "현재 채번 정보 조회",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 122,
+              "snippet": "    Sequence sequence = sequenceMapper.getSequence(new Sequence(name, -1));"
+            }
+          ]
+        },
+        {
+          "id": "d1",
+          "kind": "decision",
+          "label": "채번 정보가 있는가",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 123,
+              "snippet": "    if (sequence == null) {"
+            }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "오류 발생시켜 처리 중단",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 124,
+              "snippet": "      throw new RuntimeException("
+            }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "다음 번호로 채번 정보 갱신",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 128,
+              "snippet": "    sequenceMapper.updateSequence(parameterObject);"
+            }
+          ]
+        },
+        {
+          "id": "a4",
+          "kind": "activity",
+          "label": "발번된 번호 반환",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 129,
+              "snippet": "    return sequence.getNextId();"
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "채번 완료"
+        },
+        {
+          "id": "e2",
+          "kind": "end",
+          "label": "채번 실패"
+        }
+      ],
+      "edges": [
+        {
+          "from": "s1",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "to": "a2",
+          "label": "NO"
+        },
+        {
+          "from": "d1",
+          "to": "a3",
+          "label": "YES"
+        },
+        {
+          "from": "a2",
+          "to": "e2"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "e1"
+        }
+      ]
+    },
+    {
+      "title": "주문 이력 조회",
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "주문 이력 조회 요청"
+        },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "세션에서 로그인 계정 확인",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 109,
+              "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");"
+            }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "주문자 아이디로 주문 목록 조회",
+          "flowRef": "flow:ANY /actions/Order.action?listOrders",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 110,
+              "snippet": "    orderList = orderService.getOrdersByUsername(accountBean.getAccount().getUsername());"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 110,
+              "snippet": "    return orderMapper.getOrdersByUsername(username);"
+            }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "주문 목록 화면 표시",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 111,
+              "snippet": "    return new ForwardResolution(LIST_ORDERS);"
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "이력 조회 완료"
+        }
+      ],
+      "edges": [
+        {
+          "from": "s1",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "e1"
+        }
+      ]
+    },
+    {
+      "title": "주문 상세 조회",
+      "nodes": [
+        {
+          "id": "s1",
+          "kind": "start",
+          "label": "주문 상세 조회 요청"
+        },
+        {
+          "id": "a1",
+          "kind": "activity",
+          "label": "세션에서 로그인 계정 확인",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 174,
+              "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"accountBean\");"
+            }
+          ]
+        },
+        {
+          "id": "a2",
+          "kind": "activity",
+          "label": "주문번호로 주문 조회",
+          "flowRef": "flow:ANY /actions/Order.action?viewOrder",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 176,
+              "snippet": "    order = orderService.getOrder(order.getOrderId());"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 89,
+              "snippet": "    Order order = orderMapper.getOrder(orderId);"
+            }
+          ]
+        },
+        {
+          "id": "a3",
+          "kind": "activity",
+          "label": "주문품목 목록 채움",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 90,
+              "snippet": "    order.setLineItems(lineItemMapper.getLineItemsByOrderId(orderId));"
+            }
+          ]
+        },
+        {
+          "id": "a4",
+          "kind": "activity",
+          "label": "품목별 현재 재고 수량 채움",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 94,
+              "snippet": "      item.setQuantity(itemMapper.getInventoryQuantity(lineItem.getItemId()));"
+            }
+          ]
+        },
+        {
+          "id": "d1",
+          "kind": "decision",
+          "label": "본인 주문인가",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 178,
+              "snippet": "    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {"
+            }
+          ]
+        },
+        {
+          "id": "a5",
+          "kind": "activity",
+          "label": "주문 상세 화면 표시",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 179,
+              "snippet": "      return new ForwardResolution(VIEW_ORDER);"
+            }
+          ]
+        },
+        {
+          "id": "a6",
+          "kind": "activity",
+          "label": "타인 주문 조회 차단 안내",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 181,
+              "snippet": "      order = null;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 182,
+              "snippet": "      setMessage(\"You may only view your own orders.\");"
+            }
+          ]
+        },
+        {
+          "id": "e1",
+          "kind": "end",
+          "label": "상세 조회 완료"
+        },
+        {
+          "id": "e2",
+          "kind": "end",
+          "label": "조회 거부"
+        }
+      ],
+      "edges": [
+        {
+          "from": "s1",
+          "to": "a1"
+        },
+        {
+          "from": "a1",
+          "to": "a2"
+        },
+        {
+          "from": "a2",
+          "to": "a3"
+        },
+        {
+          "from": "a3",
+          "to": "a4"
+        },
+        {
+          "from": "a4",
+          "to": "d1"
+        },
+        {
+          "from": "d1",
+          "to": "a5",
+          "label": "YES"
+        },
+        {
+          "from": "d1",
+          "to": "a6",
+          "label": "NO"
+        },
+        {
+          "from": "a5",
+          "to": "e1"
+        },
+        {
+          "from": "a6",
+          "to": "e2"
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "flowId": "flow:ANY /actions/Order.action?listOrders",
+      "name": "주문 이력 조회",
+      "summary": {
+        "text": "세션의 로그인 계정에서 주문자 아이디를 얻어 해당 사용자의 주문 목록을 조회하고 주문 목록 화면으로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 110,
+            "snippet": "    orderList = orderService.getOrdersByUsername(accountBean.getAccount().getUsername());"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 111,
+            "snippet": "    return new ForwardResolution(LIST_ORDERS);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Order.action?newOrder",
+      "name": "주문 확정",
+      "summary": {
+        "text": "배송지 입력·사용자 확인 단계를 순서대로 거친 뒤 주문을 저장한다. 저장이 끝나면 장바구니를 비우고 접수 완료를 안내하며 주문 화면을 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 152,
+            "snippet": "      orderService.insertOrder(order);"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 155,
+            "snippet": "      cartBean.clear();"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 159,
+            "snippet": "      return new ForwardResolution(VIEW_ORDER);"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Order.action?newOrderForm",
+      "name": "주문서 작성",
+      "summary": {
+        "text": "로그인 여부와 장바구니 존재를 확인한 뒤, 계정 정보와 장바구니 내용으로 주문서를 초기화하고 주문 입력 화면을 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 125,
+            "snippet": "    if (accountBean == null || !accountBean.isAuthenticated()) {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 129,
+            "snippet": "      order.initOrder(accountBean.getAccount(), cartBean.getCart());"
+          }
+        ]
+      }
+    },
+    {
+      "flowId": "flow:ANY /actions/Order.action?viewOrder",
+      "name": "주문 상세 조회",
+      "summary": {
+        "text": "주문번호로 주문과 주문품목·재고를 조회한 뒤, 로그인 계정과 주문자가 일치할 때만 주문 상세 화면을 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 176,
+            "snippet": "    order = orderService.getOrder(order.getOrderId());"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 178,
+            "snippet": "    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {"
+          }
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "name": "주문 화면 처리 - 이력 조회",
+      "summary": {
+        "text": "주문 이력 조회 요청을 받아 세션의 계정에서 주문자 아이디를 얻고 주문 서비스에 목록 조회를 위임한 뒤 주문 목록 화면으로 전달한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 107,
+            "snippet": "  public Resolution listOrders() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 110,
+            "snippet": "    orderList = orderService.getOrdersByUsername(accountBean.getAccount().getUsername());"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 이력 조회의 진입점으로, 세션에 등록된 계정 화면 객체에서 주문자를 식별해 주문 서비스에 목록 조회를 위임하고, 결과를 주문 목록 화면으로 넘긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 109,
+              "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 111,
+              "snippet": "    return new ForwardResolution(LIST_ORDERS);"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터를 직접 받지 않고 세션 속성 '/actions/Account.action' 에 등록된 계정 객체에서 주문자 아이디를 얻는다. 조회 결과는 주문 목록 필드에 담긴다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 108,
+              "snippet": "    HttpSession session = context.getRequest().getSession();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 109,
+              "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 56,
+              "snippet": "  private List<Order> orderList;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "계정 화면 처리 - 주문자 식별",
+      "summary": {
+        "text": "세션에 보관된 계정 객체로서 로그인한 사용자의 계정 정보를 제공한다. 주문 이력 조회는 여기서 주문자 아이디를 얻는다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 68,
+            "snippet": "  public Account getAccount() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 110,
+            "snippet": "    orderList = orderService.getOrdersByUsername(accountBean.getAccount().getUsername());"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "세션 범위 객체로 로그인 계정을 보유하며, 주문 이력 조회 흐름에 주문자 아이디를 공급하는 협력자 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 42,
+              "snippet": "@SessionScope"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 68,
+              "snippet": "  public Account getAccount() {"
+            }
+          ]
+        },
+        "request": {
+          "text": "로그인 시 계정 정보가 채워지고 인증 표시가 설정되며, 인증 여부는 인증 표시·계정 존재·아이디 존재를 모두 만족할 때만 참이 된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 161,
+              "snippet": "    account = accountService.getAccount(getUsername(), getPassword());"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 171,
+              "snippet": "      authenticated = true;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 196,
+              "snippet": "    return authenticated && account != null && account.getUsername() != null;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "name": "주문 서비스 - 이력 조회",
+      "summary": {
+        "text": "주문자 아이디를 받아 해당 사용자의 주문 목록 조회를 주문 매퍼에 위임한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 109,
+            "snippet": "  public List<Order> getOrdersByUsername(String username) {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 110,
+            "snippet": "    return orderMapper.getOrdersByUsername(username);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 이력 조회에서 조회 요청을 주문 매퍼로 전달하는 얇은 위임 계층이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 109,
+              "snippet": "  public List<Order> getOrdersByUsername(String username) {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 41,
+              "snippet": "  private final OrderMapper orderMapper;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "이력 조회에는 별도 트랜잭션 경계나 가공 규칙이 없고, 주문자 아이디를 그대로 넘겨 조회 결과를 반환한다. 주문 저장·상세 조회에만 트랜잭션이 선언되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 110,
+              "snippet": "    return orderMapper.getOrdersByUsername(username);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 87,
+              "snippet": "  @Transactional"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "name": "계정 정보 - 주문자",
+      "summary": {
+        "text": "주문 이력 조회의 조회 조건이 되는 주문자 아이디를 보유한 계정 데이터다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 31,
+            "snippet": "  private String username;"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 50,
+            "snippet": "  public String getUsername() {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "직렬화 가능한 계정 데이터 구조로, 이 흐름에서는 주문 목록을 걸러낼 주문자 아이디를 제공한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 27,
+              "snippet": "public class Account implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 50,
+              "snippet": "  public String getUsername() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·비밀번호·이메일·이름·성·상태 등 계정 필드를 보유하며, 이름과 성은 계정 신규 등록·수정 시 필수 입력으로 검증된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 31,
+              "snippet": "  private String username;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 34,
+              "snippet": "  private String firstName;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 78,
+              "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?listOrders:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+      "name": "주문 매퍼 - 이력 조회",
+      "summary": {
+        "text": "주문자 아이디로 주문 목록을 조회하는 영속 인터페이스다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+            "line": 29,
+            "snippet": "  List<Order> getOrdersByUsername(String username);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 데이터 접근을 담당하는 매퍼 인터페이스로, 이 흐름에서는 주문자별 주문 목록 조회를 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+              "line": 27,
+              "snippet": "public interface OrderMapper {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+              "line": 29,
+              "snippet": "  List<Order> getOrdersByUsername(String username);"
+            }
+          ]
+        },
+        "persistence": {
+          "text": "주문자 아이디를 조건으로 주문 목록을 조회해 주문 객체 목록으로 매핑한다. 매퍼는 인터페이스로만 선언되어 있고 SQL 은 MyBatis 매핑 설정이 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+              "line": 29,
+              "snippet": "  List<Order> getOrdersByUsername(String username);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+              "line": 20,
+              "snippet": "import org.mybatis.jpetstore.domain.Order;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "name": "주문 화면 처리 - 주문 확정",
+      "summary": {
+        "text": "배송지 입력 필요 여부와 사용자 확인 여부를 차례로 판정해 필요한 화면으로 보내고, 두 조건이 충족되면 주문 저장을 위임한 뒤 장바구니를 비우고 접수 완료를 안내한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 142,
+            "snippet": "  public Resolution newOrder() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 152,
+            "snippet": "      orderService.insertOrder(order);"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 155,
+            "snippet": "      cartBean.clear();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 확정의 진입점으로, 배송지 입력·주문 확인이라는 선행 단계를 통과시킨 뒤에만 주문 서비스에 저장을 위임하고, 저장 후 장바구니 정리와 결과 화면 전환을 책임진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 145,
+              "snippet": "    if (shippingAddressRequired) {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 152,
+              "snippet": "      orderService.insertOrder(order);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 159,
+              "snippet": "      return new ForwardResolution(VIEW_ORDER);"
+            }
+          ]
+        },
+        "request": {
+          "text": "주문 입력값은 세션에 보관된 주문 객체에 바인딩되며, 배송지 입력 요청 표시와 확인 표시가 분기 조건이 된다. 주문이 비어 있으면 오류 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 54,
+              "snippet": "  private boolean shippingAddressRequired;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 148,
+              "snippet": "    } else if (!isConfirmed()) {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 161,
+              "snippet": "      setMessage(\"An error occurred processing your order (order was null).\");"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "name": "주문 서비스 - 주문 저장",
+      "summary": {
+        "text": "주문번호를 채번하고 품목별 재고를 차감한 뒤 주문·주문 상태·주문품목을 저장하는 작업을 하나의 트랜잭션으로 조율한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 60,
+            "snippet": "  public void insertOrder(Order order) {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 61,
+            "snippet": "    order.setOrderId(getNextId(\"ordernum\"));"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 71,
+            "snippet": "    orderMapper.insertOrder(order);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 확정의 업무 조율자로, 채번·재고 차감·주문 저장·상태 기록·품목 저장을 정해진 순서로 실행한다. 네 개의 매퍼를 주입받아 사용한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 45,
+              "snippet": "  public OrderService(ItemMapper itemMapper, OrderMapper orderMapper, SequenceMapper sequenceMapper,"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 72,
+              "snippet": "    orderMapper.insertOrderStatus(order);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 75,
+              "snippet": "      lineItemMapper.insertLineItem(lineItem);"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "주문 저장은 트랜잭션으로 선언되어 재고 차감과 주문·상태·품목 저장이 함께 성공하거나 함께 실패한다. 재고는 품목별 주문 수량만큼 조정하며, 각 주문품목에는 채번된 주문번호가 부여된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 59,
+              "snippet": "  @Transactional"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 64,
+              "snippet": "      Integer increment = lineItem.getQuantity();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 74,
+              "snippet": "      lineItem.setOrderId(order.getOrderId());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "name": "장바구니 화면 처리 - 주문 후 비움",
+      "summary": {
+        "text": "주문 저장이 끝난 뒤 세션의 장바구니 객체를 새 장바구니로 교체해 담긴 상품을 비운다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 145,
+            "snippet": "  public void clear() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 146,
+            "snippet": "    cart = new Cart();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "세션 범위로 장바구니를 보유하는 객체이며, 주문 확정 흐름에서는 주문이 저장된 뒤 장바구니를 초기화하는 협력자로 참여한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+              "line": 37,
+              "snippet": "@SessionScope"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+              "line": 48,
+              "snippet": "  private Cart cart = new Cart();"
+            }
+          ]
+        },
+        "request": {
+          "text": "주문 확정 요청 자체의 파라미터는 받지 않고, 세션 속성 '/actions/Cart.action' 으로 조회되어 비움 요청만 받는다. 비움 시 장바구니와 작업 중 상품 아이디가 함께 초기화된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 154,
+              "snippet": "      CartActionBean cartBean = (CartActionBean) session.getAttribute(\"/actions/Cart.action\");"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+              "line": 147,
+              "snippet": "    workingItemId = null;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/domain/Order.java",
+      "name": "주문 정보 - 저장 대상",
+      "summary": {
+        "text": "저장 대상이 되는 주문 데이터로, 채번된 주문번호와 주문품목 목록을 보유한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 34,
+            "snippet": "  private int orderId;"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 60,
+            "snippet": "  private List<LineItem> lineItems = new ArrayList<>();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 확정 흐름에서 채번된 주문번호를 부여받고 재고 차감·품목 저장의 입력이 되는 주문 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 66,
+              "snippet": "  public void setOrderId(int orderId) {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 274,
+              "snippet": "  public List<LineItem> getLineItems() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주문번호·주문자·주문일시·총액·상태와 배송지/청구지 필드를 보유하고, 주문품목 목록은 빈 목록으로 초기화되어 null 이 되지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 35,
+              "snippet": "  private String username;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 59,
+              "snippet": "  private String status;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 60,
+              "snippet": "  private List<LineItem> lineItems = new ArrayList<>();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "name": "상품 매퍼 - 재고 차감",
+      "summary": {
+        "text": "주문된 품목의 재고 수량을 주문 수량만큼 조정하는 영속 인터페이스다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "line": 30,
+            "snippet": "  void updateInventoryQuantity(Map<String, Object> param);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "재고 데이터 갱신을 담당하며, 주문 확정 흐름에서 품목별 재고 차감을 맡는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+              "line": 28,
+              "snippet": "public interface ItemMapper {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 68,
+              "snippet": "      itemMapper.updateInventoryQuantity(param);"
+            }
+          ]
+        },
+        "persistence": {
+          "text": "상품 아이디와 차감 수량을 담은 맵을 파라미터로 받아 재고 수량을 갱신한다. 파라미터 키는 'itemId' 와 'increment' 다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 66,
+              "snippet": "      param.put(\"itemId\", itemId);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 67,
+              "snippet": "      param.put(\"increment\", increment);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+              "line": 30,
+              "snippet": "  void updateInventoryQuantity(Map<String, Object> param);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+      "name": "주문 매퍼 - 주문 저장",
+      "summary": {
+        "text": "주문 본문과 주문 상태를 각각 저장하는 영속 인터페이스다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+            "line": 33,
+            "snippet": "  void insertOrder(Order order);"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+            "line": 35,
+            "snippet": "  void insertOrderStatus(Order order);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 확정 흐름에서 주문 본문 저장과 주문 상태 저장이라는 두 건의 쓰기 작업을 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 71,
+              "snippet": "    orderMapper.insertOrder(order);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 72,
+              "snippet": "    orderMapper.insertOrderStatus(order);"
+            }
+          ]
+        },
+        "persistence": {
+          "text": "주문 객체를 파라미터로 받아 주문 정보와 주문 상태 정보를 삽입한다. 주문과 주문 상태가 별도 쓰기로 분리되어 있다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+              "line": 33,
+              "snippet": "  void insertOrder(Order order);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+              "line": 35,
+              "snippet": "  void insertOrderStatus(Order order);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+      "name": "주문품목 매퍼 - 품목 저장",
+      "summary": {
+        "text": "주문에 속한 주문품목을 한 건씩 저장하는 영속 인터페이스다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+            "line": 31,
+            "snippet": "  void insertLineItem(LineItem lineItem);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문품목 데이터 접근을 담당하며, 주문 확정 흐름에서 주문번호가 부여된 품목들을 저장한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+              "line": 27,
+              "snippet": "public interface LineItemMapper {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 75,
+              "snippet": "      lineItemMapper.insertLineItem(lineItem);"
+            }
+          ]
+        },
+        "persistence": {
+          "text": "주문품목 객체를 파라미터로 받아 품목을 삽입하며, 주문의 품목 수만큼 반복 호출된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+              "line": 31,
+              "snippet": "  void insertLineItem(LineItem lineItem);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 73,
+              "snippet": "    order.getLineItems().forEach(lineItem -> {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrder:src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+      "name": "채번 매퍼 - 주문번호 발번",
+      "summary": {
+        "text": "채번 정보를 조회하고 다음 번호로 갱신하는 영속 인터페이스다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+            "line": 27,
+            "snippet": "  Sequence getSequence(Sequence sequence);"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+            "line": 29,
+            "snippet": "  void updateSequence(Sequence sequence);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 확정 흐름에서 주문번호 채번을 담당한다. 'ordernum' 이름으로 현재 번호를 읽고 다음 번호를 기록한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 61,
+              "snippet": "    order.setOrderId(getNextId(\"ordernum\"));"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 122,
+              "snippet": "    Sequence sequence = sequenceMapper.getSequence(new Sequence(name, -1));"
+            }
+          ]
+        },
+        "persistence": {
+          "text": "채번 객체를 조건으로 현재 채번 값을 조회하고, 조회된 값에 1 을 더한 채번 객체로 갱신한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/SequenceMapper.java",
+              "line": 27,
+              "snippet": "  Sequence getSequence(Sequence sequence);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 127,
+              "snippet": "    Sequence parameterObject = new Sequence(name, sequence.getNextId() + 1);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 128,
+              "snippet": "    sequenceMapper.updateSequence(parameterObject);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "name": "주문 화면 처리 - 주문서 작성",
+      "summary": {
+        "text": "이전 입력을 초기화하고 로그인 여부와 장바구니 존재를 확인한 뒤, 계정과 장바구니로 주문서를 초기화해 주문 입력 화면을 표시한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 119,
+            "snippet": "  public Resolution newOrderForm() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 129,
+            "snippet": "      order.initOrder(accountBean.getAccount(), cartBean.getCart());"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문서 작성의 진입점으로, 세션의 계정과 장바구니를 확인해 주문서 초기화를 지시하고, 조건 미충족 시 로그인 화면 또는 오류 화면으로 되돌리는 관문 역할을 한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 125,
+              "snippet": "    if (accountBean == null || !accountBean.isAuthenticated()) {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 127,
+              "snippet": "      return new ForwardResolution(AccountActionBean.class);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 133,
+              "snippet": "      return new ForwardResolution(ERROR);"
+            }
+          ]
+        },
+        "request": {
+          "text": "요청 파라미터 대신 세션 속성 '/actions/Account.action' 과 '/actions/Cart.action' 을 읽어 인증과 장바구니를 확인한다. 시작 시 이전 주문 입력·배송지 표시·확인 표시를 모두 초기화한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 121,
+              "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"/actions/Account.action\");"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 122,
+              "snippet": "    CartActionBean cartBean = (CartActionBean) session.getAttribute(\"/actions/Cart.action\");"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 192,
+              "snippet": "    shippingAddressRequired = false;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "계정 화면 처리 - 로그인 확인",
+      "summary": {
+        "text": "주문서 작성의 선행 조건인 로그인 여부를 판정하고, 주문서 초기값이 될 계정 정보를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 195,
+            "snippet": "  public boolean isAuthenticated() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 125,
+            "snippet": "    if (accountBean == null || !accountBean.isAuthenticated()) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문서 작성 흐름의 인증 판정자이자 계정 정보 공급자다. 이 객체가 세션에 없거나 인증되지 않았으면 주문서 작성이 차단된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 125,
+              "snippet": "    if (accountBean == null || !accountBean.isAuthenticated()) {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 68,
+              "snippet": "  public Account getAccount() {"
+            }
+          ]
+        },
+        "request": {
+          "text": "인증 여부는 인증 표시·계정 존재·아이디 존재를 모두 만족해야 참이다. 로그아웃 시 세션이 무효화되고 계정과 인증 표시가 초기화된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 196,
+              "snippet": "    return authenticated && account != null && account.getUsername() != null;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 185,
+              "snippet": "    context.getRequest().getSession().invalidate();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 205,
+              "snippet": "    authenticated = false;"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "name": "장바구니 화면 처리 - 장바구니 제공",
+      "summary": {
+        "text": "주문서 작성 시 세션에 보관된 장바구니를 제공한다. 이 객체가 없으면 주문서를 만들 수 없다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+            "line": 51,
+            "snippet": "  public Cart getCart() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 128,
+            "snippet": "    } else if (cartBean != null) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "세션 범위로 장바구니를 보유하며, 주문서 작성 흐름에 주문품목과 총액의 원천이 되는 장바구니를 공급한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+              "line": 37,
+              "snippet": "@SessionScope"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 129,
+              "snippet": "      order.initOrder(accountBean.getAccount(), cartBean.getCart());"
+            }
+          ]
+        },
+        "request": {
+          "text": "주문서 작성 요청의 파라미터는 받지 않고 세션 속성으로 조회된다. 장바구니는 객체 생성 시 빈 장바구니로 초기화되어 있으며, 결제 화면 이동 요청을 별도로 처리한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+              "line": 48,
+              "snippet": "  private Cart cart = new Cart();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+              "line": 141,
+              "snippet": "  public ForwardResolution checkOut() {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Order.java",
+      "name": "주문 정보 - 주문서 초기화",
+      "summary": {
+        "text": "계정과 장바구니를 받아 주문자·주문일시·배송지·청구지·총액·결제 기본값·상태를 채우고, 장바구니 상품을 주문품목으로 등록한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 286,
+            "snippet": "  public void initOrder(Account account, Cart cart) {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 309,
+            "snippet": "    totalPrice = cart.getSubTotal();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문서 작성 흐름에서 계정과 장바구니를 입력으로 받아 주문서 초기값을 구성하는 데이터 구조다. 배송지와 청구지를 모두 계정 주소로 채운다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 288,
+              "snippet": "    username = account.getUsername();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 293,
+              "snippet": "    shipAddress1 = account.getAddress1();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 302,
+              "snippet": "    billAddress1 = account.getAddress1();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주문일시는 초기화 시점의 현재 시각으로 설정되고, 상태는 'P' 로 시작한다. 신용카드·유효기간·카드종류·배송사·지역은 고정 기본값으로 채워진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 289,
+              "snippet": "    orderDate = new Date();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 311,
+              "snippet": "    creditCard = \"999 9999 9999 9999\";"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 316,
+              "snippet": "    status = \"P\";"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "name": "계정 정보 - 주문서 기본값",
+      "summary": {
+        "text": "주문서의 배송지·청구지 기본값과 주문자 이름의 공급원이 되는 계정 데이터다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 100,
+            "snippet": "  public String getAddress1() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 291,
+            "snippet": "    shipToFirstName = account.getFirstName();"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문서 초기화의 입력 데이터로, 아이디·이름·성과 주소 정보를 주문의 배송지·청구지로 복사하는 데 쓰인다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 74,
+              "snippet": "  public String getFirstName() {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 295,
+              "snippet": "    shipCity = account.getCity();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주소는 주소1·주소2·도시·주·우편번호·국가로 구성되며, 이름과 성은 계정 신규 등록·수정 시 필수 입력으로 검증된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 37,
+              "snippet": "  private String address1;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 42,
+              "snippet": "  private String country;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 87,
+              "snippet": "  @Validate(required = true, on = { \"newAccount\", \"editAccount\" })"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?newOrderForm:src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+      "name": "장바구니 정보 - 주문품목 원천",
+      "summary": {
+        "text": "담긴 상품 목록과 소계를 제공해 주문품목과 주문 총액의 원천이 된다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+            "line": 51,
+            "snippet": "  public Iterator<CartItem> getAllCartItems() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+            "line": 119,
+            "snippet": "  public BigDecimal getSubTotal() {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문서 초기화 시 담긴 상품을 순회해 주문품목으로 옮기고 소계를 주문 총액으로 넘기는 데이터 구조다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 318,
+              "snippet": "    Iterator<CartItem> i = cart.getAllCartItems();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 309,
+              "snippet": "    totalPrice = cart.getSubTotal();"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "상품 아이디를 키로 하는 맵과 목록을 동시에 유지해 같은 상품이 중복 등록되지 않게 하며, 소계는 각 상품의 정가와 수량을 곱해 합산한 값이다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+              "line": 36,
+              "snippet": "  private final Map<String, CartItem> itemMap = Collections.synchronizedMap(new HashMap<>());"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+              "line": 37,
+              "snippet": "  private final List<CartItem> itemList = new ArrayList<>();"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Cart.java",
+              "line": 121,
+              "snippet": "        .map(cartItem -> cartItem.getItem().getListPrice().multiply(new BigDecimal(cartItem.getQuantity())))"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "name": "주문 화면 처리 - 상세 조회",
+      "summary": {
+        "text": "주문번호로 주문을 조회한 뒤 로그인 계정과 주문자가 일치하는지 확인해 상세 화면 또는 오류 화면으로 보낸다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 171,
+            "snippet": "  public Resolution viewOrder() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 178,
+            "snippet": "    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 상세 조회의 진입점으로, 주문 서비스에서 주문을 받아온 뒤 본인 주문 여부를 검사하는 권한 관문 역할을 한다. 타인 주문이면 주문을 비우고 오류 화면으로 보낸다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 176,
+              "snippet": "    order = orderService.getOrder(order.getOrderId());"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 181,
+              "snippet": "      order = null;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 183,
+              "snippet": "      return new ForwardResolution(ERROR);"
+            }
+          ]
+        },
+        "request": {
+          "text": "주문번호는 주문 객체에 바인딩되어 들어오고, 계정은 세션 속성 'accountBean' 에서 읽는다. 이 흐름은 인증 여부를 따로 판정하지 않고 아이디 일치만 검사한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 66,
+              "snippet": "  public void setOrderId(int orderId) {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 174,
+              "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"accountBean\");"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 178,
+              "snippet": "    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "name": "주문 서비스 - 상세 조회",
+      "summary": {
+        "text": "주문번호로 주문을 조회하고 주문품목 목록과 각 품목의 상품 정보·현재 재고 수량을 채워 반환한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 88,
+            "snippet": "  public Order getOrder(int orderId) {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+            "line": 90,
+            "snippet": "    order.setLineItems(lineItemMapper.getLineItemsByOrderId(orderId));"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 상세 조회의 조립자로, 주문 본문·주문품목·상품·재고를 각각 조회해 하나의 완성된 주문으로 합쳐 돌려준다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 89,
+              "snippet": "    Order order = orderMapper.getOrder(orderId);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 93,
+              "snippet": "      Item item = itemMapper.getItem(lineItem.getItemId());"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 98,
+              "snippet": "    return order;"
+            }
+          ]
+        },
+        "businessLogic": {
+          "text": "조회는 트랜잭션으로 선언되어 있고, 각 주문품목의 상품 수량은 저장 당시 값이 아니라 조회 시점의 재고 수량으로 채워진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 87,
+              "snippet": "  @Transactional"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 94,
+              "snippet": "      item.setQuantity(itemMapper.getInventoryQuantity(lineItem.getItemId()));"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 95,
+              "snippet": "      lineItem.setItem(item);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/domain/Order.java",
+      "name": "주문 정보 - 조회 결과",
+      "summary": {
+        "text": "조회된 주문 데이터로, 본인 확인의 기준이 되는 주문자 아이디와 화면에 표시될 주문품목 목록을 보유한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 70,
+            "snippet": "  public String getUsername() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+            "line": 270,
+            "snippet": "  public void setLineItems(List<LineItem> lineItems) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 상세 조회 흐름에서 조회 결과를 담는 데이터 구조로, 주문자 아이디는 본인 주문 여부 판정에 사용된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 35,
+              "snippet": "  private String username;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 178,
+              "snippet": "    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "주문번호·주문일시·총액·상태와 배송지/청구지 필드를 보유하며, 주문품목 목록은 조회 시 별도로 채워진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 36,
+              "snippet": "  private Date orderDate;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Order.java",
+              "line": 50,
+              "snippet": "  private BigDecimal totalPrice;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 90,
+              "snippet": "    order.setLineItems(lineItemMapper.getLineItemsByOrderId(orderId));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "name": "계정 화면 처리 - 본인 확인",
+      "summary": {
+        "text": "세션에 등록된 계정 객체로서 본인 주문 여부 판정의 기준이 되는 로그인 아이디를 제공한다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+            "line": 68,
+            "snippet": "  public Account getAccount() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 178,
+            "snippet": "    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 상세 조회 흐름에 로그인 계정을 공급하는 협력자다. 이 객체는 로그인 성공 시 세션 속성 'accountBean' 으로 등록된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 174,
+              "snippet": "      s.setAttribute(\"accountBean\", this);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+              "line": 174,
+              "snippet": "    AccountActionBean accountBean = (AccountActionBean) session.getAttribute(\"accountBean\");"
+            }
+          ]
+        },
+        "request": {
+          "text": "로그인 시 아이디·비밀번호로 계정을 조회해 보관하며, 조회에 실패하면 계정이 비워지고 세션 속성도 등록되지 않는다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 161,
+              "snippet": "    account = accountService.getAccount(getUsername(), getPassword());"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 163,
+              "snippet": "    if (account == null) {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 166,
+              "snippet": "      clear();"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/domain/Account.java",
+      "name": "계정 정보 - 본인 확인 기준",
+      "summary": {
+        "text": "본인 주문 여부를 판정할 때 비교 기준이 되는 로그인 아이디를 보유한 계정 데이터다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+            "line": 50,
+            "snippet": "  public String getUsername() {"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+            "line": 178,
+            "snippet": "    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 상세 조회 흐름에서 조회자를 식별하는 데이터 구조로, 아이디가 주문의 주문자와 비교된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 31,
+              "snippet": "  private String username;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 50,
+              "snippet": "  public String getUsername() {"
+            }
+          ]
+        },
+        "dataShape": {
+          "text": "아이디·비밀번호·이메일·이름·성·상태 등 계정 필드를 보유하는 직렬화 가능 구조다. 로그인 성공 후 비밀번호는 비워진다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 27,
+              "snippet": "public class Account implements Serializable {"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/domain/Account.java",
+              "line": 32,
+              "snippet": "  private String password;"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+              "line": 169,
+              "snippet": "      account.setPassword(null);"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+      "name": "주문 매퍼 - 주문 조회",
+      "summary": {
+        "text": "주문번호로 주문 한 건을 조회하는 영속 인터페이스다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+            "line": 31,
+            "snippet": "  Order getOrder(int orderId);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 상세 조회 흐름에서 주문 본문 조회를 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+              "line": 31,
+              "snippet": "  Order getOrder(int orderId);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 89,
+              "snippet": "    Order order = orderMapper.getOrder(orderId);"
+            }
+          ]
+        },
+        "persistence": {
+          "text": "주문번호를 조건으로 주문 한 건을 조회해 주문 객체로 매핑한다. 주문품목은 이 조회에 포함되지 않고 별도 매퍼로 채운다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/OrderMapper.java",
+              "line": 31,
+              "snippet": "  Order getOrder(int orderId);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 90,
+              "snippet": "    order.setLineItems(lineItemMapper.getLineItemsByOrderId(orderId));"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+      "name": "주문품목 매퍼 - 품목 조회",
+      "summary": {
+        "text": "주문번호로 해당 주문의 주문품목 목록을 조회하는 영속 인터페이스다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+            "line": 29,
+            "snippet": "  List<LineItem> getLineItemsByOrderId(int orderId);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 상세 조회 흐름에서 주문에 속한 품목 목록 조회를 담당한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+              "line": 29,
+              "snippet": "  List<LineItem> getLineItemsByOrderId(int orderId);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 90,
+              "snippet": "    order.setLineItems(lineItemMapper.getLineItemsByOrderId(orderId));"
+            }
+          ]
+        },
+        "persistence": {
+          "text": "주문번호를 조건으로 주문품목 목록을 조회해 주문품목 객체 목록으로 매핑한다. 각 품목의 상품 정보는 이 조회에 포함되지 않아 상품 매퍼로 별도 조회된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/LineItemMapper.java",
+              "line": 29,
+              "snippet": "  List<LineItem> getLineItemsByOrderId(int orderId);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 93,
+              "snippet": "      Item item = itemMapper.getItem(lineItem.getItemId());"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stepId": "step:ANY /actions/Order.action?viewOrder:src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+      "name": "상품 매퍼 - 상품·재고 조회",
+      "summary": {
+        "text": "주문품목의 상품 정보와 현재 재고 수량을 조회하는 영속 인터페이스다.",
+        "citations": [
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "line": 32,
+            "snippet": "  int getInventoryQuantity(String itemId);"
+          },
+          {
+            "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+            "line": 36,
+            "snippet": "  Item getItem(String itemId);"
+          }
+        ]
+      },
+      "detail": {
+        "role": {
+          "text": "주문 상세 조회 흐름에서 각 주문품목에 붙일 상품 정보와 재고 수량을 공급한다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 93,
+              "snippet": "      Item item = itemMapper.getItem(lineItem.getItemId());"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 94,
+              "snippet": "      item.setQuantity(itemMapper.getInventoryQuantity(lineItem.getItemId()));"
+            }
+          ]
+        },
+        "persistence": {
+          "text": "상품 아이디를 조건으로 상품 한 건과 재고 수량을 각각 조회한다. 상품 조회와 재고 조회가 별도 메서드로 분리되어 주문품목마다 두 번 호출된다.",
+          "citations": [
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+              "line": 36,
+              "snippet": "  Item getItem(String itemId);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/mapper/ItemMapper.java",
+              "line": 32,
+              "snippet": "  int getInventoryQuantity(String itemId);"
+            },
+            {
+              "filePath": "src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+              "line": 92,
+              "snippet": "    order.getLineItems().forEach(lineItem -> {"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
